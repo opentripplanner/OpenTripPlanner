@@ -26,9 +26,9 @@ public class JsonSupport {
     // -Dline.seperator cannot be reliably overridden
     // 2 spaces + LF
     var lfOnlyIndenter = new DefaultIndenter("  ", "\n");
-    var pp = new DefaultPrettyPrinter();
-    pp = pp.withObjectIndenter(lfOnlyIndenter);
-    pp = pp.withArrayIndenter(lfOnlyIndenter);
+    var pp = new DefaultPrettyPrinter()
+      .withObjectIndenter(lfOnlyIndenter)
+      .withArrayIndenter(lfOnlyIndenter);
     PRETTY_PRINTER = LENIENT_MAPPER.writer(pp);
   }
 
