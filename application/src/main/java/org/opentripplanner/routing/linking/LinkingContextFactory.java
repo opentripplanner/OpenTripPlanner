@@ -399,7 +399,7 @@ public class LinkingContextFactory {
       );
     }
 
-    // check that vertices where found if visit via locations with coordinates were specified
+    // check that vertices were found if visit via locations with coordinates were specified
     if (!visitViaLocationsWithCoordinates.isEmpty()) {
       var errors = visitViaLocationVertices
         .entrySet()
@@ -427,11 +427,6 @@ public class LinkingContextFactory {
   }
 
   private static boolean isDisconnected(Set<Vertex> vertices, LocationType type) {
-    // Not connected if linking was not attempted, and vertices were not specified in the request.
-    if (vertices.isEmpty()) {
-      return true;
-    }
-
     Predicate<Vertex> isNotTransit = Predicate.not(TransitStopVertex.class::isInstance);
     Predicate<Vertex> hasNoIncoming = v -> v.getIncoming().isEmpty();
     Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
@@ -439,8 +434,8 @@ public class LinkingContextFactory {
     // Not connected if linking did not create incoming/outgoing edges depending on the
     // location type.
     Predicate<Vertex> isNotConnected = switch (type) {
-      case FROM -> isNotTransit.and(hasNoOutgoing);
-      case TO -> isNotTransit.and(hasNoIncoming);
+      case FROM -> hasNoOutgoing;
+      case TO -> hasNoIncoming;
       case VISIT_VIA_LOCATION -> hasNoIncoming.or(hasNoOutgoing);
     };
 
