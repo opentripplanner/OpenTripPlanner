@@ -79,7 +79,7 @@ class GraphTest {
     g.addVertex(b);
     g.addVertex(c);
 
-    Set<Edge> expectedEdges = new HashSet<>(4);
+    Set<Edge> expectedEdges = HashSet.newHashSet(4);
     expectedEdges.add(FreeEdge.createFreeEdge(a, b));
     expectedEdges.add(FreeEdge.createFreeEdge(b, c));
     expectedEdges.add(FreeEdge.createFreeEdge(c, b));
@@ -97,7 +97,7 @@ class GraphTest {
     Vertex b = intersectionVertex("B", 6, 6);
     Vertex c = intersectionVertex("C", 3, 2);
 
-    Set<Edge> allEdges = new HashSet<>(4);
+    Set<Edge> allEdges = HashSet.newHashSet(4);
     allEdges.add(FreeEdge.createFreeEdge(a, b));
     allEdges.add(FreeEdge.createFreeEdge(b, c));
     allEdges.add(FreeEdge.createFreeEdge(c, b));
@@ -118,7 +118,7 @@ class GraphTest {
     g.addVertex(b);
     g.addVertex(c);
 
-    Set<Edge> allStreetEdges = new HashSet<>(4);
+    Set<Edge> allStreetEdges = HashSet.newHashSet(4);
     allStreetEdges.add(edge(a, b, 1.0));
     allStreetEdges.add(edge(b, c, 1.0));
     allStreetEdges.add(edge(c, b, 1.0));
@@ -127,19 +127,6 @@ class GraphTest {
     Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
     assertEquals(4, edges.size());
     assertEquals(allStreetEdges, edges);
-  }
-
-  @Test
-  void testGetEdgesAndVerticesById() {
-    StreetVertex a = intersectionVertex("A", 5, 5);
-    StreetVertex b = intersectionVertex("B", 6, 6);
-    StreetVertex c = intersectionVertex("C", 3, 2);
-
-    Set<Edge> allEdges = new HashSet<>(4);
-    allEdges.add(edge(a, b, 1.0));
-    allEdges.add(edge(b, c, 1.0));
-    allEdges.add(edge(c, b, 1.0));
-    allEdges.add(edge(c, a, 1.0));
   }
 
   /**

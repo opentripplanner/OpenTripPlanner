@@ -257,7 +257,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmArea> areas,
     Multimap<OsmNode, OsmWay> barriers
   ) {
-    Map<OsmArea, Set<OsmLevel>> areasLevels = new HashMap<>(areas.size());
+    Map<OsmArea, Set<OsmLevel>> areasLevels = HashMap.newHashMap(areas.size());
     for (OsmArea area : areas) {
       areasLevels.put(area, osmdb.getLevelSetForEntity(area.parent));
     }
