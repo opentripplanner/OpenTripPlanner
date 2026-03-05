@@ -123,7 +123,7 @@ public class TripTimeOnDateRequestBuilder {
   }
 
   public TripTimeOnDateRequestBuilder withDeparturesPerLineAndDestinationDisplay(
-    Integer departuresPerLineAndDestinationDisplay
+    @Nullable Integer departuresPerLineAndDestinationDisplay
   ) {
     this.departuresPerLineAndDestinationDisplay = departuresPerLineAndDestinationDisplay;
     return this;

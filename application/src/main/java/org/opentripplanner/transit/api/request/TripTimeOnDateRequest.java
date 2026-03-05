@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
@@ -47,7 +48,7 @@ public class TripTimeOnDateRequest {
     FilterValues<FeedScopedId> excludeRoutes,
     FilterValues<TransitMode> includeModes,
     FilterValues<TransitMode> excludeModes,
-    Integer departuresPerLineAndDestinationDisplay,
+    @Nullable Integer departuresPerLineAndDestinationDisplay,
     List<TripTimeOnDateFilterRequest> transitFilters
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
@@ -123,6 +124,7 @@ public class TripTimeOnDateRequest {
     return sortOrder;
   }
 
+  @Nullable
   public Integer departuresPerLineAndDestinationDisplay() {
     return departuresPerLineAndDestinationDisplay;
   }
