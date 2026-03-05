@@ -56,10 +56,12 @@ class ScheduledTransitLegTest {
   private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
 
+  private static final double EXPECTED_DISTANCE = 1111.95;
+  private static final double EXPECTED_DISTANCE_STOP1_TO_STOP2 = EXPECTED_DISTANCE / 2;
+  private static final double DISTANCE_DELTA = 0.01;
   private static final int BOARD_STOP_INDEX_IN_PATTERN = 0;
   private static final int ALIGHT_STOP_INDEX_IN_PATTERN = 2;
   private static final int GENERALIZED_COST = 980;
-  private static final double DISTANCE = 900.0;
   private static final ZoneId ZONE_ID = ZoneIds.BERLIN;
   private static final Duration DELAY = Duration.ofMinutes(4);
   private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES =
@@ -91,7 +93,6 @@ class ScheduledTransitLegTest {
     .withServiceDate(START_TIME.toLocalDate())
     .withZoneId(ZONE_ID)
     .withGeneralizedCost(GENERALIZED_COST)
-    .withDistanceMeters(DISTANCE)
     .withAlerts(ALERTS)
     .withEmissionPerPerson(EMISSION)
     .withFareProducts(FARE_PRODUCTS)
@@ -110,7 +111,6 @@ class ScheduledTransitLegTest {
       .withEndTime(END_TIME)
       .withServiceDate(START_TIME.toLocalDate())
       .withZoneId(ZONE_ID)
-      .withDistanceMeters(DISTANCE)
       .build();
 
     assertEquals(TRIP_TIMES, subject.tripTimes());
@@ -121,7 +121,7 @@ class ScheduledTransitLegTest {
     assertEquals(END_TIME, subject.endTime());
     assertEquals(ZONE_ID, subject.zoneId());
     assertEquals(Cost.ZERO.toSeconds(), subject.generalizedCost());
-    assertEquals(DISTANCE, subject.distanceMeters());
+    assertEquals(EXPECTED_DISTANCE, subject.distanceMeters(), DISTANCE_DELTA);
 
     // Uninitialized fields
     assertFalse(subject.isRealTimeUpdated());
@@ -141,7 +141,7 @@ class ScheduledTransitLegTest {
     assertEquals(END_TIME, subject.endTime());
     assertEquals(ZONE_ID, subject.zoneId());
     assertEquals(GENERALIZED_COST, subject.generalizedCost());
-    assertEquals(DISTANCE, subject.distanceMeters());
+    assertEquals(EXPECTED_DISTANCE, subject.distanceMeters(), DISTANCE_DELTA);
     assertEquals(ALERTS, subject.listTransitAlerts());
     assertEquals(FROM_VIA_LOCATION_TYPE, subject.fromViaLocationType());
     assertEquals(FROM_VIA_LOCATION_TYPE, subject.from().viaLocationType);
@@ -156,9 +156,9 @@ class ScheduledTransitLegTest {
 
   @Test
   void testCopyOf() {
-    // We need to change something(distance) because the copyOf() may return the same instance,
+    // We need to change something because the copyOf() may return the same instance,
     // if not changed.
-    var copy = subject.copyOf().withDistanceMeters(9.0).build();
+    var copy = subject.copyOf().withGeneralizedCost(999).build();
 
     assertEquals(REAL_TIME_TRIP_TIMES, copy.tripTimes());
     assertEquals(PATTERN, copy.tripPattern());
@@ -167,15 +167,34 @@ class ScheduledTransitLegTest {
     assertEquals(START_TIME, copy.startTime());
     assertEquals(END_TIME, copy.endTime());
     assertEquals(ZONE_ID, copy.zoneId());
-    assertEquals(GENERALIZED_COST, copy.generalizedCost());
+    assertEquals(999, copy.generalizedCost());
     assertEquals(ALERTS, copy.listTransitAlerts());
     assertEquals(FROM_VIA_LOCATION_TYPE, copy.fromViaLocationType());
     assertEquals(TO_VIA_LOCATION_TYPE, copy.toViaLocationType());
     assertEquals(EMISSION, copy.emissionPerPerson());
     assertEquals(FARE_PRODUCTS, copy.fareOffers());
 
-    // We change something else, not distance and make sure distance is unchanged
-    assertEquals(DISTANCE, subject.copyOf().withGeneralizedCost(9).build().distanceMeters());
+    // Distance is unchanged when board/alight positions don't change
+    assertEquals(
+      subject.distanceMeters(),
+      subject.copyOf().withGeneralizedCost(9).build().distanceMeters()
+    );
+  }
+
+  @Test
+  void copyOfRecomputesDistanceWhenBoardStopChanges() {
+    // The subject boards at stop 0 and alights at stop 2 (full pattern).
+    // A copy that changes the board stop to 1 should have a shorter distance.
+    var shorterLeg = subject.copyOf().withBoardStopIndexInPattern(1).build();
+
+    assertTrue(
+      shorterLeg.distanceMeters() < subject.distanceMeters(),
+      "Expected shorter distance when boarding later, but got " +
+        shorterLeg.distanceMeters() +
+        " >= " +
+        subject.distanceMeters()
+    );
+    assertEquals(EXPECTED_DISTANCE_STOP1_TO_STOP2, shorterLeg.distanceMeters(), DISTANCE_DELTA);
   }
 
   @Test
@@ -187,7 +206,7 @@ class ScheduledTransitLegTest {
         "startTime: 2023-04-17T17:49:06, " +
         "endTime: 2023-04-17T17:59:06, " +
         "realTime: true, " +
-        "distance: 900.0m, " +
+        "distance: 1,111.95m, " +
         "generalizedCost: $980, " +
         "agencyId: F:Agency1, " +
         "routeId: F:Route1, " +

@@ -17,7 +17,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
-import org.opentripplanner.model.plan.leg.LegConstructionSupport;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.UnknownPathLeg;
@@ -233,12 +232,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       pathLeg.toStop()
     );
 
-    var distanceMeters = LegConstructionSupport.computeDistanceMeters(
-      tripSchedule.getOriginalTripPattern(),
-      boardStopIndexInPattern,
-      alightStopIndexInPattern
-    );
-
     if (tripSchedule.isFrequencyBasedTrip()) {
       int frequencyHeadwayInSeconds = tripSchedule.frequencyHeadwayInSeconds();
       return new FrequencyTransitLegBuilder()
@@ -248,7 +241,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
         .withStartTime(createZonedDateTime(pathLeg.fromTime() + frequencyHeadwayInSeconds))
         .withEndTime(createZonedDateTime(pathLeg.toTime()))
-        .withDistanceMeters(distanceMeters)
         .withServiceDate(tripSchedule.getServiceDate())
         .withZoneId(transitSearchTimeZero.getZone().normalized())
         .withTransferFromPreviousLeg(
@@ -281,7 +273,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withAlightStopIndexInPattern(alightStopIndexInPattern)
       .withStartTime(createZonedDateTime(pathLeg.fromTime()))
       .withEndTime(createZonedDateTime(pathLeg.toTime()))
-      .withDistanceMeters(distanceMeters)
       .withServiceDate(tripSchedule.getServiceDate())
       .withZoneId(transitSearchTimeZero.getZone().normalized())
       .withTripOnServiceDate(tripOnServiceDate)
