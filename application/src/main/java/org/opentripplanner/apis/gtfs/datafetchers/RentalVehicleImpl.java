@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -31,7 +32,8 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   public DataFetcher<OffsetDateTime> availableUntil() {
     return environment -> {
       var timeZone = getTransitService(environment).getTimeZone();
-      return OffsetDateTime.ofInstant(getSource(environment).availableUntil(), timeZone);
+      var availableUntil = getSource(environment).availableUntil();
+      return availableUntil != null ? OffsetDateTime.ofInstant(availableUntil, timeZone) : null;
     };
   }
 

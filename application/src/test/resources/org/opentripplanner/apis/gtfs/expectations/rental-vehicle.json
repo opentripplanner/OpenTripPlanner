@@ -21,6 +21,9 @@
         "range": 5501
       },
       "availableUntil": "2025-05-14T02:00:00+02:00"
+    },
+    "rentalVehicle2": {
+      "availableUntil": null
     }
   }
 }
