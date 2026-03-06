@@ -29,7 +29,7 @@ public class TripTimeOnDateFilterMapper {
 
   @SuppressWarnings("unchecked")
   public List<TripTimeOnDateFilterRequest> mapFilters(List<Map<String, ?>> filters) {
-    validateNonEmpty("filters", filters);
+    validateFieldNotEmpty("filters", filters);
 
     var filterRequests = new ArrayList<TripTimeOnDateFilterRequest>();
 
@@ -38,14 +38,14 @@ public class TripTimeOnDateFilterMapper {
 
       if (filterInput.containsKey("select")) {
         var select = (List<Map<String, List<?>>>) filterInput.get("select");
-        validateNonEmpty("select", select);
+        validateFieldNotEmpty("select", select);
         for (var it : select) {
           filterRequestBuilder.addSelect(mapSelectRequest(it));
         }
       }
       if (filterInput.containsKey("not")) {
         var not = (List<Map<String, List<?>>>) filterInput.get("not");
-        validateNonEmpty("not", not);
+        validateFieldNotEmpty("not", not);
         for (var it : not) {
           filterRequestBuilder.addNot(mapSelectRequest(it));
         }
@@ -60,26 +60,30 @@ public class TripTimeOnDateFilterMapper {
 
   @SuppressWarnings("unchecked")
   private TripTimeOnDateSelectRequest mapSelectRequest(Map<String, List<?>> input) {
+    validateNotEmpty(input);
+
     var builder = TripTimeOnDateSelectRequest.of();
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      validateNonEmpty("lines", lines);
+      validateFieldNotEmpty("lines", lines);
       builder.withRoutes(idMapper.parseListNullSafe(lines));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
-      validateNonEmpty("authorities", authorities);
+      validateFieldNotEmpty("authorities", authorities);
       builder.withAgencies(idMapper.parseListNullSafe(authorities));
     }
 
     if (input.containsKey("transportModes")) {
       var transportModes = (List<Map<String, ?>>) input.get("transportModes");
-      validateNonEmpty("transportModes", transportModes);
+      validateFieldNotEmpty("transportModes", transportModes);
 
       var tModes = new ArrayList<MainAndSubMode>();
       for (Map<String, ?> modeWithSubModes : transportModes) {
+        validateMainModePresent(modeWithSubModes);
+
         var mainMode = (TransitMode) modeWithSubModes.get("transportMode");
         if (modeWithSubModes.containsKey("transportSubModes")) {
           var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
@@ -98,9 +102,27 @@ public class TripTimeOnDateFilterMapper {
     return builder.build();
   }
 
-  private static void validateNonEmpty(String fieldName, List<?> values) {
+  private static void validateNotEmpty(Map<String, List<?>> input) {
+    if (
+      !input.containsKey("lines") &&
+      !input.containsKey("authorities") &&
+      !input.containsKey("transportModes")
+    ) {
+      throw new IllegalArgumentException("A selector cannot be empty");
+    }
+  }
+
+  private static void validateFieldNotEmpty(String fieldName, List<?> values) {
     if (values.isEmpty()) {
       throw new IllegalArgumentException("'%s' cannot be an empty list".formatted(fieldName));
+    }
+  }
+
+  private static void validateMainModePresent(Map<String, ?> transportModeWithSubModes) {
+    if (!transportModeWithSubModes.containsKey("transportMode")) {
+      throw new IllegalArgumentException(
+        "'transportMode' is required in a transport mode selector."
+      );
     }
   }
 }

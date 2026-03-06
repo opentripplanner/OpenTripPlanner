@@ -22,6 +22,7 @@ class TripTimeOnDateFilterMapperTest {
     new DefaultFeedIdMapper()
   );
 
+  @SuppressWarnings("unchecked")
   static Stream<Arguments> mapFiltersCases() {
     return Stream.of(
       argumentSet(
@@ -66,13 +67,6 @@ class TripTimeOnDateFilterMapperTest {
           map("not", list(map("authorities", list("F:Auth:2"))))
         ),
         "[(select: [(routes: [F:Line:1])]), (not: [(agencies: [F:Auth:2])])]"
-      ),
-      argumentSet("emptySelectorInSelect", list(map("select", list(map()))), "[(select: [()])]"),
-      argumentSet("emptySelectorInNot", list(map("not", list(map()))), "[(not: [()])]"),
-      argumentSet(
-        "emptySelectorInSelectAndNot",
-        list(map(entry("select", list(map())), entry("not", list(map())))),
-        "[(select: [()], not: [()])]"
       )
     );
   }
@@ -84,6 +78,7 @@ class TripTimeOnDateFilterMapperTest {
     assertEquals(expected, result.toString());
   }
 
+  @SuppressWarnings("unchecked")
   static Stream<Arguments> emptyListRejectedCases() {
     return Stream.of(
       argumentSet("emptyFilterList", List.<Map<String, ?>>of()),
@@ -104,7 +99,21 @@ class TripTimeOnDateFilterMapperTest {
         "emptyTransportModesInNot",
         list(map("not", list(map(entry("transportModes", list())))))
       ),
-      argumentSet("emptyFilter", list(map()))
+      argumentSet("emptyFilter", list(map())),
+      argumentSet("emptySelectorInSelect", list(map("select", list(map())))),
+      argumentSet("emptySelectorInNot", list(map("not", list(map())))),
+      argumentSet(
+        "emptySelectorInSelectAndNot",
+        list(map(entry("select", list(map())), entry("not", list(map()))))
+      ),
+      argumentSet(
+        "emptyModeEntryInSelect",
+        list(map("select", list(map(entry("transportModes", list(map()))))))
+      ),
+      argumentSet(
+        "emptyModeEntryInNot",
+        list(map("not", list(map(entry("transportModes", list(map()))))))
+      )
     );
   }
 

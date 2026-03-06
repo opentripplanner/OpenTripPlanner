@@ -13,6 +13,7 @@ public class EstimatedCallSelectInputType {
     .name("EstimatedCallSelectInput")
     .description(
       "A selector for filter allow-list / exclude-list. " +
+        "At least one field must be provided. " +
         "An estimated call matches a selector if it matches all fields. " +
         "Within each field, a call matches if it matches any of the listed values."
     )
@@ -44,7 +45,8 @@ public class EstimatedCallSelectInputType {
         .description(
           "The allowed modes for the estimated call. " +
             "A call matches if its mode matches any of the listed modes. " +
-            "An empty list is not allowed. Omit the field to match all modes."
+            "An empty list is not allowed. Omit the field to match all modes. " +
+            "Omitting main mode (transportMode) is also not allowed."
         )
         .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()

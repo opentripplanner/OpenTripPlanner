@@ -2235,13 +2235,13 @@ input EstimatedCallFilterInput {
   select: [EstimatedCallSelectInput!]
 }
 
-"A selector for filter allow-list / exclude-list. An estimated call matches a selector if it matches all fields. Within each field, a call matches if it matches any of the listed values."
+"A selector for filter allow-list / exclude-list. At least one field must be provided. An estimated call matches a selector if it matches all fields. Within each field, a call matches if it matches any of the listed values."
 input EstimatedCallSelectInput {
   "Set of ids for authorities that should be included in/excluded from search. A call matches if its authority matches any of the given IDs. An empty list is not allowed. Omit the field to match all authorities."
   authorities: [ID!]
   "Set of ids for lines that should be included in/excluded from search. A call matches if its line matches any of the given IDs. An empty list is not allowed. Omit the field to match all lines."
   lines: [ID!]
-  "The allowed modes for the estimated call. A call matches if its mode matches any of the listed modes. An empty list is not allowed. Omit the field to match all modes."
+  "The allowed modes for the estimated call. A call matches if its mode matches any of the listed modes. An empty list is not allowed. Omit the field to match all modes. Omitting main mode (transportMode) is also not allowed."
   transportModes: [TransportModes!]
 }
 
