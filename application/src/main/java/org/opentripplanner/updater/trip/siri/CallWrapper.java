@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.transit.model.framework.Result;
-import org.opentripplanner.updater.spi.UpdateError.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.utils.lang.StringUtils;
 import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri21.CallStatusEnumeration;

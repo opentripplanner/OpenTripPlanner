@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_VALID_STOPS;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -24,7 +24,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class SiriFuzzyTripMatcher {
   /**
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
-  public Result<TripAndPattern, UpdateError.UpdateErrorType> match(
+  public Result<TripAndPattern, UpdateErrorType> match(
     EstimatedVehicleJourney journey,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
@@ -235,7 +235,7 @@ public class SiriFuzzyTripMatcher {
   /**
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
-  private Result<TripAndPattern, UpdateError.UpdateErrorType> getTripAndPatternForJourney(
+  private Result<TripAndPattern, UpdateErrorType> getTripAndPatternForJourney(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
@@ -291,10 +291,10 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (possibleTrips.isEmpty()) {
-      return Result.failure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
+      return Result.failure(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
     } else if (possibleTrips.size() > 1) {
       LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
-      return Result.failure(UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
+      return Result.failure(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     } else {
       return Result.success(possibleTrips.iterator().next());
     }

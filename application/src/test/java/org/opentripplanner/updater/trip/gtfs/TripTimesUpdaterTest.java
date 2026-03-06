@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -658,7 +658,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isFailure());
 
     result.ifFailure(p -> {
-      assertEquals(UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME, p.errorType());
+      assertEquals(UpdateErrorType.INVALID_ARRIVAL_TIME, p.errorType());
     });
   }
 
@@ -936,7 +936,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isFailure());
 
     patch.ifFailure(p -> {
-      assertEquals(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, p.errorType());
+      assertEquals(UpdateErrorType.NEGATIVE_HOP_TIME, p.errorType());
     });
   }
 
@@ -1172,7 +1172,7 @@ public class TripTimesUpdaterTest {
 
     private static void testInvalidStopTime(
       BiConsumer<StopTimeUpdate.Builder, StopTimeEvent> setEmptyEvent,
-      UpdateError.UpdateErrorType expectedError
+      UpdateErrorType expectedError
     ) {
       var builder = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE);
       builder.addRawStopTime(emptyStopTime(1, setEmptyEvent));

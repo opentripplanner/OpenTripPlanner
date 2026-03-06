@@ -36,7 +36,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
 class AddedTripBuilderTest {
@@ -412,7 +412,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
-      UpdateError.UpdateErrorType.NO_START_DATE,
+      UpdateErrorType.NO_START_DATE,
       addedTrip.failureValue().errorType(),
       "Trip creation should fail without start date"
     );
@@ -466,7 +466,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
-      UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME,
+      UpdateErrorType.NEGATIVE_DWELL_TIME,
       addedTrip.failureValue().errorType(),
       "Trip creation should fail with invalid dwell time"
     );
@@ -506,7 +506,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
-      UpdateError.UpdateErrorType.TOO_FEW_STOPS,
+      UpdateErrorType.TOO_FEW_STOPS,
       addedTrip.failureValue().errorType(),
       "Trip creation should fail with too few calls"
     );
@@ -553,7 +553,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
-      UpdateError.UpdateErrorType.UNKNOWN_STOP,
+      UpdateErrorType.UNKNOWN_STOP,
       addedTrip.failureValue().errorType(),
       "Trip creation should fail with call referring to unknown stop"
     );

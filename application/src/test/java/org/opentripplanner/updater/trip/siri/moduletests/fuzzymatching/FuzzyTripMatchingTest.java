@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 import uk.org.siri.siri21.VehicleModesEnumeration;
@@ -76,7 +76,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
-    assertFailure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
+    assertFailure(UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
   }
 
   /**

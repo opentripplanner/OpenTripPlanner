@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.moduletests.rejection;
 
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MISSING_CALL_ORDER;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER;
+import static org.opentripplanner.updater.spi.UpdateErrorType.MISSING_CALL_ORDER;
+import static org.opentripplanner.updater.spi.UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 

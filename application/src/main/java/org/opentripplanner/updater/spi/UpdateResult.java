@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.framework.Result;
 public record UpdateResult(
   int successful,
   int failed,
-  Multimap<UpdateError.UpdateErrorType, UpdateError> failures,
+  Multimap<UpdateErrorType, UpdateError> failures,
   List<UpdateSuccess.WarningType> warnings,
   List<UpdateSuccess> successes,
   List<UpdateError> errors

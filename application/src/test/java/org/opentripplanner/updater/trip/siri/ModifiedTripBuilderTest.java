@@ -32,6 +32,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
 
 class ModifiedTripBuilderTest {
@@ -164,7 +165,7 @@ class ModifiedTripBuilderTest {
     ).build();
 
     assertTrue(result.isFailure());
-    assertEquals(UpdateError.UpdateErrorType.TOO_FEW_STOPS, result.failureValue().errorType());
+    assertEquals(UpdateErrorType.TOO_FEW_STOPS, result.failureValue().errorType());
   }
 
   @Test
@@ -292,7 +293,7 @@ class ModifiedTripBuilderTest {
     UpdateError updateError = result.failureValue();
 
     // Check that values are copied over
-    assertEquals(UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME, updateError.errorType());
+    assertEquals(UpdateErrorType.NEGATIVE_DWELL_TIME, updateError.errorType());
     assertEquals(1, updateError.stopIndex());
   }
 
@@ -460,7 +461,7 @@ class ModifiedTripBuilderTest {
 
     // Assert
     assertTrue(result.isFailure());
-    assertEquals(UpdateError.UpdateErrorType.STOP_MISMATCH, result.failureValue().errorType());
+    assertEquals(UpdateErrorType.STOP_MISMATCH, result.failureValue().errorType());
   }
 
   @Test

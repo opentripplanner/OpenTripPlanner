@@ -30,17 +30,17 @@ public class DataValidationExceptionMapper {
     }
     // The mapper should handle all possible errors
     LOG.error("Unhandled error: {}", error.getMessage(), error);
-    return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.UNKNOWN));
+    return Result.failure(UpdateError.noTripId(UpdateErrorType.UNKNOWN));
   }
 
-  private static <T> UpdateError.UpdateErrorType mapTimeTableError(
+  private static <T> UpdateErrorType mapTimeTableError(
     TimetableValidationError.ErrorCode code
   ) {
     return switch (code) {
-      case NEGATIVE_DWELL_TIME -> UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-      case NEGATIVE_HOP_TIME -> UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
-      case MISSING_ARRIVAL_TIME -> UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-      case MISSING_DEPARTURE_TIME -> UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+      case NEGATIVE_DWELL_TIME -> UpdateErrorType.NEGATIVE_DWELL_TIME;
+      case NEGATIVE_HOP_TIME -> UpdateErrorType.NEGATIVE_HOP_TIME;
+      case MISSING_ARRIVAL_TIME -> UpdateErrorType.INVALID_ARRIVAL_TIME;
+      case MISSING_DEPARTURE_TIME -> UpdateErrorType.INVALID_DEPARTURE_TIME;
     };
   }
 }

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class UpdateResultAssertions {
 
-  public static void assertFailure(UpdateError.UpdateErrorType expectedError, UpdateResult result) {
+  public static void assertFailure(UpdateErrorType expectedError, UpdateResult result) {
     assertEquals(Set.of(expectedError), result.failures().keySet());
   }
 

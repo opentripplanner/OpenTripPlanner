@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.propagation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NEGATIVE_HOP_TIME;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 

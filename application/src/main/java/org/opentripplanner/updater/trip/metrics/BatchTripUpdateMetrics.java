@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
@@ -28,7 +28,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
   private final AtomicInteger successfulGauge;
   private final AtomicInteger failureGauge;
   private final AtomicInteger warningsGauge;
-  private final Map<UpdateError.UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
+  private final Map<UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
   private final Map<UpdateSuccess.WarningType, AtomicInteger> warningsByType = new HashMap<>();
 
   public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
