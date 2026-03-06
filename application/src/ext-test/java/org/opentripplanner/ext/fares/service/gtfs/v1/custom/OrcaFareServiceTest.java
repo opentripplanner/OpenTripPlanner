@@ -185,7 +185,11 @@ public class OrcaFareServiceTest {
     assertEquals(hasXfer, hasTransfer, "Incorrect transfer leg fare product status.");
   }
 
-  private static void assertLegHasFareProductForType(Leg leg, ItineraryFare fares, FareType fareType) {
+  private static void assertLegHasFareProductForType(
+    Leg leg,
+    ItineraryFare fares,
+    FareType fareType
+  ) {
     var expectedCategoryName = getRiderCategoryName(fareType);
     var expectedMediumName = usesOrca(fareType) ? "electronic" : "cash";
     var legFareProducts = fares.getLegProducts().get(leg);
@@ -195,11 +199,12 @@ public class OrcaFareServiceTest {
     var hasMatchingProduct = legFareProducts
       .stream()
       .map(FareOffer::fareProduct)
-      .anyMatch(product ->
-        product.category() != null &&
-        product.medium() != null &&
-        product.category().name().equals(expectedCategoryName) &&
-        product.medium().name().equals(expectedMediumName)
+      .anyMatch(
+        product ->
+          product.category() != null &&
+          product.medium() != null &&
+          product.category().name().equals(expectedCategoryName) &&
+          product.medium().name().equals(expectedMediumName)
       );
 
     assertTrue(
