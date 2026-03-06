@@ -64,7 +64,7 @@ public class OrcaFareServiceTest {
   private static final Money THREE_DOLLARS = usDollars(3);
   private static final Money HALF_FERRY_FARE = usDollars(1.75f);
   private static final Money ORCA_SPECIAL_FARE = usDollars(1.00f);
-  private static final String KC_METRO_FREE_ROUTE_SHORT_NAME = "FREE";
+  private static final String LINK_SHUTTLE_SHORT_NAME = "Shuttle";
   public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(7.00f);
   public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(6.25f);
   private static final String FEED_ID = "A";
@@ -456,8 +456,8 @@ public class OrcaFareServiceTest {
   }
 
   @Test
-  void calculateFreeKCMetroFaresForDiscountCategories() {
-    List<Leg> rides = List.of(getLeg(KC_METRO_AGENCY_ID, KC_METRO_FREE_ROUTE_SHORT_NAME, 1));
+  void linkShuttleFreeFareTest() {
+    List<Leg> rides = List.of(getLeg(KC_METRO_AGENCY_ID, LINK_SHUTTLE_SHORT_NAME, 1));
 
     calculateFare(rides, FareType.senior, Money.ZERO_USD);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
@@ -851,7 +851,7 @@ public class OrcaFareServiceTest {
       if (
         rides.size() == 1 &&
         rides.get(0).route() != null &&
-        KC_METRO_FREE_ROUTE_SHORT_NAME.equals(rides.get(0).route().getShortName())
+        LINK_SHUTTLE_SHORT_NAME.equals(rides.get(0).route().getShortName())
       ) {
         return Optional.of(ZERO_USD);
       }
