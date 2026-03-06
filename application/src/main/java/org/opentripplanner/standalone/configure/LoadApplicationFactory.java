@@ -31,8 +31,8 @@ import org.opentripplanner.standalone.config.configure.DeduplicatorServiceModule
 import org.opentripplanner.standalone.config.configure.LoadConfigModule;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.configure.StreetRepositoryModule;
-import org.opentripplanner.transfer.TransferRepository;
-import org.opentripplanner.transfer.configure.TransferRepositoryModule;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.configure.TransferRepositoryModule;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**

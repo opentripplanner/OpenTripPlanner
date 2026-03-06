@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import java.util.function.Supplier;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -10,6 +9,7 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.path.Path;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
  * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and a

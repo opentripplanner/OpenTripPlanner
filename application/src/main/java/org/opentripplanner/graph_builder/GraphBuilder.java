@@ -29,7 +29,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
-import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
@@ -290,7 +290,9 @@ public class GraphBuilder implements Runnable {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
-    var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
+    var nTransfers = f.formatNumber(
+      timetableRepository.getConstrainedTransferService().listAll().size()
+    );
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

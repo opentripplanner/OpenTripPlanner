@@ -966,6 +966,25 @@ public class GraphQLTypes {
     VEHICLE_RENT,
   }
 
+  public static class GraphQLFlexRequestInput {
+
+    private java.time.OffsetDateTime bookingTime;
+
+    public GraphQLFlexRequestInput(Map<String, Object> args) {
+      if (args != null) {
+        this.bookingTime = (java.time.OffsetDateTime) args.get("bookingTime");
+      }
+    }
+
+    public java.time.OffsetDateTime getGraphQLBookingTime() {
+      return this.bookingTime;
+    }
+
+    public void setGraphQLBookingTime(java.time.OffsetDateTime bookingTime) {
+      this.bookingTime = bookingTime;
+    }
+  }
+
   public enum GraphQLFormFactor {
     BICYCLE,
     CAR,
@@ -2653,7 +2672,7 @@ public class GraphQLTypes {
 
     private String after;
     private String before;
-    private GraphQLCanceledTripsFilterInput filters;
+    private List<GraphQLCanceledTripsFilterInput> filters;
     private Integer first;
     private Integer last;
 
@@ -2661,9 +2680,11 @@ public class GraphQLTypes {
       if (args != null) {
         this.after = (String) args.get("after");
         this.before = (String) args.get("before");
-        this.filters = new GraphQLCanceledTripsFilterInput(
-          (Map<String, Object>) args.get("filters")
-        );
+        if (args.get("filters") != null) {
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLCanceledTripsFilterInput(o))
+            .collect(Collectors.toList());
+        }
         this.first = (Integer) args.get("first");
         this.last = (Integer) args.get("last");
       }
@@ -2677,7 +2698,7 @@ public class GraphQLTypes {
       return this.before;
     }
 
-    public GraphQLCanceledTripsFilterInput getGraphQLFilters() {
+    public List<GraphQLCanceledTripsFilterInput> getGraphQLFilters() {
       return this.filters;
     }
 
@@ -2697,7 +2718,7 @@ public class GraphQLTypes {
       this.before = before;
     }
 
-    public void setGraphQLFilters(GraphQLCanceledTripsFilterInput filters) {
+    public void setGraphQLFilters(List<GraphQLCanceledTripsFilterInput> filters) {
       this.filters = filters;
     }
 
@@ -3838,6 +3859,7 @@ public class GraphQLTypes {
     private GraphQLPlanDateTimeInput dateTime;
     private GraphQLPlanLabeledLocationInput destination;
     private Integer first;
+    private GraphQLFlexRequestInput flex;
     private GraphQLPlanItineraryFilterInput itineraryFilter;
     private Integer last;
     private java.util.Locale locale;
@@ -3856,6 +3878,7 @@ public class GraphQLTypes {
           (Map<String, Object>) args.get("destination")
         );
         this.first = (Integer) args.get("first");
+        this.flex = new GraphQLFlexRequestInput((Map<String, Object>) args.get("flex"));
         this.itineraryFilter = new GraphQLPlanItineraryFilterInput(
           (Map<String, Object>) args.get("itineraryFilter")
         );
@@ -3893,6 +3916,10 @@ public class GraphQLTypes {
 
     public Integer getGraphQLFirst() {
       return this.first;
+    }
+
+    public GraphQLFlexRequestInput getGraphQLFlex() {
+      return this.flex;
     }
 
     public GraphQLPlanItineraryFilterInput getGraphQLItineraryFilter() {
@@ -3945,6 +3972,10 @@ public class GraphQLTypes {
 
     public void setGraphQLFirst(Integer first) {
       this.first = first;
+    }
+
+    public void setGraphQLFlex(GraphQLFlexRequestInput flex) {
+      this.flex = flex;
     }
 
     public void setGraphQLItineraryFilter(GraphQLPlanItineraryFilterInput itineraryFilter) {

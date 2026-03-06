@@ -117,7 +117,7 @@ class GtfsModuleTest {
 
       assertEquals(
         expectedTransfers,
-        model.timetableRepository.getTransferService().listAll().size()
+        model.timetableRepository.getConstrainedTransferService().listAll().size()
       );
     }
   }

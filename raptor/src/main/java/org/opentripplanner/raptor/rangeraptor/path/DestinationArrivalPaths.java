@@ -128,9 +128,22 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     return paths.isEmpty();
   }
 
-  public boolean qualify(int departureTime, int arrivalTime, int numberOfTransfers, int cost) {
+  public boolean qualify(
+    int departureTime,
+    int arrivalTime,
+    int numberOfTransfers,
+    int cost,
+    int c2
+  ) {
     return paths.qualify(
-      Path.dummyPath(iterationDepartureTime, departureTime, arrivalTime, numberOfTransfers, cost)
+      Path.dummyPath(
+        iterationDepartureTime,
+        departureTime,
+        arrivalTime,
+        numberOfTransfers,
+        cost,
+        c2
+      )
     );
   }
 

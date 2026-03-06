@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,29 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 class CanceledTripsFilterMapperTest {
 
   @Test
+  void testEmptyFilter() {
+    Map<String, Object> args = Map.of("filters", List.of());
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertTrue(request.includeModes().includeEverything());
+    assertTrue(request.excludeModes().includeEverything());
+  }
+
+  @Test
+  void testNullFilter() {
+    Map<String, Object> args = new HashMap<>();
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertTrue(request.includeModes().includeEverything());
+    assertTrue(request.excludeModes().includeEverything());
+  }
+
+  @Test
   void testIncludeWithModes() {
     var mode = TransitMode.BUS;
     Map<String, Object> args = Map.of(
       "filters",
-      Map.of("include", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode)))))
+      List.of(Map.of("include", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
     );
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
@@ -35,7 +54,7 @@ class CanceledTripsFilterMapperTest {
     var mode = TransitMode.BUS;
     Map<String, Object> args = Map.of(
       "filters",
-      Map.of("exclude", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode)))))
+      List.of(Map.of("exclude", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
     );
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
@@ -46,8 +65,21 @@ class CanceledTripsFilterMapperTest {
   }
 
   @Test
+  void testMultipleFilters() {
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("include", List.of()), Map.of("include", List.of()))
+    );
+    var environment = getEnvironment(args);
+    var exception = assertThrows(IllegalArgumentException.class, () ->
+      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    );
+    assertEquals("Only one filter is allowed for now.", exception.getMessage());
+  }
+
+  @Test
   void testEmptyInclude() {
-    Map<String, Object> args = Map.of("filters", Map.of("include", List.of()));
+    Map<String, Object> args = Map.of("filters", List.of(Map.of("include", List.of())));
     var environment = getEnvironment(args);
     var exception = assertThrows(IllegalArgumentException.class, () ->
       CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
@@ -57,7 +89,7 @@ class CanceledTripsFilterMapperTest {
 
   @Test
   void testEmptyExclude() {
-    Map<String, Object> args = Map.of("filters", Map.of("exclude", List.of()));
+    Map<String, Object> args = Map.of("filters", List.of(Map.of("exclude", List.of())));
     var environment = getEnvironment(args);
     var exception = assertThrows(IllegalArgumentException.class, () ->
       CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
@@ -69,7 +101,7 @@ class CanceledTripsFilterMapperTest {
   void testEmptyModes() {
     Map<String, Object> args = Map.of(
       "filters",
-      Map.of("include", List.of(Map.of("modes", List.of())))
+      List.of(Map.of("include", List.of(Map.of("modes", List.of()))))
     );
     var environment = getEnvironment(args);
     var exception = assertThrows(IllegalArgumentException.class, () ->

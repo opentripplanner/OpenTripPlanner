@@ -251,8 +251,24 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
+  public DataFetcher<Boolean> isReplacement() {
+    return environment ->
+      getTransitService(environment)
+        .getReplacementHelper()
+        .isReplacementTrip(getSource(environment));
+  }
+
+  @Override
   public DataFetcher<TripPattern> pattern() {
     return this::getTripPattern;
+  }
+
+  @Override
+  public DataFetcher<Boolean> replacementsExist() {
+    return environment ->
+      getTransitService(environment)
+        .getReplacementHelper()
+        .replacementsExist(getSource(environment));
   }
 
   @Override

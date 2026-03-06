@@ -42,8 +42,8 @@ import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangl
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transfer.TransferRepository;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;

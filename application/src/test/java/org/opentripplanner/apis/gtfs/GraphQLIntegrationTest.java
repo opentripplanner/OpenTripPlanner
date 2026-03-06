@@ -98,7 +98,7 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.FilePatternSource;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Money;
@@ -219,6 +219,10 @@ class GraphQLIntegrationTest {
     var stopTimes2 = TEST_MODEL.stopTimesEvery5Minutes(3, trip2, "11:30");
     var tripTimes2 = TripTimesFactory.tripTimes(trip2, stopTimes2, DEDUPLICATOR);
 
+    // realtime-trip.graphql will return isReplacementTrip: false even though it is logically
+    // wrong, because currently there is no way to represent a BUS replacing a BUS in GTFS
+    // data so that the replacement link exists, or is even implied by some attribute. We
+    // still include the test in the hope that one day it becomes possible.
     var tripToBeReplaced = TimetableRepositoryForTest.trip(REPLACEMENT_TRIP_ID)
       .withServiceId(cal_id)
       .build();
@@ -272,17 +276,25 @@ class GraphQLIntegrationTest {
       )
     );
 
-    var routes = Arrays.stream(TransitMode.values())
-      .sorted(Comparator.comparing(Enum::name))
-      .map(m ->
-        TimetableRepositoryForTest.route(m.name())
-          .withMode(m)
-          .withLongName(I18NString.of("Long name for %s".formatted(m)))
-          .withGtfsSortOrder(sortOrder(m))
-          .withBikesAllowed(bikesAllowed(m))
+    var routes = Stream.concat(
+      Arrays.stream(TransitMode.values())
+        .sorted(Comparator.comparing(Enum::name))
+        .map(m ->
+          TimetableRepositoryForTest.route(m.name())
+            .withMode(m)
+            .withLongName(I18NString.of("Long name for %s".formatted(m)))
+            .withGtfsSortOrder(sortOrder(m))
+            .withBikesAllowed(bikesAllowed(m))
+            .build()
+        ),
+      Stream.of(
+        TimetableRepositoryForTest.route("replacement")
+          .withMode(BUS)
+          .withLongName(I18NString.of("Long name for replacement bus"))
+          .withGtfsType(714)
           .build()
       )
-      .toList();
+    ).toList();
 
     var busRoute = routes
       .stream()

@@ -41,7 +41,7 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.TransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 @HttpRequestScoped
@@ -61,7 +61,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final List<RideHailingService> rideHailingServices;
   private final RouteRequest routeRequestDefaults;
   private final StreetLimitationParametersService streetLimitationParametersService;
-  private final TransferService transferService;
+  private final RegularTransferService transferService;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
   private final VectorTileConfig vectorTileConfig;
@@ -130,7 +130,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     List<RideHailingService> rideHailingServices,
     RouteRequest routeRequestDefaults,
     StreetLimitationParametersService streetLimitationParametersService,
-    TransferService transferService,
+    RegularTransferService transferService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
     TriasApiParameters triasApiParameters,
@@ -221,7 +221,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public TransferService transferService() {
+  public RegularTransferService transferService() {
     return transferService;
   }
 

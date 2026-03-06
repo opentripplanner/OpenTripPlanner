@@ -129,9 +129,10 @@ public class DebugVectorTilesResource {
       "stops",
       tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
     );
-    var streetSource = new VectorSource(
-      "street",
-      tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES, VERTICES))
+    var streetSource = new VectorSource("street", tileJsonUrl(base, List.of(EDGES, VERTICES)));
+    var geofencingSource = new VectorSource(
+      "geofencing",
+      tileJsonUrl(base, List.of(GEOFENCING_ZONES))
     );
     var rentalSource = new VectorSource("rental", tileJsonUrl(base, List.of(RENTAL)));
 
@@ -141,7 +142,7 @@ public class DebugVectorTilesResource {
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource),
-      GEOFENCING_ZONES.toVectorSourceLayer(streetSource),
+      GEOFENCING_ZONES.toVectorSourceLayer(geofencingSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       serverContext.debugUiConfig().additionalBackgroundLayers()
     );

@@ -6,6 +6,7 @@ import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetu
 import java.util.stream.IntStream;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.OtpStartupInfo;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
@@ -22,8 +23,9 @@ public class TransferCacheTest {
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
       var config = SpeedTestConfig.config(opts.rootDir());
+      var routerConfig = new OtpConfigLoader(opts.rootDir()).loadRouterConfig();
       SetupHelper.loadOtpFeatures(opts);
-      var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
+      var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var timetableRepository = model.timetableRepository();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
@@ -33,7 +35,11 @@ public class TransferCacheTest {
 
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
-      createRaptorTransitData(timetableRepository, transferRepository, config.transitRoutingParams);
+      createRaptorTransitData(
+        timetableRepository,
+        transferRepository,
+        routerConfig.transitTuningConfig()
+      );
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 

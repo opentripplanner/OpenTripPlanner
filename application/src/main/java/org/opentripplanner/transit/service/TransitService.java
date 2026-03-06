@@ -18,9 +18,9 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
@@ -359,7 +359,7 @@ public interface TransitService {
 
   Instant getTransitServiceStarts();
 
-  TransferService getTransferService();
+  ConstrainedTransferService getConstrainedTransferService();
 
   boolean transitFeedCovers(Instant dateTime);
 
@@ -446,4 +446,10 @@ public interface TransitService {
    * This does not include real-time updates, so it only checks the scheduled service dates.
    */
   boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
+
+  /**
+   * Returns a helper for Route/Trip/TripOnServiceDate replacement logic, with the same lifecycle
+   * as TransitService.
+   */
+  ReplacementHelper getReplacementHelper();
 }

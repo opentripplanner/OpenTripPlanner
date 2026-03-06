@@ -178,7 +178,7 @@ public class WayTestData {
 
   public static OsmWay sidewalkBoth() {
     var way = new OsmWay();
-    way.addTag("highway", "both");
+    way.addTag("highway", "primary");
     way.addTag("sidewalk", "both");
     return way;
   }
@@ -251,6 +251,36 @@ public class WayTestData {
   public static OsmWay highwayTertiary() {
     var way = new OsmWay();
     way.addTag("highway", "tertiary");
+    return way;
+  }
+
+  public static OsmWay highwaySecondary() {
+    var way = new OsmWay();
+    way.addTag("highway", "secondary");
+    return way;
+  }
+
+  public static OsmWay highwayService() {
+    var way = new OsmWay();
+    way.addTag("highway", "service");
+    return way;
+  }
+
+  public static OsmWay highwayServiceWithSidewalk() {
+    var way = highwayService();
+    way.addTag("sidewalk", "both");
+    return way;
+  }
+
+  public static OsmWay highwayPedestrian() {
+    var way = new OsmWay();
+    way.addTag("highway", "pedestrian");
+    return way;
+  }
+
+  public static OsmWay highwayPedestrianWithSidewalk() {
+    var way = highwayPedestrian();
+    way.addTag("sidewalk", "both");
     return way;
   }
 

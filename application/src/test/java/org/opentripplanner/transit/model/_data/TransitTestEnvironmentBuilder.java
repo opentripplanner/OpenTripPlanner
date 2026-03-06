@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Operator;

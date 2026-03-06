@@ -64,19 +64,7 @@ public class TimetableSnapshotTest {
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
 
-    TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
-      trip,
-      List.of(new StopTime()),
-      new Deduplicator()
-    );
-    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
-      pattern,
-      updatedTriptimes,
-      SERVICE_DATE,
-      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
-      true,
-      true
-    );
+    RealTimeTripUpdate realTimeTripUpdate = createRealTimeTripUpdate(pattern, trip);
 
     snapshot.update(realTimeTripUpdate);
     snapshot.update(realTimeTripUpdate);
@@ -150,19 +138,7 @@ public class TimetableSnapshotTest {
       trip.getId(),
       SERVICE_DATE
     );
-    TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
-      trip,
-      List.of(new StopTime()),
-      new Deduplicator()
-    );
-    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
-      pattern,
-      updatedTriptimes,
-      SERVICE_DATE,
-      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
-      true,
-      true
-    );
+    RealTimeTripUpdate realTimeTripUpdate = createRealTimeTripUpdate(pattern, trip);
 
     snapshot.update(realTimeTripUpdate);
 
@@ -191,6 +167,22 @@ public class TimetableSnapshotTest {
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
     assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
+  }
+
+  private static RealTimeTripUpdate createRealTimeTripUpdate(TripPattern pattern, Trip trip) {
+    TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
+      trip,
+      List.of(new StopTime(), new StopTime(), new StopTime()),
+      new Deduplicator()
+    );
+    return new RealTimeTripUpdate(
+      pattern,
+      updatedTriptimes,
+      SERVICE_DATE,
+      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
+      true,
+      true
+    );
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

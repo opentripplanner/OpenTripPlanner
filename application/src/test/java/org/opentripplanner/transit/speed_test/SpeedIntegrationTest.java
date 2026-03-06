@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
@@ -90,9 +91,11 @@ public class SpeedIntegrationTest {
   private static void runProfile(SpeedTestProfile profile) {
     var opts = speedTestOptions(profile);
     var config = SpeedTestConfig.config(opts.rootDir());
+    var routerConfig = new OtpConfigLoader(opts.rootDir()).loadRouterConfig();
     var speedTest = new SpeedTest(
       opts,
       config,
+      routerConfig,
       model.graph(),
       model.timetableRepository(),
       model.transferRepository()

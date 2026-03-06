@@ -67,7 +67,7 @@ public interface TransitTuningParameters {
 
   /**
    * {@link RouteRequest}s which will be used at server startup to pre-fill the raptor transfer cache.
-   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache}
+   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache}
    */
   List<RouteRequest> transferCacheRequests();
 }

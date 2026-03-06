@@ -80,7 +80,7 @@ public class TripQuery {
             Normally this is when the search is performed (now), plus a small grace period to
             complete the booking. Services which must be booked before this time is excluded. The
             `latestBookingTime` and `minimumBookingPeriod` in `BookingArrangement` (flexible
-            services only) is used to enforce this. If this parameter is _not set_, no booking-time
+            services only) are used to enforce this. If this parameter is _not set_, no booking-time
             restrictions are applied - all journeys are listed.
             """
           )

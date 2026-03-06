@@ -73,6 +73,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add modes filter and totalCount to the canceled trips query in the GTFS API [#7200](https://github.com/opentripplanner/OpenTripPlanner/pull/7200)
 - Make sure flex transfers are indexed exactly once [#7218](https://github.com/opentripplanner/OpenTripPlanner/pull/7218)
 - Fix SIRI ET ExtraJourney trips not appearing in departure/arrival boards [#7052](https://github.com/opentripplanner/OpenTripPlanner/pull/7052)
+- Add `CarRequest` to cache key in `RaptorRequestTransferCache` [#7194](https://github.com/opentripplanner/OpenTripPlanner/pull/7194)
+- Add booking time parameter to the GTFS API [#7221](https://github.com/opentripplanner/OpenTripPlanner/pull/7221)
+- Add HTTP response time metric [#7133](https://github.com/opentripplanner/OpenTripPlanner/pull/7133)
+- Add second criteria to the Raptor heuristics [#7165](https://github.com/opentripplanner/OpenTripPlanner/pull/7165)
+- Add Route/Trip/TripOnServiceDate replacement to query apis [#7126](https://github.com/opentripplanner/OpenTripPlanner/pull/7126)
+- Make filters for the canceled trips query in the GTFS API a list [#7235](https://github.com/opentripplanner/OpenTripPlanner/pull/7235)
+- Allow setting `maxThreads` lower than `MIN_THREADS` when using parameter [#7224](https://github.com/opentripplanner/OpenTripPlanner/pull/7224)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

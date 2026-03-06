@@ -16,8 +16,8 @@ class CarRequestTest {
   private static final Cost PICKUP_COST = Cost.costOfSeconds(500);
   private static final double ACCELERATION_SPEED = 3.1;
   private static final double DECELERATION_SPEED = 3.5;
-  public static final int RENTAL_PICKUP_TIME = 30;
-  public static final Cost PARK_COST = Cost.costOfSeconds(30);
+  private static final int RENTAL_PICKUP_TIME = 30;
+  private static final Cost PARK_COST = Cost.costOfSeconds(30);
 
   private final CarRequest subject = CarRequest.of()
     .withReluctance(RELUCTANCE)
