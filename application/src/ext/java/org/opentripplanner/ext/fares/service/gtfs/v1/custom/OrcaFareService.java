@@ -285,7 +285,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare(rideType);
+      case youth, electronicYouth -> getYouthFare(rideType, defaultFare);
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
@@ -348,8 +348,10 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
       case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
+      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
+        ? optionalUSD(1.00f)
+        : defaultFare;
       case
-        KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
@@ -390,13 +392,15 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL, EVERETT_TRANSIT -> optionalUSD(0.5f);
+      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
+        ? optionalUSD(1f)
+        : defaultFare;
       case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
         SOUND_TRANSIT_T_LINK,
-        KC_METRO,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> optionalUSD(1f);
@@ -416,9 +420,12 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
-  private Optional<Money> getYouthFare(RideType rideType) {
+  private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
     return switch (rideType) {
       case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, MONORAIL -> Optional.empty();
+      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
+        ? Optional.of(ZERO_USD)
+        : defaultFare;
       default -> Optional.of(ZERO_USD);
     };
   }
