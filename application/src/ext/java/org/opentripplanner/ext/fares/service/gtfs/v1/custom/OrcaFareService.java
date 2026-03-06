@@ -620,6 +620,8 @@ public class OrcaFareService extends DefaultFareService {
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct);
           fare.addFareProduct(leg, newFareOffer);
           purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));
+        } else {
+          fare.addFareProduct(leg, validAgencyFareProducts.getFirst());
         }
       } else {
         // Create a generic fare product for this leg

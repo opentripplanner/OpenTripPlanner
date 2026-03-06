@@ -185,6 +185,29 @@ public class OrcaFareServiceTest {
     assertEquals(hasXfer, hasTransfer, "Incorrect transfer leg fare product status.");
   }
 
+  private static void assertLegHasFareProductForType(Leg leg, ItineraryFare fares, FareType fareType) {
+    var expectedCategoryName = getRiderCategoryName(fareType);
+    var expectedMediumName = usesOrca(fareType) ? "electronic" : "cash";
+    var legFareProducts = fares.getLegProducts().get(leg);
+
+    assertFalse(legFareProducts.isEmpty(), "No leg fare products found for leg.");
+
+    var hasMatchingProduct = legFareProducts
+      .stream()
+      .map(FareOffer::fareProduct)
+      .anyMatch(product ->
+        product.category() != null &&
+        product.medium() != null &&
+        product.category().name().equals(expectedCategoryName) &&
+        product.medium().name().equals(expectedMediumName)
+      );
+
+    assertTrue(
+      hasMatchingProduct,
+      "No fare product found for expected fare type and medium on transfer leg."
+    );
+  }
+
   /**
    * Test to confirm the correct transfer cost per fare type within a single agency.
    */
@@ -497,6 +520,17 @@ public class OrcaFareServiceTest {
     // Transfer extended by CT ride
     calculateFare(rides, FareType.electronicSenior, usDollars(2.00f));
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+  }
+
+  @Test
+  void includeCashFareProductOnSameAgencyTransferLeg() {
+    List<Leg> rides = List.of(getLeg(KC_METRO_AGENCY_ID, 0), getLeg(KC_METRO_AGENCY_ID, 20));
+
+    var regularFares = orcaFareService.calculateFaresForType(USD, FareType.regular, rides, null);
+    var seniorFares = orcaFareService.calculateFaresForType(USD, FareType.senior, rides, null);
+
+    assertLegHasFareProductForType(rides.get(1), regularFares, FareType.regular);
+    assertLegHasFareProductForType(rides.get(1), seniorFares, FareType.senior);
   }
 
   @Test
