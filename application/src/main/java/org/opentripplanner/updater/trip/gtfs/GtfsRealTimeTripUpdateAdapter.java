@@ -141,7 +141,8 @@ public class GtfsRealTimeTripUpdateAdapter {
           forwardsDelayPropagationType
         );
       } catch (DataValidationException e) {
-        result = DataValidationExceptionMapper.toResult(e);
+        // TODO: switch to exception
+        result = DataValidationExceptionMapper.map(e).toResult();
       }
       results.add(result);
     }

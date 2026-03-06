@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -25,6 +24,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,19 +60,19 @@ public class SiriFuzzyTripMatcher {
   /**
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
-  public Result<TripAndPattern, UpdateErrorType> match(
+  public TripAndPattern match(
     EstimatedVehicleJourney journey,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
-  ) {
+  ) throws UpdateException {
     if (calls.isEmpty()) {
-      return Result.failure(NO_VALID_STOPS);
+      throw UpdateException.of(NO_VALID_STOPS);
     }
 
     if (calls.getFirst().getAimedDepartureTime() == null) {
-      return Result.failure(NO_FUZZY_TRIP_MATCH);
+      throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
     Set<Trip> trips = null;
@@ -89,7 +89,7 @@ public class SiriFuzzyTripMatcher {
       // quay ids also work
       RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
       if (stop == null) {
-        return Result.failure(NO_FUZZY_TRIP_MATCH);
+        throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
       }
       ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
         ? lastCall.getAimedArrivalTime()
@@ -100,7 +100,7 @@ public class SiriFuzzyTripMatcher {
       }
     }
     if (trips == null || trips.isEmpty()) {
-      return Result.failure(NO_FUZZY_TRIP_MATCH);
+      throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
     if (journey.getLineRef() != null) {
@@ -235,17 +235,17 @@ public class SiriFuzzyTripMatcher {
   /**
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
-  private Result<TripAndPattern, UpdateErrorType> getTripAndPatternForJourney(
+  private TripAndPattern getTripAndPatternForJourney(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
-  ) {
+  ) throws UpdateException {
     var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
     var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
     if (journeyFirstStop == null || journeyLastStop == null) {
-      return Result.failure(NO_VALID_STOPS);
+      throw UpdateException.of(NO_VALID_STOPS);
     }
 
     ZonedDateTime date = calls.getFirst().getAimedDepartureTime();
@@ -291,12 +291,12 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (possibleTrips.isEmpty()) {
-      return Result.failure(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
+      throw UpdateException.of(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
     } else if (possibleTrips.size() > 1) {
       LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
-      return Result.failure(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
+      throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     } else {
-      return Result.success(possibleTrips.iterator().next());
+      return possibleTrips.iterator().next();
     }
   }
 }

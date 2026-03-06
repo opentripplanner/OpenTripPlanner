@@ -55,4 +55,20 @@ public record UpdateResult(
       errors
     );
   }
+
+  public static UpdateResult of(List<UpdateSuccess> successes, List<UpdateError> errors) {
+    List<UpdateSuccess.WarningType> warnings = successes
+      .stream()
+      .flatMap(s -> s.warnings().stream())
+      .toList();
+    ImmutableListMultimap errorIndex = Multimaps.index(errors, UpdateError::errorType);
+    return new UpdateResult(
+      successes.size(),
+      errors.size(),
+      errorIndex,
+      warnings,
+      successes,
+      errors
+    );
+  }
 }

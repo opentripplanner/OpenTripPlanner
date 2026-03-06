@@ -214,7 +214,8 @@ class TripTimesUpdater {
         new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
       );
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e);
+      // TODO
+      return Result.failure(DataValidationExceptionMapper.map(e).toError());
     }
   }
 

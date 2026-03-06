@@ -14,6 +14,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +171,8 @@ public final class TimetableSnapshotManager {
    *
    * @return whether the update was actually applied
    */
-  public Result<UpdateSuccess, UpdateError> updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
+  public UpdateSuccess updateBufferExn(RealTimeTripUpdate realTimeTripUpdate)
+    throws UpdateException {
     var trip = realTimeTripUpdate.updatedTripTimes().getTrip();
     var serviceDate = realTimeTripUpdate.serviceDate();
 
@@ -200,7 +202,15 @@ public final class TimetableSnapshotManager {
 
     // Phase 3: Apply the main update
     buffer.update(realTimeTripUpdate);
-    return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
+    return UpdateSuccess.noWarnings(realTimeTripUpdate.producer());
+  }
+
+  public Result<UpdateSuccess, UpdateError> updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
+    try {
+      return Result.success(updateBufferExn(realTimeTripUpdate));
+    } catch (UpdateException e) {
+      return e.toResult();
+    }
   }
 
   /**
