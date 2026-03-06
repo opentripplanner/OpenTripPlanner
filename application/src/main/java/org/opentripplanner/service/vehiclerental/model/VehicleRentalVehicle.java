@@ -30,6 +30,8 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   private final boolean isReserved;
   private final boolean isDisabled;
   private final RentalVehicleFuel fuel;
+
+  @Nullable
   private final Instant availableUntil;
 
   public VehicleRentalVehicle() {
