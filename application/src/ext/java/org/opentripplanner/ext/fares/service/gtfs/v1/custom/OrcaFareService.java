@@ -355,21 +355,10 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
-      case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
-      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
-        ? optionalUSD(1.00f)
-        : defaultFare;
-      case
-        SOUND_TRANSIT,
-        SOUND_TRANSIT_BUS,
-        SOUND_TRANSIT_LINK,
-        SOUND_TRANSIT_SOUNDER,
-        SOUND_TRANSIT_T_LINK,
-        KITSAP_TRANSIT,
-        EVERETT_TRANSIT,
-        PIERCE_COUNTY_TRANSIT,
-        SEATTLE_STREET_CAR -> optionalUSD(1.00f);
+      case COMM_TRANS_LOCAL_SWIFT, KC_METRO, KC_WATER_TAXI_VASHON_ISLAND,
+           KC_WATER_TAXI_WEST_SEATTLE, SOUND_TRANSIT, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK,
+           SOUND_TRANSIT_SOUNDER, SOUND_TRANSIT_T_LINK, KITSAP_TRANSIT, EVERETT_TRANSIT,
+           PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR -> optionalUSD(1.00f);
       case MONORAIL -> Optional.empty();
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
@@ -399,11 +388,8 @@ public class OrcaFareService extends DefaultFareService {
     }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
+      case COMM_TRANS_LOCAL_SWIFT, KC_METRO -> optionalUSD(1.00f);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL, EVERETT_TRANSIT -> optionalUSD(0.5f);
-      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
-        ? optionalUSD(1f)
-        : defaultFare;
       case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
@@ -438,9 +424,6 @@ public class OrcaFareService extends DefaultFareService {
         SKAGIT_CROSS_COUNTY,
         MONORAIL,
         LINK_SHUTTLE -> Optional.empty();
-      case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
-        ? Optional.of(ZERO_USD)
-        : defaultFare;
       default -> Optional.of(ZERO_USD);
     };
   }
