@@ -173,7 +173,7 @@ public class TransitRouter {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         raptorTransitData::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
-        serverContext.transitService().getTransferService(),
+        serverContext.transitService().getConstrainedTransferService(),
         requestTransitDataProvider,
         raptorTransitData.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),

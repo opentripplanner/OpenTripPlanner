@@ -45,7 +45,7 @@ class AddedThenRemovedTest implements RealtimeTestConstants {
 
     assertThat(env.raptorData().summarizePatterns()).containsExactly(
       "F:Pattern1[SCHEDULED]",
-      "F:AddedTrip::rt#1[ADDED]"
+      "F:AddedTrip::001:RT[ADDED]"
     );
 
     // the GTFS updater is configured to clear timetables, so an empty list should remove the

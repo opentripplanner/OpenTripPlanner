@@ -163,11 +163,10 @@ public class GrizzlyServer {
     LOG.info("Java reports that this machine has {} available processors.", maxThreads);
     // Testing shows increased throughput up to 1.25x as many threads as cores
     maxThreads *= 1.25;
-    if (params.maxThreads != null) {
+    if (params.maxThreads != null && params.maxThreads > 0) {
       maxThreads = params.maxThreads;
       LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
-    }
-    if (maxThreads < MIN_THREADS) {
+    } else if (maxThreads < MIN_THREADS) {
       // Some machines apparently report 1 processor even when they have 8.
       maxThreads = MIN_THREADS;
     }

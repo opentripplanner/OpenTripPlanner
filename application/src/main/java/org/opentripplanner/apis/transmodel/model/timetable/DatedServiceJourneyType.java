@@ -41,7 +41,9 @@ public class DatedServiceJourneyType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType journeyPatternType,
     GraphQLType estimatedCallType,
-    GraphQLType quayType
+    GraphQLType quayType,
+    GraphQLOutputType replacedByType,
+    GraphQLOutputType replacementForType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -78,8 +80,33 @@ public class DatedServiceJourneyType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("replacementFor")
           .description("List of the dated service journeys this dated service journeys replaces")
+          .deprecate("Use replacementForRelation")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(REF))))
           .dataFetcher(environment -> tripOnServiceDate(environment).getReplacementFor())
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("replacementForRelation")
+          .description(
+            "Dated service journeys this dated service journey replaces with full replacement information"
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacementForType))))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .getReplacementFor(tripOnServiceDate(environment))
+          )
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("replacedByRelation")
+          .description("Dated service journeys this dated service journey is replaced by")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .getReplacedBy(tripOnServiceDate(environment))
+          )
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

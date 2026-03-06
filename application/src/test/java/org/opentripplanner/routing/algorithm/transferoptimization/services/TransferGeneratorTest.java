@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -27,6 +26,7 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {

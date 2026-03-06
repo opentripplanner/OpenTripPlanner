@@ -183,7 +183,9 @@ public class TimetableRepositoryTestBuilder {
     var tripBuilder = Trip.of(id(tripInput.id()))
       .withRoute(route)
       .withHeadsign(tripInput.headsign())
-      .withServiceId(serviceId);
+      .withServiceId(serviceId)
+      .withMode(tripInput.mode())
+      .withNetexSubmode(tripInput.netexSubmode());
     if (customizer != null) {
       customizer.accept(tripBuilder);
     }

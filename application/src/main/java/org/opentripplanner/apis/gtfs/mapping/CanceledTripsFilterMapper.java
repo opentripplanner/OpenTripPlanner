@@ -17,9 +17,16 @@ public class CanceledTripsFilterMapper {
   public static TripOnServiceDateRequest mapToTripOnServiceDateRequest(
     DataFetchingEnvironment env
   ) {
-    var filter = new GraphQLTypes.GraphQLQueryTypeCanceledTripsArgs(
+    var filters = new GraphQLTypes.GraphQLQueryTypeCanceledTripsArgs(
       env.getArguments()
     ).getGraphQLFilters();
+    if (CollectionUtils.isEmpty(filters)) {
+      return TripOnServiceDateRequest.of().build();
+    }
+    if (filters.size() > 1) {
+      throw new IllegalArgumentException("Only one filter is allowed for now.");
+    }
+    var filter = filters.getFirst();
     var includes = filter.getGraphQLInclude();
     var excludes = filter.getGraphQLExclude();
     CollectionUtils.requireNullOrNonEmpty(includes, "filters.include");

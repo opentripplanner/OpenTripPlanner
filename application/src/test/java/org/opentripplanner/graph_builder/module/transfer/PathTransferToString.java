@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.transfer;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.PathTransfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 
 class PathTransferToString {
 

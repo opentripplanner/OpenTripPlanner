@@ -51,7 +51,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
-import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TimetableRepository;
 

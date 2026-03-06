@@ -3,13 +3,13 @@ package org.opentripplanner.raptorlegacy._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

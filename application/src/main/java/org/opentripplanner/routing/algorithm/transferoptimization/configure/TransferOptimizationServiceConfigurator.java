@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 import java.util.List;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
@@ -19,6 +18,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.passthro
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -28,7 +28,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
 
   private final IntFunction<StopLocation> stopLookup;
   private final RaptorStopNameResolver stopNameResolver;
-  private final TransferService transferService;
+  private final ConstrainedTransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
 
   @Nullable
@@ -40,7 +40,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private TransferOptimizationServiceConfigurator(
     IntFunction<StopLocation> stopLookup,
     RaptorStopNameResolver stopNameResolver,
-    TransferService transferService,
+    ConstrainedTransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
@@ -63,7 +63,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   > createOptimizeTransferService(
     IntFunction<StopLocation> stopLookup,
     RaptorStopNameResolver stopNameResolver,
-    TransferService transferService,
+    ConstrainedTransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     @Nullable int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
