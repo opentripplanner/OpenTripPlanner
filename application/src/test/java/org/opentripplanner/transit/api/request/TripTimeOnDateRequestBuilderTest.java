@@ -3,7 +3,6 @@ package org.opentripplanner.transit.api.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -41,7 +40,6 @@ class TripTimeOnDateRequestBuilderTest {
     assertTrue(request.transitFilters().isEmpty());
     assertNotNull(request.sortOrder());
     assertTrue(request.stopLocations().contains(STOP));
-    assertNull(request.departuresPerLineAndDestinationDisplay());
   }
 
   @Test
@@ -172,16 +170,6 @@ class TripTimeOnDateRequestBuilderTest {
     assertTrue(request.excludeRoutes().includeEverything());
     assertTrue(request.excludeAgencies().includeEverything());
     assertTrue(request.excludeModes().includeEverything());
-  }
-
-  @Test
-  void withDeparturesPerLineAndDestinationDisplay() {
-    var request = TripTimeOnDateRequest.of(List.of(STOP))
-      .withTime(TIME)
-      .withDeparturesPerLineAndDestinationDisplay(3)
-      .build();
-
-    assertEquals(3, request.departuresPerLineAndDestinationDisplay());
   }
 
   @Test

@@ -54,7 +54,6 @@ public class TripTimeOnDateRequestBuilder {
   private int numberOfDepartures = 10;
   private Instant time;
   private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByDeparture();
-  private Integer departuresPerLineAndDestinationDisplay = null;
 
   TripTimeOnDateRequestBuilder(Collection<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;
@@ -122,13 +121,6 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withDeparturesPerLineAndDestinationDisplay(
-    @Nullable Integer departuresPerLineAndDestinationDisplay
-  ) {
-    this.departuresPerLineAndDestinationDisplay = departuresPerLineAndDestinationDisplay;
-    return this;
-  }
-
   public TripTimeOnDateRequestBuilder withTransitFilters(
     List<TripTimeOnDateFilterRequest> transitFilters
   ) {
@@ -151,7 +143,6 @@ public class TripTimeOnDateRequestBuilder {
       excludeRoutes,
       includeModes,
       excludeModes,
-      departuresPerLineAndDestinationDisplay,
       transitFilters
     );
   }

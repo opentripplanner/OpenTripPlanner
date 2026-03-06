@@ -346,31 +346,8 @@ class StopTimesHelperTest {
     assertEquals(SERVICE_DATE, stopTime.getServiceDay());
   }
 
-  /**
-   * All 5 departures at stop J span 3 routes (5, 6, 7) with the same destination display.
-   * Limiting to 1 departure per line+destination should return 3 results.
-   */
   @Test
-  void findTripTimesOnDate_limitPerLineAndDestinationDisplay() {
-    var stop = transitService.getRegularStop(stopId);
-    var request = TripTimeOnDateRequest.of(List.of(stop))
-      .withTime(SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant())
-      .withTimeWindow(Duration.ofHours(24))
-      .withNumberOfDepartures(10)
-      .withIncludeCancelledTrips(true)
-      .withDeparturesPerLineAndDestinationDisplay(1)
-      .build();
-
-    var result = stopTimesHelper.findTripTimesOnDate(request);
-
-    assertEquals(3, result.size());
-  }
-
-  /**
-   * Without the per-line limit, all 5 departures should be returned.
-   */
-  @Test
-  void findTripTimesOnDate_noLimitPerLineAndDestinationDisplay() {
+  void findTripTimesOnDate_allDepartures() {
     var stop = transitService.getRegularStop(stopId);
     var request = TripTimeOnDateRequest.of(List.of(stop))
       .withTime(SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant())

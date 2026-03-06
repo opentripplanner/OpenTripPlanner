@@ -37,7 +37,6 @@ import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -45,7 +44,6 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -395,14 +393,14 @@ public class StopPlaceType {
               .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
               .withIncludeModes(transitModes);
 
-            var tripTimeOnDateStream = GqlUtil.getTransitService(environment)
-              .findTripTimesOnDate(requestBuilder.build())
-              .stream();
+            var tripTimes = GqlUtil.getTransitService(environment).findTripTimesOnDate(
+              requestBuilder.build()
+            );
 
-            return limitPerLineAndDestinationDisplay(
-              tripTimeOnDateStream,
+            return EstimatedCallHelper.limitPerLineAndDestinationDisplay(
+              tripTimes,
               departuresPerLineAndDestinationDisplay
-            ).toList();
+            );
           })
           .build()
       )
@@ -421,31 +419,6 @@ public class StopPlaceType {
           .build()
       )
       .build();
-  }
-
-  private static Stream<TripTimeOnDate> limitPerLineAndDestinationDisplay(
-    Stream<TripTimeOnDate> tripTimesStream,
-    Integer departuresPerLineAndDestinationDisplay
-  ) {
-    boolean limitOnDestinationDisplay =
-      departuresPerLineAndDestinationDisplay != null && departuresPerLineAndDestinationDisplay > 0;
-
-    if (limitOnDestinationDisplay) {
-      // Group by line and destination display, limit departures per group and merge
-      return tripTimesStream
-        .collect(Collectors.groupingBy(StopPlaceType::destinationDisplayPerLine))
-        .values()
-        .stream()
-        .flatMap(tripTimes ->
-          tripTimes
-            .stream()
-            .sorted(TripTimeOnDate.compareByDeparture())
-            .distinct()
-            .limit(departuresPerLineAndDestinationDisplay)
-        );
-    } else {
-      return tripTimesStream;
-    }
   }
 
   public static MonoOrMultiModalStation fetchStopPlaceById(
@@ -553,11 +526,5 @@ public class StopPlaceType {
       }
     }
     return false;
-  }
-
-  private static String destinationDisplayPerLine(TripTimeOnDate t) {
-    Trip trip = t.getTrip();
-    String headsign = t.getHeadsign() != null ? t.getHeadsign().toString() : null;
-    return trip == null ? headsign : trip.getRoute().getId() + "|" + headsign;
   }
 }

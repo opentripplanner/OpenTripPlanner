@@ -321,8 +321,7 @@ public class QuayType {
               .withTimeWindow(timeRange)
               .withArrivalDeparture(arrivalDeparture)
               .withNumberOfDepartures(numberOfDepartures)
-              .withIncludeCancelledTrips(includeCancelledTrips)
-              .withDeparturesPerLineAndDestinationDisplay(departuresPerLineAndDestinationDisplay);
+              .withIncludeCancelledTrips(includeCancelledTrips);
 
             if (filtersInput != null) {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
@@ -335,8 +334,13 @@ public class QuayType {
               .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
               .withIncludeModes(transitModes);
 
-            return GqlUtil.getTransitService(environment).findTripTimesOnDate(
+            var tripTimes = GqlUtil.getTransitService(environment).findTripTimesOnDate(
               requestBuilder.build()
+            );
+
+            return EstimatedCallHelper.limitPerLineAndDestinationDisplay(
+              tripTimes,
+              departuresPerLineAndDestinationDisplay
             );
           })
           .build()
