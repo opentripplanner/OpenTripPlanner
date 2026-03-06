@@ -168,6 +168,7 @@ class GraphQLIntegrationTest {
       .withNetwork("Network-2")
       .withCurrentRangeMeters(null)
       .withCurrentFuelPercent(null)
+      .withAvailableUntil(null)
       .build();
 
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
