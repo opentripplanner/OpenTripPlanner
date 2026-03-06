@@ -285,7 +285,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare(fareType, rideType);
+      case youth, electronicYouth -> getYouthFare(rideType);
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
@@ -295,10 +295,6 @@ public class OrcaFareService extends DefaultFareService {
 
   private static Optional<Money> optionalUSD(float amount) {
     return Optional.of(usDollars(amount));
-  }
-
-  private static Optional<Money> getCTLocalReducedFare(Leg leg) {
-    return optionalUSD(1.00f);
   }
 
   /**
@@ -350,7 +346,7 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
+      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
       case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
       case
         KC_METRO,
@@ -392,9 +388,8 @@ public class OrcaFareService extends DefaultFareService {
     }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
-      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
-      case EVERETT_TRANSIT -> optionalUSD(0.5f);
+      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.00f);
+      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL, EVERETT_TRANSIT -> optionalUSD(0.5f);
       case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
@@ -421,11 +416,11 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
-  private Optional<Money> getYouthFare(FareType fareType, RideType rideType) {
-    if (rideType == RideType.MONORAIL) {
-      return Optional.empty();
-    }
-    return Optional.of(ZERO_USD);
+  private Optional<Money> getYouthFare(RideType rideType) {
+    return switch (rideType) {
+      case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, MONORAIL -> Optional.empty();
+      default -> Optional.of(ZERO_USD);
+    };
   }
 
   /**
