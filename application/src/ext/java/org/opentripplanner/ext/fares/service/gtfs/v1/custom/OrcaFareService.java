@@ -117,7 +117,8 @@ public class OrcaFareService extends DefaultFareService {
     SKAGIT_LOCAL,
     SKAGIT_CROSS_COUNTY,
     UNKNOWN,
-    MONORAIL;
+    MONORAIL,
+    LINK_SHUTTLE;
 
     public TransferType getTransferType(FareType fareType, ZonedDateTime startTime) {
       if (usesOrca(fareType) && this.permitsFreeTransfers(startTime)) {
@@ -201,6 +202,9 @@ public class OrcaFareService extends DefaultFareService {
             // CommTrans operates some ST routes.
             yield RideType.SOUND_TRANSIT_BUS;
           }
+          if (route.getShortName().contains("Shuttle")) {
+            yield RideType.LINK_SHUTTLE;
+          }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
@@ -221,6 +225,9 @@ public class OrcaFareService extends DefaultFareService {
         } else if ("975".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
+        if (route.getShortName().contains("Shuttle")) {
+          yield RideType.LINK_SHUTTLE;
+        }
         yield RideType.KC_METRO;
       }
       case PIERCE_COUNTY_TRANSIT_AGENCY_ID -> {
@@ -235,7 +242,9 @@ public class OrcaFareService extends DefaultFareService {
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
-      case SOUND_TRANSIT_AGENCY_ID -> RideType.SOUND_TRANSIT;
+      case SOUND_TRANSIT_AGENCY_ID -> route.getShortName().contains("Shuttle")
+        ? RideType.LINK_SHUTTLE
+        : RideType.SOUND_TRANSIT;
       case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
       case SKAGIT_TRANSIT_AGENCY_ID -> Set.of("80X", "90X").contains(route.getShortName())
         ? RideType.SKAGIT_CROSS_COUNTY
@@ -422,7 +431,13 @@ public class OrcaFareService extends DefaultFareService {
    */
   private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
     return switch (rideType) {
-      case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, MONORAIL -> Optional.empty();
+      case
+        UNKNOWN,
+        SKAGIT_TRANSIT,
+        SKAGIT_LOCAL,
+        SKAGIT_CROSS_COUNTY,
+        MONORAIL,
+        LINK_SHUTTLE -> Optional.empty();
       case KC_METRO -> defaultFare.filter(Money::isPositive).isPresent()
         ? Optional.of(ZERO_USD)
         : defaultFare;
