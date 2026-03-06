@@ -615,7 +615,7 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
-    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list of filters means that all estimated calls should be included. "
+    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list is not allowed. Omit the parameter to include all estimated calls."
     filters: [EstimatedCallFilterInput!],
     "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
@@ -1307,7 +1307,7 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
-    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list of filters means that all estimated calls should be included. "
+    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list is not allowed. Omit the parameter to include all estimated calls."
     filters: [EstimatedCallFilterInput!],
     "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
@@ -2227,21 +2227,21 @@ input BikePreferencesInput {
   triangleFactors: TriangleFactors
 }
 
-"A collection of selectors for what estimated calls should be included / excluded. The `select` is always applied first, then `not`. If only `not` is present, the exclude is applied to the existing set of estimated calls."
+"A collection of selectors for what estimated calls should be included / excluded. At least one of `select` or `not` must be provided. The `select` is always applied first, then `not`. If only `not` is present, the exclude is applied to the existing set of estimated calls."
 input EstimatedCallFilterInput {
   "A list of selectors for what estimated calls should be excluded during the search. If a call matches with at least one selector it will be excluded."
   not: [EstimatedCallSelectInput!]
-  "A list of selectors for what estimated calls should be included. If the list is non-empty, a call is included if it matches at least one selector. If the list is empty or omitted, all calls are included."
+  "A list of selectors for what estimated calls should be included. A call is included if it matches at least one selector. Omit the field to include all calls. An empty list is not allowed."
   select: [EstimatedCallSelectInput!]
 }
 
-"A selector for filter allow-list / exclude-list. A field that is not present or empty means all values are matched. An estimated call matches a selector if it matches all fields. Within each field, a call matches if it matches any of the listed values."
+"A selector for filter allow-list / exclude-list. An estimated call matches a selector if it matches all fields. Within each field, a call matches if it matches any of the listed values."
 input EstimatedCallSelectInput {
-  "Set of ids for authorities that should be included in/excluded from search. A call matches if its authority matches any of the given IDs."
+  "Set of ids for authorities that should be included in/excluded from search. A call matches if its authority matches any of the given IDs. An empty list is not allowed. Omit the field to match all authorities."
   authorities: [ID!]
-  "Set of ids for lines that should be included in/excluded from search. A call matches if its line matches any of the given IDs."
+  "Set of ids for lines that should be included in/excluded from search. A call matches if its line matches any of the given IDs. An empty list is not allowed. Omit the field to match all lines."
   lines: [ID!]
-  "The allowed modes for the estimated call. A call matches if its mode matches any of the listed modes."
+  "The allowed modes for the estimated call. A call matches if its mode matches any of the listed modes. An empty list is not allowed. Omit the field to match all modes."
   transportModes: [TransportModes!]
 }
 

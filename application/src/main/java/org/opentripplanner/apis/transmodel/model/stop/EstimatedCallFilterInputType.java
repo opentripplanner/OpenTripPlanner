@@ -11,6 +11,7 @@ public class EstimatedCallFilterInputType {
     .name("EstimatedCallFilterInput")
     .description(
       "A collection of selectors for what estimated calls should be included / excluded. " +
+        "At least one of `select` or `not` must be provided. " +
         "The `select` is always applied first, then `not`. " +
         "If only `not` is present, the exclude is applied to the existing set of estimated calls."
     )
@@ -19,8 +20,8 @@ public class EstimatedCallFilterInputType {
         .name("select")
         .description(
           "A list of selectors for what estimated calls should be included. " +
-            "If the list is non-empty, a call is included if it matches at least one selector. " +
-            "If the list is empty or omitted, all calls are included."
+            "A call is included if it matches at least one selector. " +
+            "Omit the field to include all calls. An empty list is not allowed."
         )
         .type(new GraphQLList(new GraphQLNonNull(EstimatedCallSelectInputType.INPUT_TYPE)))
         .build()

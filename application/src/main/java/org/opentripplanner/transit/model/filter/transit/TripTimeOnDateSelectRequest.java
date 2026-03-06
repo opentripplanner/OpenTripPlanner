@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.filter.transit;
 
-import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -11,7 +11,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Represents a single selection criterion for filtering
  * {@link org.opentripplanner.model.TripTimeOnDate} objects.
  * Criteria within a single request are combined with AND logic: all specified criteria must
- * match for the request to match. Empty/unset criteria are ignored (match everything).
+ * match for the request to match. Unset (null) criteria are ignored (match everything).
  */
 public class TripTimeOnDateSelectRequest {
 
@@ -20,12 +20,9 @@ public class TripTimeOnDateSelectRequest {
   private final FilterValues<MainAndSubMode> transportModes;
 
   private TripTimeOnDateSelectRequest(Builder builder) {
-    this.agencies = FilterValues.ofEmptyIsEverything("agencies", builder.agencies);
-    this.routes = FilterValues.ofEmptyIsEverything("routes", builder.routes);
-    this.transportModes = FilterValues.ofEmptyIsEverything(
-      "transportModes",
-      builder.transportModes
-    );
+    this.agencies = FilterValues.ofNullIsEverything("agencies", builder.agencies);
+    this.routes = FilterValues.ofNullIsEverything("routes", builder.routes);
+    this.transportModes = FilterValues.ofNullIsEverything("transportModes", builder.transportModes);
   }
 
   public static Builder of() {
@@ -61,9 +58,14 @@ public class TripTimeOnDateSelectRequest {
 
   public static class Builder {
 
-    private List<FeedScopedId> agencies = new ArrayList<>();
-    private List<FeedScopedId> routes = new ArrayList<>();
-    private List<MainAndSubMode> transportModes = new ArrayList<>();
+    @Nullable
+    private List<FeedScopedId> agencies;
+
+    @Nullable
+    private List<FeedScopedId> routes;
+
+    @Nullable
+    private List<MainAndSubMode> transportModes;
 
     public Builder withAgencies(List<FeedScopedId> agencies) {
       this.agencies = agencies;

@@ -2,6 +2,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.list;
 import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
@@ -66,10 +67,6 @@ class TripTimeOnDateFilterMapperTest {
         ),
         "[(select: [(routes: [F:Line:1])]), (not: [(agencies: [F:Auth:2])])]"
       ),
-      // Empty list cases
-      argumentSet("emptyFilterList", List.<Map<String, ?>>of(), "[]"),
-      argumentSet("emptySelectArray", list(map("select", list())), "[ALL]"),
-      argumentSet("emptyNotArray", list(map("not", list())), "[ALL]"),
       argumentSet("emptySelectorInSelect", list(map("select", list(map()))), "[(select: [()])]"),
       argumentSet("emptySelectorInNot", list(map("not", list(map()))), "[(not: [()])]"),
       argumentSet(
@@ -85,5 +82,35 @@ class TripTimeOnDateFilterMapperTest {
   void mapFilters(List<Map<String, ?>> input, String expected) {
     var result = MAPPER.mapFilters(input);
     assertEquals(expected, result.toString());
+  }
+
+  static Stream<Arguments> emptyListRejectedCases() {
+    return Stream.of(
+      argumentSet("emptyFilterList", List.<Map<String, ?>>of()),
+      argumentSet("emptySelectArray", list(map("select", list()))),
+      argumentSet("emptyNotArray", list(map("not", list()))),
+      argumentSet("emptyLinesInSelect", list(map("select", list(map("lines", list()))))),
+      argumentSet(
+        "emptyAuthoritiesInSelect",
+        list(map("select", list(map("authorities", list()))))
+      ),
+      argumentSet(
+        "emptyTransportModesInSelect",
+        list(map("select", list(map(entry("transportModes", list())))))
+      ),
+      argumentSet("emptyLinesInNot", list(map("not", list(map("lines", list()))))),
+      argumentSet("emptyAuthoritiesInNot", list(map("not", list(map("authorities", list()))))),
+      argumentSet(
+        "emptyTransportModesInNot",
+        list(map("not", list(map(entry("transportModes", list())))))
+      ),
+      argumentSet("emptyFilter", list(map()))
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("emptyListRejectedCases")
+  void emptyListsAreRejected(List<Map<String, ?>> input) {
+    assertThrows(IllegalArgumentException.class, () -> MAPPER.mapFilters(input));
   }
 }

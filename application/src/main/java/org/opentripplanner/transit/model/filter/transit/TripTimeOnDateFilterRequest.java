@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.filter.transit;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -9,39 +10,41 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Select: a TripTimeOnDate must match at least one select criterion (OR between selects).
  * Not: a TripTimeOnDate is excluded if it matches any not criterion.
- * An empty filter (no select, no not) matches everything.
+ * A filter with no select and no not matches everything.
  */
 public class TripTimeOnDateFilterRequest {
 
+  @Nullable
   private final List<TripTimeOnDateSelectRequest> select;
+
+  @Nullable
   private final List<TripTimeOnDateSelectRequest> not;
 
   private TripTimeOnDateFilterRequest(Builder builder) {
-    this.select = List.copyOf(builder.select);
-    this.not = List.copyOf(builder.not);
+    this.select = builder.select.isEmpty() ? null : List.copyOf(builder.select);
+    this.not = builder.not.isEmpty() ? null : List.copyOf(builder.not);
   }
 
   public static Builder of() {
     return new Builder();
   }
 
+  @Nullable
   public List<TripTimeOnDateSelectRequest> select() {
     return select;
   }
 
+  @Nullable
   public List<TripTimeOnDateSelectRequest> not() {
     return not;
   }
 
   @Override
   public String toString() {
-    if (select.isEmpty() && not.isEmpty()) {
+    if (select == null && not == null) {
       return "ALL";
     }
-    return ToStringBuilder.ofEmbeddedType()
-      .addCol("select", select, List.of())
-      .addCol("not", not, List.of())
-      .toString();
+    return ToStringBuilder.ofEmbeddedType().addCol("select", select).addCol("not", not).toString();
   }
 
   public static class Builder {

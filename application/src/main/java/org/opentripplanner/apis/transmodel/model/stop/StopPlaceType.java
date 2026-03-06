@@ -344,7 +344,7 @@ public class StopPlaceType {
               .description(
                 "A list of filters for which estimated calls should be included. " +
                   "An estimated call will be included if it matches with at least one filter. " +
-                  "An empty list of filters means that all estimated calls should be included. "
+                  "An empty list is not allowed. Omit the parameter to include all estimated calls."
               )
               .type(GraphQLList.list(new GraphQLNonNull(EstimatedCallFilterInputType.INPUT_TYPE)))
               .build()

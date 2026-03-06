@@ -65,18 +65,18 @@ public class TripTimeOnDateMatcherFactory {
   /**
    * Builds a matcher for a single filter request implementing select/not semantics:
    * <ul>
-   *   <li>Match at least one select criterion (or all if select is empty), AND</li>
+   *   <li>Match at least one select criterion (or all if select is null), AND</li>
    *   <li>Match none of the not criteria.</li>
    * </ul>
    */
   private static Matcher<TripTimeOnDate> buildFilterMatcher(TripTimeOnDateFilterRequest filter) {
     return ExpressionBuilder.<TripTimeOnDate>of()
       .atLeastOneMatch(
-        FilterValues.ofEmptyIsEverything("select", filter.select()),
+        FilterValues.ofNullIsEverything("select", filter.select()),
         TripTimeOnDateMatcherFactory::buildSelectorMatcher
       )
       .matchesNone(
-        FilterValues.ofEmptyIsEverything("not", filter.not()),
+        FilterValues.ofNullIsEverything("not", filter.not()),
         TripTimeOnDateMatcherFactory::buildSelectorMatcher
       )
       .build();
