@@ -7,13 +7,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.util.ConcurrentPublished;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
@@ -171,8 +169,7 @@ public final class TimetableSnapshotManager {
    *
    * @return whether the update was actually applied
    */
-  public UpdateSuccess updateBufferExn(RealTimeTripUpdate realTimeTripUpdate)
-    throws UpdateException {
+  public UpdateSuccess updateBuffer(RealTimeTripUpdate realTimeTripUpdate) throws UpdateException {
     var trip = realTimeTripUpdate.updatedTripTimes().getTrip();
     var serviceDate = realTimeTripUpdate.serviceDate();
 
@@ -203,14 +200,6 @@ public final class TimetableSnapshotManager {
     // Phase 3: Apply the main update
     buffer.update(realTimeTripUpdate);
     return UpdateSuccess.noWarnings(realTimeTripUpdate.producer());
-  }
-
-  public Result<UpdateSuccess, UpdateError> updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
-    try {
-      return Result.success(updateBufferExn(realTimeTripUpdate));
-    } catch (UpdateException e) {
-      return e.toResult();
-    }
   }
 
   /**

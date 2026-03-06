@@ -361,7 +361,7 @@ public class SiriRealTimeTripUpdateAdapter {
       .withRevertPreviousRealTimeUpdates(revertPreviousRealTimeUpdates)
       .withHideTripInScheduledPattern(tripUpdate.hideTripInScheduledPattern())
       .build();
-    var result = snapshotManager.updateBufferExn(realTimeTripUpdate);
+    var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;
   }

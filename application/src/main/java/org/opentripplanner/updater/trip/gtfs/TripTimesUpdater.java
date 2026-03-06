@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs;
 
-import static org.opentripplanner.transit.model.framework.Result.success;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
@@ -18,7 +17,6 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -28,7 +26,7 @@ import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
@@ -64,23 +62,24 @@ class TripTimesUpdater {
    * @param tripUpdate                    GTFS-RT trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link Result < TripTimesPatch ,    UpdateError   >} contains either a new copy of updated
+   * @return {@link TripTimesPatch} contains a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
-   * realtime update; or an error if something went wrong
+   * realtime update.
+   * @throws UpdateException if there are any problems with the data
    */
-  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
+  public TripTimesPatch createUpdatedTripTimesFromGtfsRt(
     Timetable timetable,
     TripUpdate tripUpdate,
     ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
-  ) {
+  ) throws UpdateException {
     var tripId = tripUpdate.tripId();
 
     var tripTimes = timetable.getTripTimes(tripId);
     if (tripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
-      return Result.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
+      throw UpdateException.of(tripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
     RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
@@ -159,7 +158,7 @@ class TripTimesUpdater {
               i,
               tripId
             );
-            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, i));
+            throw UpdateException.of(tripId, INVALID_ARRIVAL_TIME, i);
           }
           if (!update.isDepartureValid()) {
             LOG.debug(
@@ -167,7 +166,7 @@ class TripTimesUpdater {
               i,
               tripId
             );
-            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, i));
+            throw UpdateException.of(tripId, INVALID_DEPARTURE_TIME, i);
           }
           setArrivalAndDeparture(builder, i, update, today);
         }
@@ -184,7 +183,7 @@ class TripTimesUpdater {
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
+      throw UpdateException.of(tripId, INVALID_STOP_SEQUENCE);
     }
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
@@ -210,12 +209,9 @@ class TripTimesUpdater {
     // Validate for non-increasing times. Log error if present.
     try {
       var result = builder.build();
-      return success(
-        new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
-      );
+      return new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices);
     } catch (DataValidationException e) {
-      // TODO
-      return Result.failure(DataValidationExceptionMapper.map(e).toError());
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 
@@ -225,9 +221,9 @@ class TripTimesUpdater {
    * @param trip              trip
    * @param tripUpdate        information about the trip
    * @param realTimeState     real-time state of new trip
-   * @return empty Result if successful or one containing an error
+   * @throws UpdateException if there are any errors with the TripUpdate
    */
-  public Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGtfsRt(
+  public TripTimesWithStopPattern createNewTripTimesFromGtfsRt(
     Trip trip,
     TripUpdate tripUpdate,
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
@@ -260,7 +256,7 @@ class TripTimesUpdater {
             trip.getId(),
             tripUpdate.serviceDate()
           );
-          return UpdateError.result(trip.getId(), INVALID_ARRIVAL_TIME);
+          throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
       }
@@ -275,7 +271,7 @@ class TripTimesUpdater {
             trip.getId(),
             tripUpdate.serviceDate()
           );
-          return UpdateError.result(trip.getId(), INVALID_DEPARTURE_TIME);
+          throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
       }
@@ -322,7 +318,7 @@ class TripTimesUpdater {
     RealTimeTripTimes tripTimes = builder.build();
 
     // Add new trip times to the buffer
-    return success(new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes)));
+    return new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes));
   }
 
   private static void setArrivalAndDeparture(

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.trip.TimetableSnapshotManagerTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotManagerTest.SameAssert.Same;
 
@@ -145,10 +144,7 @@ class TimetableSnapshotManagerTest {
       clock::get
     );
 
-    var res1 = snapshotManager.updateBuffer(
-      RealTimeTripUpdate.of(PATTERN, TRIP_TIMES, YESTERDAY).build()
-    );
-    assertTrue(res1.isSuccess());
+    snapshotManager.updateBuffer(RealTimeTripUpdate.of(PATTERN, TRIP_TIMES, YESTERDAY).build());
 
     snapshotManager.commitTimetableSnapshot(true);
     final TimetableSnapshot snapshotA = snapshotManager.getTimetableSnapshot();
@@ -156,10 +152,7 @@ class TimetableSnapshotManagerTest {
     // Turn the clock to tomorrow
     clock.set(TOMORROW);
 
-    var res2 = snapshotManager.updateBuffer(
-      RealTimeTripUpdate.of(PATTERN, TRIP_TIMES, TODAY).build()
-    );
-    assertTrue(res2.isSuccess());
+    snapshotManager.updateBuffer(RealTimeTripUpdate.of(PATTERN, TRIP_TIMES, TODAY).build());
 
     snapshotManager.purgeAndCommit();
 
@@ -193,11 +186,8 @@ class TimetableSnapshotManagerTest {
       .withDepartureDelay(1, 60)
       .build();
 
-    var result = manager.updateBuffer(
-      RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build()
-    );
+    manager.updateBuffer(RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build());
 
-    assertTrue(result.isSuccess());
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
@@ -218,13 +208,11 @@ class TimetableSnapshotManagerTest {
       .withDepartureDelay(1, 60)
       .build();
 
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
     );
-
-    assertTrue(result.isSuccess());
 
     // Trip should be DELETED in the scheduled pattern
     var scheduledTimetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
@@ -263,13 +251,11 @@ class TimetableSnapshotManagerTest {
     assertEquals(MODIFIED_PATTERN, manager.getNewTripPatternForModifiedTrip(TRIP.getId(), TODAY));
 
     // Now revert and update on the scheduled pattern
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
-
-    assertTrue(result.isSuccess());
 
     // Trip should no longer be registered on the modified pattern
     assertNull(manager.getNewTripPatternForModifiedTrip(TRIP.getId(), TODAY));
@@ -305,14 +291,12 @@ class TimetableSnapshotManagerTest {
 
     // Now revert from the first modified pattern, delete from scheduled, and update on the
     // second modified pattern
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(SECOND_MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
     );
-
-    assertTrue(result.isSuccess());
 
     // Trip should be DELETED in the scheduled pattern
     var scheduledTimetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
@@ -343,13 +327,12 @@ class TimetableSnapshotManagerTest {
       .cancelTrip()
       .build();
 
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
 
-    assertTrue(result.isSuccess());
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
@@ -367,13 +350,12 @@ class TimetableSnapshotManagerTest {
       .deleteTrip()
       .build();
 
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, deletedTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
 
-    assertTrue(result.isSuccess());
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
@@ -408,13 +390,11 @@ class TimetableSnapshotManagerTest {
     var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .cancelTrip()
       .build();
-    var result = manager.updateBuffer(
+    manager.updateBuffer(
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
-
-    assertTrue(result.isSuccess());
 
     // Trip should no longer be registered on the modified pattern
     assertNull(manager.getNewTripPatternForModifiedTrip(TRIP.getId(), TODAY));

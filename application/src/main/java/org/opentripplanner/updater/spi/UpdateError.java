@@ -14,18 +14,6 @@ public record UpdateError(
   @Nullable Integer stopIndex,
   @Nullable String producer
 ) {
-  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
-    this(tripId, errorType, null, null);
-  }
-
-  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, Integer stopIndex) {
-    this(tripId, errorType, stopIndex, null);
-  }
-
-  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, String producer) {
-    this(tripId, errorType, null, producer);
-  }
-
   public String debugId() {
     if (tripId == null) {
       return "no trip id";
@@ -37,18 +25,10 @@ public record UpdateError(
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {
-    return Result.failure(new UpdateError(tripId, errorType));
-  }
-
-  public static <T> Result<T, UpdateError> result(
-    FeedScopedId tripId,
-    UpdateErrorType errorType,
-    String producer
-  ) {
-    return Result.failure(new UpdateError(tripId, errorType, producer));
+    return Result.failure(new UpdateError(tripId, errorType, null, null));
   }
 
   public static UpdateError noTripId(UpdateErrorType errorType) {
-    return new UpdateError(null, errorType);
+    return new UpdateError(null, errorType, null, null);
   }
 }

@@ -17,9 +17,7 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
-import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.spi.UpdateException;
 
 /**
  * A real-time update for trip, which may contain updated stop times and trip properties.
@@ -109,15 +107,15 @@ public final class TripUpdate {
       );
   }
 
-  public Result<UpdateSuccess, UpdateError> validate() throws DataValidationException {
+  public void validate() throws DataValidationException, UpdateException {
     if (tripDescriptor.tripId().isEmpty()) {
-      return Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE));
+      throw UpdateException.noTripId(INVALID_INPUT_STRUCTURE);
     }
 
     try {
       tripDescriptor.startDate();
     } catch (ParseException e) {
-      return Result.failure(new UpdateError(tripId(), INVALID_INPUT_STRUCTURE));
+      throw UpdateException.of(tripId(), INVALID_INPUT_STRUCTURE);
     }
 
     var lastStopSequence = -1;
@@ -127,15 +125,14 @@ public final class TripUpdate {
       if (stopSequence.isPresent()) {
         var seq = stopSequence.getAsInt();
         if (seq < 0) {
-          return UpdateError.result(tripId(), INVALID_STOP_SEQUENCE);
+          throw UpdateException.of(tripId(), INVALID_STOP_SEQUENCE);
         }
         if (seq <= lastStopSequence) {
-          return UpdateError.result(tripId(), INVALID_STOP_SEQUENCE);
+          throw UpdateException.of(tripId(), INVALID_STOP_SEQUENCE);
         }
         lastStopSequence = seq;
       }
     }
-    return Result.success(UpdateSuccess.noWarnings());
   }
 
   public Optional<FeedScopedId> routeId() {

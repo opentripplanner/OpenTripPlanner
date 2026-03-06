@@ -50,6 +50,14 @@ public class UpdateException extends RuntimeException {
     return new UpdateException(null, updateErrorType, null, null);
   }
 
+  public static UpdateException of(
+    FeedScopedId tripId,
+    UpdateErrorType updateErrorType,
+    int stopIndex
+  ) {
+    return new UpdateException(tripId, updateErrorType, stopIndex, null);
+  }
+
   // Gives an updated exception with the specified dataSource
   public UpdateException withDataSource(String dataSource) {
     return new UpdateException(this.tripId, this.errorType, this.stopIndex, dataSource);
@@ -77,11 +85,6 @@ public class UpdateException extends RuntimeException {
     } else {
       return "%s{stopIndex=%s}".formatted(tripId, stopIndex);
     }
-  }
-
-  // TODO: remove this method, only for temporary compatability
-  public Result<UpdateSuccess, UpdateError> toResult() {
-    return Result.failure(toError());
   }
 
   public UpdateError toError() {
