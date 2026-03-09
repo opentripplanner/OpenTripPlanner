@@ -176,16 +176,16 @@ class AddedTripBuilder {
 
   TripUpdate build() throws UpdateException {
     if (calls.size() < 2) {
-      throw UpdateException.of(tripId, TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(tripId, TOO_FEW_STOPS);
     }
 
     if (serviceDate == null) {
-      throw UpdateException.of(tripId, NO_START_DATE, dataSource);
+      throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
-      throw UpdateException.of(tripId, NO_START_DATE, dataSource);
+      throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     boolean isAddedRoute = false;
@@ -193,7 +193,7 @@ class AddedTripBuilder {
     if (route == null) {
       Agency agency = resolveAgency();
       if (agency == null) {
-        throw UpdateException.of(tripId, CANNOT_RESOLVE_AGENCY, dataSource);
+        throw UpdateException.of(tripId, CANNOT_RESOLVE_AGENCY);
       }
       route = createRoute(agency);
       isAddedRoute = true;
@@ -218,7 +218,7 @@ class AddedTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        throw UpdateException.of(tripId, UNKNOWN_STOP, dataSource);
+        throw UpdateException.of(tripId, UNKNOWN_STOP);
       }
 
       aimedStopTimes.add(stopTime);
@@ -285,7 +285,7 @@ class AddedTripBuilder {
         null
       );
     } catch (DataValidationException e) {
-      throw DataValidationExceptionMapper.map(e, dataSource);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 

@@ -2,7 +2,6 @@ package org.opentripplanner.updater.spi;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model.framework.Result;
 
 public class UpdateException extends RuntimeException {
 
@@ -11,43 +10,33 @@ public class UpdateException extends RuntimeException {
   @Nullable
   private final FeedScopedId tripId;
 
-  private final @Nullable Integer stopIndex;
-  private final @Nullable String producer;
+  @Nullable
+  private final Integer stopIndex;
 
-  public UpdateException(
+  private UpdateException(
     @Nullable FeedScopedId tripId,
     UpdateErrorType errorType,
-    @Nullable Integer stopIndex,
-    @Nullable String producer
+    @Nullable Integer stopIndex
   ) {
     this.tripId = tripId;
     this.errorType = errorType;
     this.stopIndex = stopIndex;
-    this.producer = producer;
   }
 
   public static UpdateException of(FeedScopedId tripId, UpdateErrorType errorType) {
-    return new UpdateException(tripId, errorType, null, null);
-  }
-
-  public static UpdateException of(
-    FeedScopedId tripId,
-    UpdateErrorType errorType,
-    String producer
-  ) {
-    return new UpdateException(tripId, errorType, null, producer);
+    return new UpdateException(tripId, errorType, null);
   }
 
   public static UpdateException ofStopIndex(UpdateErrorType updateErrorType, int stopIndex) {
-    return new UpdateException(null, updateErrorType, stopIndex, null);
+    return new UpdateException(null, updateErrorType, stopIndex);
   }
 
   public static UpdateException noTripId(UpdateErrorType errorType) {
-    return new UpdateException(null, errorType, null, null);
+    return new UpdateException(null, errorType, null);
   }
 
   public static UpdateException of(UpdateErrorType updateErrorType) {
-    return new UpdateException(null, updateErrorType, null, null);
+    return new UpdateException(null, updateErrorType, null);
   }
 
   public static UpdateException of(
@@ -55,17 +44,12 @@ public class UpdateException extends RuntimeException {
     UpdateErrorType updateErrorType,
     int stopIndex
   ) {
-    return new UpdateException(tripId, updateErrorType, stopIndex, null);
-  }
-
-  // Gives an updated exception with the specified dataSource
-  public UpdateException withDataSource(String dataSource) {
-    return new UpdateException(this.tripId, this.errorType, this.stopIndex, dataSource);
+    return new UpdateException(tripId, updateErrorType, stopIndex);
   }
 
   // Gives an updated exception with the specified tripId
   public UpdateException withTripId(FeedScopedId tripId) {
-    return new UpdateException(tripId, this.errorType, this.stopIndex, this.producer);
+    return new UpdateException(tripId, this.errorType, this.stopIndex);
   }
 
   @Nullable
@@ -77,17 +61,11 @@ public class UpdateException extends RuntimeException {
     return errorType;
   }
 
-  public String debugId() {
-    if (tripId == null) {
-      return "no trip id";
-    } else if (stopIndex == null) {
-      return tripId.toString();
-    } else {
-      return "%s{stopIndex=%s}".formatted(tripId, stopIndex);
-    }
+  public UpdateError toError() {
+    return new UpdateError(tripId, errorType, stopIndex, null);
   }
 
-  public UpdateError toError() {
+  public UpdateError toError(String producer) {
     return new UpdateError(tripId, errorType, stopIndex, producer);
   }
 }

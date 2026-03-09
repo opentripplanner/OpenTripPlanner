@@ -81,16 +81,16 @@ class ExtraCallTripBuilder {
     if (calls.size() - numExtraCalls != originalPattern.numberOfStops()) {
       // A trip update with extra calls is expected to have the same number of non-extra calls as
       // the number of stops in the original scheduled trip
-      throw UpdateException.of(trip.getId(), INVALID_STOP_SEQUENCE, dataSource);
+      throw UpdateException.of(trip.getId(), INVALID_STOP_SEQUENCE);
     }
 
     if (serviceDate == null) {
-      throw UpdateException.of(trip.getId(), NO_START_DATE, dataSource);
+      throw UpdateException.of(trip.getId(), NO_START_DATE);
     }
 
     FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
-      throw UpdateException.of(trip.getId(), NO_START_DATE, dataSource);
+      throw UpdateException.of(trip.getId(), NO_START_DATE);
     }
 
     ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
@@ -113,7 +113,7 @@ class ExtraCallTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        throw UpdateException.of(trip.getId(), UNKNOWN_STOP, dataSource);
+        throw UpdateException.of(trip.getId(), UNKNOWN_STOP);
       }
 
       // Drop this update if it replaces scheduled stops from the original pattern.
@@ -129,7 +129,7 @@ class ExtraCallTripBuilder {
           !stopInNewPattern.equals(stopInOriginalPattern) &&
           !stopInNewPattern.isPartOfSameStationAs(stopInOriginalPattern)
         ) {
-          throw UpdateException.of(trip.getId(), STOP_MISMATCH, dataSource);
+          throw UpdateException.of(trip.getId(), STOP_MISMATCH);
         }
       }
 
@@ -190,7 +190,7 @@ class ExtraCallTripBuilder {
         null
       );
     } catch (DataValidationException e) {
-      throw DataValidationExceptionMapper.map(e, dataSource);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 }

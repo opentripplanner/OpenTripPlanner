@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.spi;
 
-import com.beust.jcommander.internal.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.timetable.TimetableValidationError;
 import org.slf4j.Logger;
@@ -15,17 +14,8 @@ public class DataValidationExceptionMapper {
   private static final Logger LOG = LoggerFactory.getLogger(DataValidationExceptionMapper.class);
 
   public static UpdateException map(DataValidationException error) {
-    return map(error, null);
-  }
-
-  public static UpdateException map(DataValidationException error, @Nullable String producer) {
     if (error.error() instanceof TimetableValidationError tt) {
-      return new UpdateException(
-        tt.trip().getId(),
-        mapTimeTableError(tt.code()),
-        tt.stopIndex(),
-        producer
-      );
+      return UpdateException.of(tt.trip().getId(), mapTimeTableError(tt.code()), tt.stopIndex());
     }
     // The mapper should handle all possible errors
     LOG.error("Unhandled error: {}", error.getMessage(), error);

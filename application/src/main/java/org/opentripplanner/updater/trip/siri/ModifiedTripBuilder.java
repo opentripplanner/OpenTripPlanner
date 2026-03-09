@@ -109,11 +109,11 @@ class ModifiedTripBuilder {
     }
 
     if (calls.size() < existingTripTimes.getNumStops()) {
-      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 
     if (calls.size() > existingTripTimes.getNumStops()) {
-      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS);
     }
 
     StopPattern stopPattern;
@@ -126,7 +126,7 @@ class ModifiedTripBuilder {
         e.errorType(),
         e.stopIndex()
       );
-      throw e.withDataSource(dataSource).withTripId(existingTripTimes.getTrip().getId());
+      throw e.withTripId(existingTripTimes.getTrip().getId());
     }
 
     if (stopPattern.isAllStopsNonRoutable()) {
@@ -152,7 +152,7 @@ class ModifiedTripBuilder {
         numStopsInUpdate,
         numStopsInPattern
       );
-      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 
     // TODO - Handle DataValidationException at the outermost level (pr trip)
@@ -166,7 +166,7 @@ class ModifiedTripBuilder {
         builder.getTrip().getId(),
         e.getMessage()
       );
-      throw DataValidationExceptionMapper.map(e, dataSource);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 

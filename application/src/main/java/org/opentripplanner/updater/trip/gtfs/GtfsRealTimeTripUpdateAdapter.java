@@ -139,7 +139,6 @@ public class GtfsRealTimeTripUpdateAdapter {
         );
         successes.add(result);
       } catch (DataValidationException e) {
-        // TODO: switch to exception
         errors.add(DataValidationExceptionMapper.map(e).toError());
       } catch (UpdateException e) {
         errors.add(e.toError());
