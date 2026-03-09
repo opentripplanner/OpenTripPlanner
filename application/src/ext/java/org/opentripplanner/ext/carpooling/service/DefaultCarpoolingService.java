@@ -118,7 +118,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   }
 
   @Override
-  public List<Itinerary> route(RouteRequest request, LinkingContext linkingContext)
+  public List<Itinerary> routeDirect(RouteRequest request, LinkingContext linkingContext)
     throws RoutingValidationException {
     if (!StreetMode.CARPOOL.equals(request.journey().direct().mode())) {
       return Collections.emptyList();

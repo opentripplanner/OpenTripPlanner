@@ -28,7 +28,7 @@ public interface CarpoolingService {
    *         if no compatible trips found. Results are limited to avoid overwhelming users.
    * @throws IllegalArgumentException if request is null
    */
-  List<Itinerary> route(RouteRequest request, LinkingContext linkingContext);
+  List<Itinerary> routeDirect(RouteRequest request, LinkingContext linkingContext);
 
   List<CarpoolAccessEgress> routeAccessEgress(
     RouteRequest request,
