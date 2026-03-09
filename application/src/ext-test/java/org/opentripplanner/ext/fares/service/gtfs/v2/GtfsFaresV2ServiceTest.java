@@ -6,7 +6,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 
-import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -33,30 +32,22 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
     Money.euros(5)
-  )
-    .withValidity(Duration.ofDays(1))
-    .build();
+  ).build();
   private static final FareProduct MONTHLY_PASS = FareProduct.of(
     new FeedScopedId("another", "monthly_pass"),
     "Monthly Pass",
     Money.euros(30)
-  )
-    .withValidity(Duration.ofDays(30))
-    .build();
+  ).build();
   private static final FareProduct EXPRESS_DAY_PASS = FareProduct.of(
     new FeedScopedId(FEED_ID, "express_pass"),
     "Express Pass",
     Money.euros(50)
-  )
-    .withValidity(Duration.ofDays(1))
-    .build();
+  ).build();
   private static final FareProduct LOCAL_DAY_PASS = FareProduct.of(
     new FeedScopedId(FEED_ID, "local_pass"),
     "Local Pass",
     Money.euros(20)
-  )
-    .withValidity(Duration.ofDays(1))
-    .build();
+  ).build();
 
   private static final GtfsFaresV2Service SERVICE = GtfsFaresV2Service.of()
     .withLegRules(
