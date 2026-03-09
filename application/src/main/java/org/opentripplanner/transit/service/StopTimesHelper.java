@@ -89,7 +89,7 @@ public class StopTimesHelper {
 
   List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
     Matcher<TripTimeOnDate> matcher = TripTimeOnDateMatcherFactory.of(request);
-    var sorted = request
+    return request
       .stopLocations()
       .stream()
       .flatMap(stopLocation ->
@@ -108,8 +108,6 @@ public class StopTimesHelper {
       )
       .sorted(request.sortOrder())
       .toList();
-
-    return sorted;
   }
 
   /**

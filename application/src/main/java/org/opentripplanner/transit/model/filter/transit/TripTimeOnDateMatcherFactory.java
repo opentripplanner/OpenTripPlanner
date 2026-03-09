@@ -56,9 +56,6 @@ public class TripTimeOnDateMatcherFactory {
       .map(TripTimeOnDateMatcherFactory::buildFilterMatcher)
       .toList();
 
-    if (filterMatchers.isEmpty()) {
-      return Matcher.nothing();
-    }
     return OrMatcher.of(filterMatchers);
   }
 
