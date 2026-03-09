@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import java.time.Duration;
+import java.util.Objects;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.OsmUrlGenerator;
@@ -10,6 +11,11 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.time.DurationUtils;
 
 public record IsolatedStop(TransitStopVertex vertex, Duration maxWalk) implements DataImportIssue {
+  public IsolatedStop {
+    Objects.requireNonNull(vertex);
+    DurationUtils.requireNonNegative(maxWalk);
+  }
+
   private static final String FMT = "Stop %s is isolated, only %s of walking possible";
 
   @Override
