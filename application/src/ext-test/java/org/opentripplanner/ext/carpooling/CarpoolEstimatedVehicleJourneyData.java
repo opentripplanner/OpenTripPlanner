@@ -22,8 +22,11 @@ import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.StopAssignmentStructure;
 
 public class CarpoolEstimatedVehicleJourneyData {
-  private static final String FIRST_STOP_POLYGON = "10.813864907662264 59.904961620490184 10.818271230878196 59.903856857974404 10.818498026925795 59.90393809176436 10.818604482213118 59.9039055982723 10.818386943147004 59.90379187079944 10.818215688988204 59.90380579663352 10.81386953615231 59.90490591905822 10.813864907662264 59.904961620490184";
-  private static final String LAST_STOP_POLYGON = "10.197976677739746 59.74492585818382 10.19775667855555 59.74465335895027 10.197230513839912 59.74475958772939 10.19714251416596 59.74464319791892 10.197628345697694 59.744487087140186 10.197844678229416 59.744667214897106 10.198856674477867 59.74438085749492 10.19892634088606 59.744463993767596 10.198640341946088 59.74453696877012 10.19883100790608 59.74475404536645 10.197976677739746 59.74492585818382";
+
+  private static final String FIRST_STOP_POLYGON =
+    "10.813864907662264 59.904961620490184 10.818271230878196 59.903856857974404 10.818498026925795 59.90393809176436 10.818604482213118 59.9039055982723 10.818386943147004 59.90379187079944 10.818215688988204 59.90380579663352 10.81386953615231 59.90490591905822 10.813864907662264 59.904961620490184";
+  private static final String LAST_STOP_POLYGON =
+    "10.197976677739746 59.74492585818382 10.19775667855555 59.74465335895027 10.197230513839912 59.74475958772939 10.19714251416596 59.74464319791892 10.197628345697694 59.744487087140186 10.197844678229416 59.744667214897106 10.198856674477867 59.74438085749492 10.19892634088606 59.744463993767596 10.198640341946088 59.74453696877012 10.19883100790608 59.74475404536645 10.197976677739746 59.74492585818382";
 
   public static EstimatedVehicleJourney arrivalIsAfterDepartureTime() {
     var journey = new EstimatedVehicleJourney();
@@ -114,7 +117,6 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   public static EstimatedVehicleJourney tripHasExpectedTimesOnly() {
-
     var journey = minimalCompleteJourney();
 
     var firstStop = journey.getEstimatedCalls().getEstimatedCalls().getFirst();
@@ -166,7 +168,7 @@ public class CarpoolEstimatedVehicleJourneyData {
 
     var stop = new StopAssignmentStructure();
     var flexibleStop = poslistToAimedFlexibleArea(posList);
-    stop.setAimedFlexibleArea(flexibleStop);
+    stop.setExpectedFlexibleArea(flexibleStop);
 
     call.getDepartureStopAssignments().add(stop);
     return call;
@@ -175,14 +177,14 @@ public class CarpoolEstimatedVehicleJourneyData {
   static AimedFlexibleArea poslistToAimedFlexibleArea(String coordinates) {
     var gmlFactory = new ObjectFactory();
 
-    var poslist = Arrays.stream(coordinates.trim().split("\\s+"))
-      .map(Double::valueOf)
-      .toList();
-    var polygon = new PolygonType()
-      .withExterior(new AbstractRingPropertyType()
-        .withAbstractRing(gmlFactory.createLinearRing(new LinearRingType()
-          .withPosList(new DirectPositionListType()
-            .withValue(poslist)))));
+    var poslist = Arrays.stream(coordinates.trim().split("\\s+")).map(Double::valueOf).toList();
+    var polygon = new PolygonType().withExterior(
+      new AbstractRingPropertyType().withAbstractRing(
+        gmlFactory.createLinearRing(
+          new LinearRingType().withPosList(new DirectPositionListType().withValue(poslist))
+        )
+      )
+    );
 
     var area = new AimedFlexibleArea();
     area.setPolygon(polygon);

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.arrivalIsAfterDepartureTime;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.lessThanTwoStops;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourneyWithPolygon;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.stopTimesAreOutOfOrder;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasAimedTimesOnly;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasExpectedTimesOnly;
@@ -73,7 +74,7 @@ public class CarpoolSiriMapperTest {
 
   @Test
   void mapSiriToCarpoolTrip_minimalDataUsingPolygonStops_mapsOk() {
-    var journey = minimalCompleteJourney();
+    var journey = minimalCompleteJourneyWithPolygon();
     var mapped = mapper.mapSiriToCarpoolTrip(journey);
 
     var firstStop = mapped.stops().getFirst();
