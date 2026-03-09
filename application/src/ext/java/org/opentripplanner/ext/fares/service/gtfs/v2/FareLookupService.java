@@ -115,10 +115,10 @@ class FareLookupService implements Serializable {
   Set<LegOffer> findTransferOffersForSubLegs(
     TransitLeg head,
     List<TransitLeg> tail,
-    Predicate<FareTransferRule> filterTransfers
+    Predicate<FareTransferRule> transferPredicate
   ) {
     Set<TransferMatch> transfers = this.transferRules.stream()
-      .filter(filterTransfers)
+      .filter(transferPredicate)
       .flatMap(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());
         var toRules = findFareLegRule(r.toLegGroup());
@@ -191,9 +191,10 @@ class FareLookupService implements Serializable {
     List<FareLegRule> fromRules,
     List<FareLegRule> toRules
   ) {
+    Predicate<FareLegRule> predicate = _ -> TimeLimitEvaluator.withinTimeLimit(r, from, to);
     return fromRules
       .stream()
-      .filter(_ -> TimeLimitEvaluator.withinTimeLimit(r, from, to))
+      .filter(predicate)
       .flatMap(fromRule -> toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule)))
       .filter(
         match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())
