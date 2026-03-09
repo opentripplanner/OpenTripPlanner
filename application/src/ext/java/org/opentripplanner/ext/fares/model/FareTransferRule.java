@@ -60,6 +60,23 @@ public final class FareTransferRule implements Serializable {
     return transferCount == UNLIMITED_TRANSFERS;
   }
 
+  /**
+   * Does it limit the number of transfers?
+   */
+  public boolean limitedTransfers() {
+    return !unlimitedTransfers();
+  }
+
+  /**
+   * Does the rule allow a given number of transfers?
+   */
+  public boolean allowsNumberOfTransfers(int transferCount) {
+    if (unlimitedTransfers()) {
+      return true;
+    }
+    return this.transferCount >= transferCount;
+  }
+
   public FeedScopedId id() {
     return id;
   }
