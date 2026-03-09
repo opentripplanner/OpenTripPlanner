@@ -42,6 +42,7 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     this.url = original.getUrl();
     this.centroid = original.getCoordinate();
     this.geometry = original.getGeometry();
+    this.sequenceNumber = original.getSequenceNumber();
 
     this.carpoolStopType = original.getCarpoolStopType();
     this.expectedArrivalTime = original.getExpectedArrivalTime();
@@ -72,6 +73,7 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
   }
 
   public CarpoolStopBuilder withCentroid(WgsCoordinate centroid) {
+    // TODO: Rename this to "withCoordinate". Update code in "toGeometry"
     this.centroid = centroid;
     this.geometry = toGeometry(centroid);
     return this;
@@ -165,6 +167,8 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
   }
 
   private Geometry toGeometry(WgsCoordinate coordinate) {
+    // TODO: change this code to map wgsCoordinate to geom Point and remove null guard.
+
     if (centroid == null) {
       return null;
     }

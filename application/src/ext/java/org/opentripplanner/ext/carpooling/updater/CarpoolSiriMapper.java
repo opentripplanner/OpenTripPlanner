@@ -201,7 +201,12 @@ public class CarpoolSiriMapper {
     }
   }
 
-  private CarpoolStop toCarpoolStop(EstimatedCall call, String id, boolean isFirst, boolean isLast) {
+  private CarpoolStop toCarpoolStop(
+    EstimatedCall call,
+    String id,
+    boolean isFirst,
+    boolean isLast
+  ) {
     var flexibleArea = toFlexibleArea(call);
     var circleLocation = flexibleArea.getCircularArea();
     var legacyGeometry = flexibleArea.getPolygon();
