@@ -229,7 +229,7 @@ class TripTimesUpdater {
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
     RealTimeState realTimeState,
     int serviceCode
-  ) {
+  ) throws UpdateException {
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
       tripUpdate.serviceDate(),

@@ -330,7 +330,7 @@ public class SiriRealTimeTripUpdateAdapter {
   /**
    * Add a (new) trip to the timetableRepository and the buffer
    */
-  private UpdateSuccess addTripToGraphAndBuffer(TripUpdate tripUpdate) throws UpdateException {
+  private UpdateSuccess addTripToGraphAndBuffer(TripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();
     LocalDate serviceDate = tripUpdate.serviceDate();
 

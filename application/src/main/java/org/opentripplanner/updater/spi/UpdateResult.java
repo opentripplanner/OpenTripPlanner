@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.List;
-import org.opentripplanner.transit.model.framework.Result;
 
 /**
  * An aggregation of results of the application of realtime updates which makes it easy to get
@@ -28,34 +27,8 @@ public record UpdateResult(
   }
 
   /**
-   * Aggregate a list of results into an instance of {@link UpdateResult}.
+   * Aggregate a list of results and errors into an instance of {@link UpdateResult}.
    */
-  public static UpdateResult ofResults(List<Result<UpdateSuccess, UpdateError>> results) {
-    List<UpdateError> errors = results
-      .stream()
-      .filter(Result::isFailure)
-      .map(Result::failureValue)
-      .toList();
-    List<UpdateSuccess> successes = results
-      .stream()
-      .filter(Result::isSuccess)
-      .map(Result::successValue)
-      .toList();
-    List<UpdateSuccess.WarningType> warnings = successes
-      .stream()
-      .flatMap(s -> s.warnings().stream())
-      .toList();
-    ImmutableListMultimap errorIndex = Multimaps.index(errors, UpdateError::errorType);
-    return new UpdateResult(
-      successes.size(),
-      errors.size(),
-      errorIndex,
-      warnings,
-      successes,
-      errors
-    );
-  }
-
   public static UpdateResult of(List<UpdateSuccess> successes, List<UpdateError> errors) {
     List<UpdateSuccess.WarningType> warnings = successes
       .stream()

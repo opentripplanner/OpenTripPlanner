@@ -3,6 +3,8 @@ package org.opentripplanner.updater.spi;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
+/// An exception for indicating various issues with realtime data. It can be thrown anywhere in the
+/// handling code for a realtime update and is caught by the UpdateAdapters.
 public class UpdateException extends RuntimeException {
 
   private final UpdateErrorType errorType;
@@ -47,7 +49,7 @@ public class UpdateException extends RuntimeException {
     return new UpdateException(tripId, updateErrorType, stopIndex);
   }
 
-  // Gives an updated exception with the specified tripId
+  /// Gives an updated exception with the specified tripId
   public UpdateException withTripId(FeedScopedId tripId) {
     return new UpdateException(tripId, this.errorType, this.stopIndex);
   }
