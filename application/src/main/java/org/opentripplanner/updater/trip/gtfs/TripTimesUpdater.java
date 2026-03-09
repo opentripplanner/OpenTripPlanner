@@ -93,7 +93,7 @@ class TripTimesUpdater {
 
     for (var i = 0; i < tripUpdate.stopTimeUpdates().size(); i++) {
       var update = tripUpdate.stopTimeUpdates().get(i);
-      var res = mapper.stopPositionInPattern(update, i);
+      var res = mapper.stopPositionInPattern(i, update);
 
       if (res.isFailure()) {
         return res.toFailureResult();

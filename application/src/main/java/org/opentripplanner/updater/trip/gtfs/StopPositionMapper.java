@@ -38,11 +38,10 @@ class StopPositionMapper {
    * the stop position in the trip's pattern.
    *
    * @param listIndex The list index of the update in the list of stop time updates
-   * @return
    */
-  Result<Integer, UpdateError> stopPositionInPattern(StopTimeUpdate update, int listIndex) {
+  Result<Integer, UpdateError> stopPositionInPattern(int listIndex, StopTimeUpdate update) {
     if (update.stopSequence().isPresent()) {
-      return handleStopSequence(update, listIndex);
+      return handleStopSequence(listIndex, update);
     } else if (update.stopId().isPresent()) {
       return handleStopId(listIndex, update.stopId().get());
     } else {
@@ -50,12 +49,12 @@ class StopPositionMapper {
     }
   }
 
-  private Result<Integer, UpdateError> handleStopSequence(StopTimeUpdate update, int listIndex) {
-    var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
-    if (tmp.isEmpty()) {
+  private Result<Integer, UpdateError> handleStopSequence(int listIndex, StopTimeUpdate update) {
+    var pos = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
+    if (pos.isEmpty()) {
       return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE, listIndex));
     } else {
-      return Result.success(tmp.getAsInt());
+      return Result.success(pos.getAsInt());
     }
   }
 
@@ -69,10 +68,9 @@ class StopPositionMapper {
     }
     // special case: circular stop pattern but the updates supplied contain only stop_id
     // not stop_sequence. it's quite questionable that this should be supported at all.
-    if (visitsAtStop > 1) {
+    else {
       return handleCircularRoute(listIndex, stopId);
     }
-    return invalid(listIndex);
   }
 
   /**
