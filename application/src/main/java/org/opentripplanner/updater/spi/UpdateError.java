@@ -57,7 +57,7 @@ public record UpdateError(
     // the stop cannot be found in the site repository
     UNKNOWN_STOP,
     // the stop exists in the site repository, but the planned stop cannot be replaced by this stop
-    // since they do not belong to the same station.,
+    // since they do not belong to the same station.
     STOP_MISMATCH,
     // it's not possible to resolve the stop reference (id or sequence) to the position in the pattern
     INVALID_STOP_REFERENCE,
