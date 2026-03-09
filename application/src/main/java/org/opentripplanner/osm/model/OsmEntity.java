@@ -596,7 +596,7 @@ public abstract class OsmEntity {
     for (StringBuffer sb : i18n.values()) {
       sb.append(pattern, lastEnd, pattern.length());
     }
-    Map<String, String> out = new HashMap<>(i18n.size());
+    Map<String, String> out = HashMap.newHashMap(i18n.size());
     for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
       out.put(kv.getKey(), kv.getValue().toString());
     }

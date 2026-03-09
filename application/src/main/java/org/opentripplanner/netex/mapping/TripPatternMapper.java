@@ -168,11 +168,11 @@ class TripPatternMapper {
       return Optional.empty();
     }
 
-    List<Trip> trips = new ArrayList<>();
+    List<Trip> trips = new ArrayList<>(serviceJourneys.size());
     ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
-    HashMap<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+    HashMap<Trip, List<StopTime>> tripStopTimes = HashMap.newHashMap(serviceJourneys.size());
     Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
-    ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
+    ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>(serviceJourneys.size());
 
     for (ServiceJourney serviceJourney : serviceJourneys) {
       Trip trip = mapTrip(journeyPattern, serviceJourney);

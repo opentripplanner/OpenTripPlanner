@@ -21,7 +21,7 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
 
   public MultiTargetTerminationStrategy(Set<Vertex> targets) {
     unreachedTargets = new HashSet<>(targets);
-    reachedTargets = new HashSet<>(targets.size());
+    reachedTargets = HashSet.newHashSet(targets.size());
   }
 
   /**

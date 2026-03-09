@@ -127,6 +127,28 @@ class LinkingContextFactoryTest {
   }
 
   @Test
+  void stopIdNoStreet() {
+    var stopLinkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
+      Set::of,
+      id -> Optional.empty()
+    );
+    var container = new TemporaryVerticesContainer();
+    var from = stopToLocation(stopA);
+    var to = stopToLocation(stopB);
+    var request = LinkingContextRequest.of()
+      .withFrom(from)
+      .withTo(to)
+      .withDirectMode(StreetMode.NOT_SET)
+      .build();
+    var linkingContext = stopLinkingContextFactory.create(container, request);
+
+    assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
+    assertEquals(stopB, toStop(linkingContext.toStopVertices()));
+  }
+
+  @Test
   void stationId() {
     var mapping = ImmutableMultimap.<FeedScopedId, FeedScopedId>builder()
       .putAll(OMEGA_ID, stopC.getId(), stopD.getId())
