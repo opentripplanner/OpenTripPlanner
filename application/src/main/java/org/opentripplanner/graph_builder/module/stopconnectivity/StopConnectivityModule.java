@@ -65,7 +65,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     if (stop.isConnectedToGraph()) {
       return null;
     } else {
-      return new IsolatedStop(stop);
+      return new IsolatedStop(stop, Duration.ZERO);
     }
   }
 
@@ -81,16 +81,22 @@ public class StopConnectivityModule implements GraphBuilderModule {
       .withTerminationStrategy(new DurationTerminationStrategy(DURATION.plusMinutes(1)))
       .getShortestPathTree();
 
-    var isIsolated = spt
-      .getAllStates()
-      .stream()
-      .noneMatch(s -> s.getElapsedTimeSeconds() > DURATION.toSeconds());
+    long maxWalk_s = 0;
+    boolean allowsTenMinuteWalking = false;
+
+    for (var state : spt.getAllStates()) {
+      maxWalk_s = Math.max(maxWalk_s, state.getElapsedTimeSeconds());
+      if (maxWalk_s > DURATION.toSeconds()) {
+        allowsTenMinuteWalking = true;
+        break;
+      }
+    }
 
     progress.step(i -> LOG.info(i));
-    if (isIsolated) {
-      return new IsolatedStop(stop);
-    } else {
+    if (allowsTenMinuteWalking) {
       return null;
+    } else {
+      return new IsolatedStop(stop, Duration.ofSeconds(maxWalk_s));
     }
   }
 }
