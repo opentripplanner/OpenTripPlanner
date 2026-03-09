@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.function.IntSupplier;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -170,8 +169,7 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
       return null;
     }
 
-    Point point = GEOMETRY_FACTORY.createPoint(coordinate.asJtsCoordinate());
-    // TODO: Do projection
+    var point = GEOMETRY_FACTORY.createPoint(coordinate.asJtsCoordinate());
     double radiusMeters = 1;
     double radiusDegrees = radiusMeters / 111_000d;
     return point.buffer(radiusDegrees);

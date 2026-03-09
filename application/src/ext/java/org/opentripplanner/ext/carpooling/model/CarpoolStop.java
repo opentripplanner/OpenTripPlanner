@@ -39,8 +39,8 @@ public class CarpoolStop
   public CarpoolStop(CarpoolStopBuilder builder) {
     super(builder.getId());
     this.index = builder.createIndex();
-    // according to the spec stop location names are optional for flex zones so, we set the id
-    // as the bogus name. *shrug*
+    // according to the spec stop location names are optional for flex zones so,
+    // we set the id as the dummy name
     if (builder.name() == null) {
       this.name = new NonLocalizedString(builder.getId().toString());
     } else {

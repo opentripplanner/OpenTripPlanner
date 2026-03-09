@@ -32,6 +32,8 @@ public class CarpoolSiriMapper {
 
   private static final int DEFAULT_AVAILABLE_SEATS = 2;
   private static final Duration DEFAULT_DEVIATION_BUDGET = Duration.ofMinutes(15);
+  // INDEX is not relevant for our stop type. Also set index to a hard coded value to avoid
+  // run-away memory use if it by error ends up in global repositories.
   public static final int CARPOOLING_DUMMY_INDEX = -9_999;
 
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
@@ -199,36 +201,32 @@ public class CarpoolSiriMapper {
     }
   }
 
-  private CarpoolStop toCarpoolStop(EstimatedCall et, String id, boolean isFirst, boolean isLast) {
-    var flexibleArea = toFlexibleArea(et);
-
+  private CarpoolStop toCarpoolStop(EstimatedCall call, String id, boolean isFirst, boolean isLast) {
+    var flexibleArea = toFlexibleArea(call);
     var circleLocation = flexibleArea.getCircularArea();
     var legacyGeometry = flexibleArea.getPolygon();
-    if (circleLocation == null && legacyGeometry == null) {
-      throw new IllegalArgumentException("Expected exactly location for call: " + et);
-    }
-
     var centroid = circleLocation == null
       ? toWgsCoordinate(toPolygon(legacyGeometry))
       : toWgsCoordinate(circleLocation);
+
     CarpoolStopType stopType;
     if (isFirst) {
       stopType = CarpoolStopType.PICKUP_ONLY;
     } else if (isLast) {
       stopType = CarpoolStopType.DROP_OFF_ONLY;
     } else {
-      stopType = determineCarpoolStopType(et);
+      stopType = determineCarpoolStopType(call);
     }
 
     return CarpoolStop.of(new FeedScopedId(FEED_ID, id), () -> CARPOOLING_DUMMY_INDEX)
-      .withName(I18NString.of(et.getStopPointNames().getFirst().getValue()))
+      .withName(I18NString.of(call.getStopPointNames().getFirst().getValue()))
       .withCentroid(centroid)
       .withCarpoolStopType(stopType)
-      .withAimedDepartureTime(isLast ? null : et.getAimedDepartureTime())
-      .withExpectedDepartureTime(isLast ? null : et.getExpectedDepartureTime())
-      .withAimedArrivalTime(isFirst ? null : et.getAimedArrivalTime())
-      .withExpectedArrivalTime(isFirst ? null : et.getExpectedArrivalTime())
-      .withPassengerDelta(isLast ? 0 : calculatePassengerDelta(et, stopType))
+      .withAimedDepartureTime(isLast ? null : call.getAimedDepartureTime())
+      .withExpectedDepartureTime(isLast ? null : call.getExpectedDepartureTime())
+      .withAimedArrivalTime(isFirst ? null : call.getAimedArrivalTime())
+      .withExpectedArrivalTime(isFirst ? null : call.getExpectedArrivalTime())
+      .withPassengerDelta(isLast ? 0 : calculatePassengerDelta(call, stopType))
       .build();
   }
 
