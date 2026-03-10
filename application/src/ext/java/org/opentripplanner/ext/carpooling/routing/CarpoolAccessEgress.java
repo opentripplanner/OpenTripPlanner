@@ -17,7 +17,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final int endOfTrip;
   private final int stop;
   private final int durationInSeconds;
-  private final int cost;
+  private final int c1;
   private final Duration extraTimeForStop;
   private final List<GraphPath<State, Edge, Vertex>> segments;
   private final TimeAndCost penalty;
@@ -46,7 +46,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
        same way for both access/egress and direct.
     */
     this.totalWeight = this.durationInSeconds * carReluctance;
-    this.cost = RaptorCostConverter.toRaptorCost(this.totalWeight);
+    this.c1 = RaptorCostConverter.toRaptorCost(this.totalWeight);
     this.segments = segments;
     this.penalty = penalty;
     this.extraTimeForStop = extraTimeForStop;
@@ -59,7 +59,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int c1() {
-    return this.cost;
+    return this.c1;
   }
 
   @Override
