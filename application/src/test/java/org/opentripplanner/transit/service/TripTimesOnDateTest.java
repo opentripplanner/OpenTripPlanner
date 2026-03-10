@@ -11,6 +11,7 @@ import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class TripTimesOnDateTest {
@@ -142,5 +143,67 @@ public class TripTimesOnDateTest {
         .build()
     );
     assertThat(result).hasSize(2);
+  }
+
+  /**
+   * Mode filter should use the trip's mode, not the route's mode. Trips can override
+   * the mode of their route, e.g. a rail replacement bus on a rail route.
+   */
+  @Test
+  void modeFilterRespectsTriplevelModeOverride() {
+    var envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+    var stopA = envBuilder.stop("A");
+    var stopB = envBuilder.stop("B");
+
+    var railRoute = envBuilder.route("RailRoute", r -> r.withMode(TransitMode.RAIL));
+
+    // Two regular rail trips
+    envBuilder.addTrip(
+      TripInput.of("rail1").withRoute(railRoute).addStop(stopA, "10:00").addStop(stopB, "10:30")
+    );
+    envBuilder.addTrip(
+      TripInput.of("rail2").withRoute(railRoute).addStop(stopA, "10:10").addStop(stopB, "10:40")
+    );
+    // A rail replacement bus on the same route
+    envBuilder.addTrip(
+      TripInput.of("replacementBus")
+        .withRoute(railRoute)
+        .withMode(TransitMode.BUS)
+        .addStop(stopA, "10:20")
+        .addStop(stopB, "10:50")
+    );
+
+    var env = envBuilder.build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
+
+    // Filtering for BUS should return only the replacement bus trip
+    var busResult = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(stopA))
+        .withTime(dt.instant("10:00"))
+        .withTimeWindow(Duration.ofHours(2))
+        .withNumberOfDepartures(10)
+        .withIncludeModes(List.of(TransitMode.BUS))
+        .build()
+    );
+    assertThat(busResult).hasSize(1);
+    assertThat(busResult.getFirst().getTrip().getId().getId()).isEqualTo("replacementBus");
+
+    // Filtering for RAIL should return only the rail trips
+    var railResult = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(stopA))
+        .withTime(dt.instant("10:00"))
+        .withTimeWindow(Duration.ofHours(2))
+        .withNumberOfDepartures(10)
+        .withIncludeModes(List.of(TransitMode.RAIL))
+        .build()
+    );
+    assertThat(railResult).hasSize(2);
+    assertThat(
+      railResult
+        .stream()
+        .map(t -> t.getTrip().getId().getId())
+        .toList()
+    ).containsExactly("rail1", "rail2");
   }
 }
