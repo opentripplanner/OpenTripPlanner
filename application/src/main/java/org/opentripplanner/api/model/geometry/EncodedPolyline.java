@@ -82,6 +82,8 @@ public final class EncodedPolyline {
 
   private void calculateDistance() {
     if (distance_m == NOT_SET) {
+      // Optimization: In the case of a LineString, it is more efficient to compute the distance
+      // from the coordinate sequence than the coordinates (less intermediate objects creation)
       if (geometry instanceof LineString ls) {
         distance_m = (int) GeometryUtils.sumDistances(ls.getCoordinateSequence());
       } else {
