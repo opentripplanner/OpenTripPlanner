@@ -53,7 +53,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
           .withId(TimetableRepositoryForTest.id("t3"))
           .withFromLegGroup(LEG_GROUP_A)
           .withToLegGroup(LEG_GROUP_B)
-          .withFareProducts(List.of(TRANSFER_1))
+          .withFareProducts(TRANSFER_1)
           .build(),
         // transferring from B to A is free
         FareTransferRule.of()

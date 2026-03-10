@@ -141,39 +141,61 @@ public final class CompactLineStringUtils {
     boolean reverse
   ) {
     int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
-    int size = coords == null ? 2 : (coords.length / 2) + 2;
-    Coordinate[] c = new Coordinate[size];
     double x0 = reverse ? xb : xa;
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
+    int intermediateCount = coords == null ? 0 : coords.length / 2;
+    Coordinate[] c = new Coordinate[intermediateCount + 2];
     c[0] = new Coordinate(x0, y0);
     if (coords != null) {
       int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
       int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
-      for (int i = 1; i < c.length - 1; i++) {
-        int ix = oix + coords[(i - 1) * 2];
-        int iy = oiy + coords[(i - 1) * 2 + 1];
-        c[i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
-        oix = ix;
-        oiy = iy;
-      }
+      decodeDeltaCoordinates(coords, c, 1, oix, oiy);
     }
     c[c.length - 1] = new Coordinate(x1, y1);
     LineString out = GeometryUtils.makeLineString(c);
-    if (reverse) {
-      out = out.reverse();
-    }
-    return out;
+    return reverse ? out.reverse() : out;
   }
 
   /**
-   * Wrapper for the above method in the case where there are no start/end coordinates provided.
-   * 0-coordinates are added and then removed in order for the delta encoding to work correctly.
-   * Same as the other version, but in a var-len int packed form (Dlugosz coding).
+   * Uncompact a line string that was compacted without start/end endpoint context. Decodes the
+   * delta-encoded coordinates directly without adding/removing dummy endpoints.
    */
   public static LineString uncompactLineString(byte[] packedCoords, boolean reverse) {
-    LineString lineString = uncompactLineString(0.0, 0.0, 0.0, 0.0, packedCoords, reverse);
-    return GeometryUtils.removeStartEndCoordinatesFromLineString(lineString);
+    int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
+    if (coords == null || coords.length == 0) {
+      return GeometryUtils.makeLineString(new Coordinate[0]);
+    }
+    Coordinate[] c = new Coordinate[coords.length / 2];
+    decodeDeltaCoordinates(coords, c, 0, 0, 0);
+    LineString out = GeometryUtils.makeLineString(c);
+    return reverse ? out.reverse() : out;
+  }
+
+  /**
+   * Decode delta-encoded coordinate pairs into a Coordinate array.
+   *
+   * @param coords  Delta-encoded int pairs [dx0, dy0, dx1, dy1, ...]
+   * @param out     Target array to write decoded coordinates into
+   * @param offset  Starting index in {@code out} to write to
+   * @param oix     Initial x in fixed-point (start of delta chain)
+   * @param oiy     Initial y in fixed-point (start of delta chain)
+   */
+  private static void decodeDeltaCoordinates(
+    int[] coords,
+    Coordinate[] out,
+    int offset,
+    int oix,
+    int oiy
+  ) {
+    int count = coords.length / 2;
+    for (int i = 0; i < count; i++) {
+      int ix = oix + coords[i * 2];
+      int iy = oiy + coords[i * 2 + 1];
+      out[offset + i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
+      oix = ix;
+      oiy = iy;
+    }
   }
 }

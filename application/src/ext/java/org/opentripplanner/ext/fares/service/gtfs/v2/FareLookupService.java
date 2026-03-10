@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -52,7 +53,7 @@ class FareLookupService implements Serializable {
    * Are there free transfers between the legs?
    */
   boolean hasFreeTransfers(List<TransitLeg> legs) {
-    return !findTransfersMatchingAllLegs(legs).isEmpty();
+    return !findTransfersMatchingAllLegs(legs, FareTransferRule::unlimitedTransfers).isEmpty();
   }
 
   /**
@@ -81,12 +82,15 @@ class FareLookupService implements Serializable {
   /**
    * Find those fare products that match all legs through an unlimited transfer.
    */
-  Set<FareProduct> findTransfersMatchingAllLegs(List<TransitLeg> legs) {
+  Set<FareProduct> findTransfersMatchingAllLegs(
+    List<TransitLeg> legs,
+    Predicate<FareTransferRule> transferPredicate
+  ) {
     if (legs.size() < 2) {
       return Set.of();
     }
     return this.transferRules.stream()
-      .filter(FareTransferRule::unlimitedTransfers)
+      .filter(transferPredicate)
       .filter(FareTransferRule::isFree)
       .filter(r -> TimeLimitEvaluator.withinTimeLimit(r, legs.getFirst(), legs.getLast()))
       .flatMap(r -> findTransferMatches(r, legs).stream())
@@ -106,10 +110,15 @@ class FareLookupService implements Serializable {
   }
 
   /**
-   * Find fare offers for a specific pair of legs.
+   * Find fare offers for a specific head and a tail of legs.
    */
-  Set<LegOffer> findTransferOffersForSubLegs(TransitLeg head, List<TransitLeg> tail) {
+  Set<LegOffer> findTransferOffersForSubLegs(
+    TransitLeg head,
+    List<TransitLeg> tail,
+    Predicate<FareTransferRule> transferPredicate
+  ) {
     Set<TransferMatch> transfers = this.transferRules.stream()
+      .filter(transferPredicate)
       .flatMap(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());
         var toRules = findFareLegRule(r.toLegGroup());
@@ -151,7 +160,7 @@ class FareLookupService implements Serializable {
             LegOffer.of(
               FareOffer.of(head.startTime(), product, dependencies.get(product)),
               head,
-              t.transferRule().timeLimit().orElse(null)
+              t.transferRule()
             )
           )
       )
@@ -182,9 +191,10 @@ class FareLookupService implements Serializable {
     List<FareLegRule> fromRules,
     List<FareLegRule> toRules
   ) {
+    Predicate<FareLegRule> predicate = _ -> TimeLimitEvaluator.withinTimeLimit(r, from, to);
     return fromRules
       .stream()
-      .filter(match -> TimeLimitEvaluator.withinTimeLimit(r, from, to))
+      .filter(predicate)
       .flatMap(fromRule -> toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule)))
       .filter(
         match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())

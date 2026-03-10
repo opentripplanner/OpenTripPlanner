@@ -91,7 +91,7 @@ public class GenericDataFile {
       latitudeArray = latitude.read();
       longitudeArray = longitude.read();
 
-      netcdfDataForVariable = new HashMap<>(genVariables.size());
+      netcdfDataForVariable = HashMap.newHashMap(genVariables.size());
       for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()) {
         netcdfDataForVariable.put(genVariable.getKey().getName(), genVariable.getValue().read());
       }

@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>248</otp.serialization.version.id>
+        <otp.serialization.version.id>249</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.2</geotools.version>
@@ -69,12 +69,12 @@
         <junit.version>6.0.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.27</logback.version>
+        <logback.version>1.5.32</logback.version>
         <lucene.version>10.3.2</lucene.version>
         <micrometer.version>1.16.3</micrometer.version>
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.33.5</protobuf.version>
+        <protobuf.version>4.34.0</protobuf.version>
         <siri-java-model.version>2.0.4</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -467,7 +467,16 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.75.0</version>
+                <version>26.77.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <!-- This makes sure all Jackson libraries are using compatible versions. -->
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -680,7 +689,7 @@
                 </repository>
             </distributionManagement>
         </profile>
-        
+
         <profile>
             <id>integrationTests</id>
             <activation>

@@ -62,12 +62,11 @@ public class SiriFuzzyTripMatcher {
    */
   public Result<TripAndPattern, UpdateError.UpdateErrorType> match(
     EstimatedVehicleJourney journey,
+    List<CallWrapper> calls,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
   ) {
-    List<CallWrapper> calls = CallWrapper.of(journey);
-
     if (calls.isEmpty()) {
       return Result.failure(NO_VALID_STOPS);
     }

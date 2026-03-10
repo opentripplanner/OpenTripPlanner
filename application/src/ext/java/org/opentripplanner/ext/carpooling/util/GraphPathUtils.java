@@ -16,13 +16,20 @@ public class GraphPathUtils {
     cumulativeDurations[0] = Duration.ZERO;
 
     for (int i = 0; i < segments.length; i++) {
-      Duration segmentDuration = Duration.between(
-        segments[i].states.getFirst().getTime(),
-        segments[i].states.getLast().getTime()
-      );
+      Duration segmentDuration = calculateDuration(segments[i]);
       cumulativeDurations[i + 1] = cumulativeDurations[i].plus(segmentDuration);
     }
 
     return cumulativeDurations;
+  }
+
+  /**
+   * Calculates duration for a segment
+   */
+  public static Duration calculateDuration(GraphPath<State, Edge, Vertex> segment) {
+    return Duration.between(
+      segment.states.getFirst().getTime(),
+      segment.states.getLast().getTime()
+    );
   }
 }

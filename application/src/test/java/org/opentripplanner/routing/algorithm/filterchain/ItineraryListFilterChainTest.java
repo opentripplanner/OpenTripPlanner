@@ -30,7 +30,8 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.utils.lang.Box;
 
 /**
@@ -39,12 +40,22 @@ import org.opentripplanner.utils.lang.Box;
  */
 class ItineraryListFilterChainTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
-  private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
-  private static final Place C = Place.forStop(TEST_MODEL.stop("C").build());
-  private static final Place D = Place.forStop(TEST_MODEL.stop("D").build());
-  private static final Place E = Place.forStop(TEST_MODEL.stop("E").build());
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final Place A = Place.forStop(
+    ENV_BUILDER.stop("A", b -> b.withCoordinate(60.0, 10.000))
+  );
+  private static final Place B = Place.forStop(
+    ENV_BUILDER.stop("B", b -> b.withCoordinate(60.0, 10.010))
+  );
+  private static final Place C = Place.forStop(
+    ENV_BUILDER.stop("C", b -> b.withCoordinate(60.0, 10.015))
+  );
+  private static final Place D = Place.forStop(
+    ENV_BUILDER.stop("D", b -> b.withCoordinate(60.0, 10.022))
+  );
+  private static final Place E = Place.forStop(
+    ENV_BUILDER.stop("E", b -> b.withCoordinate(60.0, 10.030))
+  );
 
   private static final int I3_LATE_START_TIME = T11_33;
   private static final Duration SW_D10_m = Duration.ofSeconds(D10_m);

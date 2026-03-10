@@ -1,11 +1,11 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
+import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -15,7 +15,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
  */
 class ScopedLinkingTest {
 
-  private static final IntersectionVertex SPLIT = StreetModelForTest.intersectionVertex(0.05, 0.05);
+  private static final IntersectionVertex SPLIT = StreetModelFactory.intersectionVertex(0.05, 0.05);
 
   @Test
   void splitRequestScoped() {
@@ -57,10 +57,10 @@ class ScopedLinkingTest {
   }
 
   private static LinkingEnvironment buildEnv() {
-    var v1 = StreetModelForTest.intersectionVertex(0.0, 0.0);
-    var v2 = StreetModelForTest.intersectionVertex(0.1, 0.1);
+    var v1 = StreetModelFactory.intersectionVertex(0.0, 0.0);
+    var v2 = StreetModelFactory.intersectionVertex(0.1, 0.1);
 
-    StreetModelForTest.streetEdge(v1, v2);
+    StreetModelFactory.streetEdge(v1, v2);
 
     return new LinkingEnvironment(v1, v2);
   }

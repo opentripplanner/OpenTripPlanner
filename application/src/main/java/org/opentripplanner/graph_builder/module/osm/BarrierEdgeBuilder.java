@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.routing.linking.VertexLinker.getNoThruModes;
+import static org.opentripplanner.street.linking.VertexLinker.getNoThruModes;
 
 import java.util.Arrays;
 import java.util.Collection;

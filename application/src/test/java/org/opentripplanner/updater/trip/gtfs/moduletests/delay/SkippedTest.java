@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -73,6 +74,7 @@ class SkippedTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
     var tripUpdate = rt
       .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
@@ -81,6 +83,8 @@ class SkippedTest implements RealtimeTestConstants {
       .build();
 
     assertSuccess(rt.applyTripUpdate(tripUpdate, DIFFERENTIAL));
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[UPDATED]");
 
     // Create update to the same trip but now the skipped stop is no longer skipped
     var scheduledBuilder = rt
@@ -93,6 +97,8 @@ class SkippedTest implements RealtimeTestConstants {
 
     // apply the update with the previously skipped stop now scheduled
     assertSuccess(rt.applyTripUpdate(tripUpdate, DIFFERENTIAL));
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[UPDATED]");
 
     // Check that the there is no longer a realtime added trip pattern for the trip and that the
     // stoptime updates have gone through

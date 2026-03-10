@@ -52,7 +52,8 @@ class ExtraCallTripBuilder {
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> generateTripPatternId,
-    Trip trip
+    Trip trip,
+    List<CallWrapper> calls
   ) {
     this.trip = Objects.requireNonNull(trip);
 
@@ -60,13 +61,13 @@ class ExtraCallTripBuilder {
     // DataSource of added trip
     dataSource = estimatedVehicleJourney.getDataSource();
 
-    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
+    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     isJourneyPredictionInaccurate = TRUE.equals(estimatedVehicleJourney.isPredictionInaccurate());
     occupancy = estimatedVehicleJourney.getOccupancy();
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
 
-    calls = CallWrapper.of(estimatedVehicleJourney);
+    this.calls = calls;
 
     this.transitService = transitService;
     this.generateTripPatternId = generateTripPatternId;
@@ -180,7 +181,16 @@ class ExtraCallTripBuilder {
     /* Validate */
     try {
       return Result.success(
-        new TripUpdate(stopPattern, builder.build(), serviceDate, null, pattern, false, dataSource)
+        new TripUpdate(
+          stopPattern,
+          builder.build(),
+          serviceDate,
+          null,
+          pattern,
+          false,
+          dataSource,
+          null
+        )
       );
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e, dataSource);

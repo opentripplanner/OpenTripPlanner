@@ -97,8 +97,13 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   ) {
     var transitService = env.transitService();
     var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
+    var callsResult = CallWrapper.of(evj);
+    if (callsResult.isFailure()) {
+      return Result.failure(callsResult.failureValue());
+    }
     return fuzzyMatcher.match(
       evj,
+      callsResult.successValue(),
       new EntityResolver(transitService, env.feedId()),
       transitService::findTimetable,
       transitService::findNewTripPatternForModifiedTrip

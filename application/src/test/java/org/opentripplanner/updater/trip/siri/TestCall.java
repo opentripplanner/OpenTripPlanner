@@ -11,6 +11,7 @@ import uk.org.siri.siri21.OccupancyEnumeration;
 public class TestCall implements CallWrapper {
 
   private final String stopPointRef;
+  private final int sortOrder;
   private final Boolean cancellation;
   private final boolean extraCall;
   private final Boolean predictionInaccurate;
@@ -30,6 +31,7 @@ public class TestCall implements CallWrapper {
 
   private TestCall(
     String stopPointRef,
+    int sortOrder,
     Boolean cancellation,
     boolean extraCall,
     Boolean predictionInaccurate,
@@ -48,6 +50,7 @@ public class TestCall implements CallWrapper {
     boolean isRecorded
   ) {
     this.stopPointRef = stopPointRef;
+    this.sortOrder = sortOrder;
     this.cancellation = cancellation;
     this.extraCall = extraCall;
     this.predictionInaccurate = predictionInaccurate;
@@ -76,18 +79,8 @@ public class TestCall implements CallWrapper {
   }
 
   @Override
-  public boolean hasOrder() {
-    return false;
-  }
-
-  @Override
-  public boolean hasVisitNumber() {
-    return false;
-  }
-
-  @Override
   public int getSortOrder() {
-    return 0;
+    return sortOrder;
   }
 
   @Override
@@ -173,6 +166,7 @@ public class TestCall implements CallWrapper {
   public static class TestCallBuilder {
 
     private String stopPointRef = null;
+    private int sortOrder = 0;
     private Boolean cancellation = null;
     private boolean extraCall = false;
     private Boolean predictionInaccurate = null;
@@ -192,6 +186,11 @@ public class TestCall implements CallWrapper {
 
     public TestCallBuilder withStopPointRef(String stopPointRef) {
       this.stopPointRef = stopPointRef;
+      return this;
+    }
+
+    public TestCallBuilder withSortOrder(int sortOrder) {
+      this.sortOrder = sortOrder;
       return this;
     }
 
@@ -284,6 +283,7 @@ public class TestCall implements CallWrapper {
     public TestCall build() {
       return new TestCall(
         stopPointRef,
+        sortOrder,
         cancellation,
         extraCall,
         predictionInaccurate,

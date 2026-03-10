@@ -105,7 +105,11 @@ public class TimetableSnapshotTest {
     LocalDate today = LocalDate.now(TIME_ZONE);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
-    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(pattern, tripTimes, today);
+    RealTimeTripUpdate realTimeTripUpdate = RealTimeTripUpdate.of(
+      pattern,
+      tripTimes,
+      today
+    ).build();
     assertThrows(ConcurrentModificationException.class, () ->
       committedSnapshot.update(realTimeTripUpdate)
     );
@@ -239,14 +243,13 @@ public class TimetableSnapshotTest {
       List.of(new StopTime(), new StopTime(), new StopTime()),
       new Deduplicator()
     );
-    return new RealTimeTripUpdate(
-      pattern,
-      updatedTriptimes,
-      SERVICE_DATE,
-      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
-      true,
-      true
-    );
+    return RealTimeTripUpdate.of(pattern, updatedTriptimes, SERVICE_DATE)
+      .withAddedTripOnServiceDate(
+        TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build()
+      )
+      .withTripCreation(true)
+      .withRouteCreation(true)
+      .build();
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

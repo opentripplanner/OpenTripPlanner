@@ -279,11 +279,11 @@ public class LegacyTimetableSnapshotIntegrationTest {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     if (result.isSuccess()) {
-      var realTimeTripUpdate = new RealTimeTripUpdate(
+      var realTimeTripUpdate = RealTimeTripUpdate.of(
         pattern,
         result.successValue().tripTimes(),
         serviceDate
-      );
+      ).build();
       resolver.update(realTimeTripUpdate);
       return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
     }
