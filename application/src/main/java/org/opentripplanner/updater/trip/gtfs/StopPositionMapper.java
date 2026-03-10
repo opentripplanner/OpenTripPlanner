@@ -75,7 +75,9 @@ class StopPositionMapper {
 
   /**
    * Special handling for finding the stop position in the pattern when it is circular and the
-   * update supplies only stop_id.
+   * update supplies only stop_id (not stop_sequence).
+   *
+   * We make a limited effort to interpret the data, but not every case is supported.
    */
   private Result<Integer, UpdateError> handleCircularRoute(int listIndex, String stopId) {
     // we take the position of the update in the list and see if that, by chance, is the same
@@ -84,8 +86,8 @@ class StopPositionMapper {
       // order in the updates also happens to match the order in the stop pattern
       return Result.success(listIndex);
     } else {
-      // very niche edge case: the stop pattern is circular, the update supplies only stop_id
-      // and the beginning of the trip is missing in the real-time update
+      // very niche edge case: the update supplies only stop_id and the beginning of
+      // the trip is missing in the real-time update
       var lastPosInPattern = stopIds.lastIndexOf(stopId);
       if (lastPosInPattern == -1) {
         return invalid(listIndex);
