@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 /**
  * Whether so-called "visibility lines" should be computed, which are used when navigating through

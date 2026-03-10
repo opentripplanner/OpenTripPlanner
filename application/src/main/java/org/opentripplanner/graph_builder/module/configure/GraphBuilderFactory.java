@@ -38,7 +38,6 @@ import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.configure.VertexLinkerGraphBuildingModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
@@ -48,6 +47,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
