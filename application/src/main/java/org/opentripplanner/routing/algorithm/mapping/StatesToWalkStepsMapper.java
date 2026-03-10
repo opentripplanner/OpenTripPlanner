@@ -199,7 +199,7 @@ public class StatesToWalkStepsMapper {
 
     if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
       createAndSaveStationEntranceWalkStep(backState, forwardState, stationEntranceVertex);
-      // Create a separate entrance step (do not return).
+      // Do not return.
     }
 
     // generate a step for getting off an elevator (all elevator narrative generation occurs
