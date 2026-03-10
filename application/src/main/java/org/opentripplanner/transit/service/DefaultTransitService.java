@@ -433,7 +433,8 @@ public class DefaultTransitService implements TransitEditorService {
       numberOfDepartures,
       arrivalDeparture,
       includeCancelledTrips,
-      TripTimeOnDate.compareByDeparture()
+      TripTimeOnDate.compareByDeparture(),
+      null
     );
   }
 

@@ -206,4 +206,137 @@ public class TripTimesOnDateTest {
         .toList()
     ).containsExactly("rail1", "rail2");
   }
+
+  /**
+   * Mode filter on a multi-modal route where trips override their mode.
+   * Earlier BUS trips should not prevent later COACH trips from being returned
+   * when filtering for COACH.
+   */
+  @Test
+  void modeFilterOnMultiModalRoute() {
+    var envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+    var stopA = envBuilder.stop("A");
+    var stopB = envBuilder.stop("B");
+
+    var route = envBuilder.route("MixedRoute", r -> r.withMode(TransitMode.BUS));
+
+    envBuilder.addTrip(
+      TripInput.of("bus1")
+        .withRoute(route)
+        .withMode(TransitMode.BUS)
+        .addStop(stopA, "10:00")
+        .addStop(stopB, "10:30")
+    );
+    envBuilder.addTrip(
+      TripInput.of("bus2")
+        .withRoute(route)
+        .withMode(TransitMode.BUS)
+        .addStop(stopA, "10:10")
+        .addStop(stopB, "10:40")
+    );
+    envBuilder.addTrip(
+      TripInput.of("bus3")
+        .withRoute(route)
+        .withMode(TransitMode.BUS)
+        .addStop(stopA, "10:20")
+        .addStop(stopB, "10:50")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach1")
+        .withRoute(route)
+        .withMode(TransitMode.COACH)
+        .addStop(stopA, "10:30")
+        .addStop(stopB, "11:00")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach2")
+        .withRoute(route)
+        .withMode(TransitMode.COACH)
+        .addStop(stopA, "10:40")
+        .addStop(stopB, "11:10")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach3")
+        .withRoute(route)
+        .withMode(TransitMode.COACH)
+        .addStop(stopA, "10:50")
+        .addStop(stopB, "11:20")
+    );
+
+    var env = envBuilder.build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
+
+    var result = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(stopA))
+        .withTime(dt.instant("10:00"))
+        .withTimeWindow(Duration.ofHours(2))
+        .withNumberOfDepartures(3)
+        .withIncludeModes(List.of(TransitMode.COACH))
+        .build()
+    );
+
+    assertThat(result).hasSize(3);
+    assertThat(
+      result
+        .stream()
+        .map(t -> t.getTrip().getId().getId())
+        .toList()
+    ).containsExactly("coach1", "coach2", "coach3");
+  }
+
+  /**
+   * Mode filter with separate single-mode routes. BUS and COACH are on different
+   * routes (and thus different patterns), so filtering for COACH returns the COACH
+   * trips regardless of earlier BUS departures.
+   */
+  @Test
+  void modeFilterOnSingleModalRoutes() {
+    var envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+    var stopA = envBuilder.stop("A");
+    var stopB = envBuilder.stop("B");
+
+    var busRoute = envBuilder.route("RouteBus", r -> r.withMode(TransitMode.BUS));
+    var coachRoute = envBuilder.route("RouteCoach", r -> r.withMode(TransitMode.COACH));
+
+    envBuilder.addTrip(
+      TripInput.of("bus1").withRoute(busRoute).addStop(stopA, "10:00").addStop(stopB, "10:30")
+    );
+    envBuilder.addTrip(
+      TripInput.of("bus2").withRoute(busRoute).addStop(stopA, "10:10").addStop(stopB, "10:40")
+    );
+    envBuilder.addTrip(
+      TripInput.of("bus3").withRoute(busRoute).addStop(stopA, "10:20").addStop(stopB, "10:50")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach1").withRoute(coachRoute).addStop(stopA, "10:30").addStop(stopB, "11:00")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach2").withRoute(coachRoute).addStop(stopA, "10:40").addStop(stopB, "11:10")
+    );
+    envBuilder.addTrip(
+      TripInput.of("coach3").withRoute(coachRoute).addStop(stopA, "10:50").addStop(stopB, "11:20")
+    );
+
+    var env = envBuilder.build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
+
+    var result = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(stopA))
+        .withTime(dt.instant("10:00"))
+        .withTimeWindow(Duration.ofHours(2))
+        .withNumberOfDepartures(3)
+        .withIncludeModes(List.of(TransitMode.COACH))
+        .build()
+    );
+
+    assertThat(result).hasSize(3);
+    assertThat(
+      result
+        .stream()
+        .map(t -> t.getTrip().getId().getId())
+        .toList()
+    ).containsExactly("coach1", "coach2", "coach3");
+  }
 }

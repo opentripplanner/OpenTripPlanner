@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Queue;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -50,6 +51,7 @@ public class StopTimesHelper {
    * @param numberOfDepartures    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
+   * @param tripTimeOnDateMatcher An optional matcher to filter out trip times
    */
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
@@ -58,7 +60,8 @@ public class StopTimesHelper {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
-    Comparator<TripTimeOnDate> sortOrder
+    Comparator<TripTimeOnDate> sortOrder,
+    @Nullable Matcher<TripTimeOnDate> tripTimeOnDateMatcher
   ) {
     if (numberOfDepartures <= 0) {
       return List.of();
@@ -78,7 +81,8 @@ public class StopTimesHelper {
         numberOfDepartures,
         arrivalDeparture,
         includeCancelledTrips,
-        sortOrder
+        sortOrder,
+        tripTimeOnDateMatcher
       );
 
       result.addAll(getStopTimesInPattern(pattern, pq));
@@ -100,11 +104,11 @@ public class StopTimesHelper {
           request.numberOfDepartures(),
           request.arrivalDeparture(),
           true,
-          request.sortOrder()
+          request.sortOrder(),
+          matcher
         )
           .stream()
           .flatMap(st -> st.times.stream())
-          .filter(matcher::match)
       )
       .sorted(request.sortOrder())
       .toList();
@@ -194,7 +198,8 @@ public class StopTimesHelper {
       numberOfDepartures,
       arrivalDeparture,
       includeCancellations,
-      TripTimeOnDate.compareByDeparture()
+      TripTimeOnDate.compareByDeparture(),
+      null
     );
 
     return new ArrayList<>(pq);
@@ -223,7 +228,8 @@ public class StopTimesHelper {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
-    Comparator<TripTimeOnDate> sortOrder
+    Comparator<TripTimeOnDate> sortOrder,
+    @Nullable Matcher<TripTimeOnDate> tripTimeOnDateMatcher
   ) {
     ZoneId zoneId = transitService.getTimeZone();
 
@@ -301,15 +307,16 @@ public class StopTimesHelper {
               (arrivalDeparture != ARRIVALS && departureTimeInRange) ||
               (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
-              pq.add(
-                new TripTimeOnDate(
-                  tripTimes,
-                  stopPos,
-                  pattern,
-                  serviceDate,
-                  serviceDateMidnight.toInstant()
-                )
+              var tripTimeOnDate = new TripTimeOnDate(
+                tripTimes,
+                stopPos,
+                pattern,
+                serviceDate,
+                serviceDateMidnight.toInstant()
               );
+              if (tripTimeOnDateMatcher == null || tripTimeOnDateMatcher.match(tripTimeOnDate)) {
+                pq.add(tripTimeOnDate);
+              }
             }
           }
           // TODO Add back support for frequency entries
