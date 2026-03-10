@@ -1,10 +1,8 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.google.common.truth.Truth;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -28,7 +26,7 @@ class FlexLinkingTest {
 
     var toBeLinked = StreetModelFactory.intersectionVertex(0.0005, 0.0006);
 
-    Truth.assertThat(toBeLinked.areaStops()).isEmpty();
+    assertThat(toBeLinked.areaStops()).isEmpty();
 
     StreetModelFactory.streetEdge(v1, v2);
 

@@ -1,10 +1,8 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetModelFactory;
@@ -22,38 +20,38 @@ class ScopedLinkingTest {
   @Test
   void splitRequestScoped() {
     var env = buildEnv();
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(1);
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
     var temp = env.linkVertexForRequest(0.05, 0.05);
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(2);
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
     temp.disposeEdges();
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(1);
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
   }
 
   @Test
   void splitPermanently() {
     var env = buildEnv();
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(1);
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
     env
       .linker()
       .linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (vertex, streetVertex) ->
         List.of()
       );
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(2);
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
     env.disposeEdges();
     // edges should stay after disposing
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(2);
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
   }
 
   @Test
   void splitRealtime() {
     var env = buildEnv();
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(1);
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
     var temp = env
       .linker()
       .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (v1, v2) -> List.of());
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(2);
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
     temp.disposeEdges();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
   }

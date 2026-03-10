@@ -1,11 +1,10 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -30,7 +29,7 @@ class MultipleModeLinkingTest {
 
     var env = new LinkingEnvironment(vertices);
 
-    Truth.assertThat(env.graph().listStreetEdges()).hasSize(3);
+    assertThat(env.graph().listStreetEdges()).hasSize(3);
 
     // link point below all edges, in the middle
     env.linkVertexForRequest(0.005, -0.0001);
@@ -44,7 +43,7 @@ class MultipleModeLinkingTest {
     );
 
     // the majority of the temporary edges are in the disposable edge collection
-    Truth.assertThat(env.disposable().summarize()).containsExactly(
+    assertThat(env.disposable().summarize()).containsExactly(
       "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
       "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
       "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
@@ -55,8 +54,8 @@ class MultipleModeLinkingTest {
     env.disposeEdges();
 
     // after disposing all temporary edges should be gone
-    Truth.assertThat(env.disposable().summarize()).isEmpty();
-    Truth.assertWithMessage(
+    assertThat(env.disposable().summarize()).isEmpty();
+    assertWithMessage(
       "Graph should not have any temporary edges. Inspect %s",
       env.graph().geoJsonUrl()
     )

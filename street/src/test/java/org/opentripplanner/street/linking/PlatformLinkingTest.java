@@ -10,7 +10,6 @@ import static org.opentripplanner.street.model.StreetModelFactory.intersectionVe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -67,7 +66,7 @@ public class PlatformLinkingTest {
     // both split points are linked to the stop bidirectionally (+4 edges).
     // both split points also link to 2 visibility points at opposite side (+8 edges)
     // 14 new edges in total
-    Assertions.assertEquals(22, graph.listEdges().size());
+    assertEquals(22, graph.listEdges().size());
   }
 
   /**
@@ -97,7 +96,7 @@ public class PlatformLinkingTest {
     // new vertex connects to all 4 visibility points with 4*2 new edges
     // new vertex connects to the closest edge pair split points with 2*2 edges
     // edge pair splits to 2 edges more
-    Assertions.assertEquals(24, graph.listEdges().size());
+    assertEquals(24, graph.listEdges().size());
 
     // transit stop is connected in one rectangle corner only to walk no thru trafic edges
     // verify that new area edge connection is also walk no thru
@@ -134,7 +133,7 @@ public class PlatformLinkingTest {
     linkStops(graph, 100, true);
 
     // stop links to a existing vertex with 2 edges
-    Assertions.assertEquals(10, graph.listEdges().size());
+    assertEquals(10, graph.listEdges().size());
   }
 
   /**
@@ -177,11 +176,11 @@ public class PlatformLinkingTest {
     linker.addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
-    Assertions.assertEquals(10, graph.listEdges().size());
+    assertEquals(10, graph.listEdges().size());
 
     // check that link edges obey area safety factors
     var out = v.getOutgoing();
-    Assertions.assertEquals(out.size(), 1);
+    assertEquals(out.size(), 1);
     StreetEdge streetEdge = null;
     if (out.iterator().next() instanceof StreetEdge se) {
       streetEdge = se;
@@ -215,7 +214,7 @@ public class PlatformLinkingTest {
     // Bottom edge pair splits in the middle (+2)
     // Stop links to split vertices (+4)
     // Split vertices link with visibily vertices at top corners (+8)
-    Assertions.assertEquals(22, graph.listEdges().size());
+    assertEquals(22, graph.listEdges().size());
   }
 
   /**
@@ -244,7 +243,7 @@ public class PlatformLinkingTest {
     // stops are also linked directly (+2)
     // each stop links bidirectionally to closest edge pair (+ 2*2*2)
     // closest edge pairs split into two (+ 2*2)
-    Assertions.assertEquals(42, graph.listEdges().size());
+    assertEquals(42, graph.listEdges().size());
 
     // verify direct linking
     List<TransitStopVertex> transitStops = graph.listStopVertices();
@@ -300,7 +299,7 @@ public class PlatformLinkingTest {
     // edge pair splitting adds 2 edges, and transit vertex linking 2 more
     // new splitting vertices cannot connect with the visibility points
     // because they are hidden behind the corner
-    Assertions.assertEquals(
+    assertEquals(
       20,
       graph.listEdges().size(),
       "Incorrect number of edges, check %s".formatted(graph.geoJsonUrl())
@@ -384,13 +383,13 @@ public class PlatformLinkingTest {
 
     // Edge split points become visibility points
     var aEdges = graph.listAreaEdges();
-    Assertions.assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
+    assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
 
     // platform is a loop of 6 points, which adds 5 area edge pairs
     // western boundary splitting adds an edge pair
     // visibility edge connection from split points to exit adds two pairs more
     // Transit stop linking adds 2 pairs more
-    Assertions.assertEquals(
+    assertEquals(
       20,
       graph.listEdges().size(),
       "Incorrect number of edges, check %s".formatted(graph.geoJsonUrl())
