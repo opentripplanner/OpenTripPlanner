@@ -11,7 +11,6 @@ import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.test.support.GeoJsonIo;
 
 class SimpleAreaTest {
 
@@ -47,10 +46,6 @@ class SimpleAreaTest {
 
     assertFalse(graph.getVertices().isEmpty());
 
-    assertEquals(
-      10,
-      graph.getEdgesOfType(AreaEdge.class).size(),
-      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
-    );
+    assertEquals(10, graph.getEdgesOfType(AreaEdge.class).size(), "Incorrect number of edges");
   }
 }
