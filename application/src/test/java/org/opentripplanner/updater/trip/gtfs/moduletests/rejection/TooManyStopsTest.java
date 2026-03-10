@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.rejection;
 
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,6 @@ class TooManyStopsTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "10:31")
       .build();
 
-    assertFailure(INVALID_STOP_SEQUENCE, rt.applyTripUpdate(update));
+    assertFailure(INVALID_STOP_REFERENCE, rt.applyTripUpdate(update));
   }
 }
