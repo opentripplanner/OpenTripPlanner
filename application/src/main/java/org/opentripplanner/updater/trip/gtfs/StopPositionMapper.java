@@ -78,8 +78,8 @@ class StopPositionMapper {
    * update supplies only stop_id.
    */
   private Result<Integer, UpdateError> handleCircularRoute(int listIndex, String stopId) {
-    // we take the position of the update in the list and see if that by chance is the same
-    // index the pattern.
+    // we take the position of the update in the list and see if that, by chance, is the same
+    // index in the pattern.
     if (stopIds.get(listIndex).equals(stopId)) {
       // order in the updates also happens to match the order in the stop pattern
       return Result.success(listIndex);
