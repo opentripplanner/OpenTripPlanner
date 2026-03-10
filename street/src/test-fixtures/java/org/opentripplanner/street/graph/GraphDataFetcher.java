@@ -1,10 +1,10 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.GeoJsonIo;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -14,7 +14,6 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.test.support.GeoJsonIo;
 
 public class GraphDataFetcher {
 

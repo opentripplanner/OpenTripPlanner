@@ -186,17 +186,19 @@ public class LegacyRouteRequestMapper {
         if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
           var filterRequestBuilder = TransitFilterRequest.of();
 
-          callWith.argument("banned.routes", (String v) ->
-            filterRequestBuilder.addNot(
-              SelectRequest.of().withRoutes(FeedScopedId.parseList(v)).build()
-            )
-          );
+          callWith.argument("banned.routes", (String v) -> {
+            var bannedRoutes = FeedScopedId.parseList(v);
+            if (!bannedRoutes.isEmpty()) {
+              filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedRoutes).build());
+            }
+          });
 
-          callWith.argument("banned.agencies", (String v) ->
-            filterRequestBuilder.addNot(
-              SelectRequest.of().withAgencies(FeedScopedId.parseList(v)).build()
-            )
-          );
+          callWith.argument("banned.agencies", (String v) -> {
+            var bannedAgencies = FeedScopedId.parseList(v);
+            if (!bannedAgencies.isEmpty()) {
+              filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
+            }
+          });
 
           callWith.argument("banned.trips", (String v) ->
             transitBuilder.withBannedTrips(FeedScopedId.parseList(v))
@@ -236,11 +238,6 @@ public class LegacyRouteRequestMapper {
         }
       });
     });
-
-    if (hasArgument(environment, "allowedTicketTypes")) {
-      // request.allowedFares = new HashSet();
-      // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
-    }
 
     return request.buildRequest();
   }

@@ -15,6 +15,7 @@ import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.SplitLineString;
+import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.elevation.ElevationUtils;

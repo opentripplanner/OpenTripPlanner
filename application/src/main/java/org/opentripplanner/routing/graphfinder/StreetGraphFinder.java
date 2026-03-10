@@ -12,7 +12,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.LinkingContextRequest;
-import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.StreetSearchBuilder;

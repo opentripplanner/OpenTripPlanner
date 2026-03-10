@@ -1,9 +1,7 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
-import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -12,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -93,16 +92,16 @@ class MultipleModeLinkingTest {
   ) {
     // test model has 3 parallel horizontal edges, of which uppermost allows car driving
     IntersectionVertex[] vertices = {
-      intersectionVertex(0.0, 0.0),
-      intersectionVertex(0.01, 0.0),
-      intersectionVertex(0.0, 0.0001),
-      intersectionVertex(0.01, 0.0001),
-      intersectionVertex(0.0, 0.0002),
-      intersectionVertex(0.01, 0.0002),
+      StreetModelFactory.intersectionVertex(0.0, 0.0),
+      StreetModelFactory.intersectionVertex(0.01, 0.0),
+      StreetModelFactory.intersectionVertex(0.0, 0.0001),
+      StreetModelFactory.intersectionVertex(0.01, 0.0001),
+      StreetModelFactory.intersectionVertex(0.0, 0.0002),
+      StreetModelFactory.intersectionVertex(0.01, 0.0002),
     };
-    streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
-    streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
-    streetEdge(vertices[4], vertices[5], 0.01, CAR);
+    StreetModelFactory.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[4], vertices[5], 0.01, CAR);
 
     var env = new LinkingEnvironment(vertices);
 
@@ -171,16 +170,16 @@ class MultipleModeLinkingTest {
   ) {
     // test model has 3 parallel horizontal edges, all of them allow everything
     IntersectionVertex[] vertices = {
-      intersectionVertex(0.0, 0.0),
-      intersectionVertex(0.01, 0.0),
-      intersectionVertex(0.0, 0.0001),
-      intersectionVertex(0.01, 0.0001),
-      intersectionVertex(0.0, 0.0002),
-      intersectionVertex(0.01, 0.0002),
+      StreetModelFactory.intersectionVertex(0.0, 0.0),
+      StreetModelFactory.intersectionVertex(0.01, 0.0),
+      StreetModelFactory.intersectionVertex(0.0, 0.0001),
+      StreetModelFactory.intersectionVertex(0.01, 0.0001),
+      StreetModelFactory.intersectionVertex(0.0, 0.0002),
+      StreetModelFactory.intersectionVertex(0.01, 0.0002),
     };
-    streetEdge(vertices[0], vertices[1], 0.01, ALL);
-    streetEdge(vertices[2], vertices[3], 0.01, ALL);
-    streetEdge(vertices[4], vertices[5], 0.01, ALL);
+    StreetModelFactory.streetEdge(vertices[0], vertices[1], 0.01, ALL);
+    StreetModelFactory.streetEdge(vertices[2], vertices[3], 0.01, ALL);
+    StreetModelFactory.streetEdge(vertices[4], vertices[5], 0.01, ALL);
 
     var env = new LinkingEnvironment(vertices);
 

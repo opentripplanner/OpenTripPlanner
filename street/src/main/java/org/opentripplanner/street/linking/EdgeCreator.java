@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.edge.Edge;

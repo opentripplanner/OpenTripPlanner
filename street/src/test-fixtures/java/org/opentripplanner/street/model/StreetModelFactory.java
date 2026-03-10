@@ -24,6 +24,8 @@ import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 public class StreetModelFactory {
 
@@ -54,9 +56,9 @@ public class StreetModelFactory {
     );
   }
 
-  public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {
+  public static StreetEdge streetEdge(Vertex vA, Vertex vB) {
     var meters = SphericalDistanceLibrary.distance(vA.getCoordinate(), vB.getCoordinate());
-    return streetEdge(vA, vB, meters, StreetTraversalPermission.ALL);
+    return streetEdge((StreetVertex) vA, (StreetVertex) vB, meters, StreetTraversalPermission.ALL);
   }
 
   public static StreetEdgeBuilder<?> streetEdgeBuilder(
@@ -140,6 +142,13 @@ public class StreetModelFactory {
   public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
     var rentalVehicleBuilder = getTestRentalVehicleBuilder(formFactor);
     return new VehicleRentalPlaceVertex(rentalVehicleBuilder.build());
+  }
+
+  public static TransitStopVertex transitStopVertex(int i, Coordinate stop) {
+    return TransitStopVertex.of()
+      .withId(id(i))
+      .withPoint(GeometryUtils.getGeometryFactory().createPoint(stop))
+      .build();
   }
 
   private static TestFreeFloatingRentalVehicleBuilder getTestRentalVehicleBuilder(

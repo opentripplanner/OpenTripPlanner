@@ -26,15 +26,18 @@ export function FeatureSelectPopup({
         </thead>
         <tbody>
           {features.map((feature, index) => {
-            let labelInfo = feature.properties.name || feature.properties.label || 'N/A';
-            if (feature.properties.fromVertexLabel && feature.properties.toVertexLabel) {
+            let labelInfo = feature.properties.name ?? feature.properties.label ?? 'N/A';
+            if (feature.properties.fromVertexLabel !== undefined && feature.properties.toVertexLabel !== undefined) {
               labelInfo = `${feature.properties.fromVertexLabel} -> ${feature.properties.toVertexLabel}`;
             }
 
-            let levelInfo = feature.properties.levels || 'N/A';
-            if (feature.properties.levelValue) {
+            let levelInfo = feature.properties.levels ?? 'N/A';
+            if (feature.properties.levelValue !== undefined) {
               levelInfo = `${feature.properties.levelValue} "${feature.properties.levelName}"`;
-            } else if (feature.properties.lowerLevelValue && feature.properties.upperLevelValue) {
+            } else if (
+              feature.properties.lowerLevelValue !== undefined &&
+              feature.properties.upperLevelValue !== undefined
+            ) {
               if (feature.properties.lowerVertexLabel === feature.properties.fromVertexLabel) {
                 levelInfo = `${feature.properties.lowerLevelValue} "${feature.properties.lowerLevelName}" -> ${feature.properties.upperLevelValue} "${feature.properties.upperLevelName}"`;
               } else {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
