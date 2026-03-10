@@ -1,6 +1,7 @@
 package org.opentripplanner.street.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
@@ -27,7 +28,7 @@ public class PolylineEncoder {
    */
   public static PolylineEncoderResult encodeGeometry(Geometry geometry) {
     if (geometry instanceof LineString string) {
-      return encodeCoordinates(string.getCoordinates());
+      return encodeCoordinateSequence(string.getCoordinateSequence());
     } else if (geometry instanceof MultiLineString mls) {
       return encodeCoordinates(mls.getCoordinates());
     } else if (geometry instanceof Polygon polygon) {
@@ -80,6 +81,34 @@ public class PolylineEncoder {
     }
 
     return new PolylineEncoderResult(encodedPoints.toString(), count);
+  }
+
+  /**
+   * Encodes a coordinate sequence using the Google Polyline encoding algorithm.
+   * <p>
+   * This variant reads coordinates directly from the sequence using {@code getX(i)}/{@code getY(i)}
+   * to avoid allocating intermediate {@code Coordinate} objects.
+   */
+  public static PolylineEncoderResult encodeCoordinateSequence(CoordinateSequence seq) {
+    StringBuilder encodedPoints = new StringBuilder();
+
+    int plat = 0;
+    int plng = 0;
+
+    for (int i = 0; i < seq.size(); i++) {
+      int late5 = floor1e5(seq.getY(i));
+      int lnge5 = floor1e5(seq.getX(i));
+
+      int dlat = late5 - plat;
+      int dlng = lnge5 - plng;
+
+      plat = late5;
+      plng = lnge5;
+
+      encodedPoints.append(encodeSignedNumber(dlat)).append(encodeSignedNumber(dlng));
+    }
+
+    return new PolylineEncoderResult(encodedPoints.toString(), seq.size());
   }
 
   /**

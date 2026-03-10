@@ -136,11 +136,19 @@ public class GeometryUtils {
    */
   public static SplitLineString splitGeometryAtFraction(Geometry geometry, double fraction) {
     LineString empty = new LineString(null, GF);
-    Coordinate[] coordinates = geometry.getCoordinates();
-    CoordinateSequence sequence = GF.getCoordinateSequenceFactory().create(coordinates);
-    LineString total = new LineString(sequence, GF);
+    LineString total;
+    int numPoints;
+    if (geometry instanceof LineString ls) {
+      total = ls;
+      numPoints = ls.getNumPoints();
+    } else {
+      Coordinate[] coordinates = geometry.getCoordinates();
+      CoordinateSequence sequence = GF.getCoordinateSequenceFactory().create(coordinates);
+      total = new LineString(sequence, GF);
+      numPoints = coordinates.length;
+    }
 
-    if (coordinates.length < 2) {
+    if (numPoints < 2) {
       return new SplitLineString(empty, empty);
     }
     if (fraction <= 0) {
@@ -265,13 +273,11 @@ public class GeometryUtils {
    * segments [[A,B],[B,C],[C,D]].
    */
   public static Stream<Envelope> toEnvelopes(LineString ls) {
-    Coordinate[] coordinates = ls.getCoordinates();
-    Envelope[] envelopes = new Envelope[coordinates.length - 1];
+    CoordinateSequence seq = ls.getCoordinateSequence();
+    Envelope[] envelopes = new Envelope[seq.size() - 1];
 
     for (int i = 0; i < envelopes.length; i++) {
-      Coordinate from = coordinates[i];
-      Coordinate to = coordinates[i + 1];
-      envelopes[i] = new Envelope(from, to);
+      envelopes[i] = new Envelope(seq.getX(i), seq.getX(i + 1), seq.getY(i), seq.getY(i + 1));
     }
 
     return Arrays.stream(envelopes);
@@ -294,6 +300,24 @@ public class GeometryUtils {
     double distance = 0;
     for (int i = 1; i < coordinates.length; i++) {
       distance += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+    }
+    return distance;
+  }
+
+  /**
+   * Returns the sum of the distances in between the pairs of coordinates in meters.
+   * Uses the coordinate sequence directly to avoid allocating intermediate Coordinate objects.
+   * If the sequence has fewer than 2 points, {@code 0} is returned.
+   */
+  public static double sumDistances(CoordinateSequence seq) {
+    double distance = 0;
+    for (int i = 1; i < seq.size(); i++) {
+      distance += SphericalDistanceLibrary.distance(
+        seq.getY(i - 1),
+        seq.getX(i - 1),
+        seq.getY(i),
+        seq.getX(i)
+      );
     }
     return distance;
   }
