@@ -188,6 +188,10 @@ public class GraphBuilder implements Runnable {
     }
 
     if (loadStreetGraph || hasOsm) {
+      graphBuilder.addModuleOptional(
+        factory.gbfsGeofencingGraphBuilder(),
+        OTPFeature.GbfsGeofencingBuildTime
+      );
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 

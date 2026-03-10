@@ -1,6 +1,8 @@
 package org.opentripplanner.service.vehiclerental.street;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -8,6 +10,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.Propuls
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
@@ -34,6 +37,24 @@ public class VehicleRentalEdge extends Edge {
     RentalFormFactor formFactor
   ) {
     return connectToGraph(new VehicleRentalEdge(vertex, formFactor));
+  }
+
+  /**
+   * Creates rental edges for all form factors available at a station and adds them to the
+   * given disposable edge collection.
+   */
+  public static void createRentalEdgesForStation(
+    VehicleRentalPlaceVertex vertex,
+    VehicleRentalPlace station,
+    DisposableEdgeCollection edges
+  ) {
+    var formFactors = Stream.concat(
+      station.availablePickupFormFactors(false).stream(),
+      station.availableDropoffFormFactors(false).stream()
+    ).collect(Collectors.toSet());
+    for (var formFactor : formFactors) {
+      edges.addEdge(createVehicleRentalEdge(vertex, formFactor));
+    }
   }
 
   @Override

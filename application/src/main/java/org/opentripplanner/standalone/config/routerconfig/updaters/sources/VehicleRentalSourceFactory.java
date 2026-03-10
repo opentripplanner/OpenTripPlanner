@@ -9,11 +9,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Set;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
+import org.opentripplanner.gbfs.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 

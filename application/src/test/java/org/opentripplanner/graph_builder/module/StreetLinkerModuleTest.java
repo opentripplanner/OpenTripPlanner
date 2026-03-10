@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner._support.geometry.Coordinates.KONGSBERG_PLATFORM_1;
-import static org.opentripplanner.routing.linking.VisibilityMode.TRAVERSE_AREA_EDGES;
+import static org.opentripplanner.street.linking.VisibilityMode.TRAVERSE_AREA_EDGES;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -19,10 +19,10 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -229,7 +229,7 @@ class StreetLinkerModuleTest {
 
       module = new StreetLinkerModule(
         graph,
-        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0),
+        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         timetableRepository,
         DataImportIssueStore.NOOP

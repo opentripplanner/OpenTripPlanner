@@ -14,8 +14,23 @@ public record GeofencingZone(
   @Nullable I18NString name,
   Geometry geometry,
   boolean dropOffBanned,
-  boolean traversalBanned
+  boolean traversalBanned,
+  int priority
 ) {
+  /**
+   * Convenience constructor with default priority (0 = highest priority).
+   * Used for backward compatibility with existing code.
+   */
+  public GeofencingZone(
+    FeedScopedId id,
+    @Nullable I18NString name,
+    Geometry geometry,
+    boolean dropOffBanned,
+    boolean traversalBanned
+  ) {
+    this(id, name, geometry, dropOffBanned, traversalBanned, 0);
+  }
+
   /**
    * Are there any restrictions in this zone. (It's possible that the data says there are none.)
    */

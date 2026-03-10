@@ -13,7 +13,6 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.test.support.GeoJsonIo;
 
 /**
  * Checks that concave areas of inner rings/holes in multipolygons are connected to the outer ring.
@@ -81,11 +80,7 @@ class ConcaveHoleTest {
 
     osmModule.buildGraph();
 
-    assertEquals(
-      28,
-      graph.getEdgesOfType(AreaEdge.class).size(),
-      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
-    );
+    assertEquals(28, graph.getEdgesOfType(AreaEdge.class).size(), "Incorrect number of edges");
 
     var vertex = graph.getVertex(VertexLabel.osm(visibilityNodeId));
     assertThat(vertex.getOutgoing()).hasSize(4);

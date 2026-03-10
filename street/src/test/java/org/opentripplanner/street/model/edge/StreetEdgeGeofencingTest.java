@@ -55,6 +55,79 @@ class StreetEdgeGeofencingTest {
     assertTrue(edge.fromv.rentalTraversalBanned(forwardState("b")));
   }
 
+  /**
+   * Test that when two geofencing zones overlap, the one with higher priority (lower value)
+   * takes precedence. Per GBFS spec, earlier listed zones should take precedence.
+   */
+  @Test
+  public void higherPriorityZoneTakesPrecedence() {
+    var edge = streetEdge(V1, V2);
+
+    // Zone A (priority 0): drop-off ALLOWED (highest priority)
+    var zoneA = new GeofencingZone(
+      new FeedScopedId(NETWORK_TIER, "zone-a"),
+      null,
+      null,
+      false,
+      false,
+      0
+    );
+
+    // Zone B (priority 1): drop-off BANNED (lower priority)
+    var zoneB = new GeofencingZone(
+      new FeedScopedId(NETWORK_TIER, "zone-b"),
+      null,
+      null,
+      true,
+      false,
+      1
+    );
+
+    edge.addRentalRestriction(new GeofencingZoneExtension(zoneA));
+    edge.addRentalRestriction(new GeofencingZoneExtension(zoneB));
+
+    var state = forwardState(NETWORK_TIER);
+
+    // Zone A has higher priority (0 < 1), so its rules apply: drop-off is ALLOWED
+    assertFalse(edge.fromv.rentalRestrictions().dropOffBanned(state));
+  }
+
+  /**
+   * Test the reverse: lower priority zone should not override higher priority zone.
+   */
+  @Test
+  public void lowerPriorityZoneDoesNotOverride() {
+    var edge = streetEdge(V1, V2);
+
+    // Zone A (priority 0): drop-off BANNED (highest priority)
+    var zoneA = new GeofencingZone(
+      new FeedScopedId(NETWORK_TIER, "zone-a"),
+      null,
+      null,
+      true,
+      false,
+      0
+    );
+
+    // Zone B (priority 1): drop-off ALLOWED (lower priority)
+    var zoneB = new GeofencingZone(
+      new FeedScopedId(NETWORK_TIER, "zone-b"),
+      null,
+      null,
+      false,
+      false,
+      1
+    );
+
+    edge.addRentalRestriction(new GeofencingZoneExtension(zoneA));
+    edge.addRentalRestriction(new GeofencingZoneExtension(zoneB));
+
+    var state = forwardState(NETWORK_TIER);
+
+    // Zone A has higher priority (0 < 1), so its rules apply: drop-off is BANNED
+    assertTrue(edge.fromv.rentalRestrictions().dropOffBanned(state));
+  }
+
   @Test
   public void removeExtensions() {
     var edge = streetEdge(V1, V2);
