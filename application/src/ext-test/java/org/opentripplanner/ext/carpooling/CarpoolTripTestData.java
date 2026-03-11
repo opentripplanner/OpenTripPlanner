@@ -14,7 +14,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 /**
  * Builder utility for creating test CarpoolTrip instances without requiring full Graph infrastructure.
  */
-public class TestCarpoolTripBuilder {
+public class CarpoolTripTestData {
 
   private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
   private static final AtomicInteger AREA_STOP_COUNTER = new AtomicInteger(0);
@@ -62,7 +62,7 @@ public class TestCarpoolTripBuilder {
       CarpoolStop intermediate = intermediateStops.get(i);
       allStops.add(
         CarpoolStop.of(intermediate.getId(), () -> intermediate.getIndex() + 1)
-          .withCentroid(intermediate.getCoordinate())
+          .withCoordinate(intermediate.getCoordinate())
           .withCarpoolStopType(intermediate.getCarpoolStopType())
           .withExpectedDepartureTime(intermediate.getExpectedDepartureTime())
           .withAimedArrivalTime(intermediate.getAimedArrivalTime())
@@ -158,7 +158,7 @@ public class TestCarpoolTripBuilder {
       FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
       AREA_STOP_COUNTER::getAndIncrement
     )
-      .withCentroid(location)
+      .withCoordinate(location)
       .withSequenceNumber(sequence)
       .withPassengerDelta(passengerDelta)
       .build();
@@ -180,7 +180,7 @@ public class TestCarpoolTripBuilder {
     ZonedDateTime aimedDepartureTime
   ) {
     return CarpoolStop.of(FeedScopedId.ofNullable("TEST", "area-0"), () -> 0)
-      .withCentroid(location)
+      .withCoordinate(location)
       .withExpectedDepartureTime(expectedDepartureTime)
       .withAimedDepartureTime(aimedDepartureTime)
       .build();
@@ -206,7 +206,7 @@ public class TestCarpoolTripBuilder {
       FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
       AREA_STOP_COUNTER::getAndIncrement
     )
-      .withCentroid(location)
+      .withCoordinate(location)
       .withCarpoolStopType(CarpoolStopType.DROP_OFF_ONLY)
       .withSequenceNumber(sequenceNumber)
       .withExpectedArrivalTime(expectedArrivalTime)

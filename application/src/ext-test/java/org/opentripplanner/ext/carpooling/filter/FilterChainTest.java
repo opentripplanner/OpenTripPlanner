@@ -6,10 +6,10 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CEN
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createDestinationStop;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createOriginStop;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithCapacity;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createDestinationStop;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createOriginStop;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithCapacity;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

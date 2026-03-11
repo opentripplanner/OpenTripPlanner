@@ -13,10 +13,13 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private String provider;
-
   private Duration deviationBudget = Duration.ofMinutes(15);
   private int availableSeats = 1;
   private List<CarpoolStop> stops = new ArrayList<>();
+
+  public CarpoolTripBuilder(FeedScopedId id) {
+    super(id);
+  }
 
   public CarpoolTripBuilder(CarpoolTrip original) {
     super(original);
@@ -26,10 +29,6 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     this.deviationBudget = original.deviationBudget();
     this.availableSeats = original.availableSeats();
     this.stops = new ArrayList<>(original.stops());
-  }
-
-  public CarpoolTripBuilder(FeedScopedId id) {
-    super(id);
   }
 
   public CarpoolTripBuilder withStartTime(ZonedDateTime startTime) {

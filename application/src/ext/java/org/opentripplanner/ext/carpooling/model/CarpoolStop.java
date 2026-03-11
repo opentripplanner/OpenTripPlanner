@@ -26,7 +26,7 @@ public class CarpoolStop
   private final I18NString name;
   private final I18NString description;
   private final I18NString url;
-  private final WgsCoordinate centroid;
+  private final WgsCoordinate coordinate;
   private final Geometry geometry;
   private final CarpoolStopType carpoolStopType;
   private final ZonedDateTime expectedArrivalTime;
@@ -48,7 +48,7 @@ public class CarpoolStop
     }
     this.description = builder.description();
     this.url = builder.url();
-    this.centroid = Objects.requireNonNull(builder.centroid());
+    this.coordinate = Objects.requireNonNull(builder.coordinate());
     this.geometry = builder.geometry();
     this.carpoolStopType = builder.carpoolStopType();
     this.expectedArrivalTime = builder.expectedArrivalTime();
@@ -63,7 +63,7 @@ public class CarpoolStop
     return new CarpoolStopBuilder(id, indexCounter);
   }
 
-  public static CarpoolStopBuilder of(CarpoolStop carpoolStop, IntSupplier indexCounter) {
+  public static CarpoolStopBuilder of(CarpoolStop carpoolStop) {
     return new CarpoolStopBuilder(carpoolStop);
   }
 
@@ -111,7 +111,7 @@ public class CarpoolStop
 
   @Override
   public WgsCoordinate getCoordinate() {
-    return centroid;
+    return coordinate;
   }
 
   @Override

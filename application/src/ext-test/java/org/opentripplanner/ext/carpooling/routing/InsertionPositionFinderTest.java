@@ -8,12 +8,12 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAS
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createDestinationStop;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createOriginStop;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithCapacity;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createDestinationStop;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createOriginStop;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithCapacity;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.time.Duration;
 import java.util.List;

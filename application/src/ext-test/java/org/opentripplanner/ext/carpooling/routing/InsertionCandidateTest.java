@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPaths;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithDeviationBudget;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithDeviationBudget;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;

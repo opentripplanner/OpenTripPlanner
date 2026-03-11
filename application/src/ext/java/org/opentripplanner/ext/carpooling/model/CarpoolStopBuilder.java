@@ -17,7 +17,7 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
   private I18NString name;
   private I18NString description;
   private I18NString url;
-  private WgsCoordinate centroid;
+  private WgsCoordinate coordinate;
   private Geometry geometry;
 
   private CarpoolStopType carpoolStopType;
@@ -40,7 +40,7 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     this.name = original.getName();
     this.description = original.getDescription();
     this.url = original.getUrl();
-    this.centroid = original.getCoordinate();
+    this.coordinate = original.getCoordinate();
     this.geometry = original.getGeometry();
     this.sequenceNumber = original.getSequenceNumber();
 
@@ -72,10 +72,9 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return this;
   }
 
-  public CarpoolStopBuilder withCentroid(WgsCoordinate centroid) {
-    // TODO: Rename this to "withCoordinate". Update code in "toGeometry"
-    this.centroid = centroid;
-    this.geometry = toGeometry(centroid);
+  public CarpoolStopBuilder withCoordinate(WgsCoordinate coordinate) {
+    this.coordinate = coordinate;
+    this.geometry = toGeometry(coordinate);
     return this;
   }
 
@@ -130,8 +129,8 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return url;
   }
 
-  public WgsCoordinate centroid() {
-    return centroid;
+  public WgsCoordinate coordinate() {
+    return coordinate;
   }
 
   public Geometry geometry() {
@@ -167,15 +166,6 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
   }
 
   private Geometry toGeometry(WgsCoordinate coordinate) {
-    // TODO: change this code to map wgsCoordinate to geom Point and remove null guard.
-
-    if (centroid == null) {
-      return null;
-    }
-
-    var point = GEOMETRY_FACTORY.createPoint(coordinate.asJtsCoordinate());
-    double radiusMeters = 1;
-    double radiusDegrees = radiusMeters / 111_000d;
-    return point.buffer(radiusDegrees);
+    return GEOMETRY_FACTORY.createPoint(coordinate.asJtsCoordinate());
   }
 }

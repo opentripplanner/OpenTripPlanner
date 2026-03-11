@@ -225,7 +225,7 @@ public class CarpoolSiriMapper {
 
     return CarpoolStop.of(new FeedScopedId(FEED_ID, id), () -> CARPOOLING_DUMMY_INDEX)
       .withName(I18NString.of(call.getStopPointNames().getFirst().getValue()))
-      .withCentroid(centroid)
+      .withCoordinate(centroid)
       .withCarpoolStopType(stopType)
       .withAimedDepartureTime(isLast ? null : call.getAimedDepartureTime())
       .withExpectedDepartureTime(isLast ? null : call.getExpectedDepartureTime())

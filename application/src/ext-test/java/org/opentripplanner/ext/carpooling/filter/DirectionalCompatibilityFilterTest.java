@@ -11,9 +11,9 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CEN
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

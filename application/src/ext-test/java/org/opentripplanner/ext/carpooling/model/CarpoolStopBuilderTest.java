@@ -61,7 +61,7 @@ public class CarpoolStopBuilderTest {
     builder
       .withSequenceNumber(1)
       .withPassengerDelta(2)
-      .withCentroid(OSLO_NORTH)
+      .withCoordinate(OSLO_NORTH)
       .withCarpoolStopType(DROP_OFF_ONLY)
       .withAimedArrivalTime(AIMED_ARRIVAL_TIME)
       .withExpectedArrivalTime(EXPECTED_ARRIVAL_TIME)
@@ -96,7 +96,7 @@ public class CarpoolStopBuilderTest {
     originalBuilder
       .withSequenceNumber(2)
       .withPassengerDelta(3)
-      .withCentroid(OSLO_CENTER)
+      .withCoordinate(OSLO_CENTER)
       .withCarpoolStopType(DROP_OFF_ONLY)
       .withAimedArrivalTime(AIMED_ARRIVAL_TIME)
       .withExpectedArrivalTime(EXPECTED_ARRIVAL_TIME)
