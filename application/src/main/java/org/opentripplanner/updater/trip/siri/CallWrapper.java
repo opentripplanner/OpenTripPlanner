@@ -36,7 +36,7 @@ public interface CallWrapper {
     throws UpdateException {
     List<CallWrapper> result = new ArrayList<>();
     boolean hasOrderCalls = false;
-    boolean hasVisitNumberCalls = false;
+    boolean hasCallWithoutOrder = false;
 
     if (estimatedVehicleJourney.getRecordedCalls() != null) {
       for (var call : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
@@ -45,8 +45,9 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
+        var hasOrder = call.getOrder() != null;
+        hasOrderCalls |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
         result.add(new RecordedCallWrapper(call, sortOrder));
       }
     }
@@ -58,16 +59,14 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
+        var hasOrder = call.getOrder() != null;
+        hasOrderCalls |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
         result.add(new EstimatedCallWrapper(call, sortOrder));
       }
     }
 
-    // we reject messages that contain both Order and VisitNumber since we do not see any obvious
-    // use case that requires both, and making them mutually exclusive make the implementation
-    // simpler. We can relax this validation rule later if valid use cases are identified.
-    if (hasOrderCalls && hasVisitNumberCalls) {
+    if (hasOrderCalls && hasCallWithoutOrder) {
       throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
 
@@ -89,9 +88,6 @@ public interface CallWrapper {
     }
     if (order == null && visitNumber == null) {
       throw UpdateException.of(UpdateErrorType.MISSING_CALL_ORDER);
-    }
-    if (order != null && visitNumber != null) {
-      throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
     return order != null ? order.intValueExact() : visitNumber.intValueExact();
   }

@@ -58,13 +58,18 @@ class CallWrapperParsingTest {
   }
 
   @Test
-  void rejectBothOrderAndVisitNumber() {
+  void preferOrderBeforeVisitNumber() {
     var journey = new EstimatedVehicleJourney();
     var estimatedCalls = new EstimatedVehicleJourney.EstimatedCalls();
-    estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_A", 1, 1));
+    estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_A", 1, 3));
+    estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", 2, 6));
     journey.setEstimatedCalls(estimatedCalls);
 
-    assertFailure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER, () -> CallWrapper.of(journey));
+    var calls = CallWrapper.of(journey);
+
+    assertEquals(2, calls.size());
+    assertEquals(1, calls.get(0).getSortOrder());
+    assertEquals(2, calls.get(1).getSortOrder());
   }
 
   @Test
