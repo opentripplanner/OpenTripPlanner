@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
-import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,11 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     OBJECT_MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
 
-  public GbfsFeedLoaderImpl(List<F> feeds, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
+  public GbfsFeedLoaderImpl(
+    List<F> feeds,
+    HttpHeaders httpHeaders,
+    OtpHttpClient otpHttpClient
+  ) {
     this.httpHeaders = httpHeaders;
     this.otpHttpClient = otpHttpClient;
 
@@ -45,7 +48,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     for (var feed : feeds) {
       var feedName = feed.getName();
       if (feedUpdaters.containsKey(feedName)) {
-        throw new UpdaterConstructionException(
+        throw new GbfsConstructionException(
           "Feed contains duplicate url for feed " +
             feedName +
             ". " +

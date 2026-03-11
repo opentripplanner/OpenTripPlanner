@@ -9,7 +9,6 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,7 @@ public class GbfsFeedLoaderAndMapper {
   private final org.opentripplanner.gbfs.GbfsFeedMapper mapper;
 
   public GbfsFeedLoaderAndMapper(
-    GbfsVehicleRentalDataSourceParameters params,
+    GbfsDataSourceParameters params,
     OtpHttpClientFactory otpHttpClientFactory
   ) throws URISyntaxException {
     URI uri = new URI(params.url());

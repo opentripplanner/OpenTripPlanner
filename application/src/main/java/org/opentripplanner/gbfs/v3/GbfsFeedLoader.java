@@ -8,7 +8,7 @@ import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeedName;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSGbfs;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.updater.spi.UpdaterConstructionException;
+import org.opentripplanner.gbfs.GbfsConstructionException;
 import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class GbfsFeedLoader
     try {
       uri = new URI(url);
     } catch (URISyntaxException e) {
-      throw new UpdaterConstructionException("Invalid url " + url);
+      throw new GbfsConstructionException("Invalid url " + url);
     }
 
     // Fetch autoconfiguration file
@@ -48,7 +48,7 @@ public class GbfsFeedLoader
           url
         );
       }
-      throw new UpdaterConstructionException(
+      throw new GbfsConstructionException(
         "Could not fetch the feed auto-configuration file from " + uri
       );
     }

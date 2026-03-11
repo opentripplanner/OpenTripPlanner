@@ -24,8 +24,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
+import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +34,11 @@ public class GbfsFeedMapper
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapper.class);
 
   private final GbfsFeedLoader loader;
-  private final GbfsVehicleRentalDataSourceParameters params;
+  private final GbfsDataSourceParameters params;
   private List<GeofencingZone> geofencingZones = List.of();
   private boolean logGeofencingZonesDoesNotExistWarning = true;
 
-  public GbfsFeedMapper(GbfsFeedLoader loader, GbfsVehicleRentalDataSourceParameters params) {
+  public GbfsFeedMapper(GbfsFeedLoader loader, GbfsDataSourceParameters params) {
     this.loader = loader;
     this.params = params;
   }
@@ -58,7 +57,7 @@ public class GbfsFeedMapper
     final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
     List<VehicleRentalPlace> stations = new LinkedList<>();
-    if (params.allowRentalType(RentalPickupType.STATION)) {
+    if (params.allowStationRental()) {
       // Both station information and status are required for all systems using stations
       var stationInformation = loader.getFeed(GBFSStationInformation.class);
       var stationStatus = loader.getFeed(GBFSStationStatus.class);
@@ -103,7 +102,7 @@ public class GbfsFeedMapper
     }
 
     // Append the floating bike stations.
-    if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(RentalPickupType.FREE_FLOATING)) {
+    if (OTPFeature.FloatingBike.isOn() && params.allowFreeFloatingRental()) {
       var freeBikeStatus = loader.getFeed(GBFSVehicleStatus.class);
       if (freeBikeStatus != null) {
         GbfsVehicleStatusMapper freeVehicleStatusMapper = new GbfsVehicleStatusMapper(
