@@ -33,6 +33,7 @@ class EstimatedCallHelper {
           .distinct()
           .limit(departuresPerLineAndDestinationDisplay)
       )
+      .sorted(TripTimeOnDate.compareByDeparture())
       .toList();
   }
 
