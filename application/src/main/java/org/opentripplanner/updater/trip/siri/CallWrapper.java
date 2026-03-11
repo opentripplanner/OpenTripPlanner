@@ -4,8 +4,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.transit.model.framework.Result;
-import org.opentripplanner.updater.spi.UpdateError.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.lang.StringUtils;
 import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri21.CallStatusEnumeration;
@@ -32,9 +32,8 @@ public interface CallWrapper {
    *
    * @return a successful sorted list of calls, or a failure with the appropriate error type
    */
-  static Result<List<CallWrapper>, UpdateErrorType> of(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
+  static List<CallWrapper> of(EstimatedVehicleJourney estimatedVehicleJourney)
+    throws UpdateException {
     List<CallWrapper> result = new ArrayList<>();
     boolean hasOrderCalls = false;
     boolean hasVisitNumberCalls = false;
@@ -46,12 +45,9 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        if (sortOrder.isFailure()) {
-          return sortOrder.toFailureResult();
-        }
         hasOrderCalls |= call.getOrder() != null;
         hasVisitNumberCalls |= call.getVisitNumber() != null;
-        result.add(new RecordedCallWrapper(call, sortOrder.successValue()));
+        result.add(new RecordedCallWrapper(call, sortOrder));
       }
     }
 
@@ -62,12 +58,9 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        if (sortOrder.isFailure()) {
-          return sortOrder.toFailureResult();
-        }
         hasOrderCalls |= call.getOrder() != null;
         hasVisitNumberCalls |= call.getVisitNumber() != null;
-        result.add(new EstimatedCallWrapper(call, sortOrder.successValue()));
+        result.add(new EstimatedCallWrapper(call, sortOrder));
       }
     }
 
@@ -75,33 +68,32 @@ public interface CallWrapper {
     // use case that requires both, and making them mutually exclusive make the implementation
     // simpler. We can relax this validation rule later if valid use cases are identified.
     if (hasOrderCalls && hasVisitNumberCalls) {
-      return Result.failure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
+      throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
 
     result.sort(Comparator.comparingInt(CallWrapper::getSortOrder));
-
-    return Result.success(List.copyOf(result));
+    return List.copyOf(result);
   }
 
   /**
    * Validate a single call's stop point ref and resolve its sort order from Order/VisitNumber.
    */
-  private static Result<Integer, UpdateErrorType> validateCall(
+  private static int validateCall(
     StopPointRefStructure stopPointRef,
     java.math.BigInteger order,
     java.math.BigInteger visitNumber
-  ) {
+  ) throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
     if (StringUtils.hasNoValueOrNullAsString(ref)) {
-      return Result.failure(UpdateErrorType.EMPTY_STOP_POINT_REF);
+      throw UpdateException.of(UpdateErrorType.EMPTY_STOP_POINT_REF);
     }
     if (order == null && visitNumber == null) {
-      return Result.failure(UpdateErrorType.MISSING_CALL_ORDER);
+      throw UpdateException.of(UpdateErrorType.MISSING_CALL_ORDER);
     }
     if (order != null && visitNumber != null) {
-      return Result.failure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
+      throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
-    return Result.success(order != null ? order.intValueExact() : visitNumber.intValueExact());
+    return order != null ? order.intValueExact() : visitNumber.intValueExact();
   }
 
   String getStopPointRef();

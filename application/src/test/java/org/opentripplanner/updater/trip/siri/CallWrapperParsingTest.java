@@ -2,11 +2,12 @@ package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.math.BigInteger;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.updater.spi.UpdateError.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.RecordedCall;
@@ -22,10 +23,8 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", 2, null));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
+    var calls = CallWrapper.of(journey);
 
-    assertTrue(result.isSuccess());
-    var calls = result.successValue();
     assertEquals(2, calls.size());
     assertEquals("STOP_A", calls.get(0).getStopPointRef());
     assertEquals(1, calls.get(0).getSortOrder());
@@ -41,10 +40,8 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", null, 2));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
+    var calls = CallWrapper.of(journey);
 
-    assertTrue(result.isSuccess());
-    var calls = result.successValue();
     assertEquals(2, calls.size());
     assertEquals(1, calls.get(0).getSortOrder());
     assertEquals(2, calls.get(1).getSortOrder());
@@ -57,10 +54,7 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_A", null, null));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
-
-    assertTrue(result.isFailure());
-    assertEquals(UpdateErrorType.MISSING_CALL_ORDER, result.failureValue());
+    assertFailure(UpdateErrorType.MISSING_CALL_ORDER, () -> CallWrapper.of(journey));
   }
 
   @Test
@@ -70,10 +64,7 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_A", 1, 1));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
-
-    assertTrue(result.isFailure());
-    assertEquals(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER, result.failureValue());
+    assertFailure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER, () -> CallWrapper.of(journey));
   }
 
   @Test
@@ -84,10 +75,7 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", null, 2));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
-
-    assertTrue(result.isFailure());
-    assertEquals(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER, result.failureValue());
+    assertFailure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER, () -> CallWrapper.of(journey));
   }
 
   @Test
@@ -97,10 +85,7 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall(null, 1, null));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
-
-    assertTrue(result.isFailure());
-    assertEquals(UpdateErrorType.EMPTY_STOP_POINT_REF, result.failureValue());
+    assertFailure(UpdateErrorType.EMPTY_STOP_POINT_REF, () -> CallWrapper.of(journey));
   }
 
   @Test
@@ -112,10 +97,8 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", 2, null));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
+    var calls = CallWrapper.of(journey);
 
-    assertTrue(result.isSuccess());
-    var calls = result.successValue();
     assertEquals(
       List.of("STOP_A", "STOP_B", "STOP_C"),
       calls.stream().map(CallWrapper::getStopPointRef).toList()
@@ -134,10 +117,8 @@ class CallWrapperParsingTest {
     estimatedCalls.getEstimatedCalls().add(estimatedCall("STOP_B", 2, null));
     journey.setEstimatedCalls(estimatedCalls);
 
-    var result = CallWrapper.of(journey);
+    var calls = CallWrapper.of(journey);
 
-    assertTrue(result.isSuccess());
-    var calls = result.successValue();
     assertEquals(2, calls.size());
     assertTrue(calls.get(0).isRecorded());
     assertEquals("STOP_A", calls.get(0).getStopPointRef());
@@ -151,8 +132,7 @@ class CallWrapperParsingTest {
 
     var result = CallWrapper.of(journey);
 
-    assertTrue(result.isSuccess());
-    assertTrue(result.successValue().isEmpty());
+    assertTrue(result.isEmpty());
   }
 
   @Test
@@ -162,10 +142,7 @@ class CallWrapperParsingTest {
     recordedCalls.getRecordedCalls().add(recordedCall(null, 1, null));
     journey.setRecordedCalls(recordedCalls);
 
-    var result = CallWrapper.of(journey);
-
-    assertTrue(result.isFailure());
-    assertEquals(UpdateErrorType.EMPTY_STOP_POINT_REF, result.failureValue());
+    assertFailure(UpdateErrorType.EMPTY_STOP_POINT_REF, () -> CallWrapper.of(journey));
   }
 
   private static EstimatedCall estimatedCall(String stopRef, Integer order, Integer visitNumber) {
