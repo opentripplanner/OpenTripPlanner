@@ -10,7 +10,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.DataSource;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.AvailabiltyUpdate;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;

@@ -2,6 +2,7 @@ package org.opentripplanner.updater.spi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;

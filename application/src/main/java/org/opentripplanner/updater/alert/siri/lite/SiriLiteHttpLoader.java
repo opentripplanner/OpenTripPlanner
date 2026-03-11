@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.support.siri.SiriHelper;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.slf4j.Logger;

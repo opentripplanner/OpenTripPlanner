@@ -39,7 +39,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.slf4j.Logger;

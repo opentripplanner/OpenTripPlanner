@@ -19,7 +19,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;

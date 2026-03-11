@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.spi;
+package org.opentripplanner.framework.io;
 
 import java.util.HashMap;
 import java.util.Map;

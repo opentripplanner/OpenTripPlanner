@@ -9,7 +9,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;

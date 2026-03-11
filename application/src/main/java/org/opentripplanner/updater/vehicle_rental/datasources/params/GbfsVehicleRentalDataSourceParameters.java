@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
 public record GbfsVehicleRentalDataSourceParameters(

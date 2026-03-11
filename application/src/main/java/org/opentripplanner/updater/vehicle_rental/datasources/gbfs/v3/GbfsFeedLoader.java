@@ -7,7 +7,7 @@ import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeed;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeedName;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSGbfs;
 import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedDetails;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedLoaderImpl;

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;

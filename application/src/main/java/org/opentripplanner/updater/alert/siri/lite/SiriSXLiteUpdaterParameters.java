@@ -3,7 +3,7 @@ package org.opentripplanner.updater.alert.siri.lite;
 import java.net.URI;
 import java.time.Duration;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdater;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 
 public record SiriSXLiteUpdaterParameters(
   String configRef,

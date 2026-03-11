@@ -19,7 +19,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;

@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService
 import org.opentripplanner.street.model.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 
 public class ParkAPIUpdaterTest {
 

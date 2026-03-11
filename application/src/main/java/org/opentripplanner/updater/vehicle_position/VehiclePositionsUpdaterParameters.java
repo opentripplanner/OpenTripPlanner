@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record VehiclePositionsUpdaterParameters(

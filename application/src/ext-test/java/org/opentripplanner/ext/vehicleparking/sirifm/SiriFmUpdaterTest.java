@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 
 class SiriFmUpdaterTest {
 
