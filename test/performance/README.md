@@ -103,21 +103,9 @@ Data used:
 
 [build-config](baden-wuerttemberg/build-config.json)
  
-### Hamburg, Germany
-
-[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=hamburg&var-branch=dev-2.x&from=1658872800000&to=now)
-
-Data used:
-- NeTEx data
-- Hamburg metropolitan area OSM data
-
-Contact: [Geofox Team](mailto:Geofox-team@hbt.de)
-
-[build-config](hamburg/build-config.json)
-
 ### Helsinki, Finland
 
-[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=helsinki&var-branch=dev-2.x&from=1658872800000&to=now)
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&from=2026-02-26T22:00:00.000Z&to=now&timezone=browser&var-category=depart-after&var-location=helsinki&var-branch=dev-2.x)
 
 Data used:
 - HSL GTFS data
