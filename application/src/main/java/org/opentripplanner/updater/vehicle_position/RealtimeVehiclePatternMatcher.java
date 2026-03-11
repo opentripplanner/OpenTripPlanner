@@ -68,12 +68,14 @@ class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
+  private Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
+    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -87,6 +89,7 @@ class RealtimeVehiclePatternMatcher {
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.vehiclePositionFeatures = vehiclePositionFeatures;
+    this.getServiceDatesForServiceId = getServiceDatesForServiceId;
   }
 
   /**
@@ -140,8 +143,13 @@ class RealtimeVehiclePatternMatcher {
   }
 
   private LocalDate inferServiceDate(Trip trip) {
-    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
-    return inferServiceDate(staticTripTimes, timeZoneId, Instant.now());
+    // Use real-time timetable data, it is an overlay on the static data.
+    var tripTimes = getRealtimePattern
+      .apply(trip, LocalDate.now(timeZoneId))
+      .getScheduledTimetable()
+      .getTripTimes(trip);
+    var dates = getServiceDatesForServiceId.apply(trip.getServiceId());
+    return inferServiceDate(tripTimes, dates, timeZoneId, Instant.now());
   }
 
   /**
@@ -150,7 +158,27 @@ class RealtimeVehiclePatternMatcher {
    * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
    */
   protected static LocalDate inferServiceDate(
-    TripTimes staticTripTimes,
+    TripTimes<?> tripTimes,
+    Set<LocalDate> applicableCalendarDates,
+    ZoneId zoneId,
+    Instant now
+  ) {
+    if (tripTimes != null) {
+      return inferServiceDate(tripTimes, zoneId, now);
+    } else if (applicableCalendarDates.size() == 1) {
+      return applicableCalendarDates.stream().toList().getFirst();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+   * <p>
+   * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+   */
+  protected static LocalDate inferServiceDate(
+    TripTimes<?> staticTripTimes,
     ZoneId zoneId,
     Instant now
   ) {
