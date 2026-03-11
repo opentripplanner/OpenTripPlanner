@@ -16,9 +16,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * A mapper from the raw GBFS type into the internal model of the geofencing zones.
  */
 class GbfsGeofencingZoneMapper
-  extends org.opentripplanner.gbfs.GbfsGeofencingZoneMapper<
-    GBFSFeature
-  > {
+  extends org.opentripplanner.gbfs.GbfsGeofencingZoneMapper<GBFSFeature> {
 
   public GbfsGeofencingZoneMapper(String systemId) {
     super(systemId);

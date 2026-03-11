@@ -36,11 +36,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     OBJECT_MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
 
-  public GbfsFeedLoaderImpl(
-    List<F> feeds,
-    HttpHeaders httpHeaders,
-    OtpHttpClient otpHttpClient
-  ) {
+  public GbfsFeedLoaderImpl(List<F> feeds, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
     this.httpHeaders = httpHeaders;
     this.otpHttpClient = otpHttpClient;
 

@@ -6,11 +6,11 @@ import org.mobilitydata.gbfs.v2_3.station_information.GBFSRentalUris;
 import org.mobilitydata.gbfs.v2_3.station_information.GBFSStation;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

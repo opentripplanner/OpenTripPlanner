@@ -35,17 +35,13 @@ public class GbfsFeedLoaderAndMapper {
 
     switch (gbfsFeedVersion) {
       case "3.0" -> {
-        var loaderv30 =
-          new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
-            params.url(),
-            params.httpHeaders(),
-            client
-          );
-        loader = loaderv30;
-        mapper = new org.opentripplanner.gbfs.v3.GbfsFeedMapper(
-          loaderv30,
-          params
+        var loaderv30 = new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
+          params.url(),
+          params.httpHeaders(),
+          client
         );
+        loader = loaderv30;
+        mapper = new org.opentripplanner.gbfs.v3.GbfsFeedMapper(loaderv30, params);
       }
       case "1.1", "2.0", "2.1", "2.2", "2.3" -> {
         if (gbfsFeedVersion.startsWith("1")) {
@@ -55,32 +51,24 @@ public class GbfsFeedLoaderAndMapper {
             gbfsFeedVersion
           );
         }
-        var loaderv23 =
-          new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-            params.url(),
-            params.httpHeaders(),
-            params.language(),
-            client
-          );
-        loader = loaderv23;
-        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(
-          loaderv23,
-          params
+        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
+          params.url(),
+          params.httpHeaders(),
+          params.language(),
+          client
         );
+        loader = loaderv23;
+        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loaderv23, params);
       }
       case null -> {
-        var loaderv23 =
-          new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-            params.url(),
-            params.httpHeaders(),
-            params.language(),
-            client
-          );
-        loader = loaderv23;
-        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(
-          loaderv23,
-          params
+        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
+          params.url(),
+          params.httpHeaders(),
+          params.language(),
+          client
         );
+        loader = loaderv23;
+        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loaderv23, params);
       }
       default -> throw new UnsupportedOperationException(
         "Unsupported GBFS version " + gbfsFeedVersion + " for url " + params.url()

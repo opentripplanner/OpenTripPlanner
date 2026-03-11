@@ -15,11 +15,11 @@ import org.mobilitydata.gbfs.v2_3.system_information.GBFSSystemInformation;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +31,7 @@ import org.slf4j.LoggerFactory;
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
  * used.
  */
-public class GbfsFeedMapper
-  implements org.opentripplanner.gbfs.GbfsFeedMapper {
+public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapper.class);
 
