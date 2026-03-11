@@ -51,8 +51,7 @@ public class CallAtStopService {
       }
       stops = station.getChildStops();
     }
-    var calls = findCallsAtStop(stops, params);
-    return sort(params.numDepartures, calls);
+    return findCallsAtStop(stops, params);
   }
 
   /**
@@ -67,9 +66,7 @@ public class CallAtStopService {
       .flatMap(nearbyStop -> {
         List<StopLocation> stopLocations = List.of(nearbyStop.stop);
         var calls1 = findCallsAtStop(stopLocations, params);
-        return sort(params.numDepartures, calls1)
-          .stream()
-          .map(tt -> tt.withWalkTime(nearbyStop.duration()));
+        return calls1.stream().map(tt -> tt.withWalkTime(nearbyStop.duration()));
       })
       .toList();
 

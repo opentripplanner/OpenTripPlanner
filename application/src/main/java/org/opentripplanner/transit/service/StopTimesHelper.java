@@ -111,6 +111,7 @@ public class StopTimesHelper {
           .flatMap(st -> st.times.stream())
       )
       .sorted(request.sortOrder())
+      .limit(request.numberOfDepartures())
       .toList();
   }
 

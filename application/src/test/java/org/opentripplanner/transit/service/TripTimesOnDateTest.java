@@ -339,4 +339,34 @@ public class TripTimesOnDateTest {
         .toList()
     ).containsExactly("coach1", "coach2", "coach3");
   }
+
+  /**
+   * When querying for multiple stops, numberOfDepartures should be the total limit,
+   * not per-stop.
+   */
+  @Test
+  void numberOfDeparturesIsGlobalAcrossStops() {
+    var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
+
+    var instant = dt.instant("12:00");
+    // Both STOP_A and STOP_D have departures at 12:01, asking for 1 total
+    var result = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(STOP_A, STOP_D))
+        .withTime(instant)
+        .withNumberOfDepartures(1)
+        .build()
+    );
+    assertThat(result).hasSize(1);
+
+    // Asking for 2 should return both
+    var result2 = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(STOP_A, STOP_D))
+        .withTime(instant)
+        .withNumberOfDepartures(2)
+        .build()
+    );
+    assertThat(result2).hasSize(2);
+  }
 }
