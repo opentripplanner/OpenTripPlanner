@@ -33,6 +33,7 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
@@ -179,6 +180,15 @@ public class GraphBuilderModules {
       timetableRepository,
       issueStore
     );
+  }
+
+  @Provides
+  @Singleton
+  static StopConnectivityModule provideStopConnectivityModule(
+    Graph graph,
+    DataImportIssueStore issueStore
+  ) {
+    return new StopConnectivityModule(graph, issueStore);
   }
 
   @Provides
