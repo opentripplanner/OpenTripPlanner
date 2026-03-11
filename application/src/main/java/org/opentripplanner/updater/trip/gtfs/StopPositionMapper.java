@@ -38,7 +38,7 @@ class StopPositionMapper {
    *
    * @param listIndex The list index of the update in the list of stop time updates
    */
-  Integer stopPositionInPattern(int listIndex, StopTimeUpdate update) throws UpdateException {
+  int stopPositionInPattern(int listIndex, StopTimeUpdate update) throws UpdateException {
     if (update.stopSequence().isPresent()) {
       return handleStopSequence(listIndex, update);
     } else if (update.stopId().isPresent()) {
