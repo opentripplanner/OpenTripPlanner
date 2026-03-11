@@ -134,9 +134,9 @@ public class TransferIndexGenerator {
     ConstrainedTransfersForPatterns result,
     int nPatterns
   ) {
-    cachedResult = result;
-    dirty = false;
-    prevProcessedNumberOfPatterns = nPatterns;
+    this.cachedResult = result;
+    this.dirty = false;
+    this.prevProcessedNumberOfPatterns = nPatterns;
     return cachedResult;
   }
 
