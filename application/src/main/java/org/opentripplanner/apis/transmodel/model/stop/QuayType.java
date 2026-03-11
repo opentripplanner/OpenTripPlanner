@@ -310,7 +310,9 @@ public class QuayType {
 
             List<Map<String, ?>> filtersInput = environment.getArgument("filters");
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
-            Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
+            Collection<TransitMode> transitModes = EstimatedCallHelper.getWhitelistedModes(
+              environment.getArgument("whiteListedModes")
+            );
 
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
