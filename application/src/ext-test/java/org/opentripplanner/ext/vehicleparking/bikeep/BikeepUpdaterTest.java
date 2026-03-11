@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.framework.io.HttpHeaders;
+import org.opentripplanner.test.support.ResourceLoader;
 
 class BikeepUpdaterTest {
 

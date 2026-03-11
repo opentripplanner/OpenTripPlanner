@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.framework.io.HttpHeaders;
+import org.opentripplanner.test.support.ResourceLoader;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 
 class SiriLiteHttpLoaderTest {

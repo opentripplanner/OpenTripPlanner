@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
-import org.opentripplanner.framework.io.HttpHeaders;
 
 public class HttpHeadersConfig {
 

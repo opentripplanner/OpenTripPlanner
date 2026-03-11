@@ -74,11 +74,7 @@ public class OtpHttpClient {
    * Executes an HTTP HEAD request and returns the headers. Returns an empty list if the HTTP server
    * does not accept HTTP HEAD requests.
    */
-  public List<Header> getHeaders(
-    URI uri,
-    Duration timeout,
-    HttpHeaders requestHeaderValues
-  ) {
+  public List<Header> getHeaders(URI uri, Duration timeout, HttpHeaders requestHeaderValues) {
     return executeAndMapWithResponseHandler(
       new HttpHead(uri),
       timeout,
@@ -135,11 +131,7 @@ public class OtpHttpClient {
    * Executes an HTTP GET request and returns the body mapped as a JSON node. The default timeout is
    * applied.
    */
-  public JsonNode getAndMapAsJsonNode(
-    URI uri,
-    HttpHeaders headers,
-    ObjectMapper objectMapper
-  ) {
+  public JsonNode getAndMapAsJsonNode(URI uri, HttpHeaders headers, ObjectMapper objectMapper) {
     return getAndMapAsJsonNode(uri, null, headers, objectMapper);
   }
 

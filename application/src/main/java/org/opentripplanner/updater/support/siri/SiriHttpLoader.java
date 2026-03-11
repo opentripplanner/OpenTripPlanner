@@ -3,9 +3,9 @@ package org.opentripplanner.updater.support.siri;
 import jakarta.xml.bind.JAXBException;
 import java.time.Duration;
 import java.util.Optional;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.io.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.Siri;
@@ -70,18 +70,12 @@ public class SiriHttpLoader implements SiriLoader {
     String requestorRef
   ) {
     try {
-      return otpHttpClient.postXmlAndMap(
-        url,
-        serviceRequest,
-        timeout,
-        requestHeaders,
-        response -> {
-          requestTimer.responseFetched();
-          Siri siri = SiriHelper.unmarshal(response.body());
-          requestTimer.responseUnmarshalled();
-          return Optional.of(siri);
-        }
-      );
+      return otpHttpClient.postXmlAndMap(url, serviceRequest, timeout, requestHeaders, response -> {
+        requestTimer.responseFetched();
+        Siri siri = SiriHelper.unmarshal(response.body());
+        requestTimer.responseUnmarshalled();
+        return Optional.of(siri);
+      });
     } finally {
       LOG.info(
         "Updating SIRI-{} [{}]: Create req: {} ms, Fetching data: {} ms, Unmarshalling: {} ms",
