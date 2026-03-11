@@ -25,7 +25,7 @@ public class UpdateException extends RuntimeException {
     this.stopIndex = stopIndex;
   }
 
-  public static UpdateException of(FeedScopedId tripId, UpdateErrorType errorType) {
+  public static UpdateException of(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
     return new UpdateException(tripId, errorType, null);
   }
 

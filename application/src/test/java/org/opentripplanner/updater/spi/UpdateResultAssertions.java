@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.spi;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
@@ -27,7 +27,7 @@ public class UpdateResultAssertions {
     Supplier<T> callback,
     String msg
   ) {
-    UpdateException exn = assertThrows(msg, UpdateException.class, callback::get);
+    UpdateException exn = assertThrows(UpdateException.class, callback::get, () -> msg);
 
     assertEquals(expectedError, exn.errorType(), msg);
 
