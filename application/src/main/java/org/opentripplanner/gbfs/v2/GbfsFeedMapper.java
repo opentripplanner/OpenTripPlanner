@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
+package org.opentripplanner.gbfs.v2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * used.
  */
 public class GbfsFeedMapper
-  implements org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper {
+  implements org.opentripplanner.gbfs.GbfsFeedMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapper.class);
 

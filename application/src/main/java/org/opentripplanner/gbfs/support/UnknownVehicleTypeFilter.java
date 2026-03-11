@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support;
+package org.opentripplanner.gbfs.support;
 
 import java.util.Map;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;

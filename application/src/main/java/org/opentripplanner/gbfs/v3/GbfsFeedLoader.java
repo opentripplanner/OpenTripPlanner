@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
+package org.opentripplanner.gbfs.v3;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,8 +9,8 @@ import org.mobilitydata.gbfs.v3_0.gbfs.GBFSGbfs;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedDetails;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedLoaderImpl;
+import org.opentripplanner.gbfs.GbfsFeedDetails;
+import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
+package org.opentripplanner.gbfs.v3;
 
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.localizedString;
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
+import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.localizedString;
+import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
 import java.util.Map;
 import java.util.Objects;
@@ -15,7 +15,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support.UnknownVehicleTypeFilter;
+import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

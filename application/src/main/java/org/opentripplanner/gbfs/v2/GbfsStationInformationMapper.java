@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
+package org.opentripplanner.gbfs.v2;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,7 +10,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support.UnknownVehicleTypeFilter;
+import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

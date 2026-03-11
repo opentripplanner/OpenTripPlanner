@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
+package org.opentripplanner.gbfs.v3;
 
 import static java.util.Objects.requireNonNullElse;
 

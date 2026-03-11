@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
+package org.opentripplanner.gbfs.v2;
 
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;

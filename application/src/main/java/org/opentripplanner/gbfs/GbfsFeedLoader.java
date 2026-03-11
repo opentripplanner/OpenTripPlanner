@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
+package org.opentripplanner.gbfs;
 
 public interface GbfsFeedLoader {
   boolean update();

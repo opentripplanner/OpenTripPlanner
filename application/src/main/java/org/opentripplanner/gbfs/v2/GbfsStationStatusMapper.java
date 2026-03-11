@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
+package org.opentripplanner.gbfs.v2;
 
 import java.util.Map;
 import java.util.Objects;
@@ -10,7 +10,7 @@ import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support.UnknownVehicleTypeFilter;
+import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

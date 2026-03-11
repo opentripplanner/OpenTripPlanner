@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
+package org.opentripplanner.gbfs;
 
 import com.google.common.hash.Hashing;
 import java.nio.charset.StandardCharsets;

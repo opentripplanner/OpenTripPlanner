@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
+package org.opentripplanner.gbfs;
 
 import java.util.List;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;

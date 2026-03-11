@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
+package org.opentripplanner.gbfs.v2;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +13,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * A mapper from the raw GBFS type into the internal model of the geofencing zones.
  */
 class GbfsGeofencingZoneMapper
-  extends org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsGeofencingZoneMapper<
+  extends org.opentripplanner.gbfs.GbfsGeofencingZoneMapper<
     GBFSFeature
   > {
 

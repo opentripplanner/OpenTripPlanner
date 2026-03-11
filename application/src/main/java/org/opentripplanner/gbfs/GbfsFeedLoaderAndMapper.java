@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
+package org.opentripplanner.gbfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
@@ -21,8 +21,8 @@ public class GbfsFeedLoaderAndMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderAndMapper.class);
 
-  private final org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedLoader loader;
-  private final org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper mapper;
+  private final org.opentripplanner.gbfs.GbfsFeedLoader loader;
+  private final org.opentripplanner.gbfs.GbfsFeedMapper mapper;
 
   public GbfsFeedLoaderAndMapper(
     GbfsVehicleRentalDataSourceParameters params,
@@ -37,13 +37,13 @@ public class GbfsFeedLoaderAndMapper {
     switch (gbfsFeedVersion) {
       case "3.0" -> {
         var loaderv30 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedLoader(
+          new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             client
           );
         loader = loaderv30;
-        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper(
+        mapper = new org.opentripplanner.gbfs.v3.GbfsFeedMapper(
           loaderv30,
           params
         );
@@ -57,28 +57,28 @@ public class GbfsFeedLoaderAndMapper {
           );
         }
         var loaderv23 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedLoader(
+          new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             params.language(),
             client
           );
         loader = loaderv23;
-        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedMapper(
+        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(
           loaderv23,
           params
         );
       }
       case null -> {
         var loaderv23 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedLoader(
+          new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             params.language(),
             client
           );
         loader = loaderv23;
-        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedMapper(
+        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(
           loaderv23,
           params
         );
