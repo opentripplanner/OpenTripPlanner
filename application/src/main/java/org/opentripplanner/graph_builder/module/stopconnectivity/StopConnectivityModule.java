@@ -78,6 +78,10 @@ public class StopConnectivityModule implements GraphBuilderModule {
       .withPreStartHook(() -> {})
       .withRequest(StreetSearchRequest.of().withMode(StreetMode.WALK).build())
       .withFrom(stop)
+      // If we hard-terminate the search when reaching DURATION we never exceed it and the
+      // check below never considers a state to be allowing DURATION minutes of walking.
+      // Therefore, we add a minute to make sure that we really cross the duration limit. We then
+      // hard-terminate the search at DURATION+1m.
       .withTerminationStrategy(new DurationTerminationStrategy(DURATION.plusMinutes(1)))
       .getShortestPathTree();
 

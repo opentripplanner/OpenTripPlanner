@@ -30,7 +30,7 @@ public class TransitStopVertexBuilder {
     return this;
   }
 
-  public TransitStopVertexBuilder withCoordinate(long lat, long lon) {
+  public TransitStopVertexBuilder withCoordinate(double lat, double lon) {
     this.coordinate = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
     return this;
   }
