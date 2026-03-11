@@ -102,6 +102,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update Entur-specific emission data docs url in Transmodel custom documentation  [#7352](https://github.com/opentripplanner/OpenTripPlanner/pull/7352)
 - Fix booking time calculation for multi-day flex trip searches [#7255](https://github.com/opentripplanner/OpenTripPlanner/pull/7255)
 - Fix empty string handling for `banned.routes` and `banned.agencies` in GTFS API [#7340](https://github.com/opentripplanner/OpenTripPlanner/pull/7340)
+- Throttle and improve GBFS 'Unexpected vehicle type ID' log message [#7399](https://github.com/opentripplanner/OpenTripPlanner/pull/7399)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
