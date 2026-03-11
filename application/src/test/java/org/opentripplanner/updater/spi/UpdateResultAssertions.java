@@ -27,7 +27,7 @@ public class UpdateResultAssertions {
     Supplier<T> callback,
     String msg
   ) {
-    UpdateException exn = assertThrows(UpdateException.class, callback::get, () -> msg);
+    UpdateException exn = assertThrows(UpdateException.class, callback::get, msg);
 
     assertEquals(expectedError, exn.errorType(), msg);
 
