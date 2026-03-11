@@ -3,6 +3,7 @@ package org.opentripplanner.apis.transmodel.support;
 import graphql.ErrorClassification;
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
@@ -26,7 +27,9 @@ public class ExecutionResultMapper {
     ErrorClassification.errorClassification("InternalServerError");
 
   public static Response okResponse(ExecutionResult result) {
-    return Response.ok(GraphQLResponseSerializer.serialize(result)).build();
+    return Response.ok(GraphQLResponseSerializer.serializeAsStream(result))
+      .type(MediaType.APPLICATION_JSON_TYPE)
+      .build();
   }
 
   public static Response timeoutResponse() {

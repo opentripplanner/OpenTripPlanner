@@ -5,6 +5,10 @@ import static org.opentripplanner.utils.lang.StringUtils.quoteReplace;
 
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
+import jakarta.ws.rs.core.StreamingOutput;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 class ExecutionResultMapperTest {
@@ -64,10 +68,13 @@ class ExecutionResultMapperTest {
   );
 
   @Test
-  void okResponse() {
+  void okResponse() throws IOException {
     var response = ExecutionResultMapper.okResponse(OK_RESULT_WITH_DATA_AND_ERROR);
     assertEquals(200, response.getStatus());
-    assertEquals(RESULT_SERIALIZED, response.getEntity().toString());
+    var streaming = (StreamingOutput) response.getEntity();
+    var baos = new ByteArrayOutputStream();
+    streaming.write(baos);
+    assertEquals(RESULT_SERIALIZED, baos.toString(StandardCharsets.UTF_8));
   }
 
   @Test

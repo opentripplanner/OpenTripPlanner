@@ -19,7 +19,10 @@ import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SE
 
 import com.google.common.collect.ImmutableListMultimap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -641,7 +644,17 @@ class GraphQLIntegrationTest {
 
   private static String responseBody(Response response) {
     if (response instanceof OutboundJaxrsResponse outbound) {
-      return (String) outbound.getContext().getEntity();
+      var entity = outbound.getContext().getEntity();
+      if (entity instanceof StreamingOutput streaming) {
+        try {
+          var baos = new ByteArrayOutputStream();
+          streaming.write(baos);
+          return baos.toString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+          fail("Failed to read streaming response: " + e.getMessage());
+        }
+      }
+      return (String) entity;
     }
     fail("expected an outbound response but got %s".formatted(response.getClass().getSimpleName()));
     return null;
