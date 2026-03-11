@@ -560,7 +560,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     if (dataInitializationUrl == null) {
       return Optional.empty();
     }
-    var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
+    var headers = HttpHeaders.of().acceptApplicationXML().build();
 
     LOG.info(
       "Fetching initial Siri data from {}, timeout is {} ms.",

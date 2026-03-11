@@ -61,7 +61,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   protected void runPolling() throws InterruptedException, ExecutionException {
     final FeedMessage feed = otpHttpClient.getAndMap(
       URI.create(url),
-      this.headers.asMap(),
+      this.headers,
       response -> FeedMessage.parseFrom(response.body())
     );
 

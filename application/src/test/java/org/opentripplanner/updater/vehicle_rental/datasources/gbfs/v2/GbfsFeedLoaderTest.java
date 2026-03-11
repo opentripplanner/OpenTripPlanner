@@ -11,7 +11,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -99,7 +98,7 @@ class GbfsFeedLoaderTest {
   void fetchAllPublicFeeds() {
     List<Exception> exceptions = OTP_HTTP_CLIENT.getAndMap(
       URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
-      Map.of(),
+      HttpHeaders.empty(),
       response -> {
         List<Exception> cvsExceptions = new ArrayList<>();
         CsvReader reader = new CsvReader(response.body(), StandardCharsets.UTF_8);

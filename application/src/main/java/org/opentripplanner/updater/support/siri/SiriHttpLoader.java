@@ -74,7 +74,7 @@ public class SiriHttpLoader implements SiriLoader {
         url,
         serviceRequest,
         timeout,
-        requestHeaders.asMap(),
+        requestHeaders,
         response -> {
           requestTimer.responseFetched();
           Siri siri = SiriHelper.unmarshal(response.body());

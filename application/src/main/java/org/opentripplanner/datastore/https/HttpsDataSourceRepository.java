@@ -3,8 +3,8 @@ package org.opentripplanner.datastore.https;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import org.apache.hc.core5.http.Header;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -80,7 +80,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   protected List<Header> getHttpHeaders(URI uri) {
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
       var otpHttpClient = otpHttpClientFactory.create(LOG);
-      return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
+      return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, HttpHeaders.empty());
     }
   }
 }

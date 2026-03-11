@@ -42,7 +42,7 @@ class GtfsRealtimeHttpVehiclePositionSource {
    */
   public List<VehiclePosition> getPositions() {
     try {
-      return otpHttpClient.getAndMap(url, headers.asMap(), response ->
+      return otpHttpClient.getAndMap(url, headers, response ->
         this.getPositions(response.body())
       );
     } catch (OtpHttpClientException e) {

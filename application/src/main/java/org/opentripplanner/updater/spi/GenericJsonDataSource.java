@@ -31,7 +31,7 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
       url,
       jsonParsePath,
       this::parseElement,
-      headers.asMap(),
+      headers,
       otpHttpClient
     );
   }

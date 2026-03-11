@@ -3,7 +3,6 @@ package org.opentripplanner.ext.vehicleparking.sirifm;
 import static uk.org.siri.siri21.CountingTypeEnumeration.PRESENT_COUNT;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -26,12 +25,12 @@ public class SiriFmDataSource implements DataSource<AvailabiltyUpdate> {
   private static final Logger LOG = LoggerFactory.getLogger(SiriFmDataSource.class);
   private final SiriFmUpdaterParameters params;
   private final OtpHttpClient httpClient;
-  private final Map<String, String> headers;
+  private final HttpHeaders headers;
   private List<AvailabiltyUpdate> updates = List.of();
 
   public SiriFmDataSource(SiriFmUpdaterParameters parameters) {
     params = parameters;
-    headers = HttpHeaders.of().acceptApplicationXML().add(parameters.httpHeaders()).build().asMap();
+    headers = HttpHeaders.of().acceptApplicationXML().add(parameters.httpHeaders()).build();
     httpClient = new OtpHttpClientFactory().create(LOG);
   }
 
