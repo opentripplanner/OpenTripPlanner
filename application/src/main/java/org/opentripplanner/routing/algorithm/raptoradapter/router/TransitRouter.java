@@ -293,17 +293,6 @@ public class TransitRouter {
     }
 
     var accessRequest = accessBuilder.buildRequest();
-    // Special handling of carpool access egress
-    if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
-      return carpoolingService.routeAccessEgress(
-        accessRequest,
-        streetRequest,
-        type,
-        transitServiceResolver,
-        linkingContext,
-        transitSearchTimeZero
-      );
-    }
 
     var accessEgressPreferences = accessRequest.preferences().street().accessEgress();
 
@@ -338,6 +327,19 @@ public class TransitRouter {
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
+    }
+
+    // Special handling of carpool access egress
+    if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
+      var carpoolAccessEgressList = carpoolingService.routeAccessEgress(
+        accessRequest,
+        streetRequest,
+        type,
+        transitServiceResolver,
+        linkingContext,
+        transitSearchTimeZero
+      );
+      results.addAll(carpoolAccessEgressList);
     }
 
     return results;

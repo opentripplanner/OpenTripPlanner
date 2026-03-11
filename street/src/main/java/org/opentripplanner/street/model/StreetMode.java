@@ -69,8 +69,14 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    * Carpooling is a hybrid mode: like transit, it operates on scheduled trips with set departure
    * times; like street modes, it uses private vehicles traveling on the road network. This street
    * mode is the input for requesting carpool routing, while the transit mode appears in responses.
+   *
+   * The reason why the features DRIVING and PICKUP are not used even though CARPOOLING obviously
+   * involves driving and pickup, is because we don't want to get results involving car if there are
+   * not carpooling trips available. Carpooling has to be handled differently from ordinary
+   * driving. It does on the other hand make sense to return results involving only walking and
+   * no carpooling if those results are practical for the user.
    */
-  CARPOOL(Feature.WALKING, Feature.DRIVING, Feature.PICKUP, Feature.ACCESS, Feature.EGRESS),
+  CARPOOL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING),
 
   /**
    * Encompasses all types of on-demand and flexible transportation.
