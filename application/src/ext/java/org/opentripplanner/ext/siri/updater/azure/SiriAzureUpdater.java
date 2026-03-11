@@ -522,8 +522,8 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     try {
-      var siriXmlMessage = message.getBody().toString();
-      var siri = SiriXml.parseXml(siriXmlMessage);
+      var siriXmlMessage = message.getBody();
+      var siri = SiriXml.parseXml(siriXmlMessage.toStream());
       var serviceDelivery = siri.getServiceDelivery();
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
