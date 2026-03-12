@@ -54,7 +54,8 @@ public class ExecutionResultMapper {
 
   public static Response response(ExecutionResult result, Response.StatusType status) {
     return Response.status(status.getStatusCode())
-      .entity(GraphQLResponseSerializer.serialize(result))
+      .entity(GraphQLResponseSerializer.serializeAsStream(result))
+      .type(MediaType.APPLICATION_JSON_TYPE)
       .build();
   }
 

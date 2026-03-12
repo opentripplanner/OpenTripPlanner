@@ -71,30 +71,34 @@ class ExecutionResultMapperTest {
   void okResponse() throws IOException {
     var response = ExecutionResultMapper.okResponse(OK_RESULT_WITH_DATA_AND_ERROR);
     assertEquals(200, response.getStatus());
+    assertEquals(RESULT_SERIALIZED, readEntity(response));
+  }
+
+  @Test
+  void timeoutResponse() throws IOException {
+    var response = ExecutionResultMapper.timeoutResponse();
+    assertEquals(422, response.getStatus());
+    assertEquals(TIMEOUT_RESPONSE, readEntity(response));
+  }
+
+  @Test
+  void tooLargeResponse() throws IOException {
+    var response = ExecutionResultMapper.tooLargeResponse(TOO_LARGE_MESSAGE);
+    assertEquals(422, response.getStatus());
+    assertEquals(TOO_LARGE_RESPONSE, readEntity(response));
+  }
+
+  @Test
+  void systemErrorResponse() throws IOException {
+    var response = ExecutionResultMapper.systemErrorResponse(SYSTEM_ERROR_MESSAGE);
+    assertEquals(500, response.getStatus());
+    assertEquals(SYSTEM_ERROR_RESPONSE, readEntity(response));
+  }
+
+  private static String readEntity(jakarta.ws.rs.core.Response response) throws IOException {
     var streaming = (StreamingOutput) response.getEntity();
     var baos = new ByteArrayOutputStream();
     streaming.write(baos);
-    assertEquals(RESULT_SERIALIZED, baos.toString(StandardCharsets.UTF_8));
-  }
-
-  @Test
-  void timeoutResponse() {
-    var response = ExecutionResultMapper.timeoutResponse();
-    assertEquals(422, response.getStatus());
-    assertEquals(TIMEOUT_RESPONSE, response.getEntity().toString());
-  }
-
-  @Test
-  void tooLargeResponse() {
-    var response = ExecutionResultMapper.tooLargeResponse(TOO_LARGE_MESSAGE);
-    assertEquals(422, response.getStatus());
-    assertEquals(TOO_LARGE_RESPONSE, response.getEntity().toString());
-  }
-
-  @Test
-  void systemErrorResponse() {
-    var response = ExecutionResultMapper.systemErrorResponse(SYSTEM_ERROR_MESSAGE);
-    assertEquals(500, response.getStatus());
-    assertEquals(SYSTEM_ERROR_RESPONSE, response.getEntity().toString());
+    return baos.toString(StandardCharsets.UTF_8);
   }
 }
