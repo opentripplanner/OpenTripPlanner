@@ -27,16 +27,17 @@ import uk.org.siri.siri21.StopPointRefStructure;
 public interface CallWrapper {
   /**
    * Parse and validate all calls from an {@link EstimatedVehicleJourney}. Each call must have a
-   * non-empty stop point ref and exactly one of Order or VisitNumber. All calls must use the same
-   * strategy (all Order or all VisitNumber). The returned list is sorted by sort order.
+   * non-empty stop point ref and at least one of Order or VisitNumber (Order is preferred when both
+   * are present). All calls must use the same strategy (all Order or all VisitNumber). The returned
+   * list is sorted by sort order.
    *
    * @return a successful sorted list of calls, or a failure with the appropriate error type
    */
   static List<CallWrapper> of(EstimatedVehicleJourney estimatedVehicleJourney)
     throws UpdateException {
     List<CallWrapper> result = new ArrayList<>();
-    boolean hasOrderCalls = false;
-    boolean hasVisitNumberCalls = false;
+    boolean hasCallWithOrder = false;
+    boolean hasCallWithoutOrder = false;
 
     if (estimatedVehicleJourney.getRecordedCalls() != null) {
       for (var call : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
@@ -45,8 +46,9 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
+        var hasOrder = call.getOrder() != null;
+        hasCallWithOrder |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
         result.add(new RecordedCallWrapper(call, sortOrder));
       }
     }
@@ -58,16 +60,14 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
+        var hasOrder = call.getOrder() != null;
+        hasCallWithOrder |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
         result.add(new EstimatedCallWrapper(call, sortOrder));
       }
     }
 
-    // we reject messages that contain both Order and VisitNumber since we do not see any obvious
-    // use case that requires both, and making them mutually exclusive make the implementation
-    // simpler. We can relax this validation rule later if valid use cases are identified.
-    if (hasOrderCalls && hasVisitNumberCalls) {
+    if (hasCallWithOrder && hasCallWithoutOrder) {
       throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
 
@@ -89,9 +89,6 @@ public interface CallWrapper {
     }
     if (order == null && visitNumber == null) {
       throw UpdateException.of(UpdateErrorType.MISSING_CALL_ORDER);
-    }
-    if (order != null && visitNumber != null) {
-      throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
     return order != null ? order.intValueExact() : visitNumber.intValueExact();
   }
