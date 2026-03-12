@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.siri.moduletests.rejection;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateErrorType.MISSING_CALL_ORDER;
 import static org.opentripplanner.updater.spi.UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
@@ -107,7 +108,7 @@ class MissingCallOrderTest implements RealtimeTestConstants {
   }
 
   @Test
-  void rejectMixedOrderAndVisitNumber() {
+  void preferOrderToVisitNumber() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
@@ -120,14 +121,20 @@ class MissingCallOrderTest implements RealtimeTestConstants {
           .withVisitNumber(1)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
+          .withVisitNumber(3)
           .departAimedExpected("00:00:21", "00:00:25")
           .call(STOP_C)
+          .withVisitNumber(2)
           .arriveAimedExpected("00:00:40", "00:00:45")
       )
       .buildEstimatedTimetableDeliveries();
 
     var result = siri.applyEstimatedTimetable(updates);
-    assertFailure(MIXED_CALL_ORDER_AND_VISIT_NUMBER, result);
+    assertSuccess(result);
+    assertEquals(
+      "UPDATED | A 0:00:15 0:00:15 | B 0:00:20 0:00:25 | C 0:00:45 0:00:45",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
   }
 
   @Test
