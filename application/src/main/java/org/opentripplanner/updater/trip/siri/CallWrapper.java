@@ -35,7 +35,7 @@ public interface CallWrapper {
   static List<CallWrapper> of(EstimatedVehicleJourney estimatedVehicleJourney)
     throws UpdateException {
     List<CallWrapper> result = new ArrayList<>();
-    boolean hasOrderCalls = false;
+    boolean hasCallWithOrder = false;
     boolean hasCallWithoutOrder = false;
 
     if (estimatedVehicleJourney.getRecordedCalls() != null) {
@@ -46,7 +46,7 @@ public interface CallWrapper {
           call.getVisitNumber()
         );
         var hasOrder = call.getOrder() != null;
-        hasOrderCalls |= hasOrder;
+        hasCallWithOrder |= hasOrder;
         hasCallWithoutOrder |= !hasOrder;
         result.add(new RecordedCallWrapper(call, sortOrder));
       }
@@ -60,13 +60,13 @@ public interface CallWrapper {
           call.getVisitNumber()
         );
         var hasOrder = call.getOrder() != null;
-        hasOrderCalls |= hasOrder;
+        hasCallWithOrder |= hasOrder;
         hasCallWithoutOrder |= !hasOrder;
         result.add(new EstimatedCallWrapper(call, sortOrder));
       }
     }
 
-    if (hasOrderCalls && hasCallWithoutOrder) {
+    if (hasCallWithOrder && hasCallWithoutOrder) {
       throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
 
