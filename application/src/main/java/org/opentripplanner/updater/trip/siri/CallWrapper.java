@@ -27,8 +27,9 @@ import uk.org.siri.siri21.StopPointRefStructure;
 public interface CallWrapper {
   /**
    * Parse and validate all calls from an {@link EstimatedVehicleJourney}. Each call must have a
-   * non-empty stop point ref and exactly one of Order or VisitNumber. All calls must use the same
-   * strategy (all Order or all VisitNumber). The returned list is sorted by sort order.
+   * non-empty stop point ref and at least one of Order or VisitNumber (Order is preferred when both
+   * are present). All calls must use the same strategy (all Order or all VisitNumber). The returned
+   * list is sorted by sort order.
    *
    * @return a successful sorted list of calls, or a failure with the appropriate error type
    */
