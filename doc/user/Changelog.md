@@ -105,6 +105,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Throttle and improve GBFS 'Unexpected vehicle type ID' log message [#7399](https://github.com/opentripplanner/OpenTripPlanner/pull/7399)
 - Improve stop connectivity check [#7375](https://github.com/opentripplanner/OpenTripPlanner/pull/7375)
 - Infer vehicle position's service date for ADDED trip [#7179](https://github.com/opentripplanner/OpenTripPlanner/pull/7179)
+- Set default street routing timeout to 5 seconds again [#7373](https://github.com/opentripplanner/OpenTripPlanner/pull/7373)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
