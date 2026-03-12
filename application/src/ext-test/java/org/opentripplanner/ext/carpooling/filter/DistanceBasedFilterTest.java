@@ -9,9 +9,9 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_SOU
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_WEST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

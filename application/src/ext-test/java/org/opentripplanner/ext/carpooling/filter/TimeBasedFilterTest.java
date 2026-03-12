@@ -6,7 +6,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CEN
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTripWithTime;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTripWithTime;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;

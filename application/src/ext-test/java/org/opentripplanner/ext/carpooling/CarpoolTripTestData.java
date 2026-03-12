@@ -10,12 +10,11 @@ import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * Builder utility for creating test CarpoolTrip instances without requiring full Graph infrastructure.
  */
-public class TestCarpoolTripBuilder {
+public class CarpoolTripTestData {
 
   private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
   private static final AtomicInteger AREA_STOP_COUNTER = new AtomicInteger(0);
@@ -62,16 +61,16 @@ public class TestCarpoolTripBuilder {
     for (int i = 0; i < intermediateStops.size(); i++) {
       CarpoolStop intermediate = intermediateStops.get(i);
       allStops.add(
-        new CarpoolStop(
-          intermediate.getAreaStop(),
-          intermediate.getCarpoolStopType(),
-          intermediate.getPassengerDelta(),
-          i + 1,
-          intermediate.getExpectedArrivalTime(),
-          intermediate.getAimedArrivalTime(),
-          intermediate.getExpectedDepartureTime(),
-          intermediate.getAimedDepartureTime()
-        )
+        CarpoolStop.of(intermediate.getId(), () -> intermediate.getIndex() + 1)
+          .withCoordinate(intermediate.getCoordinate())
+          .withCarpoolStopType(intermediate.getCarpoolStopType())
+          .withExpectedDepartureTime(intermediate.getExpectedDepartureTime())
+          .withAimedArrivalTime(intermediate.getAimedArrivalTime())
+          .withExpectedArrivalTime(intermediate.getExpectedArrivalTime())
+          .withAimedArrivalTime(intermediate.getAimedDepartureTime())
+          .withSequenceNumber(intermediate.getSequenceNumber() + 1)
+          .withPassengerDelta(intermediate.getPassengerDelta())
+          .build()
       );
     }
 
@@ -155,16 +154,14 @@ public class TestCarpoolTripBuilder {
    * Creates a CarpoolStop with all parameters.
    */
   public static CarpoolStop createStopAt(int sequence, int passengerDelta, WgsCoordinate location) {
-    return new CarpoolStop(
-      createAreaStop(location),
-      CarpoolStopType.PICKUP_AND_DROP_OFF,
-      passengerDelta,
-      sequence,
-      null,
-      null,
-      null,
-      null
-    );
+    return CarpoolStop.of(
+      FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
+      AREA_STOP_COUNTER::getAndIncrement
+    )
+      .withCoordinate(location)
+      .withSequenceNumber(sequence)
+      .withPassengerDelta(passengerDelta)
+      .build();
   }
 
   /**
@@ -182,16 +179,11 @@ public class TestCarpoolTripBuilder {
     ZonedDateTime expectedDepartureTime,
     ZonedDateTime aimedDepartureTime
   ) {
-    return new CarpoolStop(
-      createAreaStop(location),
-      CarpoolStopType.PICKUP_ONLY,
-      0,
-      0,
-      null,
-      null,
-      expectedDepartureTime,
-      aimedDepartureTime
-    );
+    return CarpoolStop.of(FeedScopedId.ofNullable("TEST", "area-0"), () -> 0)
+      .withCoordinate(location)
+      .withExpectedDepartureTime(expectedDepartureTime)
+      .withAimedDepartureTime(aimedDepartureTime)
+      .build();
   }
 
   /**
@@ -210,33 +202,15 @@ public class TestCarpoolTripBuilder {
     ZonedDateTime expectedArrivalTime,
     ZonedDateTime aimedArrivalTime
   ) {
-    return new CarpoolStop(
-      createAreaStop(location),
-      CarpoolStopType.DROP_OFF_ONLY,
-      0,
-      sequenceNumber,
-      expectedArrivalTime,
-      aimedArrivalTime,
-      null,
-      null
-    );
-  }
-
-  /**
-   * Creates a minimal AreaStop for testing.
-   */
-  private static AreaStop createAreaStop(WgsCoordinate coordinate) {
-    // Create a simple point geometry at the coordinate
-    var geometryFactory = new org.locationtech.jts.geom.GeometryFactory();
-    var point = geometryFactory.createPoint(
-      new org.locationtech.jts.geom.Coordinate(coordinate.longitude(), coordinate.latitude())
-    );
-
-    return AreaStop.of(
+    return CarpoolStop.of(
       FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
       AREA_STOP_COUNTER::getAndIncrement
     )
-      .withGeometry(point)
+      .withCoordinate(location)
+      .withCarpoolStopType(CarpoolStopType.DROP_OFF_ONLY)
+      .withSequenceNumber(sequenceNumber)
+      .withExpectedArrivalTime(expectedArrivalTime)
+      .withAimedArrivalTime(aimedArrivalTime)
       .build();
   }
 }
