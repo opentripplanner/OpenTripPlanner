@@ -43,7 +43,7 @@ public class ShortestPathTree<
   public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
-    stateSets = new IdentityHashMap<>(10_000);
+    stateSets = new IdentityHashMap<>(25_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */
@@ -91,7 +91,7 @@ public class ShortestPathTree<
 
     // if the vertex has no states, add one and return
     if (states == null) {
-      states = new ArrayList<>();
+      states = new ArrayList<>(1);
       stateSets.put(vertex, states);
       states.add(newState);
       return true;
@@ -193,7 +193,7 @@ public class ShortestPathTree<
 
   /** @return every state in this tree */
   public Collection<State> getAllStates() {
-    ArrayList<State> allStates = new ArrayList<>();
+    ArrayList<State> allStates = new ArrayList<>(stateSets.size());
     for (List<State> stateSet : stateSets.values()) {
       allStates.addAll(stateSet);
     }
