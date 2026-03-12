@@ -382,7 +382,11 @@ public class GraphBuilderModules {
     awsTileSource.awsSecretKey = config.elevationBucket.secretKey;
     awsTileSource.awsBucketName = config.elevationBucket.bucketName;
 
-    return new NEDGridCoverageFactoryImpl(nedCacheDirectory, awsTileSource);
+    return new NEDGridCoverageFactoryImpl(
+      nedCacheDirectory,
+      config.elevationBucket.datumUrl,
+      awsTileSource
+    );
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(

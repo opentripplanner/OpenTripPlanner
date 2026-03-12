@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
+import java.net.URI;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ public class S3BucketConfig {
   public String accessKey;
   public String secretKey;
   public String bucketName;
+  public URI datumUrl;
 
   public static S3BucketConfig fromConfig(NodeAdapter root, String elevationBucketName) {
     return fromConfig(
@@ -73,6 +76,24 @@ public class S3BucketConfig {
         .since(NA)
         .summary("The bucket from which you want to download.")
         .asString();
+      bucketConfig.datumUrl = config
+        .of("datumUrl")
+        .since(V2_9)
+        .summary("HTTP URL of the vertical datum zip file.")
+        .summary(
+          """
+          URL of the vertical datum zip file which is necessary to convert the
+          [USGS elevation data](https://www.usgs.gov/programs/national-geospatial-program/national-map)
+          from North American Vertical Datum of 1988 (NAVD88) to WGS84 format that OpenStreetMap
+          (and GPS) uses.
+
+          The OTP project used to host these files and hard-code the URL. In 2026 we made the decision
+          to require users to host this file themselves.
+
+          If you would like to get a copy of the file, please ask in our chat room.
+          """
+        )
+        .asUri();
     } catch (OtpAppException ex) {
       LOG.error(
         "You must specify an accessKey, a secretKey, and a bucketName when " +
