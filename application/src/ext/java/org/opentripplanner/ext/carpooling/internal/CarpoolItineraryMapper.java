@@ -72,6 +72,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class CarpoolItineraryMapper {
 
   private final ZoneId timeZone;
+  private final ZonedDateTime transitSearchTimeZero;
+
 
   /**
    * Creates a new carpool itinerary mapper with the specified timezone.
@@ -80,9 +82,15 @@ public class CarpoolItineraryMapper {
    * ZonedDateTime for comparison with driver pickup times.
    * <p>
    * @param timeZone the timezone for time conversions, typically from TransitService.getTimeZone()
+   * @param transitSearchTimeZero the base time for access egress requests. It is not used for access / egress
    */
-  public CarpoolItineraryMapper(ZoneId timeZone) {
+  public CarpoolItineraryMapper(ZoneId timeZone, ZonedDateTime transitSearchTimeZero) {
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
+    this.transitSearchTimeZero = transitSearchTimeZero;
+  }
+
+  public CarpoolItineraryMapper(ZoneId timeZone) {
+    this(timeZone, null);
   }
 
   /**
@@ -169,8 +177,7 @@ public class CarpoolItineraryMapper {
   }
 
   public Itinerary toItinerary(
-    CarpoolAccessEgress accessEgress,
-    ZonedDateTime transitSearchTimeZero
+    CarpoolAccessEgress accessEgress
   ) {
     var segments = accessEgress.getSegments();
     var allEdges = segments

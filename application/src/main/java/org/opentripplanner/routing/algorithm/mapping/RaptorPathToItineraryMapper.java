@@ -71,6 +71,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
   private final TransitService transitService;
+  private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -101,6 +102,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       graph.ellipsoidToGeoidDifference
     );
     this.transitService = transitService;
+    this.carpoolItineraryMapper = new CarpoolItineraryMapper(
+      transitService.getTimeZone(),
+      transitSearchTimeZero
+    );
   }
 
   public Itinerary createItinerary(RaptorPath<T> path) {
@@ -112,9 +117,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var accessPathLeg = Objects.requireNonNull(path.accessLeg());
     // Map access leg
-    List<Leg> legs = new ArrayList<>();
-
-    legs.addAll(mapAccessLeg(accessPathLeg));
+    List<Leg> legs = new ArrayList<>(mapAccessLeg(accessPathLeg));
 
     PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
@@ -201,11 +204,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
-      CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
-        transitService.getTimeZone()
-      );
       return carpoolItineraryMapper
-        .toItinerary((CarpoolAccessEgress) accessPathLeg.access(), transitSearchTimeZero)
+        .toItinerary((CarpoolAccessEgress) accessPathLeg.access())
         .legs();
     }
 
@@ -368,12 +368,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
-      CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
-        transitService.getTimeZone()
-      );
       return carpoolItineraryMapper.toItinerary(
-        (CarpoolAccessEgress) egressPathLeg.egress(),
-        transitSearchTimeZero
+        (CarpoolAccessEgress) egressPathLeg.egress()
       );
     }
 
