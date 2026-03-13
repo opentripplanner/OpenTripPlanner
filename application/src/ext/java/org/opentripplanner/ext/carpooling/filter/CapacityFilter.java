@@ -1,26 +1,22 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import java.time.Duration;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Filters trips based on available capacity.
  * <p>
- * This is a fast pre-filter that checks if the trip has any capacity at all.
- * More detailed per-position capacity checking happens during insertion validation.
+ * This is a fast pre-filter that checks if the trip has any capacity at all. More detailed
+ * per-position capacity checking happens during insertion validation.
  */
 public class CapacityFilter implements TripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CapacityFilter.class);
 
   @Override
-  public boolean accepts(
-    CarpoolTrip trip,
-    WgsCoordinate passengerPickup,
-    WgsCoordinate passengerDropoff
-  ) {
+  public boolean accepts(CarpoolTrip trip, CarpoolingRequest request, Duration searchWindow) {
     boolean hasCapacity = trip.availableSeats() > 0;
 
     if (!hasCapacity) {

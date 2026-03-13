@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.geometry.DirectionUtils;
@@ -36,11 +37,9 @@ public class DirectionalCompatibilityFilter implements TripFilter {
   }
 
   @Override
-  public boolean accepts(
-    CarpoolTrip trip,
-    WgsCoordinate passengerPickup,
-    WgsCoordinate passengerDropoff
-  ) {
+  public boolean accepts(CarpoolTrip trip, CarpoolingRequest request, Duration searchWindow) {
+    WgsCoordinate passengerPickup = request.getPassengerPickup();
+    WgsCoordinate passengerDropoff = request.getPassengerDropoff();
     List<WgsCoordinate> routePoints = trip.routePoints();
 
     if (routePoints.size() < 2) {

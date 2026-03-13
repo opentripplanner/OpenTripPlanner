@@ -23,8 +23,12 @@ class FilterChainTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     var chain = new FilterChain(List.of(filter1, filter2));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
-    assertTrue(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
+    assertTrue(chain.accepts(trip, request, null));
   }
 
   @Test
@@ -34,8 +38,12 @@ class FilterChainTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     var chain = new FilterChain(List.of(filter1, filter2));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
-    assertFalse(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
+    assertFalse(chain.accepts(trip, request, null));
   }
 
   @Test
@@ -49,9 +57,13 @@ class FilterChainTest {
       return true;
     };
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
     var chain = new FilterChain(List.of(filter1, filter2, filter3));
-    chain.accepts(trip, OSLO_EAST, OSLO_WEST);
+    chain.accepts(trip, request, null);
 
     assertFalse(filter3Called[0], "Filter3 should not have been called due to short-circuit");
   }
@@ -66,9 +78,13 @@ class FilterChainTest {
       return true;
     };
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
     var chain = new FilterChain(List.of(filter1, filter2));
-    chain.accepts(trip, OSLO_EAST, OSLO_WEST);
+    chain.accepts(trip, request, null);
 
     assertFalse(filter2Called[0], "Filter2 should not have been called due to short-circuit");
   }
@@ -81,9 +97,13 @@ class FilterChainTest {
     // Verify by testing behavior with a trip that has no capacity
     var stops = List.of(createOriginStop(OSLO_CENTER), createDestinationStop(OSLO_NORTH, 1));
     var emptyTrip = createTripWithCapacity(0, stops);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
     // Should reject due to capacity filter
-    assertFalse(chain.accepts(emptyTrip, OSLO_EAST, OSLO_WEST));
+    assertFalse(chain.accepts(emptyTrip, request, null));
   }
 
   @Test
@@ -92,18 +112,26 @@ class FilterChainTest {
 
     // Trip going north, passenger going south
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_CENTER)
+      .build();
 
     // Should reject due to directional filter
-    assertFalse(chain.accepts(trip, OSLO_EAST, OSLO_CENTER));
+    assertFalse(chain.accepts(trip, request, null));
   }
 
   @Test
   void emptyChain_acceptsAll() {
     var chain = new FilterChain(List.of());
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
     // Empty chain accepts everything
-    assertTrue(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
+    assertTrue(chain.accepts(trip, request, null));
   }
 
   @Test
@@ -112,7 +140,11 @@ class FilterChainTest {
 
     var chain = new FilterChain(List.of(filter));
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
 
-    assertTrue(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
+    assertTrue(chain.accepts(trip, request, null));
   }
 }

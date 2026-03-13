@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Combines multiple trip filters using AND logic (all filters must pass).
@@ -44,34 +42,7 @@ public class FilterChain implements TripFilter {
   }
 
   @Override
-  public boolean accepts(
-    CarpoolTrip trip,
-    WgsCoordinate passengerPickup,
-    WgsCoordinate passengerDropoff
-  ) {
-    return filters
-      .stream()
-      .allMatch(filter -> filter.accepts(trip, passengerPickup, passengerDropoff));
-  }
-
-  @Override
-  public boolean accepts(
-    CarpoolTrip trip,
-    WgsCoordinate passengerPickup,
-    WgsCoordinate passengerDropoff,
-    Instant passengerDepartureTime,
-    Duration searchWindow
-  ) {
-    return filters
-      .stream()
-      .allMatch(filter ->
-        filter.accepts(
-          trip,
-          passengerPickup,
-          passengerDropoff,
-          passengerDepartureTime,
-          searchWindow
-        )
-      );
+  public boolean accepts(CarpoolTrip trip, CarpoolingRequest request, Duration searchWindow) {
+    return filters.stream().allMatch(filter -> filter.accepts(trip, request, searchWindow));
   }
 }

@@ -35,9 +35,13 @@ class DistanceBasedFilterTest {
     // Passenger journey along approximately the same line
     var passengerPickup = new WgsCoordinate(59.920, 10.760);
     var passengerDropoff = new WgsCoordinate(59.940, 10.780);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
     // Both points should be very close to the trip's direct line
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -49,8 +53,12 @@ class DistanceBasedFilterTest {
     // Within 50km perpendicular distance
     var passengerPickup = new WgsCoordinate(59.920, 10.740);
     var passengerDropoff = new WgsCoordinate(59.940, 10.760);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -64,8 +72,12 @@ class DistanceBasedFilterTest {
     var passengerPickup = new WgsCoordinate(59.9139, 9.5);
     // Still far west
     var passengerDropoff = new WgsCoordinate(59.9549, 9.5);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -76,8 +88,12 @@ class DistanceBasedFilterTest {
     // Passenger in Bergen (~300km away)
     var passengerPickup = new WgsCoordinate(60.39, 5.32);
     var passengerDropoff = new WgsCoordinate(60.40, 5.33);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -93,9 +109,13 @@ class DistanceBasedFilterTest {
     var passengerPickup = new WgsCoordinate(59.9, 10.75);
     // Far north
     var passengerDropoff = new WgsCoordinate(59.9 + 0.5, 10.75);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
     // Should accept because only one location must be near the route
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -107,9 +127,13 @@ class DistanceBasedFilterTest {
     // Short passenger segment along the driver's route
     var passengerPickup = new WgsCoordinate(59.920, 10.760);
     var passengerDropoff = new WgsCoordinate(59.940, 10.780);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
     // Should accept - passenger is riding only a small segment of a long trip
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -122,8 +146,12 @@ class DistanceBasedFilterTest {
     var passengerPickup = new WgsCoordinate(59.914, 10.753);
     // Very close to end
     var passengerDropoff = new WgsCoordinate(59.954, 10.791);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -135,9 +163,13 @@ class DistanceBasedFilterTest {
     // Using ~0.4° offset which is roughly 45km at this latitude
     var passengerPickup = new WgsCoordinate(59.920, 10.752 + 0.4);
     var passengerDropoff = new WgsCoordinate(59.940, 10.772 + 0.4);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
     // Should accept at boundary
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -150,8 +182,12 @@ class DistanceBasedFilterTest {
     // Passenger 80km perpendicular to the route (would be rejected by default 50km filter)
     var passengerPickup = new WgsCoordinate(59.920, 10.752 + 0.7);
     var passengerDropoff = new WgsCoordinate(59.940, 10.772 + 0.7);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(customFilter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(customFilter.accepts(trip, request, null));
   }
 
   @Test
@@ -168,8 +204,12 @@ class DistanceBasedFilterTest {
     // At this latitude, 0.27° latitude ≈ 30km
     var passengerPickup = new WgsCoordinate(59.9 + 0.27, 10.72);
     var passengerDropoff = new WgsCoordinate(59.9 + 0.27, 10.78);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertFalse(customFilter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(customFilter.accepts(trip, request, null));
   }
 
   @Test
@@ -193,8 +233,12 @@ class DistanceBasedFilterTest {
     // Passenger also going north along the same longitude
     var passengerPickup = new WgsCoordinate(59.92, 10.75);
     var passengerDropoff = new WgsCoordinate(59.95, 10.75);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -207,8 +251,12 @@ class DistanceBasedFilterTest {
     // Passenger also going east along the same latitude
     var passengerPickup = new WgsCoordinate(59.9, 10.72);
     var passengerDropoff = new WgsCoordinate(59.9, 10.78);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -223,9 +271,13 @@ class DistanceBasedFilterTest {
     var passengerPickup = new WgsCoordinate(59.9139, 10.735);
     // Near WEST
     var passengerDropoff = new WgsCoordinate(59.9139, 10.720);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
     // Should accept if close to any segment of the route
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -238,8 +290,12 @@ class DistanceBasedFilterTest {
     // Very close
     var passengerPickup = new WgsCoordinate(59.901, 10.751);
     var passengerDropoff = new WgsCoordinate(59.902, 10.752);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -251,7 +307,11 @@ class DistanceBasedFilterTest {
     // Passenger far away
     var passengerPickup = new WgsCoordinate(60.5, 11.0);
     var passengerDropoff = new WgsCoordinate(60.5, 11.1);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, request, null));
   }
 }
