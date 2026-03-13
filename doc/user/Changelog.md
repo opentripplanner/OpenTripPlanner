@@ -106,6 +106,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve stop connectivity check [#7375](https://github.com/opentripplanner/OpenTripPlanner/pull/7375)
 - Infer vehicle position's service date for ADDED trip [#7179](https://github.com/opentripplanner/OpenTripPlanner/pull/7179)
 - Set default street routing timeout to 5 seconds again [#7373](https://github.com/opentripplanner/OpenTripPlanner/pull/7373)
+- Fix walk steps for escalators leading directly to a station entrance [#7361](https://github.com/opentripplanner/OpenTripPlanner/pull/7361)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
