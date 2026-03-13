@@ -11,7 +11,6 @@ import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpl
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TimeBasedFilterTest {
