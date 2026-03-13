@@ -3,11 +3,10 @@ package org.opentripplanner.astar.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
@@ -38,24 +37,33 @@ public class ShortestPathTree<
 
   public final DominanceFunction<State> dominanceFunction;
 
-  private final Map<Vertex, List<State>> stateSets;
+  // Value is either a single State (common case) or List<State> (multi-state vertices)
+  private final IdentityOpenHashMap<Vertex, Object> stateSets;
 
   public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
-    stateSets = new IdentityHashMap<>(25_000);
+    stateSets = new IdentityOpenHashMap<>(25_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */
+  @SuppressWarnings("unchecked")
   public List<GraphPath<State, Edge, Vertex>> getPaths(Vertex dest) {
-    List<? extends State> stateList = getStates(dest);
-    if (stateList == null) {
+    Object existing = stateSets.get(dest);
+    if (existing == null) {
       return Collections.emptyList();
     }
     List<GraphPath<State, Edge, Vertex>> ret = new LinkedList<>();
-    for (State s : stateList) {
+    if (!(existing instanceof List)) {
+      State s = (State) existing;
       if (s.isFinal()) {
         ret.add(new GraphPath<>(s));
+      }
+    } else {
+      for (State s : (List<State>) existing) {
+        if (s.isFinal()) {
+          ret.add(new GraphPath<>(s));
+        }
       }
     }
     return ret;
@@ -72,7 +80,9 @@ public class ShortestPathTree<
   }
 
   public Set<Vertex> getVertices() {
-    return stateSets.keySet();
+    Set<Vertex> vertices = new HashSet<>();
+    stateSets.forEachKey(vertices::add);
+    return vertices;
   }
 
   /**
@@ -85,25 +95,42 @@ public class ShortestPathTree<
    * @return a boolean value indicating whether the state was added to the tree and should therefore
    * be enqueued
    */
+  @SuppressWarnings("unchecked")
   public boolean add(State newState) {
     Vertex vertex = newState.getVertex();
-    List<State> states = stateSets.get(vertex);
+    Object existing = stateSets.get(vertex);
 
-    // if the vertex has no states, add one and return
-    if (states == null) {
-      states = new ArrayList<>(1);
-      stateSets.put(vertex, states);
-      states.add(newState);
+    // if the vertex has no states, store directly (no list wrapper)
+    if (existing == null) {
+      stateSets.put(vertex, newState);
       return true;
     }
 
-    // if the vertex has any states that dominate the new state, don't add the state
-    // if the new state dominates any old states, remove them
+    // Single-state fast path (99% of vertices)
+    if (!(existing instanceof List)) {
+      State oldState = (State) existing;
+      // order is important, because in the case of a tie we want to reject the new state
+      if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
+        return false;
+      }
+      if (dominanceFunction.betterOrEqualAndComparable(newState, oldState)) {
+        stateSets.put(vertex, newState);
+        return true;
+      }
+      // Co-dominant: promote to list
+      List<State> list = new ArrayList<>(2);
+      list.add(oldState);
+      list.add(newState);
+      stateSets.put(vertex, list);
+      return true;
+    }
+
+    // Multi-state path: existing iterator-based dominance logic
+    List<State> states = (List<State>) existing;
     Iterator<State> it = states.iterator();
     while (it.hasNext()) {
       State oldState = it.next();
-      // order is important, because in the case of a tie
-      // we want to reject the new state
+      // order is important, because in the case of a tie we want to reject the new state
       if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
         return false;
       }
@@ -111,8 +138,6 @@ public class ShortestPathTree<
         it.remove();
       }
     }
-
-    // any states remaining are co-dominant with the new state
     states.add(newState);
     return true;
   }
@@ -123,14 +148,19 @@ public class ShortestPathTree<
    * @param dest the vertex of interest
    * @return a 'best' state at that vertex
    */
+  @SuppressWarnings("unchecked")
   public State getState(Vertex dest) {
-    Collection<State> states = stateSets.get(dest);
-    if (states == null) {
+    Object existing = stateSets.get(dest);
+    if (existing == null) {
       return null;
+    }
+    if (!(existing instanceof List)) {
+      State s = (State) existing;
+      return s.isFinal() ? s : null;
     }
     State ret = null;
     // TODO are we only checking path parser acceptance when we fetch states via this specific method?
-    for (State s : states) {
+    for (State s : (List<State>) existing) {
       if ((ret == null || s.getWeight() < ret.getWeight()) && s.isFinal()) {
         ret = s;
       }
@@ -147,13 +177,21 @@ public class ShortestPathTree<
    * @param dest the vertex of interest
    * @return a collection of 'interesting' states at that vertex
    */
+  @SuppressWarnings("unchecked")
   public List<State> getStates(Vertex dest) {
-    return stateSets.get(dest);
+    Object existing = stateSets.get(dest);
+    if (existing == null) {
+      return null;
+    }
+    if (existing instanceof List) {
+      return (List<State>) existing;
+    }
+    return List.of((State) existing);
   }
 
   /** @return number of vertices referenced in this SPT */
   public int getVertexCount() {
-    return stateSets.keySet().size();
+    return stateSets.size();
   }
 
   /**
@@ -180,23 +218,31 @@ public class ShortestPathTree<
    * @param state - the state about to be visited
    * @return - whether this state is still considered worth visiting.
    */
+  @SuppressWarnings("unchecked")
   public boolean visit(State state) {
-    boolean ret = false;
-    for (State s : stateSets.get(state.getVertex())) {
+    Object existing = stateSets.get(state.getVertex());
+    if (!(existing instanceof List)) {
+      return existing == state;
+    }
+    for (State s : (List<State>) existing) {
       if (s == state) {
-        ret = true;
-        break;
+        return true;
       }
     }
-    return ret;
+    return false;
   }
 
   /** @return every state in this tree */
+  @SuppressWarnings("unchecked")
   public Collection<State> getAllStates() {
     ArrayList<State> allStates = new ArrayList<>(stateSets.size());
-    for (List<State> stateSet : stateSets.values()) {
-      allStates.addAll(stateSet);
-    }
+    stateSets.forEachValue(value -> {
+      if (value instanceof List) {
+        allStates.addAll((List<State>) value);
+      } else {
+        allStates.add((State) value);
+      }
+    });
     return allStates;
   }
 
