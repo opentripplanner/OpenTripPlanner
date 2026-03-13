@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.spi;
+package org.opentripplanner.framework.io;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 
 /**
- * Encapsulate HTTP header parameters for use in updaters. The builder
+ * Encapsulate HTTP header parameters for use in HTTP requests. The builder
  * will use the {@link EnvironmentVariableReplacer} to substitute TOKENS in the
  * values passed in. There is also a convenience method for adding
  * {@link Builder#acceptApplicationXML()}.

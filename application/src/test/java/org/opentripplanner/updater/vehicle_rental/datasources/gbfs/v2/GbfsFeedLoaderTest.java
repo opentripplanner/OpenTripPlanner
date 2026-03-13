@@ -11,7 +11,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,9 @@ import org.mobilitydata.gbfs.v2_3.system_pricing_plans.GBFSSystemPricingPlans;
 import org.mobilitydata.gbfs.v2_3.system_regions.GBFSSystemRegions;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -99,7 +98,7 @@ class GbfsFeedLoaderTest {
   void fetchAllPublicFeeds() {
     List<Exception> exceptions = OTP_HTTP_CLIENT.getAndMap(
       URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
-      Map.of(),
+      HttpHeaders.empty(),
       response -> {
         List<Exception> cvsExceptions = new ArrayList<>();
         CsvReader reader = new CsvReader(response.body(), StandardCharsets.UTF_8);

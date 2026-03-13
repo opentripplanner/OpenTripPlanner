@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ public class JsonDataListDownloader<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonDataListDownloader.class);
   private final String jsonParsePath;
-  private final Map<String, String> headers;
+  private final HttpHeaders headers;
   private final Function<JsonNode, T> elementParser;
   private final String url;
   private final OtpHttpClient otpHttpClient;
@@ -27,7 +26,7 @@ public class JsonDataListDownloader<T> {
     String url,
     String jsonParsePath,
     Function<JsonNode, T> elementParser,
-    Map<String, String> headers
+    HttpHeaders headers
   ) {
     this(url, jsonParsePath, elementParser, headers, new OtpHttpClientFactory().create(LOG));
   }
@@ -36,7 +35,7 @@ public class JsonDataListDownloader<T> {
     String url,
     String jsonParsePath,
     Function<JsonNode, T> elementParser,
-    Map<String, String> headers,
+    HttpHeaders headers,
     OtpHttpClient OtpHttpClient
   ) {
     this.url = Objects.requireNonNull(url);

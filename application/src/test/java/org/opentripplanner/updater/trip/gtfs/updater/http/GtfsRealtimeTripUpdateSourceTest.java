@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.spi;
+package org.opentripplanner.framework.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

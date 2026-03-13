@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
@@ -76,11 +74,7 @@ public class OtpHttpClient {
    * Executes an HTTP HEAD request and returns the headers. Returns an empty list if the HTTP server
    * does not accept HTTP HEAD requests.
    */
-  public List<Header> getHeaders(
-    URI uri,
-    Duration timeout,
-    Map<String, String> requestHeaderValues
-  ) {
+  public List<Header> getHeaders(URI uri, Duration timeout, HttpHeaders requestHeaderValues) {
     return executeAndMapWithResponseHandler(
       new HttpHead(uri),
       timeout,
@@ -107,7 +101,7 @@ public class OtpHttpClient {
    */
   public <T> T getAndMapAsJsonObject(
     URI uri,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ObjectMapper objectMapper,
     Class<T> clazz
   ) {
@@ -120,7 +114,7 @@ public class OtpHttpClient {
   public <T> T getAndMapAsJsonObject(
     URI uri,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ObjectMapper objectMapper,
     Class<T> clazz
   ) {
@@ -137,11 +131,7 @@ public class OtpHttpClient {
    * Executes an HTTP GET request and returns the body mapped as a JSON node. The default timeout is
    * applied.
    */
-  public JsonNode getAndMapAsJsonNode(
-    URI uri,
-    Map<String, String> headers,
-    ObjectMapper objectMapper
-  ) {
+  public JsonNode getAndMapAsJsonNode(URI uri, HttpHeaders headers, ObjectMapper objectMapper) {
     return getAndMapAsJsonNode(uri, null, headers, objectMapper);
   }
 
@@ -151,7 +141,7 @@ public class OtpHttpClient {
   public JsonNode getAndMapAsJsonNode(
     URI uri,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ObjectMapper objectMapper
   ) {
     return getAndMap(uri, timeout, headers, response -> {
@@ -167,7 +157,7 @@ public class OtpHttpClient {
    * Executes an HTTP GET request and returns the body mapped according to the provided content
    * mapper. The default timeout is applied.
    */
-  public <T> T getAndMap(URI uri, Map<String, String> headers, ResponseMapper<T> responseMapper) {
+  public <T> T getAndMap(URI uri, HttpHeaders headers, ResponseMapper<T> responseMapper) {
     return getAndMap(uri, null, headers, responseMapper);
   }
 
@@ -178,7 +168,7 @@ public class OtpHttpClient {
   public <T> T getAndMap(
     URI uri,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
     return sendAndMap(new HttpGet(uri), uri, timeout, headers, responseMapper);
@@ -192,12 +182,15 @@ public class OtpHttpClient {
     URI uri,
     JsonNode jsonBody,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
     var request = new HttpPost(uri);
     request.setEntity(new StringEntity(jsonBody.toString()));
-    request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON);
+    request.setHeader(
+      org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE,
+      ContentType.APPLICATION_JSON
+    );
     return sendAndMap(request, uri, timeout, headers, responseMapper);
   }
 
@@ -209,7 +202,7 @@ public class OtpHttpClient {
     String url,
     String xmlData,
     Duration timeout,
-    Map<String, String> requestHeaderValues,
+    HttpHeaders requestHeaderValues,
     ResponseMapper<T> responseMapper
   ) {
     HttpPost httppost = new HttpPost(url);
@@ -226,7 +219,7 @@ public class OtpHttpClient {
   public <T> T executeAndMap(
     HttpUriRequestBase httpRequest,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
     return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response ->
@@ -241,7 +234,7 @@ public class OtpHttpClient {
   public <T> Optional<T> executeAndMapOptional(
     HttpUriRequestBase httpRequest,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
     return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response -> {
@@ -257,7 +250,7 @@ public class OtpHttpClient {
    * close the stream in order to release resources. Use preferably the provided getAndMapXXX
    * methods in this class, since they provide automatic resource management.
    */
-  public InputStream getAsInputStream(URI uri, Duration timeout, Map<String, String> requestHeaders)
+  public InputStream getAsInputStream(URI uri, Duration timeout, HttpHeaders requestHeaders)
     throws IOException {
     Objects.requireNonNull(uri);
     Objects.requireNonNull(timeout);
@@ -265,7 +258,7 @@ public class OtpHttpClient {
 
     HttpUriRequestBase httpRequest = new HttpGet(uri);
     httpRequest.setConfig(requestConfig(timeout));
-    requestHeaders.forEach(httpRequest::addHeader);
+    requestHeaders.asMap().forEach(httpRequest::addHeader);
     CloseableHttpResponse response = httpClient.execute(httpRequest);
 
     if (isFailedRequest(response)) {
@@ -292,14 +285,14 @@ public class OtpHttpClient {
   protected <T> T executeAndMapWithResponseHandler(
     HttpUriRequestBase httpRequest,
     Duration timeout,
-    Map<String, String> requestHeaders,
+    HttpHeaders requestHeaders,
     final HttpClientResponseHandler<? extends T> responseHandler
   ) {
     Objects.requireNonNull(requestHeaders);
     if (timeout != null) {
       httpRequest.setConfig(requestConfig(timeout));
     }
-    requestHeaders.forEach(httpRequest::addHeader);
+    requestHeaders.asMap().forEach(httpRequest::addHeader);
     try {
       return httpClient.execute(httpRequest, responseHandler);
     } catch (IOException e) {
@@ -357,7 +350,7 @@ public class OtpHttpClient {
     HttpUriRequestBase request,
     URI uri,
     Duration timeout,
-    Map<String, String> headers,
+    HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
     URL downloadUrl;

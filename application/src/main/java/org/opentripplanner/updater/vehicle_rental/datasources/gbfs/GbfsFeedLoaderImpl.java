@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     Class<T> clazz
   ) {
     try {
-      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders.asMap(), OBJECT_MAPPER, clazz);
+      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders, OBJECT_MAPPER, clazz);
     } catch (OtpHttpClientException e) {
       LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
       return null;
@@ -124,12 +124,12 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     OtpHttpClient.ResponseMapper<T> contentMapper
   ) {
     // Build headers with If-None-Match if ETag is available
-    Map<String, String> headers = new HashMap<>(httpHeaders.asMap());
+    var headersBuilder = HttpHeaders.of().add(httpHeaders);
     if (etag != null && !etag.isEmpty()) {
-      headers.put(HEADER_IF_NONE_MATCH, etag);
+      headersBuilder.add(HEADER_IF_NONE_MATCH, etag);
     }
 
-    return otpHttpClient.getAndMap(uri, null, headers, contentMapper);
+    return otpHttpClient.getAndMap(uri, null, headersBuilder.build(), contentMapper);
   }
 
   public record GBFSFeedResponse<T>(T body, @Nullable String etag, boolean statusNotModified) {}
