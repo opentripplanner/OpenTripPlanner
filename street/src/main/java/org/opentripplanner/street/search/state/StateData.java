@@ -61,6 +61,10 @@ public class StateData implements Cloneable {
   private StateData(StreetMode requestMode) {
     currentMode = switch (requestMode) {
       // when renting or using a flex vehicle, you start on foot until you have found the vehicle
+      /*
+        CARPOOL maps to TraverseMode.WALK because we want results involving only walking when it makes sense,
+        but we do not want results that includes driving when there are no available carpooling trips.
+       */
       case NOT_SET, WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL, FLEXIBLE, CARPOOL -> TraverseMode.WALK;
       // when cycling all the way or to a stop, you start on your own bike
       case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;

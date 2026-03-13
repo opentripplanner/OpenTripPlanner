@@ -329,7 +329,6 @@ public class TransitRouter {
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
     }
 
-    // Special handling of carpool access egress
     if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
       var carpoolAccessEgressList = carpoolingService.routeAccessEgress(
         accessRequest,
