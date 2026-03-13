@@ -236,6 +236,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder escalatorEdgeAndStationEntrance() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = new StationEntranceVertex(count, count, 12345, "B", Accessibility.POSSIBLE);
+    var edge = StreetModelForTest.escalatorEdge(from, to, 30);
+
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
   public TestStateBuilder stop(RegularStop stop) {
     return arriveAtStop(stop);
   }
