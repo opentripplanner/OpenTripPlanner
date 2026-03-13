@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolv
 import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -84,16 +85,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TimetableRepository timetableRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
-    Duration defaultMaxTransferDuration,
-    List<RouteRequest> transferRequests,
-    Map<StreetMode, TransferParametersForMode> transferParametersForMode
+    RegularTransferParameters parameters
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
-    this.defaultMaxTransferDuration = defaultMaxTransferDuration;
-    this.transferRequests = transferRequests;
-    this.transferParametersForMode = transferParametersForMode;
+    this.defaultMaxTransferDuration = parameters.maxDuration();
+    this.transferRequests = parameters.requests();
+    this.transferParametersForMode = parameters.parametersForMode();
     this.transferRepository = transferRepository;
   }
 

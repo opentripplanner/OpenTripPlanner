@@ -1,12 +1,9 @@
 package org.opentripplanner.graph_builder.module.transfer;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -36,10 +33,8 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
   private boolean noTransfersOnStationA = false;
   private boolean graphHasStreets = false;
   private boolean includeCarFerryTrips = false;
-  private Duration maxTransferDuration = MAX_TRANSFER_DURATION;
-  private final List<RouteRequest> transferRequests = new ArrayList<>();
-  private final Map<StreetMode, TransferParametersForMode> transferParametersForMode =
-    new HashMap<>();
+  private RegularTransferParameters.Builder regularTransferParameters =
+    RegularTransferParameters.of().withMaxDuration(MAX_TRANSFER_DURATION);
 
   public DirectTransferGeneratorTestData withPatterns() {
     this.addPatterns = true;
@@ -67,12 +62,12 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
   }
 
   public DirectTransferGeneratorTestData withMaxTransferDuration(Duration value) {
-    this.maxTransferDuration = value;
+    this.regularTransferParameters.withMaxDuration(value);
     return this;
   }
 
   public DirectTransferGeneratorTestData withTransferRequests(RouteRequest... request) {
-    this.transferRequests.addAll(Arrays.asList(request));
+    this.regularTransferParameters.withRequests(List.of(request));
     return this;
   }
 
@@ -80,7 +75,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
     StreetMode mode,
     TransferParametersForMode value
   ) {
-    this.transferParametersForMode.put(mode, value);
+    this.regularTransferParameters.addParametersForMode(mode, value);
     return this;
   }
 
@@ -93,9 +88,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
       model.timetableRepository(),
       model.transferRepository(),
       DataImportIssueStore.NOOP,
-      maxTransferDuration,
-      transferRequests,
-      transferParametersForMode
+      regularTransferParameters.build()
     ).buildGraph();
 
     return model.transferRepository();

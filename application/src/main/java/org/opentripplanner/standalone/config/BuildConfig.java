@@ -12,11 +12,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -35,26 +33,23 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
+import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
+import org.opentripplanner.standalone.config.buildconfig.RegularTransferConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
-import org.opentripplanner.standalone.config.buildconfig.TransferConfig;
-import org.opentripplanner.standalone.config.buildconfig.TransferRequestConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,15 +153,13 @@ public class BuildConfig implements OtpDataStoreConfig {
   /** See {@link IslandPruningConfig}. */
   public final IslandPruningConfig islandPruning;
 
-  public final Duration maxTransferDuration;
-  public final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   public final NetexFeedParameters netexDefaults;
   public final GtfsDefaultParameters gtfsDefaults;
 
   public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;
 
-  public final List<RouteRequest> transferRequests;
+  private final RegularTransferParameters regularTransferParameters;
 
   public final int maxAreaNodes;
 
@@ -284,14 +277,9 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asInt(1000);
-    maxTransferDuration = root
-      .of("maxTransferDuration")
-      .since(V2_1)
-      .summary(
-        "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
-      )
-      .asDuration(Duration.ofMinutes(30));
-    transferParametersForMode = TransferConfig.map(root, "transferParametersForMode");
+
+    this.regularTransferParameters = RegularTransferConfig.map(root);
+
     maxStopToShapeSnapDistance = root
       .of("maxStopToShapeSnapDistance")
       .since(V2_1)
@@ -622,8 +610,6 @@ public class BuildConfig implements OtpDataStoreConfig {
     edgeNamer = EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
-    transferRequests = TransferRequestConfig.map(root, "transferRequests");
-
     gsConfig = GsConfig.fromConfig(root, "gsConfig");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -724,6 +710,10 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public List<FeedScopedId> transitRouteToStationCentroid() {
     return transitRouteToStationCentroid;
+  }
+
+  public RegularTransferParameters regularTransferParameters() {
+    return regularTransferParameters;
   }
 
   public int getSubwayAccessTimeSeconds() {
