@@ -116,7 +116,12 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());
         if (!connectVertexToStop(ts, stop, graph)) {
-          LOG.debug("Could not connect {} at {}", ts.getId(), ts.getCoordinate());
+          LOG.debug(
+            "Could not connect {} ({}) at {}",
+            ts.getId(),
+            stop.getCode(),
+            ts.getCoordinate()
+          );
         } else {
           successes++;
         }
