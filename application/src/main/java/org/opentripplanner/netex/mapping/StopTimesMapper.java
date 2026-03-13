@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -317,8 +318,12 @@ class StopTimesMapper {
           stopPoint.getDestinationDisplayRef().getRef()
         );
 
+
         if (destinationDisplay != null) {
-          currentHeadSign = new NonLocalizedString(destinationDisplay.getFrontText().getValue());
+          currentHeadSign = Optional.ofNullable(destinationDisplay.getFrontText())
+            .or(() -> Optional.ofNullable(destinationDisplay.getName()))
+            .map(s -> I18NString.of(s.getValue()))
+            .orElse(null);
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
             currentHeadSignVias = viaValues

@@ -46,6 +46,9 @@ public class ServiceJourneyInfo {
       .getPassingTimes()
       .getTimetabledPassingTime()
       .stream()
+      .filter(timetabledPassingTime ->
+        stopPointIdToOrder.containsKey(stopPointId(timetabledPassingTime))
+      )
       .sorted(
         Comparator.comparing(timetabledPassingTime ->
           stopPointIdToOrder.get(stopPointId(timetabledPassingTime))

@@ -19,9 +19,12 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.VehicleJourneyRefStructure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransferMapper {
 
+  private static final Logger LOG = LoggerFactory.getLogger(TransferMapper.class);
   private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
   private final Map<String, List<String>> scheduledStopPointsIndex;
@@ -61,6 +64,7 @@ public class TransferMapper {
     var to = mapPoint(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
 
     if (from == null || to == null) {
+      issueStore.add("InvalidInterchange", "Interchange %s contains invalid from/to refs", it);
       return null;
     }
 
@@ -81,6 +85,9 @@ public class TransferMapper {
     VehicleJourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
+    if(sjRef == null || sjRef.getRef() == null) {
+      return null;
+    }
     var sjId = sjRef.getRef();
     var trip = findTrip(label, "Journey", interchangeId, sjId);
     int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
