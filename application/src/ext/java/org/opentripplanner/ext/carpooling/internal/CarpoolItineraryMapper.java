@@ -177,8 +177,8 @@ public class CarpoolItineraryMapper {
       .stream()
       .flatMap(seg -> seg.edges.stream())
       .toList();
-    var startTime = transitSearchTimeZero.plusSeconds(accessEgress.getStartOfTrip());
-    var endTime = transitSearchTimeZero.plusSeconds(accessEgress.getEndOfTrip());
+    var startTime = transitSearchTimeZero.plusSeconds(accessEgress.getDepartureTimeOfPassenger());
+    var endTime = transitSearchTimeZero.plusSeconds(accessEgress.getArrivalTimeOfPassenger());
     var fromVertex = segments.getFirst().states.getFirst().getVertex();
     var toVertex = segments.getLast().states.getLast().getVertex();
     LineString geometry = GeometryUtils.concatenateLineStrings(allEdges, Edge::getGeometry);

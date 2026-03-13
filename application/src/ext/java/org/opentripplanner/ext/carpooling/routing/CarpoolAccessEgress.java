@@ -13,8 +13,15 @@ import org.opentripplanner.street.search.state.State;
 
 public class CarpoolAccessEgress implements RoutingAccessEgress {
 
-  private final int startOfTrip;
-  private final int endOfTrip;
+  /**
+   * The departure time of the passenger in seconds since transitSearchTimeZero.
+   */
+  private final int departureTimeOfPassenger;
+
+  /**
+   * The arrival time of the passenger in seconds since transitSearchTimeZero.
+   */
+  private final int arrivalTimeOfPassenger;
   private final int stop;
   private final int durationInSeconds;
   private final int c1;
@@ -28,14 +35,14 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     int stop,
     Duration duration,
     Duration extraTimeForStop,
-    int startOfTrip,
-    int endOfTrip,
+    int departureTimeOfPassenger,
+    int arrivalTimeOfPassenger,
     List<GraphPath<State, Edge, Vertex>> segments,
     TimeAndCost penalty,
     Double carReluctance
   ) {
-    this.startOfTrip = startOfTrip;
-    this.endOfTrip = endOfTrip;
+    this.departureTimeOfPassenger = departureTimeOfPassenger;
+    this.arrivalTimeOfPassenger = arrivalTimeOfPassenger;
     this.stop = stop;
     this.durationInSeconds = (int) duration.getSeconds();
     this.carReluctance = carReluctance;
@@ -69,18 +76,18 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    if (requestedDepartureTime > startOfTrip) {
+    if (requestedDepartureTime > departureTimeOfPassenger) {
       return RaptorConstants.TIME_NOT_SET;
     }
-    return startOfTrip;
+    return departureTimeOfPassenger;
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    if (requestedArrivalTime < endOfTrip) {
+    if (requestedArrivalTime < arrivalTimeOfPassenger) {
       return RaptorConstants.TIME_NOT_SET;
     }
-    return endOfTrip;
+    return arrivalTimeOfPassenger;
   }
 
   @Override
@@ -88,12 +95,12 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     return true;
   }
 
-  public int getStartOfTrip() {
-    return startOfTrip;
+  public int getDepartureTimeOfPassenger() {
+    return departureTimeOfPassenger;
   }
 
-  public int getEndOfTrip() {
-    return endOfTrip;
+  public int getArrivalTimeOfPassenger() {
+    return arrivalTimeOfPassenger;
   }
 
   @Override
@@ -102,8 +109,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
       this.stop,
       Duration.ofSeconds(this.durationInSeconds),
       this.extraTimeForStop,
-      this.startOfTrip,
-      this.endOfTrip,
+      this.departureTimeOfPassenger,
+      this.arrivalTimeOfPassenger,
       this.segments,
       penalty,
       this.carReluctance
