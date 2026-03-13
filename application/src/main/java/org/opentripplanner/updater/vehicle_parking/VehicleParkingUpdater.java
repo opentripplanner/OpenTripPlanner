@@ -21,7 +21,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
@@ -176,10 +176,14 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     private DisposableEdgeCollection linkVehicleParkingForRealtime(
       VehicleParkingEntranceVertex vehicleParkingEntranceVertex
     ) {
-      var modes = new TraverseModeSet();
-      modes.setWalk(vehicleParkingEntranceVertex.isWalkAccessible());
-      modes.setCar(vehicleParkingEntranceVertex.isCarAccessible());
-      if (!modes.isValid()) {
+      var modes = new HashSet<TraverseMode>();
+      if (vehicleParkingEntranceVertex.isWalkAccessible()) {
+        modes.add(TraverseMode.WALK);
+      }
+      if (vehicleParkingEntranceVertex.isCarAccessible()) {
+        modes.add(TraverseMode.CAR);
+      }
+      if (modes.isEmpty()) {
         return null;
       }
       return linker.linkVertexBidirectionallyForRealTime(

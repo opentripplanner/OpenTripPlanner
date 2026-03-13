@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking.internal;
 
-import java.util.List;
+import java.util.Set;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
@@ -49,8 +49,8 @@ public class VertexCreationService {
 
     var disposableEdgeCollection = vertexLinker.linkVertexForRequest(
       temporaryStreetLocation,
-      new TraverseModeSet(request.incomingModes()),
-      new TraverseModeSet(request.outgoingModes()),
+      request.incomingModes(),
+      request.outgoingModes(),
       TemporaryFreeEdge::createTemporaryFreeEdge
     );
     container.addEdgeCollection(disposableEdgeCollection);
@@ -67,7 +67,7 @@ public class VertexCreationService {
 
   public static VertexCreationRequest createVertexCreationRequest(
     GenericLocation location,
-    List<TraverseMode> modes,
+    Set<TraverseModeSet> modes,
     LocationType type
   ) {
     var incomingModes = getIncomingModes(modes, type);
@@ -82,39 +82,49 @@ public class VertexCreationService {
    * Maps a street mode to the appropriate traverse modes for vertex linking.
    *
    * @param streetMode The street mode from the request
-   * @param type The location type (origin, destination, or via)
-   * @return The traverse modes to use for linking
+   * @param type       The location type (origin, destination, or via)
+   * @return The traverse modes to use for linking. We don't need to find suitable links for all
+   * modes in the set, just for one of them.
    */
-  public static List<TraverseMode> getTraverseModeForLinker(
-    StreetMode streetMode,
-    LocationType type
-  ) {
-    // TODO we should try to link to cycling-only ways with BICYCLE modes if they are the closest
-
-    // arrival and departure is allowed with either car or walk (not 100% sure about departure with
-    // flex).
-    if (
-      streetMode == StreetMode.FLEXIBLE ||
-      streetMode == StreetMode.CAR_HAILING ||
-      streetMode == StreetMode.CAR_PICKUP
-    ) {
-      return List.of(TraverseMode.WALK, TraverseMode.CAR);
+  public static TraverseModeSet getTraverseModeForLinker(StreetMode streetMode, LocationType type) {
+    var bikeParkAndRideDepart = streetMode == StreetMode.BIKE_TO_PARK && type == LocationType.FROM;
+    var onlyBikeAvailable = streetMode == StreetMode.BIKE;
+    if (onlyBikeAvailable || bikeParkAndRideDepart) {
+      // We use the closest street(s) that are either traversable with WALK or BICYCLE, but don't
+      // need to ensure we get links for both modes.
+      return new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
     }
+
+    var flexArrival = streetMode == StreetMode.FLEXIBLE && type == LocationType.TO;
+    if (
+      flexArrival || streetMode == StreetMode.CAR_HAILING || streetMode == StreetMode.CAR_PICKUP
+    ) {
+      // Link to only the closest street(s) that are traversable with WALK or CAR (but not
+      // necessarily with both)
+      return new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
+    }
+
     // for park and ride, we will start in car mode and walk to the end vertex
     boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && type == LocationType.FROM;
     boolean onlyCarAvailable = streetMode == StreetMode.CAR;
     if (onlyCarAvailable || parkAndRideDepart) {
-      return List.of(TraverseMode.CAR);
+      return new TraverseModeSet(TraverseMode.CAR);
     }
-    return List.of(TraverseMode.WALK);
+    return new TraverseModeSet(TraverseMode.WALK);
   }
 
-  private static List<TraverseMode> getIncomingModes(List<TraverseMode> modes, LocationType type) {
-    return type == LocationType.TO || type == LocationType.VISIT_VIA_LOCATION ? modes : List.of();
+  private static Set<TraverseModeSet> getIncomingModes(
+    Set<TraverseModeSet> modes,
+    LocationType type
+  ) {
+    return type == LocationType.TO || type == LocationType.VISIT_VIA_LOCATION ? modes : Set.of();
   }
 
-  private static List<TraverseMode> getOutgoingModes(List<TraverseMode> modes, LocationType type) {
-    return type == LocationType.FROM || type == LocationType.VISIT_VIA_LOCATION ? modes : List.of();
+  private static Set<TraverseModeSet> getOutgoingModes(
+    Set<TraverseModeSet> modes,
+    LocationType type
+  ) {
+    return type == LocationType.FROM || type == LocationType.VISIT_VIA_LOCATION ? modes : Set.of();
   }
 
   /**

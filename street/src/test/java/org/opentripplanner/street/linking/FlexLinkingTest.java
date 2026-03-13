@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdFactory;
 import org.opentripplanner.street.model.StreetModelFactory;
-import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.TraverseMode;
 
 class FlexLinkingTest {
 
@@ -33,7 +33,7 @@ class FlexLinkingTest {
       .linker()
       .linkVertexBidirectionallyPermanently(
         toBeLinked,
-        TraverseModeSet.allModes(),
+        Set.of(TraverseMode.WALK, TraverseMode.CAR),
         StreetModelFactory::streetEdge
       );
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.linking;
 
+import java.util.Set;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
@@ -7,7 +8,6 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -72,7 +72,7 @@ class TestGraph {
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       linker.linkVertexBidirectionallyPermanently(
         tStop,
-        new TraverseModeSet(TraverseMode.WALK),
+        Set.of(TraverseMode.WALK),
         StreetTransitStopLink::createStreetTransitStopLink
       );
     }

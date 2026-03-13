@@ -33,7 +33,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 
 public class PlatformLinkingTest {
 
@@ -475,13 +474,13 @@ public class PlatformLinkingTest {
       if (permanent) {
         linker.linkVertexBidirectionallyPermanently(
           tStop,
-          new TraverseModeSet(TraverseMode.WALK),
+          Set.of(TraverseMode.WALK),
           StreetTransitStopLink::createStreetTransitStopLink
         );
       } else {
         linker.linkVertexBidirectionallyForRealTime(
           tStop,
-          new TraverseModeSet(TraverseMode.WALK),
+          Set.of(TraverseMode.WALK),
           StreetTransitStopLink::createStreetTransitStopLink
         );
       }

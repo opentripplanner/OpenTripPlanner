@@ -33,7 +33,6 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
@@ -220,7 +219,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       );
       linker.linkToSpecificStreetEdgesPermanently(
         boardingLocation,
-        new TraverseModeSet(TraverseMode.WALK),
+        TraverseMode.WALK,
         platformEdgeList
           .getValue()
           .stream()
@@ -256,7 +255,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
           linker.linkVertexBidirectionallyPermanently(
             boardingLocation,
-            new TraverseModeSet(TraverseMode.WALK),
+            Set.of(TraverseMode.WALK),
             (splitterVertex, osmBoardingLocationVertex) ->
               osmBoardingLocationVertex == splitterVertex
                 ? null

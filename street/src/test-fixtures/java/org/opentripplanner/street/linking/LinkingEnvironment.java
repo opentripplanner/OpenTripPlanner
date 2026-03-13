@@ -3,6 +3,7 @@ package org.opentripplanner.street.linking;
 import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -43,14 +44,19 @@ public class LinkingEnvironment {
   }
 
   public DisposableEdgeCollection linkVertexForRequest(double lat, double lon) {
-    return linkVertexForRequest(lat, lon, TraverseModeSet.allModes(), TraverseModeSet.allModes());
+    return linkVertexForRequest(
+      lat,
+      lon,
+      Set.of(TraverseModeSet.allModes()),
+      Set.of(TraverseModeSet.allModes())
+    );
   }
 
   public DisposableEdgeCollection linkVertexForRequest(
     double lat,
     double lon,
-    TraverseModeSet incoming,
-    TraverseModeSet outgoing
+    Set<TraverseModeSet> incoming,
+    Set<TraverseModeSet> outgoing
   ) {
     var split = new TemporaryStreetLocation(new Coordinate(lon, lat), I18NString.of("split"));
     disposable = linker.linkVertexForRequest(

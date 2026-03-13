@@ -2,10 +2,11 @@ package org.opentripplanner.street.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * Tests that the right number of permanent edges are in the graph for the various linking
@@ -14,6 +15,11 @@ import org.opentripplanner.street.search.TraverseModeSet;
 class ScopedLinkingTest {
 
   private static final IntersectionVertex SPLIT = StreetModelFactory.intersectionVertex(0.05, 0.05);
+  private static final Set<TraverseMode> ALL_MODES = Set.of(
+    TraverseMode.WALK,
+    TraverseMode.BICYCLE,
+    TraverseMode.CAR
+  );
 
   @Test
   void splitRequestScoped() {
@@ -29,8 +35,7 @@ class ScopedLinkingTest {
   void splitPermanently() {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
-    TraverseModeSet traverseModes = TraverseModeSet.allModes();
-    env.linker().linkVertexBidirectionallyPermanently(SPLIT, traverseModes, (_, _) -> null);
+    env.linker().linkVertexBidirectionallyPermanently(SPLIT, ALL_MODES, (_, _) -> null);
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     env.disposeEdges();
     // edges should stay after disposing
@@ -41,10 +46,7 @@ class ScopedLinkingTest {
   void splitRealtime() {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
-    TraverseModeSet traverseModes = TraverseModeSet.allModes();
-    var temp = env
-      .linker()
-      .linkVertexBidirectionallyForRealTime(SPLIT, traverseModes, (_, _) -> null);
+    var temp = env.linker().linkVertexBidirectionallyForRealTime(SPLIT, ALL_MODES, (_, _) -> null);
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     temp.disposeEdges();
     assertThat(env.graph().listStreetEdges()).hasSize(1);

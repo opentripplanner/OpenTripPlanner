@@ -3,6 +3,7 @@ package org.opentripplanner.street.linking;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -49,8 +50,8 @@ public class TemporaryVerticesContainerTest {
       );
       var collection = vertexLinker.linkVertexForRequest(
         temporaryLocation,
-        new TraverseModeSet(TraverseMode.WALK),
-        new TraverseModeSet(),
+        Set.of(new TraverseModeSet(TraverseMode.WALK)),
+        Set.of(),
         TemporaryFreeEdge::createTemporaryFreeEdge
       );
       container.addEdgeCollection(collection);

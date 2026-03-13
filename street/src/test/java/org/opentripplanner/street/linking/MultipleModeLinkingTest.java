@@ -7,6 +7,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,11 +18,29 @@ import org.opentripplanner.street.search.TraverseModeSet;
 
 class MultipleModeLinkingTest {
 
+  private static final Set<TraverseModeSet> OR_ALL_MODES = Set.of(TraverseModeSet.allModes());
+  private static final Set<TraverseModeSet> AND_ALL_MODES = Set.of(
+    new TraverseModeSet(TraverseMode.WALK),
+    new TraverseModeSet(TraverseMode.BICYCLE),
+    new TraverseModeSet(TraverseMode.CAR)
+  );
+
   private static List<Arguments> multiModeLinkingWithSeparateTestCases() {
     return List.of(
       Arguments.of(
-        TraverseModeSet.allModes(),
-        TraverseModeSet.allModes(),
+        OR_ALL_MODES,
+        OR_ALL_MODES,
+        List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅", "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"),
+        List.of(
+          "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+          "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+          "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+          "(0.005,0) → (0.005,-0.0001) PEDESTRIAN"
+        )
+      ),
+      Arguments.of(
+        AND_ALL_MODES,
+        AND_ALL_MODES,
         List.of(
           "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
           "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
@@ -40,8 +59,8 @@ class MultipleModeLinkingTest {
         )
       ),
       Arguments.of(
-        new TraverseModeSet(TraverseMode.CAR),
-        new TraverseModeSet(TraverseMode.WALK),
+        Set.of(new TraverseModeSet(TraverseMode.CAR)),
+        Set.of(new TraverseModeSet(TraverseMode.WALK)),
         List.of(
           "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
           "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
@@ -58,8 +77,8 @@ class MultipleModeLinkingTest {
         )
       ),
       Arguments.of(
-        TraverseModeSet.allModes(),
-        new TraverseModeSet(),
+        AND_ALL_MODES,
+        Set.of(),
         List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅", "(0,0.0002) → (0.005,0.0002) CAR ♿✅"),
         List.of(
           "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
@@ -69,8 +88,8 @@ class MultipleModeLinkingTest {
         )
       ),
       Arguments.of(
-        new TraverseModeSet(),
-        TraverseModeSet.allModes(),
+        Set.of(),
+        AND_ALL_MODES,
         List.of("(0.005,0.0002) → (0.01,0.0002) CAR ♿✅", "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"),
         List.of(
           "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
@@ -78,6 +97,18 @@ class MultipleModeLinkingTest {
           "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
           "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅"
         )
+      ),
+      Arguments.of(
+        OR_ALL_MODES,
+        Set.of(),
+        List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅"),
+        List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅", "(0.005,0) → (0.005,-0.0001) PEDESTRIAN")
+      ),
+      Arguments.of(
+        Set.of(),
+        OR_ALL_MODES,
+        List.of("(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"),
+        List.of("(0.005,-0.0001) → (0.005,0) PEDESTRIAN", "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅")
       )
     );
   }
@@ -85,8 +116,8 @@ class MultipleModeLinkingTest {
   @ParameterizedTest
   @MethodSource("multiModeLinkingWithSeparateTestCases")
   void multiModeLinkingWithSeparateLinks(
-    TraverseModeSet incoming,
-    TraverseModeSet outgoing,
+    Set<TraverseModeSet> incoming,
+    Set<TraverseModeSet> outgoing,
     List<String> expectedTempEdges,
     List<String> expectedDisposableEdges
   ) {
@@ -124,8 +155,8 @@ class MultipleModeLinkingTest {
   private static List<Arguments> multiModeLinkingWithSameLinksTestCases() {
     return List.of(
       Arguments.of(
-        TraverseModeSet.allModes(),
-        TraverseModeSet.allModes(),
+        AND_ALL_MODES,
+        AND_ALL_MODES,
         List.of("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.01,0) ALL ♿✅"),
         List.of(
           "(0,0) → (0.005,0) ALL ♿✅",
@@ -135,8 +166,19 @@ class MultipleModeLinkingTest {
         )
       ),
       Arguments.of(
-        new TraverseModeSet(TraverseMode.CAR),
-        new TraverseModeSet(TraverseMode.WALK),
+        OR_ALL_MODES,
+        OR_ALL_MODES,
+        List.of("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.01,0) ALL ♿✅"),
+        List.of(
+          "(0,0) → (0.005,0) ALL ♿✅",
+          "(0.005,0) → (0.01,0) ALL ♿✅",
+          "(0.005,-0.0001) → (0.005,0) ALL",
+          "(0.005,0) → (0.005,-0.0001) ALL"
+        )
+      ),
+      Arguments.of(
+        Set.of(new TraverseModeSet(TraverseMode.CAR)),
+        Set.of(new TraverseModeSet(TraverseMode.WALK)),
         List.of("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.01,0) ALL ♿✅"),
         List.of(
           "(0,0) → (0.005,0) ALL ♿✅",
@@ -146,14 +188,26 @@ class MultipleModeLinkingTest {
         )
       ),
       Arguments.of(
-        TraverseModeSet.allModes(),
-        new TraverseModeSet(),
+        AND_ALL_MODES,
+        Set.of(),
         List.of("(0,0) → (0.005,0) ALL ♿✅"),
         List.of("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.005,-0.0001) ALL")
       ),
       Arguments.of(
-        new TraverseModeSet(),
-        TraverseModeSet.allModes(),
+        Set.of(),
+        AND_ALL_MODES,
+        List.of("(0.005,0) → (0.01,0) ALL ♿✅"),
+        List.of("(0.005,0) → (0.01,0) ALL ♿✅", "(0.005,-0.0001) → (0.005,0) ALL")
+      ),
+      Arguments.of(
+        OR_ALL_MODES,
+        Set.of(),
+        List.of("(0,0) → (0.005,0) ALL ♿✅"),
+        List.of("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.005,-0.0001) ALL")
+      ),
+      Arguments.of(
+        Set.of(),
+        OR_ALL_MODES,
         List.of("(0.005,0) → (0.01,0) ALL ♿✅"),
         List.of("(0.005,0) → (0.01,0) ALL ♿✅", "(0.005,-0.0001) → (0.005,0) ALL")
       )
@@ -163,8 +217,8 @@ class MultipleModeLinkingTest {
   @ParameterizedTest
   @MethodSource("multiModeLinkingWithSameLinksTestCases")
   void multiModeLinkingWithSameLinks(
-    TraverseModeSet incoming,
-    TraverseModeSet outgoing,
+    Set<TraverseModeSet> incoming,
+    Set<TraverseModeSet> outgoing,
     List<String> expectedTempEdges,
     List<String> expectedDisposableEdges
   ) {

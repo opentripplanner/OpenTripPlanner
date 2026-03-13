@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +25,6 @@ import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -43,11 +43,8 @@ import org.slf4j.LoggerFactory;
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
-  private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
-  private static final TraverseModeSet WALK_AND_CAR = new TraverseModeSet(
-    TraverseMode.WALK,
-    TraverseMode.CAR
-  );
+  private static final Set<TraverseMode> WALK_ONLY = Set.of(TraverseMode.WALK);
+  private static final Set<TraverseMode> WALK_AND_CAR = Set.of(TraverseMode.WALK, TraverseMode.CAR);
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
@@ -166,12 +163,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkVehicleParkingWithLinker(VehicleParkingEntranceVertex vehicleParkingVertex) {
-    var modes = new TraverseModeSet();
+    var modes = new HashSet<TraverseMode>();
     if (vehicleParkingVertex.isWalkAccessible()) {
-      modes.setWalk(true);
+      modes.add(TraverseMode.WALK);
     }
     if (vehicleParkingVertex.isCarAccessible()) {
-      modes.setCar(true);
+      modes.add(TraverseMode.CAR);
     }
     vertexLinker.linkVertexBidirectionallyPermanently(
       vehicleParkingVertex,

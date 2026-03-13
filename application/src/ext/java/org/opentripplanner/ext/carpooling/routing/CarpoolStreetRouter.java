@@ -137,8 +137,8 @@ public class CarpoolStreetRouter {
 
     var disposableEdges = vertexLinker.linkVertexForRequest(
       tempVertex,
-      new TraverseModeSet(TraverseMode.CAR),
-      new TraverseModeSet(TraverseMode.CAR),
+      Set.of(new TraverseModeSet(TraverseMode.CAR)),
+      Set.of(new TraverseModeSet(TraverseMode.CAR)),
       TemporaryFreeEdge::createTemporaryFreeEdge
     );
 

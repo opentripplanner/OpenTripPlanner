@@ -146,7 +146,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   private static List<Arguments> testPedestrianLinkingTestCases() {
     var args = new ArrayList<Arguments>();
-    var modes = List.of(WALK, BIKE, BIKE_TO_PARK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL);
+    var modes = List.of(WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL);
 
     for (StreetMode mode : modes) {
       args.addAll(
@@ -173,6 +173,26 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     LinkingTestCase expectedStreet
   ) {
     assertLinking(placeCloseToStreetTestCase, expectedStreet, mode);
+  }
+
+  @Test
+  public void testBikeLinking() {
+    assertLinking(closeToCarSt(), ALL_TC, BIKE);
+    assertLinking(closeToAllSt(), ALL_TC, BIKE);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, BIKE);
+    assertLinking(closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC, BIKE);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, BIKE);
+    assertLinking(stopLocation, ALL_TC, BIKE);
+  }
+
+  @Test
+  public void testBikeParkLinking() {
+    assertLinking(closeToCarSt(), ALL_TC, BIKE_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, BIKE_TO_PARK);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, BIKE_TO_PARK);
+    assertLinking(closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC, BIKE_TO_PARK);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, BIKE_TO_PARK);
+    assertLinking(stopLocation, ALL_TC, BIKE_TO_PARK);
   }
 
   @Test
@@ -217,20 +237,12 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @Test
   public void testFlexLinking() {
-    assertLinking(closeToCarSt(), List.of(ALL_TC, CAR_TC), FLEXIBLE);
+    assertLinking(closeToCarSt(), ALL_TC, CAR_TC, FLEXIBLE);
     assertLinking(closeToAllSt(), ALL_TC, FLEXIBLE);
-    assertLinking(closeToPedestrianSt(), List.of(PEDESTRIAN_TC, ALL_TC), FLEXIBLE);
-    assertLinking(
-      closeToPedestrianAndBicycleSt(),
-      List.of(PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC),
-      FLEXIBLE
-    );
-    assertLinking(
-      closeToBicycleAndCarSt(),
-      List.of(PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC),
-      FLEXIBLE
-    );
-    assertLinking(stopLocation, List.of(ALL_TC, CAR_TC), FLEXIBLE);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, FLEXIBLE);
+    assertLinking(closeToPedestrianAndBicycleSt(), List.of(PEDESTRIAN_BICYCLE_TC), FLEXIBLE);
+    assertLinking(closeToBicycleAndCarSt(), PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC, FLEXIBLE);
+    assertLinking(stopLocation, List.of(ALL_TC), List.of(CAR_TC, ALL_TC), FLEXIBLE);
   }
 
   // TODO: Linking to wheelchair accessible streets is currently not implemented,
