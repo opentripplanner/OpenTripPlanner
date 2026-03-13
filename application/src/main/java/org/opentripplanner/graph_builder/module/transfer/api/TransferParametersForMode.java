@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.transfer.api;
 
 import java.time.Duration;
 import javax.annotation.Nullable;
@@ -7,7 +7,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Mode-specific parameters for transfers.
  */
-public record TransferParameters(
+public record TransferParametersForMode(
   @Nullable Duration maxTransferDuration,
   @Nullable Duration carsAllowedStopMaxTransferDuration,
   @Nullable Duration bikesAllowedStopMaxTransferDuration,
@@ -18,7 +18,7 @@ public record TransferParameters(
   public static final Duration DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION = null;
   public static final boolean DEFAULT_DISABLE_DEFAULT_TRANSFERS = false;
 
-  TransferParameters(Builder builder) {
+  TransferParametersForMode(Builder builder) {
     this(
       builder.maxTransferDuration,
       builder.carsAllowedStopMaxTransferDuration,
@@ -73,8 +73,8 @@ public record TransferParameters(
       return this;
     }
 
-    public TransferParameters build() {
-      return new TransferParameters(this);
+    public TransferParametersForMode build() {
+      return new TransferParametersForMode(this);
     }
   }
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.TransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
@@ -38,7 +38,8 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
   private boolean includeCarFerryTrips = false;
   private Duration maxTransferDuration = MAX_TRANSFER_DURATION;
   private final List<RouteRequest> transferRequests = new ArrayList<>();
-  private final Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+  private final Map<StreetMode, TransferParametersForMode> transferParametersForMode =
+    new HashMap<>();
 
   public DirectTransferGeneratorTestData withPatterns() {
     this.addPatterns = true;
@@ -77,7 +78,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
 
   public DirectTransferGeneratorTestData addTransferParameters(
     StreetMode mode,
-    TransferParameters value
+    TransferParametersForMode value
   ) {
     this.transferParametersForMode.put(mode, value);
     return this;

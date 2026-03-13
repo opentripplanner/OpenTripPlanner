@@ -4,13 +4,16 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.EnumMap;
 import java.util.Map;
-import org.opentripplanner.graph_builder.module.TransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.street.model.StreetMode;
 
 public class TransferConfig {
 
-  public static Map<StreetMode, TransferParameters> map(NodeAdapter root, String parameterName) {
+  public static Map<StreetMode, TransferParametersForMode> map(
+    NodeAdapter root,
+    String parameterName
+  ) {
     return root
       .of(parameterName)
       .since(V2_7)

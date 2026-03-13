@@ -31,11 +31,11 @@ import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.graph_builder.module.TransferParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -159,7 +159,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final IslandPruningConfig islandPruning;
 
   public final Duration maxTransferDuration;
-  public final Map<StreetMode, TransferParameters> transferParametersForMode;
+  public final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   public final NetexFeedParameters netexDefaults;
   public final GtfsDefaultParameters gtfsDefaults;
 

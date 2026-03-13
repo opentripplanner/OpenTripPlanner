@@ -3,19 +3,19 @@ package org.opentripplanner.standalone.config.buildconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
-import org.opentripplanner.graph_builder.module.TransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransferParametersMapper {
 
-  public static TransferParameters map(NodeAdapter c) {
-    TransferParameters.Builder builder = new TransferParameters.Builder();
+  public static TransferParametersForMode map(NodeAdapter c) {
+    TransferParametersForMode.Builder builder = new TransferParametersForMode.Builder();
     builder.withMaxTransferDuration(
       c
         .of("maxTransferDuration")
         .summary("This overwrites the default `maxTransferDuration` for the given mode.")
         .since(V2_7)
-        .asDuration(TransferParameters.DEFAULT_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_MAX_TRANSFER_DURATION)
     );
     builder.withCarsAllowedStopMaxTransferDuration(
       c
@@ -44,7 +44,7 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_7)
-        .asDuration(TransferParameters.DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION)
     );
     builder.withBikesAllowedStopMaxTransferDuration(
       c
@@ -68,7 +68,7 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_9)
-        .asDuration(TransferParameters.DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION)
     );
     builder.withDisableDefaultTransfers(
       c
@@ -85,7 +85,7 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_7)
-        .asBoolean(TransferParameters.DEFAULT_DISABLE_DEFAULT_TRANSFERS)
+        .asBoolean(TransferParametersForMode.DEFAULT_DISABLE_DEFAULT_TRANSFERS)
     );
     return builder.build();
   }

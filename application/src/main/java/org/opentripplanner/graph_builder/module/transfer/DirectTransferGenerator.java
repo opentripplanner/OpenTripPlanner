@@ -15,12 +15,12 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.TransferParameters;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -53,7 +53,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Duration defaultMaxTransferDuration;
 
   private final List<RouteRequest> transferRequests;
-  private final Map<StreetMode, TransferParameters> transferParametersForMode;
+  private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final TransferRepository transferRepository;
@@ -86,7 +86,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
     List<RouteRequest> transferRequests,
-    Map<StreetMode, TransferParameters> transferParametersForMode
+    Map<StreetMode, TransferParametersForMode> transferParametersForMode
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
@@ -311,7 +311,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     for (RouteRequest transferProfile : transferRequests) {
       StreetMode mode = transferProfile.journey().transfer().mode();
-      TransferParameters transferParameters = transferParametersForMode.get(mode);
+      var transferParameters = transferParametersForMode.get(mode);
       if (transferParameters != null) {
         // WALK mode transfers can not be disabled. For example, flex transfers need them.
         if (transferParameters.disableDefaultTransfers() && mode == StreetMode.WALK) {
