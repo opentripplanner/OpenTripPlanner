@@ -108,7 +108,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /*
-    Not sure how to support this. We would need to somehow merge the states of the segments.
+    TODO: Implement this function.
+    It is never used for instances of CarpoolAccessEgress, but this might change in the future.
    */
   @Override
   public State getLastState() {
