@@ -28,7 +28,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final List<GraphPath<State, Edge, Vertex>> segments;
   private final TimeAndCost penalty;
   private final double totalWeight;
-  private final double carReluctance;
+  private final double carpoolReluctance;
 
   public CarpoolAccessEgress(
     int stop,
@@ -37,20 +37,14 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     int arrivalTimeOfPassenger,
     List<GraphPath<State, Edge, Vertex>> segments,
     TimeAndCost penalty,
-    Double carReluctance
+    Double carpoolReluctance
   ) {
     this.departureTimeOfPassenger = departureTimeOfPassenger;
     this.arrivalTimeOfPassenger = arrivalTimeOfPassenger;
     this.stop = stop;
     this.durationInSeconds = (int) duration.getSeconds();
-    this.carReluctance = carReluctance;
-    /*
-       Setting the cost and weight to the duration of the trip times carReluctance. Not sure
-       if this is the way it should be, but it works for now. This is done differently for
-       carpooling in direct mode, and the cost should be set ( presumably ?) the
-       same way for both access/egress and direct.
-    */
-    this.totalWeight = this.durationInSeconds * carReluctance;
+    this.carpoolReluctance = carpoolReluctance;
+    this.totalWeight = this.durationInSeconds * carpoolReluctance;
     this.c1 = RaptorCostConverter.toRaptorCost(this.totalWeight);
     this.segments = segments;
     this.penalty = penalty;
@@ -109,7 +103,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
       this.arrivalTimeOfPassenger,
       this.segments,
       penalty,
-      this.carReluctance
+      this.carpoolReluctance
     );
   }
 
