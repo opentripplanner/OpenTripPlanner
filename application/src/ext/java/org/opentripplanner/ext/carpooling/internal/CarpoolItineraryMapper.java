@@ -74,7 +74,6 @@ public class CarpoolItineraryMapper {
   private final ZoneId timeZone;
   private final ZonedDateTime transitSearchTimeZero;
 
-
   /**
    * Creates a new carpool itinerary mapper with the specified timezone.
    * <p>
@@ -176,9 +175,7 @@ public class CarpoolItineraryMapper {
       .build();
   }
 
-  public Itinerary toItinerary(
-    CarpoolAccessEgress accessEgress
-  ) {
+  public Itinerary toItinerary(CarpoolAccessEgress accessEgress) {
     var segments = accessEgress.getSegments();
     var allEdges = segments
       .stream()

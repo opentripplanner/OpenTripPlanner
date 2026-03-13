@@ -368,9 +368,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
-      return carpoolItineraryMapper.toItinerary(
-        (CarpoolAccessEgress) egressPathLeg.egress()
-      );
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) egressPathLeg.egress());
     }
 
     var subItinerary = mapAccessEgressPathLeg(egressPathLeg.egress());
