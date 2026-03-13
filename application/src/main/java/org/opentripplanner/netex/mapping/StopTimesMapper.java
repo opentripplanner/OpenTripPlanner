@@ -316,7 +316,6 @@ class StopTimesMapper {
           stopPoint.getDestinationDisplayRef().getRef()
         );
 
-
         if (destinationDisplay != null) {
           currentHeadSign = HeadsignMapper.mapHeadsign(destinationDisplay);
           Vias_RelStructure viaValues = destinationDisplay.getVias();
