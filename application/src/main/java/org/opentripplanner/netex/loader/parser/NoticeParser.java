@@ -36,7 +36,7 @@ class NoticeParser {
       return;
     }
 
-    for (JAXBElement<? extends DataManagedObjectStructure> it : na.getNoticeAssignment_()) {
+    for (JAXBElement<? extends DataManagedObjectStructure> it : na.getNoticeAssignment_Dummy()) {
       NoticeAssignment noticeAssignment = (NoticeAssignment) it.getValue();
       boolean error = false;
 

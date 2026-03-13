@@ -45,7 +45,9 @@ class VehicleParkingMapper {
     }
     return VehicleParking.builder()
       .id(idFactory.createId(parking.getId()))
-      .name(NonLocalizedString.ofNullable(parking.getName().getValue()))
+      .name(
+        NonLocalizedString.ofNullable(MultilingualStringMapper.nullableValueOf(parking.getName()))
+      )
       .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
       .capacity(mapCapacity(parking))
       .bicyclePlaces(hasBikes(parking))
@@ -62,7 +64,7 @@ class VehicleParkingMapper {
     if (parking.getId() != null) {
       return parking.getId();
     } else if (parking.getName() != null) {
-      return parking.getName().getValue();
+      return MultilingualStringMapper.getStringValue(parking.getName());
     } else if (parking.getCentroid() != null) {
       return parking.getCentroid().toString();
     } else {

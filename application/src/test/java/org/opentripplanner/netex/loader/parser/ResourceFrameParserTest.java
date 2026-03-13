@@ -32,7 +32,7 @@ class ResourceFrameParserTest {
       new Authority()
     );
     resourceFrame.setOrganisations(objectFactory.createOrganisationsInFrame_RelStructure());
-    resourceFrame.getOrganisations().getOrganisation_().add(organisation);
+    resourceFrame.getOrganisations().getOrganisation_Dummy().add(organisation);
     resourceFrameParser.parse(resourceFrame);
     resourceFrameParser.setResultOnIndex(netexEntityIndex);
     assertEquals(1, netexEntityIndex.authoritiesById.size());

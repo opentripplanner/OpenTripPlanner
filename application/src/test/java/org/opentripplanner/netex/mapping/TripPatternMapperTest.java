@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -22,9 +21,10 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.ReplacedJourneys_RelStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 class TripPatternMapperTest {
 
@@ -128,9 +128,9 @@ class TripPatternMapperTest {
     DatedServiceJourney dsjReplacing = sample.getDatedServiceJourneyById(
       NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2
     );
-    dsjReplacing.withJourneyRef(
-      List.of(
-        MappingSupport.createWrappedRef(dsjReplaced.getId(), DatedServiceJourneyRefStructure.class)
+    dsjReplacing.withReplacedJourneys(
+      new ReplacedJourneys_RelStructure().withDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef(
+        MappingSupport.createWrappedRef(dsjReplaced.getId(), VehicleJourneyRefStructure.class)
       )
     );
     Optional<TripPatternMapperResult> res = mapTripPattern(sample);

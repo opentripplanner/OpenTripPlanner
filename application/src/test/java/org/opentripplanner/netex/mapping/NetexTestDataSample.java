@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeRefStructure;
@@ -60,7 +60,7 @@ public class NetexTestDataSample {
   public static final List<String> OPERATING_DAYS = List.of("2022-02-28", "2022-02-29");
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
-    .withName(new MultilingualString().withValue("everyday"));
+    .withName(new MultilingualString().withContent("everyday"));
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
@@ -89,8 +89,8 @@ public class NetexTestDataSample {
 
     Line line = new Line()
       .withId("RUT:Line:1")
-      .withName(new MultilingualString().withValue("Line 1"))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+      .withName(new MultilingualString().withContent("Line 1"))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS);
     JAXBElement<LineRefStructure> lineRef = createWrappedRef(line.getId(), LineRefStructure.class);
 
     // Add OTP Route (correspond to Netex Line)
@@ -116,7 +116,7 @@ public class NetexTestDataSample {
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_2))
         )
       )
-      .withFrontText(new MultilingualString().withValue("Bergen"));
+      .withFrontText(new MultilingualString().withContent("Bergen"));
 
     DestinationDisplay destinationStavanger = new DestinationDisplay()
       .withId(DESTINATION_DISPLAY_ID_2)
@@ -125,7 +125,7 @@ public class NetexTestDataSample {
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_1))
         )
       )
-      .withFrontText(new MultilingualString().withValue("Stavanger"));
+      .withFrontText(new MultilingualString().withContent("Stavanger"));
 
     destinationDisplayById.add(destinationBergen);
     destinationDisplayById.add(destinationStavanger);
@@ -188,9 +188,7 @@ public class NetexTestDataSample {
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
           .withId(DATED_SERVICE_JOURNEY_ID.get(i))
           .withJourneyRef(
-            List.of(
-              MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
-            )
+            MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
           )
           .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
           .withOperatingDayRef(new OperatingDayRefStructure().withRef(operatingDay.getId()));

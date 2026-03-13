@@ -58,7 +58,7 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
 
   private void parseOrganization(OrganisationsInFrame_RelStructure elements) {
     if (elements != null) {
-      for (JAXBElement<?> e : elements.getOrganisation_()) {
+      for (JAXBElement<?> e : elements.getOrganisation_Dummy()) {
         parseOrganization((Organisation_VersionStructure) e.getValue());
       }
     }

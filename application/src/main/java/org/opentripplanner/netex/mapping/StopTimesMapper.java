@@ -32,7 +32,6 @@ import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -318,7 +317,9 @@ class StopTimesMapper {
         );
 
         if (destinationDisplay != null) {
-          currentHeadSign = new NonLocalizedString(destinationDisplay.getFrontText().getValue());
+          currentHeadSign = new NonLocalizedString(
+            MultilingualStringMapper.getStringValue(destinationDisplay.getFrontText())
+          );
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
             currentHeadSignVias = viaValues
@@ -332,7 +333,7 @@ class StopTimesMapper {
               .filter(Objects::nonNull)
               .map(DestinationDisplay_VersionStructure::getFrontText)
               .filter(Objects::nonNull)
-              .map(MultilingualString::getValue)
+              .map(MultilingualStringMapper::getStringValue)
               .filter(Objects::nonNull)
               .collect(Collectors.toList());
 

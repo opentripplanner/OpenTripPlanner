@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
@@ -69,7 +68,9 @@ class StationMapper {
       .withCoordinate(mapCoordinate(stopPlace))
       .withShouldRouteToCentroid(shouldRouteToCentroid(id))
       .withDescription(
-        NonLocalizedString.ofNullable(stopPlace.getDescription(), MultilingualString::getValue)
+        NonLocalizedString.ofNullable(
+          MultilingualStringMapper.nullableValueOf(stopPlace.getDescription())
+        )
       )
       .withPriority(StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting()))
       .withTimezone(
@@ -112,19 +113,19 @@ class StationMapper {
       name = new NonLocalizedString("N/A");
     } else if (stopPlace.getAlternativeNames() != null) {
       Map<String, String> translations = new HashMap<>();
-      translations.put(null, stopPlace.getName().getValue());
+      translations.put(null, MultilingualStringMapper.getStringValue(stopPlace.getName()));
       for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
         if (translation.getNameType() == NameTypeEnumeration.TRANSLATION) {
           String lang = translation.getLang() != null
             ? translation.getLang()
             : translation.getName().getLang();
-          translations.put(lang, translation.getName().getValue());
+          translations.put(lang, MultilingualStringMapper.getStringValue(translation.getName()));
         }
       }
 
       name = TranslatedString.getDeduplicatedI18NString(translations, false);
     } else {
-      name = new NonLocalizedString(stopPlace.getName().getValue());
+      name = new NonLocalizedString(MultilingualStringMapper.getStringValue(stopPlace.getName()));
     }
     return name;
   }

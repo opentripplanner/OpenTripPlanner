@@ -45,7 +45,9 @@ class GroupOfStationsMapper {
     I18NString name;
 
     if (groupOfStopPlaces.getName() != null) {
-      name = NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue());
+      name = NonLocalizedString.ofNullable(
+        MultilingualStringMapper.nullableValueOf(groupOfStopPlaces.getName())
+      );
     } else {
       issueStore.add(
         "GroupOfStopPlacesWithoutName",

@@ -35,7 +35,6 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
@@ -44,6 +43,7 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteView;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern
@@ -248,7 +248,11 @@ class TripPatternMapper {
       .withMode(trips.get(0).getMode())
       .withNetexSubmode(trips.get(0).getNetexSubMode())
       .withContainsMultipleModes(hasMultipleModes || hasMultipleSubmodes)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withName(
+        journeyPattern.getName() == null
+          ? ""
+          : MultilingualStringMapper.getStringValue(journeyPattern.getName())
+      )
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
       )
@@ -301,43 +305,47 @@ class TripPatternMapper {
       datedServiceJourney.getServiceAlteration()
     );
 
-    var replacementFor = datedServiceJourney
-      .getJourneyRef()
-      .stream()
-      .map(JAXBElement::getValue)
-      .filter(DatedServiceJourneyRefStructure.class::isInstance)
-      .map(DatedServiceJourneyRefStructure.class::cast)
-      .map(DatedServiceJourneyRefStructure::getRef)
-      .map(datedServiceJourneyById::lookup)
-      .filter(Objects::nonNull)
-      .map(replacement -> {
-        if (datedServiceJourney.equals(replacement)) {
-          issueStore.add(
-            "InvalidDatedServiceJourneyRef",
-            "DatedServiceJourney %s has reference to itself, skipping",
-            datedServiceJourney.getId()
+    List<TripOnServiceDate> replacementFor;
+    if (datedServiceJourney.getReplacedJourneys() != null) {
+      replacementFor = datedServiceJourney
+        .getReplacedJourneys()
+        .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
+        .stream()
+        .map(JAXBElement::getValue)
+        .map(VehicleJourneyRefStructure::getRef)
+        .map(datedServiceJourneyById::lookup)
+        .filter(Objects::nonNull)
+        .map(replacement -> {
+          if (datedServiceJourney.equals(replacement)) {
+            issueStore.add(
+              "InvalidDatedServiceJourneyRef",
+              "DatedServiceJourney %s has reference to itself, skipping",
+              datedServiceJourney.getId()
+            );
+            return null;
+          }
+          String serviceJourneyRef = replacement.getJourneyRef().getValue().getRef();
+          ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
+          if (serviceJourney == null) {
+            issueStore.add(
+              "InvalidDatedServiceJourneyRef",
+              "DatedServiceJourney %s has reference to %s, which is not found, skipping",
+              datedServiceJourney.getId(),
+              serviceJourneyRef
+            );
+            return null;
+          }
+          return mapDatedServiceJourney(
+            journeyPattern,
+            mapTrip(journeyPattern, serviceJourney),
+            replacement
           );
-          return null;
-        }
-        String serviceJourneyRef = replacement.getJourneyRef().get(0).getValue().getRef();
-        ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
-        if (serviceJourney == null) {
-          issueStore.add(
-            "InvalidDatedServiceJourneyRef",
-            "DatedServiceJourney %s has reference to %s, which is not found, skipping",
-            datedServiceJourney.getId(),
-            serviceJourneyRef
-          );
-          return null;
-        }
-        return mapDatedServiceJourney(
-          journeyPattern,
-          mapTrip(journeyPattern, serviceJourney),
-          replacement
-        );
-      })
-      .filter(Objects::nonNull)
-      .toList();
+        })
+        .filter(Objects::nonNull)
+        .toList();
+    } else {
+      replacementFor = List.of();
+    }
 
     return TripOnServiceDate.of(id)
       .withTrip(trip)

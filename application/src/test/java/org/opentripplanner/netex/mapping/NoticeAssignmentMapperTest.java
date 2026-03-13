@@ -22,6 +22,7 @@ import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.NoticeRefStructure;
 import org.rutebanken.netex.model.PointInJourneyPatternRefStructure;
+import org.rutebanken.netex.model.PublicCodeStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
@@ -37,8 +38,8 @@ public class NoticeAssignmentMapperTest {
 
   private static final Notice NOTICE = new org.rutebanken.netex.model.Notice()
     .withId(NOTICE_ID)
-    .withPublicCode("Notice Code")
-    .withText(new MultilingualString().withValue("Notice text"));
+    .withPublicCode(new PublicCodeStructure().withValue("Notice Code"))
+    .withText(new MultilingualString().withContent("Notice text"));
 
   @Test
   public void mapNoticeAssignment() {

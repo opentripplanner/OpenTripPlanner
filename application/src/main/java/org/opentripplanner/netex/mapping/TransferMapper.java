@@ -16,9 +16,9 @@ import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.rutebanken.netex.model.JourneyRefStructure;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class TransferMapper {
 
@@ -78,7 +78,7 @@ public class TransferMapper {
   private TripTransferPoint mapPoint(
     Label label,
     String interchangeId,
-    VehicleJourneyRefStructure sjRef,
+    JourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
     var sjId = sjRef.getRef();

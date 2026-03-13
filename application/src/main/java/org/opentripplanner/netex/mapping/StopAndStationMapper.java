@@ -132,7 +132,7 @@ class StopAndStationMapper {
 
     return stopPlace
       .getTariffZones()
-      .getTariffZoneRef_()
+      .getTariffZoneRef_Dummy()
       .stream()
       .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
       .filter(Objects::nonNull)

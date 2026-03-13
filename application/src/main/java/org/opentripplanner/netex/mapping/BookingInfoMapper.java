@@ -179,7 +179,7 @@ public class BookingInfoMapper {
       ContactInfo contactInfo = ContactInfo.of()
         .withContactPerson(
           contactStructure.getContactPerson() != null
-            ? contactStructure.getContactPerson().getValue()
+            ? MultilingualStringMapper.getStringValue(contactStructure.getContactPerson())
             : null
         )
         .withPhoneNumber(contactStructure.getPhone())
@@ -188,7 +188,7 @@ public class BookingInfoMapper {
         .withBookingUrl(contactStructure.getUrl())
         .withAdditionalDetails(
           contactStructure.getFurtherDetails() != null
-            ? contactStructure.getFurtherDetails().getValue()
+            ? MultilingualStringMapper.getStringValue(contactStructure.getFurtherDetails())
             : null
         )
         .build();
@@ -220,7 +220,9 @@ public class BookingInfoMapper {
         minimumBookingNotice = minimumBookingPeriod;
       }
 
-      String bookingInfoMessage = bookingNote != null ? bookingNote.getValue() : null;
+      String bookingInfoMessage = bookingNote != null
+        ? MultilingualStringMapper.getStringValue(bookingNote)
+        : null;
       return BookingInfo.of()
         .withContactInfo(contactInfo)
         .withBookingMethods(filteredBookingMethods)

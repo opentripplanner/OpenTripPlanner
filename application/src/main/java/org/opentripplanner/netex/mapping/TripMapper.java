@@ -109,7 +109,9 @@ class TripMapper {
       builder.withNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
     }
 
-    builder.withShortName(serviceJourney.getPublicCode());
+    builder.withShortName(
+      serviceJourney.getPublicCode() != null ? serviceJourney.getPublicCode().getValue() : null
+    );
     builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {

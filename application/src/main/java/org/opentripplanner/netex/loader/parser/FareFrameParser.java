@@ -38,7 +38,7 @@ public class FareFrameParser extends NetexParser<FareFrame_VersionFrameStructure
     warnOnMissingMapping(LOG, frame.getGeographicalIntervals());
     warnOnMissingMapping(LOG, frame.getGeographicalStructureFactors());
     warnOnMissingMapping(LOG, frame.getGeographicalUnits());
-    warnOnMissingMapping(LOG, frame.getGroupOfDistributionAssignments());
+    warnOnMissingMapping(LOG, frame.getDistributionAssignments());
     warnOnMissingMapping(LOG, frame.getGroupsOfDistanceMatrixElements());
     warnOnMissingMapping(LOG, frame.getGroupsOfDistributionChannels());
     warnOnMissingMapping(LOG, frame.getGroupsOfSalesOfferPackages());
