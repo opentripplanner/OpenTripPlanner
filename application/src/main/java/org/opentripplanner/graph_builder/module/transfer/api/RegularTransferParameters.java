@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 
 public final class RegularTransferParameters {
 
   private final Duration maxDuration;
+  private final List<FeedScopedId> includeStops;
   private final Map<StreetMode, TransferParametersForMode> parametersForMode;
   private final List<RouteRequest> requests;
 
@@ -18,16 +20,19 @@ public final class RegularTransferParameters {
 
   private RegularTransferParameters() {
     this.maxDuration = Duration.ofMinutes(30);
+    this.includeStops = List.of();
     this.parametersForMode = Map.of();
     this.requests = List.of();
   }
 
   public RegularTransferParameters(
     Duration maxDuration,
+    List<FeedScopedId> includeStops,
     Map<StreetMode, TransferParametersForMode> parametersForMode,
     List<RouteRequest> requests
   ) {
     this.maxDuration = Objects.requireNonNull(maxDuration);
+    this.includeStops = List.copyOf(includeStops);
     this.parametersForMode = Map.copyOf(parametersForMode);
     this.requests = List.copyOf(requests);
   }
@@ -38,6 +43,10 @@ public final class RegularTransferParameters {
 
   public Duration maxDuration() {
     return maxDuration;
+  }
+
+  public List<FeedScopedId> includeStops() {
+    return includeStops;
   }
 
   public Map<StreetMode, TransferParametersForMode> parametersForMode() {
@@ -51,17 +60,24 @@ public final class RegularTransferParameters {
   public static class Builder {
 
     private Duration maxDuration;
+    private List<FeedScopedId> includeStops;
     private Map<StreetMode, TransferParametersForMode> parametersForMode = new HashMap<>();
     private List<RouteRequest> requests;
 
     private Builder(RegularTransferParameters original) {
       this.maxDuration = original.maxDuration;
+      this.includeStops = original.includeStops;
       this.parametersForMode.putAll(original.parametersForMode);
       this.requests = original.requests;
     }
 
     public Builder withMaxDuration(Duration maxDuration) {
       this.maxDuration = maxDuration;
+      return this;
+    }
+
+    public Builder withIncludeStops(List<FeedScopedId> includeStops) {
+      this.includeStops = includeStops;
       return this;
     }
 
@@ -84,7 +100,7 @@ public final class RegularTransferParameters {
     }
 
     public RegularTransferParameters build() {
-      return new RegularTransferParameters(maxDuration, parametersForMode, requests);
+      return new RegularTransferParameters(maxDuration, includeStops, parametersForMode, requests);
     }
   }
 }
