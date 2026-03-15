@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -53,6 +54,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final Duration defaultMaxTransferDuration;
 
+  private final Set<FeedScopedId> includeStopsWithRegularTransfers;
   private final List<RouteRequest> transferRequests;
   private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
@@ -61,7 +63,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
 
   /**
-   * Constructor used in tests. This initializes transferParametersForMode as an empty map.
+   * Constructor used in tests. This initializes transferParametersForMode as an empty map and
+   * stopsWithRegularTransfers as an empty set.
    */
   public DirectTransferGenerator(
     Graph graph,
@@ -75,6 +78,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
+    this.includeStopsWithRegularTransfers = Set.of();
     this.transferRequests = transferRequests;
     this.transferRepository = transferRepository;
     this.transferParametersForMode = Map.of();
@@ -91,6 +95,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = parameters.maxDuration();
+    this.includeStopsWithRegularTransfers = Set.copyOf(parameters.includeStops());
     this.transferRequests = parameters.requests();
     this.transferParametersForMode = parameters.parametersForMode();
     this.transferRepository = transferRepository;
@@ -252,7 +257,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
-      return new PatternConsideringNearbyStopFinder(transitService, finder);
+      return new PatternConsideringNearbyStopFinder(
+        transitService,
+        finder,
+        includeStopsWithRegularTransfers
+      );
     } else {
       return finder;
     }

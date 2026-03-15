@@ -20,14 +20,20 @@ import org.opentripplanner.transit.service.TransitService;
  * or alighting is possible (depending on direction).
  * <p>
  * Stops without patterns may still be included if they are marked as sometimes-used by real-time
- * updates (when the IncludeStopsUsedRealTimeInTransfers feature is enabled).
+ * updates (when the IncludeStopsUsedRealTimeInTransfers feature is enabled), or if they are
+ * explicitly listed in the {@code stopsWithRegularTransfers} build configuration.
  */
 class PatternNearbyStopFilter implements NearbyStopFilter {
 
   private final TransitService transitService;
+  private final Set<FeedScopedId> stopsWithRegularTransfers;
 
-  PatternNearbyStopFilter(TransitService transitService) {
+  PatternNearbyStopFilter(
+    TransitService transitService,
+    Set<FeedScopedId> stopsWithRegularTransfers
+  ) {
     this.transitService = transitService;
+    this.stopsWithRegularTransfers = stopsWithRegularTransfers;
   }
 
   @Override
@@ -82,6 +88,15 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
   }
 
   private boolean includeStopUsedRealtime(RegularStop stop) {
-    return OTPFeature.IncludeStopsUsedRealTimeInTransfers.isOn() && stop.isSometimesUsedRealtime();
+    // Some stops, like railway and bus-replacement stops, are tagged during graph building/data
+    // import. These should allways be included.
+    if (OTPFeature.IncludeStopsUsedRealTimeInTransfers.isOn() && stop.isSometimesUsedRealtime()) {
+      return true;
+    }
+    // Some stops is listed in the build-config, these are regular stops to include.
+    if (stopsWithRegularTransfers.contains(stop.getId())) {
+      return true;
+    }
+    return false;
   }
 }
