@@ -107,6 +107,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Infer vehicle position's service date for ADDED trip [#7179](https://github.com/opentripplanner/OpenTripPlanner/pull/7179)
 - Set default street routing timeout to 5 seconds again [#7373](https://github.com/opentripplanner/OpenTripPlanner/pull/7373)
 - Fix walk steps for escalators leading directly to a station entrance [#7361](https://github.com/opentripplanner/OpenTripPlanner/pull/7361)
+- Reduce Raptor on-board optimal set by using strict less-than for tripSortIndex [#7417](https://github.com/opentripplanner/OpenTripPlanner/pull/7417)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
