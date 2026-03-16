@@ -40,20 +40,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class links transit stops to streets by splitting the streets (unless the stop is extremely
- * close to the street intersection).
+ * This class links any vertices to streets by splitting the streets (unless the vertex is extremely
+ * close to the street intersection). The linking can be done permanently, or temporarily for the
+ * scope of a request or for a real-time update.
  * <p>
- * It is intended to eventually completely replace the existing stop linking code, which had been
- * through so many revisions and adaptations to different street and turn representations that it
- * was very glitchy. This new code is also intended to be deterministic in linking to streets,
- * independent of the order in which the JVM decides to iterate over Maps and even in the presence
- * of points that are exactly halfway between multiple candidate linking points.
- * <p>
- * It would be wise to keep this new incarnation of the linking code relatively simple, considering
- * what happened before.
- * <p>
- * See discussion in pull request #1922, follow up issue #1934, and the original issue calling for
- * replacement of the stop linker, #1305.
+ * This class is intended to be deterministic in linking to streets, independent of the order in
+ * which the JVM decides to iterate over Maps and even in the presence of points that are exactly
+ * halfway between multiple candidate linking points.
  */
 public class VertexLinker {
 
