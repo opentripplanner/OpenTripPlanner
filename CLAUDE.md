@@ -262,3 +262,4 @@ Features not yet part of core OTP can be developed as Sandbox extensions. These 
 - Have conditional code blocks in core OTP
 - See: http://docs.opentripplanner.org/en/latest/SandboxExtension/
 - Use comments sparingly. Only comment complex code.
+- 
