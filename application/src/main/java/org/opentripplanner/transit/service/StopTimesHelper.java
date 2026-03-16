@@ -48,7 +48,7 @@ public class StopTimesHelper {
    * @param stop                  Stop object to perform the search for
    * @param startTime             Start time for the search.
    * @param timeRange             Searches forward for timeRange from startTime
-   * @param numberOfDepartures    Number of departures to fetch per pattern
+   * @param numberOfDeparturesPerPattern    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
    * @param tripTimeOnDateMatcher An optional matcher to filter out trip times
@@ -57,13 +57,13 @@ public class StopTimesHelper {
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     Comparator<TripTimeOnDate> sortOrder,
     @Nullable Matcher<TripTimeOnDate> tripTimeOnDateMatcher
   ) {
-    if (numberOfDepartures <= 0) {
+    if (numberOfDeparturesPerPattern <= 0) {
       return List.of();
     }
 
@@ -78,7 +78,7 @@ public class StopTimesHelper {
         pattern,
         startTime,
         timeRange,
-        numberOfDepartures,
+        numberOfDeparturesPerPattern,
         arrivalDeparture,
         includeCancelledTrips,
         sortOrder,
@@ -176,7 +176,7 @@ public class StopTimesHelper {
    * @param pattern              Pattern object to perform the search for
    * @param startTime            Start time for the search.
    * @param timeRange            Searches forward for timeRange from startTime
-   * @param numberOfDepartures   Number of departures to fetch per pattern
+   * @param numberOfDeparturesPerPattern   Number of departures to fetch per pattern
    * @param arrivalDeparture     Filter by arrivals, departures, or both.
    * @param includeCancellations If the result should include those trip times where either the entire
    *                             trip or the stop at the given stop location has been cancelled.
@@ -187,7 +187,7 @@ public class StopTimesHelper {
     TripPattern pattern,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   ) {
@@ -196,7 +196,7 @@ public class StopTimesHelper {
       pattern,
       startTime,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       includeCancellations,
       TripTimeOnDate.compareByDeparture(),
@@ -226,7 +226,7 @@ public class StopTimesHelper {
     TripPattern pattern,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
     Comparator<TripTimeOnDate> sortOrder,
@@ -239,12 +239,12 @@ public class StopTimesHelper {
     // probably be optimized, and the trip search in the Raptor search does almost the same
     // thing. This is not part of a routing request, but is a used frequently in some
     // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and
-    // hotel lobbies). Setting the numberOfDepartures and timeRange to a big number for a
+    // hotel lobbies). Setting the numberOfDeparturesPerPattern and timeRange to a big number for a
     // transit hub could result in a DOS attack, but there are probably other more effective
     // ways to do it.
     //
     MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue.orderedBy(sortOrder)
-      .maximumSize(numberOfDepartures)
+      .maximumSize(numberOfDeparturesPerPattern)
       .create();
 
     int timeRangeSeconds = (int) timeRange.toSeconds();

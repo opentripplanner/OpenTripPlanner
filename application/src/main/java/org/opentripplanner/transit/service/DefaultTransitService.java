@@ -421,7 +421,7 @@ public class DefaultTransitService implements TransitEditorService {
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
   ) {
@@ -430,7 +430,7 @@ public class DefaultTransitService implements TransitEditorService {
       stop,
       startTime,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       includeCancelledTrips,
       TripTimeOnDate.compareByDeparture(),
@@ -460,7 +460,7 @@ public class DefaultTransitService implements TransitEditorService {
     TripPattern pattern,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   ) {
@@ -470,7 +470,7 @@ public class DefaultTransitService implements TransitEditorService {
       pattern,
       startTime,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       includeCancellations
     );
