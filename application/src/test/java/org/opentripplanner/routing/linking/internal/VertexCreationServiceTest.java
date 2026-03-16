@@ -97,19 +97,9 @@ class VertexCreationServiceTest {
       ),
       Arguments.of(List.of(StreetMode.CAR), ALL_TYPES, new TraverseModeSet(TraverseMode.CAR)),
       Arguments.of(
-        List.of(StreetMode.CAR_HAILING, StreetMode.CAR_PICKUP),
+        List.of(StreetMode.CAR_HAILING, StreetMode.CAR_PICKUP, StreetMode.FLEXIBLE),
         ALL_TYPES,
         new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR)
-      ),
-      Arguments.of(
-        List.of(StreetMode.FLEXIBLE),
-        List.of(TO),
-        new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR)
-      ),
-      Arguments.of(
-        List.of(StreetMode.FLEXIBLE),
-        List.of(FROM, VISIT_VIA_LOCATION),
-        new TraverseModeSet(TraverseMode.WALK)
       ),
       Arguments.of(
         List.of(StreetMode.CAR_TO_PARK),

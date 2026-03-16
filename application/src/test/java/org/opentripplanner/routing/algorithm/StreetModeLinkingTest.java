@@ -237,12 +237,12 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @Test
   public void testFlexLinking() {
-    assertLinking(closeToCarSt(), ALL_TC, CAR_TC, FLEXIBLE);
+    assertLinking(closeToCarSt(), CAR_TC, CAR_TC, FLEXIBLE);
     assertLinking(closeToAllSt(), ALL_TC, FLEXIBLE);
     assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, FLEXIBLE);
     assertLinking(closeToPedestrianAndBicycleSt(), List.of(PEDESTRIAN_BICYCLE_TC), FLEXIBLE);
-    assertLinking(closeToBicycleAndCarSt(), PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC, FLEXIBLE);
-    assertLinking(stopLocation, List.of(ALL_TC), List.of(CAR_TC, ALL_TC), FLEXIBLE);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, BICYCLE_CAR_TC, FLEXIBLE);
+    assertLinking(stopLocation, List.of(CAR_TC, ALL_TC), List.of(CAR_TC, ALL_TC), FLEXIBLE);
   }
 
   // TODO: Linking to wheelchair accessible streets is currently not implemented,

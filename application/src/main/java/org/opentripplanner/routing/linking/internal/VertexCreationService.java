@@ -95,9 +95,10 @@ public class VertexCreationService {
       return new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
     }
 
-    var flexArrival = streetMode == StreetMode.FLEXIBLE && type == LocationType.TO;
     if (
-      flexArrival || streetMode == StreetMode.CAR_HAILING || streetMode == StreetMode.CAR_PICKUP
+      streetMode == StreetMode.FLEXIBLE ||
+      streetMode == StreetMode.CAR_HAILING ||
+      streetMode == StreetMode.CAR_PICKUP
     ) {
       // Link to only the closest street(s) that are traversable with WALK or CAR (but not
       // necessarily with both)
