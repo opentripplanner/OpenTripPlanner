@@ -64,7 +64,8 @@ class StopTimesHelperTest {
       0,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertTrue(result.isEmpty());
@@ -82,7 +83,8 @@ class StopTimesHelperTest {
       1,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -123,7 +125,8 @@ class StopTimesHelperTest {
       10,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -145,7 +148,8 @@ class StopTimesHelperTest {
       10,
       ArrivalDeparture.BOTH,
       false,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -170,7 +174,8 @@ class StopTimesHelperTest {
       2,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -194,7 +199,8 @@ class StopTimesHelperTest {
       10,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
