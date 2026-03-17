@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -264,7 +265,9 @@ public class StopPlaceType {
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .flatMap(s -> s.getFareZones().stream())
-              .collect(Collectors.toSet())
+              .distinct()
+              .sorted(Comparator.comparing(fareZone -> fareZone.getId().toString()))
+              .toList()
           )
           .build()
       )
