@@ -10,7 +10,7 @@ import org.rutebanken.netex.model.ServiceJourney;
  * Checks that all refs to stop points in journey pattern can be found in the journey pattern.
  * <p>
  * This is a more specific check than {@link JourneyPatternSJMismatch} which only checks that
- * the number of point are equal.
+ * the number of points is equal.
  */
 class InvalidPointInJourneyPatternRef extends AbstractHMapValidationRule<String, ServiceJourney> {
 
