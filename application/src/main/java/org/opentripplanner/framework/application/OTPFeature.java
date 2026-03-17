@@ -27,6 +27,11 @@ public enum OTPFeature {
     false,
     "Enable limiting transfers so that there is only a single transfer to each pattern."
   ),
+  CostlyAssertions(
+    true,
+    false,
+    "Enable some resource consuming assertions which are typically not meant to be run in production."
+  ),
   DebugUi(
     true,
     false,
