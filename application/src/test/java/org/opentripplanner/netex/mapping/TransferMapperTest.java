@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -181,8 +182,9 @@ class TransferMapperTest {
   void returnsNullWhenFromJourneyRefIsNull() {
     var trips = createTripsIndex();
     var stopPointsIndex = createStopPointsIndex();
+    var issueStore = new DefaultDataImportIssueStore();
 
-    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+    var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
     var interchange = new ServiceJourneyInterchange()
       .withId(INTERCHANGE_ID)
@@ -191,9 +193,8 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    var transfer = mapper.mapToTransfer(interchange);
-
-    assertNull(transfer);
+    assertNull(mapper.mapToTransfer(interchange));
+    assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
   @Test
@@ -212,9 +213,7 @@ class TransferMapperTest {
       .withGuaranteed(true);
 
     assertNull(mapper.mapToTransfer(interchange));
-    assertThat(issueStore.listIssues().stream().map(DataImportIssue::getType)).contains(
-      "InvalidInterchange"
-    );
+    assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
   @Test
@@ -222,7 +221,8 @@ class TransferMapperTest {
     var trips = new DefaultEntityById<Trip>();
     var stopPointsIndex = createStopPointsIndex();
 
-    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+    var issueStore = new DefaultDataImportIssueStore();
+    var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
     var interchange = new ServiceJourneyInterchange()
       .withId(INTERCHANGE_ID)
@@ -233,6 +233,7 @@ class TransferMapperTest {
       .withGuaranteed(true);
 
     assertNull(mapper.mapToTransfer(interchange));
+    assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
   @Test
@@ -240,7 +241,8 @@ class TransferMapperTest {
     var trips = createTripsIndex();
     var stopPointsIndex = Map.<String, List<String>>of();
 
-    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+    var issueStore = new DefaultDataImportIssueStore();
+    var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
     var interchange = new ServiceJourneyInterchange()
       .withId(INTERCHANGE_ID)
@@ -251,6 +253,7 @@ class TransferMapperTest {
       .withGuaranteed(true);
 
     assertNull(mapper.mapToTransfer(interchange));
+    assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
   @Test
@@ -258,7 +261,8 @@ class TransferMapperTest {
     var trips = createTripsIndex();
     var stopPointsIndex = createStopPointsIndex();
 
-    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+    var issueStore = new DefaultDataImportIssueStore();
+    var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
     var interchange = new ServiceJourneyInterchange()
       .withId(INTERCHANGE_ID)
@@ -268,6 +272,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID));
 
     assertNull(mapper.mapToTransfer(interchange));
+    assertThat(listTypes(issueStore)).contains("InterchangeWithoutConstraint");
   }
 
   @Test
@@ -337,5 +342,9 @@ class TransferMapperTest {
 
   private ScheduledStopPointRefStructure createStopRef(String id) {
     return new ScheduledStopPointRefStructure().withRef(id);
+  }
+
+  private static Stream<String> listTypes(DefaultDataImportIssueStore issueStore) {
+    return issueStore.listIssues().stream().map(DataImportIssue::getType);
   }
 }

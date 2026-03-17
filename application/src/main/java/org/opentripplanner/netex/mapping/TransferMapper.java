@@ -61,7 +61,13 @@ public class TransferMapper {
     var to = mapPoint(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
 
     if (from == null || to == null) {
-      issueStore.add("InvalidInterchange", "Interchange %s contains invalid from/to refs", it);
+      issueStore.add(
+        "InvalidInterchange",
+        "Interchange %s contains invalid from/to refs. from=%s, to=%s",
+        it,
+        from,
+        to
+      );
       return null;
     }
 
