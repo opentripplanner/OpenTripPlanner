@@ -13,9 +13,11 @@ public class ServiceJourneyPatternBuilder {
 
   public ServiceJourneyPatternBuilder(String id) {
     pattern.setId(id);
-    pattern.setPointsInSequence(points);
   }
 
+  /**
+   * Generates point in sequence and replaces the existing ones.
+   */
   public ServiceJourneyPatternBuilder withPointsInSequence(int... orders) {
     var items = Arrays.stream(orders)
       .mapToObj(order -> pointInPattern(order, ACCESS))
@@ -36,6 +38,7 @@ public class ServiceJourneyPatternBuilder {
   }
 
   public ServiceJourneyPattern build() {
+    pattern.setPointsInSequence(points);
     return pattern;
   }
 
