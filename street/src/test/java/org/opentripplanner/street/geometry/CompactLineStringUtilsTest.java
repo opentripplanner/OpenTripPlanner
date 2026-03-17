@@ -81,6 +81,30 @@ public class CompactLineStringUtilsTest {
   }
 
   @Test
+  public void testNoEndpointRoundTrip() {
+    GeometryFactory gf = new GeometryFactory();
+
+    Coordinate[] points = {
+      new Coordinate(-179.99, 1.12345),
+      new Coordinate(10.123456, 59.654321),
+      new Coordinate(179.99, 1.12345),
+    };
+    LineString original = gf.createLineString(points);
+
+    // Forward
+    byte[] packed = CompactLineStringUtils.compactLineString(original, false);
+    LineString result = CompactLineStringUtils.uncompactLineString(packed, false);
+    assertEquals(original.getNumPoints(), result.getNumPoints());
+    assertTrue(original.equalsExact(result, 0.0000015));
+
+    // Reverse
+    LineString reversed = (LineString) original.reverse();
+    result = CompactLineStringUtils.uncompactLineString(packed, true);
+    assertEquals(reversed.getNumPoints(), result.getNumPoints());
+    assertTrue(reversed.equalsExact(result, 0.0000015));
+  }
+
+  @Test
   public final void testDlugoszVarLenIntPacker() {
     packTest(new int[] {}, 0);
     packTest(new int[] { 0 }, 1);

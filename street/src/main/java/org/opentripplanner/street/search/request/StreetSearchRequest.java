@@ -2,6 +2,7 @@ package org.opentripplanner.street.search.request;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  */
 public class StreetSearchRequest implements AStarRequest {
 
-  private static final StreetSearchRequest DEFAULT = new StreetSearchRequest();
+  public static final StreetSearchRequest DEFAULT = new StreetSearchRequest();
 
   /**
    * How close to do you have to be to the start or end to be considered "close".
@@ -51,11 +52,9 @@ public class StreetSearchRequest implements AStarRequest {
   private final CarRequest car;
   private final WheelchairRequest wheelchairRequest;
   private final ElevatorRequest elevator;
-
-  private IntersectionTraversalCalculator intersectionTraversalCalculator =
-    IntersectionTraversalCalculator.DEFAULT;
-
-  private List<ExtensionRequestContext> extensionRequestContexts;
+  private final IntersectionTraversalCalculator intersectionTraversalCalculator;
+  private final List<ExtensionRequestContext> extensionRequestContexts;
+  private final Duration timeout;
 
   @Nullable
   private final RentalPeriod rentalPeriod;
@@ -79,6 +78,9 @@ public class StreetSearchRequest implements AStarRequest {
     this.wheelchairRequest = WheelchairRequest.DEFAULT;
     this.elevator = ElevatorRequest.DEFAULT;
     this.rentalPeriod = null;
+    this.intersectionTraversalCalculator = IntersectionTraversalCalculator.DEFAULT;
+    this.extensionRequestContexts = List.of();
+    this.timeout = Duration.ofSeconds(5);
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
@@ -97,6 +99,9 @@ public class StreetSearchRequest implements AStarRequest {
     this.wheelchairRequest = requireNonNull(builder.wheelchair);
     this.elevator = requireNonNull(builder.elevator);
     this.rentalPeriod = builder.rentalPeriod;
+    this.intersectionTraversalCalculator = requireNonNull(builder.intersectionTraversalCalculator);
+    this.extensionRequestContexts = List.copyOf(requireNonNull(builder.extensionRequestContexts));
+    this.timeout = requireNonNull(builder.timeout);
   }
 
   public static StreetSearchRequestBuilder of() {
@@ -167,18 +172,8 @@ public class StreetSearchRequest implements AStarRequest {
     return extensionRequestContexts;
   }
 
-  public void setExtensionRequestContexts(List<ExtensionRequestContext> extensionRequestContexts) {
-    this.extensionRequestContexts = extensionRequestContexts;
-  }
-
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
     return copyOf(this).withStartTime(time).withArriveBy(!arriveBy);
-  }
-
-  public void setIntersectionTraversalCalculator(
-    IntersectionTraversalCalculator intersectionTraversalCalculator
-  ) {
-    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
   }
 
   /**
@@ -220,6 +215,10 @@ public class StreetSearchRequest implements AStarRequest {
 
   public double turnReluctance() {
     return turnReluctance;
+  }
+
+  public Duration timeout() {
+    return timeout;
   }
 
   public RentalRequest rental(TraverseMode traverseMode) {

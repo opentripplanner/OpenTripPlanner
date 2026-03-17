@@ -50,23 +50,39 @@ class TripTimeOnDateTest {
   }
 
   @Test
-  void isRecordedStop() {
+  void hasArrivedStop() {
     var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
       .createRealTimeFromScheduledTimes()
-      .withRecorded(1)
+      .withHasArrived(1, true)
       .build();
 
     var subject = new TripTimeOnDate(tripTimes, 0, pattern);
-
-    assertFalse(subject.isRecordedStop());
+    assertFalse(subject.hasArrived());
 
     subject = new TripTimeOnDate(tripTimes, 1, pattern);
+    assertTrue(subject.hasArrived());
+  }
 
-    assertTrue(subject.isRecordedStop());
+  @Test
+  void hasDepartedStop() {
+    var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
+    var trip = TimetableRepositoryForTest.trip("123").build();
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
+
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
+      .createRealTimeFromScheduledTimes()
+      .withHasDeparted(1, true)
+      .build();
+
+    var subject = new TripTimeOnDate(tripTimes, 0, pattern);
+    assertFalse(subject.hasDeparted());
+
+    subject = new TripTimeOnDate(tripTimes, 1, pattern);
+    assertTrue(subject.hasDeparted());
   }
 
   @Test

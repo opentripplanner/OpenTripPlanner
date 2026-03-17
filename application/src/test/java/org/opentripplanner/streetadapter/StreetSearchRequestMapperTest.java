@@ -22,6 +22,9 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.search.intersection_model.DrivingDirection;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class StreetSearchRequestMapperTest {
@@ -38,7 +41,7 @@ class StreetSearchRequestMapperTest {
 
     var req = builder.withDateTime(INSTANT).withFrom(from).withTo(to).buildRequest();
 
-    var subject = StreetSearchRequestMapper.mapInternal(req).build();
+    var subject = StreetSearchRequestMapper.map(req).build();
 
     assertEquals(INSTANT, subject.startTime());
 
@@ -64,7 +67,7 @@ class StreetSearchRequestMapperTest {
 
     var req = builder.withDateTime(INSTANT).withFrom(from).withTo(to).buildRequest();
 
-    var subject = StreetSearchRequestMapper.mapInternal(req).build();
+    var subject = StreetSearchRequestMapper.map(req).build();
 
     assertNull(subject.fromEnvelope());
     assertNull(subject.toEnvelope());
@@ -89,7 +92,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertEquals(dateTime, subject.startTime());
     assertTrue(subject.wheelchairEnabled());
@@ -136,7 +139,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var walkRequest = subject.walk();
     assertEquals(1.5, walkRequest.speed());
@@ -152,7 +155,7 @@ class StreetSearchRequestMapperTest {
       pref.withWalk(w -> w.withEscalator(e -> e.withReluctance(99).withSpeed(88)))
     );
 
-    var subject = StreetSearchRequestMapper.mapInternal(builder.buildRequest()).build();
+    var subject = StreetSearchRequestMapper.map(builder.buildRequest()).build();
 
     var req = subject.walk().escalator();
     assertEquals(99, req.reluctance());
@@ -181,7 +184,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var bikeRequest = subject.bike();
     assertEquals(5.0, bikeRequest.speed());
@@ -210,7 +213,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var bikeRequest = subject.bike();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, bikeRequest.optimizeType());
@@ -233,7 +236,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var carRequest = subject.car();
     assertEquals(1.8, carRequest.reluctance());
@@ -256,7 +259,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var scooterRequest = subject.scooter();
     assertEquals(4.5, scooterRequest.speed());
@@ -286,7 +289,7 @@ class StreetSearchRequestMapperTest {
       )
       .buildRequest();
 
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var rentalRequest = subject.bike().rental();
     assertEquals(Duration.ofSeconds(120), rentalRequest.pickupTime());
@@ -312,7 +315,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertEquals(dateTime, subject.startTime());
     assertEquals(dateTime, subject.rentalPeriod().start());
@@ -338,11 +341,42 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertEquals(dateTime, subject.startTime());
     assertEquals(dateTime.minus(rentalDuration), subject.rentalPeriod().start());
     assertEquals(dateTime, subject.rentalPeriod().end());
+  }
+
+  @Test
+  void mapTimeout() {
+    var timeout = Duration.ofSeconds(3);
+
+    var request = builder()
+      .withPreferences(p -> p.withStreet(s -> s.withRoutingTimeout(timeout)))
+      .buildRequest();
+
+    var subject = StreetSearchRequestMapper.map(request).build();
+
+    assertEquals(timeout, subject.timeout());
+  }
+
+  @Test
+  void mapIntersectionTraversalCalculator() {
+    var model = IntersectionTraversalModel.SIMPLE;
+    var direction = DrivingDirection.RIGHT;
+
+    var request = builder()
+      .withPreferences(p ->
+        p.withStreet(s -> s.withIntersectionTraversalModel(model).withDrivingDirection(direction))
+      )
+      .buildRequest();
+
+    var subject = StreetSearchRequestMapper.map(request).build();
+
+    var expected = IntersectionTraversalCalculator.create(model, direction);
+
+    assertEquals(expected, subject.intersectionTraversalCalculator());
   }
 
   @Test
@@ -360,7 +394,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var parkingRequest = subject.car().parking();
     assertEquals(costOfSeconds(15), parkingRequest.cost());
@@ -376,7 +410,7 @@ class StreetSearchRequestMapperTest {
 
     var request = builder().withFrom(from).withTo(to).withArriveBy(true).buildRequest();
 
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertTrue(subject.arriveBy());
   }
@@ -395,7 +429,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var req = subject.wheelchair();
     assertEquals(0.9, req.maxSlope());
@@ -422,7 +456,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     var req = subject.elevator();
     assertEquals(88, req.boardSlack().toSeconds());
@@ -440,7 +474,7 @@ class StreetSearchRequestMapperTest {
     );
 
     var request = builder.buildRequest();
-    var subject = StreetSearchRequestMapper.mapInternal(request).build();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertTrue(subject.geoidElevation());
     assertEquals(3.5, subject.turnReluctance());

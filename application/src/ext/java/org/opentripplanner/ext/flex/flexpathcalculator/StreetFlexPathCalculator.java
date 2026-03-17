@@ -7,15 +7,14 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.streetadapter.StreetSearchBuilder;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -80,14 +79,16 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
     // TODO: This is incorrect, the configured defaults are not used.
-    var routingRequest = RouteRequest.of().withArriveBy(reverseDirection).buildDefault();
+    var streetRequest = StreetSearchRequest.of()
+      .withMode(StreetMode.CAR)
+      .withArriveBy(reverseDirection)
+      .build();
 
     return StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .withRequest(routingRequest)
-      .withStreetRequest(new StreetRequest(StreetMode.CAR))
+      .withRequest(streetRequest)
       .withFrom(reverseDirection ? null : vertex)
       .withTo(reverseDirection ? vertex : null)
       .getShortestPathTree();

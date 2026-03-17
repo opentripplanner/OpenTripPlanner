@@ -58,24 +58,24 @@
 
 
     <properties>
-        <otp.serialization.version.id>242</otp.serialization.version.id>
+        <otp.serialization.version.id>249</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.2</geotools.version>
-        <google.dagger.version>2.59.1</google.dagger.version>
-        <jackson.version>2.21.0</jackson.version>
-        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
+        <google.dagger.version>2.59.2</google.dagger.version>
+        <jackson.version>2.21.1</jackson.version>
+        <jaxb-runtime.version>4.0.7</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
         <junit.version>6.0.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.27</logback.version>
+        <logback.version>1.5.32</logback.version>
         <lucene.version>10.3.2</lucene.version>
-        <micrometer.version>1.16.3</micrometer.version>
+        <micrometer.version>1.16.4</micrometer.version>
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.33.5</protobuf.version>
-        <siri-java-model.version>2.0.1</siri-java-model.version>
+        <protobuf.version>4.34.0</protobuf.version>
+        <siri-java-model.version>2.0.5</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -144,10 +144,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.1</version>
+                <version>3.15.0</version>
                 <configuration>
                     <!-- Target Java version -->
-                    <release>21</release>
+                    <release>25</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -332,7 +332,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.28.0</version>
+                <version>6.29.0</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -351,7 +351,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.26.0</version>
+                        <version>2.27.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -375,7 +375,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>13.0.0</version>
+                        <version>13.2.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -408,7 +408,7 @@
                         </ports>
                     </container>
                     <from>
-                        <image>eclipse-temurin:24-jre</image>
+                        <image>eclipse-temurin:25-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>amd64</architecture>
@@ -467,7 +467,16 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.75.0</version>
+                <version>26.77.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <!-- This makes sure all Jackson libraries are using compatible versions. -->
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -533,6 +542,13 @@
                 <artifactId>gt-geojson-core</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
+            <!-- JTS is a transitive dependency of GeoTools. We pin the version here to
+                 prevent mapbox-vector-tile from pulling in an older, incompatible version. -->
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-core</artifactId>
+                <version>1.20.0</version>
+            </dependency>
             <dependency>
                 <groupId>de.grundid.opendatalab</groupId>
                 <artifactId>geojson-jackson</artifactId>
@@ -564,7 +580,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.21.0</version>
+                <version>5.23.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
@@ -680,7 +696,7 @@
                 </repository>
             </distributionManagement>
         </profile>
-        
+
         <profile>
             <id>integrationTests</id>
             <activation>

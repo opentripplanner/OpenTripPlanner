@@ -28,7 +28,7 @@ You should only need the following software:
 
 - Git, a version control system
 
-- Java Development Kit, preferably version 21
+- Java Development Kit, preferably version 25
 
 - Maven, a build and dependency management system
 

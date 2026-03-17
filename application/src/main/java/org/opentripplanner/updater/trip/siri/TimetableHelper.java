@@ -59,10 +59,8 @@ class TimetableHelper {
     CallWrapper call,
     OccupancyEnumeration journeyOccupancy
   ) {
-    if (call.getActualDepartureTime() != null || call.getActualArrivalTime() != null) {
-      //Flag as recorded
-      tripTimesBuilder.withRecorded(index);
-    }
+    tripTimesBuilder.withHasArrived(index, call.hasArrived());
+    tripTimesBuilder.withHasDeparted(index, call.hasDeparted());
 
     // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
     boolean isCallPredictionInaccurate = TRUE.equals(call.isPredictionInaccurate());

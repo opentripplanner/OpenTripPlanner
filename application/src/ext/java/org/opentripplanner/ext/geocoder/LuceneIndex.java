@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -49,12 +48,10 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.model.site.StopType;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.utils.collection.ListUtils;
 
 public class LuceneIndex implements Serializable {
 
@@ -114,41 +111,13 @@ public class LuceneIndex implements Serializable {
           iwcWithSuggestField(analyzer, Set.of(SUGGEST))
         )
       ) {
-        transitService
+        var regularStops = transitService
           .listStopLocations()
-          .forEach(stopLocation ->
-            addToIndex(
-              directoryWriter,
-              StopLocation.class,
-              stopLocation.getId().toString(),
-              List.of(),
-              ListUtils.ofNullable(stopLocation.getName()),
-              ListUtils.ofNullable(stopLocation.getCode()),
-              stopLocation.getCoordinate().latitude(),
-              stopLocation.getCoordinate().longitude()
-            )
-          );
-
-        transitService
-          .listStopLocationGroups()
-          .forEach(stopLocationsGroup ->
-            addToIndex(
-              directoryWriter,
-              StopLocationsGroup.class,
-              stopLocationsGroup.getId().toString(),
-              List.of(),
-              ListUtils.ofNullable(stopLocationsGroup.getName()),
-              List.of(),
-              stopLocationsGroup.getCoordinate().latitude(),
-              stopLocationsGroup.getCoordinate().longitude()
-            )
-          );
-
+          .stream()
+          .filter(stopLocation -> stopLocation.getStopType() == StopType.REGULAR)
+          .toList();
         stopClusterMapper
-          .generateStopClusters(
-            transitService.listStopLocations(),
-            transitService.listStopLocationGroups()
-          )
+          .generateStopClusters(regularStops, transitService.listStopLocationGroups())
           .forEach(stopCluster ->
             addToIndex(
               directoryWriter,

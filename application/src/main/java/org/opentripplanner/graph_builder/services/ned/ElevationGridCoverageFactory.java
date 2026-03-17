@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.services.ned;
 
 import org.geotools.api.coverage.Coverage;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Factory interface specifying the ability to generate GeoTools {@link GridCoverage2D} objects

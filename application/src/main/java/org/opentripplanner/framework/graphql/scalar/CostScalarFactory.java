@@ -2,6 +2,7 @@ package org.opentripplanner.framework.graphql.scalar;
 
 import graphql.GraphQLContext;
 import graphql.execution.CoercedVariables;
+import graphql.language.IntValue;
 import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.Coercing;
@@ -59,6 +60,9 @@ public class CostScalarFactory {
       @Override
       public Cost parseValue(Object input, GraphQLContext c, Locale l)
         throws CoercingParseValueException {
+        if (input instanceof Integer intValue) {
+          return Cost.costOfSeconds(intValue);
+        }
         return parseCost((String) input);
       }
 
@@ -67,6 +71,9 @@ public class CostScalarFactory {
         throws CoercingParseLiteralException {
         if (input instanceof StringValue stringValue) {
           return parseCost(stringValue.getValue());
+        }
+        if (input instanceof IntValue intValue) {
+          return Cost.costOfSeconds(intValue.getValue().intValue());
         }
         return null;
       }

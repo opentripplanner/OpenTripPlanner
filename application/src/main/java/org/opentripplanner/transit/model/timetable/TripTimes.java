@@ -133,7 +133,11 @@ public interface TripTimes<T extends TripTimes> extends Serializable, Comparable
 
   boolean isCancelledStop(int stopPos);
 
-  boolean isRecordedStop(int stopPos);
+  /// True if there is realtime information indicating that the trip has arrived at the stop.
+  boolean hasArrived(int stopPosition);
+
+  /// True if there is realtime information indicating that the trip has departed from the stop.
+  boolean hasDeparted(int stopPosition);
 
   boolean isNoDataStop(int stopPos);
 

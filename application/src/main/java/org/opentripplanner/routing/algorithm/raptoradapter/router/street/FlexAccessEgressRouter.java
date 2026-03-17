@@ -9,7 +9,6 @@ import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -38,7 +37,7 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
       ? accessEgressRouter.findAccessEgresses(
           request,
-          new StreetRequest(StreetMode.WALK),
+          StreetMode.WALK,
           extensionRequestContexts,
           AccessEgressType.ACCESS,
           serverContext.flexParameters().maxAccessWalkDuration(),
@@ -50,7 +49,7 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
       ? accessEgressRouter.findAccessEgresses(
           request,
-          new StreetRequest(StreetMode.WALK),
+          StreetMode.WALK,
           extensionRequestContexts,
           AccessEgressType.EGRESS,
           serverContext.flexParameters().maxEgressWalkDuration(),

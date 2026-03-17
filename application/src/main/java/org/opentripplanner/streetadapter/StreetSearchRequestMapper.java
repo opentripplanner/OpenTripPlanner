@@ -11,7 +11,6 @@ import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.ElevatorPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
@@ -20,6 +19,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingSelect;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.request.AccessibilityRequest;
 import org.opentripplanner.street.search.request.BikeRequest;
 import org.opentripplanner.street.search.request.CarRequest;
@@ -41,9 +41,12 @@ import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect
 
 public class StreetSearchRequestMapper {
 
-  public static StreetSearchRequestBuilder mapInternal(RouteRequest request) {
+  /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] transferring all parameters
+  /// relevant for street routing.
+  public static StreetSearchRequestBuilder map(RouteRequest request) {
     var time = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
-    final RoutingPreferences preferences = request.preferences();
+    var preferences = request.preferences();
+    var street = preferences.street();
     var streetSearchRequestBuilder = StreetSearchRequest.of()
       .withStartTime(time)
       .withArriveBy(request.arriveBy())
@@ -51,27 +54,40 @@ public class StreetSearchRequestMapper {
       .withTo(mapGenericLocation(request.to()))
       .withWheelchairEnabled(request.journey().wheelchair())
       .withGeoidElevation(preferences.system().geoidElevation())
-      .withTurnReluctance(preferences.street().turnReluctance())
-      .withWheelchair(b -> mapWheelchair(b, request.preferences().wheelchair()))
+      .withTurnReluctance(street.turnReluctance())
+      .withWheelchair(b -> mapWheelchair(b, preferences.wheelchair()))
       .withWalk(b -> mapWalk(b, preferences.walk()))
       .withBike(b -> mapBike(b, preferences.bike()))
       .withCar(b -> mapCar(b, preferences.car()))
       .withScooter(b -> mapScooter(b, preferences.scooter()))
-      .withElevator(b -> mapElevator(b, preferences.street().elevator()));
+      .withElevator(b -> mapElevator(b, street.elevator()))
+      .withIntersectionTraversalCalculator(
+        IntersectionTraversalCalculator.create(
+          street.intersectionTraversalModel(),
+          street.drivingDirection()
+        )
+      )
+      .withTimeout(street.routingTimeout());
 
     var rentalDuration = request.journey().direct().rentalDuration();
     if (rentalDuration != null) {
       var rentalPeriod = request.arriveBy()
         ? RentalPeriod.createFromLatestArrivalTime(time, rentalDuration)
         : RentalPeriod.createFromEarliestDepartureTime(time, rentalDuration);
-      return streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
+      streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
     }
 
     return streetSearchRequestBuilder;
   }
 
+  /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] for transfer requests, where some
+  /// special rules apply:
+  ///
+  ///  - they are always depart-at
+  ///  - their start time is always the epoch (0)
+  ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
-    return mapInternal(request)
+    return map(request)
       .withFrom(null)
       .withTo(null)
       // transfer requests are always depart-at

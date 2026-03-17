@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.linking;
 
 import java.util.List;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.street.model.edge.LinkingDirection;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.LinkingDirection;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;

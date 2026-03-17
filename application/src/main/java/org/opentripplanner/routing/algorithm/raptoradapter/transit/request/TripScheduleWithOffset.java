@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
-import java.util.function.IntUnaryOperator;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -22,8 +21,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private final TripPatternForDates pattern;
   private final int sortIndex;
   private final int tripIndexForDates;
-  private final IntUnaryOperator arrivalTimes;
-  private final IntUnaryOperator departureTimes;
 
   // Computed when needed later for RaptorPathToItineraryMapper
   private TripTimes tripTimes = null;
@@ -34,12 +31,8 @@ public final class TripScheduleWithOffset implements TripSchedule {
     this.tripIndexForDates = tripIndexForDates;
     this.pattern = pattern;
 
-    // get arrival/departures lambda
-    this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
-    this.departureTimes = pattern.getDepartureTimesForTrip(tripIndexForDates);
-
     // Trip times are sorted based on the arrival times at stop 0,
-    this.sortIndex = arrivalTimes.applyAsInt(0);
+    this.sortIndex = pattern.arrivalTime(0, tripIndexForDates);
   }
 
   @Override
@@ -49,12 +42,12 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public int arrival(int stopPosInPattern) {
-    return this.arrivalTimes.applyAsInt(stopPosInPattern);
+    return pattern.arrivalTime(stopPosInPattern, tripIndexForDates);
   }
 
   @Override
   public int departure(int stopPosInPattern) {
-    return this.departureTimes.applyAsInt(stopPosInPattern);
+    return pattern.departureTime(stopPosInPattern, tripIndexForDates);
   }
 
   @Override

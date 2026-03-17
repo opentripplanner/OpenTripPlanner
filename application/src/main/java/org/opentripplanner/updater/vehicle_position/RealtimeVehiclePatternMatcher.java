@@ -3,10 +3,10 @@ package org.opentripplanner.updater.vehicle_position;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
@@ -34,7 +34,6 @@ import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -42,6 +41,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
@@ -67,12 +68,14 @@ class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
+  private Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
+    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -86,6 +89,7 @@ class RealtimeVehiclePatternMatcher {
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.vehiclePositionFeatures = vehiclePositionFeatures;
+    this.getServiceDatesForServiceId = getServiceDatesForServiceId;
   }
 
   /**
@@ -94,17 +98,20 @@ class RealtimeVehiclePatternMatcher {
    * @param vehiclePositions List of vehicle positions to match to patterns
    */
   public UpdateResult applyRealtimeVehicleUpdates(List<VehiclePosition> vehiclePositions) {
-    var matchResults = vehiclePositions
-      .stream()
-      .map(vehiclePosition -> toRealtimeVehicle(feedId, vehiclePosition))
-      .toList();
+    List<PatternAndRealtimeVehicle> matchResults = new ArrayList<>();
+    List<UpdateError> errors = new ArrayList<>();
+    for (var vehiclePosition : vehiclePositions) {
+      try {
+        matchResults.add(toRealtimeVehicle(feedId, vehiclePosition));
+      } catch (UpdateException e) {
+        errors.add(e.toError());
+      }
+    }
 
     // we take the list of vehicles and out of them create a MultiMap<TripPattern, RealtimeVehicle>
     // that makes it very easy to update the vehicles in the service
     var vehicles = matchResults
       .stream()
-      .filter(Result::isSuccess)
-      .map(Result::successValue)
       .collect(
         Multimaps.toMultimap(
           PatternAndRealtimeVehicle::pattern,
@@ -126,18 +133,23 @@ class RealtimeVehiclePatternMatcher {
     // need to convert the sucess to the correct type.
     var results = matchResults
       .stream()
-      .map(e -> e.mapSuccess(ignored -> UpdateSuccess.noWarnings()))
+      .map(ignored -> UpdateSuccess.noWarnings())
       .toList();
     // needs to be put into a new list so the types are correct
-    var updateResult = UpdateResult.ofResults(new ArrayList<>(results));
+    var updateResult = UpdateResult.of(results, errors);
     ResultLogger.logUpdateResult(feedId, "gtfs-rt-vehicle-positions", updateResult);
 
     return updateResult;
   }
 
   private LocalDate inferServiceDate(Trip trip) {
-    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
-    return inferServiceDate(staticTripTimes, timeZoneId, Instant.now());
+    // Use real-time timetable data, it is an overlay on the static data.
+    var tripTimes = getRealtimePattern
+      .apply(trip, LocalDate.now(timeZoneId))
+      .getScheduledTimetable()
+      .getTripTimes(trip);
+    var dates = getServiceDatesForServiceId.apply(trip.getServiceId());
+    return inferServiceDate(tripTimes, dates, timeZoneId, Instant.now());
   }
 
   /**
@@ -146,7 +158,27 @@ class RealtimeVehiclePatternMatcher {
    * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
    */
   protected static LocalDate inferServiceDate(
-    TripTimes staticTripTimes,
+    TripTimes<?> tripTimes,
+    Set<LocalDate> applicableCalendarDates,
+    ZoneId zoneId,
+    Instant now
+  ) {
+    if (tripTimes != null) {
+      return inferServiceDate(tripTimes, zoneId, now);
+    } else if (applicableCalendarDates.size() == 1) {
+      return applicableCalendarDates.stream().toList().getFirst();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+   * <p>
+   * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+   */
+  protected static LocalDate inferServiceDate(
+    TripTimes<?> staticTripTimes,
     ZoneId zoneId,
     Instant now
   ) {
@@ -306,16 +338,16 @@ class RealtimeVehiclePatternMatcher {
     return vehiclePosition.toBuilder().setTrip(trip).build();
   }
 
-  private Result<PatternAndRealtimeVehicle, UpdateError> toRealtimeVehicle(
+  private PatternAndRealtimeVehicle toRealtimeVehicle(
     String feedId,
     VehiclePosition vehiclePosition
-  ) {
+  ) throws UpdateException {
     if (!vehiclePosition.hasTrip()) {
       LOG.debug(
         "Realtime vehicle positions {} has no trip ID. Ignoring.",
         toString(vehiclePosition)
       );
-      return Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE));
+      throw UpdateException.noTripId(INVALID_INPUT_STRUCTURE);
     }
 
     var vehiclePositionWithTripId = fuzzyTripMatcher == null
@@ -325,7 +357,7 @@ class RealtimeVehiclePatternMatcher {
     var tripId = vehiclePositionWithTripId.getTrip().getTripId();
 
     if (StringUtils.hasNoValue(tripId)) {
-      return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
+      throw UpdateException.noTripId(UpdateErrorType.NO_TRIP_ID);
     }
 
     var scopedTripId = new FeedScopedId(feedId, tripId);
@@ -336,7 +368,7 @@ class RealtimeVehiclePatternMatcher {
         feedId,
         tripId
       );
-      return UpdateError.result(scopedTripId, TRIP_NOT_FOUND);
+      throw UpdateException.of(scopedTripId, TRIP_NOT_FOUND);
     }
 
     var serviceDate = Optional.of(vehiclePositionWithTripId.getTrip().getStartDate())
@@ -347,7 +379,7 @@ class RealtimeVehiclePatternMatcher {
     var pattern = getRealtimePattern.apply(trip, serviceDate);
     if (pattern == null) {
       LOG.debug("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
-      return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
+      throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
     // the trip times are only used for mapping the GTFS-RT stop_sequence back to a stop.
@@ -355,7 +387,7 @@ class RealtimeVehiclePatternMatcher {
     // look at the static trips for the stop_sequence->stop mapping
     var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
     if (staticTripTimes == null) {
-      return UpdateError.result(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
+      throw UpdateException.of(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
     // Add position to pattern
@@ -366,7 +398,7 @@ class RealtimeVehiclePatternMatcher {
       staticTripTimes::stopPositionForGtfsSequence
     );
 
-    return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));
+    return new PatternAndRealtimeVehicle(pattern, newVehicle);
   }
 
   private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}

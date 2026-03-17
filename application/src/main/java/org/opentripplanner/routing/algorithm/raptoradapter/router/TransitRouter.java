@@ -294,7 +294,7 @@ public class TransitRouter {
 
     var nearbyStops = accessEgressRouter.findAccessEgresses(
       accessRequest,
-      streetRequest,
+      streetRequest.mode(),
       serverContext.listExtensionRequestContexts(accessRequest),
       type,
       durationLimit,

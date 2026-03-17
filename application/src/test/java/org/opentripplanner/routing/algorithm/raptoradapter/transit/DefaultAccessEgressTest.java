@@ -66,30 +66,6 @@ class DefaultAccessEgressTest {
     assertEquals(LAST_STATE, subject.getLastState());
   }
 
-  /**
-   * @deprecated TODO - This test dos not test a single line in DefaultAccessEgress. If the
-   *                    test have value move it to where it belong (StateTest ?).
-   */
-  @Deprecated
-  @Test
-  void containsDriving() {
-    var state = TestStateBuilder.ofDriving().streetEdge().streetEdge().streetEdge().build();
-    var access = new DefaultAccessEgress(0, state);
-    assertTrue(access.getLastState().containsModeCar());
-  }
-
-  /**
-   * @deprecated TODO - This test dos not test a single line in DefaultAccessEgress. If the
-   *                    test have value move it to where it belong (StateTest ?).
-   */
-  @Deprecated
-  @Test
-  void walking() {
-    var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().streetEdge().build();
-    var access = new DefaultAccessEgress(0, state);
-    assertFalse(access.getLastState().containsModeCar());
-  }
-
   @Test
   void containsModeWalkOnly() {
     var stateWalk = TestStateBuilder.ofWalking().build();

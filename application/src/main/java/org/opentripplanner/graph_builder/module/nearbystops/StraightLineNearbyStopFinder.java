@@ -5,9 +5,9 @@ import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -32,7 +32,7 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
-    StreetRequest streetRequest,
+    StreetMode streetMode,
     boolean reverseDirection
   ) {
     return findNearbyStopsViaDirectTransfers(vertex);

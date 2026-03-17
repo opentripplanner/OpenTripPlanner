@@ -18,12 +18,12 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
+import uk.org.siri.siri21.CallStatusEnumeration;
 import uk.org.siri.siri21.OccupancyEnumeration;
 
 public class TimetableHelperTest {
@@ -82,8 +82,6 @@ public class TimetableHelperTest {
 
   @Test
   public void testApplyUpdates_MapPredictionInaccurate_EstimatedCall() {
-    // Arrange
-
     CallWrapper estimatedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withCancellation(false)
@@ -91,17 +89,16 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(true)
       .build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
 
-    // Assert
-    assertStatuses(0, OccupancyStatus.MANY_SEATS_AVAILABLE, false, false, false, true);
+    assertEquals(
+      "Occupancy:MANY_SEATS_AVAILABLE Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
+      showStatuses(0)
+    );
   }
 
   @Test
   public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_EstimatedCall() {
-    // Arrange
-
     CallWrapper estimatedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withCancellation(true)
@@ -109,18 +106,16 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(true)
       .build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
 
-    // Assert
-
-    assertStatuses(0, OccupancyStatus.FULL, true, false, false, false);
+    assertEquals(
+      "Occupancy:FULL Cancelled:true Extra:false Arrived:false Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
   }
 
   @Test
   public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_RecordedCall() {
-    // Arrange
-
     ZonedDateTime actualTime = START_OF_SERVICE.plus(Duration.ofHours(1));
     CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
@@ -130,18 +125,16 @@ public class TimetableHelperTest {
       .withActualDepartureTime(actualTime)
       .build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
-    // Assert
-
-    assertStatuses(0, OccupancyStatus.FULL, true, false, false, false);
+    assertEquals(
+      "Occupancy:FULL Cancelled:true Extra:false Arrived:false Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
   }
 
   @Test
   public void testApplyUpdates_PredictionInaccuratePriorityOverRecorded() {
-    // Arrange
-
     CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withPredictionInaccurate(true)
@@ -150,38 +143,56 @@ public class TimetableHelperTest {
       .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
       .build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
-    // Assert
-    assertStatuses(0, OccupancyStatus.FULL, false, false, false, true);
+    assertEquals(
+      "Occupancy:FULL Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
+      showStatuses(0)
+    );
   }
 
   @Test
-  public void testApplyUpdates_ActualTimeResultsInRecorded() {
-    // Arrange
-
+  public void testApplyUpdates_RecordedCallResultsInArrivedAndDeparted() {
     CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withPredictionInaccurate(false)
       .withOccupancy(OccupancyEnumeration.STANDING_AVAILABLE)
       .withCancellation(false)
       .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
+      .withIsRecorded(true)
       .build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
-    // Assert
-    assertStatuses(0, OccupancyStatus.STANDING_ROOM_ONLY, false, false, true, false);
+    assertEquals(
+      "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:true Departed:true Inaccurate:false",
+      showStatuses(0)
+    );
+  }
+
+  @Test
+  public void testApplyUpdates_Arrived() {
+    CallWrapper recordedCall = TestCall.of()
+      .withStopPointRef(STOP_ID)
+      .withPredictionInaccurate(false)
+      .withOccupancy(OccupancyEnumeration.STANDING_AVAILABLE)
+      .withCancellation(false)
+      .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
+      .withArrivalStatus(CallStatusEnumeration.ARRIVED)
+      .build();
+
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+
+    assertEquals(
+      "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:true Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
   }
 
   @Test
   public void testApplyUpdates_JourneyDefaultValues() {
-    // Arrange
     CallWrapper recordedCall = TestCall.of().withStopPointRef(STOP_ID).build();
 
-    // Act
     TimetableHelper.applyUpdates(
       START_OF_SERVICE,
       builder,
@@ -192,43 +203,60 @@ public class TimetableHelperTest {
       OccupancyEnumeration.STANDING_AVAILABLE
     );
 
-    // Assert
-    assertStatuses(0, OccupancyStatus.STANDING_ROOM_ONLY, false, false, false, true);
+    assertEquals(
+      "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
+      showStatuses(0)
+    );
+  }
+
+  @Test
+  public void testApplyUpdates_RecordedCallArrivedButNotDeparted() {
+    ZonedDateTime actualArrival = START_OF_SERVICE.plus(Duration.ofHours(1));
+    ZonedDateTime expectedDeparture = actualArrival.plus(Duration.ofMinutes(5));
+    CallWrapper recordedCall = TestCall.of()
+      .withStopPointRef(STOP_ID)
+      .withPredictionInaccurate(false)
+      .withCancellation(false)
+      .withActualArrivalTime(actualArrival)
+      .withExpectedDepartureTime(expectedDeparture)
+      .withIsRecorded(true)
+      .build();
+
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+
+    assertEquals(
+      "Occupancy:NO_DATA_AVAILABLE Cancelled:false Extra:false Arrived:true Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
   }
 
   @Test
   public void testApplyUpdates_ExtraCall_EstimatedCall() {
-    // Arrange
     CallWrapper estimatedCall = TestCall.of().withExtraCall(true).build();
 
-    // Act
     TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
 
-    // Assert
-    assertStatuses(0, OccupancyStatus.NO_DATA_AVAILABLE, false, true, false, false);
+    assertEquals(
+      "Occupancy:NO_DATA_AVAILABLE Cancelled:false Extra:true Arrived:false Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
   }
 
-  private void assertStatuses(
-    int index,
-    OccupancyStatus occupancyStatus,
-    boolean cancelled,
-    boolean extraCall,
-    boolean recorded,
-    boolean predictionInaccurate
-  ) {
+  private String showStatuses(int index) {
     RealTimeTripTimes tripTimes = builder.build();
-    assertEquals(
-      predictionInaccurate,
-      tripTimes.isPredictionInaccurate(index),
-      "Prediction inaccurate mapped incorrectly"
+    return (
+      "Occupancy:" +
+      tripTimes.getOccupancyStatus(index) +
+      " Cancelled:" +
+      tripTimes.isCancelledStop(index) +
+      " Extra:" +
+      tripTimes.isExtraCall(index) +
+      " Arrived:" +
+      tripTimes.hasArrived(index) +
+      " Departed:" +
+      tripTimes.hasDeparted(index) +
+      " Inaccurate:" +
+      tripTimes.isPredictionInaccurate(index)
     );
-    assertEquals(recorded, tripTimes.isRecordedStop(index), "Recorded status mapped incorrectly");
-    assertEquals(
-      occupancyStatus,
-      tripTimes.getOccupancyStatus(index),
-      "Occupancy should be mapped to " + occupancyStatus
-    );
-    assertEquals(cancelled, tripTimes.isCancelledStop(index));
-    assertEquals(extraCall, tripTimes.isExtraCall(index));
   }
 }

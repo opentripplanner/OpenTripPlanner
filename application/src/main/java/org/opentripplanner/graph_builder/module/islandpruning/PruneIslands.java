@@ -13,10 +13,9 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
-import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -85,14 +84,6 @@ public class PruneIslands implements GraphBuilderModule {
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
       streetLinkerModule.linkTransitStops(graph, timetableRepository);
-      int isolated = 0;
-      for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-        if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
-          issueStore.add(new IsolatedStop(tStop));
-          isolated++;
-        }
-      }
-      LOG.info("{} stops remain isolated", isolated);
     }
 
     // clean up pruned street vertices

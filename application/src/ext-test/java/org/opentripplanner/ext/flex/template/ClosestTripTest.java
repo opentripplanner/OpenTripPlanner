@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import gnu.trove.set.hash.TIntHashSet;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -34,11 +35,12 @@ class ClosestTripTest {
     .build();
 
   private static final LocalDate DATE = LocalDate.of(2025, 2, 28);
-  private static final FlexServiceDate FSD = new FlexServiceDate(
+  private static final FlexServiceDate FSD = FlexServiceDate.of(
     DATE,
     ServiceDateUtils.secondsSinceStartOfTime(DATE.atStartOfDay(ZoneIds.BERLIN), DATE),
-    10,
-    new TIntHashSet()
+    Instant.ofEpochSecond(10),
+    ZoneIds.BERLIN,
+    new ArrayList<>()
   );
   private static final StopLocation STOP = FLEX_TRIP.getStop(0);
   private static final FlexAccessEgressCallbackAdapter ADAPTER =

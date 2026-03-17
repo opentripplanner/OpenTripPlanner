@@ -40,11 +40,11 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   }
 
   @Override
-  public boolean isSubModePredicate() {
+  public boolean isModeSelective() {
     for (var selectRequest : select) {
       if (
         selectRequest.transportModeFilter() != null &&
-        selectRequest.transportModeFilter().isSubMode()
+        selectRequest.transportModeFilter().isModeSelective()
       ) {
         return true;
       }
@@ -53,7 +53,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     for (var selectRequest : not) {
       if (
         selectRequest.transportModeFilter() != null &&
-        selectRequest.transportModeFilter().isSubMode()
+        selectRequest.transportModeFilter().isModeSelective()
       ) {
         return true;
       }

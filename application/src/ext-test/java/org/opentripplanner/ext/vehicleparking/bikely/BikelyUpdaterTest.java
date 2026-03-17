@@ -10,10 +10,10 @@ import java.util.Locale;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.basic.Locales;
-import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class BikelyUpdaterTest {
 

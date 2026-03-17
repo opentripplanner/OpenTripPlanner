@@ -22,13 +22,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.LinkingContextRequest;
-import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -307,7 +307,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     private static int indexCounter = 0;
 
     /**
-     * Generate a street from A to B. The streets are horisontal and paralell to each other with
+     * Generate a street from A to B. The streets are horizontal and parallel to each other with
      * about 10-11m apart (see {@link #STREET_DELTA}).
      */
     static LinkingTestCase of(StreetTraversalPermission permission) {

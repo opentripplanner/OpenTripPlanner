@@ -36,12 +36,12 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private final List<FareLegRule> fareLegRules = new ArrayList<>();
-  private final List<FareTransferRule> fareTransferRules = new ArrayList<>();
+  protected final List<FareLegRule> fareLegRules = new ArrayList<>();
+  protected final List<FareTransferRule> fareTransferRules = new ArrayList<>();
 
   // mapping the stop ids to area ids. one stop can be in several areas.
-  private final Multimap<FeedScopedId, FeedScopedId> stopAreas = ArrayListMultimap.create();
-  private final Multimap<FeedScopedId, LocalDate> serviceDates = ArrayListMultimap.create();
+  protected final Multimap<FeedScopedId, FeedScopedId> stopAreas = ArrayListMultimap.create();
+  protected final Multimap<FeedScopedId, LocalDate> serviceDates = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {

@@ -36,7 +36,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -45,6 +44,7 @@ import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehi
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -136,11 +136,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   static Stream<Arguments> banningCases() {
     return Stream.of(
       of(Map.of(), "[ALL]"),
+      of(Map.of("routes", ""), "[ALL]"),
+      of(Map.of("agencies", ""), "[ALL]"),
+      of(Map.of("agencies", "", "routes", ""), "[ALL]"),
       of(
         Map.of("routes", "trimet:555"),
         "[(not: [(transportModes: EMPTY, routes: [trimet:555])])]"
       ),
-      of(Map.of("agencies", ""), "[(not: [(transportModes: EMPTY)])]"),
       of(
         Map.of("agencies", "trimet:666"),
         "[(not: [(transportModes: EMPTY, agencies: [trimet:666])])]"
@@ -195,7 +197,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       Arguments.of("F:t1", List.of(TRIP_ID_1)),
       Arguments.of("F:t1,F:t2", List.of(TRIP_ID_1, TRIP_ID_2)),
       Arguments.of("F:t1, F:t2", List.of(TRIP_ID_1, TRIP_ID_2)),
-      Arguments.of(",F:t1, F:t2,", List.of(TRIP_ID_1, TRIP_ID_2))
+      Arguments.of(",F:t1, F:t2,", List.of(TRIP_ID_1, TRIP_ID_2)),
+      Arguments.of("", List.of())
     );
   }
 
@@ -211,6 +214,20 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       CONTEXT
     );
     assertThat(routeRequest.journey().transit().bannedTrips()).containsExactlyElementsIn(expected);
+  }
+
+  @Test
+  void emptyStringBanning() {
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of("banned", Map.of("trips", "", "agencies", "", "routes", ""))
+    );
+
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      CONTEXT
+    );
+    assertThat(routeRequest.journey().transit().bannedTrips()).isEmpty();
+    assertEquals("[ALL]", routeRequest.journey().transit().filters().toString());
   }
 
   @Test

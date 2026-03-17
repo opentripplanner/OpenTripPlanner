@@ -161,14 +161,11 @@ public class TemporaryPartialStreetEdgeTest {
     StreetSearchRequest request = StreetSearchRequest.of()
       .withMode(StreetMode.CAR)
       .withTurnReluctance(0.5)
+      // All intersections take 10 minutes - we'll notice if one isn't counted.
+      .withIntersectionTraversalCalculator(new ConstantIntersectionTraversalCalculator(10.0 * 60.0))
       .build();
 
-    // All intersections take 10 minutes - we'll notice if one isn't counted.
-    double turnDurationSecs = 10.0 * 60.0;
-    var calculator = new ConstantIntersectionTraversalCalculator(turnDurationSecs);
-
     State s0 = new State(v1, request);
-    s0.getRequest().setIntersectionTraversalCalculator(calculator);
     State s1 = e1.traverse(s0)[0];
     State s2 = e2.traverse(s1)[0];
     State s3 = e3.traverse(s2)[0];
@@ -177,7 +174,6 @@ public class TemporaryPartialStreetEdgeTest {
     Edge partialE2Second = start.getOutgoing().iterator().next();
 
     State partialS0 = new State(v1, request);
-    partialS0.getRequest().setIntersectionTraversalCalculator(calculator);
     State partialS1 = e1.traverse(partialS0)[0];
     State partialS2A = partialE2First.traverse(partialS1)[0];
     State partialS2B = partialE2Second.traverse(partialS2A)[0];
@@ -192,16 +188,17 @@ public class TemporaryPartialStreetEdgeTest {
     assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
 
     // All intersections take 0 seconds now.
-    calculator = new ConstantIntersectionTraversalCalculator();
+    var calculator = new ConstantIntersectionTraversalCalculator();
 
-    State s0NoCost = new State(v1, request);
-    s0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
+    var request2 = StreetSearchRequest.copyOf(request)
+      .withIntersectionTraversalCalculator(calculator)
+      .build();
+    State s0NoCost = new State(v1, request2);
     State s1NoCost = e1.traverse(s0NoCost)[0];
     State s2NoCost = e2.traverse(s1NoCost)[0];
     State s3NoCost = e3.traverse(s2NoCost)[0];
 
-    State partialS0NoCost = new State(v1, request);
-    partialS0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
+    State partialS0NoCost = new State(v1, request2);
     State partialS1NoCost = e1.traverse(partialS0NoCost)[0];
     State partialS2ANoCost = partialE2First.traverse(partialS1NoCost)[0];
     State partialS2BNoCost = partialE2Second.traverse(partialS2ANoCost)[0];

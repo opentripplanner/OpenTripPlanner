@@ -1,16 +1,13 @@
 package org.opentripplanner.updater.trip.gtfs;
 
-import static org.opentripplanner.transit.model.framework.Result.success;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +15,6 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -28,17 +24,13 @@ import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TripTimesUpdater {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TripTimesUpdater.class);
 
   private final ZoneId timeZone;
   private final DeduplicatorService deduplicator;
@@ -62,25 +54,25 @@ class TripTimesUpdater {
    * all trips in a timetable are from the same feed, which should always be the case.
    *
    * @param tripUpdate                    GTFS-RT trip update
-   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   * @param backwardsDelay Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link Result < TripTimesPatch ,    UpdateError   >} contains either a new copy of updated
+   * @return {@link TripTimesPatch} contains a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
-   * realtime update; or an error if something went wrong
+   * realtime update.
+   * @throws UpdateException if there are any problems with the data
    */
-  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
+  public TripTimesPatch createUpdatedTripTimesFromGtfsRt(
     Timetable timetable,
     TripUpdate tripUpdate,
-    ForwardsDelayPropagationType forwardsDelayPropagationType,
-    BackwardsDelayPropagationType backwardsDelayPropagationType
-  ) {
+    ForwardsDelayPropagationType forwardsDelay,
+    BackwardsDelayPropagationType backwardsDelay
+  ) throws UpdateException {
     var tripId = tripUpdate.tripId();
 
     var tripTimes = timetable.getTripTimes(tripId);
     if (tripTimes == null) {
-      LOG.debug("tripId {} not found in pattern.", tripId);
-      return Result.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
+      throw UpdateException.of(tripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
     RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
@@ -91,116 +83,66 @@ class TripTimesUpdater {
     Map<Integer, PickDrop> updatedDropoffs = new HashMap<>();
     Map<Integer, String> replacedStopIndices = new HashMap<>();
 
-    // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
-    Iterator<StopTimeUpdate> updates = tripUpdate.stopTimeUpdates().iterator();
-    StopTimeUpdate update = null;
-    if (!updates.hasNext()) {
-      LOG.warn("Zero-length trip update to trip {}.", tripId);
-    } else {
-      update = updates.next();
-    }
-
-    int numStops = tripTimes.getNumStops();
-
     final long today = ServiceDateUtils.asStartOfService(
       tripUpdate.serviceDate(),
       timeZone
     ).toEpochSecond();
 
-    for (int i = 0; i < numStops; i++) {
-      var index = i;
-      boolean match = false;
-      if (update != null) {
-        if (update.stopSequence().isPresent()) {
-          match = update.stopSequence().getAsInt() == tripTimes.gtfsSequenceOfStopIndex(i);
-        } else if (update.stopId().isPresent()) {
-          match = timetable.getPattern().getStop(i).getId().getId().equals(update.stopId().get());
+    var mapper = new StopPositionMapper(tripId, tripTimes, timetable);
+
+    for (var i = 0; i < tripUpdate.stopTimeUpdates().size(); i++) {
+      var update = tripUpdate.stopTimeUpdates().get(i);
+      final int pos = mapper.stopPositionInPattern(i, update);
+
+      var scheduledStopId = timetable.getPattern().getStop(pos).getId().getId();
+      var scheduledStopHeadsign = tripTimes.getHeadsign(pos);
+      var scheduledPickup = timetable.getPattern().getBoardType(pos);
+      var scheduledDropoff = timetable.getPattern().getAlightType(pos);
+      update
+        .stopHeadsign()
+        .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
+        .ifPresent(x -> builder.withStopHeadsign(pos, x));
+      update
+        .pickup()
+        .filter(x -> x != scheduledPickup)
+        .ifPresent(x -> updatedPickups.put(pos, x));
+      update
+        .dropoff()
+        .filter(x -> x != scheduledDropoff)
+        .ifPresent(x -> updatedDropoffs.put(pos, x));
+      update
+        .assignedStopId()
+        .filter(x -> !Objects.equals(x, scheduledStopId))
+        .ifPresent(x -> replacedStopIndices.put(pos, x));
+
+      var scheduleRelationship = update.scheduleRelationship();
+      // Handle each schedule relationship case
+      if (scheduleRelationship == ScheduleRelationship.SKIPPED) {
+        // Set status to cancelled
+        updatedPickups.put(pos, PickDrop.CANCELLED);
+        updatedDropoffs.put(pos, PickDrop.CANCELLED);
+        builder.withCanceled(pos);
+      } else if (scheduleRelationship == ScheduleRelationship.NO_DATA) {
+        // Set status to NO_DATA and delays to 0.
+        // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
+        builder.withNoData(pos);
+      } else {
+        // Else the status is SCHEDULED, update times as needed.
+        if (!update.isArrivalValid()) {
+          throw UpdateException.of(tripId, INVALID_ARRIVAL_TIME, i);
         }
+        if (!update.isDepartureValid()) {
+          throw UpdateException.of(tripId, INVALID_DEPARTURE_TIME, i);
+        }
+        setArrivalAndDeparture(builder, pos, update, today);
       }
-
-      if (match) {
-        var scheduledStopId = timetable.getPattern().getStop(i).getId().getId();
-        var scheduledStopHeadsign = tripTimes.getHeadsign(i);
-        var scheduledPickup = timetable.getPattern().getBoardType(i);
-        var scheduledDropoff = timetable.getPattern().getAlightType(i);
-        update
-          .stopHeadsign()
-          .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
-          .ifPresent(x -> builder.withStopHeadsign(index, x));
-        update
-          .pickup()
-          .filter(x -> x != scheduledPickup)
-          .ifPresent(x -> updatedPickups.put(index, x));
-        update
-          .dropoff()
-          .filter(x -> x != scheduledDropoff)
-          .ifPresent(x -> updatedDropoffs.put(index, x));
-        update
-          .assignedStopId()
-          .filter(x -> !Objects.equals(x, scheduledStopId))
-          .ifPresent(x -> replacedStopIndices.put(index, x));
-
-        var scheduleRelationship = update.scheduleRelationship();
-        // Handle each schedule relationship case
-        if (scheduleRelationship == ScheduleRelationship.SKIPPED) {
-          // Set status to cancelled
-          updatedPickups.put(i, PickDrop.CANCELLED);
-          updatedDropoffs.put(i, PickDrop.CANCELLED);
-          builder.withCanceled(i);
-        } else if (scheduleRelationship == ScheduleRelationship.NO_DATA) {
-          // Set status to NO_DATA and delays to 0.
-          // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-          builder.withNoData(i);
-        } else {
-          // Else the status is SCHEDULED, update times as needed.
-          if (!update.isArrivalValid()) {
-            LOG.debug(
-              "Arrival time at index {} of trip {} has neither a delay nor a time.",
-              i,
-              tripId
-            );
-            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, i));
-          }
-          if (!update.isDepartureValid()) {
-            LOG.debug(
-              "Departure time at index {} of trip {} has neither a delay nor a time.",
-              i,
-              tripId
-            );
-            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, i));
-          }
-          setArrivalAndDeparture(builder, i, update, today);
-        }
-
-        if (updates.hasNext()) {
-          update = updates.next();
-        } else {
-          update = null;
-        }
-      }
-    }
-    if (update != null) {
-      LOG.debug(
-        "Part of a TripUpdate object could not be applied successfully to trip {}.",
-        tripId
-      );
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
     }
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
     // GTFS-RT updates ONLY not for SIRI updates.
-    if (
-      ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder)
-    ) {
-      LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
-    }
+    ForwardsDelayInterpolator.getInstance(forwardsDelay).interpolateDelay(builder);
 
-    var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
-      backwardsDelayPropagationType
-    ).propagateBackwards(builder);
-    backwardPropagationIndex.ifPresent(index ->
-      LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
-    );
+    BackwardsDelayInterpolator.getInstance(backwardsDelay).propagateBackwards(builder);
 
     tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);
 
@@ -210,11 +152,9 @@ class TripTimesUpdater {
     // Validate for non-increasing times. Log error if present.
     try {
       var result = builder.build();
-      return success(
-        new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
-      );
+      return new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices);
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 
@@ -224,15 +164,15 @@ class TripTimesUpdater {
    * @param trip              trip
    * @param tripUpdate        information about the trip
    * @param realTimeState     real-time state of new trip
-   * @return empty Result if successful or one containing an error
+   * @throws UpdateException if there are any errors with the TripUpdate
    */
-  public Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGtfsRt(
+  public TripTimesWithStopPattern createNewTripTimesFromGtfsRt(
     Trip trip,
     TripUpdate tripUpdate,
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
     RealTimeState realTimeState,
     int serviceCode
-  ) {
+  ) throws UpdateException {
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
       tripUpdate.serviceDate(),
@@ -253,13 +193,7 @@ class TripTimesUpdater {
       if (arrival.isPresent()) {
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          LOG.debug(
-            "NEW trip {} on {} has invalid arrival time (compared to start date in " +
-              "TripDescriptor), skipping.",
-            trip.getId(),
-            tripUpdate.serviceDate()
-          );
-          return UpdateError.result(trip.getId(), INVALID_ARRIVAL_TIME);
+          throw UpdateException.of(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
       }
@@ -268,13 +202,7 @@ class TripTimesUpdater {
       if (departure.isPresent()) {
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          LOG.debug(
-            "NEW trip {} on {} has invalid departure time (compared to start date in " +
-              "TripDescriptor), skipping.",
-            trip.getId(),
-            tripUpdate.serviceDate()
-          );
-          return UpdateError.result(trip.getId(), INVALID_DEPARTURE_TIME);
+          throw UpdateException.of(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
       }
@@ -321,7 +249,7 @@ class TripTimesUpdater {
     RealTimeTripTimes tripTimes = builder.build();
 
     // Add new trip times to the buffer
-    return success(new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes)));
+    return new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes));
   }
 
   private static void setArrivalAndDeparture(

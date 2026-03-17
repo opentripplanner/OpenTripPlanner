@@ -29,6 +29,15 @@ public class PatternRideC2Test {
       )
     );
 
+    // Left sort index higher than right: should NOT dominate (tripSortIndex is not a dominance
+    // criterion in this direction — different trips are incomparable, only lower index dominates)
+    assertFalse(
+      comparator.leftDominanceExist(
+        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null),
+        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
+      )
+    );
+
     assertTrue(
       comparator.leftDominanceExist(
         new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),

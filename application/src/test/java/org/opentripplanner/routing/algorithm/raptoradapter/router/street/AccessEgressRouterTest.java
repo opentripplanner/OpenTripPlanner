@@ -14,15 +14,15 @@ import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolv
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -276,7 +276,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         new SiteRepositoryResolver(timetableRepository.getSiteRepository())
       ).findAccessEgresses(
         request,
-        StreetRequest.DEFAULT,
+        StreetMode.WALK,
         List.of(),
         accessEgress,
         durationLimit,

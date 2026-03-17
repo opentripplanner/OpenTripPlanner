@@ -34,7 +34,7 @@ public class DirectFlexRouter {
     // Prepare access/egress transfers
     Collection<NearbyStop> accessStops = accessEgressRouter.findAccessEgresses(
       request,
-      request.journey().direct(),
+      request.journey().direct().mode(),
       serverContext.listExtensionRequestContexts(request),
       AccessEgressType.ACCESS,
       serverContext.flexParameters().maxAccessWalkDuration(),
@@ -43,7 +43,7 @@ public class DirectFlexRouter {
     );
     Collection<NearbyStop> egressStops = accessEgressRouter.findAccessEgresses(
       request,
-      request.journey().direct(),
+      request.journey().direct().mode(),
       serverContext.listExtensionRequestContexts(request),
       AccessEgressType.EGRESS,
       serverContext.flexParameters().maxEgressWalkDuration(),

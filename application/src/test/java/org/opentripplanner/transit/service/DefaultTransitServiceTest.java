@@ -195,14 +195,22 @@ class DefaultTransitServiceTest {
       .withDepartureTimes(new int[] { 0, 1 })
       .withServiceCode(SERVICE_CODE)
       .build();
-    timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
-    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
-    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
     timetableSnapshot.update(
-      new RealTimeTripUpdate(REAL_TIME_PATTERN, REALTIME_TRIP_TIMES, SERVICE_DATE)
+      RealTimeTripUpdate.of(REAL_TIME_PATTERN, tripTimes, firstDate).build()
     );
     timetableSnapshot.update(
-      new RealTimeTripUpdate(REAL_TIME_PATTERN, ADDED_TRIP_TIMES, SERVICE_DATE, null, true, false)
+      RealTimeTripUpdate.of(RAIL_PATTERN, canceledTripTimes, firstDate).build()
+    );
+    timetableSnapshot.update(
+      RealTimeTripUpdate.of(RAIL_PATTERN, canceledTripTimes, secondDate).build()
+    );
+    timetableSnapshot.update(
+      RealTimeTripUpdate.of(REAL_TIME_PATTERN, REALTIME_TRIP_TIMES, SERVICE_DATE).build()
+    );
+    timetableSnapshot.update(
+      RealTimeTripUpdate.of(REAL_TIME_PATTERN, ADDED_TRIP_TIMES, SERVICE_DATE)
+        .withTripCreation(true)
+        .build()
     );
 
     var snapshot = timetableSnapshot.commit();

@@ -418,7 +418,12 @@ public final class TripPattern
    * SiriTripPatternCache.
    *
    * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
+   *
+   * TODO RT_VP: this method is unreliable due to a design flaw in the current implementation of
+   *             {@link org.opentripplanner.updater.trip.patterncache.TripPatternCache}
+   *             See comment in TripPatternCache.
    */
+  @Deprecated
   @Nullable
   public TripPattern getOriginalTripPattern() {
     return originalTripPattern;

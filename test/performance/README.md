@@ -22,6 +22,46 @@ The results will be displayed in the console.
 The test is run after every merge to dev-2.x. Its GitHub Actions workflow is defined
 in [performance-test.yml](/.github/workflows/performance-test.yml).
 
+### Running the test manually
+
+Sometimes it is desirable to run the test configuration in the CI environment manually, for
+example, when making changes to the tests. To do this, perform these steps:
+1. Create a local branch in git that contains the desired performance test configuration.
+2. In [performance-test.yml](/.github/workflows/performance-test.yml) add your test branch name to
+the configuration and change all those locations that you want to run on the branch to `core`:
+
+```diff
+name: Performance test
+
+on:
+  push:
+    branches:
+      - dev-2.x
++     - test-branch-name
+
+jobs:
+  perf-test:
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for') && !startsWith(github.event.head_commit.message ,'Upgrade debug client to version')
+    runs-on: performance-test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          ...
+          - location: helsinki
+            iterations: 1
+            jfr-delay: "50s"
+-           profile: extended
++           profile: core
+...
+```
+3. Commit the changes to [performance-test.yml](/.github/workflows/performance-test.yml).
+4. Push the changes to a branch in the **upstream** [OpenTripPlanner](https://github.com/opentripplanner/OpenTripPlanner/) repository with the same name you added to [performance-test.yml](/.github/workflows/performance-test.yml).
+5. The tests will run after the push.
+
+**Note** In order to visualise before and after, it is helpful to push a commit that is the same as the current `dev-2.x` and run the speed
+test on that.
+
 ## Instrumentation
 
 Each run on CI is instrumented with Java Flight Recorder. The results are then saved as an artifact
@@ -63,21 +103,9 @@ Data used:
 
 [build-config](baden-wuerttemberg/build-config.json)
  
-### Hamburg, Germany
-
-[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=hamburg&var-branch=dev-2.x&from=1658872800000&to=now)
-
-Data used:
-- NeTEx data
-- Hamburg metropolitan area OSM data
-
-Contact: [Geofox Team](mailto:Geofox-team@hbt.de)
-
-[build-config](hamburg/build-config.json)
-
 ### Helsinki, Finland
 
-[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=helsinki&var-branch=dev-2.x&from=1658872800000&to=now)
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&from=2026-02-26T22:00:00.000Z&to=now&timezone=browser&var-category=depart-after&var-location=helsinki&var-branch=dev-2.x)
 
 Data used:
 - HSL GTFS data

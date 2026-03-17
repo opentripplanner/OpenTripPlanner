@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.STOP_MISMATCH;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_MANY_STOPS;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.spi.UpdateErrorType.STOP_MISMATCH;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -22,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -55,7 +54,8 @@ class ModifiedTripBuilder {
     EstimatedVehicleJourney journey,
     LocalDate serviceDate,
     ZoneId zoneId,
-    EntityResolver entityResolver
+    EntityResolver entityResolver,
+    List<CallWrapper> calls
   ) {
     this.existingTripTimes = existingTripTimes;
     this.pattern = pattern;
@@ -63,7 +63,7 @@ class ModifiedTripBuilder {
     this.zoneId = zoneId;
     this.entityResolver = entityResolver;
 
-    calls = CallWrapper.of(journey);
+    this.calls = calls;
     cancellation = TRUE.equals(journey.isCancellation());
     predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
     occupancy = journey.getOccupancy();
@@ -101,7 +101,7 @@ class ModifiedTripBuilder {
    * Create a new StopPattern and TripTimes for the trip based on the calls, and other fields read
    * in form the SIRI-ET update.
    */
-  public Result<TripUpdate, UpdateError> build() {
+  public TripUpdate build() throws UpdateException {
     RealTimeTripTimesBuilder builder = existingTripTimes.createRealTimeFromScheduledTimes();
 
     if (cancellation) {
@@ -109,33 +109,26 @@ class ModifiedTripBuilder {
     }
 
     if (calls.size() < existingTripTimes.getNumStops()) {
-      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 
     if (calls.size() > existingTripTimes.getNumStops()) {
-      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS);
     }
 
-    var result = createStopPattern(pattern, calls, entityResolver);
-    if (result.isFailure()) {
-      int invalidStopIndex = result.failureValue().stopIndex();
+    StopPattern stopPattern;
+    try {
+      stopPattern = createStopPattern(pattern, calls, entityResolver);
+    } catch (UpdateException e) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - {} at stop index {}",
         existingTripTimes.getTrip().getId(),
-        result.failureValue().errorType(),
-        invalidStopIndex
+        e.errorType(),
+        e.stopIndex()
       );
-      return Result.failure(
-        new UpdateError(
-          existingTripTimes.getTrip().getId(),
-          result.failureValue().errorType(),
-          invalidStopIndex,
-          dataSource
-        )
-      );
+      throw e.withTripId(existingTripTimes.getTrip().getId());
     }
 
-    StopPattern stopPattern = result.successValue();
     if (stopPattern.isAllStopsNonRoutable()) {
       return cancelTrip(builder);
     }
@@ -159,32 +152,30 @@ class ModifiedTripBuilder {
         numStopsInUpdate,
         numStopsInPattern
       );
-      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 
     // TODO - Handle DataValidationException at the outermost level (pr trip)
     try {
       var newTimes = builder.build();
       LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-      return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
+      return new TripUpdate(stopPattern, newTimes, serviceDate, dataSource);
     } catch (DataValidationException e) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - TripTimes failed to validate after applying SIRI delay propagation. {}",
         builder.getTrip().getId(),
         e.getMessage()
       );
-      return DataValidationExceptionMapper.toResult(e, dataSource);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 
   /**
    * Full cancellation of a trip.
    */
-  private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimesBuilder builder) {
+  private TripUpdate cancelTrip(RealTimeTripTimesBuilder builder) {
     builder.cancelTrip();
-    return Result.success(
-      new TripUpdate(pattern.getStopPattern(), builder.build(), serviceDate, dataSource)
-    );
+    return new TripUpdate(pattern.getStopPattern(), builder.build(), serviceDate, dataSource);
   }
 
   /**
@@ -243,11 +234,11 @@ class ModifiedTripBuilder {
    * Precondition: the number of calls is equal to the number of stops in the pattern (this is
    * verified before calling this method).
    */
-  static Result<StopPattern, UpdateError> createStopPattern(
+  static StopPattern createStopPattern(
     TripPattern pattern,
     List<CallWrapper> calls,
     EntityResolver entityResolver
-  ) {
+  ) throws UpdateException {
     int numberOfStops = pattern.numberOfStops();
     var builder = pattern.copyPlannedStopPattern();
 
@@ -265,7 +256,7 @@ class ModifiedTripBuilder {
         //Current stop is being updated
         var callStop = entityResolver.resolveQuay(call.getStopPointRef());
         if (callStop == null) {
-          return Result.failure(new UpdateError(null, UNKNOWN_STOP, i));
+          throw UpdateException.ofStopIndex(UNKNOWN_STOP, i);
         }
 
         if (!stop.equals(callStop) && !stop.isPartOfSameStationAs(callStop)) {
@@ -289,12 +280,12 @@ class ModifiedTripBuilder {
         break;
       }
       if (!matchFound) {
-        return Result.failure(new UpdateError(null, STOP_MISMATCH, i));
+        throw UpdateException.ofStopIndex(STOP_MISMATCH, i);
       }
     }
     var newStopPattern = builder.build();
     return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
-      ? Result.success(pattern.getStopPattern())
-      : Result.success(newStopPattern);
+      ? pattern.getStopPattern()
+      : newStopPattern;
   }
 }

@@ -4,14 +4,20 @@ import java.time.Instant;
 import org.opentripplanner.astar.spi.AStarRequest;
 import org.opentripplanner.astar.spi.AStarState;
 
-class TestState implements AStarState<TestState, TestEdge, TestVertex> {
+public class TestState implements AStarState<TestState, TestEdge, TestVertex> {
 
   private final TestVertex vertex;
   private final double weight;
+  private final long elapsedTimeSeconds;
 
   public TestState(TestVertex vertex, double weight) {
+    this(vertex, weight, 0);
+  }
+
+  public TestState(TestVertex vertex, double weight, long elapsedTimeSeconds) {
     this.vertex = vertex;
     this.weight = weight;
+    this.elapsedTimeSeconds = elapsedTimeSeconds;
   }
 
   @Override
@@ -51,16 +57,13 @@ class TestState implements AStarState<TestState, TestEdge, TestVertex> {
 
   @Override
   public long getElapsedTimeSeconds() {
-    return 0;
+    return elapsedTimeSeconds;
   }
 
   @Override
   public Instant getTime() {
     return null;
   }
-
-  @Override
-  public void initBackEdge(TestEdge originBackEdge) {}
 
   @Override
   public AStarRequest getRequest() {

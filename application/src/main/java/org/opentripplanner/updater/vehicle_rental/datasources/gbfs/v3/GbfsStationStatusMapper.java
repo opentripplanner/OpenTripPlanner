@@ -11,12 +11,14 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support.UnknownVehicleTypeFilter;
+import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class GbfsStationStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
+  private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
   private static final Collector<
     VehicleTypeCount,
     ?,
@@ -51,7 +53,7 @@ class GbfsStationStatusMapper {
       ? status
           .getVehicleTypesAvailable()
           .stream()
-          .filter(e -> containsVehicleType(e, status))
+          .filter(e -> containsVehicleType(e, status, station.network()))
           .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
       : Map.of(RentalVehicleType.getDefaultType(station.network()), vehiclesAvailable);
 
@@ -125,14 +127,19 @@ class GbfsStationStatusMapper {
 
   private boolean containsVehicleType(
     GBFSVehicleTypesAvailable vehicleTypesAvailable,
-    GBFSStation station
+    GBFSStation station,
+    String network
   ) {
     boolean containsKey = vehicleTypes.containsKey(vehicleTypesAvailable.getVehicleTypeId());
     if (!containsKey) {
-      LOG.warn(
-        "Unexpected vehicle type ID {} in status for GBFS station {}",
-        vehicleTypesAvailable.getVehicleTypeId(),
-        station.getStationId()
+      LOG_THROTTLE.throttle(() ->
+        LOG.info(
+          "Unexpected vehicle type ID {} in status for GBFS station {} in network {}. {}",
+          vehicleTypesAvailable.getVehicleTypeId(),
+          station.getStationId(),
+          network,
+          LOG_THROTTLE.setupInfo()
+        )
       );
     }
     return containsKey;

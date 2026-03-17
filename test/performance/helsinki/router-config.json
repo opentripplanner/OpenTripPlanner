@@ -7,8 +7,9 @@
       "boardSlack": "60s"
     },
     "bicycle": {
-      "boardCost": 120,
+      "speed": 5.55,
       "reluctance": 1.7,
+      "boardCost": 120,
       "optimization": "safest-streets"
     },
     "car": {
@@ -16,7 +17,7 @@
     },
     "walk": {
       "speed": 1.28,
-      "reluctance": 1.75,
+      "reluctance": 1.8,
       "stairsReluctance": 1.2,
       "stairsTimeFactor": 2,
       "escalator": {
@@ -108,5 +109,12 @@
     "maxFlexTripDuration": "30m",
     "maxAccessWalkDuration": "5m",
     "maxEgressWalkDuration": "5m"
+  },
+  "transit": {
+    "maxSearchWindow": "8h",
+    "pagingSearchWindowAdjustments": ["8h", "2h", "2h", "2h", "2h"],
+    "dynamicSearchWindow": {
+      "minWindow": "1h"
+    }
   }
 }

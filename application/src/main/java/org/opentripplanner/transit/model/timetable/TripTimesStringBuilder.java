@@ -15,7 +15,8 @@ public class TripTimesStringBuilder {
    *
    * Where flags are:
    * C: Canceled
-   * R: Recorded
+   * R: Recorded (Arrived & Departed)
+   * A: Arrived but not departed
    * PI: Prediction Inaccurate
    * ND: No Data
    * </pre>
@@ -39,8 +40,12 @@ public class TripTimesStringBuilder {
       if (tripTimes.isCancelledStop(i)) {
         flags.add("C");
       }
-      if (tripTimes.isRecordedStop(i)) {
-        flags.add("R");
+      if (tripTimes.hasArrived(i)) {
+        if (tripTimes.hasDeparted(i)) {
+          flags.add("R");
+        } else {
+          flags.add("A");
+        }
       }
       if (tripTimes.isPredictionInaccurate(i)) {
         flags.add("PI");

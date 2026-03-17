@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.TestHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 

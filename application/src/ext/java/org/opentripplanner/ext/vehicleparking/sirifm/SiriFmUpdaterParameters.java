@@ -5,7 +5,7 @@ import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterP
 
 import java.net.URI;
 import java.time.Duration;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 

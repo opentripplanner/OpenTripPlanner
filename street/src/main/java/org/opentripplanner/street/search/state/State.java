@@ -1,7 +1,5 @@
 package org.opentripplanner.street.search.state;
 
-import static org.opentripplanner.utils.lang.ObjectUtils.requireNotInitialized;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -309,10 +307,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public Edge getBackEdge() {
     return this.backEdge;
-  }
-
-  public void initBackEdge(Edge initialBackEdge) {
-    this.backEdge = requireNotInitialized(this.backEdge, initialBackEdge);
   }
 
   public StreetSearchRequest getRequest() {

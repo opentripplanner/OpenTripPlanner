@@ -1,8 +1,6 @@
 publiccodeYmlVersion: 0.5.0
 name: OpenTripPlanner
-applicationSuite: OpenTripPlanner
-url: https://github.com/opentripplanner/OpenTripPlanner
-landingURL: https://opentripplanner.org
+url: https://github.com/opentripplanner/OpenTripPlanner/
 softwareVersion: 2.8.1
 releaseDate: 2025-09-22
 logo: https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/user/images/otp-logo.svg
@@ -15,6 +13,7 @@ categories:
   - other
 organisation:
   uri: https://sfconservancy.org
+  name: Software Freedom Conservancy
 fundedBy:
   - name: Entur
     uri: https://entur.no
@@ -47,27 +46,29 @@ usedBy:
   - Germany, Leipzig, Leipzig Move
   - Polen, Poznań, Urban Transport Authority of Poznań
   - Iceland (nationwide) – Strætó
-  - See https://docs.opentripplanner.org/en/latest/Deployments/ which includes non-European listings
-
-roadmap: "https://github.com/orgs/opentripplanner/projects/3"
-
+  - See https://docs.opentripplanner.org/en/latest/Deployments/ for more,
+    including deployments outside of Europe
+roadmap: https://github.com/orgs/opentripplanner/projects/3
+developmentStatus: stable
+softwareType: standalone/backend
 description:
   en:
     localisedName: OpenTripPlanner
     shortDescription: Open source multi-modal trip planner focused on travel by
       scheduled and flexible public transportation combined with street routing.
     longDescription: OpenTripPlanner (OTP) is an open source multi-modal trip
-      planner, focused on travel by scheduled public transportation in combination
-      with walking, cycling, driving, and mobility services including bike
-      share and ride hailing. Its server component runs on any platform with a
-      Java virtual machine (including Linux, Mac, and Windows). It exposes
-      GraphQL APIs that can be accessed by various clients including open source
-      Javascript components and native mobile applications. It builds its
-      representation of the transportation network from open data in open standard
-      file formats (primarily NeTEx, Siri, GTFS, GBFS and OpenStreetMap). It
-      applies real-time updates and alerts with immediate visibility to clients,
-      finding itineraries that account for disruptions and service changes.
-    documentation: https://opentripplanner.org
+      planner, focused on travel by scheduled public transportation in
+      combination with walking, cycling, driving, and mobility services
+      including bike share and ride hailing. Its server component runs on any
+      platform with a Java virtual machine (including Linux, Mac, and Windows).
+      It exposes GraphQL APIs that can be accessed by various clients including
+      open source Javascript components and native mobile applications. It
+      builds its representation of the transportation network from open data in
+      open standard file formats (primarily NeTEx, Siri, GTFS, GBFS and
+      OpenStreetMap). It applies real-time updates and alerts with immediate
+      visibility to clients, finding itineraries that account for disruptions
+      and service changes.
+    documentation: https://www.opentripplanner.org/
     apiDocumentation: https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/introduction
     features:
       - Multimodal street and transit planning

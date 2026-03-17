@@ -231,7 +231,12 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
-  public boolean isRecordedStop(int stopPos) {
+  public boolean hasArrived(int stopPosition) {
+    return false;
+  }
+
+  @Override
+  public boolean hasDeparted(int stopPosition) {
     return false;
   }
 

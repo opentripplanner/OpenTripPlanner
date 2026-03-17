@@ -241,7 +241,7 @@ public interface TransitService {
    * @param stop                  Stop object to perform the search for
    * @param startTime             Start time for the search.
    * @param timeRange             Searches forward for timeRange from startTime
-   * @param numberOfDepartures    Number of departures to fetch per pattern
+   * @param numberOfDeparturesPerPattern    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result.
    */
@@ -249,7 +249,7 @@ public interface TransitService {
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
   );
@@ -280,7 +280,7 @@ public interface TransitService {
    * @param pattern              Pattern object to perform the search for
    * @param startTime            Start time for the search.
    * @param timeRange            Searches forward for timeRange from startTime
-   * @param numberOfDepartures   Number of departures to fetch per pattern
+   * @param numberOfDeparturesPerPattern   Number of departures to fetch per pattern
    * @param arrivalDeparture     Filter by arrivals, departures, or both
    * @param includeCancellations If the result should include those trip times where either the entire
    *                             trip or the stop at the given stop location has been cancelled.
@@ -291,7 +291,7 @@ public interface TransitService {
     TripPattern pattern,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   );

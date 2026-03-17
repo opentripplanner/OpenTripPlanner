@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -25,6 +26,8 @@ public class Timetable implements Serializable {
 
   private List<TripTimes> tripTimes;
 
+  private Map<FeedScopedId, TripTimes> tripTimesIndex;
+
   private List<FrequencyEntry> frequencyEntries;
 
   @Nullable
@@ -36,6 +39,7 @@ public class Timetable implements Serializable {
     this.pattern = timetableBuilder.getPattern();
     this.serviceDate = timetableBuilder.getServiceDate();
     this.tripTimes = timetableBuilder.createImmutableOrderedListOfTripTimes();
+    this.tripTimesIndex = timetableBuilder.createImmutableTripTimesIndex();
     this.frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
     this.maxTripSpanDays = computeMaxTripSpanDays(this.tripTimes);
   }
@@ -54,21 +58,12 @@ public class Timetable implements Serializable {
 
   @Nullable
   public TripTimes getTripTimes(Trip trip) {
-    for (TripTimes tt : tripTimes) {
-      if (tt.getTrip() == trip) {
-        return tt;
-      }
-    }
-    return null;
+    return getTripTimes(trip.getId());
   }
 
+  @Nullable
   public TripTimes getTripTimes(FeedScopedId tripId) {
-    for (TripTimes tt : tripTimes) {
-      if (tt.getTrip().getId().equals(tripId)) {
-        return tt;
-      }
-    }
-    return null;
+    return tripTimesIndex.get(tripId);
   }
 
   public boolean isValidFor(LocalDate serviceDate) {
@@ -82,6 +77,9 @@ public class Timetable implements Serializable {
       .stream()
       .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
       .toList();
+    tripTimesIndex = tripTimes
+      .stream()
+      .collect(Collectors.toUnmodifiableMap(tt -> tt.getTrip().getId(), tt -> tt));
     // Repeated code... bad sign...
     frequencyEntries = frequencyEntries
       .stream()

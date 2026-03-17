@@ -19,6 +19,15 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *             be part of the main model - not a separate cache. It is possible that this class works when it comes to
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
+ *  TODO RT_VP  TripPatternCache caches RT patterns keyed by StopPattern only, setting
+ *              originalTripPattern from the first trip that created the entry in the cache.
+ *              When a second trip on a different route produces the same modified StopPattern,
+ *              the cache returns a pattern with potentially the wrong originalTripPattern.
+ *              If the updater uses originalTripPattern to identify the original scheduled pattern
+ *              of a modified trip, it will return the wrong result
+ *              (symptom: when looking up for TripTimes in the wrong pattern's timetable,
+ *              it will get null → TRIP_NOT_FOUND_IN_PATTERN).
+ *
  */
 public class TripPatternCache {
 

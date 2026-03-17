@@ -1,6 +1,7 @@
 package org.opentripplanner.street.search.intersection_model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -203,5 +204,22 @@ public class SimpleIntersectionTraversalCalculator
 
   private boolean isRightTurn(int turnAngle) {
     return turnAngle >= MIN_ABSOLUTE_ANGLE_FOR_LEFT_OR_RIGHT_TURN;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof SimpleIntersectionTraversalCalculator that)) {
+      return false;
+    }
+    return (
+      Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) ==
+        0 &&
+      drivingDirection == that.drivingDirection
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(drivingDirection, acrossTrafficBicycleTurnMultiplier);
   }
 }

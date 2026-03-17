@@ -23,8 +23,8 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -389,7 +389,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
-        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
+        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
         if (sd.stop == stop) {
@@ -415,7 +415,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
-        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), true);
+        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), true);
       // This code is for finding transfers from AreaStops to Stops, transfers
       // from Stops to AreaStops and between Stops are already covered above.
       for (NearbyStop sd : nearbyStops) {
@@ -491,7 +491,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     StreetMode mode = transferProfile.journey().transfer().mode();
     var nearbyStops = nearbyStopFinder
       .get(mode)
-      .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
+      .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
     for (NearbyStop sd : nearbyStops) {
       // Skip the origin stop, loop transfers are not needed.
       if (sd.stop == stop) {

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.dataoverlay;
 
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * This class allows updating the graph with the grid data from generic .nc file in accordance with

@@ -9,6 +9,7 @@ import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Locale;
@@ -87,7 +88,8 @@ class GtfsGraphQLIndex {
     );
 
     return Response.status(Response.Status.OK)
-      .entity(GraphQLResponseSerializer.serialize(executionResult))
+      .entity(GraphQLResponseSerializer.serializeAsStream(executionResult))
+      .type(MediaType.APPLICATION_JSON_TYPE)
       .build();
   }
 }
