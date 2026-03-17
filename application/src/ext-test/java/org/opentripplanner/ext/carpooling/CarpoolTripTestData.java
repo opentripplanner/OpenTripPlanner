@@ -176,9 +176,9 @@ public class CarpoolTripTestData {
    */
   public static CarpoolStop createStopAt(int sequence, int passengerDelta, WgsCoordinate location) {
     return CarpoolStop.of(
-        FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
-        AREA_STOP_COUNTER::getAndIncrement
-      )
+      FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
+      AREA_STOP_COUNTER::getAndIncrement
+    )
       .withCoordinate(location)
       .withSequenceNumber(sequence)
       .withPassengerDelta(passengerDelta)
@@ -224,9 +224,9 @@ public class CarpoolTripTestData {
     ZonedDateTime aimedArrivalTime
   ) {
     return CarpoolStop.of(
-        FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
-        AREA_STOP_COUNTER::getAndIncrement
-      )
+      FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
+      AREA_STOP_COUNTER::getAndIncrement
+    )
       .withCoordinate(location)
       .withCarpoolStopType(CarpoolStopType.DROP_OFF_ONLY)
       .withSequenceNumber(sequenceNumber)

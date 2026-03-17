@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 class TimeBasedFilterTest {
+
   private final TimeBasedFilter filter = new TimeBasedFilter();
   private static final boolean ARRIVE_BY = true;
   private static final boolean DEPART_AFTER = false;
