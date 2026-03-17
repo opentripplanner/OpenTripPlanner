@@ -7,11 +7,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import net.opengis.gml._3.AbstractRingPropertyType;
-import net.opengis.gml._3.DirectPositionListType;
-import net.opengis.gml._3.LinearRingType;
-import net.opengis.gml._3.ObjectFactory;
-import net.opengis.gml._3.PolygonType;
+import net.opengis.gml.siri.AbstractRingPropertyType;
+import net.opengis.gml.siri.LinearRingType;
+import net.opengis.gml.siri.ObjectFactory;
+import net.opengis.gml.siri.PolygonType;
+import net.opengis.gml.siri.PosList;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import uk.org.siri.siri21.AimedFlexibleArea;
 import uk.org.siri.siri21.CircularAreaStructure;
@@ -177,14 +177,17 @@ public class CarpoolEstimatedVehicleJourneyData {
   static AimedFlexibleArea poslistToAimedFlexibleArea(String coordinates) {
     var gmlFactory = new ObjectFactory();
 
-    var poslist = Arrays.stream(coordinates.trim().split("\\s+")).map(Double::valueOf).toList();
-    var polygon = new PolygonType().withExterior(
-      new AbstractRingPropertyType().withAbstractRing(
-        gmlFactory.createLinearRing(
-          new LinearRingType().withPosList(new DirectPositionListType().withValue(poslist))
-        )
-      )
-    );
+    var posListValues = Arrays.stream(coordinates.trim().split("\\s+"))
+      .map(Double::valueOf)
+      .toList();
+    var posList = new PosList();
+    posList.getValues().addAll(posListValues);
+    var linearRing = new LinearRingType();
+    linearRing.setPosList(posList);
+    var abstractRing = new AbstractRingPropertyType();
+    abstractRing.setAbstractRing(gmlFactory.createLinearRing(linearRing));
+    var polygon = new PolygonType();
+    polygon.setExterior(abstractRing);
 
     var area = new AimedFlexibleArea();
     area.setPolygon(polygon);

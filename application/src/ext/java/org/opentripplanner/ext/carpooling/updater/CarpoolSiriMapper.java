@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import net.opengis.gml._3.LinearRingType;
-import net.opengis.gml._3.PolygonType;
+import net.opengis.gml.siri.LinearRingType;
+import net.opengis.gml.siri.PolygonType;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
@@ -263,7 +263,7 @@ public class CarpoolSiriMapper {
       throw new IllegalArgumentException("Expected LinearRingType for polygon exterior");
     }
 
-    List<Double> values = linearRing.getPosList().getValue();
+    List<Double> values = linearRing.getPosList().getValues();
 
     // Convert to JTS coordinates (lon lat pairs)
     Coordinate[] coords = new Coordinate[values.size() / 2];
