@@ -65,7 +65,7 @@ public final class RegularTransferParameters {
       return this;
     }
 
-    /// Note! This method replace/overwrite any existing content
+    /// Note! This method replaces/overwrites any existing content
     public Builder withParametersForMode(Map<StreetMode, TransferParametersForMode> map) {
       this.parametersForMode.clear();
       this.parametersForMode.putAll(map);

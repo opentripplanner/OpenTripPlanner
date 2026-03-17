@@ -100,14 +100,14 @@ public class RegularTransferConfig {
 
   private static TransferParametersForMode mapParametersForMode(NodeAdapter c) {
     TransferParametersForMode.Builder builder = new TransferParametersForMode.Builder();
-    builder.withMaxTransferDuration(
+    builder.withMaxDuration(
       c
         .of("maxTransferDuration")
         .summary("This overwrites the default `maxTransferDuration` for the given mode.")
         .since(V2_7)
-        .asDuration(TransferParametersForMode.DEFAULT_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_MAX_DURATION)
     );
-    builder.withCarsAllowedStopMaxTransferDuration(
+    builder.withCarsAllowedStopMaxDuration(
       c
         .of("carsAllowedStopMaxTransferDuration")
         .summary(
@@ -134,9 +134,9 @@ public class RegularTransferConfig {
           """
         )
         .since(V2_7)
-        .asDuration(TransferParametersForMode.DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_CARS_ALLOWED_STOP_MAX_DURATION)
     );
-    builder.withBikesAllowedStopMaxTransferDuration(
+    builder.withBikesAllowedStopMaxDuration(
       c
         .of("bikesAllowedStopMaxTransferDuration")
         .summary(
@@ -158,7 +158,7 @@ public class RegularTransferConfig {
           """
         )
         .since(V2_9)
-        .asDuration(TransferParametersForMode.DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_BIKES_ALLOWED_STOP_MAX_DURATION)
     );
 
     builder.withDisableDefaultTransfers(

@@ -61,7 +61,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
     return this;
   }
 
-  public DirectTransferGeneratorTestData withMaxTransferDuration(Duration value) {
+  public DirectTransferGeneratorTestData withMaxDuration(Duration value) {
     this.regularTransferParameters.withMaxDuration(value);
     return this;
   }

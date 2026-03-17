@@ -316,35 +316,36 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         if (transferParameters.disableDefaultTransfers() && mode == StreetMode.WALK) {
           throw new IllegalArgumentException("WALK mode transfers can not be disabled");
         }
-        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
+        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers
+        // is set in the build config.
         if (!transferParameters.disableDefaultTransfers()) {
           defaultTransferRequests.add(transferProfile);
-          // Set mode-specific maxTransferDuration, if it is set in the build config.
-          Duration maxTransferDuration = transferParameters.maxTransferDuration();
-          if (maxTransferDuration != null) {
-            defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxTransferDuration));
+          // Set mode-specific maxDuration, if it is set in the build config.
+          Duration maxDuration = transferParameters.maxDuration();
+          if (maxDuration != null) {
+            defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxDuration));
           } else {
             defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
           }
         }
-        // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
-        Duration carsAllowedStopMaxTransferDuration =
-          transferParameters.carsAllowedStopMaxTransferDuration();
-        if (carsAllowedStopMaxTransferDuration != null) {
+        // Create transfers between carsAllowedStops for the specific mode if
+        // carsAllowedStopMaxDuration is set in the build config.
+        Duration carsAllowedStopMaxDuration = transferParameters.carsAllowedStopMaxDuration();
+        if (carsAllowedStopMaxDuration != null) {
           carsAllowedStopTransferRequests.add(transferProfile);
           carsAllowedStopNearbyStopFinderForMode.put(
             mode,
-            createNearbyStopFinder(carsAllowedStopMaxTransferDuration)
+            createNearbyStopFinder(carsAllowedStopMaxDuration)
           );
         }
-        // Create transfers between bikesAllowedStops for the specific mode if bikesAllowedStopMaxTransferDuration is set in the build config.
-        Duration bikesAllowedStopMaxTransferDuration =
-          transferParameters.bikesAllowedStopMaxTransferDuration();
-        if (bikesAllowedStopMaxTransferDuration != null) {
+        // Create transfers between bikesAllowedStops for the specific mode if
+        // bikesAllowedStopMaxDuration is set in the build config.
+        Duration bikesAllowedStopMaxDuration = transferParameters.bikesAllowedStopMaxDuration();
+        if (bikesAllowedStopMaxDuration != null) {
           bikesAllowedStopTransferRequests.add(transferProfile);
           bikesAllowedStopNearbyStopFinderForMode.put(
             mode,
-            createNearbyStopFinder(bikesAllowedStopMaxTransferDuration)
+            createNearbyStopFinder(bikesAllowedStopMaxDuration)
           );
         }
       } else {

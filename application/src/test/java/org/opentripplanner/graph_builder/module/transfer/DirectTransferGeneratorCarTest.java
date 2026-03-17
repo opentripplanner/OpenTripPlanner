@@ -26,7 +26,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   public void testRequestWithCarsAllowedPatterns() {
     OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
       var transferParameters = new TransferParametersForMode.Builder()
-        .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60))
+        .withCarsAllowedStopMaxDuration(Duration.ofMinutes(60))
         .withDisableDefaultTransfers(true)
         .build();
 
@@ -52,7 +52,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   @Test
   public void testRequestWithCarsAllowedPatternsWithDurationLimit() {
     var transferParameters = new TransferParametersForMode.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofSeconds(10))
+      .withCarsAllowedStopMaxDuration(Duration.ofSeconds(10))
       .withDisableDefaultTransfers(true)
       .build();
 
@@ -72,7 +72,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   @Test
   public void testMultipleRequestsWithPatternsAndWithCarsAllowedPatterns() {
     var transferParameters = new TransferParametersForMode.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60))
+      .withCarsAllowedStopMaxDuration(Duration.ofMinutes(60))
       .withDisableDefaultTransfers(true)
       .build();
 
@@ -110,7 +110,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   @Test
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatterns() {
     var transferParameters = new TransferParametersForMode.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(120))
+      .withCarsAllowedStopMaxDuration(Duration.ofMinutes(120))
       .build();
 
     var repository = testDataWithStreetFraphAndPatterns()
@@ -133,7 +133,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatternsWithoutCarInTransferRequests() {
     var repository = testDataWithStreetFraphAndPatterns()
       .withCarFerrys_FARAWAY_S0_S12_and_S22_S23()
-      .withMaxTransferDuration(Duration.ofSeconds(30))
+      .withMaxDuration(Duration.ofSeconds(30))
       .withTransferRequests(REQUEST_WITH_BIKE_TRANSFER)
       .build();
 
@@ -184,10 +184,10 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   @Test
   public void testMaxTransferDurationForMode() {
     var transferParametersBuilderWalk = new TransferParametersForMode.Builder()
-      .withMaxTransferDuration(Duration.ofSeconds(100))
+      .withMaxDuration(Duration.ofSeconds(100))
       .build();
     var transferParametersBuilderBike = new TransferParametersForMode.Builder()
-      .withMaxTransferDuration(Duration.ofSeconds(21))
+      .withMaxDuration(Duration.ofSeconds(21))
       .build();
 
     var repository = DirectTransferGeneratorTestData.of()
