@@ -6,10 +6,12 @@ import java.util.Map;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -35,10 +37,16 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> cache = new HashMap<>();
   private final boolean reverseDirection;
   private final Duration maxFlexTripDuration;
+  private final int maxStopCount;
 
-  public StreetFlexPathCalculator(boolean reverseDirection, Duration maxFlexTripDuration) {
+  public StreetFlexPathCalculator(
+    boolean reverseDirection,
+    Duration maxFlexTripDuration,
+    int maxStopCount
+  ) {
     this.reverseDirection = reverseDirection;
     this.maxFlexTripDuration = maxFlexTripDuration;
+    this.maxStopCount = maxStopCount;
   }
 
   @Override
@@ -84,13 +92,22 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       .withArriveBy(reverseDirection)
       .build();
 
-    return StreetSearchBuilder.of()
+    var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
       .withRequest(streetRequest)
       .withFrom(reverseDirection ? null : vertex)
-      .withTo(reverseDirection ? vertex : null)
-      .getShortestPathTree();
+      .withTo(reverseDirection ? vertex : null);
+
+    if (maxStopCount > 0) {
+      streetSearch.withTerminationStrategy(
+        new MaxCountTerminationStrategy<>(maxStopCount, state ->
+          state.getVertex() instanceof TransitStopVertex
+        )
+      );
+    }
+
+    return streetSearch.getShortestPathTree();
   }
 }

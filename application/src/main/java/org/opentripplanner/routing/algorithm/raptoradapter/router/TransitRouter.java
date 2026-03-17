@@ -320,7 +320,6 @@ public class TransitRouter {
         accessEgressRouter,
         serverContext,
         additionalSearchDays,
-        serverContext.flexParameters(),
         serverContext.listExtensionRequestContexts(accessRequest),
         type,
         linkingContext

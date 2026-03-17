@@ -51,7 +51,8 @@ class FlexTemplateFactoryTest {
    */
   private static final FlexPathCalculator CALCULATOR = new StreetFlexPathCalculator(
     false,
-    Duration.ofHours(3)
+    Duration.ofHours(3),
+    100
   );
 
   public static final int SERVICE_TIME_OFFSET = 3600 * 2;

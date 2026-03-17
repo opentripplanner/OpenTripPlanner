@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import java.time.Duration;
+import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
 
 /**
  * Define parameters used to configure flex. For further documentation on these parameters, look
@@ -26,6 +27,10 @@ public interface FlexParameters {
    * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
    */
   Duration maxEgressWalkDuration();
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
+  MaxStopCountLimit maxFlexStopCountLimit();
 
   /**
    * This defines the default values. This will be used by the OTP configuration and by tests,
@@ -51,6 +56,11 @@ public interface FlexParameters {
       @Override
       public Duration maxEgressWalkDuration() {
         return Duration.ofMinutes(45);
+      }
+
+      @Override
+      public MaxStopCountLimit maxFlexStopCountLimit() {
+        return MaxStopCountLimit.of().withDefaultLimit(200).build();
       }
     };
   }
