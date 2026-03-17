@@ -205,7 +205,7 @@ public enum OTPFeature {
     if (!featureWarnings.isBlank()) {
       LOG.warn(
         "FEATURES THAT SHOULD BE TURNED OFF IN PRODUCTION: \n\t{}",
-        enabledValuesWithSevereWarningAsString()
+        featureWarnings
       );
     }
   }
