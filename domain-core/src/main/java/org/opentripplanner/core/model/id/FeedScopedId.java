@@ -115,7 +115,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
   /**
    * Note: the contents of a feed scoped id is not intended to carry semantic meaning, so comparison
-   * should rarely be relied on, except for e.g. achieving a stable sort order.
+   * should rarely be relied on, except for e.g. achieving deterministic sorting behavior.
    */
   @Override
   public int compareTo(FeedScopedId o) {
