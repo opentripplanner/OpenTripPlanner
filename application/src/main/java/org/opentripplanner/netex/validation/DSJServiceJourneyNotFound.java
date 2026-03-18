@@ -1,7 +1,5 @@
 package org.opentripplanner.netex.validation;
 
-import jakarta.xml.bind.JAXBElement;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.netex.issues.ObjectNotFound;
@@ -26,12 +24,12 @@ class DSJServiceJourneyNotFound extends AbstractHMapValidationRule<String, Dated
 
   @Nullable
   private String getServiceJourneyRef(DatedServiceJourney dsj) {
-    List<JAXBElement<? extends JourneyRefStructure>> journeyRef = dsj.getJourneyRef();
+    var journeyRef = dsj.getJourneyRef();
 
-    if (journeyRef == null || journeyRef.isEmpty()) {
+    if (journeyRef == null) {
       return null;
     }
-    JourneyRefStructure ref = journeyRef.get(0).getValue();
+    JourneyRefStructure ref = journeyRef.getValue();
     return ref == null ? null : ref.getRef();
   }
 }

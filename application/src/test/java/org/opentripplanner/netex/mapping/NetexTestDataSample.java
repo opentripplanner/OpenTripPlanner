@@ -188,9 +188,7 @@ public class NetexTestDataSample {
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
           .withId(DATED_SERVICE_JOURNEY_ID.get(i))
           .withJourneyRef(
-            List.of(
-              MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
-            )
+            MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
           )
           .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
           .withOperatingDayRef(new OperatingDayRefStructure().withRef(operatingDay.getId()));
