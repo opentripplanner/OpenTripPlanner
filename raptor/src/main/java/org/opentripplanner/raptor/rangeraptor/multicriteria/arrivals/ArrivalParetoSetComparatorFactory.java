@@ -11,7 +11,7 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
    * {@code paretoRound} and {@code c1} to compare arrivals. It does NOT include
    * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
    * - you can continue on foot, walking to the next stop. But, we only do this if it happens
-   * in the same Raptor iteration and round - if it does it is taken care of by the order
+   * in the same Raptor iteration and round - if it does, it is taken care of by the order
    * which the algorithm works - not by this comparator.
    */
   ParetoComparator<T> compareArrivalTimeRoundAndCost();
@@ -40,7 +40,7 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
   private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
     T
   > createFactoryC1() {
-    return new ArrivalParetoSetComparatorFactory<T>() {
+    return new ArrivalParetoSetComparatorFactory<>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
         return McStopArrival::compareBase;
@@ -57,7 +57,7 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
   private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
     T
   > createFactoryC1AndC2(DominanceFunction c2DominanceFunction) {
-    return new ArrivalParetoSetComparatorFactory<T>() {
+    return new ArrivalParetoSetComparatorFactory<>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
         return (l, r) ->
