@@ -40,7 +40,8 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  *     (generating randomized schedules)
  * </ul>
  * <p>
- * This class originated as a rewrite of Conveyals RAPTOR code: https://github.com/conveyal/r5.
+ * This class originated as a rewrite of
+ * <a href="https://github.com/conveyal/r5">Conveyals RAPTOR code</a>.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -84,7 +85,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
     this.calculator = requireNonNull(calculator);
     this.timers = requireNonNull(timers);
     this.accessPaths = requireNonNull(accessPaths);
-    this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
+    this.minNumberOfRounds = accessPaths.maxNumberOfRides();
     this.roundTracker = requireNonNull(roundTracker);
     this.lifeCycle = requireNonNull(lifeCyclePublisher);
     this.timeoutHook = requireNonNull(timeoutHook);
