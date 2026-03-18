@@ -35,9 +35,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   /**
    * Set the time at a transit index if it is optimal. This sets both the best time and the
    * transfer time.
-   *
-   * @param nextLegArrivals When chaining two Raptor searches together, the next-leg is the next
-   *                search we are copying state into.
    */
   public McStopArrivals(
     int nStops,
