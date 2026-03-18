@@ -1,10 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
@@ -72,12 +69,5 @@ public abstract class AbstractTransitEntity<
     }
     buf.append('}');
     return buf.toString();
-  }
-
-  protected static <T> Set<T> setOfNullSafe(@Nullable Collection<T> input) {
-    if (input == null || input.isEmpty()) {
-      return Set.of();
-    }
-    return Set.copyOf(input);
   }
 }
