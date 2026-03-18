@@ -20,7 +20,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite
 ///
 /// If the debugger is not done first, then the logging will be strange -> events
 /// arriving at the destination, before arriving at the egress stop.
-public class ArrivalsEventListenerMapper<T extends RaptorTripSchedule> {
+public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener;
@@ -30,7 +30,7 @@ public class ArrivalsEventListenerMapper<T extends RaptorTripSchedule> {
   private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> result =
     new TIntObjectHashMap<>();
 
-  private ArrivalsEventListenerMapper(
+  private McArrivalsEventListenerFactory(
     DebugHandlerFactory<T> debugHandlerFactory,
     TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener,
     @Nullable EgressPaths egressPaths,
@@ -50,7 +50,7 @@ public class ArrivalsEventListenerMapper<T extends RaptorTripSchedule> {
     EgressPaths egressPaths,
     DestinationArrivalPaths<T> destinationPaths
   ) {
-    return new ArrivalsEventListenerMapper<>(
+    return new McArrivalsEventListenerFactory<>(
       debugHandlerFactory,
       connectionListeners,
       egressPaths,
