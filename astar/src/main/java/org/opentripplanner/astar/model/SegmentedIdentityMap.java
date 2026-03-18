@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * No remove operation — entries are never removed from ShortestPathTree. Does not implement
  * {@link java.util.Map}.
  */
-class IdentityOpenHashMap<K, V> {
+class SegmentedIdentityMap<K, V> {
 
   private static final int MAX_CAPACITY = 1 << 29;
   private static final int SEGMENT_SLOT_BITS = 14;
@@ -28,7 +28,7 @@ class IdentityOpenHashMap<K, V> {
   private int size;
   private int threshold;
 
-  IdentityOpenHashMap(int expectedSize) {
+  SegmentedIdentityMap(int expectedSize) {
     initSegments(tableSizeFor(expectedSize));
   }
 
@@ -106,7 +106,7 @@ class IdentityOpenHashMap<K, V> {
     Object[][] oldSegments = segments;
     int oldTotalSlots = (slotMask + 1) * (segmentMask + 1);
     if (oldTotalSlots >= MAX_CAPACITY) {
-      throw new IllegalStateException("IdentityOpenHashMap capacity exhausted");
+      throw new IllegalStateException("SegmentedIdentityMap capacity exhausted");
     }
     initSegments(oldTotalSlots * 2);
     for (Object[] oldSeg : oldSegments) {

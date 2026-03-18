@@ -36,12 +36,12 @@ public class ShortestPathTree<
   public final DominanceFunction<State> dominanceFunction;
 
   // Value is either a single State (common case) or List<State> (multi-state vertices)
-  private final IdentityOpenHashMap<Vertex, Object> stateSets;
+  private final SegmentedIdentityMap<Vertex, Object> stateSets;
 
   public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
-    stateSets = new IdentityOpenHashMap<>(25_000);
+    stateSets = new SegmentedIdentityMap<>(25_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */

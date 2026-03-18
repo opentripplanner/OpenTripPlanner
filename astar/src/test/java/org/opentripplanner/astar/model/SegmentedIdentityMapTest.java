@@ -7,18 +7,18 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
-class IdentityOpenHashMapTest {
+class SegmentedIdentityMapTest {
 
   @Test
   void emptyMap() {
-    var map = new IdentityOpenHashMap<String, String>(4);
+    var map = new SegmentedIdentityMap<String, String>(4);
     assertEquals(0, map.size());
     assertNull(map.get("key"));
   }
 
   @Test
   void putAndGet() {
-    var map = new IdentityOpenHashMap<String, Integer>(4);
+    var map = new SegmentedIdentityMap<String, Integer>(4);
     String key = "hello";
     assertNull(map.put(key, 42));
     assertEquals(42, map.get(key));
@@ -27,7 +27,7 @@ class IdentityOpenHashMapTest {
 
   @Test
   void putReplace() {
-    var map = new IdentityOpenHashMap<String, Integer>(4);
+    var map = new SegmentedIdentityMap<String, Integer>(4);
     String key = "key";
     assertNull(map.put(key, 1));
     assertEquals(1, map.put(key, 2));
@@ -37,7 +37,7 @@ class IdentityOpenHashMapTest {
 
   @Test
   void identitySemantics() {
-    var map = new IdentityOpenHashMap<String, Integer>(4);
+    var map = new SegmentedIdentityMap<String, Integer>(4);
     // new String() forces a different identity
     String key1 = new String("same");
     String key2 = new String("same");
@@ -51,7 +51,7 @@ class IdentityOpenHashMapTest {
   @Test
   void resize() {
     // Small initial capacity to force resize
-    var map = new IdentityOpenHashMap<Object, Integer>(2);
+    var map = new SegmentedIdentityMap<Object, Integer>(2);
     Object[] keys = new Object[100];
     for (int i = 0; i < keys.length; i++) {
       keys[i] = new Object();
@@ -66,7 +66,7 @@ class IdentityOpenHashMapTest {
   @Test
   void largeMap() {
     int count = 100_000;
-    var map = new IdentityOpenHashMap<Object, Integer>(count);
+    var map = new SegmentedIdentityMap<Object, Integer>(count);
     Object[] keys = new Object[count];
     for (int i = 0; i < count; i++) {
       keys[i] = new Object();
@@ -80,7 +80,7 @@ class IdentityOpenHashMapTest {
 
   @Test
   void forEachKey() {
-    var map = new IdentityOpenHashMap<String, Integer>(8);
+    var map = new SegmentedIdentityMap<String, Integer>(8);
     String a = "a",
       b = "b",
       c = "c";
@@ -95,7 +95,7 @@ class IdentityOpenHashMapTest {
 
   @Test
   void forEachValue() {
-    var map = new IdentityOpenHashMap<String, Integer>(8);
+    var map = new SegmentedIdentityMap<String, Integer>(8);
     map.put("a", 1);
     map.put("b", 2);
     map.put("c", 3);
@@ -109,7 +109,7 @@ class IdentityOpenHashMapTest {
   void multipleSegments() {
     // expectedSize=25_000 forces 4 segments (totalSlots=65536, 16384 slots each)
     int count = 25_000;
-    var map = new IdentityOpenHashMap<Object, Integer>(count);
+    var map = new SegmentedIdentityMap<Object, Integer>(count);
     Object[] keys = new Object[count];
     for (int i = 0; i < count; i++) {
       keys[i] = new Object();
@@ -123,7 +123,7 @@ class IdentityOpenHashMapTest {
 
   @Test
   void sizeTracking() {
-    var map = new IdentityOpenHashMap<String, Integer>(8);
+    var map = new SegmentedIdentityMap<String, Integer>(8);
     assertEquals(0, map.size());
     String key = "key";
     map.put(key, 1);
