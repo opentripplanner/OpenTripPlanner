@@ -50,7 +50,7 @@ public final class RegularStop
     this.netexVehicleSubmode = SubMode.getOrBuildAndCacheForever(builder.netexVehicleSubmode());
     this.sometimesUsedRealtime = builder.isSometimesUsedRealtime();
     this.boardingAreas = setOfNullSafe(builder.boardingAreas());
-    this.fareZones = listOfNullSafe(builder.fareZones());
+    this.fareZones = builder.fareZones();
     if (isPartOfStation()) {
       getParentStation().addChildStop(this);
     }

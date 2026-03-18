@@ -2,12 +2,12 @@
 package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.function.IntSupplier;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -37,7 +37,7 @@ public final class RegularStopBuilder
 
   private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
-  private final SortedSet<FareZone> fareZones = new TreeSet<>(TransitEntity.idComparator());
+  private final List<FareZone> fareZones = new ArrayList<>();
 
   RegularStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
@@ -114,8 +114,17 @@ public final class RegularStopBuilder
     return this;
   }
 
-  public SortedSet<FareZone> fareZones() {
-    return fareZones;
+  public RegularStopBuilder withFareZones(Collection<FareZone> fareZone) {
+    this.fareZones.clear();
+    this.fareZones.addAll(fareZone);
+    return this;
+  }
+
+  /**
+   * @return a read-only deterministic list of unique fare zones
+   */
+  public List<FareZone> fareZones() {
+    return fareZones.stream().distinct().sorted(TransitEntity.idComparator()).toList();
   }
 
   public RegularStopBuilder addBoardingArea(BoardingArea boardingArea) {
