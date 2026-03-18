@@ -39,7 +39,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -266,7 +266,7 @@ public class StopPlaceType {
               .stream()
               .flatMap(s -> s.getFareZones().stream())
               .distinct()
-              .sorted(AbstractTransitEntity.idComparator())
+              .sorted(TransitEntity.idComparator())
               .toList()
           )
           .build()
