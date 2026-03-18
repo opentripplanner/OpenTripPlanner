@@ -121,16 +121,16 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   public McStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
       // Glue arrivals to next-connection, egress/destination events, and debug-event on stops.
-      var listeners = McArrivalsEventListenerFactory.<T>map(
+      var factory = new McArrivalsEventListenerFactory<>(
         context().debugFactory(),
         createViaConnectionListeners(),
         contextSegment.egressPaths(),
         createDestinationArrivalPaths()
-      );
+      ).create();
 
       this.arrivals = new McStopArrivals<>(
         context().nStops(),
-        listeners,
+        factory.arrivalListeners(),
         createFactoryParetoComparator(),
         context().debugFactory()
       );
