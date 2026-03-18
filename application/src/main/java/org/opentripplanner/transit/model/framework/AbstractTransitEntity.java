@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -73,6 +74,15 @@ public abstract class AbstractTransitEntity<
     }
     buf.append('}');
     return buf.toString();
+  }
+
+  /**
+   * Compare transit entities by their {@link FeedScopedId}. Useful for achieving deterministic
+   * ordering, but the sort order itself will rarely carry semantic meaning and so usually shouldn't
+   * be relied on.
+   */
+  public static <T extends AbstractTransitEntity<?, ?>> Comparator<T> idComparator() {
+    return Comparator.comparing(AbstractTransitEntity::getId);
   }
 
   protected static <T> List<T> listOfNullSafe(@Nullable Collection<T> list) {

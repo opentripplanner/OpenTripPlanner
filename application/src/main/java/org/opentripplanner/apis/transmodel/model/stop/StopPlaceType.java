@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +39,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -266,7 +266,7 @@ public class StopPlaceType {
               .stream()
               .flatMap(s -> s.getFareZones().stream())
               .distinct()
-              .sorted(Comparator.comparing(fareZone -> fareZone.getId().toString()))
+              .sorted(AbstractTransitEntity.idComparator())
               .toList()
           )
           .build()

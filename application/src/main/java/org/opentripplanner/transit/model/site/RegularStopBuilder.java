@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -13,6 +12,7 @@ import java.util.function.IntSupplier;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -37,9 +37,7 @@ public final class RegularStopBuilder
 
   private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
-  private final SortedSet<FareZone> fareZones = new TreeSet<>(
-    Comparator.comparing(fareZone -> fareZone.getId().toString())
-  );
+  private final SortedSet<FareZone> fareZones = new TreeSet<>(AbstractTransitEntity.idComparator());
 
   RegularStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
