@@ -116,9 +116,9 @@ class RegularStopTest {
       .regularStop(TimetableRepositoryForTest.id("sortTest"))
       .withName(NAME)
       .withCoordinate(COORDINATE)
-      .addFareZones(zoneC)
-      .addFareZones(zoneA)
-      .addFareZones(zoneB)
+      .addFareZone(zoneC)
+      .addFareZone(zoneA)
+      .addFareZone(zoneB)
       .build();
 
     assertEquals(List.of(zoneA, zoneB, zoneC), List.copyOf(stop.getFareZones()));

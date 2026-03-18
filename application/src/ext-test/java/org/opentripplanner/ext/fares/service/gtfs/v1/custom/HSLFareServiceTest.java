@@ -74,17 +74,17 @@ public class HSLFareServiceTest implements PlanTestConstants {
     FareZone D = FareZone.of(new FeedScopedId(FEED_ID, "D")).build();
 
     var testModel = TimetableRepositoryForTest.of();
-    Place A1 = testModel.place("A1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
-    Place A2 = testModel.place("A2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
+    Place A1 = testModel.place("A1", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(A));
+    Place A2 = testModel.place("A2", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(A));
 
-    Place B1 = testModel.place("B1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
-    Place B2 = testModel.place("B2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
+    Place B1 = testModel.place("B1", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(B));
+    Place B2 = testModel.place("B2", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(B));
 
-    Place C1 = testModel.place("C1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
-    Place C2 = testModel.place("C2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
+    Place C1 = testModel.place("C1", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(C));
+    Place C2 = testModel.place("C2", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(C));
 
-    Place D1 = testModel.place("D1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
-    Place D2 = testModel.place("D2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
+    Place D1 = testModel.place("D1", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(D));
+    Place D2 = testModel.place("D2", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(D));
 
     var AB_PRICE = euros(2.80f);
     var BC_PRICE = euros(2.80f);

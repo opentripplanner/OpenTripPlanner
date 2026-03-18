@@ -111,7 +111,7 @@ public final class RegularStopBuilder
     return this;
   }
 
-  public RegularStopBuilder addFareZones(FareZone fareZone) {
+  public RegularStopBuilder addFareZone(FareZone fareZone) {
     this.fareZones.add(fareZone);
     return this;
   }
