@@ -129,11 +129,11 @@ class IdentityOpenHashMap<K, V> {
   private void initSegments(int totalSlots) {
     int slotsPerSegment = Math.min(totalSlots, MAX_SEGMENT_SLOTS);
     int segmentCount = totalSlots / slotsPerSegment;
-    slotBits = Integer.numberOfTrailingZeros(slotsPerSegment);
-    slotMask = slotsPerSegment - 1;
-    segmentMask = segmentCount - 1;
-    threshold = (totalSlots * 2) / 3;
-    segments = new Object[segmentCount][];
+    this.slotBits = Integer.numberOfTrailingZeros(slotsPerSegment);
+    this.slotMask = slotsPerSegment - 1;
+    this.segmentMask = segmentCount - 1;
+    this.threshold = (totalSlots * 2) / 3;
+    this.segments = new Object[segmentCount][];
     for (int i = 0; i < segmentCount; i++) {
       segments[i] = new Object[slotsPerSegment * 2];
     }
