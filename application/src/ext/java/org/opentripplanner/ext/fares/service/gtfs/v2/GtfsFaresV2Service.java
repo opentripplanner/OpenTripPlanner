@@ -81,11 +81,7 @@ public final class GtfsFaresV2Service implements Serializable {
       );
     }
 
-    var itinProducts = lookup.findTransfersMatchingAllLegs(
-      transitLegs,
-      FareTransferRule::unlimitedTransfers
-    );
-    return new FareResult(itinProducts, offerContainer.toMultimap());
+    return new FareResult(offerContainer.toMultimap());
   }
 
   /**

@@ -58,7 +58,13 @@ class OregonHopFareFactoryTest implements FareTestConstants {
 
     var results = service.calculateFares(TestItinerary.of(trimetLeg, ctranLeg).build());
 
-    assertThat(results.getItineraryProducts()).containsExactly(FP_TRIMET_REGULAR);
+    assertThat(results.getLegProducts().get(trimetLeg)).containsExactly(
+      FareOffer.of(trimetLeg.startTime(), FP_TRIMET_REGULAR)
+    );
+
+    assertThat(results.getLegProducts().get(ctranLeg)).contains(
+      FareOffer.of(trimetLeg.startTime(), FP_TRIMET_REGULAR)
+    );
   }
 
   @Test

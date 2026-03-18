@@ -63,8 +63,6 @@ class TransferCountWithTimeLimitTest implements PlanTestConstants, FareTestConst
   void twoTransfers() {
     var result = SERVICE.calculateFares(TestItinerary.of(LEG_1, LEG_2, LEG_3).build());
 
-    assertThat(result.itineraryProducts()).isEmpty();
-
     assertThat(result.offersForLeg(LEG_1)).containsExactly(
       FareOffer.of(LEG_1.startTime(), FARE_PRODUCT_A)
     );
@@ -79,8 +77,6 @@ class TransferCountWithTimeLimitTest implements PlanTestConstants, FareTestConst
   @Test
   void threeTransfers() {
     var result = SERVICE.calculateFares(TestItinerary.of(LEG_1, LEG_2, LEG_3, LEG_4).build());
-
-    assertThat(result.itineraryProducts()).isEmpty();
 
     assertThat(result.offersForLeg(LEG_1)).containsExactly(
       FareOffer.of(LEG_1.startTime(), FARE_PRODUCT_A)

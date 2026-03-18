@@ -49,10 +49,6 @@ public final class FareTransferRule implements Serializable {
     return fareProducts.isEmpty() || fareProducts.stream().allMatch(p -> p.price().isZero());
   }
 
-  public boolean containsWildCard() {
-    return fromLegGroup == null || toLegGroup == null;
-  }
-
   /**
    * Returns true if there is no limit on the number of transfers or if limit unknown.
    */

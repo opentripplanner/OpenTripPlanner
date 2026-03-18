@@ -55,8 +55,6 @@ class FreeTransferTimeLimitTest implements PlanTestConstants, FareTestConstants 
 
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
-
     var first = i1.legs().getFirst();
     var second = i1.legs().get(1);
     var last = i1.legs().getLast();

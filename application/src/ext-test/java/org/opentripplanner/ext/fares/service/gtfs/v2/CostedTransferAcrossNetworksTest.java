@@ -89,7 +89,6 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(last.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 
   @Test
@@ -123,7 +122,6 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(last.startTime(), FARE_PRODUCT_A),
       FareOffer.of(third.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 
   /**
@@ -154,7 +152,6 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(second.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 
   @Test
@@ -183,7 +180,6 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(second.startTime(), FARE_PRODUCT_B),
       FareOffer.of(last.startTime(), FARE_PRODUCT_A)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 
   @Test
@@ -218,7 +214,6 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(third.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(fourth.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 
   @Test
@@ -246,6 +241,5 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
       FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(third.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).isEmpty();
   }
 }
