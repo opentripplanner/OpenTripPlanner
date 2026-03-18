@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -73,13 +72,6 @@ public abstract class AbstractTransitEntity<
     }
     buf.append('}');
     return buf.toString();
-  }
-
-  protected static <T> List<T> listOfNullSafe(@Nullable Collection<T> list) {
-    if (list == null || list.isEmpty()) {
-      return List.of();
-    }
-    return List.copyOf(list);
   }
 
   protected static <T> Set<T> setOfNullSafe(@Nullable Collection<T> input) {

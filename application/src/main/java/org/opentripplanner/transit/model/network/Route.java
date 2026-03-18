@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
+import static org.opentripplanner.utils.collection.ListUtils.nullSafeImmutableList;
 
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +54,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     // Optional fields
     this.operator = builder.getOperator();
     this.branding = builder.getBranding();
-    this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
+    this.groupsOfRoutes = nullSafeImmutableList(builder.getGroupsOfRoutes());
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = IntUtils.requireNullOrNotNegative(builder.getGtfsSortOrder(), "sortOrder");
     this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
