@@ -142,11 +142,6 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   /* Egress */
 
-  /** @return true if destination arrival, otherwise false. */
-  default boolean arrivedAtDestination() {
-    return false;
-  }
-
   default EgressPathView egressPath() {
     throw new UnsupportedOperationException();
   }
