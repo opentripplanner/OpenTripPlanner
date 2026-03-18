@@ -70,6 +70,7 @@ class StopTimesMapper {
   private final ReadOnlyHierarchicalMap<String, Route> routeByid;
 
   private final ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById;
+  private final HeadsignMapper headsignMapper;
 
   private I18NString currentHeadSign;
 
@@ -97,6 +98,7 @@ class StopTimesMapper {
     this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     this.flexibleLinesById = flexibleLinesById;
     this.routeByid = routeById;
+    this.headsignMapper = new HeadsignMapper(issueStore);
   }
 
   static int calculateOtpTime(LocalTime time, BigInteger dayOffset) {
@@ -317,7 +319,7 @@ class StopTimesMapper {
         );
 
         if (destinationDisplay != null) {
-          currentHeadSign = HeadsignMapper.mapHeadsign(destinationDisplay);
+          currentHeadSign = headsignMapper.map(destinationDisplay);
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
             currentHeadSignVias = viaValues
