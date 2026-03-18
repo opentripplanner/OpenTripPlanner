@@ -3,6 +3,7 @@ package org.opentripplanner.netex.validation;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.netex.config.SwissProfile;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
@@ -12,6 +13,7 @@ import org.rutebanken.netex.model.ServiceJourney;
  * This is a more specific check than {@link JourneyPatternSJMismatch} which only checks that
  * the number of points is equal.
  */
+@SwissProfile
 class InvalidPointInJourneyPatternRef extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
