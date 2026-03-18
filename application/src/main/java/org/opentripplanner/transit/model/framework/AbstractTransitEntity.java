@@ -75,7 +75,7 @@ public abstract class AbstractTransitEntity<
     return buf.toString();
   }
 
-  protected static <T> List<T> listOfNullSafe(@Nullable List<T> list) {
+  protected static <T> List<T> listOfNullSafe(@Nullable Collection<T> list) {
     if (list == null || list.isEmpty()) {
       return List.of();
     }
