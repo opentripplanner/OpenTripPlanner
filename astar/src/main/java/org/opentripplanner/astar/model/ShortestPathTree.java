@@ -3,11 +3,9 @@ package org.opentripplanner.astar.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
@@ -77,12 +75,6 @@ public class ShortestPathTree<
     } else {
       return new GraphPath<>(s);
     }
-  }
-
-  public Set<Vertex> getVertices() {
-    Set<Vertex> vertices = new HashSet<>();
-    stateSets.forEachKey(vertices::add);
-    return vertices;
   }
 
   /**

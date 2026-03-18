@@ -128,20 +128,6 @@ class ShortestPathTreeTest {
   }
 
   @Test
-  void getVertices() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
-    var v1 = new TestVertex();
-    var v2 = new TestVertex();
-    spt.add(new TestState(v1, 1.0));
-    spt.add(new TestState(v2, 1.0));
-
-    var vertices = spt.getVertices();
-    assertEquals(2, vertices.size());
-    assertTrue(vertices.contains(v1));
-    assertTrue(vertices.contains(v2));
-  }
-
-  @Test
   void getPathReturnsNullForAbsentVertex() {
     var spt = new ShortestPathTree<>(BY_WEIGHT);
     assertNull(spt.getPath(new TestVertex()));
