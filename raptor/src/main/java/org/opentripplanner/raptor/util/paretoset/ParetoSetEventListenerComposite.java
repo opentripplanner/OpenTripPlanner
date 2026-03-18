@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.util.paretoset;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -14,7 +15,7 @@ import org.opentripplanner.raptor.util.composite.CompositeUtil;
  */
 public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListener<T> {
 
-  private final List<ParetoSetEventListener<T>> listeners;
+  private final ParetoSetEventListener<T>[] listeners;
 
   /**
    * Take a list of listeners and return a composite listener. Input listeners, which are {@code null},
@@ -28,7 +29,7 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
     return CompositeUtil.of(
       ParetoSetEventListenerComposite::new,
       it -> it instanceof ParetoSetEventListenerComposite<T>,
-      it -> ((ParetoSetEventListenerComposite<T>) it).listeners,
+      it -> List.of(((ParetoSetEventListenerComposite<T>) it).listeners),
       listeners
     );
   }
@@ -36,7 +37,7 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
   private ParetoSetEventListenerComposite(
     Collection<? extends ParetoSetEventListener<T>> listeners
   ) {
-    this.listeners = List.copyOf(listeners);
+    this.listeners = listeners.<ParetoSetEventListener<T>>toArray(ParetoSetEventListener[]::new);
   }
 
   @Override
@@ -62,6 +63,6 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
 
   @Override
   public String toString() {
-    return "ParetoSetEventListenerComposite{" + "listeners=" + listeners + '}';
+    return "ParetoSetEventListenerComposite{" + "listeners=" + Arrays.toString(listeners) + '}';
   }
 }
