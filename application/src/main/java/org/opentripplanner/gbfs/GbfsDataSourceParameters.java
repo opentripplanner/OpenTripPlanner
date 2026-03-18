@@ -4,8 +4,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**
- * Parameters needed by the GBFS feed loader and mappers, defined as an interface in the gbfs
- * package to avoid a dependency from gbfs back to the updater/vehicle_rental package.
+ * Parameters needed by the GBFS feed loader and mappers
  */
 public interface GbfsDataSourceParameters {
   String url();
