@@ -181,11 +181,6 @@ public class ShortestPathTree<
     return List.of((State) existing);
   }
 
-  /** @return number of vertices referenced in this SPT */
-  public int getVertexCount() {
-    return stateSets.size();
-  }
-
   /**
    * The visit method should be called upon extracting a State from a priority queue. It checks
    * whether the State is still worth visiting (i.e. whether it has been dominated since it was

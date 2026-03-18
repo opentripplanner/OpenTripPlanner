@@ -32,7 +32,6 @@ class ShortestPathTreeTest {
     var s = new TestState(v, 1.0);
 
     assertTrue(spt.add(s));
-    assertEquals(1, spt.getVertexCount());
     assertTrue(spt.visit(s));
     assertEquals(s, spt.getState(v));
     assertEquals(List.of(s), spt.getStates(v));
@@ -47,8 +46,6 @@ class ShortestPathTreeTest {
 
     assertTrue(spt.add(worse));
     assertTrue(spt.add(better));
-    // Only better survives — no list promotion
-    assertEquals(1, spt.getVertexCount());
     assertFalse(spt.visit(worse));
     assertTrue(spt.visit(better));
     assertEquals(better, spt.getState(v));
@@ -76,7 +73,6 @@ class ShortestPathTreeTest {
 
     assertTrue(spt.add(s1));
     assertTrue(spt.add(s2));
-    assertEquals(1, spt.getVertexCount());
     assertTrue(spt.visit(s1));
     assertTrue(spt.visit(s2));
     assertEquals(List.of(s1, s2), spt.getStates(v));
