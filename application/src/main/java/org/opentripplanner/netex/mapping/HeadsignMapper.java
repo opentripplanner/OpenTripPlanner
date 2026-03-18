@@ -12,9 +12,13 @@ class HeadsignMapper {
 
   @Nullable
   static I18NString mapHeadsign(DestinationDisplay destinationDisplay) {
-    return Optional.ofNullable(destinationDisplay.getFrontText())
-      .or(() -> Optional.ofNullable(destinationDisplay.getName()))
-      .map(s -> I18NString.of(s.getValue()))
-      .orElse(null);
+    if(destinationDisplay.getFrontText() != null) {
+      return I18NString.of(s.getValue());
+    }
+    // Swiss profile
+    if(destinationDisplay.getName() != null) {
+      return I18NString.of(s.getValue());
+    }
+    return null;
   }
 }
