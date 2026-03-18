@@ -3,6 +3,10 @@
 The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
+## 2.10.0-SNAPSHOT (in progress)
+
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
 ## 2.9.0 (2026-03-18)
 
 ### Notable changes
