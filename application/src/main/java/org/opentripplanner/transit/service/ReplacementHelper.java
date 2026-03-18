@@ -66,20 +66,20 @@ public class ReplacementHelper {
     return tripOnServiceDate.getReplacementFor().stream().map(ReplacementForRelation::new).toList();
   }
 
-  private boolean submodeIsReplacement(SubMode submode) {
+  private static boolean submodeIsReplacement(SubMode submode) {
     return submode.toString().toLowerCase().contains("replacement");
   }
 
-  private boolean isReplacementGtfsType(Route route) {
+  private static boolean isReplacementGtfsType(Route route) {
     var type = route.getGtfsType();
     return type != null && REPLACEMENT_EXTENDED_TYPES.contains(type);
   }
 
-  public boolean isReplacementRoute(Route route) {
+  public static boolean isReplacementRoute(Route route) {
     return isReplacementGtfsType(route) || submodeIsReplacement(route.getNetexSubmode());
   }
 
-  public boolean isReplacementTrip(Trip trip) {
+  public static boolean isReplacementTrip(Trip trip) {
     return isReplacementGtfsType(trip.getRoute()) || submodeIsReplacement(trip.getNetexSubMode());
   }
 

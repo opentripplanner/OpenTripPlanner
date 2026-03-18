@@ -468,12 +468,6 @@ public class GraphQLTypes {
     NO_INFORMATION,
   }
 
-  public enum GraphQLCarsAllowed {
-    ALLOWED,
-    NOT_ALLOWED,
-    NO_INFORMATION,
-  }
-
   public static class GraphQLBoardPreferencesInput {
 
     private java.time.Duration slack;
@@ -726,6 +720,12 @@ public class GraphQLTypes {
     public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
       this.rentalDuration = rentalDuration;
     }
+  }
+
+  public enum GraphQLCarsAllowed {
+    ALLOWED,
+    NOT_ALLOWED,
+    NO_INFORMATION,
   }
 
   public static class GraphQLCyclingOptimizationInput {
@@ -2279,36 +2279,66 @@ public class GraphQLTypes {
 
   public static class GraphQLPlanTransitModePreferenceInput {
 
+    private List<Integer> allowedExtendedType;
     private GraphQLTransitModePreferenceCostInput cost;
+    private List<Integer> forbiddenExtendedType;
     private GraphQLTransitMode mode;
+    private Boolean replacement;
 
     public GraphQLPlanTransitModePreferenceInput(Map<String, Object> args) {
       if (args != null) {
+        this.allowedExtendedType = (List<Integer>) args.get("allowedExtendedType");
         this.cost = new GraphQLTransitModePreferenceCostInput(
           (Map<String, Object>) args.get("cost")
         );
+        this.forbiddenExtendedType = (List<Integer>) args.get("forbiddenExtendedType");
         if (args.get("mode") instanceof GraphQLTransitMode) {
           this.mode = (GraphQLTransitMode) args.get("mode");
         } else if (args.get("mode") != null) {
           this.mode = GraphQLTransitMode.valueOf((String) args.get("mode"));
         }
+        this.replacement = (Boolean) args.get("replacement");
       }
+    }
+
+    public List<Integer> getGraphQLAllowedExtendedType() {
+      return this.allowedExtendedType;
     }
 
     public GraphQLTransitModePreferenceCostInput getGraphQLCost() {
       return this.cost;
     }
 
+    public List<Integer> getGraphQLForbiddenExtendedType() {
+      return this.forbiddenExtendedType;
+    }
+
     public GraphQLTransitMode getGraphQLMode() {
       return this.mode;
+    }
+
+    public Boolean getGraphQLReplacement() {
+      return this.replacement;
+    }
+
+    public void setGraphQLAllowedExtendedType(List<Integer> allowedExtendedType) {
+      this.allowedExtendedType = allowedExtendedType;
     }
 
     public void setGraphQLCost(GraphQLTransitModePreferenceCostInput cost) {
       this.cost = cost;
     }
 
+    public void setGraphQLForbiddenExtendedType(List<Integer> forbiddenExtendedType) {
+      this.forbiddenExtendedType = forbiddenExtendedType;
+    }
+
     public void setGraphQLMode(GraphQLTransitMode mode) {
       this.mode = mode;
+    }
+
+    public void setGraphQLReplacement(Boolean replacement) {
+      this.replacement = replacement;
     }
   }
 

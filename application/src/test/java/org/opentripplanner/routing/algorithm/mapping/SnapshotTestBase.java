@@ -51,6 +51,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -254,7 +255,13 @@ public abstract class SnapshotTestBase {
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
     if (filter instanceof TransitFilterRequest filterRequest) {
-      transportModes = filterRequest.select().get(0).transportModes();
+      transportModes = filterRequest
+        .select()
+        .get(0)
+        .transportModes()
+        .stream()
+        .map(NarrowedTransitMode::toMainAndSubMode)
+        .toList();
     } else if (filter instanceof AllowAllTransitFilter) {
       transportModes = MainAndSubMode.all();
     }

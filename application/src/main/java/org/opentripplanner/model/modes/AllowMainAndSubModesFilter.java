@@ -33,7 +33,8 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean match(TransitMode transitMode, SubMode subMode) {
+  public boolean match(TransitMode transitMode, SubMode subMode, Integer gtfsExtendedType) {
+    // if netexSubmode is non-null, gtfsExtendedType is null, so no need to check that
     return mainMode == transitMode && includesSubMode(subMode);
   }
 
