@@ -5,10 +5,10 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
+import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
@@ -29,6 +29,7 @@ import org.opentripplanner.raptor.util.IntIterators;
 public class AccessPaths {
 
   private final int iterationStep;
+  private final int maxNumberOfRides;
   private final int maxTimePenalty;
   private final IntUnaryOperator iterationOp;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
@@ -38,18 +39,20 @@ public class AccessPaths {
 
   private AccessPaths(
     int iterationStep,
+    int maxNumberOfRides,
+    int maxTimePenalty,
     IntUnaryOperator iterationOp,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides,
-    List<RaptorOnBoardAccess> onBoardAccessPaths,
-    int maxTimePenalty
+    List<RaptorOnBoardAccess> onBoardAccessPaths
   ) {
     this.iterationStep = iterationStep;
+    this.maxNumberOfRides = maxNumberOfRides;
+    this.maxTimePenalty = maxTimePenalty;
     this.iterationOp = iterationOp;
     this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
     this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;
     this.onBoardAccessPaths = onBoardAccessPaths;
-    this.maxTimePenalty = maxTimePenalty;
   }
 
   /**
@@ -85,17 +88,23 @@ public class AccessPaths {
     paths = decorateWithTimePenaltyLogic(paths);
     var arrivedOnStreetByNumOfRides = groupByRound(paths, RaptorAccessEgress::stopReachedByWalking);
     var arrivedOnBoardByNumOfRides = groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard);
+    int maxNumberOfRides = Math.max(
+      maxNumberOfRounds(arrivedOnStreetByNumOfRides),
+      maxNumberOfRounds(arrivedOnBoardByNumOfRides)
+    );
+    int maxTimePenalty = Math.max(
+      maxTimePenalty(arrivedOnStreetByNumOfRides),
+      maxTimePenalty(arrivedOnBoardByNumOfRides)
+    );
 
     return new AccessPaths(
       iterationStep,
+      maxNumberOfRides,
+      maxTimePenalty,
       iterationOp(searchDirection),
       arrivedOnStreetByNumOfRides,
       arrivedOnBoardByNumOfRides,
-      onBoardAccessPaths,
-      Math.max(
-        maxTimePenalty(arrivedOnStreetByNumOfRides),
-        maxTimePenalty(arrivedOnBoardByNumOfRides)
-      )
+      onBoardAccessPaths
     );
   }
 
@@ -126,11 +135,8 @@ public class AccessPaths {
     return onBoardAccessPaths;
   }
 
-  public int calculateMaxNumberOfRides() {
-    return Math.max(
-      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
-      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
-    );
+  public int maxNumberOfRides() {
+    return maxNumberOfRides;
   }
 
   /**
@@ -175,11 +181,12 @@ public class AccessPaths {
   public AccessPaths filterOnSegment(int segment) {
     return new AccessPaths(
       iterationStep,
+      maxNumberOfRides,
+      maxTimePenalty,
       iterationOp,
       AccessEgressFunctions.filterOnSegment(arrivedOnStreetByNumOfRides, segment),
       AccessEgressFunctions.filterOnSegment(arrivedOnBoardByNumOfRides, segment),
-      AccessEgressFunctions.filterOnSegment(onBoardAccessPaths, segment),
-      maxTimePenalty
+      AccessEgressFunctions.filterOnSegment(onBoardAccessPaths, segment)
     );
   }
 
@@ -192,6 +199,10 @@ public class AccessPaths {
       .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
       .max()
       .orElse(RaptorConstants.TIME_NOT_SET);
+  }
+
+  private static int maxNumberOfRounds(TIntObjectMap<List<RaptorAccessEgress>> col) {
+    return IntStream.of(col.keys()).max().orElse(0);
   }
 
   /**
