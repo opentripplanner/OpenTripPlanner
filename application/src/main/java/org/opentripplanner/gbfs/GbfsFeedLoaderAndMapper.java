@@ -20,8 +20,8 @@ public class GbfsFeedLoaderAndMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderAndMapper.class);
 
-  private final org.opentripplanner.gbfs.GbfsFeedLoader loader;
-  private final org.opentripplanner.gbfs.GbfsFeedMapper mapper;
+  private final GbfsFeedLoader loader;
+  private final GbfsFeedMapper mapper;
 
   public GbfsFeedLoaderAndMapper(
     GbfsDataSourceParameters params,
