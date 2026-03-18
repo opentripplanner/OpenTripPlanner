@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
@@ -367,12 +366,7 @@ public class QuayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-          .dataFetcher(env ->
-            ((StopLocation) env.getSource()).getFareZones()
-              .stream()
-              .sorted(Comparator.comparing(fareZone -> fareZone.getId().toString()))
-              .toList()
-          )
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getFareZones())
           .build()
       )
       .build();

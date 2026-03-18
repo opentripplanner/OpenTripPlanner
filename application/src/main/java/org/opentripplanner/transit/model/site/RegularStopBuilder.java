@@ -3,9 +3,12 @@ package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.IntSupplier;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -34,7 +37,9 @@ public final class RegularStopBuilder
 
   private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
-  private final Set<FareZone> fareZones = new HashSet<>();
+  private final SortedSet<FareZone> fareZones = new TreeSet<>(
+    Comparator.comparing(fareZone -> fareZone.getId().toString())
+  );
 
   RegularStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
@@ -111,7 +116,7 @@ public final class RegularStopBuilder
     return this;
   }
 
-  public Set<FareZone> fareZones() {
+  public SortedSet<FareZone> fareZones() {
     return fareZones;
   }
 

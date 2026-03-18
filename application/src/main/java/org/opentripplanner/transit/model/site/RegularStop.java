@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntSupplier;
@@ -37,7 +38,7 @@ public final class RegularStop
 
   private final Set<BoardingArea> boardingAreas;
 
-  private final Set<FareZone> fareZones;
+  private final List<FareZone> fareZones;
 
   RegularStop(RegularStopBuilder builder) {
     super(builder);
@@ -49,7 +50,7 @@ public final class RegularStop
     this.netexVehicleSubmode = SubMode.getOrBuildAndCacheForever(builder.netexVehicleSubmode());
     this.sometimesUsedRealtime = builder.isSometimesUsedRealtime();
     this.boardingAreas = setOfNullSafe(builder.boardingAreas());
-    this.fareZones = setOfNullSafe(builder.fareZones());
+    this.fareZones = builder.fareZones().isEmpty() ? List.of() : List.copyOf(builder.fareZones());
     if (isPartOfStation()) {
       getParentStation().addChildStop(this);
     }

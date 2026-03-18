@@ -7,10 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -102,5 +104,24 @@ class RegularStopTest {
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPlatformCode("X").build()));
+  }
+
+  @Test
+  void fareZonesAreSortedById() {
+    var zoneC = FareZone.of(new FeedScopedId("F", "C")).build();
+    var zoneA = FareZone.of(new FeedScopedId("F", "A")).build();
+    var zoneB = FareZone.of(new FeedScopedId("F", "B")).build();
+
+    var stop = SiteRepository.of()
+      .regularStop(TimetableRepositoryForTest.id("sortTest"))
+      .withName(NAME)
+      .withCoordinate(COORDINATE)
+      .addFareZones(zoneC)
+      .addFareZones(zoneA)
+      .addFareZones(zoneB)
+      .build();
+
+    assertEquals(List.of(zoneA, zoneB, zoneC), List.copyOf(stop.getFareZones()));
+    assertEquals("A", stop.getFirstZoneAsString());
   }
 }
