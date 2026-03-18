@@ -25,44 +25,29 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener;
   private final @Nullable EgressPaths egressPaths;
-  private final DestinationArrivalPaths<T> paths;
+  private final DestinationArrivalPaths<T> destinationPaths;
+  private boolean processed = false;
 
-  private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> result =
+  private final TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners =
     new TIntObjectHashMap<>();
 
-  private McArrivalsEventListenerFactory(
+  public McArrivalsEventListenerFactory(
     DebugHandlerFactory<T> debugHandlerFactory,
     TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> nextConnectionListener,
     @Nullable EgressPaths egressPaths,
-    DestinationArrivalPaths<T> paths
+    DestinationArrivalPaths<T> destinationPaths
   ) {
     this.debugHandlerFactory = debugHandlerFactory;
     this.nextConnectionListener = nextConnectionListener;
     this.egressPaths = egressPaths;
-    this.paths = paths;
-  }
-
-  public static <T extends RaptorTripSchedule> TIntObjectMap<
-    ParetoSetEventListener<ArrivalView<T>>
-  > map(
-    DebugHandlerFactory<T> debugHandlerFactory,
-    TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> connectionListeners,
-    EgressPaths egressPaths,
-    DestinationArrivalPaths<T> destinationPaths
-  ) {
-    return new McArrivalsEventListenerFactory<>(
-      debugHandlerFactory,
-      connectionListeners,
-      egressPaths,
-      destinationPaths
-    ).map();
+    this.destinationPaths = destinationPaths;
   }
 
   /**
    * This method creates a ParetoSet for the given egress stop. When arrivals are added to the stop,
    * the "glue" make sure new destination arrivals are added to the destination arrivals.
    */
-  private TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> map() {
+  public McArrivalsEventListenerFactory<T> create() {
     for (int stop : nextConnectionListener.keys()) {
       append(stop, nextConnectionListener.get(stop));
     }
@@ -70,13 +55,18 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
     for (int stop : egressByStop.keys()) {
       List<RaptorAccessEgress> egressList = egressByStop.get(stop);
-      append(stop, new CalculateTransferToDestination<>(egressList, paths));
+      append(stop, new CalculateTransferToDestination<>(egressList, destinationPaths));
     }
-    return result;
+    processed = true;
+    return this;
+  }
+
+  public TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners() {
+    return assertProcessed(arrivalListeners);
   }
 
   private void append(int stop, ParetoSetEventListener<ArrivalView<T>> listener) {
-    var e = result.get(stop);
+    var e = arrivalListeners.get(stop);
     var l = listener;
     if (e != null) {
       // existing listeners should be inserted before new one
@@ -86,6 +76,13 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
       var debug = debugHandlerFactory.paretoSetStopArrivalListener(stop);
       l = ParetoSetEventListenerComposite.of(debug, l);
     }
-    result.put(stop, l);
+    arrivalListeners.put(stop, l);
+  }
+
+  private <R> R assertProcessed(R result) {
+    if (!processed) {
+      throw new IllegalStateException("Call the map() method before accessing the result!");
+    }
+    return result;
   }
 }
