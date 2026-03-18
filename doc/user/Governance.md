@@ -49,5 +49,4 @@ https://docs.google.com/document/d/1L8FPVJXvL7ok9wEmFa5lV_t_ES7XxN_J-1Ws8AeXySc/
 ## Development
 We enforce a policy on the review and merging of new changes to the OTP system, guided by a roadmap
 maintained by the Product Meeting. All changes must be reviewed and approved by at least two people
-from two different organizations. The list of approved reviewers is the PLC Github group, visible
-here https://github.com/orgs/opentripplanner/teams/plc/members
+from two different organizations.
