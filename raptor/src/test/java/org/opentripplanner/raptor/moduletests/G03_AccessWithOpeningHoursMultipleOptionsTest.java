@@ -20,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /*
@@ -59,8 +58,6 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(30))
       .timetable(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {

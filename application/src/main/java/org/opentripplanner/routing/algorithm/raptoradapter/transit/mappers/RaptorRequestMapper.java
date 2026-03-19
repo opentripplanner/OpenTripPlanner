@@ -180,7 +180,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
     if (raptorDebugging.isEnabled()) {
       var debug = builder.debug();
-      var debugLogger = new SystemErrDebugLogger(true, false);
+      var debugLogger = new SystemErrDebugLogger(null, true);
 
       debug
         .withStops(mapDebugStopList(raptorDebugging.stops()))
