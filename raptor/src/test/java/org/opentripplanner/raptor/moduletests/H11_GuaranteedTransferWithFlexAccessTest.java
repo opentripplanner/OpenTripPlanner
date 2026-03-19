@@ -21,7 +21,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
@@ -67,8 +66,6 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .constrainedTransfers(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {

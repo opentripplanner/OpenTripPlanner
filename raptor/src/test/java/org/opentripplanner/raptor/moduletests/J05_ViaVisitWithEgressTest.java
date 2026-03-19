@@ -19,7 +19,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 
 /**
  * FEATURE UNDER TEST
@@ -53,8 +52,6 @@ class J05_ViaVisitWithEgressTest {
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
       .timetable(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   @Test
