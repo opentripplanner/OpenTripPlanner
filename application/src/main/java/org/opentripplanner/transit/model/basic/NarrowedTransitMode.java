@@ -1,52 +1,36 @@
 package org.opentripplanner.transit.model.basic;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.ReplacementHelper;
 
 public class NarrowedTransitMode {
 
   TransitMode mode;
 
   @Nullable
-  List<SubMode> subModes;
+  SubMode subMode;
 
   @Nullable
   Boolean replacement;
 
-  @Nullable
-  List<Integer> allowedExtendedTypes;
-
-  @Nullable
-  List<Integer> forbiddenExtendedTypes;
-
   private static final List<NarrowedTransitMode> ALL = Stream.of(TransitMode.values())
-    .map(mode -> new NarrowedTransitMode(mode, Collections.emptyList(), null, null, null))
+    .map(mode -> new NarrowedTransitMode(mode, null, null))
     .toList();
 
   public NarrowedTransitMode(
     TransitMode mode,
-    @Nullable List<SubMode> subModes,
-    @Nullable Boolean replacement,
-    @Nullable List<Integer> allowedExtendedType,
-    @Nullable List<Integer> forbiddenExtendedType
+    @Nullable SubMode subMode,
+    @Nullable Boolean replacement
   ) {
     this.mode = mode;
-    this.subModes = subModes;
+    this.subMode = subMode;
     this.replacement = replacement;
-    this.allowedExtendedTypes = allowedExtendedType;
-    this.forbiddenExtendedTypes = forbiddenExtendedType;
   }
 
   public static NarrowedTransitMode of(MainAndSubMode mode) {
-    return new NarrowedTransitMode(mode.mainMode(), submodesOfNullable(mode.subMode()), null, null, null);
-  }
-
-  private static List<SubMode> submodesOfNullable(@Nullable SubMode subMode) {
-    return subMode != null ? Collections.singletonList(subMode) : Collections.emptyList();
+    return new NarrowedTransitMode(mode.mainMode(), mode.subMode(), null);
   }
 
   public static List<NarrowedTransitMode> all() {
@@ -54,27 +38,14 @@ public class NarrowedTransitMode {
   }
 
   public boolean isMainModeOnly() {
-    return (
-      (this.subModes == null || this.subModes.isEmpty()) &&
-      this.replacement == null &&
-      this.allowedExtendedTypes == null &&
-      this.forbiddenExtendedTypes == null
-    );
+    return (this.subMode == null && this.replacement == null);
   }
 
   public MainAndSubMode toMainAndSubMode() {
-    if (
-      (this.subModes != null && this.subModes.size() > 1) ||
-      this.replacement != null ||
-      this.allowedExtendedTypes != null ||
-      this.forbiddenExtendedTypes != null
-    ) {
+    if (this.replacement != null) {
       throw new IllegalArgumentException("Not convertible to MainAndSubMode");
     }
-    return new MainAndSubMode(
-      this.mode,
-      this.subModes != null && !this.subModes.isEmpty() ? this.subModes.getFirst() : null
-    );
+    return new MainAndSubMode(this.mode, this.subMode);
   }
 
   public TransitMode getMode() {
@@ -82,8 +53,8 @@ public class NarrowedTransitMode {
   }
 
   @Nullable
-  public List<SubMode> getSubModes() {
-    return subModes;
+  public SubMode getSubMode() {
+    return subMode;
   }
 
   @Nullable
@@ -91,13 +62,25 @@ public class NarrowedTransitMode {
     return replacement;
   }
 
-  @Nullable
-  public List<Integer> getAllowedExtendedTypes() {
-    return allowedExtendedTypes;
+  public String toString() {
+    if (replacement != null) {
+      return mode.name() + "::" + (subMode == null ? "" : subMode.name()) + "::" + replacement;
+    }
+    if (subMode == null) {
+      return mode.name();
+    }
+    return mode.name() + "::" + subMode;
   }
 
-  @Nullable
-  public List<Integer> getForbiddenExtendedTypes() {
-    return forbiddenExtendedTypes;
+  /**
+   * Make sure the String serialization is deterministic by sorting the elements in
+   * alphabetic order.
+   *
+   * @see MainAndSubMode::toString(Collection)
+   */
+  public static String toString(Collection<NarrowedTransitMode> modes) {
+    return modes != null
+      ? modes.stream().map(NarrowedTransitMode::toString).sorted().toList().toString()
+      : null;
   }
 }

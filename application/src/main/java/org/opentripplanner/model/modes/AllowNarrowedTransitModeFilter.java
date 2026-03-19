@@ -3,6 +3,7 @@ package org.opentripplanner.model.modes;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.service.ReplacementHelper;
 
 public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
 
@@ -19,19 +20,12 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
 
   @Override
   public boolean match(TransitMode transitMode, SubMode netexSubmode, Integer gtfsExtendedType) {
-    // TODO
     if (mode.getMode() != transitMode) {
       return false;
     }
-    if (mode.getSubModes() != null && !mode.getSubModes().isEmpty()) {
-      if (mode.getSubModes().contains(netexSubmode)) {
-        return true;
-      }
-    } else if (mode.getAllowedExtendedTypes() != null) {
-      return mode.getAllowedExtendedTypes().contains(gtfsExtendedType);
-    } else if (mode.getForbiddenExtendedTypes() != null) {
-      return !mode.getForbiddenExtendedTypes().contains(gtfsExtendedType);
+    if (mode.getSubMode() != null && mode.getSubMode() == netexSubmode) {
+      return true;
     }
-    return true;
+    return ReplacementHelper.isReplacementExtendedType(gtfsExtendedType);
   }
 }

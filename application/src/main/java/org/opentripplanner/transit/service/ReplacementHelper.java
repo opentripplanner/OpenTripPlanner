@@ -47,6 +47,10 @@ public class ReplacementHelper {
     this.timetableSnapshot = timetableSnapshot;
   }
 
+  public static boolean isReplacementExtendedType(int extendedType) {
+    return REPLACEMENT_EXTENDED_TYPES.contains(extendedType);
+  }
+
   public Collection<ReplacedByRelation> getReplacedBy(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
     var replacedBy = timetableRepository.getReplacedByTripOnServiceDate(id);

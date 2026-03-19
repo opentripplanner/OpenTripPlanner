@@ -24,20 +24,13 @@ class FilterFactory {
   private FilterFactory() {}
 
   static AllowTransitModeFilter of(NarrowedTransitMode mode) {
-    if (
-      mode.isReplacement() != null ||
-      mode.getAllowedExtendedTypes() != null ||
-      mode.getForbiddenExtendedTypes() != null ||
-      (mode.getSubModes() != null && mode.getSubModes().size() > 1)
-    ) {
+    if (mode.isReplacement() != null) {
       return new AllowNarrowedTransitModeFilter(mode);
     }
-    if (mode.getSubModes() == null || mode.getSubModes().isEmpty()) {
+    if (mode.getSubMode() == null) {
       return new AllowMainModeFilter(mode.getMode());
     } else {
-      return new AllowMainAndSubModeFilter(
-        new MainAndSubMode(mode.getMode(), mode.getSubModes().getFirst())
-      );
+      return new AllowMainAndSubModeFilter(new MainAndSubMode(mode.getMode(), mode.getSubMode()));
     }
   }
 

@@ -62,7 +62,11 @@ public class SelectRequest implements Serializable {
 
     return (
       this.transportModeFilter == null ||
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode(), trip.getRoute().getGtfsType())
+      this.transportModeFilter.match(
+        trip.getMode(),
+        trip.getNetexSubMode(),
+        trip.getRoute().getGtfsType()
+      )
     );
   }
 
@@ -73,7 +77,11 @@ public class SelectRequest implements Serializable {
     var trip = tripTimes.getTrip();
     return (
       this.transportModeFilter != null &&
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode(), trip.getRoute().getGtfsType())
+      this.transportModeFilter.match(
+        trip.getMode(),
+        trip.getNetexSubMode(),
+        trip.getRoute().getGtfsType()
+      )
     );
   }
 
@@ -128,7 +136,13 @@ public class SelectRequest implements Serializable {
       if (tripPattern.getContainsMultipleModes()) {
         return maybeValue;
       }
-      if (!this.transportModeFilter.match(tripPattern.getMode(), tripPattern.getNetexSubmode(), tripPattern.getRoute().getGtfsType())) {
+      if (
+        !this.transportModeFilter.match(
+          tripPattern.getMode(),
+          tripPattern.getNetexSubmode(),
+          tripPattern.getRoute().getGtfsType()
+        )
+      ) {
         return false;
       }
     }
@@ -163,10 +177,7 @@ public class SelectRequest implements Serializable {
         );
       }
     }
-    // TODO
-    return MainAndSubMode.toString(
-      transportModes.stream().map(NarrowedTransitMode::toMainAndSubMode).toList()
-    );
+    return NarrowedTransitMode.toString(transportModes);
   }
 
   public static class Builder {

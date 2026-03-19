@@ -4733,12 +4733,8 @@ input PlanStreetPreferencesInput {
 
 "Transit mode and a reluctance associated with it."
 input PlanTransitModePreferenceInput {
-  "Limit possible extended types to ones in this list"
-  allowedExtendedType: [Int!]
   "Costs related to using a transit mode."
   cost: TransitModePreferenceCostInput
-  "Limit possible extended types to ones not in this list"
-  forbiddenExtendedType: [Int!]
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
   "Limit possible extended types to ones which are (or are not) replacement types"

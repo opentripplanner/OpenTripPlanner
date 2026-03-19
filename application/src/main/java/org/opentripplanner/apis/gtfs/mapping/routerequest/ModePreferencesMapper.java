@@ -6,7 +6,6 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMappe
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -103,10 +102,8 @@ public class ModePreferencesMapper {
     if (input != null) {
       return new NarrowedTransitMode(
         TransitModeMapper.map(input.getGraphQLMode()),
-        Collections.emptyList(),
-        input.getGraphQLReplacement(),
-        input.getGraphQLAllowedExtendedType(),
-        input.getGraphQLForbiddenExtendedType()
+        null,
+        input.getGraphQLReplacement()
       );
     } else {
       return null;
