@@ -1,13 +1,12 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model;
 
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
-import org.opentripplanner.apis.transmodel.model.EnumTypes;
 
-class ModeInputType {
+public class ModeInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("Modes")
     .description(
       "Input format for specifying which modes will be allowed for this search. " +

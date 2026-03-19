@@ -1,15 +1,14 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model;
 
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
-import org.opentripplanner.apis.transmodel.model.EnumTypes;
 
 public class ModeAndSubModeInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("TransportModes")
     .field(
       GraphQLInputObjectField.newInputObjectField()

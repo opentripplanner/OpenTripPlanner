@@ -16,6 +16,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 class StopTimesHelperTest {
@@ -349,6 +350,21 @@ class StopTimesHelperTest {
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
     assertEquals(SERVICE_DATE, stopTime.getServiceDay());
+  }
+
+  @Test
+  void findTripTimesOnDate_allDepartures() {
+    var stop = transitService.getRegularStop(stopId);
+    var request = TripTimeOnDateRequest.of(List.of(stop))
+      .withTime(SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant())
+      .withTimeWindow(Duration.ofHours(24))
+      .withNumberOfDepartures(10)
+      .withIncludeCancelledTrips(true)
+      .build();
+
+    var result = stopTimesHelper.findTripTimesOnDate(request);
+
+    assertEquals(5, result.size());
   }
 
   boolean hasCancelledTrips(List<StopTimesInPattern> stopTimes) {
