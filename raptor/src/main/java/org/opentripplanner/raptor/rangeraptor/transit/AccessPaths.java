@@ -128,6 +128,14 @@ public class AccessPaths {
     return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
+  public List<RaptorAccessEgress> arrivedOnBoard() {
+    return arrivedOnBoardByNumOfRides
+      .valueCollection()
+      .stream()
+      .flatMap(Collection::stream)
+      .toList();
+  }
+
   /**
    * Return the on-board accesses
    */
