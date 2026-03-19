@@ -31,7 +31,7 @@ import org.opentripplanner.raptor.util.BitSetIterator;
 public class TestTransitData
   implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  private final static AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
+  private static final AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
 
   private static final Pattern ROUTE_NAME_PATTERN = Pattern.compile("[-\\w]+");
 
@@ -387,7 +387,7 @@ public class TestTransitData
         .withPathFilteringListener(logger::pathFilteringListener)
         .withLogger(logger);
     } else {
-      if(WARNING_COUNTER.getAndIncrement() % 20 == 0) {
+      if (WARNING_COUNTER.getAndIncrement() % 20 == 0) {
         System.err.println(
           "[INFO] The debug logging for raptor module teste is off by default! " +
             "Add \"-DdebugRaptor\" to the command line to enable."
