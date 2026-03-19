@@ -4,17 +4,12 @@ import static org.opentripplanner.apis.transmodel.support.GqlUtil.newIdListInput
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectType;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 public class JourneyWhiteListed {
 
@@ -48,34 +43,5 @@ public class JourneyWhiteListed {
       this.authorityIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("authorities")));
       this.lineIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("lines")));
     }
-  }
-
-  public static Stream<TripTimeOnDate> whiteListAuthoritiesAndOrLines(
-    Stream<TripTimeOnDate> stream,
-    Collection<FeedScopedId> authorityIds,
-    Collection<FeedScopedId> lineIds
-  ) {
-    if (authorityIds.isEmpty() && lineIds.isEmpty()) {
-      return stream;
-    }
-    return stream.filter(it -> isTripTimeOnDateAcceptable(it, authorityIds, lineIds));
-  }
-
-  private static boolean isTripTimeOnDateAcceptable(
-    TripTimeOnDate tts,
-    Collection<FeedScopedId> authorityIds,
-    Collection<FeedScopedId> lineIds
-  ) {
-    Trip trip = tts.getTrip();
-
-    if (trip == null || trip.getRoute() == null) {
-      return true;
-    }
-
-    Route route = trip.getRoute();
-    boolean okForAuthority = authorityIds.contains(route.getAgency().getId());
-    boolean okForLine = lineIds.contains(route.getId());
-
-    return okForAuthority || okForLine;
   }
 }

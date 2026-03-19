@@ -68,8 +68,6 @@ class TransferCountTest implements PlanTestConstants, FareTestConstants {
   void twoTransfers() {
     var result = SERVICE.calculateFares(TestItinerary.of(LEG_1, LEG_2, LEG_3).build());
 
-    assertThat(result.itineraryProducts()).isEmpty();
-
     assertThat(result.offersForLeg(LEG_1)).containsExactly(
       FareOffer.of(LEG_1.startTime(), FARE_PRODUCT_A)
     );

@@ -103,7 +103,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: 2.8.1
+      MASTER_BRANCH_VERSION: 2.9.0
 
     steps:
 

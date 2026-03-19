@@ -14,19 +14,19 @@ import org.opentripplanner.utils.collection.ListUtils;
 public final class ItineraryFaresDecorator {
 
   private final ItineraryFare fare;
-  private final List<FareOffer> itineraryFareUses;
+  private final List<FareOffer> fareOffers;
 
-  public ItineraryFaresDecorator(ItineraryFare fare, List<FareOffer> itineraryFareUses) {
+  public ItineraryFaresDecorator(ItineraryFare fare, List<FareOffer> fareOffers) {
     this.fare = fare;
-    this.itineraryFareUses = itineraryFareUses;
+    this.fareOffers = fareOffers;
   }
 
   public static Itinerary decorateItineraryWithFare(Itinerary i, ItineraryFare fare) {
-    var legDecorator = new ItineraryFaresDecorator(fare, createItineraryFareUses(i, fare));
+    var legDecorator = new ItineraryFaresDecorator(fare, createFareOffers(i, fare));
     return i.copyOf().withFare(fare).transformTransitLegs(legDecorator::decorateTransitLeg).build();
   }
 
-  private static List<FareOffer> createItineraryFareUses(Itinerary i, ItineraryFare fare) {
+  private static List<FareOffer> createFareOffers(Itinerary i, ItineraryFare fare) {
     return fare
       .getItineraryProducts()
       .stream()
@@ -38,11 +38,11 @@ public final class ItineraryFaresDecorator {
   }
 
   private TransitLeg decorateTransitLeg(TransitLeg leg) {
-    var legUses = fare.getLegProducts().get(leg);
-    var allUses = ListUtils.combine(itineraryFareUses, legUses);
+    var legOffers = fare.getLegProducts().get(leg);
+    var allOfferes = ListUtils.combine(fareOffers, legOffers);
 
     return (leg instanceof FareProductAware<TransitLeg> fpa)
-      ? fpa.decorateWithFareOffers(allUses)
+      ? fpa.decorateWithFareOffers(allOfferes)
       : leg;
   }
 }

@@ -1,23 +1,113 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
-import org.opentripplanner.graph_builder.module.TransferParameters;
+import java.util.EnumMap;
+import java.util.List;
+import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.OtpVersion;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.street.model.StreetMode;
 
-public class TransferParametersMapper {
+public class RegularTransferConfig {
 
-  public static TransferParameters map(NodeAdapter c) {
-    TransferParameters.Builder builder = new TransferParameters.Builder();
-    builder.withMaxTransferDuration(
+  public static RegularTransferParameters map(NodeAdapter root) {
+    var builder = RegularTransferParameters.of();
+    var dft = RegularTransferParameters.DEFAULT;
+
+    builder.withMaxDuration(
+      root
+        .of("maxTransferDuration")
+        .since(V2_1)
+        .summary(
+          "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
+        )
+        .asDuration(dft.maxDuration())
+    );
+
+    builder.withParametersForMode(
+      root
+        .of("transferParametersForMode")
+        .since(V2_7)
+        .summary("Configures mode-specific properties for transfer calculations.")
+        .description(
+          """
+          This field enables configuring mode-specific parameters for transfer calculations.
+          To configure mode-specific parameters, the modes should also be used in the `transferRequests` field in the build config.
+
+          **Example**
+
+          ```JSON
+          // build-config.json
+          {
+            "transferParametersForMode": {
+              "CAR": {
+                "disableDefaultTransfers": true,
+                "carsAllowedStopMaxTransferDuration": "3h"
+              },
+              "BIKE": {
+                "maxTransferDuration": "30m",
+                "carsAllowedStopMaxTransferDuration": "3h"
+              }
+            }
+          }
+          ```
+          """
+        )
+        .asEnumMap(
+          StreetMode.class,
+          RegularTransferConfig::mapParametersForMode,
+          new EnumMap<>(StreetMode.class)
+        )
+    );
+
+    builder.withRequests(
+      root
+        .of("transferRequests")
+        .since(OtpVersion.V2_1)
+        .summary("Routing requests to use for pre-calculating stop-to-stop transfers.")
+        .description(
+          """
+          It will use the street network if OSM data has already been loaded into the graph. Otherwise it
+          will use straight-line distance between stops.
+
+          If not set, the default behavior is to generate stop-to-stop transfers using the default request
+          with street mode set to WALK. Use this to change the default or specify more than one way to
+          transfer.
+
+          **Example**
+
+          ```JSON
+          // build-config.json
+          {
+            "transferRequests": [
+              { "modes": "WALK" },
+              { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }}
+            ]
+          }
+          ```
+          """
+        )
+        .asObjects(List.of(RouteRequest.defaultValue()), RouteRequestConfig::mapRouteRequest)
+    );
+    return builder.build();
+  }
+
+  private static TransferParametersForMode mapParametersForMode(NodeAdapter c) {
+    TransferParametersForMode.Builder builder = new TransferParametersForMode.Builder();
+    builder.withMaxDuration(
       c
         .of("maxTransferDuration")
         .summary("This overwrites the default `maxTransferDuration` for the given mode.")
         .since(V2_7)
-        .asDuration(TransferParameters.DEFAULT_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_MAX_DURATION)
     );
-    builder.withCarsAllowedStopMaxTransferDuration(
+    builder.withCarsAllowedStopMaxDuration(
       c
         .of("carsAllowedStopMaxTransferDuration")
         .summary(
@@ -44,9 +134,9 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_7)
-        .asDuration(TransferParameters.DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_CARS_ALLOWED_STOP_MAX_DURATION)
     );
-    builder.withBikesAllowedStopMaxTransferDuration(
+    builder.withBikesAllowedStopMaxDuration(
       c
         .of("bikesAllowedStopMaxTransferDuration")
         .summary(
@@ -68,8 +158,9 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_9)
-        .asDuration(TransferParameters.DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION)
+        .asDuration(TransferParametersForMode.DEFAULT_BIKES_ALLOWED_STOP_MAX_DURATION)
     );
+
     builder.withDisableDefaultTransfers(
       c
         .of("disableDefaultTransfers")
@@ -85,7 +176,7 @@ public class TransferParametersMapper {
           """
         )
         .since(V2_7)
-        .asBoolean(TransferParameters.DEFAULT_DISABLE_DEFAULT_TRANSFERS)
+        .asBoolean(TransferParametersForMode.DEFAULT_DISABLE_DEFAULT_TRANSFERS)
     );
     return builder.build();
   }

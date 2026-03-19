@@ -10,6 +10,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
@@ -22,6 +23,7 @@ public class TripTimeOnDateRequestBuilder {
   private static final String EXCLUDE_ROUTES = "excludeRoutes";
   private static final String EXCLUDE_MODES = "excludeModes";
   private final Collection<StopLocation> stopLocations;
+  private boolean includeCancelledTrips = false;
   private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
     INCLUDE_AGENCIES,
     null
@@ -46,6 +48,7 @@ public class TripTimeOnDateRequestBuilder {
     EXCLUDE_MODES,
     List.of()
   );
+  private List<TripTimeOnDateFilterRequest> transitFilters = List.of();
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
@@ -54,6 +57,11 @@ public class TripTimeOnDateRequestBuilder {
 
   TripTimeOnDateRequestBuilder(Collection<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;
+  }
+
+  public TripTimeOnDateRequestBuilder withIncludeCancelledTrips(boolean includeCancelledTrips) {
+    this.includeCancelledTrips = includeCancelledTrips;
+    return this;
   }
 
   public TripTimeOnDateRequestBuilder withTime(Instant time) {
@@ -113,6 +121,13 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
+  public TripTimeOnDateRequestBuilder withTransitFilters(
+    List<TripTimeOnDateFilterRequest> transitFilters
+  ) {
+    this.transitFilters = transitFilters;
+    return this;
+  }
+
   public TripTimeOnDateRequest build() {
     return new TripTimeOnDateRequest(
       stopLocations,
@@ -121,12 +136,14 @@ public class TripTimeOnDateRequestBuilder {
       arrivalDeparture,
       numberOfDepartures,
       sortOrder,
+      includeCancelledTrips,
       includeAgencies,
       includeRoutes,
       excludeAgencies,
       excludeRoutes,
       includeModes,
-      excludeModes
+      excludeModes,
+      transitFilters
     );
   }
 }

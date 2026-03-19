@@ -45,8 +45,6 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
 
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
-
     var first = i1.legs().getFirst();
     var last = i1.legs().getLast();
     assertThat(result.offersForLeg(first)).containsExactly(
@@ -65,8 +63,6 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
       .build();
 
     var result = SERVICE.calculateFares(i1);
-
-    assertThat(result.itineraryProducts()).isEmpty();
 
     var first = i1.legs().getFirst();
     var last = i1.legs().getLast();
@@ -88,8 +84,6 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
       .build();
 
     var result = SERVICE.calculateFares(i1);
-
-    assertThat(result.itineraryProducts()).isEmpty();
 
     var first = i1.legs().getFirst();
     var second = i1.legs().get(1);
@@ -116,8 +110,6 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
       .build();
 
     var result = SERVICE.calculateFares(i1);
-
-    assertThat(result.itineraryProducts()).isEmpty();
 
     var first = i1.legs().getFirst();
     var second = i1.legs().get(1);

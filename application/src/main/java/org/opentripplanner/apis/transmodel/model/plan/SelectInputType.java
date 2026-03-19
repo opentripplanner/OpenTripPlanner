@@ -5,6 +5,7 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
+import org.opentripplanner.apis.transmodel.model.ModeAndSubModeInputType;
 
 public class SelectInputType {
 

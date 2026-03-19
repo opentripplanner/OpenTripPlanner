@@ -270,9 +270,7 @@ public class GraphBuilderModules {
       timetableRepository,
       transferRepository,
       issueStore,
-      config.maxTransferDuration,
-      config.transferRequests,
-      config.transferParametersForMode
+      config.regularTransferParameters()
     );
   }
 
@@ -290,7 +288,7 @@ public class GraphBuilderModules {
       linker,
       timetableRepository,
       issueStore,
-      config.maxTransferDuration.toSeconds() * WalkPreferences.DEFAULT.speed()
+      config.regularTransferParameters().maxDuration().toSeconds() * WalkPreferences.DEFAULT.speed()
     );
   }
 
