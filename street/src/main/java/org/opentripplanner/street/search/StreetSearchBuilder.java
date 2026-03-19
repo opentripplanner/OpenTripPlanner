@@ -2,10 +2,13 @@ package org.opentripplanner.street.search;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
+import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -64,5 +67,25 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   @Override
   protected DominanceFunction<State> createDefaultDominanceFunction() {
     return new DominanceFunctions.Pareto();
+  }
+
+  /// Run the street search, returning nothing
+  public void run() {
+    build().getShortestPathTree();
+  }
+
+  /// Run the search returning the shortestPathTree
+  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
+    return build().getShortestPathTree();
+  }
+
+  /// Run the street search, returning all paths found
+  public List<StreetPath> getPathsToTarget() {
+    return build()
+      .getPathsToTarget()
+      .stream()
+      .sorted(new PathComparator(arriveBy()))
+      .map(StreetPath::new)
+      .toList();
   }
 }

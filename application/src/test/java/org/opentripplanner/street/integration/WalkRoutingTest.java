@@ -11,7 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -21,9 +20,7 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.StreetPath;
 import org.opentripplanner.test.support.ResourceLoader;
 
 class WalkRoutingTest {
@@ -65,14 +62,14 @@ class WalkRoutingTest {
     var time = base.plusMillis(offset);
     var forwardResults = route(roundabout, start, end, time, false);
     assertEquals(1, forwardResults.size());
-    var forwardStates = forwardResults.getFirst().states;
+    var forwardStates = forwardResults.getFirst().states();
     var forwardDiff = ChronoUnit.MILLIS.between(
       forwardStates.getFirst().getTimeAccurate(),
       forwardStates.getLast().getTimeAccurate()
     );
     var backwardResults = route(roundabout, start, end, time, true);
     assertEquals(1, backwardResults.size());
-    var backwardStates = forwardResults.getFirst().states;
+    var backwardStates = forwardResults.getFirst().states();
     var backwardDiff = ChronoUnit.MILLIS.between(
       backwardStates.getFirst().getTimeAccurate(),
       backwardStates.getLast().getTimeAccurate()
@@ -83,7 +80,7 @@ class WalkRoutingTest {
     assertEquals(expected, backwardDiff);
   }
 
-  private static List<GraphPath<State, Edge, Vertex>> route(
+  private static List<StreetPath> route(
     Graph graph,
     GenericLocation from,
     GenericLocation to,

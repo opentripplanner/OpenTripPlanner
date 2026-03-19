@@ -7,7 +7,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
@@ -43,6 +42,7 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -454,7 +454,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
     }
     State[] states = transferStates.toArray(State[]::new);
-    var graphPath = new GraphPath<>(states[states.length - 1]);
+    var graphPath = new StreetPath(states[states.length - 1]);
     var subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath, request);
     return subItinerary.legs();
   }
@@ -500,7 +500,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return accessEgress
       .findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::getLastState)
-      .map(GraphPath::new)
+      .map(StreetPath::new)
       .map(path -> graphPathToItineraryMapper.generateItinerary(path, request))
       .orElseThrow();
   }

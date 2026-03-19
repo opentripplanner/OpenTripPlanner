@@ -1,6 +1,7 @@
 package org.opentripplanner.astar.model;
 
 import java.util.LinkedList;
+import java.util.List;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
@@ -14,9 +15,9 @@ public class GraphPath<
   Vertex extends AStarVertex<State, Edge, Vertex>
 > {
 
-  public LinkedList<State> states;
+  public List<State> states;
 
-  public LinkedList<Edge> edges;
+  public List<Edge> edges;
 
   /**
    * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -54,6 +55,11 @@ public class GraphPath<
         edges.addFirst(cur.getBackEdge());
       }
     }
+  }
+
+  public GraphPath(List<State> states, List<Edge> edges) {
+    this.states = states;
+    this.edges = edges;
   }
 
   /**

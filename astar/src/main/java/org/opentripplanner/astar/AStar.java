@@ -89,13 +89,13 @@ public class AStar<
     }
   }
 
-  ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
+  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     runSearch();
 
     return spt;
   }
 
-  List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
+  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     runSearch();
 
     return targetAcceptedStates

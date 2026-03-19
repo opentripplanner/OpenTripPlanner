@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -196,13 +195,12 @@ public class CarpoolStreetRouter {
       .withFrom(fromVertices)
       .withTo(toVertices);
 
-    List<GraphPath<State, Edge, Vertex>> paths = streetSearch.getPathsToTarget();
-    paths.sort(new PathComparator(request.arriveBy()));
+    var paths = streetSearch.getPathsToTarget();
 
     if (paths.isEmpty()) {
       return null;
     }
 
-    return paths.getFirst();
+    return paths.getFirst().toGraphPath();
   }
 }

@@ -181,6 +181,12 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return null;
   }
 
+  /// Whether this geometry should be excluded from the final leg geometry presented to the user.
+  /// Set this to true for geometries that we only want to display in the debug ui.
+  public boolean excludeGeometryFromLeg() {
+    return false;
+  }
+
   public boolean hasGeometry() {
     return getGeometry() != null;
   }
