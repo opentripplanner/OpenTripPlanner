@@ -15,13 +15,13 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
+import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
-import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.text.Table;
@@ -38,17 +38,17 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static final int NOT_SET = Integer.MIN_VALUE;
 
   private final boolean enableDebugLogging;
-  private final boolean eventLoggingDryRun;
+  private final RaptorStopNameResolver stopNameResolver;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
   private final Table arrivalTable = Table.of()
     .withAlights(Center, Center, Right, Right, Right, Right, Left, Left)
     .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "C₁", "TRIP", "DETAILS")
-    .withMinWidths(9, 7, 3, 5, 8, 9, 24, 0)
+    .withMinWidths(9, 7, 3, 5, 11, 9, 24, 0)
     .build();
   private final Table pathTable = Table.of()
     .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
     .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "C₁", "DETAILS")
-    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 9, 0)
+    .withMinWidths(9, 2, 5, 5, 11, 11, 8, 9, 0)
     .build();
   private boolean forwardSearch = true;
   private int lastIterationTime = NOT_SET;
@@ -56,14 +56,11 @@ public class SystemErrDebugLogger implements DebugLogger {
   private boolean printPathHeader = true;
 
   /**
-   * @param enableDebugLogging Log debug information on {@link DebugTopic}s.
-   * @param eventLoggingDryRun DryRun will do the Raptor event logging, except printing the result.
-   *                           This is used to test the logging framework without logging. To turn
-   *                           off logging completely used the {@link #noop()} logger.
+   * @param enableDebugLogging Enable debug information on {@link DebugTopic}s.
    */
-  public SystemErrDebugLogger(boolean enableDebugLogging, boolean eventLoggingDryRun) {
+  public SystemErrDebugLogger(RaptorStopNameResolver stopNameResolver, boolean enableDebugLogging) {
+    this.stopNameResolver = stopNameResolver;
     this.enableDebugLogging = enableDebugLogging;
-    this.eventLoggingDryRun = eventLoggingDryRun;
   }
 
   /**
@@ -138,7 +135,7 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   @Override
   public void debug(DebugTopic topic, String message) {
-    if (enableDebugLogging) {
+    if (isEnabled()) {
       // We log to info - since debugging is controlled by the application
       if (message.contains("\n")) {
         System.err.printf("%s\n%s", topic, message);
@@ -176,7 +173,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private void printIterationHeader(int iterationTime) {
-    if (iterationTime == lastIterationTime) {
+    if (!isEnabled() || iterationTime == lastIterationTime) {
       return;
     }
     lastIterationTime = iterationTime;
@@ -193,7 +190,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         action,
         legType(a),
         a.round(),
-        IntUtils.intToString(a.stop(), NOT_SET),
+        stop(a.stop()),
         timeToStrLong(a.arrivalTime()),
         numFormat.format(a.c1()),
         pattern,
@@ -208,7 +205,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         action,
         "OnRide",
         p.prevArrival().round() + 1,
-        p.boardStopIndex(),
+        stop(p.boardStopIndex()),
         timeToStrLong(p.boardTime()),
         numFormat.format(p.relativeC1()),
         p.trip().pattern().debugInfo(),
@@ -218,7 +215,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null)).summary(a.c1(), a.c2()).toString();
+    return path(a, new PathStringBuilder(stopNameResolver)).summary(a.c1(), a.c2()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
@@ -250,7 +247,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private void printRoundHeader(int round) {
-    if (round == lastRound) {
+    if (!isEnabled() || round == lastRound) {
       return;
     }
     lastRound = round;
@@ -269,14 +266,19 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private void println() {
-    if (!eventLoggingDryRun) {
-      System.err.println();
-    }
+    System.err.println();
   }
 
   private void println(String text) {
-    if (!eventLoggingDryRun) {
-      System.err.println(text);
+    System.err.println(text);
+  }
+
+  String stop(int stopIndex) {
+    if (stopIndex == NOT_SET) {
+      return "NA";
     }
+    return stopNameResolver == null
+      ? Integer.toString(stopIndex)
+      : stopNameResolver.apply(stopIndex);
   }
 }
