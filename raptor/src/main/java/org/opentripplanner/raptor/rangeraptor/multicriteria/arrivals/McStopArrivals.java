@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.set.TIntSet;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.function.Function;
@@ -38,6 +39,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    */
   public McStopArrivals(
     int nStops,
+    TIntSet onBoardArrivalStops,
     TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
@@ -45,12 +47,26 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     //noinspection unchecked
     this.arrivals = (ParetoSet<McStopArrival<T>>[]) new ParetoSet[nStops];
     this.touchedStops = new BitSet(nStops);
-    this.comparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
+    this.comparator = comparatorFactory.compareArrivalTimeRoundAndCost();
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
+    // Comparator for stops that have arrival listeners with a on-board trip-to-trip via
+    // connection.
+    var onBoardComparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
     for (int stop : arrivalListeners.keys()) {
-      this.arrivals[stop] = ParetoSet.of(comparator, arrivalListeners.get(stop));
+      var comp = onBoardArrivalStops.contains(stop) ? onBoardComparator : comparator;
+      this.arrivals[stop] = ParetoSet.of(comp, arrivalListeners.get(stop));
+    }
+
+    for (var it = onBoardArrivalStops.iterator(); it.hasNext(); ) {
+      int stop = it.next();
+      if (this.arrivals[stop] == null) {
+        this.arrivals[stop] = ParetoSet.of(
+          onBoardComparator,
+          debugHandlerFactory.paretoSetStopArrivalListener(stop)
+        );
+      }
     }
   }
 
