@@ -5,6 +5,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.10.0-SNAPSHOT (in progress)
 
+- Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
@@ -98,6 +99,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Reduce Raptor on-board optimal set by using strict less-than for tripSortIndex [#7417](https://github.com/opentripplanner/OpenTripPlanner/pull/7417)
 - fix: Return NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW when transit search finds no trips [#7398](https://github.com/opentripplanner/OpenTripPlanner/pull/7398)
 - Fix findTripTimesOnDate filters using wrong route mode and applying filters after limit [#7408](https://github.com/opentripplanner/OpenTripPlanner/pull/7408)
+- Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
