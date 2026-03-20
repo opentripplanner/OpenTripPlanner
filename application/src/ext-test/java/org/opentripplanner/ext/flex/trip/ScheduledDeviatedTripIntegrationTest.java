@@ -187,7 +187,8 @@ class ScheduledDeviatedTripIntegrationTest {
         transitStartOfTime,
         additionalSearchDays,
         new DebugTimingAggregator(),
-        linkingContext
+        linkingContext,
+        null
       );
 
       return result.getItineraries();
