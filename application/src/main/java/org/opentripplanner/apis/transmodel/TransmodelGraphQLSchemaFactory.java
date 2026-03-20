@@ -133,7 +133,6 @@ import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1574,7 +1573,7 @@ public class TransmodelGraphQLSchemaFactory {
   private Stream<FeedScopedId> resolveIds(DataFetchingEnvironment env) {
     return Optional.ofNullable(env.<Collection<String>>getArgument("ids"))
       .stream()
-      .flatMap(ids -> ids.stream().filter(StringUtils::hasValue).map(idMapper::parse));
+      .flatMap(ids -> ids.stream().flatMap(id -> idMapper.parse(id).stream()));
   }
 
   private @Nullable List<FeedScopedId> toNullableIdList(@Nullable List<String> ids) {
