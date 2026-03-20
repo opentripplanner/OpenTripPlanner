@@ -34,21 +34,21 @@ public class NearbyStop implements Comparable<NearbyStop> {
    * away it is and the geometry of the path leading up to the given State.
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
-    // Walk the state chain directly to collect edges, avoiding GraphPath's LinkedList allocation.
-    // For arriveBy searches, reverse the state chain first to get chronological edge order.
-    State lastState = state.getRequest().arriveBy() ? state.reverse() : state;
-
+    // Walk the state chain directly to collect edges, avoiding GraphPath allocation.
     double effectiveWalkDistance = 0.0;
     var edges = new ArrayList<Edge>();
-    for (State cur = lastState; cur != null; cur = cur.getBackState()) {
+    for (State cur = state; cur != null; cur = cur.getBackState()) {
       Edge backEdge = cur.getBackEdge();
       if (backEdge != null && cur.getBackState() != null) {
         effectiveWalkDistance += backEdge.getEffectiveWalkDistance();
         edges.add(backEdge);
       }
     }
-    // Edges were collected in reverse chronological order; restore chronological order.
-    Collections.reverse(edges);
+    // For depart-after, edges are in reverse chronological order; reverse to chronological.
+    // For arriveBy, the A* searched backward so edges are already chronological.
+    if (!state.getRequest().arriveBy()) {
+      Collections.reverse(edges);
+    }
     return new NearbyStop(stop, effectiveWalkDistance, edges, state);
   }
 
