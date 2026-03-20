@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -35,13 +34,21 @@ public class NearbyStop implements Comparable<NearbyStop> {
    * away it is and the geometry of the path leading up to the given State.
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
+    // Walk the state chain directly to collect edges, avoiding GraphPath's LinkedList allocation.
+    // For arriveBy searches, reverse the state chain first to get chronological edge order.
+    State lastState = state.getRequest().arriveBy() ? state.reverse() : state;
+
     double effectiveWalkDistance = 0.0;
-    var graphPath = new GraphPath<>(state);
     var edges = new ArrayList<Edge>();
-    for (Edge edge : graphPath.edges) {
-      effectiveWalkDistance += edge.getEffectiveWalkDistance();
-      edges.add(edge);
+    for (State cur = lastState; cur != null; cur = cur.getBackState()) {
+      Edge backEdge = cur.getBackEdge();
+      if (backEdge != null && cur.getBackState() != null) {
+        effectiveWalkDistance += backEdge.getEffectiveWalkDistance();
+        edges.add(backEdge);
+      }
     }
+    // Edges were collected in reverse chronological order; restore chronological order.
+    Collections.reverse(edges);
     return new NearbyStop(stop, effectiveWalkDistance, edges, state);
   }
 
