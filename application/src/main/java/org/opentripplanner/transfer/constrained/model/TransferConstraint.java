@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardingSearch;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -183,7 +184,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
   /**
    * The min-transfer-time specify lower bound for the transfer time. {@link
-   * org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch}
+   * ConstrainedBoardingSearch}
    * uses this to make sure at least the amount of seconds specified is available to do the
    * transfer. If the path transfer takes more time than specified by the {@code min-transfer-time}
    * then the path transfer is used. Normal slack parameters are added to the path transfer, but not

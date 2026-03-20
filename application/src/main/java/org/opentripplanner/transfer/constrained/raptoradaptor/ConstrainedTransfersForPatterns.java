@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
+package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import java.util.List;
 import java.util.Objects;

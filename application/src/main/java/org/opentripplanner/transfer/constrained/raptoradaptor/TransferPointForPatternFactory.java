@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
+package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * so we need to generate
  */
 
-final class TransferPointForPatternFactory {
+public final class TransferPointForPatternFactory {
 
   /** private constructor to prevent utility class from instantiation */
   private TransferPointForPatternFactory() {
@@ -29,7 +29,7 @@ final class TransferPointForPatternFactory {
     return new StationSP(station);
   }
 
-  static TransferPointMatcher createTransferPointForPattern(int stopIndex) {
+  public static TransferPointMatcher createTransferPointForPattern(int stopIndex) {
     return new StopSP(stopIndex);
   }
 
