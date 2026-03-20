@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transfer.regular.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

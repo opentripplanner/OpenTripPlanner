@@ -13,6 +13,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
+import org.opentripplanner.transfer.regular.model.Transfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 

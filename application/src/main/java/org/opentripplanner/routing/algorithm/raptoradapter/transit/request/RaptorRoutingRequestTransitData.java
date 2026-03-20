@@ -18,7 +18,6 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
@@ -27,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalc
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.utils.time.ServiceDateUtils;

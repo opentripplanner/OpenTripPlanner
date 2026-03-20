@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transfer.regular.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;

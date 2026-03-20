@@ -5,9 +5,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
+import org.opentripplanner.transfer.regular.model.Transfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

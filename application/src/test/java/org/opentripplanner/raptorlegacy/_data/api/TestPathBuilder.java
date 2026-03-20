@@ -15,7 +15,7 @@ import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code

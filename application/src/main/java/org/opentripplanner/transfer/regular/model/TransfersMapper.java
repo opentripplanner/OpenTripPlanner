@@ -1,20 +1,18 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
+package org.opentripplanner.transfer.regular.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 
-class TransfersMapper {
+public class TransfersMapper {
 
   /**
    * Copy pre-calculated transfers from the original graph
    * @return a list where each element is a list of transfers for the corresponding stop index
    */
-  static List<List<Transfer>> mapTransfers(
+  public static List<List<Transfer>> mapTransfers(
     SiteRepository siteRepository,
     TransferRepository transferRepository
   ) {

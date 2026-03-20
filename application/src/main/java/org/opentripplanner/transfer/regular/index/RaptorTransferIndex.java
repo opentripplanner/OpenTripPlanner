@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transfer.regular.index;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -8,6 +8,8 @@ import java.util.function.Function;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.Transfer;
 
 public interface RaptorTransferIndex {
   /**
