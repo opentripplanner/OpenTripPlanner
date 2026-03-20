@@ -164,6 +164,7 @@
         "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
+        "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
         "com.azure:{/,}**"
