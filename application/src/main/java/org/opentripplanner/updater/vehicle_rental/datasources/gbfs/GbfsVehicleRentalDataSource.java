@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
 
 import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.gbfs.GbfsFeedLoaderAndMapper;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;

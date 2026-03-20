@@ -34,13 +34,16 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *    calculation.
  *  </li>
  *  <li>
- *    We do NOT allow one trip to exclude the pattern-rides of another trip in the pareto-set.
- *    Two pattern-rides are both optimal, if they have boarded the same pattern, in the same round,
- *    but on different trips/vehicles. This have no measurable impact on performance, compared with
- *    allowing an earlier trip dominating a later one. But, it allows for a trip to be optimal at
- *    some stops, and another trip to be optimal at other stops. This may happen if the
- *    generalized-cost is not <em>increasing</em> with the same amount for each trip between each
- *    stop.
+ *    An earlier-departing trip (lower {@code tripSortIndex}) dominates a later one when its cost
+ *    is equal or better. This reduces the on-board optimal set compared with treating all trips as
+ *    incomparable.
+ *    <p>
+ *    For circular patterns with a "tail" (stops that only appear after the loop completes), a
+ *    passenger heading to a tail stop should board on the second pass through a loop stop, thereby
+ *    skipping the full circle. On the second pass, an earlier-departing trip is typically
+ *    available: the earlier trip's second pass will reach the tail stop no later than the later
+ *    trip's first pass. The earlier-departure dominance therefore remains correct even for
+ *    tail-stop destinations.
  *  </li>
  *  <li>
  *    We do not have to update all elements in the "pattern-bag" for every stop visited. The

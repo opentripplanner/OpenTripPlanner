@@ -99,7 +99,7 @@ class FilterMapper {
       .map(o -> o.getLine())
       .stream()
       .flatMap(r -> r.stream().map(l -> l.getLineRef().getValue()))
-      .map(idMapper::parse)
+      .flatMap(id -> idMapper.parse(id).stream())
       .collect(Collectors.toSet());
   }
 
@@ -112,7 +112,7 @@ class FilterMapper {
       .map(o -> o.getOperatorRef())
       .stream()
       .flatMap(r -> r.stream().map(ref -> ref.getValue()))
-      .map(idMapper::parse)
+      .flatMap(id -> idMapper.parse(id).stream())
       .collect(Collectors.toSet());
   }
 

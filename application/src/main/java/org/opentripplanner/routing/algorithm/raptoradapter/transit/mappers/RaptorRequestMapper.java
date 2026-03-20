@@ -271,7 +271,12 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
           }
         }
       }
-      return builder.build();
+      var viaLocation = builder.build();
+      if (OTPFeature.CostlyAssertions.isOn()) {
+        // This check can have a bad performance if there are a lot of connections
+        viaLocation.validateDuplicateConnections();
+      }
+      return viaLocation;
     }
   }
 

@@ -35,7 +35,6 @@ class FlexLegTest implements PlanTestConstants, FareTestConstants {
     var i1 = newItinerary(A, 0).flex(T11_00, T11_05, A).build();
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     var first = i1.legs().getFirst();
     assertThat(result.offersForLeg(first)).containsExactly(
       FareOffer.of(first.startTime(), FARE_PRODUCT_A)

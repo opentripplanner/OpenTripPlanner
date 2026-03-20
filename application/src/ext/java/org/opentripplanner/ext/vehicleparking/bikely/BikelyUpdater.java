@@ -58,7 +58,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
       parameters.url(),
       POST_PARAMS,
       Duration.ofSeconds(30),
-      parameters.httpHeaders().asMap(),
+      parameters.httpHeaders(),
       response -> {
         try {
           var lots = new ArrayList<VehicleParking>();

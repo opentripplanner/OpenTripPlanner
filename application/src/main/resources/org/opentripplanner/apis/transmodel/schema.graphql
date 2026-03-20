@@ -615,6 +615,8 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
+    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list is not allowed. Omit the parameter to include all estimated calls."
+    filters: [EstimatedCallFilterInput!],
     "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
@@ -627,9 +629,9 @@ type Quay implements PlaceInterface {
     "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
     timeRange: Int = 86400,
     "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
-    whiteListed: InputWhiteListed,
+    whiteListed: InputWhiteListed @deprecated(reason : "Use 'filters' instead."),
     "Only show estimated calls for selected modes."
-    whiteListedModes: [TransportMode]
+    whiteListedModes: [TransportMode] @deprecated(reason : "Use 'filters' instead.")
   ): [EstimatedCall!]! @timingData
   "Geometry for flexible area."
   flexibleArea: Coordinates
@@ -1305,6 +1307,8 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
+    "A list of filters for which estimated calls should be included. An estimated call will be included if it matches with at least one filter. An empty list is not allowed. Omit the parameter to include all estimated calls."
+    filters: [EstimatedCallFilterInput!],
     "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
@@ -1316,9 +1320,9 @@ type StopPlace implements PlaceInterface {
     "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
     timeRange: Int = 86400,
     "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
-    whiteListed: InputWhiteListed,
+    whiteListed: InputWhiteListed @deprecated(reason : "Use 'filters' instead."),
     "Only show estimated calls for selected modes."
-    whiteListedModes: [TransportMode]
+    whiteListedModes: [TransportMode] @deprecated(reason : "Use 'filters' instead.")
   ): [EstimatedCall!]! @timingData
   id: ID!
   latitude: Float
@@ -2231,6 +2235,24 @@ input DatedServiceJourneyReference @oneOf {
   datedServiceJourneyId: String
   "Identifies the service journey by service journey ID and service date."
   serviceJourneyOnServiceDate: ServiceJourneyOnServiceDate
+}
+
+"A collection of selectors for what estimated calls should be included / excluded. At least one of `select` or `not` must be provided. The `select` is always applied first, then `not`. If only `not` is present, the exclude is applied to the existing set of estimated calls."
+input EstimatedCallFilterInput {
+  "A list of selectors for what estimated calls should be excluded during the search. If a call matches with at least one selector it will be excluded."
+  not: [EstimatedCallSelectInput!]
+  "A list of selectors for what estimated calls should be included. A call is included if it matches at least one selector. Omit the field to include all calls. An empty list is not allowed."
+  select: [EstimatedCallSelectInput!]
+}
+
+"A selector for filter allow-list / exclude-list. At least one field must be provided. An estimated call matches a selector if it matches all fields. Within each field, a call matches if it matches any of the listed values."
+input EstimatedCallSelectInput {
+  "Set of ids for authorities that should be included in/excluded from search. A call matches if its authority matches any of the given IDs. An empty list is not allowed. Omit the field to match all authorities."
+  authorities: [ID!]
+  "Set of ids for lines that should be included in/excluded from search. A call matches if its line matches any of the given IDs. An empty list is not allowed. Omit the field to match all lines."
+  lines: [ID!]
+  "The allowed modes for the estimated call. A call matches if its mode matches any of the listed modes. An empty list is not allowed. Omit the field to match all modes. Omitting main mode (transportMode) is also not allowed."
+  transportModes: [TransportModes!]
 }
 
 "Filter trips by disallowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be banned. If a line is both banned and whitelisted, it will be counted as banned."

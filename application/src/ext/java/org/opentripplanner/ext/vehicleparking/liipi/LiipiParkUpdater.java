@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -67,7 +68,7 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
       parameters.utilizationsUrl(),
       "",
       parkPatchMapper::parseUtilization,
-      Map.of(),
+      HttpHeaders.empty(),
       otpHttpClientFactory.create(LOG)
     );
     this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();

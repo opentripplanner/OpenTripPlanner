@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
@@ -27,16 +26,11 @@ class FareProductMapper {
     var currency = Currency.getInstance(rhs.getCurrency());
     var price = Money.ofFractionalAmount(currency, rhs.getAmount());
 
-    Duration duration = null;
-    if (rhs.getDurationUnit() != NOT_SET) {
-      duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
-    }
     var fp = FareProduct.of(
       idFactory.createId(rhs.getFareProductId(), "fare product"),
       rhs.getName(),
       price
     )
-      .withValidity(duration)
       .withCategory(toInternalModel(rhs.getRiderCategory()))
       .withMedium(toInternalModel(rhs.getFareMedium()))
       .build();
@@ -75,22 +69,6 @@ class FareProductMapper {
     org.onebusaway.gtfs.model.RiderCategory riderCategory
   ) {
     return riderCategory.getIsDefaultFareCategory() == 1;
-  }
-
-  private static Duration toDuration(int unit, int amount) {
-    // TODO: this isn't totally correct since we need to check if we go, for example, past the
-    // end of the business day. the correct solution would be to also take duration_type into account.
-    return switch (unit) {
-      case 0 -> Duration.ofSeconds(amount);
-      case 1 -> Duration.ofMinutes(amount);
-      case 2 -> Duration.ofHours(amount);
-      case 3 -> Duration.ofDays(amount);
-      case 4 -> Duration.ofDays(amount * 7L);
-      // not totally right but good enough
-      case 5 -> Duration.ofDays(amount * 31L);
-      case 6 -> Duration.ofDays(amount * 365L);
-      default -> throw new IllegalStateException("Unexpected value: " + unit);
-    };
   }
 
   @Nullable

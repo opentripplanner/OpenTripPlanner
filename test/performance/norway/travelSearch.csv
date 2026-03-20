@@ -86,3 +86,9 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 240,Eiksmarka to Kvadraturen,10:00,,,Eiksmarka,,59.9463,10.6263,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
 241,Eiksmarka to Bergskogen,10:00,,,Eiksmarka,,59.9463,10.6263,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
 242,Eiksmarka to Refstad,10:00,,,Eiksmarka,,59.9463,10.6263,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+301,"Direct car, Bergen to Stavanger",10:00,,,Bergen,,60.391200,5.324500,Stavanger,,58.970100,5.733100,direct-car,CAR
+302,"Direct car, Ålesund to Molde",10:00,,,Ålesund,,62.472200,6.149500,Molde,,62.737500,7.161000,direct-car,CAR
+303,"Direct car, Haugesund to Odda",10:00,,,Haugesund,,59.413800,5.268000,Odda,,60.069300,6.545500,direct-car,CAR
+401,"Direct walk, Grünerløkka to Majorstuen",10:00,,,Grünerløkka,,59.922500,10.759000,Majorstuen,,59.930000,10.713000,direct-walk,WALK
+402,"Direct walk, Jernbanetorget to Grønland",10:00,,,Jernbanetorget,,59.911200,10.750300,Grønland,,59.913300,10.762000,direct-walk,WALK
+403,"Direct walk, Frogner to Aker Brygge",10:00,,,Frogner,,59.926500,10.705000,Aker Brygge,,59.911000,10.727000,direct-walk,WALK

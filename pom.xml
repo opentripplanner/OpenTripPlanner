@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.9.0-SNAPSHOT</version>
+    <version>2.10.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -64,18 +64,18 @@
         <geotools.version>34.2</geotools.version>
         <google.dagger.version>2.59.2</google.dagger.version>
         <jackson.version>2.21.1</jackson.version>
-        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.7</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
         <junit.version>6.0.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.32</logback.version>
         <lucene.version>10.3.2</lucene.version>
-        <micrometer.version>1.16.3</micrometer.version>
+        <micrometer.version>1.16.4</micrometer.version>
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.34.0</protobuf.version>
-        <siri-java-model.version>2.0.4</siri-java-model.version>
+        <siri-java-model.version>2.0.5</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -542,6 +542,13 @@
                 <artifactId>gt-geojson-core</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
+            <!-- JTS is a transitive dependency of GeoTools. We pin the version here to
+                 prevent mapbox-vector-tile from pulling in an older, incompatible version. -->
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-core</artifactId>
+                <version>1.20.0</version>
+            </dependency>
             <dependency>
                 <groupId>de.grundid.opendatalab</groupId>
                 <artifactId>geojson-jackson</artifactId>
@@ -573,7 +580,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.21.0</version>
+                <version>5.23.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
