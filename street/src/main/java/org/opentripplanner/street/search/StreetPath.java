@@ -1,7 +1,5 @@
 package org.opentripplanner.street.search;
 
-import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -83,11 +81,6 @@ public class StreetPath {
     return GeometryUtils.concatenateLineStrings(geometries);
   }
 
-  /// Whether the path ends with renting a vehicle from a station
-  public boolean endsWithRentingVehicleFromStation() {
-    return states.getLast().isRentingVehicleFromStation();
-  }
-
   /// Get all the states of this path
   public List<State> states() {
     return states;
@@ -134,22 +127,14 @@ public class StreetPath {
     return new ElevationChange(elevationGained_m, elevationLost_m);
   }
 
+  /// Get a specific section of this path as a new path.
+  ///
+  /// @param startIdx the first state index (inclusive)
+  /// @param endIdx the end state index (exclusive)
   public StreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);
     return new StreetPath(subStates, subEdges);
-  }
-
-  /**
-   * Dropping of a free-floating vehicle can happen at any edge so be sure to select the correct
-   * state (forward, not backward).
-   */
-  private static boolean isFloatingRentalDropoff(State state) {
-    return (
-      !state.isRentingVehicle() &&
-      (state.getBackState() != null &&
-        state.getBackState().getVehicleRentalState() == RENTING_FLOATING)
-    );
   }
 
   /// This is only used in the carpooling code and can be removed once the carpooling migrates

@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
@@ -23,7 +24,9 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
+import org.opentripplanner.street.model.edge.TestEdge;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -43,10 +46,18 @@ public class TestStateBuilder {
   private State currentState;
 
   private TestStateBuilder(StreetMode mode) {
+    this(StreetSearchRequest.of().withMode(mode).withStartTime(DEFAULT_START_TIME).build());
+  }
+
+  private TestStateBuilder(StreetSearchRequest request) {
     currentState = new State(
       StreetModelFactory.intersectionVertex(count, count),
-      StreetSearchRequest.of().withMode(mode).withStartTime(DEFAULT_START_TIME).build()
+      request
     );
+  }
+
+  public static TestStateBuilder of(StreetSearchRequest request) {
+    return new TestStateBuilder(request);
   }
 
   /**
@@ -87,15 +98,21 @@ public class TestStateBuilder {
     return new TestStateBuilder(StreetMode.CAR_TO_PARK);
   }
 
+  public TestStateBuilder streetEdge() {
+    return streetEdge(b -> {});
+  }
+
   /**
    * Traverse a very plain street edge with no special characteristics.
    */
-  public TestStateBuilder streetEdge() {
+  public TestStateBuilder streetEdge(Consumer<StreetEdgeBuilder<?>> customizer) {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelFactory.intersectionVertex(count, count);
 
-    var edge = StreetModelFactory.streetEdge(from, to);
+    var edgeBuilder = StreetModelFactory.streetEdgeBuilder(from, to, 100, StreetTraversalPermission.ALL);
+    customizer.accept(edgeBuilder);
+    var edge = edgeBuilder.buildAndConnect();
     var states = edge.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
@@ -131,6 +148,21 @@ public class TestStateBuilder {
     var to = StreetModelFactory.intersectionVertex(count, count);
     var area = StreetModelFactory.areaEdge(from, to, name, StreetTraversalPermission.PEDESTRIAN);
     var states = area.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder testEdge(Consumer<TestEdge.TestEdgeBuilder> customizer) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelFactory.intersectionVertex(count, count);
+    var builder = TestEdge.of(from, to);
+    customizer.accept(builder);
+    var edge = builder.build();
+    var states = edge.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
     }

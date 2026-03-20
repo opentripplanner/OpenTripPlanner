@@ -79,7 +79,7 @@ public class GraphPathFinder {
   public List<StreetPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
     StreetPreferences preferences = request.preferences().street();
 
-    StreetSearchBuilder aStar = StreetSearchBuilder.of()
+    StreetSearchBuilder streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .withSkipEdgeStrategy(
@@ -101,7 +101,7 @@ public class GraphPathFinder {
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
     // for the AStar search
     if (traverseVisitor != null) {
-      aStar.withTraverseVisitor(traverseVisitor);
+      streetSearch.withTraverseVisitor(traverseVisitor);
     }
 
     LOG.debug("rreq={}", request);
@@ -109,7 +109,7 @@ public class GraphPathFinder {
     long searchBeginTime = System.currentTimeMillis();
     LOG.debug("BEGIN SEARCH");
 
-    var paths = aStar.getPathsToTarget();
+    var paths = streetSearch.getPathsToTarget();
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
