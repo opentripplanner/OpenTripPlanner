@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
@@ -77,7 +77,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var updates = updatedJourneyBuilder(siri).buildEstimatedTimetableDeliveries();
     var result = siri.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
-    assertFailure(UpdateError.UpdateErrorType.TRIP_NOT_FOUND, result);
+    assertFailure(UpdateErrorType.TRIP_NOT_FOUND, result);
   }
 
   /**

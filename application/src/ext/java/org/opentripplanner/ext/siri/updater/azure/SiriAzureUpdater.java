@@ -33,13 +33,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.slf4j.Logger;
@@ -522,8 +522,8 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     try {
-      var siriXmlMessage = message.getBody().toString();
-      var siri = SiriXml.parseXml(siriXmlMessage);
+      var siriXmlMessage = message.getBody();
+      var siri = SiriXml.parseXml(siriXmlMessage.toStream());
       var serviceDelivery = siri.getServiceDelivery();
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
@@ -560,7 +560,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     if (dataInitializationUrl == null) {
       return Optional.empty();
     }
-    var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
+    var headers = HttpHeaders.of().acceptApplicationXML().build();
 
     LOG.info(
       "Fetching initial Siri data from {}, timeout is {} ms.",

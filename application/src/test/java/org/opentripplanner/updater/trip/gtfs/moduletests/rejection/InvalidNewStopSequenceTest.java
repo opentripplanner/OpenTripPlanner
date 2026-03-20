@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.rejection;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;

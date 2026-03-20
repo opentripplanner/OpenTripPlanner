@@ -191,6 +191,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
+    graphBuilder.addModule(factory.stopConnectivityModule());
+
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 
     graphBuilder.addModuleOptional(factory.dataImportIssueReporter(), config.dataImportReport);

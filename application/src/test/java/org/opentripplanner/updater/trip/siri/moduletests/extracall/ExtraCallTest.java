@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
@@ -214,7 +214,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertFailure(UpdateError.UpdateErrorType.TOO_MANY_STOPS, result);
+    assertFailure(UpdateErrorType.TOO_MANY_STOPS, result);
   }
 
   @Test
@@ -238,7 +238,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
+    assertFailure(UpdateErrorType.INVALID_STOP_SEQUENCE, result);
   }
 
   @Test
@@ -265,7 +265,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertFailure(UpdateError.UpdateErrorType.STOP_MISMATCH, result);
+    assertFailure(UpdateErrorType.STOP_MISMATCH, result);
   }
 
   private List<EstimatedTimetableDeliveryStructure> updateWithExtraCall(SiriTestHelper siri) {

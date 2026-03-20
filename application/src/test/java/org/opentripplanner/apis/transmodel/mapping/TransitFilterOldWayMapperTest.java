@@ -7,6 +7,7 @@ import static org.opentripplanner.apis.transmodel._support.RequestHelper.map;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
@@ -182,6 +183,22 @@ class TransitFilterOldWayMapperTest {
 
     assertEquals(
       "(filters: [(select: [(transportModes: [RAIL::local, RAIL::regionalRail])])])",
+      transitBuilder.build().toString()
+    );
+  }
+
+  @Test
+  void handleNullSubmode() {
+    var transportMode = new HashMap<String, Object>();
+    transportMode.put("transportMode", TransitMode.RAIL);
+    transportMode.put("transportSubModes", null);
+
+    var env = envOf(map(entry("modes", map(entry("transportModes", list(transportMode))))));
+
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+
+    assertEquals(
+      "(filters: [(select: [(transportModes: [RAIL])])])",
       transitBuilder.build().toString()
     );
   }

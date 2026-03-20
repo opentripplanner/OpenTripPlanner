@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -45,7 +46,7 @@ public class LiipiHubsDownloader {
       return null;
     }
     try {
-      return otpHttpClient.getAndMap(URI.create(url), Map.of(), response -> {
+      return otpHttpClient.getAndMap(URI.create(url), HttpHeaders.empty(), response -> {
         try {
           return parseJSON(response.body());
         } catch (IllegalArgumentException e) {

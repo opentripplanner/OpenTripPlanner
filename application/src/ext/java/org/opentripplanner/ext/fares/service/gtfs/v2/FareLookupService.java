@@ -19,15 +19,12 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.utils.collection.SetUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The main part of the fare engine: it applies the leg and transfer rules to the transit legs.
  */
 class FareLookupService implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
   private final AreaMatcher areaMatcher;
@@ -41,7 +38,7 @@ class FareLookupService implements Serializable {
     Multimap<FeedScopedId, LocalDate> serviceDates
   ) {
     this.legRules = List.copyOf(legRules);
-    this.transferRules = stripWildcards(fareTransferRules);
+    this.transferRules = List.copyOf(fareTransferRules);
 
     var rulePriorityMatcher = new RulePriorityMatcher(legRules);
     this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
@@ -257,22 +254,6 @@ class FareLookupService implements Serializable {
       .stream()
       .filter(r -> r.legGroupId().equals(id))
       .toList();
-  }
-
-  private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {
-    return rules.stream().filter(FareLookupService::checkForWildcards).toList();
-  }
-
-  private static boolean checkForWildcards(FareTransferRule t) {
-    if (t.containsWildCard()) {
-      LOG.warn(
-        "Transfer rule {} contains a wildcard leg group reference. These are not supported yet.",
-        t
-      );
-      return false;
-    } else {
-      return true;
-    }
   }
 
   /**

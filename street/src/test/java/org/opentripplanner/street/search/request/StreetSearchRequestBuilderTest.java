@@ -1,11 +1,13 @@
 package org.opentripplanner.street.search.request;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.SCOOTER;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.search.TraverseMode;
@@ -25,5 +27,11 @@ class StreetSearchRequestBuilderTest {
         "Use rental availability for %s false, but should be true.".formatted(m)
       )
     );
+  }
+
+  @Test
+  void defaultTimeout() {
+    var orig = StreetSearchRequest.of().build();
+    assertEquals(Duration.ofSeconds(5), orig.timeout());
   }
 }

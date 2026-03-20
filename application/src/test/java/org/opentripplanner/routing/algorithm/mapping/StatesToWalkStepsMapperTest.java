@@ -89,10 +89,11 @@ class StatesToWalkStepsMapperTest {
         .streetEdge()
         .areaEdge("name", 10)
     );
-    assertEquals(3, walkSteps.size());
+    assertEquals(4, walkSteps.size());
     assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
     assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
     assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(3).getRelativeDirection());
   }
 
   @Test
@@ -117,6 +118,30 @@ class StatesToWalkStepsMapperTest {
     var exit = walkSteps.get(2);
     assertEquals(ENTRANCE_ID, exit.entrance().get().getId());
     assertEquals(EXIT_STATION, exit.getRelativeDirection());
+  }
+
+  @Test
+  void exitStationWithEntranceAsLastStep() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge("name", 1).entrance("name")
+    );
+    assertEquals(2, walkSteps.size());
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
+  }
+
+  @Test
+  void escalatorAndEntrance() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge("name", 1).escalatorEdgeAndStationEntrance()
+    );
+    assertEquals(3, walkSteps.size());
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(
+      EscalatorUse.class.getSimpleName(),
+      walkSteps.get(1).verticalTransportationUse().get().getClass().getSimpleName()
+    );
+    assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(2).getRelativeDirection());
   }
 
   @Test

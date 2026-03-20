@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
@@ -186,7 +186,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(createExtraJourney);
     assertEquals(0, result.successful());
-    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
+    assertFailure(UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
   @Test
@@ -251,7 +251,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     // TODO: this should have a more specific error type
-    assertFailure(UpdateError.UpdateErrorType.UNKNOWN, result);
+    assertFailure(UpdateErrorType.UNKNOWN, result);
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.opentripplanner.street.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.utils.lang.IntUtils;
 
@@ -65,23 +66,24 @@ public final class CompactLineStringUtils {
     if (lineString == null) {
       return null;
     }
-    if (lineString.getCoordinates().length == 2) {
+    if (lineString.getNumPoints() == 2) {
       return STRAIGHT_LINE_PACKED;
     }
     double x0 = reverse ? xb : xa;
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
-    Coordinate[] c = lineString.getCoordinates();
+    CoordinateSequence seq = lineString.getCoordinateSequence();
+    int n = seq.size();
     /*
      * Check if the lineString is really sticking to the given end-points. TODO: If this is not
      * guaranteed, store all delta (from 0 to n-1) -- but how to mark it? A prefix?
      */
     if (
-      Math.abs(x0 - c[0].x) > EPS ||
-      Math.abs(y0 - c[0].y) > EPS ||
-      Math.abs(x1 - c[c.length - 1].x) > EPS ||
-      Math.abs(y1 - c[c.length - 1].y) > EPS
+      Math.abs(x0 - seq.getX(0)) > EPS ||
+      Math.abs(y0 - seq.getY(0)) > EPS ||
+      Math.abs(x1 - seq.getX(n - 1)) > EPS ||
+      Math.abs(y1 - seq.getY(n - 1)) > EPS
     ) {
       throw new IllegalArgumentException(
         "CompactLineStringUtils geometry must stick to given end points. If you need to relax this, please read source code."
@@ -89,14 +91,14 @@ public final class CompactLineStringUtils {
     }
     int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
     int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
-    int[] coords = new int[(c.length - 2) * 2];
-    for (int i = 1; i < c.length - 1; i++) {
+    int[] coords = new int[(n - 2) * 2];
+    for (int i = 1; i < n - 1; i++) {
       /*
        * Note: We should do the rounding *before* the delta to prevent rounding errors from
        * accumulating on long line strings.
        */
-      int ix = IntUtils.round(c[i].x * FIXED_FLOAT_MULT);
-      int iy = IntUtils.round(c[i].y * FIXED_FLOAT_MULT);
+      int ix = IntUtils.round(seq.getX(i) * FIXED_FLOAT_MULT);
+      int iy = IntUtils.round(seq.getY(i) * FIXED_FLOAT_MULT);
       int dix = ix - oix;
       int diy = iy - oiy;
       coords[(i - 1) * 2] = dix;

@@ -4,8 +4,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.transit.model.framework.Result;
-import org.opentripplanner.updater.spi.UpdateError.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateErrorType;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.lang.StringUtils;
 import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri21.CallStatusEnumeration;
@@ -27,17 +27,17 @@ import uk.org.siri.siri21.StopPointRefStructure;
 public interface CallWrapper {
   /**
    * Parse and validate all calls from an {@link EstimatedVehicleJourney}. Each call must have a
-   * non-empty stop point ref and exactly one of Order or VisitNumber. All calls must use the same
-   * strategy (all Order or all VisitNumber). The returned list is sorted by sort order.
+   * non-empty stop point ref and at least one of Order or VisitNumber (Order is preferred when both
+   * are present). All calls must use the same strategy (all Order or all VisitNumber). The returned
+   * list is sorted by sort order.
    *
    * @return a successful sorted list of calls, or a failure with the appropriate error type
    */
-  static Result<List<CallWrapper>, UpdateErrorType> of(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
+  static List<CallWrapper> of(EstimatedVehicleJourney estimatedVehicleJourney)
+    throws UpdateException {
     List<CallWrapper> result = new ArrayList<>();
-    boolean hasOrderCalls = false;
-    boolean hasVisitNumberCalls = false;
+    boolean hasCallWithOrder = false;
+    boolean hasCallWithoutOrder = false;
 
     if (estimatedVehicleJourney.getRecordedCalls() != null) {
       for (var call : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
@@ -46,12 +46,10 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        if (sortOrder.isFailure()) {
-          return sortOrder.toFailureResult();
-        }
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
-        result.add(new RecordedCallWrapper(call, sortOrder.successValue()));
+        var hasOrder = call.getOrder() != null;
+        hasCallWithOrder |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
+        result.add(new RecordedCallWrapper(call, sortOrder));
       }
     }
 
@@ -62,46 +60,37 @@ public interface CallWrapper {
           call.getOrder(),
           call.getVisitNumber()
         );
-        if (sortOrder.isFailure()) {
-          return sortOrder.toFailureResult();
-        }
-        hasOrderCalls |= call.getOrder() != null;
-        hasVisitNumberCalls |= call.getVisitNumber() != null;
-        result.add(new EstimatedCallWrapper(call, sortOrder.successValue()));
+        var hasOrder = call.getOrder() != null;
+        hasCallWithOrder |= hasOrder;
+        hasCallWithoutOrder |= !hasOrder;
+        result.add(new EstimatedCallWrapper(call, sortOrder));
       }
     }
 
-    // we reject messages that contain both Order and VisitNumber since we do not see any obvious
-    // use case that requires both, and making them mutually exclusive make the implementation
-    // simpler. We can relax this validation rule later if valid use cases are identified.
-    if (hasOrderCalls && hasVisitNumberCalls) {
-      return Result.failure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
+    if (hasCallWithOrder && hasCallWithoutOrder) {
+      throw UpdateException.of(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
 
     result.sort(Comparator.comparingInt(CallWrapper::getSortOrder));
-
-    return Result.success(List.copyOf(result));
+    return List.copyOf(result);
   }
 
   /**
    * Validate a single call's stop point ref and resolve its sort order from Order/VisitNumber.
    */
-  private static Result<Integer, UpdateErrorType> validateCall(
+  private static int validateCall(
     StopPointRefStructure stopPointRef,
     java.math.BigInteger order,
     java.math.BigInteger visitNumber
-  ) {
+  ) throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
     if (StringUtils.hasNoValueOrNullAsString(ref)) {
-      return Result.failure(UpdateErrorType.EMPTY_STOP_POINT_REF);
+      throw UpdateException.of(UpdateErrorType.EMPTY_STOP_POINT_REF);
     }
     if (order == null && visitNumber == null) {
-      return Result.failure(UpdateErrorType.MISSING_CALL_ORDER);
+      throw UpdateException.of(UpdateErrorType.MISSING_CALL_ORDER);
     }
-    if (order != null && visitNumber != null) {
-      return Result.failure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
-    }
-    return Result.success(order != null ? order.intValueExact() : visitNumber.intValueExact());
+    return order != null ? order.intValueExact() : visitNumber.intValueExact();
   }
 
   String getStopPointRef();

@@ -33,6 +33,7 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
@@ -183,6 +184,15 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  static StopConnectivityModule provideStopConnectivityModule(
+    Graph graph,
+    DataImportIssueStore issueStore
+  ) {
+    return new StopConnectivityModule(graph, issueStore);
+  }
+
+  @Provides
+  @Singleton
   static PruneIslands providePruneIslands(
     BuildConfig config,
     Graph graph,
@@ -260,9 +270,7 @@ public class GraphBuilderModules {
       timetableRepository,
       transferRepository,
       issueStore,
-      config.maxTransferDuration,
-      config.transferRequests,
-      config.transferParametersForMode
+      config.regularTransferParameters()
     );
   }
 
@@ -280,7 +288,7 @@ public class GraphBuilderModules {
       linker,
       timetableRepository,
       issueStore,
-      config.maxTransferDuration.toSeconds() * WalkPreferences.DEFAULT.speed()
+      config.regularTransferParameters().maxDuration().toSeconds() * WalkPreferences.DEFAULT.speed()
     );
   }
 

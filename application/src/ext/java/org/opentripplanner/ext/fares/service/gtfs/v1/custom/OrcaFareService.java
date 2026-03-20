@@ -542,7 +542,6 @@ public class OrcaFareService extends DefaultFareService {
           "ORCA Fare",
           additionalFareRequired.isPositive() ? additionalFareRequired : Money.ZERO_USD
         )
-          .withValidity(Duration.ofHours(2))
           .withCategory(riderCategory)
           .withMedium(ELECTRONIC_MEDIUM)
           .build();
@@ -559,7 +558,6 @@ public class OrcaFareService extends DefaultFareService {
             "ORCA Fare",
             legFare
           )
-            .withValidity(Duration.ofHours(2))
             .withCategory(riderCategory)
             .withMedium(ELECTRONIC_MEDIUM)
             .build();

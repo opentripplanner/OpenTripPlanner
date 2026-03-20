@@ -1,8 +1,10 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class TransitStopVertexBuilder {
@@ -25,6 +27,11 @@ public class TransitStopVertexBuilder {
 
   public TransitStopVertexBuilder withPoint(Point coordinates) {
     this.coordinate = coordinates;
+    return this;
+  }
+
+  public TransitStopVertexBuilder withCoordinate(double lat, double lon) {
+    this.coordinate = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
     return this;
   }
 

@@ -25,7 +25,6 @@ class OverlappingTimeframeTest implements PlanTestConstants, FareTestConstants {
     var it = TestItinerary.of(leg).build();
     var result = buildService(leg.serviceDate()).calculateFares(it);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.offersForLeg(leg)).containsExactly(
       FareOffer.of(leg.startTime(), FARE_PRODUCT_A),
       FareOffer.of(leg.startTime(), FARE_PRODUCT_B)

@@ -1,11 +1,11 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_MONITORED;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import java.time.LocalDate;
@@ -14,7 +14,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -25,6 +24,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
@@ -101,7 +101,8 @@ public class SiriRealTimeTripUpdateAdapter {
       return UpdateResult.empty();
     }
 
-    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
+    List<UpdateSuccess> successes = new ArrayList<>();
+    List<UpdateError> errors = new ArrayList<>();
 
     if (incrementality == FULL_DATASET) {
       // Remove all updates from the buffer
@@ -113,31 +114,31 @@ public class SiriRealTimeTripUpdateAdapter {
         var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
-          results.add(apply(journey, transitEditorService, fuzzyTripMatcher, entityResolver));
+          try {
+            successes.add(apply(journey, transitEditorService, fuzzyTripMatcher, entityResolver));
+          } catch (UpdateException e) {
+            errors.add(e.toError(journey.getDataSource()));
+          }
         }
       }
     }
 
     LOG.debug("message contains {} trip updates", updates.size());
 
-    return UpdateResult.ofResults(results);
+    return UpdateResult.of(successes, errors);
   }
 
-  private Result<UpdateSuccess, UpdateError> apply(
+  private UpdateSuccess apply(
     EstimatedVehicleJourney journey,
     TransitEditorService transitService,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
-  ) {
-    var callsResult = CallWrapper.of(journey);
-    if (callsResult.isFailure()) {
-      return UpdateError.result(null, callsResult.failureValue(), journey.getDataSource());
-    }
-    List<CallWrapper> calls = callsResult.successValue();
+  ) throws UpdateException {
+    List<CallWrapper> calls = CallWrapper.of(journey);
     SiriUpdateType siriUpdateType = null;
     try {
       siriUpdateType = updateType(journey, calls, entityResolver);
-      Result<TripUpdate, UpdateError> result = switch (siriUpdateType) {
+      TripUpdate result = switch (siriUpdateType) {
         case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
           journey,
           transitService,
@@ -150,17 +151,15 @@ public class SiriRealTimeTripUpdateAdapter {
         case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journey, calls);
       };
 
-      if (result.isFailure()) {
-        return result.toFailureResult();
-      }
-
       /* commit */
-      return addTripToGraphAndBuffer(result.successValue());
+      return addTripToGraphAndBuffer(result);
+    } catch (UpdateException e) {
+      throw e;
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e, journey.getDataSource());
+      throw DataValidationExceptionMapper.map(e);
     } catch (Exception e) {
       LOG.warn("{} EstimatedJourney {} failed.", siriUpdateType, DebugString.of(journey), e);
-      return Result.failure(UpdateError.noTripId(UNKNOWN));
+      throw UpdateException.noTripId(UNKNOWN);
     }
   }
 
@@ -195,14 +194,13 @@ public class SiriRealTimeTripUpdateAdapter {
     return snapshotManager.resolve(tripPattern, serviceDate);
   }
 
-  private Result<TripUpdate, UpdateError> handleModifiedTrip(
+  private TripUpdate handleModifiedTrip(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     EstimatedVehicleJourney estimatedVehicleJourney,
     List<CallWrapper> calls
-  ) {
+  ) throws UpdateException {
     Trip trip = entityResolver.resolveTrip(estimatedVehicleJourney);
-    String dataSource = estimatedVehicleJourney.getDataSource();
 
     // Check if EstimatedVehicleJourney is reported as NOT monitored, ignore the notMonitored-flag
     // if the journey is NOT monitored because it has been cancelled
@@ -210,13 +208,13 @@ public class SiriRealTimeTripUpdateAdapter {
       !TRUE.equals(estimatedVehicleJourney.isMonitored()) &&
       !TRUE.equals(estimatedVehicleJourney.isCancellation())
     ) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED, dataSource);
+      throw UpdateException.of(trip != null ? trip.getId() : null, NOT_MONITORED);
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     if (serviceDate == null) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NO_START_DATE, dataSource);
+      throw UpdateException.of(trip != null ? trip.getId() : null, NO_START_DATE);
     }
 
     TripPattern pattern;
@@ -226,36 +224,26 @@ public class SiriRealTimeTripUpdateAdapter {
       pattern = transitEditorService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
-      var result = fuzzyTripMatcher.match(
+      var tripAndPattern = fuzzyTripMatcher.match(
         estimatedVehicleJourney,
         calls,
         entityResolver,
         this::getCurrentTimetable,
         snapshotManager::getNewTripPatternForModifiedTrip
       );
-
-      if (result.isFailure()) {
-        LOG.debug(
-          "No trips found for EstimatedVehicleJourney. {}",
-          DebugString.of(estimatedVehicleJourney)
-        );
-        return UpdateError.result(null, result.failureValue(), dataSource);
-      }
-
-      var tripAndPattern = result.successValue();
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, TRIP_NOT_FOUND, dataSource);
+      throw UpdateException.of(null, TRIP_NOT_FOUND);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
-      return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN, dataSource);
+      throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
-    var updateResult = new ModifiedTripBuilder(
+    var tripUpdate = new ModifiedTripBuilder(
       existingTripTimes,
       pattern,
       estimatedVehicleJourney,
@@ -264,28 +252,21 @@ public class SiriRealTimeTripUpdateAdapter {
       entityResolver,
       calls
     ).build();
-    if (updateResult.isFailure()) {
-      return updateResult.toFailureResult();
-    }
 
-    TripPattern deleteFrom = !updateResult
-        .successValue()
-        .stopPattern()
-        .equals(pattern.getStopPattern())
+    TripPattern deleteFrom = !tripUpdate.stopPattern().equals(pattern.getStopPattern())
       ? pattern
       : null;
 
-    return updateResult.mapSuccess(tu -> tu.withHideTripInScheduledPattern(deleteFrom));
+    return tripUpdate.withHideTripInScheduledPattern(deleteFrom);
   }
 
-  private Result<TripUpdate, UpdateError> handleExtraCall(
+  private TripUpdate handleExtraCall(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     EstimatedVehicleJourney estimatedVehicleJourney,
     List<CallWrapper> calls
-  ) {
+  ) throws UpdateException {
     Trip trip = entityResolver.resolveTrip(estimatedVehicleJourney);
-    String dataSource = estimatedVehicleJourney.getDataSource();
 
     // Check if EstimatedVehicleJourney is reported as NOT monitored, ignore the notMonitored-flag
     // if the journey is NOT monitored because it has been cancelled
@@ -293,13 +274,13 @@ public class SiriRealTimeTripUpdateAdapter {
       !TRUE.equals(estimatedVehicleJourney.isMonitored()) &&
       !TRUE.equals(estimatedVehicleJourney.isCancellation())
     ) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED, dataSource);
+      throw UpdateException.of(trip != null ? trip.getId() : null, NOT_MONITORED);
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     if (serviceDate == null) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NO_START_DATE, dataSource);
+      throw UpdateException.of(trip != null ? trip.getId() : null, NO_START_DATE);
     }
 
     TripPattern pattern;
@@ -309,7 +290,7 @@ public class SiriRealTimeTripUpdateAdapter {
       pattern = transitEditorService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
-      var result = fuzzyTripMatcher.match(
+      var tripAndPattern = fuzzyTripMatcher.match(
         estimatedVehicleJourney,
         calls,
         entityResolver,
@@ -317,28 +298,19 @@ public class SiriRealTimeTripUpdateAdapter {
         snapshotManager::getNewTripPatternForModifiedTrip
       );
 
-      if (result.isFailure()) {
-        LOG.debug(
-          "No trips found for EstimatedVehicleJourney. {}",
-          DebugString.of(estimatedVehicleJourney)
-        );
-        return UpdateError.result(null, result.failureValue(), dataSource);
-      }
-
-      var tripAndPattern = result.successValue();
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, TRIP_NOT_FOUND, dataSource);
+      throw UpdateException.of(null, TRIP_NOT_FOUND);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
-      return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN, dataSource);
+      throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
-    var updateResult = new ExtraCallTripBuilder(
+    var tripUpdate = new ExtraCallTripBuilder(
       estimatedVehicleJourney,
       transitEditorService,
       deduplicator,
@@ -347,24 +319,18 @@ public class SiriRealTimeTripUpdateAdapter {
       trip,
       calls
     ).build();
-    if (updateResult.isFailure()) {
-      return updateResult.toFailureResult();
-    }
 
-    TripPattern deleteFrom = !updateResult
-        .successValue()
-        .stopPattern()
-        .equals(pattern.getStopPattern())
+    TripPattern deleteFrom = !tripUpdate.stopPattern().equals(pattern.getStopPattern())
       ? pattern
       : null;
 
-    return updateResult.mapSuccess(tu -> tu.withHideTripInScheduledPattern(deleteFrom));
+    return tripUpdate.withHideTripInScheduledPattern(deleteFrom);
   }
 
   /**
    * Add a (new) trip to the timetableRepository and the buffer
    */
-  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(TripUpdate tripUpdate) {
+  private UpdateSuccess addTripToGraphAndBuffer(TripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();
     LocalDate serviceDate = tripUpdate.serviceDate();
 

@@ -24,6 +24,7 @@ public class ItineraryFare {
    * <p>
    * Note: LinkedHashSet keeps the insertion order
    */
+  @Deprecated
   private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
 
   /**
@@ -54,6 +55,7 @@ public class ItineraryFare {
   /**
    * Add fare products that cover the entire itinerary, i.e. are valid for all legs.
    */
+  @Deprecated
   public void addItineraryProducts(Collection<FareProduct> products) {
     itineraryProducts.addAll(products);
   }

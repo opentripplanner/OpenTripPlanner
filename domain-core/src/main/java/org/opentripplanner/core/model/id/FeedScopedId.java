@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -22,9 +23,20 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
   private final String id;
 
-  public FeedScopedId(String feedId, String id) {
+  /// @throws IllegalArgumentException if the feedId or id is empty
+  public FeedScopedId(String feedId, String id) throws IllegalArgumentException {
     this.feedId = assertHasValue(feedId, "Missing mandatory feedId on FeedScopeId");
     this.id = assertHasValue(id, "Missing mandatory id on FeedScopeId");
+  }
+
+  /// Create a FeedScopedId
+  ///
+  /// @return Optional.empty if the feedId or id is empty, otherwise a FeedScopedId
+  public static Optional<FeedScopedId> ofOptional(String feedId, String id) {
+    if (feedId.isBlank() || id.isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.of(new FeedScopedId(feedId, id));
   }
 
   /**
@@ -36,13 +48,40 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return id == null || id.isBlank() ? null : new FeedScopedId(feedId, id);
   }
 
-  /**
-   * Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
-   *
-   * @param value id of the form "feedId:entityId"
-   * @return an id object
-   * @throws IllegalArgumentException if the id cannot be parsed
-   */
+  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
+  ///
+  /// @param value id of the form "feedId:entityId"
+  /// @return Optional.empty if the value is not a valid FeedScopedId
+  public static Optional<FeedScopedId> parseOptional(String value) {
+    int index = value.indexOf(ID_SEPARATOR);
+    if (index == -1) {
+      return Optional.empty();
+    }
+
+    var feedId = value.substring(0, index);
+    var id = value.substring(index + 1);
+    if (feedId.isBlank() || id.isBlank()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(new FeedScopedId(feedId, id));
+  }
+
+  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
+  ///
+  /// @param value id of the form "feedId:entityId"
+  /// @throws IllegalArgumentException if the input is not a valid FeedScopedId
+  public static FeedScopedId parseStrict(String value) throws IllegalArgumentException {
+    return parseOptional(value).orElseThrow(() -> new IllegalArgumentException("Invalid FeedScopedId: " + value));
+  }
+
+  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
+  ///
+  /// @param value id of the form "feedId:entityId"
+  /// @return an id object or null if the input is empty or null
+  /// @throws IllegalArgumentException if the id cannot be parsed
+  /// @deprecated Use [FeedScopedId#parseOptional] or [FeedScopedId#parseStrict] instead
+  @Deprecated
   @Nullable
   public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
     if (StringUtils.hasNoValue(value)) {
