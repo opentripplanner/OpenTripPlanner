@@ -47,10 +47,6 @@ public class ReplacementHelper {
     this.timetableSnapshot = timetableSnapshot;
   }
 
-  public static boolean isReplacementExtendedType(int extendedType) {
-    return REPLACEMENT_EXTENDED_TYPES.contains(extendedType);
-  }
-
   public Collection<ReplacedByRelation> getReplacedBy(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
     var replacedBy = timetableRepository.getReplacedByTripOnServiceDate(id);
@@ -70,21 +66,24 @@ public class ReplacementHelper {
     return tripOnServiceDate.getReplacementFor().stream().map(ReplacementForRelation::new).toList();
   }
 
-  private static boolean submodeIsReplacement(SubMode submode) {
+  private static boolean isReplacementGtfsType(@Nullable Integer gtfsType) {
+    return gtfsType != null && REPLACEMENT_EXTENDED_TYPES.contains(gtfsType);
+  }
+
+  private static boolean isReplacementSubmode(SubMode submode) {
     return submode.toString().toLowerCase().contains("replacement");
   }
 
-  private static boolean isReplacementGtfsType(Route route) {
-    var type = route.getGtfsType();
-    return type != null && REPLACEMENT_EXTENDED_TYPES.contains(type);
+  public static boolean isReplacement(SubMode submode, @Nullable Integer gtfsType) {
+    return isReplacementSubmode(submode) || isReplacementGtfsType(gtfsType);
   }
 
   public static boolean isReplacementRoute(Route route) {
-    return isReplacementGtfsType(route) || submodeIsReplacement(route.getNetexSubmode());
+    return isReplacement(route.getNetexSubmode(), route.getGtfsType());
   }
 
   public static boolean isReplacementTrip(Trip trip) {
-    return isReplacementGtfsType(trip.getRoute()) || submodeIsReplacement(trip.getNetexSubMode());
+    return isReplacement(trip.getNetexSubMode(), trip.getRoute().getGtfsType());
   }
 
   public boolean isReplacementTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
