@@ -7,6 +7,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 - Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
 - Cleanup regular transfer build parameters [#7425](https://github.com/opentripplanner/OpenTripPlanner/pull/7425)
+- Add CostlyAssertions feature that should be turned off in production and improve performance of via routing with coordinates [#7301](https://github.com/opentripplanner/OpenTripPlanner/pull/7301)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
