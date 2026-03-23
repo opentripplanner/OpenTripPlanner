@@ -3,8 +3,8 @@ package org.opentripplanner.raptor._data.stoparrival;
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 
 class Transit extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {

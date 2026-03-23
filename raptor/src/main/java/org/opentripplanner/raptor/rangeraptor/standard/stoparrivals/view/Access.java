@@ -2,12 +2,12 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
 import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 
-import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 final class Access<T extends RaptorTripSchedule>

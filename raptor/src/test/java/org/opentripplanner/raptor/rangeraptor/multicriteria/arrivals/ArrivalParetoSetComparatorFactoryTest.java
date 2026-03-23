@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
-import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.api.view.PathLegType;
 
 class ArrivalParetoSetComparatorFactoryTest {
 
