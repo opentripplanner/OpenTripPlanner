@@ -2,6 +2,7 @@ package org.opentripplanner.raptorlegacy._data.transit;
 
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 
+import java.util.List;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.model.TimeAndCost;
@@ -109,16 +110,18 @@ public class TestAccessEgress {
 
     RoutingAccessEgress build() {
       var stopId = "Stop:" + stop;
-      var lastState = new State(
-        new StreetLocation(stopId, Coordinates.BOSTON, I18NString.of(stopId)),
-        StreetSearchRequest.of().build()
+      var lastStates = List.of(
+        new State(
+          new StreetLocation(stopId, Coordinates.BOSTON, I18NString.of(stopId)),
+          StreetSearchRequest.of().build()
+        )
       );
       return new DefaultAccessEgress(
         stop,
         durationInSeconds,
         generalizedCost,
         TimeAndCost.ZERO,
-        lastState
+        lastStates
       ) {
         // TODO - Use the domain type FlexAccessEgressAdapter here instead [if numberOfRides > 0]
         @Override

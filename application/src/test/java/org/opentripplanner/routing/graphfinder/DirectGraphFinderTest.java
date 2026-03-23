@@ -36,8 +36,8 @@ class DirectGraphFinderTest extends GraphRoutingTest {
 
   @Test
   void findClosestStops() {
-    var ns1 = new NearbyStop(siteRepository.getRegularStop(S1.getId()), 0, null, null);
-    var ns2 = new NearbyStop(siteRepository.getRegularStop(S2.getId()), 1112, null, null);
+    var ns1 = new NearbyStop(siteRepository.getRegularStop(S1.getId()), 0, List.of(), List.of());
+    var ns2 = new NearbyStop(siteRepository.getRegularStop(S2.getId()), 1112, List.of(), List.of());
 
     var subject = new DirectGraphFinder(siteRepository::findRegularStops);
     var coordinate = new Coordinate(19.000, 47.500);

@@ -96,7 +96,7 @@ class ClosestTripTest {
   private static Collection<ClosestTrip> closestTrips(Matcher<Trip> matcher) {
     return ClosestTrip.of(
       ADAPTER,
-      List.of(new NearbyStop(STOP, 100, List.of(), null)),
+      List.of(new NearbyStop(STOP, 100, List.of(), List.of())),
       matcher,
       List.of(FSD),
       true

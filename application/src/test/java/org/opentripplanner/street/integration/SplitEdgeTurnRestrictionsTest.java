@@ -179,7 +179,7 @@ public class SplitEdgeTurnRestrictionsTest {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var gpf = new GraphPathFinder(null);
-      var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
+      var path = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
       GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
         new NoopSiteResolver(),
@@ -189,21 +189,19 @@ public class SplitEdgeTurnRestrictionsTest {
         graph.ellipsoidToGeoidDifference
       );
 
-      var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
+      var itinerary = graphPathToItineraryMapper.mapToItinerary(path, request).get();
 
       // make sure that we only get CAR legs
-      itineraries.forEach(i ->
-        i
-          .legs()
-          .forEach(l -> {
-            if (l instanceof StreetLeg stLeg) {
-              assertEquals(TraverseMode.CAR, stLeg.getMode());
-            } else {
-              fail("Expected StreetLeg (CAR): " + l);
-            }
-          })
-      );
-      Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
+      itinerary
+        .legs()
+        .forEach(l -> {
+          if (l instanceof StreetLeg stLeg) {
+            assertEquals(TraverseMode.CAR, stLeg.getMode());
+          } else {
+            fail("Expected StreetLeg (CAR): " + l);
+          }
+        });
+      Geometry geometry = itinerary.legs().getFirst().legGeometry();
       return EncodedPolyline.of(geometry).points();
     }
   }

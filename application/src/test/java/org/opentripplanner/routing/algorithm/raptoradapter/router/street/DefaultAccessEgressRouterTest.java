@@ -28,7 +28,7 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
-class AccessEgressRouterTest extends GraphRoutingTest {
+class DefaultAccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
   private TimetableRepository timetableRepository;
@@ -229,7 +229,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     if (nearbyStop.edges.isEmpty()) {
       return "direct[" + nearbyStop.stop.getName() + "]";
     } else {
-      return "street[" + stateDescription(nearbyStop.state) + "]";
+      return "street" + nearbyStop.lastStates.stream().map(this::stateDescription).toList();
     }
   }
 
@@ -272,16 +272,18 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
 
-      return new AccessEgressRouter(
+      return new DefaultAccessEgressRouter(
         new SiteRepositoryResolver(timetableRepository.getSiteRepository())
       ).findAccessEgresses(
         request,
         StreetMode.WALK,
+        null,
         List.of(),
         accessEgress,
         durationLimit,
         maxStopCount,
-        linkingContext
+        linkingContext,
+        30
       );
     }
   }

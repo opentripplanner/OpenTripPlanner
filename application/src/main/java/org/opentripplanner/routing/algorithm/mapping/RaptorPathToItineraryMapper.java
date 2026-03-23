@@ -357,7 +357,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return mapTransferLeg(pathLeg, dftTx.transfer(), transferMode, from, to);
     }
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
-      return mapViaCoordinateTransferLeg(pathLeg, viaTx, transferMode, from, to);
+      return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
     throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
   }
@@ -410,10 +410,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private List<Leg> mapViaCoordinateTransferLeg(
     PathLeg<T> pathLeg,
-    ViaCoordinateTransfer transfer,
-    TraverseMode transferMode,
-    Place from,
-    Place to
+    ViaCoordinateTransfer transfer
   ) {
     var fromLegs = mapTransferLegWithEdges(pathLeg.fromTime(), transfer.fromEdges());
     var toLegs = mapTransferLegWithEdges(pathLeg.toTime(), transfer.toEdges());
@@ -497,12 +494,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapAccessEgressPathLeg(RaptorAccessEgress accessEgress) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
-      .map(RoutingAccessEgress::getLastState)
-      .map(GraphPath::new)
-      .map(path -> graphPathToItineraryMapper.generateItinerary(path, request))
-      .orElseThrow();
+    var routingAccessEgress = accessEgress.findOriginal(RoutingAccessEgress.class).orElseThrow();
+    var paths = routingAccessEgress.getLastStates().stream().map(GraphPath::new).toList();
+    return graphPathToItineraryMapper.generateItinerary(paths, request);
   }
 
   private TimeAndCost mapAccessEgressPenalty(RaptorAccessEgress accessEgress) {

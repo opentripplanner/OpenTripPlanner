@@ -2,10 +2,10 @@ package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -63,16 +63,16 @@ class WalkRoutingTest {
     var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     var base = DATE_TIME.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
-    var forwardResults = route(roundabout, start, end, time, false);
-    assertEquals(1, forwardResults.size());
-    var forwardStates = forwardResults.getFirst().states;
+    var forwardResult = route(roundabout, start, end, time, false);
+    assertNotNull(forwardResult);
+    var forwardStates = forwardResult.states;
     var forwardDiff = ChronoUnit.MILLIS.between(
       forwardStates.getFirst().getTimeAccurate(),
       forwardStates.getLast().getTimeAccurate()
     );
-    var backwardResults = route(roundabout, start, end, time, true);
-    assertEquals(1, backwardResults.size());
-    var backwardStates = forwardResults.getFirst().states;
+    var backwardResult = route(roundabout, start, end, time, true);
+    assertNotNull(backwardResult);
+    var backwardStates = backwardResult.states;
     var backwardDiff = ChronoUnit.MILLIS.between(
       backwardStates.getFirst().getTimeAccurate(),
       backwardStates.getLast().getTimeAccurate()
@@ -83,7 +83,7 @@ class WalkRoutingTest {
     assertEquals(expected, backwardDiff);
   }
 
-  private static List<GraphPath<State, Edge, Vertex>> route(
+  private static GraphPath<State, Edge, Vertex> route(
     Graph graph,
     GenericLocation from,
     GenericLocation to,

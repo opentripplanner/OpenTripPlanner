@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Default implementation of the RaptorAccessEgress interface.
@@ -20,9 +22,11 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   private final TimeAndCost penalty;
 
   /**
-   * This should be the last state both in the case of access and egress.
+   * For access, this is a list of states starting from origin to the access stop split at via
+   * locations visited inside the access. For egress, this is a list starting at the egress stop
+   * ending at the destination split at the via locations visited inside the egress.
    */
-  private final State lastState;
+  private final List<State> lastStates;
 
   /**
    * This is public to allow unit-tests full control over the field values.
@@ -32,24 +36,30 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     int durationInSeconds,
     int generalizedCost,
     TimeAndCost penalty,
-    State lastState
+    List<State> lastStates
   ) {
     this.stop = stop;
     this.durationInSeconds = durationInSeconds;
     this.generalizedCost = generalizedCost;
     this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
     this.penalty = penalty;
-    this.lastState = Objects.requireNonNull(lastState);
+    this.lastStates = ListUtils.requireAtLeastNElements(lastStates, 1);
+  }
+
+  public DefaultAccessEgress(int stop, List<State> lastStates) {
+    this(
+      stop,
+      (int) lastStates.stream().mapToLong(State::getElapsedTimeSeconds).reduce(0, Long::sum),
+      RaptorCostConverter.toRaptorCost(
+        lastStates.stream().mapToDouble(State::getWeight).reduce(0, Double::sum)
+      ),
+      TimeAndCost.ZERO,
+      lastStates
+    );
   }
 
   public DefaultAccessEgress(int stop, State lastState) {
-    this(
-      stop,
-      (int) lastState.getElapsedTimeSeconds(),
-      RaptorCostConverter.toRaptorCost(lastState.getWeight()),
-      TimeAndCost.ZERO,
-      lastState
-    );
+    this(stop, List.of(Objects.requireNonNull(lastState)));
   }
 
   protected DefaultAccessEgress(RoutingAccessEgress other, TimeAndCost penalty) {
@@ -61,7 +71,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
       other.durationInSeconds(),
       other.c1() + penalty.cost().toCentiSeconds(),
       penalty,
-      other.getLastState()
+      other.getLastStates()
     );
     if (other.penalty() != TimeAndCost.ZERO) {
       throw new IllegalStateException("Can not add penalty twice...");
@@ -94,13 +104,13 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   }
 
   @Override
-  public State getLastState() {
-    return lastState;
+  public List<State> getLastStates() {
+    return lastStates;
   }
 
   @Override
   public boolean isWalkOnly() {
-    return lastState.containsOnlyWalkMode();
+    return lastStates.stream().allMatch(State::containsOnlyWalkMode);
   }
 
   @Override
@@ -126,6 +136,11 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
     return requestedArrivalTime;
+  }
+
+  @Override
+  public int numberOfViaLocationsVisited() {
+    return Math.max(0, lastStates.size() - 1);
   }
 
   @Override

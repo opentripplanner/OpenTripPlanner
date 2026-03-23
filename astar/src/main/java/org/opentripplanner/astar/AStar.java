@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.astar.model.BinHeap;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -18,6 +18,7 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.utils.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,14 +96,14 @@ public class AStar<
     return spt;
   }
 
-  List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
+  Optional<GraphPath<State, Edge, Vertex>> getPathToTarget() {
     runSearch();
 
-    return targetAcceptedStates
-      .stream()
-      .filter(State::isFinal)
-      .map(GraphPath::new)
-      .collect(Collectors.toList());
+    var finalStates = targetAcceptedStates.stream().filter(State::isFinal).toList();
+    if (finalStates.size() > 1) {
+      LOG.warn("Found multiple paths when one was expected.");
+    }
+    return finalStates.stream().map(GraphPath::new).min(new PathComparator(arriveBy));
   }
 
   private boolean iterate() {

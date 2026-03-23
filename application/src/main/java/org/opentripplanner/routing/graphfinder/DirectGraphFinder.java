@@ -41,7 +41,7 @@ public class DirectGraphFinder implements GraphFinder {
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );
       if (distance < radiusMeters) {
-        NearbyStop sd = new NearbyStop(it, distance, null, null);
+        NearbyStop sd = new NearbyStop(it, distance, List.of(), List.of());
         stopsFound.add(sd);
       }
     }
