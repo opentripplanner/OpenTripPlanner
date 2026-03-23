@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * so we need to generate
  */
 
-public final class TransferPointForPatternFactory {
+final class TransferPointForPatternFactory {
 
   /** private constructor to prevent utility class from instantiation */
   private TransferPointForPatternFactory() {
@@ -29,7 +29,7 @@ public final class TransferPointForPatternFactory {
     return new StationSP(station);
   }
 
-  public static TransferPointMatcher createTransferPointForPattern(int stopIndex) {
+  static TransferPointMatcher createTransferPointForPattern(int stopIndex) {
     return new StopSP(stopIndex);
   }
 
