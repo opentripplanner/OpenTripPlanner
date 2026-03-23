@@ -2,6 +2,7 @@ package org.opentripplanner.ext.httpresponsetimemetrics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsFilter.CLIENT_TAG;
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
 
 /**
  * Note: The unit tests relies on mocks to abstract out the micrometer API (request and response objects).
@@ -90,8 +92,65 @@ class HttpResponseTimeMetricsFilterTest {
     assertTimerCount("app1", GTFS_ENDPOINT, 1);
   }
 
+  @Test
+  void recordsQueueWaitTimeWhenPresent() {
+    long queueWaitNanos = Duration.ofMillis(50).toNanos();
+    recordRequestWithQueueWait("app1", TRANSMODEL_ENDPOINT, queueWaitNanos);
+
+    var queueTimer = findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT);
+    assertNotNull(queueTimer, "Queue wait timer should exist");
+    assertEquals(1, queueTimer.count());
+  }
+
+  @Test
+  void doesNotRecordQueueWaitTimeWhenAbsent() {
+    recordRequest("app1", TRANSMODEL_ENDPOINT);
+
+    var queueTimer = findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT);
+    assertNotNull(queueTimer, "Queue wait timer should be pre-created");
+    assertEquals(0, queueTimer.count());
+  }
+
+  @Test
+  void requestToUnmonitoredEndpointConsumesQueueWaitThreadLocal() {
+    // Simulate a queue wait value left by GrizzlyQueueWaitProbe on the current thread
+    var probe = new GrizzlyQueueWaitProbe();
+    Runnable task = () -> {};
+    probe.onTaskQueueEvent(null, task);
+    probe.onTaskDequeueEvent(null, task);
+
+    // Send a request to an unmonitored endpoint — the filter should return early
+    // but still consume the ThreadLocal to prevent it leaking to the next request
+    var requestContext = mock(ContainerRequestContext.class);
+    var uriInfo = mock(UriInfo.class);
+    when(uriInfo.getRequestUri()).thenReturn(URI.create("/unmonitored/path"));
+    when(requestContext.getUriInfo()).thenReturn(uriInfo);
+
+    filter.filter(requestContext);
+
+    // The ThreadLocal must be cleared
+    assertNull(
+      GrizzlyQueueWaitProbe.getAndClearQueueWaitNanos(),
+      "Queue wait ThreadLocal should be consumed even for unmonitored endpoints"
+    );
+  }
+
+  @Test
+  void queueWaitTimersArePreCreatedAtStartup() {
+    assertNotNull(findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT));
+    assertNotNull(findQueueWaitTimer("other", TRANSMODEL_ENDPOINT));
+  }
+
   private Timer findTimer(String client, String endpoint) {
     return registry.find(METRIC_NAME).tag(CLIENT_TAG, client).tag(URI_TAG, endpoint).timer();
+  }
+
+  private Timer findQueueWaitTimer(String client, String endpoint) {
+    return registry
+      .find(METRIC_NAME + ".queueWait")
+      .tag(CLIENT_TAG, client)
+      .tag(URI_TAG, endpoint)
+      .timer();
   }
 
   private void assertTimerCount(String client, String endpoint, long expectedCount) {
@@ -104,6 +163,10 @@ class HttpResponseTimeMetricsFilterTest {
   }
 
   private void recordRequest(String clientName, String endpoint) {
+    recordRequestWithQueueWait(clientName, endpoint, null);
+  }
+
+  private void recordRequestWithQueueWait(String clientName, String endpoint, Long queueWaitNanos) {
     var requestContext = mock(ContainerRequestContext.class);
     var responseContext = mock(ContainerResponseContext.class);
     var uriInfo = mock(UriInfo.class);
@@ -115,6 +178,7 @@ class HttpResponseTimeMetricsFilterTest {
 
     when(requestContext.getProperty("metrics.startTime")).thenReturn(System.nanoTime());
     when(requestContext.getProperty("metrics.endpoint")).thenReturn(endpoint);
+    when(requestContext.getProperty("metrics.queueWaitNanos")).thenReturn(queueWaitNanos);
     when(requestContext.getHeaderString(CLIENT_HEADER)).thenReturn(clientName);
 
     filter.filter(requestContext, responseContext);

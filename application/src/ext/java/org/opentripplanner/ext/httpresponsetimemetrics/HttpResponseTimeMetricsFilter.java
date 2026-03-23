@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
 
 /**
  * A Jersey filter that records HTTP request response times with client identification.
@@ -27,6 +28,9 @@ import javax.annotation.Nullable;
  * <p>
  * The metric {@code http.client.requests} is recorded as a Timer with percentile histograms,
  * allowing analysis of response time distribution per client.
+ * <p>
+ * A second set of timers records the time each request spent waiting in the Grizzly thread pool
+ * queue before a worker thread picked it up. This is captured via {@link GrizzlyQueueWaitProbe}.
  * <p>
  * All timers are pre-created at startup for each combination of monitored client and endpoint
  * to ensure predictable metric cardinality.
@@ -39,12 +43,14 @@ public class HttpResponseTimeMetricsFilter
 
   private static final String START_TIME_PROPERTY = "metrics.startTime";
   private static final String ENDPOINT_PROPERTY = "metrics.endpoint";
+  private static final String QUEUE_WAIT_PROPERTY = "metrics.queueWaitNanos";
   private static final String OTHER_CLIENT = "other";
 
   private final String clientHeader;
   private final Set<String> monitoredClients;
   private final Set<String> monitoredEndpoints;
   private final Map<TimerKey, Timer> timers;
+  private final Map<TimerKey, Timer> queueWaitTimers;
 
   private record TimerKey(String client, String endpoint) {}
 
@@ -76,8 +82,16 @@ public class HttpResponseTimeMetricsFilter
     this.monitoredEndpoints = Set.copyOf(monitoredEndpoints);
     this.timers = createTimers(
       metricName,
+      "HTTP request response time by client",
       Objects.requireNonNull(minExpectedResponseTime),
       Objects.requireNonNull(maxExpectedResponseTime),
+      registry
+    );
+    this.queueWaitTimers = createTimers(
+      metricName + ".queueWait",
+      "Time spent waiting in the Grizzly thread pool queue by client",
+      Duration.ofNanos(100),
+      Duration.ofSeconds(5),
       registry
     );
   }
@@ -113,6 +127,7 @@ public class HttpResponseTimeMetricsFilter
 
   private Map<TimerKey, Timer> createTimers(
     String metricName,
+    String description,
     Duration minExpectedResponseTime,
     Duration maxExpectedResponseTime,
     MeterRegistry registry
@@ -124,7 +139,7 @@ public class HttpResponseTimeMetricsFilter
       for (String endpoint : monitoredEndpoints) {
         var key = new TimerKey(client, endpoint);
         var timer = Timer.builder(metricName)
-          .description("HTTP request response time by client")
+          .description(description)
           .tag(CLIENT_TAG, client)
           .tag(URI_TAG, endpoint)
           .publishPercentileHistogram()
@@ -139,6 +154,8 @@ public class HttpResponseTimeMetricsFilter
 
   @Override
   public void filter(ContainerRequestContext requestContext) {
+    Long queueWaitNanos = GrizzlyQueueWaitProbe.getAndClearQueueWaitNanos();
+
     String path = getRequestPath(requestContext);
     String matchedEndpoint = findMatchingEndpoint(path);
     if (matchedEndpoint == null) {
@@ -146,6 +163,10 @@ public class HttpResponseTimeMetricsFilter
     }
     requestContext.setProperty(START_TIME_PROPERTY, System.nanoTime());
     requestContext.setProperty(ENDPOINT_PROPERTY, matchedEndpoint);
+
+    if (queueWaitNanos != null) {
+      requestContext.setProperty(QUEUE_WAIT_PROPERTY, queueWaitNanos);
+    }
   }
 
   @Nullable
@@ -175,11 +196,18 @@ public class HttpResponseTimeMetricsFilter
     String endpoint = (String) requestContext.getProperty(ENDPOINT_PROPERTY);
     String clientName = requestContext.getHeaderString(clientHeader);
     String clientTag = resolveClientTag(clientName);
+    var key = new TimerKey(clientTag, endpoint);
 
     long duration = System.nanoTime() - startTime;
 
-    Timer timer = timers.get(new TimerKey(clientTag, endpoint));
+    Timer timer = timers.get(key);
     timer.record(duration, TimeUnit.NANOSECONDS);
+
+    Long queueWaitNanos = (Long) requestContext.getProperty(QUEUE_WAIT_PROPERTY);
+    if (queueWaitNanos != null) {
+      Timer queueTimer = queueWaitTimers.get(key);
+      queueTimer.record(queueWaitNanos, TimeUnit.NANOSECONDS);
+    }
   }
 
   private String resolveClientTag(@Nullable String clientName) {
