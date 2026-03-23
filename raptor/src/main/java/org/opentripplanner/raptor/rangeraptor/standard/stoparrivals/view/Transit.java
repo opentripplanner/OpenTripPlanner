@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
-import org.opentripplanner.raptor.api.model.PathLegType;
+import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;

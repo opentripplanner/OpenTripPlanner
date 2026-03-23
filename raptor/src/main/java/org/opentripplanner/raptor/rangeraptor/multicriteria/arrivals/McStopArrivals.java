@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
 import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;

@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 
 import java.util.Iterator;
 import java.util.Objects;

@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
