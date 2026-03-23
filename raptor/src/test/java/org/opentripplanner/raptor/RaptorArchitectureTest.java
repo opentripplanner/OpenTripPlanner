@@ -29,6 +29,7 @@ public class RaptorArchitectureTest {
     RAPTOR_UTIL_COMPOSITE
   );
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
+  private static final Package RAPTOR_EXTENSIONS = RAPTOR.subPackage("extentions..");
   private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
   private static final Package SERVICE = RAPTOR.subPackage("service");
@@ -195,6 +196,7 @@ public class RaptorArchitectureTest {
       RAPTOR_API,
       RAPTOR_SPI,
       RAPTOR_UTIL,
+      RAPTOR_EXTENSIONS,
       CONFIGURE,
       RR_INTERNAL_API,
       RR_TRANSIT,
@@ -208,6 +210,7 @@ public class RaptorArchitectureTest {
       OTP_UTILS,
       RAPTOR_API,
       RAPTOR_SPI,
+      RAPTOR_EXTENSIONS,
       RANGE_RAPTOR,
       RR_INTERNAL_API,
       RR_TRANSIT,

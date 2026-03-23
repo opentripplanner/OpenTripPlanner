@@ -16,7 +16,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.direct.api.RaptorDirectTransitRequest;
+import org.opentripplanner.raptor.extentions.direct.api.RaptorDirectTransitRequest;
 
 /**
  * FEATURE UNDER TEST

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.direct.api;
+package org.opentripplanner.raptor.extentions.direct.api;
 
 import java.time.Duration;
 import java.util.ArrayList;

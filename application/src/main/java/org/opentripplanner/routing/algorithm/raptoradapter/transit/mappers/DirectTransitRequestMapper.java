@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.raptor.direct.api.RaptorDirectTransitRequest;
+import org.opentripplanner.raptor.extentions.direct.api.RaptorDirectTransitRequest;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgressWithExtraCost;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
