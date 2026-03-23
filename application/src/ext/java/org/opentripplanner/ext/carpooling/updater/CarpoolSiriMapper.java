@@ -30,7 +30,7 @@ public class CarpoolSiriMapper {
   private static final String FEED_ID = "ENT";
   private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
-  private static final int DEFAULT_AVAILABLE_SEATS = 2;
+  private static final int DEFAULT_AVAILABLE_SEATS = 5;
   private static final Duration DEFAULT_DEVIATION_BUDGET = Duration.ofMinutes(15);
   // INDEX is not relevant for our stop type. Also set index to a hard coded value to avoid
   // run-away memory use if it by error ends up in global repositories.

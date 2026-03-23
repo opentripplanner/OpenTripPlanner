@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.geometry.DirectionUtils;
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * analysis to handle routes that take detours (e.g., driving around a lake).
  * <p>
  */
-public class DirectionalCompatibilityFilter implements TripFilter {
+public class DirectionalCompatibilityFilter implements TripFilter, AccessEgressTripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(DirectionalCompatibilityFilter.class);
 
@@ -85,6 +87,27 @@ public class DirectionalCompatibilityFilter implements TripFilter {
     return false;
   }
 
+  @Override
+  public boolean acceptsAccessEgress(
+    CarpoolTrip trip,
+    WgsCoordinate coordinateOfPassenger,
+    Instant passengerDepartureTime,
+    Duration searchWindow
+  ) {
+    var tripStartCoordinate = trip.routePoints().getFirst().asJtsCoordinate();
+    var tripEndCoordinate = trip.routePoints().getLast().asJtsCoordinate();
+    var passengerCoordJts = coordinateOfPassenger.asJtsCoordinate();
+
+    var tripBearing = DirectionUtils.getAzimuth(tripStartCoordinate, tripEndCoordinate);
+    var startToPassengerBearing = DirectionUtils.getAzimuth(tripStartCoordinate, passengerCoordJts);
+    var endToPassengerBearing = DirectionUtils.getAzimuth(passengerCoordJts, tripEndCoordinate);
+
+    return (
+      bearingsAreWithinTolerance(tripBearing, startToPassengerBearing) &&
+      bearingsAreWithinTolerance(tripBearing, endToPassengerBearing)
+    );
+  }
+
   double getBearingToleranceDegrees() {
     return bearingToleranceDegrees;
   }
@@ -107,8 +130,11 @@ public class DirectionalCompatibilityFilter implements TripFilter {
       segmentEnd.asJtsCoordinate()
     );
 
-    double bearingDiff = DirectionUtils.bearingDifference(segmentBearing, passengerBearing);
+    return bearingsAreWithinTolerance(segmentBearing, passengerBearing);
+  }
 
+  private boolean bearingsAreWithinTolerance(double bearing1, double bearing2) {
+    double bearingDiff = DirectionUtils.bearingDifference(bearing1, bearing2);
     return bearingDiff <= bearingToleranceDegrees;
   }
 }

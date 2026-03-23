@@ -26,7 +26,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     assertEquals(Duration.ofMinutes(5), candidate.additionalDuration());
@@ -44,7 +45,8 @@ class InsertionCandidateTest {
       segments,
       Duration.ofMinutes(10),
       // Same as baseline
-      Duration.ofMinutes(10)
+      Duration.ofMinutes(10),
+      null
     );
 
     assertEquals(Duration.ZERO, candidate.additionalDuration());
@@ -63,7 +65,8 @@ class InsertionCandidateTest {
       // baseline
       Duration.ofMinutes(10),
       // total (8 min additional, within 10 min budget)
-      Duration.ofMinutes(18)
+      Duration.ofMinutes(18),
+      null
     );
 
     assertTrue(candidate.isWithinDeviationBudget());
@@ -82,7 +85,8 @@ class InsertionCandidateTest {
       // baseline
       Duration.ofMinutes(10),
       // total (10 min additional, exceeds 5 min budget)
-      Duration.ofMinutes(20)
+      Duration.ofMinutes(20),
+      null
     );
 
     assertFalse(candidate.isWithinDeviationBudget());
@@ -100,7 +104,8 @@ class InsertionCandidateTest {
       segments,
       Duration.ofMinutes(10),
       // Exactly 5 min additional
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     assertTrue(candidate.isWithinDeviationBudget());
@@ -117,7 +122,8 @@ class InsertionCandidateTest {
       4,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var pickupSegments = candidate.getPickupSegments();
@@ -137,7 +143,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var pickupSegments = candidate.getPickupSegments();
@@ -155,7 +162,8 @@ class InsertionCandidateTest {
       3,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var sharedSegments = candidate.getSharedSegments();
@@ -175,7 +183,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var sharedSegments = candidate.getSharedSegments();
@@ -193,7 +202,8 @@ class InsertionCandidateTest {
       3,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var dropoffSegments = candidate.getDropoffSegments();
@@ -213,7 +223,8 @@ class InsertionCandidateTest {
       3,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var dropoffSegments = candidate.getDropoffSegments();
@@ -231,7 +242,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15)
+      Duration.ofMinutes(15),
+      null
     );
 
     var str = candidate.toString();

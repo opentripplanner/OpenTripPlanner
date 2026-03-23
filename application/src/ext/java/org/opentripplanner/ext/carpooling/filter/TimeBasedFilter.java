@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * requested departure time. This prevents matching passengers with trips
  * that have already departed or won't depart for hours.
  */
-public class TimeBasedFilter implements TripFilter {
+public class TimeBasedFilter implements TripFilter, AccessEgressTripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimeBasedFilter.class);
 
@@ -53,5 +53,21 @@ public class TimeBasedFilter implements TripFilter {
     }
 
     return withinWindow;
+  }
+
+  @Override
+  public boolean acceptsAccessEgress(
+    CarpoolTrip trip,
+    WgsCoordinate coordinateOfPassenger,
+    Instant passengerDepartureTime,
+    Duration searchWindow
+  ) {
+    var earliestDepartureTime = trip.startTime().minus(searchWindow);
+    var latestDepartureTime = trip.endTime().plus(searchWindow);
+
+    return (
+      !passengerDepartureTime.isBefore(earliestDepartureTime.toInstant()) &&
+      !passengerDepartureTime.isAfter(latestDepartureTime.toInstant())
+    );
   }
 }
