@@ -10,6 +10,8 @@ import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
@@ -70,6 +72,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
   private final TransitService transitService;
+  private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -100,6 +103,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       graph.ellipsoidToGeoidDifference
     );
     this.transitService = transitService;
+    this.carpoolItineraryMapper = new CarpoolItineraryMapper(
+      transitService.getTimeZone(),
+      transitSearchTimeZero
+    );
   }
 
   public Itinerary createItinerary(RaptorPath<T> path) {
@@ -195,6 +202,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
     if (accessPathLeg.access().isFree()) {
       return List.of();
+    }
+
+    if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
+      return carpoolItineraryMapper
+        .toItinerary((CarpoolAccessEgress) accessPathLeg.access())
+        .legs();
     }
 
     var subItinerary = mapAccessEgressPathLeg(accessPathLeg.access());
@@ -353,6 +366,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
     if (isFree(egressPathLeg)) {
       return null;
+    }
+
+    if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) egressPathLeg.egress());
     }
 
     var subItinerary = mapAccessEgressPathLeg(egressPathLeg.egress());
