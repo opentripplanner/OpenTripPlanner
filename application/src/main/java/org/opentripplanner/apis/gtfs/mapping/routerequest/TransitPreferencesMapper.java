@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -40,6 +41,17 @@ public class TransitPreferencesMapper {
     var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
     if (transitArgs == null) {
       return;
+    }
+
+    var relax = transitArgs.getGraphQLRelaxTransitGroupPriority();
+    if (relax != null) {
+      var constant = relax.getGraphQLConstant();
+      var ratio = relax.getGraphQLRatio();
+      if (constant != null && ratio != null) {
+        transitPreferences.withRelaxTransitGroupPriority(
+          CostLinearFunction.of(relax.getGraphQLConstant(), relax.getGraphQLRatio())
+        );
+      }
     }
 
     var board = transitArgs.getGraphQLBoard();
