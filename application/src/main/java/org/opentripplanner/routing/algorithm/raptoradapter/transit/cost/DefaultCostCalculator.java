@@ -175,11 +175,13 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
     int cost = waitFactor * boardWaitTime;
 
-    cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
-
-    // If it's first boarding event then it is not a transfer
-    if (stopBoardAlightTransferCosts != null && !firstBoarding) {
-      cost += stopBoardAlightTransferCosts[boardStop];
+    if (firstBoarding) {
+      cost += boardCostOnly;
+    } else {
+      cost += boardAndTransferCost;
+      if (stopBoardAlightTransferCosts != null) {
+        cost += stopBoardAlightTransferCosts[boardStop];
+      }
     }
     return cost;
   }
