@@ -22,7 +22,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
-import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.extentions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;

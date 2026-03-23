@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
-import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.extentions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

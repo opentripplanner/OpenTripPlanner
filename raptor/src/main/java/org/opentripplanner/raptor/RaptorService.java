@@ -13,7 +13,7 @@ import org.opentripplanner.raptor.direct.configure.DirectTransitSearchFactory;
 import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
-import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.extentions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
