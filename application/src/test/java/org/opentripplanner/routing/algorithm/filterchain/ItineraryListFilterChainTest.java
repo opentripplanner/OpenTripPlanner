@@ -13,6 +13,7 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -262,6 +263,38 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
       .build();
     assertEquals(toStr(List.of(i4, i1)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
+  }
+
+  @Test
+  void departuresOnDifferentServiceDatesShouldNotBeGroupedTogether() {
+    final int TRIP_ID = 1;
+    final int D50_h = 50 * D1_h;
+    final int COST = 1000;
+
+    LocalDate date1 = TestItineraryBuilder.SERVICE_DAY;
+    LocalDate date2 = TestItineraryBuilder.SERVICE_DAY.plusDays(1);
+
+    // Same trip ID and stop positions, 50h journey, departing 24h apart on consecutive service
+    // dates. The time windows overlap (50h > 24h gap), but the filter chain should still not
+    // group these and flag any of them for deletion, because the 24h difference means they are
+    // different TripOnServiceDate. This situation commonly arises with multi-day ferry routes,
+    // such as the ones along the Norwegian cost.
+    var day1 = newItinerary(A).bus(TRIP_ID, T11_00, T11_00 + D50_h, B, date1).build(COST);
+    var day2 = newItinerary(A)
+      .bus(TRIP_ID, T11_00 + D24_h, T11_00 + D24_h + D50_h, B, date2)
+      .build(COST);
+
+    var chain = new ItineraryListFilterChainBuilder(STREET_AND_ARRIVAL_TIME)
+      .withMaxNumberOfItineraries(3)
+      .addGroupBySimilarity(
+        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(0.68, 3, true, 0.0)
+      )
+      .build();
+
+    chain.filter(List.of(day2, day1));
+
+    assertFalse(day1.isFlaggedForDeletion(), "Day-1 departure should not be filtered");
+    assertFalse(day2.isFlaggedForDeletion(), "Day-2 departure should not be filtered");
   }
 
   private ItineraryListFilterChainBuilder createBuilder(
