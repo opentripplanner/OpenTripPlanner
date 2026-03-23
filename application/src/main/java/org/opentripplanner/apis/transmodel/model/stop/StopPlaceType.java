@@ -40,6 +40,7 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -264,7 +265,9 @@ public class StopPlaceType {
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .flatMap(s -> s.getFareZones().stream())
-              .collect(Collectors.toSet())
+              .distinct()
+              .sorted(TransitEntity.idComparator())
+              .toList()
           )
           .build()
       )
