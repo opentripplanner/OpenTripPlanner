@@ -3,6 +3,7 @@ package org.opentripplanner.ext.httpresponsetimemetrics;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsFilter.CLIENT_TAG;
@@ -16,6 +17,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
@@ -93,22 +95,35 @@ class HttpResponseTimeMetricsFilterTest {
   }
 
   @Test
-  void recordsQueueWaitTimeWhenPresent() {
+  void totalTimeIncludesQueueWaitWhenPresent() {
     long queueWaitNanos = Duration.ofMillis(50).toNanos();
     recordRequestWithQueueWait("app1", TRANSMODEL_ENDPOINT, queueWaitNanos);
 
-    var queueTimer = findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT);
-    assertNotNull(queueTimer, "Queue wait timer should exist");
-    assertEquals(1, queueTimer.count());
+    var totalTimer = findTotalTimer("app1", TRANSMODEL_ENDPOINT);
+    assertNotNull(totalTimer, "Total timer should exist");
+    assertEquals(1, totalTimer.count());
+
+    var processingTimer = findTimer("app1", TRANSMODEL_ENDPOINT);
+    assertTrue(
+      totalTimer.totalTime(TimeUnit.NANOSECONDS) > processingTimer.totalTime(TimeUnit.NANOSECONDS),
+      "Total time should be greater than processing time when queue wait is present"
+    );
   }
 
   @Test
-  void doesNotRecordQueueWaitTimeWhenAbsent() {
+  void totalTimeEqualsProcessingTimeWhenNoQueueWait() {
     recordRequest("app1", TRANSMODEL_ENDPOINT);
 
-    var queueTimer = findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT);
-    assertNotNull(queueTimer, "Queue wait timer should be pre-created");
-    assertEquals(0, queueTimer.count());
+    var totalTimer = findTotalTimer("app1", TRANSMODEL_ENDPOINT);
+    assertNotNull(totalTimer, "Total timer should be pre-created");
+    assertEquals(1, totalTimer.count());
+
+    var processingTimer = findTimer("app1", TRANSMODEL_ENDPOINT);
+    assertEquals(
+      processingTimer.totalTime(TimeUnit.NANOSECONDS),
+      totalTimer.totalTime(TimeUnit.NANOSECONDS),
+      "Total time should equal processing time when no queue wait"
+    );
   }
 
   @Test
@@ -136,18 +151,18 @@ class HttpResponseTimeMetricsFilterTest {
   }
 
   @Test
-  void queueWaitTimersArePreCreatedAtStartup() {
-    assertNotNull(findQueueWaitTimer("app1", TRANSMODEL_ENDPOINT));
-    assertNotNull(findQueueWaitTimer("other", TRANSMODEL_ENDPOINT));
+  void totalTimersArePreCreatedAtStartup() {
+    assertNotNull(findTotalTimer("app1", TRANSMODEL_ENDPOINT));
+    assertNotNull(findTotalTimer("other", TRANSMODEL_ENDPOINT));
   }
 
   private Timer findTimer(String client, String endpoint) {
     return registry.find(METRIC_NAME).tag(CLIENT_TAG, client).tag(URI_TAG, endpoint).timer();
   }
 
-  private Timer findQueueWaitTimer(String client, String endpoint) {
+  private Timer findTotalTimer(String client, String endpoint) {
     return registry
-      .find(METRIC_NAME + ".queueWait")
+      .find(METRIC_NAME + "_total_time")
       .tag(CLIENT_TAG, client)
       .tag(URI_TAG, endpoint)
       .timer();

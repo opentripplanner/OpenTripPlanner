@@ -29,8 +29,9 @@ import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
  * The metric {@code http.client.requests} is recorded as a Timer with percentile histograms,
  * allowing analysis of response time distribution per client.
  * <p>
- * A second set of timers records the time each request spent waiting in the Grizzly thread pool
- * queue before a worker thread picked it up. This is captured via {@link GrizzlyQueueWaitProbe}.
+ * A second set of timers records the total client-perceived time, including any time spent waiting
+ * in the Grizzly thread pool queue before a worker thread picked up the request. The queue wait
+ * time is captured via {@link GrizzlyQueueWaitProbe}.
  * <p>
  * All timers are pre-created at startup for each combination of monitored client and endpoint
  * to ensure predictable metric cardinality.
@@ -50,7 +51,7 @@ public class HttpResponseTimeMetricsFilter
   private final Set<String> monitoredClients;
   private final Set<String> monitoredEndpoints;
   private final Map<TimerKey, Timer> timers;
-  private final Map<TimerKey, Timer> queueWaitTimers;
+  private final Map<TimerKey, Timer> totalTimers;
 
   private record TimerKey(String client, String endpoint) {}
 
@@ -87,11 +88,11 @@ public class HttpResponseTimeMetricsFilter
       Objects.requireNonNull(maxExpectedResponseTime),
       registry
     );
-    this.queueWaitTimers = createTimers(
-      metricName + ".queueWait",
-      "Time spent waiting in the Grizzly thread pool queue by client",
-      Duration.ofNanos(100),
-      Duration.ofSeconds(5),
+    this.totalTimers = createTimers(
+      metricName + "_total_time",
+      "Total client-perceived HTTP request time including thread pool queue wait",
+      Objects.requireNonNull(minExpectedResponseTime),
+      Objects.requireNonNull(maxExpectedResponseTime),
       registry
     );
   }
@@ -204,10 +205,8 @@ public class HttpResponseTimeMetricsFilter
     timer.record(duration, TimeUnit.NANOSECONDS);
 
     Long queueWaitNanos = (Long) requestContext.getProperty(QUEUE_WAIT_PROPERTY);
-    if (queueWaitNanos != null) {
-      Timer queueTimer = queueWaitTimers.get(key);
-      queueTimer.record(queueWaitNanos, TimeUnit.NANOSECONDS);
-    }
+    long totalDuration = duration + (queueWaitNanos != null ? queueWaitNanos : 0);
+    totalTimers.get(key).record(totalDuration, TimeUnit.NANOSECONDS);
   }
 
   private String resolveClientTag(@Nullable String clientName) {
