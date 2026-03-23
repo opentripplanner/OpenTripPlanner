@@ -11,6 +11,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Added carpooling as an access/egress mode [#7341](https://github.com/opentripplanner/OpenTripPlanner/pull/7341)
 -  Cache TransferIndexGenerator results to skip redundant regeneration [#7355](https://github.com/opentripplanner/OpenTripPlanner/pull/7355)
 - Improve compatibility with Swiss NeTEx data [#7427](https://github.com/opentripplanner/OpenTripPlanner/pull/7427)
+- fix: Introduce stable order for fareZones (tariffZones) [#7434](https://github.com/opentripplanner/OpenTripPlanner/pull/7434)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
