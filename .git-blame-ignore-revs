@@ -37,3 +37,6 @@ beeac076c0b9f0a8aaa1424ef1d6df3a6fa8f6ab
 
 # rename constant variables
 2f2ecfcb2f1b0f7b8c5f8f3d91a59bb941023f8b
+
+# use prettier to force lf line endings
+7bee4cbeebb91dea4bf438af44509573948e6a56

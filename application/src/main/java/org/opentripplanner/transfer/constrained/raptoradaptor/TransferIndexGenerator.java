@@ -40,6 +40,10 @@ public class TransferIndexGenerator {
   private final Map<Route, Set<RoutingTripPattern>> patternsByRoute = new HashMap<>();
   private final Map<Trip, Set<RoutingTripPattern>> patternsByTrip = new HashMap<>();
 
+  private boolean dirty = false;
+  private int prevProcessedNumberOfPatterns = 0;
+  private ConstrainedTransfersForPatterns cachedResult = null;
+
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
     Collection<TripPattern> tripPatterns
@@ -50,6 +54,11 @@ public class TransferIndexGenerator {
 
   public ConstrainedTransfersForPatterns generateTransfers() {
     int nPatterns = RoutingTripPattern.indexCounter();
+
+    if (isCacheValid(nPatterns)) {
+      return cachedResult;
+    }
+
     TransferForPatternByStopPos[] forwardTransfers = new TransferForPatternByStopPos[nPatterns];
     TransferForPatternByStopPos[] reverseTransfers = new TransferForPatternByStopPos[nPatterns];
 
@@ -81,9 +90,12 @@ public class TransferIndexGenerator {
     sortTransfers(forwardTransfers);
     sortTransfers(reverseTransfers);
 
-    return new ConstrainedTransfersForPatterns(
-      Arrays.asList(forwardTransfers),
-      Arrays.asList(reverseTransfers)
+    return cacheResult(
+      new ConstrainedTransfersForPatterns(
+        Arrays.asList(forwardTransfers),
+        Arrays.asList(reverseTransfers)
+      ),
+      nPatterns
     );
   }
 
@@ -92,7 +104,38 @@ public class TransferIndexGenerator {
    * to create constrained transfers for these patterns.
    */
   public void addRealtimeTrip(TripPattern tripPattern, List<Trip> trips) {
-    setupPattern(tripPattern, trips);
+    if (setupPattern(tripPattern, trips)) {
+      invalidateCache();
+    }
+  }
+
+  /**
+   * The cache is valid if it is not null, not dirty and no other component created new patterns.
+   * In theory all real-time pattern creations should be done through the TimetableSnapshot and would
+   * be detected by the dirty flag.
+   * But since the TripPattern builder is publicly accessible, there is no strong guarantee about this.
+   * The risk is IndexOutOfBoundsException: The cached ConstrainedTransfersForPatterns wraps arrays
+   * sized by the old nPatterns. If a new RoutingTripPattern is created (index = N), and routing tries
+   * result.toStop(N) on a cached array of size N, it throws IndexOutOfBoundsException.
+   * Hence, the additional check against the previous processed number of patterns.
+   *
+   */
+  private boolean isCacheValid(int nPatterns) {
+    return !dirty && nPatterns == prevProcessedNumberOfPatterns && cachedResult != null;
+  }
+
+  private void invalidateCache() {
+    dirty = true;
+  }
+
+  private ConstrainedTransfersForPatterns cacheResult(
+    ConstrainedTransfersForPatterns result,
+    int nPatterns
+  ) {
+    this.cachedResult = result;
+    this.dirty = false;
+    this.prevProcessedNumberOfPatterns = nPatterns;
+    return cachedResult;
   }
 
   /**
@@ -104,21 +147,29 @@ public class TransferIndexGenerator {
     }
   }
 
-  private void setupPattern(TripPattern tripPattern, List<Trip> trips) {
+  /**
+   * @return true if any new entries were added to the lookup maps, false if all entries already
+   * existed.
+   */
+  private boolean setupPattern(TripPattern tripPattern, List<Trip> trips) {
+    boolean added = false;
     RoutingTripPattern pattern = tripPattern.getRoutingTripPattern();
-    patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
+    added |= patternsByRoute
+      .computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>())
+      .add(pattern);
 
     for (Trip trip : trips) {
-      patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
+      added |= patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
     }
 
     for (StopLocation stop : tripPattern.getStops()) {
-      patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
+      added |= patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
       Station station = stop.getParentStation();
       if (station != null) {
-        patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
+        added |= patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
       }
     }
+    return added;
   }
 
   /** Sort trips in a TransferForPatternByStopPos, if it is not null */
