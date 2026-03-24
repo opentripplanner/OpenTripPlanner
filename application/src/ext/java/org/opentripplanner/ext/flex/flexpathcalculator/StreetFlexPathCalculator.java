@@ -14,7 +14,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -87,7 +86,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     return StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
-      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withDominanceFunction(new CarDominanceFunction())
       .withRequest(streetRequest)
       .withFrom(reverseDirection ? null : vertex)
       .withTo(reverseDirection ? vertex : null)
