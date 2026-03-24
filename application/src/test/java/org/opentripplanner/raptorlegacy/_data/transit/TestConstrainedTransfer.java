@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransferBoarding;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransferBoarding;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

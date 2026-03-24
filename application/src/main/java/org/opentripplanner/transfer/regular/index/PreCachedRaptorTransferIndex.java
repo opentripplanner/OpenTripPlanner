@@ -1,10 +1,12 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transfer.regular.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.Transfer;
 
 class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
 

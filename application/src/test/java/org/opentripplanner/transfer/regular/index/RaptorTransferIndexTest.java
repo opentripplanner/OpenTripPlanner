@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transfer.regular.index;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetMode.BIKE;
@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.Transfer;
 
 class RaptorTransferIndexTest {
 

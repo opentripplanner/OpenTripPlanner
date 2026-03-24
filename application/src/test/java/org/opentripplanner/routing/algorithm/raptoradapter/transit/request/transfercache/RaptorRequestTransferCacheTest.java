@@ -6,10 +6,10 @@ import static org.junit.Assert.assertNotEquals;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.model.Transfer;
 
 public class RaptorRequestTransferCacheTest {
 

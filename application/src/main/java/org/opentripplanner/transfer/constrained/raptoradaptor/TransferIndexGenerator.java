@@ -1,6 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
-
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
+package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,7 +203,7 @@ public class TransferIndexGenerator {
       return List.of();
     }
 
-    var sourcePoint = createTransferPointForPattern(station);
+    var sourcePoint = TransferPointForPatternFactory.createTransferPointForPattern(station);
     var result = new ArrayList<TPoint>();
 
     for (RoutingTripPattern pattern : patterns) {
@@ -227,7 +225,7 @@ public class TransferIndexGenerator {
       return List.of();
     }
 
-    var sourcePoint = createTransferPointForPattern(stop.getIndex());
+    var sourcePoint = TransferPointForPatternFactory.createTransferPointForPattern(stop.getIndex());
     var result = new ArrayList<TPoint>();
 
     for (RoutingTripPattern pattern : patterns) {
@@ -277,7 +275,10 @@ public class TransferIndexGenerator {
       // stopPosInPattern == -1 means stop is not on pattern
       if (stopPosInPattern >= 0) {
         int stopIndex = pattern.stopIndex(stopPosInPattern);
-        var sourcePoint = createTransferPointForPattern(route, stopIndex);
+        var sourcePoint = TransferPointForPatternFactory.createTransferPointForPattern(
+          route,
+          stopIndex
+        );
         points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
       }
     }
@@ -310,7 +311,7 @@ public class TransferIndexGenerator {
     int stopPosInPattern = point.getStopPositionInPattern();
     var scheduledPattern = scheduledPatterns.get(0);
     int stopIndex = scheduledPattern.stopIndex(stopPosInPattern);
-    var sourcePoint = createTransferPointForPattern(trip, stopIndex);
+    var sourcePoint = TransferPointForPatternFactory.createTransferPointForPattern(trip, stopIndex);
     TPoint scheduledPoint = new TPoint(scheduledPattern, sourcePoint, trip, stopPosInPattern);
 
     // Return early if only scheduled pattern exists
@@ -332,7 +333,10 @@ public class TransferIndexGenerator {
           res.add(
             new TPoint(
               pattern,
-              createTransferPointForPattern(trip, pattern.stopIndex(stopPosInPattern)),
+              TransferPointForPatternFactory.createTransferPointForPattern(
+                trip,
+                pattern.stopIndex(stopPosInPattern)
+              ),
               trip,
               stopPosInPattern
             )
