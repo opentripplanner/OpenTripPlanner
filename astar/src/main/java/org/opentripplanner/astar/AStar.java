@@ -34,7 +34,24 @@ public class AStar<
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-  private static final boolean VERBOSE = LOG.isDebugEnabled();
+  /**
+   * No-op visitor used when no visitor is provided, avoiding null checks in hot path
+   */
+  private static final TraverseVisitor NO_OP_VISITOR = new TraverseVisitor() {
+    @Override
+    public void visitEdge(AStarEdge edge) {}
+
+    @Override
+    public void visitVertex(AStarState state) {}
+
+    @Override
+    public void visitEnqueue() {}
+  };
+
+  /**
+   * No-op skip edge strategy used when no strategy is provided, avoiding null checks in hot path
+   */
+  private static final SkipEdgeStrategy NO_OP_SKIP_STRATEGY = (SkipEdgeStrategy) (_, _) -> false;
 
   private final boolean arriveBy;
   private final Set<Vertex> fromVertices;
@@ -53,6 +70,7 @@ public class AStar<
   private State u;
   private int nVisited;
 
+  @SuppressWarnings("unchecked")
   AStar(
     RemainingWeightHeuristic<State> heuristic,
     Runnable preSearchHook,
@@ -67,8 +85,9 @@ public class AStar<
     Collection<State> initialStates
   ) {
     this.heuristic = heuristic;
-    this.skipEdgeStrategy = skipEdgeStrategy;
-    this.traverseVisitor = traverseVisitor;
+    // Use no-op instances instead of null to avoid null checks in hot path
+    this.skipEdgeStrategy = Objects.requireNonNullElse(skipEdgeStrategy, NO_OP_SKIP_STRATEGY);
+    this.traverseVisitor = Objects.requireNonNullElse(traverseVisitor, NO_OP_VISITOR);
     this.fromVertices = fromVertices;
     this.toVertices = toVertices;
     this.arriveBy = arriveBy;
@@ -106,12 +125,6 @@ public class AStar<
   }
 
   private boolean iterate() {
-    // print debug info
-    if (VERBOSE) {
-      double w = pq.peek_min_key();
-      LOG.debug("pq min key = {}", w);
-    }
-
     // get the lowest-weight state in the queue
     u = pq.extract_min();
 
@@ -123,21 +136,15 @@ public class AStar<
       return false;
     }
 
-    if (traverseVisitor != null) {
-      traverseVisitor.visitVertex(u);
-    }
+    traverseVisitor.visitVertex(u);
 
     nVisited += 1;
 
     Vertex u_vertex = u.getVertex();
 
-    if (VERBOSE) {
-      LOG.debug("   vertex {}", u_vertex);
-    }
-
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
     for (Edge edge : edges) {
-      if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
+      if (skipEdgeStrategy.shouldSkipEdge(u, edge)) {
         continue;
       }
 
@@ -147,9 +154,7 @@ public class AStar<
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 
-        if (traverseVisitor != null) {
-          traverseVisitor.visitEdge(edge);
-        }
+        traverseVisitor.visitEdge(edge);
 
         double remaining_w = heuristic.estimateRemainingWeight(v);
 
@@ -158,24 +163,9 @@ public class AStar<
         }
         double estimate = v.getWeight() + remaining_w;
 
-        if (VERBOSE) {
-          LOG.debug("      edge {}", edge);
-          LOG.debug(
-            "      {} -> {}(w) + {}(heur) = {} vert = {}",
-            u.getWeight(),
-            v.getWeight(),
-            remaining_w,
-            estimate,
-            v.getVertex()
-          );
-        }
-
         // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
         if (spt.add(v)) {
-          // report to the visitor if there is one
-          if (traverseVisitor != null) {
-            traverseVisitor.visitEnqueue();
-          }
+          traverseVisitor.visitEnqueue();
           pq.insert(v, estimate);
         }
       }
