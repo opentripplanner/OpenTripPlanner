@@ -64,7 +64,9 @@ public class CallAtStopService {
       .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
       .flatMap(nearbyStop -> {
-        List<StopLocation> stopLocations = List.of(nearbyStop.stop);
+        List<StopLocation> stopLocations = List.of(
+          transitService.getStopLocation(nearbyStop.stopId)
+        );
         var calls1 = findCallsAtStop(stopLocations, params);
         return calls1.stream().map(tt -> tt.withWalkTime(nearbyStop.duration()));
       })

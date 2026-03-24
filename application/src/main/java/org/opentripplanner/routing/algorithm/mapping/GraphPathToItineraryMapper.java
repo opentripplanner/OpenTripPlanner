@@ -355,6 +355,8 @@ public class GraphPathToItineraryMapper {
 
     return FlexibleTransitLeg.of()
       .withFlexTripEdge(flexEdge)
+      .withFromStop(siteResolver.getStopLocation(flexEdge.fromStopId()))
+      .withToStop(siteResolver.getStopLocation(flexEdge.toStopId()))
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withGeneralizedCost(generalizedCost)

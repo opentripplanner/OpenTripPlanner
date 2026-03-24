@@ -102,7 +102,12 @@ class CallAtStopServiceTest {
       @Override
       public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
         return List.of(
-          new NearbyStop(STOP_A, 100, List.of(), TestStateBuilder.ofWalking().streetEdge().build())
+          new NearbyStop(
+            STOP_A.getId(),
+            100,
+            List.of(),
+            TestStateBuilder.ofWalking().streetEdge().build()
+          )
         );
       }
 

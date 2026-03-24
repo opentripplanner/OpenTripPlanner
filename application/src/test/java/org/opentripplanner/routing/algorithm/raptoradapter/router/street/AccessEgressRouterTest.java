@@ -10,7 +10,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -227,7 +226,11 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   private String nearbyStopDescription(NearbyStop nearbyStop) {
     if (nearbyStop.edges.isEmpty()) {
-      return "direct[" + nearbyStop.stop.getName() + "]";
+      return (
+        "direct[" +
+        timetableRepository.getSiteRepository().getStopLocation(nearbyStop.stopId).getName() +
+        "]"
+      );
     } else {
       return "street[" + stateDescription(nearbyStop.state) + "]";
     }
@@ -272,9 +275,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
 
-      return new AccessEgressRouter(
-        new SiteRepositoryResolver(timetableRepository.getSiteRepository())
-      ).findAccessEgresses(
+      return AccessEgressRouter.findAccessEgresses(
         request,
         StreetMode.WALK,
         List.of(),

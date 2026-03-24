@@ -10,10 +10,13 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexibleTransitLegBuilder {
 
   private FlexTripEdge flexTripEdge;
+  private StopLocation fromStop;
+  private StopLocation toStop;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private int generalizedCost;
@@ -25,6 +28,8 @@ public class FlexibleTransitLegBuilder {
 
   FlexibleTransitLegBuilder(FlexibleTransitLeg original) {
     flexTripEdge = original.flexTripEdge();
+    fromStop = original.fromStop();
+    toStop = original.toStop();
     startTime = original.startTime();
     endTime = original.endTime();
     generalizedCost = original.generalizedCost();
@@ -40,6 +45,24 @@ public class FlexibleTransitLegBuilder {
 
   public FlexTripEdge flexTripEdge() {
     return flexTripEdge;
+  }
+
+  public FlexibleTransitLegBuilder withFromStop(StopLocation stop) {
+    this.fromStop = stop;
+    return this;
+  }
+
+  public StopLocation fromStop() {
+    return fromStop;
+  }
+
+  public FlexibleTransitLegBuilder withToStop(StopLocation stop) {
+    this.toStop = stop;
+    return this;
+  }
+
+  public StopLocation toStop() {
+    return toStop;
   }
 
   public FlexibleTransitLegBuilder withStartTime(ZonedDateTime startTime) {

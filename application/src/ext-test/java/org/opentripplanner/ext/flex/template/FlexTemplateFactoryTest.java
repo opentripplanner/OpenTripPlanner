@@ -330,7 +330,7 @@ class FlexTemplateFactoryTest {
   private static NearbyStop nearbyStop(StopLocation transferPoint) {
     var id = "NearbyStop:" + transferPoint.getId().getId();
     return new NearbyStop(
-      transferPoint,
+      transferPoint.getId(),
       0,
       List.of(),
       new State(

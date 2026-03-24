@@ -17,7 +17,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -45,6 +44,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -65,7 +65,6 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContext linkingContext;
-  private final AccessEgressRouter accessEgressRouter;
   private final TransitServiceResolver transitServiceResolver;
   private final CarpoolingService carpoolingService;
 
@@ -88,7 +87,6 @@ public class TransitRouter {
     this.viaTransferResolver = serverContext.viaTransferResolver();
     this.linkingContext = linkingContext;
     this.transitServiceResolver = new TransitServiceResolver(serverContext.transitService());
-    this.accessEgressRouter = new AccessEgressRouter(this.transitServiceResolver);
     this.carpoolingService = carpoolingService;
   }
 
@@ -299,7 +297,7 @@ public class TransitRouter {
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
     int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
-    var nearbyStops = accessEgressRouter.findAccessEgresses(
+    var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
       streetRequest.mode(),
       serverContext.listExtensionRequestContexts(accessRequest),
@@ -308,7 +306,8 @@ public class TransitRouter {
       stopCountLimit,
       linkingContext
     );
-    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
+    var accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
+    var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops, type);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
     var results = new ArrayList<>(accessEgresses);
@@ -317,7 +316,6 @@ public class TransitRouter {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
-        accessEgressRouter,
         serverContext,
         additionalSearchDays,
         serverContext.flexParameters(),

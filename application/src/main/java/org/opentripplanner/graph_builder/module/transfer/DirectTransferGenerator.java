@@ -16,8 +16,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
-import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
@@ -245,10 +243,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      final StopResolver stopResolver = new SiteRepositoryResolver(
-        timetableRepository.getSiteRepository()
-      );
-      finder = StreetNearbyStopFinder.of(stopResolver, radiusAsDuration, 0).build();
+      finder = StreetNearbyStopFinder.of(radiusAsDuration, 0).build();
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
@@ -390,12 +385,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .defaultNearbyStopFinderForMode()
         .get(mode)
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+      var repository = timetableRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        if (sd.stop == stop) {
+        var nearbyStop = repository.getStopLocation(sd.stopId);
+        if (nearbyStop == stop) {
           continue;
         }
-        createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+        createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
       }
     }
   }
@@ -418,16 +415,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), true);
       // This code is for finding transfers from AreaStops to Stops, transfers
       // from Stops to AreaStops and between Stops are already covered above.
+      var repository = timetableRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        if (sd.stop == stop) {
+        var nearbyStop = repository.getStopLocation(sd.stopId);
+        if (nearbyStop == stop) {
           continue;
         }
-        if (sd.stop instanceof RegularStop) {
+        if (nearbyStop instanceof RegularStop) {
           continue;
         }
         // The TransferKey and PathTransfer are created differently for flex routing.
-        createPathTransfer(sd.stop, stop, sd, distinctTransfers, mode);
+        createPathTransfer(nearbyStop, stop, sd, distinctTransfers, mode);
       }
     }
   }
@@ -492,19 +491,21 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     var nearbyStops = nearbyStopFinder
       .get(mode)
       .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+    var repository = timetableRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
+      var nearbyStop = repository.getStopLocation(sd.stopId);
       // Skip the origin stop, loop transfers are not needed.
-      if (sd.stop == stop) {
+      if (nearbyStop == stop) {
         continue;
       }
-      if (sd.stop.transfersNotAllowed()) {
+      if (nearbyStop.transfersNotAllowed()) {
         continue;
       }
       // Only calculate transfers between allowedStops.
-      if (!allowedStops.contains(sd.stop)) {
+      if (!allowedStops.contains(nearbyStop)) {
         continue;
       }
-      createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+      createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
     }
   }
 

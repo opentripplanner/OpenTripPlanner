@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
@@ -38,6 +39,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class FlexibleTransitLeg implements TransitLeg {
 
   private final FlexTripEdge edge;
+
+  private final StopLocation fromStop;
+
+  private final StopLocation toStop;
 
   private final ZonedDateTime startTime;
 
@@ -53,6 +58,8 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   FlexibleTransitLeg(FlexibleTransitLegBuilder builder) {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
+    this.fromStop = Objects.requireNonNull(builder.fromStop());
+    this.toStop = Objects.requireNonNull(builder.toStop());
     this.startTime = TimeUtils.normalize(builder.startTime());
     this.endTime = TimeUtils.normalize(builder.endTime());
     this.generalizedCost = builder.generalizedCost();
@@ -150,12 +157,12 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Place from() {
-    return Place.forFlexStop(edge.s1(), edge.getFromVertex());
+    return Place.forFlexStop(fromStop, edge.getFromVertex());
   }
 
   @Override
   public Place to() {
-    return Place.forFlexStop(edge.s2(), edge.getToVertex());
+    return Place.forFlexStop(toStop, edge.getToVertex());
   }
 
   @Override
@@ -268,6 +275,14 @@ public class FlexibleTransitLeg implements TransitLeg {
       .addObj("pickupBookingInfo", pickupBookingInfo())
       .addObj("dropOffBookingInfo", dropOffBookingInfo())
       .toString();
+  }
+
+  StopLocation fromStop() {
+    return fromStop;
+  }
+
+  StopLocation toStop() {
+    return toStop;
   }
 
   FlexTripEdge flexTripEdge() {

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graphfinder;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Interface for resolving stops and entrances by ID.
@@ -12,5 +13,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
  */
 public interface SiteResolver extends EntranceResolver {
   RegularStop getStop(FeedScopedId id);
+  StopLocation getStopLocation(FeedScopedId id);
   Entrance getEntrance(FeedScopedId id);
 }

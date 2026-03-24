@@ -49,7 +49,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
     Set<NearbyStop> uniqueStopsResult = new HashSet<>();
 
     for (var it : nearbyStops) {
-      StopLocation stop = it.stop;
+      StopLocation stop = transitService.getStopLocation(it.stopId);
 
       if (stop instanceof RegularStop regularStop) {
         var patternsForStop = findPatternsForStop(regularStop, reverseDirection);

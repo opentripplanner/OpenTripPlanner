@@ -4,30 +4,21 @@ import static org.opentripplanner.routing.graphfinder.NearbyStop.ofZeroDistance;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
-import org.opentripplanner.transit.model.site.RegularStop;
 
 public class NearbyStopFactory {
-
-  private final StopResolver stopResolver;
-
-  public NearbyStopFactory(StopResolver stopResolver) {
-    this.stopResolver = Objects.requireNonNull(stopResolver);
-  }
 
   /**
    * Create zero distance NearbyStops given a list of TransitStopVertices
    */
-  public List<NearbyStop> nearbyStopsForTransitStopVertices(
+  public static List<NearbyStop> nearbyStopsForTransitStopVertices(
     Set<TransitStopVertex> stopVertices,
     boolean reverseDirection,
     RouteRequest routeRequest,
@@ -44,7 +35,7 @@ public class NearbyStopFactory {
 
     return stopVertices
       .stream()
-      .map(s -> ofZeroDistance(stop(s.getId()), new State(s, streetSearchRequest)))
+      .map(s -> ofZeroDistance(s.getId(), new State(s, streetSearchRequest)))
       .toList();
   }
 
@@ -52,7 +43,7 @@ public class NearbyStopFactory {
    * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops
    * for them.
    */
-  public List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
+  public static List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
     Collection<? extends Vertex> vertices,
     boolean reverseDirection,
     RouteRequest routeRequest,
@@ -65,9 +56,5 @@ public class NearbyStopFactory {
       .collect(Collectors.toSet());
 
     return nearbyStopsForTransitStopVertices(transitStops, reverseDirection, routeRequest, mode);
-  }
-
-  private RegularStop stop(FeedScopedId id) {
-    return Objects.requireNonNull(stopResolver.getStop(id));
   }
 }

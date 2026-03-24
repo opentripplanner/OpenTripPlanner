@@ -32,10 +32,13 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
 
   private final NearbyStopFinder delegateNearbyStopFinder;
 
+  private final TransitService transitService;
+
   public PatternConsideringNearbyStopFinder(
     TransitService transitService,
     NearbyStopFinder delegateNearbyStopFinder
   ) {
+    this.transitService = transitService;
     var builder = CompositeNearbyStopFilter.of().add(new PatternNearbyStopFilter(transitService));
 
     if (OTPFeature.FlexRouting.isOn()) {
@@ -80,12 +83,10 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     return List.copyOf(result);
   }
 
-  private static Collection<NearbyStop> removeTransferNotAllowedStops(
-    Collection<NearbyStop> nearbyStops
-  ) {
+  private Collection<NearbyStop> removeTransferNotAllowedStops(Collection<NearbyStop> nearbyStops) {
     return nearbyStops
       .stream()
-      .filter(s -> !s.stop.transfersNotAllowed())
+      .filter(s -> !transitService.getStopLocation(s.stopId).transfersNotAllowed())
       .toList();
   }
 }

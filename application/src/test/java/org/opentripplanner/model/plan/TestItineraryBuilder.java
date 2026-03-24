@@ -245,8 +245,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     var edge = new FlexTripEdge(
       fromv,
       tov,
-      lastPlace.stop,
-      to.stop,
+      lastPlace.stop.getId(),
+      to.stop.getId(),
       flexTrip,
       fromStopPos,
       toStopPos,
@@ -256,6 +256,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     FlexibleTransitLeg leg = FlexibleTransitLeg.of()
       .withFlexTripEdge(edge)
+      .withFromStop(lastPlace.stop)
+      .withToStop(to.stop)
       .withStartTime(newTime(start))
       .withEndTime(newTime(end))
       .withGeneralizedCost(legCost)

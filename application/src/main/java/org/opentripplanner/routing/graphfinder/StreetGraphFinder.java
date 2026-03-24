@@ -29,16 +29,14 @@ import org.opentripplanner.transit.service.TransitService;
 public class StreetGraphFinder implements GraphFinder {
 
   private final LinkingContextFactory linkingContextFactory;
-  private final StopResolver stopResolver;
 
-  public StreetGraphFinder(LinkingContextFactory linkingContextFactory, StopResolver stopResolver) {
+  public StreetGraphFinder(LinkingContextFactory linkingContextFactory) {
     this.linkingContextFactory = linkingContextFactory;
-    this.stopResolver = stopResolver;
   }
 
   @Override
   public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
-    StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(stopResolver, radiusMeters);
+    StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
     findClosestUsingStreets(
       coordinate.getY(),
       coordinate.getX(),

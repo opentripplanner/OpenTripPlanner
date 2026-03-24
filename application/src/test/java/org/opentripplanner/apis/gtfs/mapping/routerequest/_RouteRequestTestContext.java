@@ -83,7 +83,6 @@ class _RouteRequestTestContext {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(
         graph.hasStreets,
-        transitService::getRegularStop,
         transitService::findRegularStopsByBoundingBox,
         linkingContextFactory
       ),

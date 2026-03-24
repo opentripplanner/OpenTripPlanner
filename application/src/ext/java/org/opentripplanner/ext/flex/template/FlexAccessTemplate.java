@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.template;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -69,7 +70,7 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
     );
   }
 
-  protected FlexTripEdge getFlexEdge(Vertex flexToVertex, StopLocation transferStop) {
+  protected FlexTripEdge getFlexEdge(Vertex flexToVertex, FeedScopedId transferStopId) {
     var flexPath = calculator.calculateFlexPath(
       accessEgress.state.getVertex(),
       flexToVertex,
@@ -84,8 +85,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
     return new FlexTripEdge(
       accessEgress.state.getVertex(),
       flexToVertex,
-      accessEgress.stop,
-      transferStop,
+      accessEgress.stopId,
+      transferStopId,
       trip,
       boardStopPosition,
       alightStopPosition,

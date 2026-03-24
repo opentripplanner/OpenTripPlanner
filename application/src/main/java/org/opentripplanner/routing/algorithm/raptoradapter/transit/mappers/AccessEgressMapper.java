@@ -10,11 +10,18 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccess
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AccessEgressMapper {
 
-  public static List<RoutingAccessEgress> mapNearbyStops(
+  private final TransitServiceResolver resolver;
+
+  public AccessEgressMapper(TransitServiceResolver resolver) {
+    this.resolver = resolver;
+  }
+
+  public List<RoutingAccessEgress> mapNearbyStops(
     Collection<NearbyStop> accessStops,
     AccessEgressType accessOrEgress
   ) {
@@ -35,16 +42,17 @@ public class AccessEgressMapper {
       .collect(Collectors.toList());
   }
 
-  private static RoutingAccessEgress mapNearbyStop(
+  private RoutingAccessEgress mapNearbyStop(
     NearbyStop nearbyStop,
     AccessEgressType accessOrEgress
   ) {
-    if (!(nearbyStop.stop instanceof RegularStop)) {
+    var stop = resolver.getStopLocation(nearbyStop.stopId);
+    if (!(stop instanceof RegularStop)) {
       return null;
     }
 
     return new DefaultAccessEgress(
-      nearbyStop.stop.getIndex(),
+      stop.getIndex(),
       accessOrEgress.isEgress() ? nearbyStop.state.reverse() : nearbyStop.state
     );
   }

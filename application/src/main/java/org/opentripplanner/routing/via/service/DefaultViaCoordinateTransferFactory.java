@@ -7,7 +7,6 @@ import java.util.List;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -57,8 +56,8 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
         transfers.add(
           new ViaCoordinateTransfer(
             coordinate,
-            from.stop.getIndex(),
-            to.stop.getIndex(),
+            transitService.getStopLocation(from.stopId).getIndex(),
+            transitService.getStopLocation(to.stopId).getIndex(),
             from.edges,
             to.edges,
             (int) (from.state.getElapsedTimeSeconds() + to.state.getElapsedTimeSeconds()),
@@ -78,11 +77,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     if (!graph.hasStreets) {
       return new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
-      return StreetNearbyStopFinder.of(
-        new TransitServiceResolver(transitService),
-        radiusAsDuration,
-        0
-      ).build();
+      return StreetNearbyStopFinder.of(radiusAsDuration, 0).build();
     }
   }
 
@@ -99,7 +94,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     var r = finder.findNearbyStops(viaVertex, request, transferMode, reverseDirection);
     return r
       .stream()
-      .filter(it -> !it.stop.transfersNotAllowed())
+      .filter(it -> !transitService.getStopLocation(it.stopId).transfersNotAllowed())
       .toList();
   }
 }
