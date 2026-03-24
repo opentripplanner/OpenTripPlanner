@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
@@ -71,8 +70,8 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    return delegate.costEgress(egress);
+  public int costEgress(int stop, boolean egressHasRides) {
+    return delegate.costEgress(stop, egressHasRides);
   }
 
   /**

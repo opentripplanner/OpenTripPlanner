@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
@@ -81,7 +80,7 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    return delegate.costEgress(egress);
+  public int costEgress(int stop, boolean egressHasRides) {
+    return delegate.costEgress(stop, egressHasRides);
   }
 }

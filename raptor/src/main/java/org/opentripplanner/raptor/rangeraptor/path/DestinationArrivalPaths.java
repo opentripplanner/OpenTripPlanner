@@ -206,13 +206,17 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     int waitTimeInSeconds = Math.abs(departureTime - stopArrival.arrivalTime());
 
-    // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
-    // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
-    int additionalCost = 0;
+    int additionalCost;
 
+    // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
     if (costCalculator != null) {
+      additionalCost = egressPath.c1();
       additionalCost += costCalculator.waitCost(waitTimeInSeconds);
-      additionalCost += costCalculator.costEgress(egressPath);
+      additionalCost += costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
+    }
+    // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
+    else {
+      additionalCost = 0;
     }
 
     return new DestinationArrival<>(

@@ -615,7 +615,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var egressPath = asEgressLeg().streetPath;
 
-    final int egressCost = costCalculator.costEgress(egressPath);
+    final int egressCost =
+      egressPath.c1() + costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
 
     if (prev == null) {
       return egressCost;

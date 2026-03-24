@@ -102,16 +102,10 @@ public class DefaultCostCalculatorTest {
 
   @Test
   public void testCostEgressWithoutRides() {
-    // Should be transfer generalized cost minus stop transfer cost
-
-    var GENERALIZED_COST = 100;
-
     // transfer cost on stop index 0 is 0 - do not subtract anything
-    var t1 = TestAccessEgress.walk(0, 15, GENERALIZED_COST);
-    assertEquals(GENERALIZED_COST, subject.costEgress(t1));
-    // transfer cost on stop index 1 is 25 - subtract 25 from generalized cost
-    var t2 = TestAccessEgress.walk(1, 15, 100);
-    assertEquals(GENERALIZED_COST - 25, subject.costEgress(t2));
+    assertEquals(0, subject.costEgress(0, false));
+    // transfer cost on stop index 1 is 25, expect -25
+    assertEquals(-25, subject.costEgress(1, false));
   }
 
   @Test
@@ -119,9 +113,9 @@ public class DefaultCostCalculatorTest {
     // Should be generalized cost plus transfer cost
 
     var GENERALIZED_COST = 100;
-    var DESIRED_COST = GENERALIZED_COST + RaptorCostConverter.toRaptorCost(TRANSFER_COST_SEC);
+    var DESIRED_COST = RaptorCostConverter.toRaptorCost(TRANSFER_COST_SEC);
 
     var egress = TestAccessEgress.flex(0, 15, 1, GENERALIZED_COST);
-    assertEquals(DESIRED_COST, subject.costEgress(egress));
+    assertEquals(DESIRED_COST, subject.costEgress(egress.stop(), egress.hasRides()));
   }
 }

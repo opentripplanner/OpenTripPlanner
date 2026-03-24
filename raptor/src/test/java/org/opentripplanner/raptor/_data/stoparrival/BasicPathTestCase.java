@@ -87,8 +87,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   private static final int BOARD_C1_SEC = 60;
   private static final int TRANSFER_C1_SEC = 120;
-  private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
-  public static final int TRANSIT_RELUCTANCE_INDEX = 0;
   public static final double WAIT_RELUCTANCE = 0.8;
   private static final int C2 = 7;
 
@@ -129,7 +127,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int TX_DURATION = TX_END - TX_START;
   public static final RaptorTransfer TX_TRANSFER = TestTransfer.transfer(STOP_C, TX_DURATION);
   public static final int TX_C1 = TX_TRANSFER.c1();
-  public static final int TX_C3 = 3;
 
   // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
   public static final int L21_START = time("11:00");
@@ -219,12 +216,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   public static final int TOTAL_C1 =
     ACCESS_C1 + LINE_11_C1 + TX_C1 + LINE_21_C1 + LINE_31_C1 + EGRESS_C1;
-
-  /** Wait time between trip L11 and L21 including slack */
-  public static final int WAIT_TIME_L11_L21 = L21_START - L11_END - TX_DURATION;
-
-  /** Wait time between trip L21 and L31 including slack */
-  public static final int WAIT_TIME_L21_L31 = L31_START - L21_END;
 
   public static WorkerLifeCycle lifeCycle() {
     return new LifeCycleSubscriptions();

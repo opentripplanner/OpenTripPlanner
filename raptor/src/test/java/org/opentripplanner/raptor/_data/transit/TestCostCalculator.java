@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor._data.transit;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
@@ -118,17 +117,17 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    if (egress.hasRides()) {
-      return egress.c1() + transferCost;
+  public int costEgress(int stop, boolean hasRides) {
+    if (hasRides) {
+      return transferCost;
     } else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
-      return egress.c1() - stopBoardAlightTransferCosts[egress.stop()];
+      return -stopBoardAlightTransferCosts[stop];
     } else {
-      return egress.c1();
+      return 0;
     }
   }
 

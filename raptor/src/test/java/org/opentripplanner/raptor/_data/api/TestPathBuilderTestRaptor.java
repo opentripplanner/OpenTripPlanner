@@ -46,7 +46,9 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       STOP_B
     );
 
-    int accessEgressCost = C1_CALCULATOR.costEgress(walk(STOP_B, D2_m + D1_m));
+    var egress = walk(STOP_B, D2_m + D1_m);
+
+    int accessEgressCost = egress.c1() + C1_CALCULATOR.costEgress(egress.stop(), egress.hasRides());
 
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(
