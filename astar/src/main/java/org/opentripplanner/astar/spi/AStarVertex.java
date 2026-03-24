@@ -13,7 +13,10 @@ public interface AStarVertex<
    * combining edge lists using stock Collection-based methods.
    */
   Collection<Edge> getOutgoing();
+  Edge[] getOutgoingRaw();
 
   /** Get a collection containing all the edges leading from other vertices to this vertex. */
   Collection<Edge> getIncoming();
+
+  Edge[] getIncomingRaw();
 }

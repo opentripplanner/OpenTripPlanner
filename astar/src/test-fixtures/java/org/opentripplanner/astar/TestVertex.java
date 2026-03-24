@@ -7,8 +7,8 @@ import org.opentripplanner.astar.spi.AStarVertex;
 public class TestVertex implements AStarVertex<TestState, TestEdge, TestVertex> {
 
   private final String name;
-  private final Collection<TestEdge> incoming = new ArrayList<>();
-  private final Collection<TestEdge> outgoing = new ArrayList<>();
+  private final ArrayList<TestEdge> incoming = new ArrayList<>();
+  private final ArrayList<TestEdge> outgoing = new ArrayList<>();
 
   public TestVertex(String name) {
     this.name = name;
@@ -24,7 +24,17 @@ public class TestVertex implements AStarVertex<TestState, TestEdge, TestVertex> 
   }
 
   @Override
+  public TestEdge[] getOutgoingRaw() {
+    return outgoing.toArray(new TestEdge[0]);
+  }
+
+  @Override
   public Collection<TestEdge> getIncoming() {
     return incoming;
+  }
+
+  @Override
+  public TestEdge[] getIncomingRaw() {
+    return incoming.toArray(new TestEdge[0]);
   }
 }

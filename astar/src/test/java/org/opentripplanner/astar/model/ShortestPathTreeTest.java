@@ -155,8 +155,18 @@ class ShortestPathTreeTest {
     }
 
     @Override
+    public TestEdge[] getOutgoingRaw() {
+      return new TestEdge[0];
+    }
+
+    @Override
     public Collection<TestEdge> getIncoming() {
       return List.of();
+    }
+
+    @Override
+    public TestEdge[] getIncomingRaw() {
+      return new TestEdge[0];
     }
   }
 

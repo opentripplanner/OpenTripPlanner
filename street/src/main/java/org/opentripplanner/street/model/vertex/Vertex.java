@@ -103,8 +103,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return Arrays.asList(outgoing);
   }
 
+  public Edge[] getOutgoingRaw() {
+    return outgoing;
+  }
+
   public Collection<Edge> getIncoming() {
     return Arrays.asList(incoming);
+  }
+
+  public Edge[] getIncomingRaw() {
+    return incoming;
   }
 
   public int getDegreeOut() {
