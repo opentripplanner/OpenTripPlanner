@@ -2,9 +2,9 @@ package org.opentripplanner.raptor.api.response;
 
 import java.util.Collection;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

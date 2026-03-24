@@ -3,10 +3,10 @@ package org.opentripplanner.raptor.rangeraptor.path;
 import static org.opentripplanner.raptor.api.view.PathLegType.EGRESS;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.EgressPathView;
 import org.opentripplanner.raptor.api.view.PathLegType;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The purpose of this class is hold information about a destination arrival and compute the values

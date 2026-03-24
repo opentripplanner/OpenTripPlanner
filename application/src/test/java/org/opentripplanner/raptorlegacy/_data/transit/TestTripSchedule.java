@@ -5,7 +5,7 @@ import static org.opentripplanner.core.model.accessibility.Accessibility.NO_INFO
 import java.time.LocalDate;
 import java.util.Arrays;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;

@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -19,6 +18,7 @@ import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**

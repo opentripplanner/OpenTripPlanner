@@ -9,7 +9,7 @@ import static org.opentripplanner.OtpArchitectureModules.GOOGLE_COLLECTIONS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
-import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
+import static org.opentripplanner.OtpArchitectureModules.RAPTOR_SPI;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
 
 import org.junit.jupiter.api.Disabled;
@@ -70,7 +70,7 @@ public class TimetableRepositoryArchitectureTest {
       SITE,
       TIMETABLE,
       LEGACY_MODEL,
-      RAPTOR_API,
+      RAPTOR_SPI,
       RAPTOR_ADAPTER_API
     ).verify();
   }

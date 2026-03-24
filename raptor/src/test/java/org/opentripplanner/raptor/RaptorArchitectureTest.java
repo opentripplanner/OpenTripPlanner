@@ -67,13 +67,15 @@ public class RaptorArchitectureTest {
   @Test
   void enforcePackageDependenciesRaptorAPI() {
     API_MODEL.dependsOn(OTP_UTILS).verify();
-    API_PATH.dependsOn(OTP_UTILS, API_MODEL).verify();
-    var debug = API.subPackage("debug").dependsOn(OTP_UTILS).verify();
-    var view = API.subPackage("view").dependsOn(OTP_UTILS, API_MODEL).verify();
+    API_PATH.dependsOn(OTP_UTILS, API_MODEL, RAPTOR_SPI).verify();
+    var debug = API.subPackage("debug").dependsOn(OTP_UTILS, RAPTOR_SPI).verify();
+    var view = API.subPackage("view").dependsOn(OTP_UTILS, API_MODEL, RAPTOR_SPI).verify();
     var request = API.subPackage("request")
-      .dependsOn(OTP_UTILS, debug, API_MODEL, API_PATH, view)
+      .dependsOn(OTP_UTILS, debug, API_MODEL, API_PATH, view, RAPTOR_SPI)
       .verify();
-    API.subPackage("response").dependsOn(OTP_UTILS, API_MODEL, API_PATH, request).verify();
+    API.subPackage("response")
+      .dependsOn(OTP_UTILS, API_MODEL, API_PATH, request, RAPTOR_SPI)
+      .verify();
   }
 
   @Test

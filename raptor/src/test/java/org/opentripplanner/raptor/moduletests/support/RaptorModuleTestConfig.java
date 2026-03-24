@@ -5,11 +5,11 @@ import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERI
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
 
 import java.util.List;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This enum is a list of all relevant ways to configure Raptor with

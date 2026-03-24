@@ -1,7 +1,7 @@
 package org.opentripplanner.transfer.regular.model;
 
 import java.util.Objects;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 

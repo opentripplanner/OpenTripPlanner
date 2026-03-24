@@ -4,8 +4,8 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating

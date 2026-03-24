@@ -3,8 +3,8 @@ package org.opentripplanner.raptor._data.transit;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.

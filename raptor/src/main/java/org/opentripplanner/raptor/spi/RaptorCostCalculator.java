@@ -1,9 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * The responsibility is to calculate multi-criteria value (like the generalized cost).

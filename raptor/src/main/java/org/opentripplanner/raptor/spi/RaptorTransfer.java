@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.model;
+package org.opentripplanner.raptor.spi;
 
 import org.opentripplanner.utils.time.DurationUtils;
 

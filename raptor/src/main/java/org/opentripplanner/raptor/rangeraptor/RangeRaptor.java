@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
@@ -14,6 +13,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The algorithm used herein is described in

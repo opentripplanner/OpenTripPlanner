@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardingSearch;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

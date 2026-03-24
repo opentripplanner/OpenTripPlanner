@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**

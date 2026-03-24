@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -10,6 +8,8 @@ import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfT
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

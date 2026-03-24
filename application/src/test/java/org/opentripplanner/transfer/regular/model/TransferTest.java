@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;

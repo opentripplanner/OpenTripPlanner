@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Abstract super class for multi-criteria stop arrival.

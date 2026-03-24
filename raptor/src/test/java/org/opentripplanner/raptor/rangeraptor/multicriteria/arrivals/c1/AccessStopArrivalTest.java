@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 class AccessStopArrivalTest {
 

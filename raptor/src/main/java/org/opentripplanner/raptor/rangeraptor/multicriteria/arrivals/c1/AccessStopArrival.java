@@ -6,11 +6,11 @@ import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.api.view.TripScheduleStopPosition;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Represent a access stop arrival.

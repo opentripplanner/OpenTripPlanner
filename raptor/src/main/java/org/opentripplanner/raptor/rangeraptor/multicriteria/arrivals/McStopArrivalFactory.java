@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.PatternRideView;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public interface McStopArrivalFactory<T extends RaptorTripSchedule> {
   McStopArrival<T> createAccessStopArrival(int departureTime, RaptorAccessEgress accessPath);

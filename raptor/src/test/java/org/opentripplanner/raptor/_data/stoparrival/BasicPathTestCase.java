@@ -7,7 +7,7 @@ import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.egress;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
-import static org.opentripplanner.raptor.api.model.RaptorTransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.raptor.spi.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -20,8 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
@@ -33,7 +31,9 @@ import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 /**
  * This class is used to create a journeys with stop arrivals.

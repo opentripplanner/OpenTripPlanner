@@ -4,7 +4,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**

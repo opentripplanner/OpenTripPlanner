@@ -2,7 +2,7 @@ package org.opentripplanner.raptor._data.transit;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * This class holds transfer constraint information.

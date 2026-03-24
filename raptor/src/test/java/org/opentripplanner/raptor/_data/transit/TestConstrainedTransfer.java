@@ -4,9 +4,9 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_SET;
 
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class TestConstrainedTransfer

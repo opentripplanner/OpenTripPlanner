@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**

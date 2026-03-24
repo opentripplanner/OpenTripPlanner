@@ -39,7 +39,7 @@ public interface OtpArchitectureModules {
 
   /* The Raptor module */
   Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
-  Package RAPTOR_API = RAPTOR_ROOT.subPackage("api..");
+  Package RAPTOR_SPI = RAPTOR_ROOT.subPackage("spi..");
 
   /**
    * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks

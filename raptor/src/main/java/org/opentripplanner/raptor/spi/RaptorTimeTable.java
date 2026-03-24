@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.spi;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 
 /**

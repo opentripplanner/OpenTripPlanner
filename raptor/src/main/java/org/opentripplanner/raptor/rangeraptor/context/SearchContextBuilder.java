@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.context;
 import java.util.List;
 import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
@@ -11,6 +10,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class SearchContextBuilder<T extends RaptorTripSchedule> {
 

@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
@@ -23,6 +22,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

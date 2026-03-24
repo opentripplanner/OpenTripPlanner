@@ -3,7 +3,6 @@ package org.opentripplanner.raptor;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
@@ -15,6 +14,7 @@ import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

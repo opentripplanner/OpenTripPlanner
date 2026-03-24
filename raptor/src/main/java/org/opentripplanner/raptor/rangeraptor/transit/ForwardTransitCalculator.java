@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Used to calculate times in a forward trip search.
