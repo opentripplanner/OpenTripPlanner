@@ -653,7 +653,7 @@ type FareProductUse {
             name: "Single Ticket"
   
         # fare product use for single ticket
-        id: "CCC" // identical to leg2. the passenger needs to buy ONE pass, not two.
+        id: "CCC" // identical to leg2. the passenger needs to buy ONE day pass, not two.
           product:
             id: "day-pass"  // product id
             name: "Day Pass"
@@ -664,11 +664,13 @@ type FareProductUse {
             id: "single-ticket"  // product id
             name: "Single Ticket"
   
-        id: "CCC" // identical to leg1. the passenger needs to buy ONE pass, not two.
+        id: "CCC" // identical to leg1. the passenger needs to buy ONE day pass, not two.
           product:
             id: "day-pass"  // product id
             name: "Day Pass"
   ```
+  **It is the responsibility of the API consumers to display the day pass as a product for the
+  entire itinerary rather than two day passes!**
   """
   id: String!
   "The purchasable fare product"
