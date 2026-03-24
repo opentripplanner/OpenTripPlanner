@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.application.OTPFeature.MinimumTransferTimeIsDefinitive;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 import static org.opentripplanner.transfer.constrained.model.TransferPriority.ALLOWED;
 
 import java.util.function.IntSupplier;

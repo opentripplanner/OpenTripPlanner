@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

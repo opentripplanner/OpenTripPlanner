@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor._data.multicriteria.ride;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_SET;
+import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_SET;
 
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;

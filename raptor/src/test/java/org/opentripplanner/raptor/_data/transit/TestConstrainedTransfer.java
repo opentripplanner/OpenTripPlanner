@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor._data.transit;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_SET;
+import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_SET;
 
 import java.util.function.Consumer;
 import javax.annotation.Nullable;

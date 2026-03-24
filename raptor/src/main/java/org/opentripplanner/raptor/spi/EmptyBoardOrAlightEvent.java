@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.function.Consumer;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.utils.time.TimeUtils;
 
 record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime) implements

@@ -6,7 +6,7 @@ import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.egress;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.raptor.spi.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 import static org.opentripplanner.utils.time.TimeUtils.time;

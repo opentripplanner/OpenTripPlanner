@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 
 /**
  * This interface defines the data needed by Raptor. It is the main/top-level interface and

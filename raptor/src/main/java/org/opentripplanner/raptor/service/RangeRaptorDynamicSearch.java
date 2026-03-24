@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.service;
 
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.util.Collections;
 import java.util.List;

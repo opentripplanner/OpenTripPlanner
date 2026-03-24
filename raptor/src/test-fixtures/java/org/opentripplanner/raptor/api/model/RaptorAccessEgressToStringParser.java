@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;

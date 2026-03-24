@@ -3,16 +3,16 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_FOUND;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
+import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_FOUND;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**

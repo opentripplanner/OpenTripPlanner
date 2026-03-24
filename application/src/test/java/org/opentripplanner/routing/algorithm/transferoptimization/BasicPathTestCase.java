@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization;
 
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;

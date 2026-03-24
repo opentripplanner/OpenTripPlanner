@@ -71,6 +71,7 @@ public class TimetableRepositoryArchitectureTest {
       TIMETABLE,
       LEGACY_MODEL,
       RAPTOR_SPI,
+      RAPTOR_SPI,
       RAPTOR_ADAPTER_API
     ).verify();
   }

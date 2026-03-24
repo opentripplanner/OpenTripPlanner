@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
  * Generic abstract implementation of the {@link DebugHandler} interface. The main purpose is to

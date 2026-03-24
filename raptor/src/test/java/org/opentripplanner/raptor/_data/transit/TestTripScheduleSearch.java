@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor._data.transit;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_FOUND;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_FOUND;
+import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.util.List;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class TestTripScheduleSearch
