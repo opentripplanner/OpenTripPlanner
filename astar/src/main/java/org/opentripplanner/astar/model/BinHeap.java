@@ -1,8 +1,6 @@
 package org.opentripplanner.astar.model;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BinHeap<T> {
 
@@ -12,7 +10,6 @@ public class BinHeap<T> {
   private T[] elem;
   private int size;
   private int capacity;
-  private final Map<T, Integer> positionMap;
 
   public BinHeap() {
     this(1000);
@@ -31,7 +28,6 @@ public class BinHeap<T> {
     size = 0;
     // set sentinel
     prio[0] = Double.NEGATIVE_INFINITY;
-    positionMap = new HashMap<>((int) (capacity * 0.75));
   }
 
   public int size() {
@@ -39,7 +35,7 @@ public class BinHeap<T> {
   }
 
   public boolean empty() {
-    return size == 0;
+    return size <= 0;
   }
 
   public double peek_min_key() {
@@ -59,12 +55,20 @@ public class BinHeap<T> {
   }
 
   public void rekey(T e, double p) {
-    // O(1) lookup using position map instead of O(n) linear search
-    Integer position = positionMap.get(e);
-    if (position == null) {
+    // Perform "inefficient" but straightforward linear search
+    // for an element then change its key by sifting up or down
+    int i = 0;
+    for (T t : elem) {
+      if (t == e) {
+        break;
+      }
+      i++;
+    }
+    if (i > size) {
+      //System.out.printf("did not find element %s\n", e);
       return;
     }
-    int i = position;
+    //System.out.printf("found element %s with key %f at %d\n", e, prio[i], i);
     if (p > prio[i]) {
       // sift up (as in extract)
       while (i * 2 <= size) {
@@ -75,7 +79,6 @@ public class BinHeap<T> {
         if (p > prio[child]) {
           elem[i] = elem[child];
           prio[i] = prio[child];
-          positionMap.put(elem[i], i);
           i = child;
         } else {
           break;
@@ -86,19 +89,16 @@ public class BinHeap<T> {
       while (prio[i / 2] > p) {
         elem[i] = elem[i / 2];
         prio[i] = prio[i / 2];
-        positionMap.put(elem[i], i);
         i /= 2;
       }
     }
     elem[i] = e;
     prio[i] = p;
-    positionMap.put(e, i);
   }
 
   public void reset() {
     // empties the queue in one operation
     size = 0;
-    positionMap.clear();
   }
 
   public void insert(T e, double p) {
@@ -110,22 +110,19 @@ public class BinHeap<T> {
     for (i = size; prio[i / 2] > p; i /= 2) {
       elem[i] = elem[i / 2];
       prio[i] = prio[i / 2];
-      positionMap.put(elem[i], i);
     }
     elem[i] = e;
     prio[i] = p;
-    positionMap.put(e, i);
   }
 
   public T extract_min() {
-    if (size == 0) {
-      return null;
-    }
     int i, child;
     T minElem = elem[1];
     T lastElem = elem[size];
     double lastPrio = prio[size];
-    positionMap.remove(minElem);
+    if (size <= 0) {
+      return null;
+    }
     size -= 1;
     for (i = 1; i * 2 <= size; i = child) {
       child = i * 2;
@@ -135,16 +132,12 @@ public class BinHeap<T> {
       if (lastPrio > prio[child]) {
         elem[i] = elem[child];
         prio[i] = prio[child];
-        positionMap.put(elem[i], i);
       } else {
         break;
       }
     }
-    if (size > 0) {
-      elem[i] = lastElem;
-      prio[i] = lastPrio;
-      positionMap.put(lastElem, i);
-    }
+    elem[i] = lastElem;
+    prio[i] = lastPrio;
     return minElem;
   }
 
