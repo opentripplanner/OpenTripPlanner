@@ -62,19 +62,9 @@ public class LocationStringParser {
     if (matcher.find()) {
       var lat = Double.parseDouble(matcher.group(1));
       var lon = Double.parseDouble(matcher.group(4));
-      return new GenericLocation(
-        label,
-        null,
-        lat,
-        lon
-      );
+      return new GenericLocation(label, null, lat, lon);
     } else {
-      return new GenericLocation(
-        label,
-        FeedScopedId.parseOptional(place).orElse(null),
-        null,
-        null
-      );
+      return new GenericLocation(label, FeedScopedId.parseOptional(place).orElse(null), null, null);
     }
   }
 }

@@ -31,9 +31,7 @@ class RouteTest {
     .withName("operator name")
     .build();
 
-  private static final Branding BRANDING = Branding.of(
-    FeedScopedId.of("x", "brandingId")
-  ).build();
+  private static final Branding BRANDING = Branding.of(FeedScopedId.of("x", "brandingId")).build();
   private static final String COLOR = "color";
   private static final String TEXT_COLOR = "text color";
   private static final int GTFS_TYPE = 0;
