@@ -43,7 +43,7 @@ public class OregonHopFareFactory extends DefaultFareServiceFactory {
   static final FeedScopedId LG_CTRAN_REGIONAL = ctranId("REGIONAL");
   static final FeedScopedId LG_CTRAN_EXPRESS = ctranId("EXPRESS");
   static final FeedScopedId LG_CTRAN_LOCAL = ctranId("LOCAL");
-  static final FeedScopedId LG_CTRAN_FLEX_LOCAL = FeedScopedId.parse("CTRAN_FLEX:LOCAL");
+  static final FeedScopedId LG_CTRAN_FLEX_LOCAL = FeedScopedId.of("CTRAN_FLEX", "LOCAL");
 
   // rider categories
   static final RiderCategory CATEGORY_YOUTH = RiderCategory.of(ctranId("YOUTH"))

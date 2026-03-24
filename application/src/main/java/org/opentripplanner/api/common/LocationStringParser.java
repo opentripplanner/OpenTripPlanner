@@ -58,17 +58,23 @@ public class LocationStringParser {
       return null;
     }
 
-    Double lat = null;
-    Double lon = null;
-    FeedScopedId placeId = null;
-
     Matcher matcher = LAT_LON_PATTERN.matcher(place);
     if (matcher.find()) {
-      lat = Double.parseDouble(matcher.group(1));
-      lon = Double.parseDouble(matcher.group(4));
-    } else if (FeedScopedId.isValidString(place)) {
-      placeId = FeedScopedId.parse(place);
+      var lat = Double.parseDouble(matcher.group(1));
+      var lon = Double.parseDouble(matcher.group(4));
+      return new GenericLocation(
+        label,
+        null,
+        lat,
+        lon
+      );
+    } else {
+      return new GenericLocation(
+        label,
+        FeedScopedId.parseOptional(place).orElse(null),
+        null,
+        null
+      );
     }
-    return new GenericLocation(label, placeId, lat, lon);
   }
 }

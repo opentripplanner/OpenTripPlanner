@@ -32,11 +32,11 @@ class TripTest {
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final String NETEX_INTERNAL_PLANNING_CODE = "internalPlanningCode";
-  private static final Operator OPERATOR = Operator.of(FeedScopedId.parse("x:operatorId"))
+  private static final Operator OPERATOR = Operator.of(FeedScopedId.of("x", "operatorId"))
     .withName("operator name")
     .build();
-  private static final FeedScopedId SERVICE_ID = FeedScopedId.parse("x:serviceId");
-  private static final FeedScopedId SHAPE_ID = FeedScopedId.parse("x:shapeId");
+  private static final FeedScopedId SERVICE_ID = FeedScopedId.of("x", "serviceId");
+  private static final FeedScopedId SHAPE_ID = FeedScopedId.of("x", "shapeId");
   private static final Trip SUBJECT = Trip.of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withRoute(ROUTE)
@@ -123,7 +123,7 @@ class TripTest {
       SUBJECT.sameAs(
         SUBJECT.copy()
           .withOperator(
-            Operator.of(FeedScopedId.parse("x:otherOperatorId"))
+            Operator.of(FeedScopedId.of("x", "otherOperatorId"))
               .withName("other operator name")
               .build()
           )
@@ -131,10 +131,10 @@ class TripTest {
       )
     );
     assertFalse(
-      SUBJECT.sameAs(SUBJECT.copy().withServiceId(FeedScopedId.parse("x:otherServiceId")).build())
+      SUBJECT.sameAs(SUBJECT.copy().withServiceId(FeedScopedId.of("x", "otherServiceId")).build())
     );
     assertFalse(
-      SUBJECT.sameAs(SUBJECT.copy().withShapeId(FeedScopedId.parse("x:otherShapeId")).build())
+      SUBJECT.sameAs(SUBJECT.copy().withShapeId(FeedScopedId.of("x", "otherShapeId")).build())
     );
   }
 }

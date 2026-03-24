@@ -29,6 +29,12 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     this.id = assertHasValue(id, "Missing mandatory id on FeedScopeId");
   }
 
+  /// Create a FeedScopedID
+  /// @throws IllegalArgumentException if the feedId or id is empty
+  public static FeedScopedId of(String feedId, String id) throws IllegalArgumentException {
+    return new FeedScopedId(feedId, id);
+  }
+
   /// Create a FeedScopedId
   ///
   /// @return Optional.empty if the feedId or id is empty, otherwise a FeedScopedId
@@ -108,7 +114,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         throw new IllegalArgumentException("Collection of FeedScopedId must not contain null.");
       }
     });
-    return value.stream().map(FeedScopedId::parse).toList();
+    return value.stream().map(FeedScopedId::parseStrict).toList();
   }
 
   /**
@@ -123,7 +129,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return Arrays.stream(s.split(","))
       .map(String::strip)
       .filter(i -> !i.isBlank())
-      .map(FeedScopedId::parse)
+      .map(FeedScopedId::parseStrict)
       .toList();
   }
 

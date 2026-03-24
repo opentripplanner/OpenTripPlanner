@@ -27,11 +27,13 @@ class RouteTest {
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
-  private static final Operator OPERATOR = Operator.of(FeedScopedId.parse("x:operatorId"))
+  private static final Operator OPERATOR = Operator.of(FeedScopedId.of("x", "operatorId"))
     .withName("operator name")
     .build();
 
-  private static final Branding BRANDING = Branding.of(FeedScopedId.parse("x:brandingId")).build();
+  private static final Branding BRANDING = Branding.of(
+    FeedScopedId.of("x", "brandingId")
+  ).build();
   private static final String COLOR = "color";
   private static final String TEXT_COLOR = "text color";
   private static final int GTFS_TYPE = 0;
@@ -105,7 +107,7 @@ class RouteTest {
       SUBJECT.sameAs(
         SUBJECT.copy()
           .withOperator(
-            Operator.of(FeedScopedId.parse("x:otherOperatorId"))
+            Operator.of(FeedScopedId.of("x", "otherOperatorId"))
               .withName("other operator name")
               .build()
           )
@@ -118,7 +120,7 @@ class RouteTest {
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()
-          .withBranding(Branding.of(FeedScopedId.parse("x:otherBrandingId")).build())
+          .withBranding(Branding.of(FeedScopedId.of("x", "otherBrandingId")).build())
           .build()
       )
     );
