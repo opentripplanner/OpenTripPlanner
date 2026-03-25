@@ -12,7 +12,7 @@ public class TestEdge extends Edge {
   private final double distance;
   private final int seconds;
   private final I18NString name;
-  private final boolean excludeGeometryFromLeg;
+  private final boolean includeGeometryInPath;
   private final LineString geometry;
 
   private TestEdge(TestEdgeBuilder builder) {
@@ -21,7 +21,7 @@ public class TestEdge extends Edge {
     this.seconds = builder.seconds;
     this.name = builder.name;
     this.distance = builder.distance;
-    this.excludeGeometryFromLeg = builder.excludeGeometryFromLeg;
+    this.includeGeometryInPath = builder.includeGeometryInPath;
 
     Coordinate[] coords = new Coordinate[2];
     coords[0] = builder.from.getCoordinate();
@@ -58,8 +58,8 @@ public class TestEdge extends Edge {
   }
 
   @Override
-  public boolean excludeGeometryFromLeg() {
-    return excludeGeometryFromLeg;
+  public boolean includeGeometryInPath() {
+    return includeGeometryInPath;
   }
 
   public static class TestEdgeBuilder {
@@ -69,7 +69,7 @@ public class TestEdge extends Edge {
     double distance = 100;
     int seconds = 100;
     I18NString name = I18NString.of("TestEdge");
-    public boolean excludeGeometryFromLeg = false;
+    public boolean includeGeometryInPath = true;
 
     public TestEdgeBuilder(Vertex from, Vertex to) {
       this.from = from;
@@ -91,8 +91,8 @@ public class TestEdge extends Edge {
       return this;
     }
 
-    public TestEdgeBuilder withExcludeGeometryFromLeg(boolean exclude) {
-      this.excludeGeometryFromLeg = exclude;
+    public TestEdgeBuilder withIncludeGeometryInPath(boolean include) {
+      this.includeGeometryInPath = include;
       return this;
     }
 

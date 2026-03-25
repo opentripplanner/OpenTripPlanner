@@ -73,7 +73,7 @@ public class StreetPath {
 
   public LineString geometry() {
     var geometries = edges.stream()
-      .filter(e -> !e.excludeGeometryFromLeg())
+      .filter(Edge::includeGeometryInPath)
       .map(Edge::getGeometry)
       .filter(Objects::nonNull)
       .toList();

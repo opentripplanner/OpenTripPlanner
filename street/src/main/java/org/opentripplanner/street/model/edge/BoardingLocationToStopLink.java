@@ -44,10 +44,10 @@ public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitS
   }
 
   @Override
-  public boolean excludeGeometryFromLeg() {
+  public boolean includeGeometryInPath() {
     // when linking an OSM boarding location, like a platform centroid, we create a link edge
     // so we can see it in the debug UI's traversal permission layer but we don't want to show the
     // link to the user so we remove it here
-    return true;
+    return false;
   }
 }

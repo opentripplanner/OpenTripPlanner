@@ -68,8 +68,8 @@ class StreetPathTest {
   @Test
   void geometry() {
     var state = startState()
-      .testEdge(b -> b.build())
-      .testEdge(b -> b.withExcludeGeometryFromLeg(true).build())
+      .testEdge()
+      .testEdge(b -> b.withIncludeGeometryInPath(false))
       .build();
     var path = new StreetPath(state);
 

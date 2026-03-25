@@ -155,6 +155,10 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder testEdge() {
+    return testEdge(_ -> {});
+  }
+
   public TestStateBuilder testEdge(Consumer<TestEdge.TestEdgeBuilder> customizer) {
     count++;
     var from = (StreetVertex) currentState.vertex;
