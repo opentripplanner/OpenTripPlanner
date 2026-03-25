@@ -384,7 +384,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<String> feedId();
 
-    public DataFetcher<String> feedVersion();
+    public DataFetcher<String> version();
     public DataFetcher<FeedPublisher> publisher();
   }
 

@@ -8,6 +8,6 @@
       name
       url
     }
-    feedVersion
+    version
   }
 }

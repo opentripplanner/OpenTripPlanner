@@ -12,7 +12,7 @@
           "name": "publisher",
           "url": "www.z.org"
         },
-        "feedVersion": "12345"
+        "version": "12345"
       }
     ]
   }
