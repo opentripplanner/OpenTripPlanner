@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -41,61 +42,63 @@ public class TransferMapper {
   }
 
   /**
-   * NeTEx ServiceJourneyInterchange example:
-   * <pre>
-   * ServiceJourneyInterchange {
-   *    id: "VYG:ServiceJourneyInterchange:3"
-   *    priority: 2
-   *    planned: true
-   *    guaranteed: true
-   *    fromPointRef.ref: "VYG:ScheduledStopPoint:VOS-BUS-341"
-   *    toPointRef.ref: "VYG:ScheduledStopPoint:VOS-2"
-   *    fromJourneyRef.ref: "VYG:ServiceJourney:BUS-610-322"
-   *    toJourneyRef.ref: "VYG:ServiceJourney:610-323"
-   * }
-   * </pre>
+   * Map a NeTEx ServiceJourneyInterchange to one or more constrained transfers. When a trip visits
+   * the same ScheduledStopPoint multiple times (loop pattern), a transfer is created for each
+   * occurrence so the interchange is findable at any stop position during routing.
    */
-  @Nullable
-  public ConstrainedTransfer mapToTransfer(ServiceJourneyInterchange it) {
+  public List<ConstrainedTransfer> mapToTransfers(ServiceJourneyInterchange it) {
     var id = it.getId();
-    var from = mapPoint(Label.FROM, id, it.getFromJourneyRef(), it.getFromPointRef());
-    var to = mapPoint(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
+    var fromPoints = mapPoints(Label.FROM, id, it.getFromJourneyRef(), it.getFromPointRef());
+    var toPoints = mapPoints(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
 
-    if (from == null || to == null) {
+    if (fromPoints.isEmpty() || toPoints.isEmpty()) {
       issueStore.add(
         "InvalidInterchange",
         "Interchange %s contains invalid from/to refs. from=%s, to=%s",
         it,
-        from,
-        to
+        fromPoints,
+        toPoints
       );
-      return null;
+      return List.of();
     }
 
     var c = mapConstraint(it);
-    var tx = new ConstrainedTransfer(idFactory.createId(it.getId()), from, to, c);
+    var feedScopedId = idFactory.createId(it.getId());
 
-    if (tx.noConstraints()) {
+    // The constraint is the same for all position combinations, so check once
+    if (c.isRegularTransfer()) {
+      var tx = new ConstrainedTransfer(feedScopedId, fromPoints.getFirst(), toPoints.getFirst(), c);
       issueStore.add(new InterchangeWithoutConstraint(tx));
-      return null;
+      return List.of();
     }
-    return tx;
+
+    var result = new ArrayList<ConstrainedTransfer>();
+    for (var from : fromPoints) {
+      for (var to : toPoints) {
+        result.add(new ConstrainedTransfer(feedScopedId, from, to, c));
+      }
+    }
+    return result;
   }
 
-  @Nullable
-  private TripTransferPoint mapPoint(
+  private List<TripTransferPoint> mapPoints(
     Label label,
     String interchangeId,
     VehicleJourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
     if (isInvalid(sjRef)) {
-      return null;
+      return List.of();
     }
     var sjId = sjRef.getRef();
     var trip = findTrip(label, "Journey", interchangeId, sjId);
-    int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
-    return (trip == null || stopPos < 0) ? null : new TripTransferPoint(trip, stopPos);
+    if (trip == null) {
+      return List.of();
+    }
+    return findAllStopPositions(interchangeId, label, "Point", sjId, pointRef)
+      .stream()
+      .map(pos -> new TripTransferPoint(trip, pos))
+      .toList();
   }
 
   @Nullable
@@ -143,7 +146,7 @@ public class TransferMapper {
     }
   }
 
-  private int findStopPosition(
+  private List<Integer> findAllStopPositions(
     String interchangeId,
     Label label,
     String fieldName,
@@ -155,12 +158,14 @@ public class TransferMapper {
     String errorMessage;
 
     if (scheduledStopPoints != null) {
-      var index = switch (label) {
-        case Label.TO -> scheduledStopPoints.indexOf(sspId);
-        case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
-      };
-      if (index >= 0) {
-        return index;
+      var positions = new ArrayList<Integer>();
+      for (int i = 0; i < scheduledStopPoints.size(); i++) {
+        if (scheduledStopPoints.get(i).equals(sspId)) {
+          positions.add(i);
+        }
+      }
+      if (!positions.isEmpty()) {
+        return positions;
       }
 
       errorMessage = "Scheduled-stop-point-ref not found";
@@ -177,7 +182,7 @@ public class TransferMapper {
         sspId
       )
     );
-    return -1;
+    return List.of();
   }
 
   private FeedScopedId createId(String id) {

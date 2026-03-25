@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
@@ -49,7 +49,9 @@ class TransferMapperTest {
       .withGuaranteed(true)
       .withPriority(BigInteger.valueOf(2));
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
+    assertEquals(1, transfers.size());
+    var transfer = transfers.getFirst();
 
     assertEquals(ID_FACTORY.createId(INTERCHANGE_ID), transfer.getId());
     assertTrue(transfer.getTransferConstraint().isGuaranteed());
@@ -71,7 +73,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withStaySeated(true);
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfer = mapper.mapToTransfers(interchange).getFirst();
 
     assertTrue(transfer.getTransferConstraint().isStaySeated());
   }
@@ -92,7 +94,7 @@ class TransferMapperTest {
       .withGuaranteed(true)
       .withMaximumWaitTime(Duration.ofMinutes(5));
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfer = mapper.mapToTransfers(interchange).getFirst();
 
     assertEquals(300, transfer.getTransferConstraint().getMaxWaitTime());
   }
@@ -112,9 +114,9 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withPriority(BigInteger.valueOf(-1));
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertNotNull(transfer);
+    assertFalse(transfers.isEmpty());
   }
 
   @Test
@@ -133,9 +135,9 @@ class TransferMapperTest {
       .withPriority(BigInteger.valueOf(0))
       .withGuaranteed(true);
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertNotNull(transfer);
+    assertFalse(transfers.isEmpty());
   }
 
   @Test
@@ -153,9 +155,9 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withPriority(BigInteger.valueOf(1));
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertNotNull(transfer);
+    assertFalse(transfers.isEmpty());
   }
 
   @Test
@@ -173,9 +175,9 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withPriority(BigInteger.valueOf(2));
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertNotNull(transfer);
+    assertFalse(transfers.isEmpty());
   }
 
   @Test
@@ -193,7 +195,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    assertNull(mapper.mapToTransfer(interchange));
+    assertTrue(mapper.mapToTransfers(interchange).isEmpty());
     assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
@@ -212,7 +214,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    assertNull(mapper.mapToTransfer(interchange));
+    assertTrue(mapper.mapToTransfers(interchange).isEmpty());
     assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
@@ -232,7 +234,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    assertNull(mapper.mapToTransfer(interchange));
+    assertTrue(mapper.mapToTransfers(interchange).isEmpty());
     assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
@@ -252,7 +254,7 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    assertNull(mapper.mapToTransfer(interchange));
+    assertTrue(mapper.mapToTransfers(interchange).isEmpty());
     assertThat(listTypes(issueStore)).contains("InvalidInterchange");
   }
 
@@ -271,12 +273,12 @@ class TransferMapperTest {
       .withFromPointRef(createStopRef(FROM_STOP_ID))
       .withToPointRef(createStopRef(TO_STOP_ID));
 
-    assertNull(mapper.mapToTransfer(interchange));
+    assertTrue(mapper.mapToTransfers(interchange).isEmpty());
     assertThat(listTypes(issueStore)).contains("InterchangeWithoutConstraint");
   }
 
   @Test
-  void usesLastIndexForFromStop() {
+  void createsTransferForEachOccurrenceOfFromStop() {
     var trips = createTripsIndex();
     var stopPointsIndex = Map.of(
       FROM_JOURNEY_ID,
@@ -295,13 +297,78 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertEquals(2, ((TripTransferPoint) transfer.getFrom()).getStopPositionInPattern());
+    assertEquals(2, transfers.size());
+    assertEquals(0, ((TripTransferPoint) transfers.get(0).getFrom()).getStopPositionInPattern());
+    assertEquals(2, ((TripTransferPoint) transfers.get(1).getFrom()).getStopPositionInPattern());
+  }
+
+  /**
+   * Verifies that a guaranteed interchange is found at all stop positions when the feeder trip
+   * visits the transfer stop twice (loop pattern). See
+   * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/7466">#7466</a>.
+   */
+  @Test
+  void interchangeFoundAtAllPositionsWhenFeederTripVisitsTransferStopTwice() {
+    var transferStopId = "TEST:ScheduledStopPoint:TransferStop";
+    int firstVisitPosition = 2;
+    int secondVisitPosition = 5;
+    var stopPointsIndex = Map.of(
+      FROM_JOURNEY_ID,
+      List.of(
+        "TEST:ScheduledStopPoint:Start",
+        "TEST:ScheduledStopPoint:StopA",
+        // Position 2: first visit
+        transferStopId,
+        "TEST:ScheduledStopPoint:StopB",
+        "TEST:ScheduledStopPoint:StopC",
+        // Position 5: second visit (loop returns through same stop)
+        transferStopId,
+        "TEST:ScheduledStopPoint:End"
+      ),
+      TO_JOURNEY_ID,
+      List.of(transferStopId, "TEST:ScheduledStopPoint:Destination")
+    );
+
+    var trips = createTripsIndex();
+    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+
+    var interchange = new ServiceJourneyInterchange()
+      .withId(INTERCHANGE_ID)
+      .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
+      .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
+      .withFromPointRef(createStopRef(transferStopId))
+      .withToPointRef(createStopRef(transferStopId))
+      .withGuaranteed(true)
+      .withMaximumWaitTime(Duration.ofMinutes(5));
+
+    var transfers = mapper.mapToTransfers(interchange);
+    assertEquals(2, transfers.size(), "One transfer per from-stop occurrence");
+    assertTrue(transfers.getFirst().getTransferConstraint().isGuaranteed());
+
+    // Store the transfers in the ConstrainedTransferService (as the graph builder does)
+    var transferService = new DefaultConstrainedTransferService();
+    transferService.addAll(transfers);
+
+    var fromTrip = trips.get(ID_FACTORY.createId(FROM_JOURNEY_ID));
+    var toTrip = trips.get(ID_FACTORY.createId(TO_JOURNEY_ID));
+    var testModel = TimetableRepositoryForTest.of();
+    var stop = testModel.stop("TransferStop", 59.0, 6.0).build();
+
+    // Lookup succeeds at BOTH stop positions
+    assertNotNull(
+      transferService.findTransfer(fromTrip, firstVisitPosition, stop, toTrip, 0, stop),
+      "Transfer found at first visit position"
+    );
+    assertNotNull(
+      transferService.findTransfer(fromTrip, secondVisitPosition, stop, toTrip, 0, stop),
+      "Transfer found at second visit position"
+    );
   }
 
   @Test
-  void usesFirstIndexForToStop() {
+  void createsTransferForEachOccurrenceOfToStop() {
     var trips = createTripsIndex();
     var stopPointsIndex = Map.of(
       FROM_JOURNEY_ID,
@@ -320,9 +387,11 @@ class TransferMapperTest {
       .withToPointRef(createStopRef(TO_STOP_ID))
       .withGuaranteed(true);
 
-    var transfer = mapper.mapToTransfer(interchange);
+    var transfers = mapper.mapToTransfers(interchange);
 
-    assertEquals(0, ((TripTransferPoint) transfer.getTo()).getStopPositionInPattern());
+    assertEquals(2, transfers.size());
+    assertEquals(0, ((TripTransferPoint) transfers.get(0).getTo()).getStopPositionInPattern());
+    assertEquals(2, ((TripTransferPoint) transfers.get(1).getTo()).getStopPositionInPattern());
   }
 
   private DefaultEntityById<Trip> createTripsIndex() {
