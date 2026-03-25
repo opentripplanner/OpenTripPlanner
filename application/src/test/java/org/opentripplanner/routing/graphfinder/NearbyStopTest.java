@@ -8,9 +8,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class NearbyStopTest {
 
-  private static TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
-
-  // TODO Add tests for all public methods in NearbyStop here
+  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
 
   @Test
   void testIsBetter() {
