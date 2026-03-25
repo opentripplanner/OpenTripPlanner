@@ -308,7 +308,7 @@ public class TransitRouter {
       stopCountLimit,
       linkingContext
     );
-    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
+    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
     var results = new ArrayList<>(accessEgresses);
@@ -326,7 +326,7 @@ public class TransitRouter {
         linkingContext
       );
 
-      results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
+      results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList));
     }
 
     if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
