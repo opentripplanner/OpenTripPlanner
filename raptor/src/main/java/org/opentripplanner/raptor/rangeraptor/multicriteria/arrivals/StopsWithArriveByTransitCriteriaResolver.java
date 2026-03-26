@@ -4,55 +4,47 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 
-public class StopsWithArriveByTransitCriteriaResolver<T extends RaptorTripSchedule> {
-
-  private final AccessPaths accessPaths;
-  private final EgressPaths egressPaths;
-  private final @Nullable ViaConnections viaConnections;
+public class StopsWithArriveByTransitCriteriaResolver {
 
   private final TIntSet stops = new TIntHashSet();
 
-  public StopsWithArriveByTransitCriteriaResolver(
+  private StopsWithArriveByTransitCriteriaResolver(
     AccessPaths accessPaths,
     EgressPaths egressPaths,
     @Nullable ViaConnections viaConnections
   ) {
-    this.accessPaths = accessPaths;
-    this.egressPaths = egressPaths;
-    this.viaConnections = viaConnections;
+    addAllAccessStopsWithAtLeastOneStopArrivalOnBoard(accessPaths);
+    addAllEgressStopsUsingStreetToDestination(egressPaths);
+    addAllViaConnectionsFromStopsWithTransfer(viaConnections);
   }
 
-  public TIntSet stops() {
-    if (stops.isEmpty()) {
-      create();
-    }
+  public static TIntSet resolve(
+    AccessPaths accessPaths,
+    EgressPaths egressPaths,
+    @Nullable ViaConnections viaConnections
+  ) {
+    return new StopsWithArriveByTransitCriteriaResolver(
+      accessPaths,
+      egressPaths,
+      viaConnections
+    ).stops();
+  }
+
+  private TIntSet stops() {
     return stops;
   }
 
-  /**
-   * This method creates a ParetoSet for the given egress stop. When arrivals are added to the stop,
-   * the "glue" make sure new destination arrivals are added to the destination arrivals.
-   */
-  private StopsWithArriveByTransitCriteriaResolver<T> create() {
-    addAllAccessStopsWithAtLeastOneStopArrivalOnBoard();
-    addAllEgressStopsUsingStreetToDestination();
-    addAllViaConnectionsFromStopsWithTransfer();
-
-    return this;
-  }
-
-  private void addAllAccessStopsWithAtLeastOneStopArrivalOnBoard() {
+  private void addAllAccessStopsWithAtLeastOneStopArrivalOnBoard(AccessPaths accessPaths) {
     stops.addAll(
       accessPaths.arrivedOnBoard().stream().mapToInt(RaptorAccessEgress::stop).toArray()
     );
   }
 
-  private void addAllEgressStopsUsingStreetToDestination() {
+  private void addAllEgressStopsUsingStreetToDestination(EgressPaths egressPaths) {
     var egressByStop = egressPaths.byStop();
     for (var it = egressByStop.keySet().iterator(); it.hasNext(); ) {
       int stop = it.next();
@@ -63,15 +55,15 @@ public class StopsWithArriveByTransitCriteriaResolver<T extends RaptorTripSchedu
     }
   }
 
-  private void addAllViaConnectionsFromStopsWithTransfer() {
+  private void addAllViaConnectionsFromStopsWithTransfer(ViaConnections viaConnections) {
     if (viaConnections == null) {
       return;
     }
     for (var it = viaConnections.byFromStop().iterator(); it.hasNext(); ) {
       it.advance();
       var stop = it.key();
-      var viaConnections = it.value();
-      if (viaConnections.stream().anyMatch(via -> !via.isSameStop())) {
+      var viaConnectionsFromStop = it.value();
+      if (viaConnectionsFromStop.stream().anyMatch(via -> !via.isSameStop())) {
         stops.add(stop);
       }
     }
