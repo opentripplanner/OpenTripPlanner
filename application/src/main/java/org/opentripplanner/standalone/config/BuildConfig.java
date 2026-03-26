@@ -111,8 +111,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean dataImportReport;
 
-  public final int maxDataImportIssuesPerFile;
-
   public final double subwayAccessTime;
 
   public final boolean embedRouterConfig;
@@ -265,18 +263,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       .asBoolean(false);
 
     islandPruning = IslandPruningConfig.fromConfig(root);
-
-    maxDataImportIssuesPerFile = root
-      .of("maxDataImportIssuesPerFile")
-      .since(V2_0)
-      .summary("When to split the import report.")
-      .description(
-        """
-          If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
-          be split in multiple files. Since browsers have problems opening large HTML files.
-        """
-      )
-      .asInt(1000);
 
     this.regularTransferParameters = RegularTransferConfig.map(root);
 

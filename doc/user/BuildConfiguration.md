@@ -29,7 +29,6 @@ Sections follow that describe particular settings in more depth.
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                     |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
 | includeInclinedEdgeLevelInfo                                                                |       `boolean`      | Whether level info for inclined edges should be stored in the graph for use during runtime.                                                                    | *Optional* | `false`                           |  2.9  |
 | maxAreaNodes                                                                                |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
-| [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                   |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
 | maxElevationPropagationMeters                                                               |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                                   |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
 | maxTransferDuration                                                                         |      `duration`      | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
@@ -470,19 +469,6 @@ NOTE: if this is set to true for graph building, make sure to not set the value 
 `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
 all of the elevation values in the street edges.
 
-
-<h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
-
-**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`   
-**Path:** / 
-
-When to split the import report.
-
-  If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
-  be split in multiple files. Since browsers have problems opening large HTML files.
-
-
-<h3 id="maxStopToShapeSnapDistance">maxStopToShapeSnapDistance</h3>
 
 **Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`   
 **Path:** / 
