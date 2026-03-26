@@ -382,7 +382,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var streetVertexUtils = new StreetVertexUtils(this.vertexLinker, temporaryVerticesContainer);
 
-      var carPoolTreeVertexRouter = new CarpoolTreeStreetRouter();
+      var carpoolTreeVertexRouter = new CarpoolTreeStreetRouter();
       Vertex passengerAccessEgressVertex = streetVertexUtils.getOrCreateVertex(
         passengerCoordinates,
         linkingContext
@@ -399,7 +399,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         0
       );
 
-      var nearByStops = streetNearbyStopFinder
+      var nearbyStops = streetNearbyStopFinder
         .build()
         .findNearbyStops(
           Set.of(passengerAccessEgressVertex),
@@ -411,11 +411,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
         .filter(stop -> !(stop.stop instanceof AreaStop))
         .toList();
 
-      var nearByStopsWithVertices = new HashMap<NearbyStop, Vertex>();
-      for (var stop : nearByStops) {
+      var nearbyStopsWithVertices = new HashMap<NearbyStop, Vertex>();
+      for (var stop : nearbyStops) {
         var vertex = streetVertexUtils.getOrCreateVertex(stop.stop.getCoordinate(), linkingContext);
         if (vertex != null) {
-          nearByStopsWithVertices.put(stop, vertex);
+          nearbyStopsWithVertices.put(stop, vertex);
         }
       }
 
@@ -427,20 +427,20 @@ public class DefaultCarpoolingService implements CarpoolingService {
         .filter(Objects::nonNull)
         .toList();
 
-      // vertices have to be added to the carPoolTreeVertexRouter AFTER all vertices have been created
-      carPoolTreeVertexRouter.addVertex(
+      // vertices have to be added to the carpoolTreeVertexRouter AFTER all vertices have been created
+      carpoolTreeVertexRouter.addVertex(
         passengerAccessEgressVertex,
         CarpoolTreeStreetRouter.Direction.BOTH,
         MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
       );
       candidateTripsWithVertices.forEach(tripWithVertices -> {
         var vertices = tripWithVertices.vertices();
-        carPoolTreeVertexRouter.addVertex(
+        carpoolTreeVertexRouter.addVertex(
           vertices.getFirst(),
           CarpoolTreeStreetRouter.Direction.FROM,
           MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
         );
-        carPoolTreeVertexRouter.addVertex(
+        carpoolTreeVertexRouter.addVertex(
           vertices.getLast(),
           CarpoolTreeStreetRouter.Direction.TO,
           MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
@@ -448,7 +448,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
         var middleVertices = vertices.subList(1, vertices.size() - 1);
         middleVertices.forEach(vertex -> {
-          carPoolTreeVertexRouter.addVertex(
+          carpoolTreeVertexRouter.addVertex(
             vertex,
             CarpoolTreeStreetRouter.Direction.BOTH,
             MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
@@ -460,13 +460,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
         delayConstraints,
         linkingContext,
         streetVertexUtils,
-        carPoolTreeVertexRouter
+        carpoolTreeVertexRouter
       );
 
       var candidateTripsWithViableStopsAndPositions = candidateTripsWithVertices
         .stream()
         .map(tripWithVertices -> {
-          var viableSegmentInsertions = nearByStopsWithVertices
+          var viableSegmentInsertions = nearbyStopsWithVertices
             .keySet()
             .stream()
             .map(nearbyStop -> {
@@ -484,7 +484,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
               );
               return new ViableAccessEgress(
                 nearbyStop,
-                nearByStopsWithVertices.get(nearbyStop),
+                nearbyStopsWithVertices.get(nearbyStop),
                 passengerAccessEgressVertex,
                 accessOrEgress,
                 viablePositions
