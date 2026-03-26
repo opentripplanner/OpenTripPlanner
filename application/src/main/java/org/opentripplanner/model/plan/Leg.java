@@ -113,9 +113,9 @@ public interface Leg {
   boolean hasSameMode(Leg other);
 
   /**
-   * Return {@code true} if to legs are the same. The mode must match and the time must overlap.
-   * For transit the trip ID must match and board/alight position must overlap. (Two trips with
-   * different service-date can overlap in time, so we use boarding-/alight-position to verify).
+   * Return {@code true} if two legs are the same. The mode must match and the time must overlap.
+   * For transit the service date, trip ID, and board/alight position must all match. (Two trips
+   * with different service-date can overlap in time, so we use boarding-/alight-position to verify)
    */
   default boolean isPartiallySameLeg(Leg other) {
     if (!hasSameMode(other)) {
@@ -133,20 +133,7 @@ public interface Leg {
     }
     // Transit leg
     else {
-      // If NOT the same trip, return false
-      if (!trip().getId().equals(other.trip().getId())) {
-        return false;
-      }
-
-      // Return true if legs overlap in space(have one common stop visit), this is necessary
-      // since the same trip id on two following service dates may overlap in time. For example,
-      // a trip may run in a loop for 48 hours, overlapping with the same trip id of the trip
-      // scheduled for the next service day. They both visit the same stops, with overlapping
-      // times, but the stop positions will be different.
-      return (
-        boardStopPosInPattern() < other.alightStopPosInPattern() &&
-        alightStopPosInPattern() > other.boardStopPosInPattern()
-      );
+      return isPartiallySameTransitLeg(other);
     }
   }
 

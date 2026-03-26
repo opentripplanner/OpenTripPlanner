@@ -156,6 +156,15 @@ public class LegTest implements PlanTestConstants {
       Leg busOther = leg(b -> b.bus(tripId, startTime, endTime, 1, fromStopIndex, B, dayBefore));
       assertFalse(busLeg.isPartiallySameLeg(busOther));
     }
+
+    // Same trip id but on a different service day
+    {
+      Leg leg1 = leg(b -> b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day));
+      Leg leg2 = leg(b ->
+        b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day.plusDays(1))
+      );
+      assertFalse(leg1.isPartiallySameLeg(leg2));
+    }
   }
 
   @Test

@@ -87,14 +87,14 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       var pattern = route.pattern();
       int boardPos = pattern.findStopPositionAfter(0, access.stop());
 
-      if (boardPos == -1) {
+      if (boardPos == -1 || !pattern.boardingPossibleAt(boardPos)) {
         continue;
       }
 
       for (var egress : egresses) {
         int alightPos = pattern.findStopPositionAfter(boardPos + 1, egress.stop());
 
-        if (alightPos == -1) {
+        if (alightPos == -1 || !pattern.alightingPossibleAt(alightPos)) {
           continue;
         }
 
