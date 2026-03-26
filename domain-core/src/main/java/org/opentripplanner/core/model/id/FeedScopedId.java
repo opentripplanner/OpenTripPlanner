@@ -83,26 +83,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     );
   }
 
-  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
-  ///
-  /// @param value id of the form "feedId:entityId"
-  /// @return an id object or null if the input is empty or null
-  /// @throws IllegalArgumentException if the id cannot be parsed
-  /// @deprecated Use [FeedScopedId#parseOptional] or [FeedScopedId#parseStrict] instead
-  @Deprecated
-  @Nullable
-  public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
-    if (StringUtils.hasNoValue(value)) {
-      return null;
-    }
-    int index = value.indexOf(ID_SEPARATOR);
-    if (index == -1) {
-      throw new IllegalArgumentException("invalid feed-scoped-id: " + value);
-    } else {
-      return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
-    }
-  }
-
   /**
    * Given collection of strings in the form "feedId:entityId", parses into a list of {@link FeedScopedId}.
    *
@@ -131,10 +111,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
       .filter(i -> !i.isBlank())
       .map(FeedScopedId::parseStrict)
       .toList();
-  }
-
-  public static boolean isValidString(@Nullable String value) throws IllegalArgumentException {
-    return value != null && value.indexOf(ID_SEPARATOR) > -1;
   }
 
   public void requireSameFeedId(FeedScopedId other) {
