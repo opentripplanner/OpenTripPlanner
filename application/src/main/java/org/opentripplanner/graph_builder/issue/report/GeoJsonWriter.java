@@ -31,8 +31,9 @@ public class GeoJsonWriter {
   }
 
   /**
-   * Write the issues to a GeoJSON file
-   * @return true if a GeoJSON was written, false if not
+   * Write the issues to a GeoJSON file.
+   *
+   * @return true if a GeoJSON file was written, false if not
    */
   boolean writeFile() {
     var filteredIssues = issues
@@ -44,7 +45,7 @@ public class GeoJsonWriter {
       return false;
     }
 
-    var featureCollection = makeContourFeatures(issues);
+    var featureCollection = makeContourFeatures(filteredIssues);
     try (GeoJSONWriter geoJSONWriter = new GeoJSONWriter(target.asOutputStream())) {
       // Set slightly higher resolution than default. We output small details
       geoJSONWriter.setMaxDecimals(6);
