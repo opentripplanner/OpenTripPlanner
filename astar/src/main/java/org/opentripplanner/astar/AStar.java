@@ -17,6 +17,7 @@ import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.spi.StatisticsCallback;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.utils.time.DateUtils;
 import org.slf4j.Logger;
@@ -34,8 +35,6 @@ public class AStar<
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-  private static final boolean VERBOSE = LOG.isDebugEnabled();
-
   private final boolean arriveBy;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
@@ -44,6 +43,7 @@ public class AStar<
   private final SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private final SearchTerminationStrategy<State> terminationStrategy;
   private final TraverseVisitor<State, Edge> traverseVisitor;
+  private final StatisticsCallback<Vertex> statistics;
   private final Duration timeout;
 
   private final ShortestPathTree<State, Edge, Vertex> spt;
@@ -64,7 +64,8 @@ public class AStar<
     SearchTerminationStrategy<State> terminationStrategy,
     DominanceFunction<State> dominanceFunction,
     Duration timeout,
-    Collection<State> initialStates
+    Collection<State> initialStates,
+    StatisticsCallback<Vertex> stats
   ) {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
@@ -76,6 +77,8 @@ public class AStar<
     this.timeout = Objects.requireNonNull(timeout);
 
     this.spt = new ShortestPathTree<>(dominanceFunction);
+
+    this.statistics = stats;
     this.preSearchHook = preSearchHook;
 
     // Initialized with a reasonable size, see #4445
@@ -106,12 +109,6 @@ public class AStar<
   }
 
   private boolean iterate() {
-    // print debug info
-    if (VERBOSE) {
-      double w = pq.peek_min_key();
-      LOG.debug("pq min key = {}", w);
-    }
-
     // get the lowest-weight state in the queue
     u = pq.extract_min();
 
@@ -130,10 +127,6 @@ public class AStar<
     nVisited += 1;
 
     Vertex u_vertex = u.getVertex();
-
-    if (VERBOSE) {
-      LOG.debug("   vertex {}", u_vertex);
-    }
 
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
     for (Edge edge : edges) {
@@ -158,18 +151,6 @@ public class AStar<
         }
         double estimate = v.getWeight() + remaining_w;
 
-        if (VERBOSE) {
-          LOG.debug("      edge {}", edge);
-          LOG.debug(
-            "      {} -> {}(w) + {}(heur) = {} vert = {}",
-            u.getWeight(),
-            v.getWeight(),
-            remaining_w,
-            estimate,
-            v.getVertex()
-          );
-        }
-
         // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
         if (spt.add(v)) {
           // report to the visitor if there is one
@@ -188,6 +169,7 @@ public class AStar<
     // execute the hook before the search begins so that it can be checked if the request
     // has already timed out.
     preSearchHook.run();
+    statistics.searchStarted();
     long abortTime = DateUtils.absoluteTimeout(timeout);
 
     /* the core of the A* algorithm */
@@ -223,10 +205,11 @@ public class AStar<
         targetAcceptedStates.add(u);
 
         // Break out of the search if we've found the requested number of paths.
-        // Currently,  we can only find one path per search.
-        LOG.debug("total vertices visited {}", nVisited);
+        // Currently, we can only find one path per search.
         break;
       }
     }
+
+    statistics.searchFinished(fromVertices, toVertices, nVisited);
   }
 }
