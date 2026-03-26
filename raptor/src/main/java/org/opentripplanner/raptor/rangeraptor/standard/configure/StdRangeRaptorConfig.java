@@ -106,13 +106,16 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private StdRangeRaptorWorkerState<T> resolveState() {
     if (state == null) {
+      var egressData = computeEgressStopData();
       this.state = oneOf(
         new StdRangeRaptorWorkerState<>(
           ctx.calculator(),
           resolveBestTimes(),
           createStopArrivals(),
           resolveBestNumberOfTransfers(),
-          resolveArrivedAtDestinationCheck()
+          resolveArrivedAtDestinationCheck(),
+          egressData[0],
+          egressData[1]
         ),
         StdWorkerState.class
       );
@@ -269,6 +272,28 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       ctx.segments().getLast().egressPaths(),
       "Last leg must have non-null egressPaths"
     );
+  }
+
+  /**
+   * Compute egress stop data for Early Pruning: returns [stopIndices, minDurations] where
+   * minDurations[i] is the minimum egress duration from stopIndices[i] to the destination.
+   */
+  private int[][] computeEgressStopData() {
+    var minDurationByStop = new java.util.LinkedHashMap<Integer, Integer>();
+    for (var egress : egressPaths().listAll()) {
+      int stop = egress.stop();
+      int dur = egress.durationInSeconds();
+      minDurationByStop.merge(stop, dur, Math::min);
+    }
+    int[] stops = new int[minDurationByStop.size()];
+    int[] durations = new int[minDurationByStop.size()];
+    int i = 0;
+    for (var entry : minDurationByStop.entrySet()) {
+      stops[i] = entry.getKey();
+      durations[i] = entry.getValue();
+      i++;
+    }
+    return new int[][] { stops, durations };
   }
 
   private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(S value) {

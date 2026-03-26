@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
@@ -60,10 +61,11 @@ class OnDemandRaptorTransferIndex implements RaptorTransferIndex {
     // We don't think that the overhead of locking is worthwhile for the occasional chance of two
     // threads generating the transfers at the same time.
     if (forwardRaptorTransfers[stopIndex] == null) {
-      forwardRaptorTransfers[stopIndex] = RaptorTransferIndex.getRaptorTransfers(
-        request,
-        forwardTransfers.get(stopIndex)
+      var transfers = new ArrayList<>(
+        RaptorTransferIndex.getRaptorTransfers(request, forwardTransfers.get(stopIndex))
       );
+      transfers.sort(Comparator.comparingInt(RaptorTransfer::durationInSeconds));
+      forwardRaptorTransfers[stopIndex] = transfers;
     }
 
     return forwardRaptorTransfers[stopIndex];
@@ -74,9 +76,11 @@ class OnDemandRaptorTransferIndex implements RaptorTransferIndex {
     initializeReversedTransfers();
 
     if (reversedRaptorTransfers[stopIndex] == null) {
-      reversedRaptorTransfers[stopIndex] = getReversedRaptorTransfers(
-        reversedTransfers.get(stopIndex)
+      var transfers = new ArrayList<>(
+        getReversedRaptorTransfers(reversedTransfers.get(stopIndex))
       );
+      transfers.sort(Comparator.comparingInt(RaptorTransfer::durationInSeconds));
+      reversedRaptorTransfers[stopIndex] = transfers;
     }
 
     return reversedRaptorTransfers[stopIndex];
