@@ -182,16 +182,13 @@ public class RouteRequestMapper {
     var stopLocation = locationInput.getGraphQLLocation().getGraphQLStopLocation();
     if (stopLocation.getGraphQLStopLocationId() != null) {
       var stopId = stopLocation.getGraphQLStopLocationId();
-      if (FeedScopedId.isValidString(stopId)) {
-        return new GenericLocation(
-          locationInput.getGraphQLLabel(),
-          FeedScopedId.parse(stopId),
-          null,
-          null
+      return FeedScopedId.parseOptional(stopId)
+        .map(feedScopedId ->
+          new GenericLocation(locationInput.getGraphQLLabel(), feedScopedId, null, null)
+        )
+        .orElseThrow(() ->
+          new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
         );
-      } else {
-        throw new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId));
-      }
     }
 
     var coordinate = locationInput.getGraphQLLocation().getGraphQLCoordinate();
