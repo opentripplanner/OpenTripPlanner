@@ -16,7 +16,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite
 
 /// This class creates {@link ParetoSetEventListener}s to glue a stop-arrival to (in order):
 /// - debug stop arrival events
-/// - updating next connection event
+/// - updating next via connection event
 /// - updating destination path collection using egress paths.
 ///
 /// If the debugger is not done first, then the logging will be strange -> events
@@ -90,7 +90,7 @@ public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
   private <R> R assertProcessed(R result) {
     if (!processed) {
-      throw new IllegalStateException("Call the map() method before accessing the result!");
+      throw new IllegalStateException("Call the create() method before accessing the result!");
     }
     return result;
   }

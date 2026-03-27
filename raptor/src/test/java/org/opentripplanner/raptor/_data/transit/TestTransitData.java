@@ -46,7 +46,7 @@ public class TestTransitData
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<TestConstrainedTransfer> constrainedTransfers = new ArrayList<>();
-  private final boolean enableDebugLogging = initEnebleDebugLoging();
+  private final boolean enableDebugLogging = initEnableDebugLogging();
 
   private int boardCostSec = 600;
   private int transferCostSec = 0;
@@ -295,11 +295,6 @@ public class TestTransitData
   /**
    * Create constraint for a given transfer. If trip passes through the stop more than once
    * constraint will be placed on stop position for the first visit.
-   * @param fromTrip initial trip
-   * @param fromStop initial stop index
-   * @param toTrip destination trip
-   * @param toStop destination trip index
-   * @param constraint constraint to set
    */
   public TestTransitData withConstrainedTransfer(
     TestTripSchedule fromTrip,
@@ -353,16 +348,6 @@ public class TestTransitData
     }
   }
 
-  private List<Integer> stopsVisited() {
-    final List<Integer> stops = new ArrayList<>();
-    for (int i = 0; i < routeIndexesByStopIndex.size(); i++) {
-      if (!routeIndexesByStopIndex.get(i).isEmpty()) {
-        stops.add(i);
-      }
-    }
-    return stops;
-  }
-
   private static String flipEgress(String egress) {
     int pos = egress.indexOf('~');
     return egress.substring(pos + 1).trim() + " ~ " + egress.substring(0, pos).trim();
@@ -396,10 +381,8 @@ public class TestTransitData
     }
   }
 
-  /// We always run with debugging enabled, but be skip logging(dryRun=true).
-  /// We do this to make sure the logging works for all test-cases, and do not throw exceptions.
-  /// Add `-DdebugRaptor=true` to enable.
-  boolean initEnebleDebugLoging() {
+  /// Add `-DdebugRaptor=true` to Raptor event logging.
+  boolean initEnableDebugLogging() {
     boolean sysDebug = System.getProperties().containsKey("debugRaptor");
     boolean envDebug = System.getenv().containsKey("debugRaptor");
     return sysDebug || envDebug;

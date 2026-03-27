@@ -33,10 +33,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private final DebugStopArrivalsStatistics debugStats;
   private final ParetoComparator<McStopArrival<T>> comparator;
 
-  /**
-   * Set the time at a transit index if it is optimal. This sets both the best time and the
-   * transfer time.
-   */
   public McStopArrivals(
     int nStops,
     TIntSet onBoardArrivalStops,
