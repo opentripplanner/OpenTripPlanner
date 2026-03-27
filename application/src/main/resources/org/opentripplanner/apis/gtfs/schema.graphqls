@@ -639,7 +639,7 @@ type FareProductUse {
   ### Example: Combination of single tickets and day passes
   
   If you have two legs and it's possible to either buy singles or use a day pass, you will
-  have a combination of identical and different `FareProduct.id`s.
+  have a combination of identical and different `FareProductUse.id`s.
   
   **Illustration**
   ```yaml
