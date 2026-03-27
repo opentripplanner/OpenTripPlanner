@@ -323,7 +323,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       try {
         result.add(Integer.parseInt(stop));
       } catch (NumberFormatException ignore) {
-        var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parse(stop)).toArray();
+        var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parseStrict(stop)).toArray();
         if (a.length != 1) {
           throw new IllegalArgumentException("Unable to parse the input stop id: '" + stop + "'");
         }

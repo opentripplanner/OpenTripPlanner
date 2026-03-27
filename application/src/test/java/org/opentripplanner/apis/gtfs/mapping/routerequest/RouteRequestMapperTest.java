@@ -140,9 +140,9 @@ class RouteRequestMapperTest {
     );
     var env = testCtx.executionContext(stopLocationArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
-    assertEquals(FeedScopedId.parse(stopA), routeRequest.from().stopId);
+    assertEquals(FeedScopedId.parseStrict(stopA), routeRequest.from().stopId);
     assertEquals(originLabel, routeRequest.from().label);
-    assertEquals(FeedScopedId.parse(stopB), routeRequest.to().stopId);
+    assertEquals(FeedScopedId.parseStrict(stopB), routeRequest.to().stopId);
     assertEquals(destinationLabel, routeRequest.to().label);
   }
 

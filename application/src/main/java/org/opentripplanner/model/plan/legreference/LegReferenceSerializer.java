@@ -93,13 +93,13 @@ public class LegReferenceSerializer {
   static LegReference readScheduledTransitLegV3(ObjectInputStream objectInputStream)
     throws IOException {
     return new ScheduledTransitLegReference(
-      FeedScopedId.parse(objectInputStream.readUTF()),
+      parseNonRequiredId(objectInputStream.readUTF()),
       LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
       objectInputStream.readInt(),
       objectInputStream.readInt(),
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      FeedScopedId.parse(objectInputStream.readUTF())
+      FeedScopedId.parseStrict(objectInputStream.readUTF()),
+      FeedScopedId.parseStrict(objectInputStream.readUTF()),
+      parseNonRequiredId(objectInputStream.readUTF())
     );
   }
 
@@ -113,5 +113,14 @@ public class LegReferenceSerializer {
     throws IOException {
     String value = in.readUTF();
     return Enum.valueOf(enumType, value);
+  }
+
+  /// Parse a string into a FeedScopedId, empty string returns null
+  @Nullable
+  private static FeedScopedId parseNonRequiredId(String id) {
+    if (id.isEmpty()) {
+      return null;
+    }
+    return FeedScopedId.parseStrict(id);
   }
 }
