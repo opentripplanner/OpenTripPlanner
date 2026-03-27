@@ -654,6 +654,8 @@ type Feed {
   feedId: String!
   "The publisher of the input transit data."
   publisher: FeedPublisher
+  "Version of the Feed"
+  version: String
 }
 
 "Feed publisher information"

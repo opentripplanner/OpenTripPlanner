@@ -383,6 +383,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<String> feedId();
+
+    public DataFetcher<String> version();
     public DataFetcher<FeedPublisher> publisher();
   }
 

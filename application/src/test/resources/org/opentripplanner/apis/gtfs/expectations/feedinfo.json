@@ -11,7 +11,8 @@
         "publisher": {
           "name": "publisher",
           "url": "www.z.org"
-        }
+        },
+        "version": "12345"
       }
     ]
   }
