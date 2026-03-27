@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import com.google.common.collect.Lists;
-import java.util.Collections;
 import java.util.function.Supplier;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -47,14 +45,15 @@ public class FlexGraphPathAdapter {
 
     // For depart-after, edges are in reverse chronological order; reverse to chronological.
     // For arriveBy, the A* searched backward so edges are already chronological.
-
     Supplier<LineString> edgeSupplier = () -> {
+      var linestring = GeometryUtils.concatenateLineStrings(
+        state.listBackEdges(),
+        Edge::getGeometry
+      );
       if (!state.getRequest().arriveBy()) {
-        var edges = Lists.newArrayList(state.listBackEdges());
-        Collections.reverse(edges);
-        return GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
+        return linestring.reverse();
       } else {
-        return GeometryUtils.concatenateLineStrings(state.listBackEdges(), Edge::getGeometry);
+        return linestring;
       }
     };
 
