@@ -19,7 +19,10 @@ class FeedScopedIdTest {
 
   @Test
   void parseOptional() {
-    assertEquals(Optional.of(new FeedScopedId("FEED", "ID")), FeedScopedId.parseOptional("FEED:ID"));
+    assertEquals(
+      Optional.of(new FeedScopedId("FEED", "ID")),
+      FeedScopedId.parseOptional("FEED:ID")
+    );
     assertEquals(Optional.empty(), FeedScopedId.parseOptional(""));
     assertEquals(Optional.empty(), FeedScopedId.parseOptional(" "));
     assertEquals(Optional.empty(), FeedScopedId.parseOptional("ID"));

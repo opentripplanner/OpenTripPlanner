@@ -6,14 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.spi.AStarEdge;
-import org.opentripplanner.astar.spi.AStarRequest;
-import org.opentripplanner.astar.spi.AStarState;
-import org.opentripplanner.astar.spi.AStarVertex;
+import org.opentripplanner.astar.TestState;
+import org.opentripplanner.astar.TestVertex;
 import org.opentripplanner.astar.spi.DominanceFunction;
 
 class ShortestPathTreeTest {
@@ -23,7 +20,7 @@ class ShortestPathTreeTest {
     a.getWeight() <= b.getWeight();
 
   /** No dominance: all states are co-dominant. */
-  private static final DominanceFunction<TestState> NONE = (a, b) -> false;
+  private static final DominanceFunction<TestState> NONE = (_, _) -> false;
 
   @Test
   void singleState() {
@@ -143,99 +140,5 @@ class ShortestPathTreeTest {
     var spt = new ShortestPathTree<>(BY_WEIGHT);
     spt.add(new TestState(new TestVertex(), 1.0));
     assertEquals("ShortestPathTree(1 vertices)", spt.toString());
-  }
-
-  // -- Minimal test fixtures --
-
-  private static class TestVertex implements AStarVertex<TestState, TestEdge, TestVertex> {
-
-    @Override
-    public Collection<TestEdge> getOutgoing() {
-      return List.of();
-    }
-
-    @Override
-    public Collection<TestEdge> getIncoming() {
-      return List.of();
-    }
-  }
-
-  private static class TestState implements AStarState<TestState, TestEdge, TestVertex> {
-
-    private final TestVertex vertex;
-    private final double weight;
-
-    TestState(TestVertex vertex, double weight) {
-      this.vertex = vertex;
-      this.weight = weight;
-    }
-
-    @Override
-    public boolean isFinal() {
-      return true;
-    }
-
-    @Override
-    public TestState getBackState() {
-      return null;
-    }
-
-    @Override
-    public TestState reverse() {
-      return this;
-    }
-
-    @Override
-    public TestEdge getBackEdge() {
-      return null;
-    }
-
-    @Override
-    public long getTimeSeconds() {
-      return 0;
-    }
-
-    @Override
-    public double getWeight() {
-      return weight;
-    }
-
-    @Override
-    public TestVertex getVertex() {
-      return vertex;
-    }
-
-    @Override
-    public long getElapsedTimeSeconds() {
-      return 0;
-    }
-
-    @Override
-    public Instant getTime() {
-      return Instant.EPOCH;
-    }
-
-    @Override
-    public AStarRequest getRequest() {
-      return () -> false;
-    }
-  }
-
-  private static class TestEdge implements AStarEdge<TestState, TestEdge, TestVertex> {
-
-    @Override
-    public TestVertex getFromVertex() {
-      return null;
-    }
-
-    @Override
-    public TestVertex getToVertex() {
-      return null;
-    }
-
-    @Override
-    public TestState[] traverse(TestState s0) {
-      return new TestState[0];
-    }
   }
 }

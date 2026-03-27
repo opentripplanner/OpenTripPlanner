@@ -502,7 +502,7 @@ def resolve_latest_ser_ver_id():
     p = git('tag', '--list', '--sort=-v:refname', error_msg='Fetch git tags failed!')
     all_tags = p.stdout.splitlines()
     prefix = f'{state.major_version}-{config.release_remote}-\\d+'
-    pattern = re.compile('v' + prefix.replace('.', r'\.') + r'\d+')
+    pattern = re.compile('v' + prefix.replace('.', r'\.'))
     tags = [item for item in all_tags if re.search(pattern, item)]
     tags = tags[:60]
     maxSId = ' '
