@@ -1,14 +1,15 @@
 package org.opentripplanner.raptor.api.model;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.RIDES;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.TIME_PENALTY;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.VIAS;
+import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 

@@ -14,6 +14,7 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
@@ -21,7 +22,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
-import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
@@ -65,6 +66,8 @@ public class TransitRouter {
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContext linkingContext;
   private final AccessEgressRouter accessEgressRouter;
+  private final TransitServiceResolver transitServiceResolver;
+  private final CarpoolingService carpoolingService;
 
   private TransitRouter(
     RouteRequest request,
@@ -73,7 +76,8 @@ public class TransitRouter {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
-    LinkingContext linkingContext
+    LinkingContext linkingContext,
+    CarpoolingService carpoolingService
   ) {
     this.request = request;
     this.serverContext = serverContext;
@@ -83,9 +87,9 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
     this.viaTransferResolver = serverContext.viaTransferResolver();
     this.linkingContext = linkingContext;
-    this.accessEgressRouter = new AccessEgressRouter(
-      new TransitServiceResolver(serverContext.transitService())
-    );
+    this.transitServiceResolver = new TransitServiceResolver(serverContext.transitService());
+    this.accessEgressRouter = new AccessEgressRouter(this.transitServiceResolver);
+    this.carpoolingService = carpoolingService;
   }
 
   public static TransitRouterResult route(
@@ -95,7 +99,8 @@ public class TransitRouter {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
-    LinkingContext linkingContext
+    LinkingContext linkingContext,
+    CarpoolingService carpoolingService
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -104,7 +109,8 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays,
       debugTimingAggregator,
-      linkingContext
+      linkingContext,
+      carpoolingService
     );
 
     return transitRouter.route();
@@ -287,6 +293,7 @@ public class TransitRouter {
     }
 
     var accessRequest = accessBuilder.buildRequest();
+
     var accessEgressPreferences = accessRequest.preferences().street().accessEgress();
 
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
@@ -320,6 +327,18 @@ public class TransitRouter {
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
+    }
+
+    if (OTPFeature.CarPooling.isOn() && mode == StreetMode.CARPOOL) {
+      var carpoolAccessEgressList = carpoolingService.routeAccessEgress(
+        accessRequest,
+        streetRequest,
+        type,
+        transitServiceResolver,
+        linkingContext,
+        transitSearchTimeZero
+      );
+      results.addAll(carpoolAccessEgressList);
     }
 
     return results;

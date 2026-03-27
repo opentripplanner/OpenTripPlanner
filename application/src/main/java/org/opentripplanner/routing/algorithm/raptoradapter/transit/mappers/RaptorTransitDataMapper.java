@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransfersMapper.mapTransfers;
+import static org.opentripplanner.transfer.regular.model.TransfersMapper.mapTransfers;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.time.LocalDate;
@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
+import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.model.Transfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;

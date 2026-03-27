@@ -2,11 +2,11 @@ package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.support.RouterResultPathAggregator;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.composite.CompositeUtil;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 

@@ -7,6 +7,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 - Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
 - Cleanup regular transfer build parameters [#7425](https://github.com/opentripplanner/OpenTripPlanner/pull/7425)
+- Add CostlyAssertions feature that should be turned off in production and improve performance of via routing with coordinates [#7301](https://github.com/opentripplanner/OpenTripPlanner/pull/7301)
+- Added carpooling as an access/egress mode [#7341](https://github.com/opentripplanner/OpenTripPlanner/pull/7341)
+-  Cache TransferIndexGenerator results to skip redundant regeneration [#7355](https://github.com/opentripplanner/OpenTripPlanner/pull/7355)
+- Improve compatibility with Swiss NeTEx data [#7427](https://github.com/opentripplanner/OpenTripPlanner/pull/7427)
+- fix: Introduce stable order for fareZones (tariffZones) [#7434](https://github.com/opentripplanner/OpenTripPlanner/pull/7434)
+- Prevent long routes mistakenly getting grouped across service-date [#7452](https://github.com/opentripplanner/OpenTripPlanner/pull/7452)
+- Migrate away from deprecated FeedScopedId.parse() [#7457](https://github.com/opentripplanner/OpenTripPlanner/pull/7457)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
@@ -100,9 +107,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Reduce Raptor on-board optimal set by using strict less-than for tripSortIndex [#7417](https://github.com/opentripplanner/OpenTripPlanner/pull/7417)
 - fix: Return NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW when transit search finds no trips [#7398](https://github.com/opentripplanner/OpenTripPlanner/pull/7398)
 - Fix findTripTimesOnDate filters using wrong route mode and applying filters after limit [#7408](https://github.com/opentripplanner/OpenTripPlanner/pull/7408)
-- Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
-- Cleanup regular transfer build parameters [#7425](https://github.com/opentripplanner/OpenTripPlanner/pull/7425)
-[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
 

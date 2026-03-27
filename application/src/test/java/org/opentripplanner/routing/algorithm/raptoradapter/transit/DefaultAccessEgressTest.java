@@ -9,7 +9,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 

@@ -179,6 +179,7 @@ public class TimetableRepositoryTestBuilder {
     var route = Optional.ofNullable(tripInput.route()).orElse(defaultRoute);
 
     var tripBuilder = Trip.of(id(tripInput.id()))
+      .withShortName(tripInput.shortName())
       .withRoute(route)
       .withHeadsign(tripInput.headsign())
       .withServiceId(serviceId)

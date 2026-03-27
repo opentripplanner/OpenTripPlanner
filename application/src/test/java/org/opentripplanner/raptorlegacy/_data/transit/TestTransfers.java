@@ -1,11 +1,11 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 
 import java.util.EnumSet;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.Transfer;
 
 /**
  * Simple factory to create {@link DefaultRaptorTransfer}s for unit-testing.

@@ -50,6 +50,6 @@ class ViaLocationMapper {
     if (ids == null) {
       return List.of();
     }
-    return ids.stream().map(FeedScopedId::parse).toList();
+    return ids.stream().map(FeedScopedId::parseStrict).toList();
   }
 }

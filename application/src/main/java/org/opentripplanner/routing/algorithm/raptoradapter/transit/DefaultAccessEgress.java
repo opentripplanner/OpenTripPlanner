@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.street.search.state.State;
 
 /**

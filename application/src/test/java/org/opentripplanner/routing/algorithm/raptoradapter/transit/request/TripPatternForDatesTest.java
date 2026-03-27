@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;

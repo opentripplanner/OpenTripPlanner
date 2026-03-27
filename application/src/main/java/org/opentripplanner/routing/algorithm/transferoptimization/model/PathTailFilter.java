@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import java.util.Set;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Filter path tails for a given stopPosition during the optimization process. The algorithm only

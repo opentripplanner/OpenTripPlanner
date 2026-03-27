@@ -153,11 +153,11 @@ public class LuceneIndex implements Serializable {
   }
 
   private StopCluster toStopCluster(Document document) {
-    var primaryId = FeedScopedId.parse(document.get(ID));
+    var primaryId = FeedScopedId.parseStrict(document.get(ID));
     var primary = stopClusterMapper.toLocation(primaryId);
 
     var secondaryIds = Arrays.stream(document.getValues(SECONDARY_IDS))
-      .map(FeedScopedId::parse)
+      .map(FeedScopedId::parseStrict)
       .map(stopClusterMapper::toLocation)
       .toList();
 

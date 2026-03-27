@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

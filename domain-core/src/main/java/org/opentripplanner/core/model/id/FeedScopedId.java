@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -22,9 +23,26 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
   private final String id;
 
-  public FeedScopedId(String feedId, String id) {
+  /// @throws IllegalArgumentException if the feedId or id is empty
+  public FeedScopedId(String feedId, String id) throws IllegalArgumentException {
     this.feedId = assertHasValue(feedId, "Missing mandatory feedId on FeedScopeId");
     this.id = assertHasValue(id, "Missing mandatory id on FeedScopeId");
+  }
+
+  /// Create a FeedScopedID
+  /// @throws IllegalArgumentException if the feedId or id is empty
+  public static FeedScopedId of(String feedId, String id) throws IllegalArgumentException {
+    return new FeedScopedId(feedId, id);
+  }
+
+  /// Create a FeedScopedId
+  ///
+  /// @return Optional.empty if the feedId or id is empty, otherwise a FeedScopedId
+  public static Optional<FeedScopedId> ofOptional(String feedId, String id) {
+    if (feedId.isBlank() || id.isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.of(new FeedScopedId(feedId, id));
   }
 
   /**
@@ -36,24 +54,33 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return id == null || id.isBlank() ? null : new FeedScopedId(feedId, id);
   }
 
-  /**
-   * Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
-   *
-   * @param value id of the form "feedId:entityId"
-   * @return an id object
-   * @throws IllegalArgumentException if the id cannot be parsed
-   */
-  @Nullable
-  public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
-    if (StringUtils.hasNoValue(value)) {
-      return null;
-    }
+  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
+  ///
+  /// @param value id of the form "feedId:entityId"
+  /// @return Optional.empty if the value is not a valid FeedScopedId
+  public static Optional<FeedScopedId> parseOptional(String value) {
     int index = value.indexOf(ID_SEPARATOR);
     if (index == -1) {
-      throw new IllegalArgumentException("invalid feed-scoped-id: " + value);
-    } else {
-      return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
+      return Optional.empty();
     }
+
+    var feedId = value.substring(0, index);
+    var id = value.substring(index + 1);
+    if (feedId.isBlank() || id.isBlank()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(new FeedScopedId(feedId, id));
+  }
+
+  /// Given an id of the form "feedId:entityId", parses into a {@link FeedScopedId} id object.
+  ///
+  /// @param value id of the form "feedId:entityId"
+  /// @throws IllegalArgumentException if the input is not a valid FeedScopedId
+  public static FeedScopedId parseStrict(String value) throws IllegalArgumentException {
+    return parseOptional(value).orElseThrow(() ->
+      new IllegalArgumentException("Invalid FeedScopedId: " + value)
+    );
   }
 
   /**
@@ -67,7 +94,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         throw new IllegalArgumentException("Collection of FeedScopedId must not contain null.");
       }
     });
-    return value.stream().map(FeedScopedId::parse).toList();
+    return value.stream().map(FeedScopedId::parseStrict).toList();
   }
 
   /**
@@ -82,12 +109,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return Arrays.stream(s.split(","))
       .map(String::strip)
       .filter(i -> !i.isBlank())
-      .map(FeedScopedId::parse)
+      .map(FeedScopedId::parseStrict)
       .toList();
-  }
-
-  public static boolean isValidString(@Nullable String value) throws IllegalArgumentException {
-    return value != null && value.indexOf(ID_SEPARATOR) > -1;
   }
 
   public void requireSameFeedId(FeedScopedId other) {
@@ -114,9 +137,9 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   }
 
   /**
-   * @deprecated Do not depend on the sort order of the ids.
+   * Note: the contents of a feed scoped id is not intended to carry semantic meaning, so comparison
+   * should rarely be relied on, except for e.g. achieving deterministic sorting behavior.
    */
-  @Deprecated
   @Override
   public int compareTo(FeedScopedId o) {
     int c = this.feedId.compareTo(o.feedId);

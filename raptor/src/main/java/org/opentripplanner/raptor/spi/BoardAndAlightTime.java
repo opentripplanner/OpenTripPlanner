@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Objects;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 

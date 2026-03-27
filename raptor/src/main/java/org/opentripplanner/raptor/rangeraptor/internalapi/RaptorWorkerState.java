@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The contract the state must implement for the {@link RangeRaptor} to do its job. This

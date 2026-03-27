@@ -1,9 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.function.Consumer;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * The purpose of the TripScheduleBoardAlight is to represent the board/alight for a given trip at a

@@ -7,9 +7,9 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -45,7 +45,7 @@ public class GraphBuilder implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
-  private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
+  private final Queue<GraphBuilderModule> graphBuilderModules = new LinkedList<>();
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
@@ -215,8 +215,11 @@ public class GraphBuilder implements Runnable {
         builder.checkInputs();
       }
 
-      for (GraphBuilderModule load : graphBuilderModules) {
-        load.buildGraph();
+      // because we want to garbage-collect the modules as soon as they are finished
+      // we remove them from the queue during the build process
+      while (!graphBuilderModules.isEmpty()) {
+        var builder = graphBuilderModules.poll();
+        builder.buildGraph();
       }
 
       new DataImportIssueSummary(issueStore.listIssues()).logSummary();

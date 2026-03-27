@@ -3,11 +3,6 @@ package org.opentripplanner.raptor.path;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
@@ -19,8 +14,13 @@ import org.opentripplanner.raptor.rangeraptor.transit.EgressWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -615,7 +615,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var egressPath = asEgressLeg().streetPath;
 
-    final int egressCost = costCalculator.costEgress(egressPath);
+    final int egressCost =
+      egressPath.c1() + costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
 
     if (prev == null) {
       return egressCost;

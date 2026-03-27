@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
@@ -72,17 +71,17 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
   ) {
     if (transferConstraints.isRegularTransfer()) {
-      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
+      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStopIndex, boardTime);
     } else {
       return boardingCostConstrainedTransfer(
         prevArrivalTime,
-        boardStop,
+        boardStopIndex,
         boardTime,
         trip.transitReluctanceFactorIndex(),
         firstBoarding,
@@ -106,7 +105,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
     int cost =
       boardCost +
@@ -116,7 +115,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     // Add transfer cost on all alighting events.
     // If it turns out to be the last one this cost will be removed during costEgress phase.
     if (stopBoardAlightTransferCosts != null) {
-      cost += stopBoardAlightTransferCosts[toStop];
+      cost += stopBoardAlightTransferCosts[toStopIndex];
     }
 
     return cost;
@@ -128,7 +127,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
     if (minNumTransfers > -1) {
       return (
         boardCostOnly +
@@ -141,22 +140,23 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
       return stopBoardAlightTransferCosts == null
         ? fixedCost
-        : fixedCost - stopBoardAlightTransferCosts[fromStop];
+        : fixedCost - stopBoardAlightTransferCosts[fromStopIndex];
     }
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    if (egress.hasRides()) {
-      return egress.c1() + transferCostOnly;
-    } else if (stopBoardAlightTransferCosts != null) {
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    if (egressHasRides) {
+      return transferCostOnly;
+    }
+    if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
-      // We do not want to add this cost on last alighting since it should only be applied on transfers
-      // It has to be done here because during alighting we do not know yet if it will be
-      // a transfer or not.
-      return egress.c1() - stopBoardAlightTransferCosts[egress.stop()];
+      // We do not want to add this cost on last alighting since it should only be applied on
+      // transfers. It has to be done here because during alighting we do not know yet if it will
+      // be a transfer or not.
+      return -stopBoardAlightTransferCosts[stopIndex];
     } else {
-      return egress.c1();
+      return 0;
     }
   }
 
@@ -175,11 +175,13 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
     int cost = waitFactor * boardWaitTime;
 
-    cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
-
-    // If it's first boarding event then it is not a transfer
-    if (stopBoardAlightTransferCosts != null && !firstBoarding) {
-      cost += stopBoardAlightTransferCosts[boardStop];
+    if (firstBoarding) {
+      cost += boardCostOnly;
+    } else {
+      cost += boardAndTransferCost;
+      if (stopBoardAlightTransferCosts != null) {
+        cost += stopBoardAlightTransferCosts[boardStop];
+      }
     }
     return cost;
   }
@@ -188,7 +190,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
   private int boardingCostConstrainedTransfer(
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     int transitReluctanceIndex,
     boolean firstBoarding,
@@ -224,6 +226,6 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     }
 
     // fallback to regular transfer
-    return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
+    return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStopIndex, boardTime);
   }
 }

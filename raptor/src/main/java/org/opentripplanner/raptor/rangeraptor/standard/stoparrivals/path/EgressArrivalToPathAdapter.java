@@ -1,11 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -14,6 +13,7 @@ import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDest
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

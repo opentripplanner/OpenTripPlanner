@@ -3,8 +3,8 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.SECONDS_IN_A_DAY;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.isTimeSet;
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.spi.RaptorConstants.isTimeSet;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,8 +13,8 @@ import java.util.Objects;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgressToStringParser;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorValue;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**

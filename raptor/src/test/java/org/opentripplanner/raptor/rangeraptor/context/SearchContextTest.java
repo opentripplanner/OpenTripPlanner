@@ -1,14 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
 import static org.opentripplanner.raptor.rangeraptor.context.SearchContext.accessOrEgressPaths;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -23,9 +23,9 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 class SearchContextTest implements RaptorTestConstants {
 

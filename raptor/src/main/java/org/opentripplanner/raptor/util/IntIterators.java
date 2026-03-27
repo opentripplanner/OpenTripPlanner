@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.util;
 
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 public class IntIterators {
 

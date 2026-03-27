@@ -6,16 +6,17 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardingSearch;
 
 /**
  * This class is responsible for finding all possible transfers between each pair of transit legs
@@ -193,8 +194,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This code duplicates the logic in
-   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch},
+   * This code duplicates the logic in {@link ConstrainedBoardingSearch},
    * see the {@code findTimetableTripInfo(RaptorTimeTable, Iterable, int, int, int)}) method.
    */
   private int calculateEarliestBoardTime(

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import org.junit.jupiter.api.Test;
 

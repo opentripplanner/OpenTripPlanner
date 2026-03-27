@@ -1,12 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
 
 import java.util.Iterator;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -19,6 +18,7 @@ import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**

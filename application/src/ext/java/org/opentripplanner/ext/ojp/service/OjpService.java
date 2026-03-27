@@ -77,7 +77,7 @@ public class OjpService {
     return placeRefStructure(ser)
       .map(PlaceRefStructure::getStopPointRef)
       .map(StopPointRefStructure::getValue)
-      .map(idMapper::parse);
+      .flatMap(idMapper::parse);
   }
 
   private Optional<WgsCoordinate> coordinate(OJPStopEventRequestStructure ser) {

@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
-import org.opentripplanner.raptor.api.model.PathLegType;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.api.view.PathLegType;
+import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

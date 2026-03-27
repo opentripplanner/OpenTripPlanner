@@ -1,18 +1,12 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorRequest;
 
 /**
- * This interface defines the data needed by Raptor. It is the main/top-level interface and together
- * with the {@link RaptorRequest} if provide all
- * information needed by Raptor to perform the search. It makes it possible to write small adapter
- * between the "OTP Transit Layer" and the Raptor algorithm.
+ * This interface defines the data needed by Raptor. It is the main/top-level interface and
+ * together with the {@code RaptorRequest} if provide all information needed by Raptor to perform
+ * the search. It makes it possible to write small adapter between the "OTP Transit Layer" and the
+ * Raptor algorithm.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

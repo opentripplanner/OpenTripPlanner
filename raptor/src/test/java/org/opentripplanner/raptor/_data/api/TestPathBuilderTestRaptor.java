@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor.api.model.RaptorTransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.raptor.spi.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -46,7 +46,9 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       STOP_B
     );
 
-    int accessEgressCost = C1_CALCULATOR.costEgress(walk(STOP_B, D2_m + D1_m));
+    var egress = walk(STOP_B, D2_m + D1_m);
+
+    int accessEgressCost = egress.c1() + C1_CALCULATOR.costEgress(egress.stop(), egress.hasRides());
 
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(

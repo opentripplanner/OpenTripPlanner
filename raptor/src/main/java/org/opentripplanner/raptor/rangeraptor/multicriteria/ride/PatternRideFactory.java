@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.ride;
 
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public interface PatternRideFactory<T extends RaptorTripSchedule, R extends PatternRide<T>> {
   R createPatternRide(

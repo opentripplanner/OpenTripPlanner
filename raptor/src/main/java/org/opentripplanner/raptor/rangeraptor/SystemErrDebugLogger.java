@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 import static org.opentripplanner.utils.text.Table.Align.Center;
 import static org.opentripplanner.utils.text.Table.Align.Left;
 import static org.opentripplanner.utils.text.Table.Align.Right;
@@ -15,13 +15,13 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.text.Table;

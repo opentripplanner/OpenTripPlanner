@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * This interface is used by Raptor to create a path from the Raptor state. We do not keep

@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.util.Arrays;
 import java.util.Collection;

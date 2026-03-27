@@ -30,7 +30,7 @@ public class FareModelForTest implements FareTestConstants {
 
   public static final RegularStop AIRPORT_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("airport"))
     .withCoordinate(new WgsCoordinate(1, 1))
-    .addFareZones(AIRPORT_ZONE)
+    .addFareZone(AIRPORT_ZONE)
     .withName(I18NString.of("Airport"))
     .build();
 
@@ -38,21 +38,21 @@ public class FareModelForTest implements FareTestConstants {
     id("city-center-a")
   )
     .withCoordinate(new WgsCoordinate(1, 2))
-    .addFareZones(CITY_CENTER_ZONE)
+    .addFareZone(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop A"))
     .build();
   public static final RegularStop CITY_CENTER_B_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     id("city-center-b")
   )
     .withCoordinate(new WgsCoordinate(1, 3))
-    .addFareZones(CITY_CENTER_ZONE)
+    .addFareZone(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop B"))
     .build();
   public static final RegularStop CITY_CENTER_C_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     id("city-center-c")
   )
     .withCoordinate(new WgsCoordinate(1, 4))
-    .addFareZones(CITY_CENTER_ZONE)
+    .addFareZone(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop C"))
     .build();
   public static final RegularStop SUBURB_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("suburb"))
@@ -65,7 +65,7 @@ public class FareModelForTest implements FareTestConstants {
   )
     .withCoordinate(new WgsCoordinate(1, 5))
     .withName(I18NString.of("Other feed stop"))
-    .addFareZones(OTHER_FEED_ZONE)
+    .addFareZone(OTHER_FEED_ZONE)
     .build();
   public static final FareAttribute TEN_DOLLARS = FareAttribute.of(id("airport-to-city-center"))
     .withPrice(Money.usDollars(10))

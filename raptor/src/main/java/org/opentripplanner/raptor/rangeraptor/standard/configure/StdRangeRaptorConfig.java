@@ -6,7 +6,6 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
@@ -34,6 +33,7 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations

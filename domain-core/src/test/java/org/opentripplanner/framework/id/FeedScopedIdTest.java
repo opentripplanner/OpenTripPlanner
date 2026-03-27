@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +16,31 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 class FeedScopedIdTest {
 
   private static final List<FeedScopedId> TRIMET_123 = List.of(new FeedScopedId("trimet", "123"));
+
+  @Test
+  void parseOptional() {
+    assertEquals(
+      Optional.of(new FeedScopedId("FEED", "ID")),
+      FeedScopedId.parseOptional("FEED:ID")
+    );
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional(""));
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional(" "));
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional("ID"));
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional(":"));
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional(":ID"));
+    assertEquals(Optional.empty(), FeedScopedId.parseOptional("FEED:"));
+  }
+
+  @Test
+  void parseStrict() {
+    assertEquals(new FeedScopedId("FEED", "ID"), FeedScopedId.parseStrict("FEED:ID"));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict(""));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict(" "));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict("ID"));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict(":"));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict(":ID"));
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parseStrict("FEED:"));
+  }
 
   @Test
   void ofNullable() {

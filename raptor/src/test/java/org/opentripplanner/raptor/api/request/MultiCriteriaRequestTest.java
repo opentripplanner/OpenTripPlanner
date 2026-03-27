@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 class MultiCriteriaRequestTest {
 

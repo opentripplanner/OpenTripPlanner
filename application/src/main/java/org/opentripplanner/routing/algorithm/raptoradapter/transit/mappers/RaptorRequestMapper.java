@@ -16,9 +16,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
@@ -27,6 +24,9 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -271,7 +271,12 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
           }
         }
       }
-      return builder.build();
+      var viaLocation = builder.build();
+      if (OTPFeature.CostlyAssertions.isOn()) {
+        // This check can have a bad performance if there are a lot of connections
+        viaLocation.validateDuplicateConnections();
+      }
+      return viaLocation;
     }
   }
 
@@ -318,7 +323,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       try {
         result.add(Integer.parseInt(stop));
       } catch (NumberFormatException ignore) {
-        var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parse(stop)).toArray();
+        var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parseStrict(stop)).toArray();
         if (a.length != 1) {
           throw new IllegalArgumentException("Unable to parse the input stop id: '" + stop + "'");
         }

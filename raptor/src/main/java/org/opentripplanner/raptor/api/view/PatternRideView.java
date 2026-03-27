@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.view;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A pattern ride provide read-only access to a

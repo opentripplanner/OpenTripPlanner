@@ -4,14 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 class TransferStopArrivalTest {
 

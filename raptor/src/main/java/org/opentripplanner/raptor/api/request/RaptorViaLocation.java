@@ -6,8 +6,8 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -42,7 +42,7 @@ public final class RaptorViaLocation {
       (int) MAX_WAIT_TIME.toSeconds(),
       "minimumWaitTime"
     );
-    this.connections = validateConnections(connections);
+    this.connections = mapConnections(connections);
   }
 
   /**
@@ -98,6 +98,22 @@ public final class RaptorViaLocation {
       .collect(BitSet::new, BitSet::set, BitSet::or);
   }
 
+  /// Compare all pairs to check for duplicates and non-optimal connections
+  /// Avoid usage of this method because it can have a really bad performance.
+  public void validateDuplicateConnections() {
+    for (int i = 0; i < connections.size(); ++i) {
+      var a = connections.get(i);
+      for (int j = i + 1; j < connections.size(); ++j) {
+        var b = connections.get(j);
+        if (a.isBetterOrEqual(b) || b.isBetterOrEqual(a)) {
+          throw new IllegalArgumentException(
+            "All connection need to be pareto-optimal: (" + a + ") <-> (" + b + ")"
+          );
+        }
+      }
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     throw new UnsupportedOperationException("No need to compare " + getClass());
@@ -134,28 +150,14 @@ public final class RaptorViaLocation {
     return buf.append("}").toString();
   }
 
-  private List<RaptorViaConnection> validateConnections(List<BuilderStopAndTransfer> connections) {
+  private List<RaptorViaConnection> mapConnections(List<BuilderStopAndTransfer> connections) {
     if (connections.isEmpty()) {
       throw new IllegalArgumentException("At least one connection is required.");
     }
-    var list = connections
+    return connections
       .stream()
       .map(it -> RaptorViaConnection.of(this, it.fromStop, it.transfer))
       .toList();
-
-    // Compare all pairs to check for duplicates and non-optimal connections
-    for (int i = 0; i < list.size(); ++i) {
-      var a = list.get(i);
-      for (int j = i + 1; j < list.size(); ++j) {
-        var b = list.get(j);
-        if (a.isBetterOrEqual(b) || b.isBetterOrEqual(a)) {
-          throw new IllegalArgumentException(
-            "All connection need to be pareto-optimal: (" + a + ") <-> (" + b + ")"
-          );
-        }
-      }
-    }
-    return list;
   }
 
   public abstract static sealed class AbstractBuilder<T extends AbstractBuilder> {

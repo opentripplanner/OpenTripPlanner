@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 

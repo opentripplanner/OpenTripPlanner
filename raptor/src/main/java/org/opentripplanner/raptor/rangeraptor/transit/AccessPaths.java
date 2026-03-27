@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.IntIterators;
 
 /**
