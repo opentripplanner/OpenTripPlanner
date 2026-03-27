@@ -93,6 +93,7 @@ Sections follow that describe particular settings in more depth.
 |    includeOsmSubwayEntrances                                                                |       `boolean`      | Whether to include subway entrances from the OSM data.                                                                                                         | *Optional* | `false`                           |  2.7  |
 |    [osmTagMapping](#od_osmTagMapping)                                                       |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                                                 |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
+| [stopsWithRegularTransfers](#stopsWithRegularTransfers)                                     |  `feed-scoped-id[]`  | Stops that should always have regular transfers computed, even without scheduled trips.                                                                        | *Optional* |                                   |  2.9  |
 | [transferParametersForMode](#transferParametersForMode)                                     | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 |    BIKE                                                                                     |       `object`       | NA                                                                                                                                                             | *Optional* |                                   |  2.7  |
 |       [bikesAllowedStopMaxTransferDuration](#tpfm_BIKE_bikesAllowedStopMaxTransferDuration) |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.9  |
@@ -949,6 +950,28 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
+
+<h3 id="stopsWithRegularTransfers">stopsWithRegularTransfers</h3>
+
+**Since version:** `2.9` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Stops that should always have regular transfers computed, even without scheduled trips.
+
+List of stop IDs for which regular transfers are always pre-computed during graph build,
+even if the stop has no scheduled trips. Remember to include _feedId_ like this
+`"RB:NSR:Quay:102541"`.
+
+This is useful for stops that are unused in static transit data, but may be visited by
+real-time updates (e.g. a platform that a train can be re-routed to at runtime). Without
+this configuration, stops with no scheduled trips are excluded from transfer pre-computation
+and become unreachable islands when a real-time update routes a trip to them.
+
+Note! This parameter should be replaced with an automatic update to regular transfers
+based on real-time updates.
+
+
+**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**
 
 <h3 id="transferParametersForMode">transferParametersForMode</h3>
 
