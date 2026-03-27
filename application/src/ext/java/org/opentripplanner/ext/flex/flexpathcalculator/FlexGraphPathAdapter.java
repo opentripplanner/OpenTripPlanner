@@ -25,6 +25,10 @@ public class FlexGraphPathAdapter {
   private final double effectiveWalkDistance;
   private List<Edge> edges;
 
+  /**
+   * @param edgeSupplier Reversing the edges is expensive, so we only do it if we need it.
+   * @param effectiveWalkDistance
+   */
   private FlexGraphPathAdapter(Supplier<List<Edge>> edgeSupplier, double effectiveWalkDistance) {
     this.edgeSupplier = edgeSupplier;
     this.effectiveWalkDistance = effectiveWalkDistance;
@@ -44,6 +48,7 @@ public class FlexGraphPathAdapter {
     }
 
     Supplier<List<Edge>> edgeSupplier = () -> edges;
+
     // For depart-after, edges are in reverse chronological order; reverse to chronological.
     // For arriveBy, the A* searched backward so edges are already chronological.
     if (!state.getRequest().arriveBy()) {
