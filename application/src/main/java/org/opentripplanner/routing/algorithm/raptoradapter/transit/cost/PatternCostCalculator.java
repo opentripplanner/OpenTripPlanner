@@ -24,7 +24,7 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -32,7 +32,7 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
     return delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
-      boardStop,
+      boardStopIndex,
       boardTime,
       trip,
       transferConstraints
@@ -50,14 +50,14 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
     int defaultCost = delegate.transitArrivalCost(
       boardCost,
       alightSlack,
       transitTime,
       trip,
-      toStop
+      toStopIndex
     );
     boolean includeUnpreferredCost = unpreferredPatterns.get(trip.pattern().patternIndex());
 
@@ -75,12 +75,12 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
-    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStop);
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
+    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStopIndex);
   }
 
   @Override
-  public int costEgress(int stop, boolean egressHasRides) {
-    return delegate.costEgress(stop, egressHasRides);
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    return delegate.costEgress(stopIndex, egressHasRides);
   }
 }

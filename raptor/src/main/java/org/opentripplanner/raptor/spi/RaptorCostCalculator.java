@@ -21,7 +21,7 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -38,7 +38,7 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   /**
    * Calculate the value when arriving by transit.
    */
-  int transitArrivalCost(int boardCost, int alightSlack, int transitTime, T trip, int toStop);
+  int transitArrivalCost(int boardCost, int alightSlack, int transitTime, T trip, int toStopIndex);
 
   /**
    * Calculate the value, when waiting between the last transit and egress paths
@@ -52,7 +52,7 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
    * the greatest value, which is guaranteed to be less than the
    * <em>real value</em> would be correct and a good choice.
    */
-  int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop);
+  int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex);
 
   /**
    * This method allows the cost calculator to add cost in addition to the generalized-cost of the
@@ -60,5 +60,5 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
    *
    * @return any additional board or transfer cost.
    */
-  int costEgress(int stop, boolean egressHasRides);
+  int costEgress(int stopIndex, boolean egressHasRides);
 }

@@ -24,7 +24,7 @@ class CoachCostCalculator<T extends TripSchedule> implements RaptorCostCalculato
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -32,7 +32,7 @@ class CoachCostCalculator<T extends TripSchedule> implements RaptorCostCalculato
     return delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
-      boardStop,
+      boardStopIndex,
       boardTime,
       trip,
       transferConstraints
@@ -50,9 +50,9 @@ class CoachCostCalculator<T extends TripSchedule> implements RaptorCostCalculato
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
-    int cost = delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
+    int cost = delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStopIndex);
 
     // This is a bit ugly, since it relies on the fact that the 'transitReluctanceFactorIndex'
     // returns the 'route.getMode().ordinal()'
@@ -68,12 +68,12 @@ class CoachCostCalculator<T extends TripSchedule> implements RaptorCostCalculato
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
-    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStop);
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
+    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStopIndex);
   }
 
   @Override
-  public int costEgress(int stop, boolean egressHasRides) {
-    return delegate.costEgress(stop, egressHasRides);
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    return delegate.costEgress(stopIndex, egressHasRides);
   }
 }

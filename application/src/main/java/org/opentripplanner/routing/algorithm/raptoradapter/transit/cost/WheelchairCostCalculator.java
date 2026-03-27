@@ -24,7 +24,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -32,7 +32,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
     int defaultCost = delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
-      boardStop,
+      boardStopIndex,
       boardTime,
       trip,
       transferConstraints
@@ -54,9 +54,9 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
-    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
+    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStopIndex);
   }
 
   @Override
@@ -65,13 +65,13 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
-    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStop);
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
+    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStopIndex);
   }
 
   @Override
-  public int costEgress(int stop, boolean egressHasRides) {
-    return delegate.costEgress(stop, egressHasRides);
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    return delegate.costEgress(stopIndex, egressHasRides);
   }
 
   /**

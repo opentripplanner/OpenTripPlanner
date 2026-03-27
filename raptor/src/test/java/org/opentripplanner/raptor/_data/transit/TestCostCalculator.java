@@ -49,17 +49,17 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     TestTripSchedule trip,
     RaptorTransferConstraint transferConstraints
   ) {
     if (transferConstraints.isRegularTransfer()) {
-      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
+      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStopIndex, boardTime);
     } else {
       return boardingCostConstrainedTransfer(
         prevArrivalTime,
-        boardStop,
+        boardStopIndex,
         boardTime,
         firstBoarding,
         transferConstraints
@@ -82,14 +82,14 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     int alightSlack,
     int transitTime,
     TestTripSchedule trip,
-    int toStop
+    int toStopIndex
   ) {
     int cost = boardCost + TRANSIT_RELUCTANCE * transitTime + waitFactor * alightSlack;
 
     // Add transfer cost on all alighting events.
     // If it turns out to be the last one this cost will be removed during costEgress phase.
     if (stopBoardAlightTransferCosts != null) {
-      cost += stopBoardAlightTransferCosts[toStop];
+      cost += stopBoardAlightTransferCosts[toStopIndex];
     }
 
     return cost;
@@ -101,7 +101,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
     if (minNumTransfers > -1) {
       return (
         boardCost +
@@ -112,12 +112,12 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null
         ? (TRANSIT_RELUCTANCE * minTravelTime)
-        : (TRANSIT_RELUCTANCE * minTravelTime) - stopBoardAlightTransferCosts[fromStop];
+        : (TRANSIT_RELUCTANCE * minTravelTime) - stopBoardAlightTransferCosts[fromStopIndex];
     }
   }
 
   @Override
-  public int costEgress(int stop, boolean hasRides) {
+  public int costEgress(int stopIndex, boolean hasRides) {
     if (hasRides) {
       return transferCost;
     } else if (stopBoardAlightTransferCosts != null) {
@@ -125,7 +125,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
       // We do not want to add this cost on last alighting since it should only be applied on transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
-      return -stopBoardAlightTransferCosts[stop];
+      return -stopBoardAlightTransferCosts[stopIndex];
     } else {
       return 0;
     }
