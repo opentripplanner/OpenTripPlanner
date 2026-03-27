@@ -7,6 +7,9 @@ import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A callback that logs statistics for A* searches.
+ */
 public class LoggingCallback<V extends AStarVertex<?, ?, ?>> implements StatisticsCallback<V> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LoggingCallback.class);
