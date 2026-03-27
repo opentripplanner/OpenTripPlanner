@@ -216,7 +216,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     }
     // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
     else {
-      additionalCost = 0;
+      additionalCost = RaptorConstants.ZERO;
     }
 
     return new DestinationArrival<>(
