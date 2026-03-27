@@ -6,9 +6,6 @@ import java.util.Optional;
 import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.path.Path;
@@ -17,7 +14,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
@@ -206,13 +206,17 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     int waitTimeInSeconds = Math.abs(departureTime - stopArrival.arrivalTime());
 
-    // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
-    // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
-    int additionalCost = 0;
+    int additionalCost;
 
+    // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
     if (costCalculator != null) {
+      additionalCost = egressPath.c1();
       additionalCost += costCalculator.waitCost(waitTimeInSeconds);
-      additionalCost += costCalculator.costEgress(egressPath);
+      additionalCost += costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
+    }
+    // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
+    else {
+      additionalCost = RaptorConstants.ZERO;
     }
 
     return new DestinationArrival<>(

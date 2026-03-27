@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

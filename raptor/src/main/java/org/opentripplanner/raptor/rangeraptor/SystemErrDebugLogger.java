@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 import static org.opentripplanner.utils.text.Table.Align.Center;
 import static org.opentripplanner.utils.text.Table.Align.Left;
 import static org.opentripplanner.utils.text.Table.Align.Right;

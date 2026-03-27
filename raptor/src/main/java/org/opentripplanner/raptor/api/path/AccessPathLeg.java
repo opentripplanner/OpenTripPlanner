@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.api.path;
 
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Represent an access leg in a path. The access leg is the first leg from origin to the first

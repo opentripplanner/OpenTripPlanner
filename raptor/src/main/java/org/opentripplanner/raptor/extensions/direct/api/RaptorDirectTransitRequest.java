@@ -1,12 +1,12 @@
-package org.opentripplanner.raptor.direct.api;
+package org.opentripplanner.raptor.extensions.direct.api;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /// All input parameters to do a direct search.

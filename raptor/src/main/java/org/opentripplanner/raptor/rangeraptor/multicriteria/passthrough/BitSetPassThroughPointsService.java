@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
  * IMPLEMENTATION DETAILS

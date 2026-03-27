@@ -1,6 +1,6 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 
 import java.util.EnumSet;
 import org.opentripplanner.street.model.StreetMode;

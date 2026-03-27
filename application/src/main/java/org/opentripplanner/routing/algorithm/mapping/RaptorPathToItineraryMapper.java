@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toOtpDomainCost;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;

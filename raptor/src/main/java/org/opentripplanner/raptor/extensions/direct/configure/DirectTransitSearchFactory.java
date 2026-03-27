@@ -1,9 +1,9 @@
-package org.opentripplanner.raptor.direct.configure;
+package org.opentripplanner.raptor.extensions.direct.configure;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.direct.api.RaptorDirectTransitRequest;
-import org.opentripplanner.raptor.direct.service.DirectTransitSearch;
+import org.opentripplanner.raptor.extensions.direct.api.RaptorDirectTransitRequest;
+import org.opentripplanner.raptor.extensions.direct.service.DirectTransitSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class DirectTransitSearchFactory {
 

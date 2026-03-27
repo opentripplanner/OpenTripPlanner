@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Abstract super class for multi-criteria stop arrival.

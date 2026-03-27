@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.spi.RaptorCostCalculator.ZERO_COST;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class PatternRideC1Test {
 

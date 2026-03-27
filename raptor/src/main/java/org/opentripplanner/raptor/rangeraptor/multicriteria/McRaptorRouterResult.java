@@ -1,12 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.Collection;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class McRaptorRouterResult<T extends RaptorTripSchedule> implements RaptorRouterResult<T> {
 

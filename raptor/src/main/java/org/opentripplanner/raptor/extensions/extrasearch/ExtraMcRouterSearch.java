@@ -1,9 +1,10 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.extensions.extrasearch;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This interface is used to run two multi-criteria searches and merging the result. Raptor will

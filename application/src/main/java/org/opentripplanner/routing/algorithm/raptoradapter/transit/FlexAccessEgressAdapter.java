@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 
 /**

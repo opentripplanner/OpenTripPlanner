@@ -1,9 +1,9 @@
 package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import java.util.function.Consumer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A boarding event passed to Raptor to perform a boarding.

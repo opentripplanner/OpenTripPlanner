@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.configure;
 
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class RaptorTestFactory {
 

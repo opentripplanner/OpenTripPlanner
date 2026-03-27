@@ -1,9 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCostCalculator<T> {
 
@@ -25,7 +24,7 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -33,7 +32,7 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
     return delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
-      boardStop,
+      boardStopIndex,
       boardTime,
       trip,
       transferConstraints
@@ -51,14 +50,14 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
     int defaultCost = delegate.transitArrivalCost(
       boardCost,
       alightSlack,
       transitTime,
       trip,
-      toStop
+      toStopIndex
     );
     boolean includeUnpreferredCost = unpreferredPatterns.get(trip.pattern().patternIndex());
 
@@ -76,12 +75,12 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
-    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStop);
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
+    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStopIndex);
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    return delegate.costEgress(egress);
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    return delegate.costEgress(stopIndex, egressHasRides);
   }
 }

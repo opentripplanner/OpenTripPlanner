@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.model;
+package org.opentripplanner.raptor.spi;
 
 /**
  * Raptor relies on {@code int} operation to be fast, so in many cases we use a "magic number" to

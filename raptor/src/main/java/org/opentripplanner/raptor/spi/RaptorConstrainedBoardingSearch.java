@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor.spi;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-
 /**
  * This interface enable the transit layer to override the normal trip search in Raptor. Each {@link
  * RaptorRoute} may provide an instance of this interface so Raptor can ask for a bord-/alight-

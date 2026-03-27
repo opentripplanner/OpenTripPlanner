@@ -2,14 +2,14 @@ package org.opentripplanner.raptor.service;
 
 import static java.util.Comparator.comparingInt;
 import static org.opentripplanner.raptor.api.debug.DebugTopic.HEURISTICS;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.N_TRANSFERS_UNREACHED;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.UNREACHED_HIGH;
+import static org.opentripplanner.raptor.spi.RaptorConstants.N_TRANSFERS_UNREACHED;
+import static org.opentripplanner.raptor.spi.RaptorConstants.UNREACHED_HIGH;
 
 import org.opentripplanner.raptor.api.debug.DebugLogger;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.CompareIntArrays;
 import org.opentripplanner.utils.lang.IntUtils;
 

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.spi.UnknownPath;
+import org.opentripplanner.raptor.rangeraptor.standard.besttimes.UnknownPath;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**

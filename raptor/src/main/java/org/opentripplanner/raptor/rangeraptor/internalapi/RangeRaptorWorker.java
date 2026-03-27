@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The worker performs the travel search. There are multiple implementations, even some that do not

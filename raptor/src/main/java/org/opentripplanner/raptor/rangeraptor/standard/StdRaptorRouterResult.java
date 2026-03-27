@@ -2,11 +2,11 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Result for Standard Range Raptor route call.

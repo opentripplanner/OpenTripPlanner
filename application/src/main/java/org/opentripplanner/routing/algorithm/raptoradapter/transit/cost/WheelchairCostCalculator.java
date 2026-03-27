@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 public class WheelchairCostCalculator<T extends DefaultTripSchedule>
@@ -25,7 +24,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     T trip,
     RaptorTransferConstraint transferConstraints
@@ -33,7 +32,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
     int defaultCost = delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
-      boardStop,
+      boardStopIndex,
       boardTime,
       trip,
       transferConstraints
@@ -55,9 +54,9 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
     int alightSlack,
     int transitTime,
     T trip,
-    int toStop
+    int toStopIndex
   ) {
-    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
+    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStopIndex);
   }
 
   @Override
@@ -66,13 +65,13 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
-    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStop);
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStopIndex) {
+    return delegate.calculateRemainingMinCost(minTravelTime, minNumTransfers, fromStopIndex);
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    return delegate.costEgress(egress);
+  public int costEgress(int stopIndex, boolean egressHasRides) {
+    return delegate.costEgress(stopIndex, egressHasRides);
   }
 
   /**

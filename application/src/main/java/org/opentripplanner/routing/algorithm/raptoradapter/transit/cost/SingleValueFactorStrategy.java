@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
 
 /**
  * This {@link FactorStrategy} keep a single value and use it every time the factor is needed. The

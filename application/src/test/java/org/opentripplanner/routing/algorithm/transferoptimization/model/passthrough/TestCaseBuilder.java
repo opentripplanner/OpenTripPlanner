@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 class TestCaseBuilder {
 
