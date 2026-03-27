@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class BackEdgeIteratorTest {
 
-
   private static List<Arguments> cases() {
     return List.of(
       of(ofWalking().build(), 0),
@@ -34,5 +33,4 @@ class BackEdgeIteratorTest {
     assertThat(edges).hasSize(expectedSize);
     assertThat(edges).doesNotContain(null);
   }
-
 }

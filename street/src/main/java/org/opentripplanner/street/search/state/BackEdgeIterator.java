@@ -23,4 +23,3 @@ class BackEdgeIterator implements Iterator<Edge> {
     return ret.getBackEdge();
   }
 }
-

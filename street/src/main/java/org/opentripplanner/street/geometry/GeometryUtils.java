@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.locationtech.jts.algorithm.ConvexHull;
@@ -71,10 +72,12 @@ public class GeometryUtils {
   }
 
   public static <T> LineString concatenateLineStrings(
-    List<T> inputObjects,
+    Iterable<T> inputObjects,
     Function<T, LineString> mapper
   ) {
-    return concatenateLineStrings(inputObjects.stream().map(mapper).toList());
+    return concatenateLineStrings(
+      StreamSupport.stream(inputObjects.spliterator(), false).map(mapper).toList()
+    );
   }
 
   public static LineString concatenateLineStrings(List<LineString> lineStrings) {

@@ -1,9 +1,10 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Supplier;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 
@@ -21,17 +22,16 @@ import org.opentripplanner.street.search.state.State;
  */
 public class FlexGraphPathAdapter {
 
-  private final Supplier<List<Edge>> edgeSupplier;
+  private final Supplier<LineString> geometrySupplier;
   private final double effectiveWalkDistance;
-  private List<Edge> edges;
 
   /**
-   * @param edgeSupplier Reversing the edges is expensive, so we only do it if we need it.
-   * @param effectiveWalkDistance
+   * @param geometrySupplier Reversing the edges is expensive, so we only do it if we need it.
+   * @param distance
    */
-  private FlexGraphPathAdapter(Supplier<List<Edge>> edgeSupplier, double effectiveWalkDistance) {
-    this.edgeSupplier = edgeSupplier;
-    this.effectiveWalkDistance = effectiveWalkDistance;
+  private FlexGraphPathAdapter(Supplier<LineString> geometrySupplier, double distance) {
+    this.geometrySupplier = geometrySupplier;
+    this.effectiveWalkDistance = distance;
   }
 
   /**
@@ -40,32 +40,29 @@ public class FlexGraphPathAdapter {
    */
   public static FlexGraphPathAdapter of(State state) {
     double distance = 0.0;
-    var edges = new ArrayList<Edge>();
 
     for (var backEdge : state.listBackEdges()) {
       distance += backEdge.getDistanceMeters();
-      edges.add(backEdge);
     }
-
-    Supplier<List<Edge>> edgeSupplier = () -> edges;
 
     // For depart-after, edges are in reverse chronological order; reverse to chronological.
     // For arriveBy, the A* searched backward so edges are already chronological.
-    if (!state.getRequest().arriveBy()) {
-      edgeSupplier = () -> {
+
+    Supplier<LineString> edgeSupplier = () -> {
+      if (!state.getRequest().arriveBy()) {
+        var edges = Lists.newArrayList(state.listBackEdges());
         Collections.reverse(edges);
-        return edges;
-      };
-    }
+        return GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
+      } else {
+        return GeometryUtils.concatenateLineStrings(state.listBackEdges(), Edge::getGeometry);
+      }
+    };
 
     return new FlexGraphPathAdapter(edgeSupplier, distance);
   }
 
-  public List<Edge> edges() {
-    if (edges == null) {
-      edges = edgeSupplier.get();
-    }
-    return edges;
+  public Supplier<LineString> geometry() {
+    return geometrySupplier;
   }
 
   public double distance() {
