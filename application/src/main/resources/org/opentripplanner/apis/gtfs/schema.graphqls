@@ -635,12 +635,12 @@ type FareProductUse {
           id: "single-ticket"  // product id
           name: "Single Ticket"
   ```
-  
+    
   ### Example: Combination of single tickets and day passes
-  
+    
   If you have two legs and it's possible to either buy singles or use a day pass, you will
   have a combination of identical and different `FareProductUse.id`s.
-  
+    
   **Illustration**
   ```yaml
   itinerary:
@@ -651,7 +651,7 @@ type FareProductUse {
           product:
             id: "single-ticket" // product id
             name: "Single Ticket"
-  
+    
         # fare product use for single ticket
         id: "CCC" // identical to leg2. the passenger needs to buy ONE day pass, not two.
           product:
@@ -663,7 +663,7 @@ type FareProductUse {
           product:
             id: "single-ticket"  // product id
             name: "Single Ticket"
-  
+    
         id: "CCC" // identical to leg1. the passenger needs to buy ONE day pass, not two.
           product:
             id: "day-pass"  // product id
