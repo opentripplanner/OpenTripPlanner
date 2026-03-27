@@ -413,10 +413,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var nearbyStopsWithVertices = new HashMap<NearbyStop, Vertex>();
       for (var stop : nearbyStops) {
-        var vertex = streetVertexUtils.getOrCreateVertex(stop.stop.getCoordinate(), linkingContext);
-        if (vertex != null) {
-          nearbyStopsWithVertices.put(stop, vertex);
-        }
+        nearbyStopsWithVertices.put(stop, stop.state.getVertex());
       }
 
       var candidateTripsWithVertices = candidateTrips
@@ -427,7 +424,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
         .filter(Objects::nonNull)
         .toList();
 
-      // vertices have to be added to the carpoolTreeVertexRouter AFTER all vertices have been created
       carpoolTreeVertexRouter.addVertex(
         passengerAccessEgressVertex,
         CarpoolTreeStreetRouter.Direction.BOTH,
