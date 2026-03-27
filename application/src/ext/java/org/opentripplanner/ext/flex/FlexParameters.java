@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import java.time.Duration;
+import org.opentripplanner.framework.model.Cost;
 
 /**
  * Define parameters used to configure flex. For further documentation on these parameters, look
@@ -26,6 +27,14 @@ public interface FlexParameters {
    * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
    */
   Duration maxEgressWalkDuration();
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
+  Cost areaStopBoardCost();
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
+  Cost areaStopAlightCost();
 
   /**
    * This defines the default values. This will be used by the OTP configuration and by tests,
@@ -51,6 +60,16 @@ public interface FlexParameters {
       @Override
       public Duration maxEgressWalkDuration() {
         return Duration.ofMinutes(45);
+      }
+
+      @Override
+      public Cost areaStopBoardCost() {
+        return Cost.ZERO;
+      }
+
+      @Override
+      public Cost areaStopAlightCost() {
+        return Cost.ZERO;
       }
     };
   }

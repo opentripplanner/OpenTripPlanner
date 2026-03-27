@@ -669,7 +669,11 @@ Used to group requests when monitoring OTP.
     "maxTransferDuration" : "5m",
     "maxFlexTripDuration" : "45m",
     "maxAccessWalkDuration" : "15m",
-    "maxEgressWalkDuration" : "15m"
+    "maxEgressWalkDuration" : "15m",
+    "areaStops" : {
+      "boardCost" : 60,
+      "alightCost" : 60
+    }
   },
   "transit" : {
     "maxNumberOfTransfers" : 12,

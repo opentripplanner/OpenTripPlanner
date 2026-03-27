@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.street.model.edge.Edge;
@@ -12,6 +13,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopType;
 
 /**
  * Flex trips edges are not connected to the graph.
@@ -25,6 +27,7 @@ public class FlexTripEdge extends Edge {
   private final int alightStopPosInPattern;
   private final LocalDate serviceDate;
   private final FlexPath flexPath;
+  private final FlexParameters flexParameters;
 
   public FlexTripEdge(
     Vertex v1,
@@ -35,7 +38,8 @@ public class FlexTripEdge extends Edge {
     int boardStopPosInPattern,
     int alightStopPosInPattern,
     LocalDate serviceDate,
-    FlexPath flexPath
+    FlexPath flexPath,
+    FlexParameters flexParameters
   ) {
     super(v1, v2);
     this.s1 = s1;
@@ -45,6 +49,7 @@ public class FlexTripEdge extends Edge {
     this.alightStopPosInPattern = alightStopPosInPattern;
     this.serviceDate = serviceDate;
     this.flexPath = Objects.requireNonNull(flexPath);
+    this.flexParameters = flexParameters;
   }
 
   public StopLocation s1() {
@@ -100,6 +105,12 @@ public class FlexTripEdge extends Edge {
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
     editor.resetEnteredNoThroughTrafficArea();
+    if (s1.getStopType() == StopType.FLEXIBLE_AREA) {
+      editor.incrementWeight(flexParameters.areaStopBoardCost().toSeconds());
+    }
+    if (s2.getStopType() == StopType.FLEXIBLE_AREA) {
+      editor.incrementWeight(flexParameters.areaStopAlightCost().toSeconds());
+    }
     return editor.makeStateArray();
   }
 }

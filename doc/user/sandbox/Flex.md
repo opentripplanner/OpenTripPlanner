@@ -41,7 +41,11 @@ following to `router-config.json`.
     "maxTransferDuration" : "5m",
     "maxFlexTripDuration" : "45m",
     "maxAccessWalkDuration" : "15m",
-    "maxEgressWalkDuration" : "15m"
+    "maxEgressWalkDuration" : "15m",
+    "areaStops" : {
+      "boardCost" : 60,
+      "alightCost" : 60
+    }
   }
 }
 ```
@@ -53,6 +57,9 @@ following to `router-config.json`.
 | [maxEgressWalkDuration](#flex_maxEgressWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.           | *Optional* | `"PT45M"`     |  2.3  |
 | [maxFlexTripDuration](#flex_maxFlexTripDuration)     | `duration` | How long can a non-scheduled flex trip at maximum be.                                                                         | *Optional* | `"PT45M"`     |  2.3  |
 | [maxTransferDuration](#flex_maxTransferDuration)     | `duration` | How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. | *Optional* | `"PT5M"`      |  2.3  |
+| areaStops                                            |  `object`  | Configuration properties for area stops. These stops are called 'locations' in GTFS and 'flexible stops' in NeTEx.            | *Optional* |               |   na  |
+|    [alightCost](#flex_areaStops_alightCost)          |  `integer` | Cost to alight an area stop, in seconds.                                                                                      | *Optional* | `0`           |   na  |
+|    [boardCost](#flex_areaStops_boardCost)            |  `integer` | Cost to board an area stop, in seconds.                                                                                       | *Optional* | `0`           |   na  |
 
 
 ### Details
@@ -111,6 +118,28 @@ during the graph build but flex ones are calculated at request time and are more
 sensitive to slowdown.
 
 A lower value means that the routing is faster.
+
+
+<h4 id="flex_areaStops_alightCost">alightCost</h4>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
+**Path:** /flex/areaStops 
+
+Cost to alight an area stop, in seconds.
+
+Area stops is the internal OTP name. In GTFS they are called "locations" and
+NeTEx FlexibleArea.
+
+
+<h4 id="flex_areaStops_boardCost">boardCost</h4>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
+**Path:** /flex/areaStops 
+
+Cost to board an area stop, in seconds.
+
+Area stops is the internal OTP name. In GTFS they are called "locations" and
+NeTEx FlexibleArea.
 
 
 
