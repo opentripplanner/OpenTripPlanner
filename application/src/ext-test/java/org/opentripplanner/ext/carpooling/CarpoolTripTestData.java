@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,7 +13,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Builder utility for creating test CarpoolTrip instances without requiring full Graph infrastructure.
+ * Builder utility for creating test CarpoolTrip instances without requiring full Graph
+ * infrastructure.
  */
 public class CarpoolTripTestData {
 
@@ -44,6 +46,25 @@ public class CarpoolTripTestData {
       startTime.plusHours(1)
     );
     return createTripWithTime(startTime, 4, List.of(origin, destination));
+  }
+
+  public static CarpoolTrip createSimpleTripWithTimes(
+    WgsCoordinate boarding,
+    WgsCoordinate alighting,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime
+  ) {
+    var origin = createOriginStopWithTime(boarding, startTime, startTime);
+    var destination = createDestinationStopWithTime(alighting, 1, endTime, endTime);
+    return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
+      FeedScopedId.ofNullable("TEST", "trip-" + ID_COUNTER.incrementAndGet())
+    )
+      .withStops(List.of(origin, destination))
+      .withAvailableSeats(4)
+      .withStartTime(origin.getAimedDepartureTime())
+      .withEndTime(destination.getAimedArrivalTime())
+      .withDeviationBudget(Duration.of(8, ChronoUnit.MINUTES))
+      .build();
   }
 
   /**
@@ -117,8 +138,8 @@ public class CarpoolTripTestData {
   }
 
   /**
-   * Creates a trip with specific start time and all other parameters.
-   * End time is calculated as startTime + 1 hour.
+   * Creates a trip with specific start time and all other parameters. End time is calculated as
+   * startTime + 1 hour.
    */
   public static CarpoolTrip createTripWithTime(
     ZonedDateTime startTime,

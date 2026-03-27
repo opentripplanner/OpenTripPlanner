@@ -34,12 +34,14 @@ class DirectionalCompatibilityFilterTest {
     // Trip goes north
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    // Passenger also going north
-    var passengerPickup = OSLO_EAST;
     // Northeast
     var passengerDropoff = new WgsCoordinate(59.9549, 10.7922);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -48,10 +50,12 @@ class DirectionalCompatibilityFilterTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going south
-    var passengerPickup = OSLO_EAST;
-    var passengerDropoff = OSLO_CENTER;
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_CENTER)
+      .build();
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -67,8 +71,13 @@ class DirectionalCompatibilityFilterTest {
     // South of east
     var passengerDropoff = new WgsCoordinate(59.9139, 10.7922);
 
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
+
     // Should accept because passenger aligns with East→South segment
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -80,8 +89,13 @@ class DirectionalCompatibilityFilterTest {
     var passengerPickup = new WgsCoordinate(59.9139, 11.0000);
     var passengerDropoff = new WgsCoordinate(59.9439, 11.0000);
 
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
+
     // Should accept - only checks direction, not distance (that's DistanceBasedFilter's job)
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -91,7 +105,12 @@ class DirectionalCompatibilityFilterTest {
 
     // Passenger going northeast (~45° off)
     // Should accept within default tolerance (60°)
-    assertTrue(filter.accepts(trip, OSLO_CENTER, OSLO_NORTHEAST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_CENTER)
+      .withPassengerDropoff(OSLO_NORTHEAST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -101,7 +120,12 @@ class DirectionalCompatibilityFilterTest {
 
     // Passenger going east (90° perpendicular)
     // Should reject (exceeds 60° tolerance)
-    assertFalse(filter.accepts(trip, OSLO_CENTER, OSLO_EAST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_CENTER)
+      .withPassengerDropoff(OSLO_EAST)
+      .build();
+
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -116,8 +140,12 @@ class DirectionalCompatibilityFilterTest {
     // Passenger going northeast (aligns with second segment)
     var passengerPickup = new WgsCoordinate(59.9289, 10.7722);
     var passengerDropoff = new WgsCoordinate(59.9389, 10.7822);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -128,8 +156,12 @@ class DirectionalCompatibilityFilterTest {
     // Passenger aligned with first segment (Center → East)
     var passengerPickup = new WgsCoordinate(59.9139, 10.7622);
     var passengerDropoff = new WgsCoordinate(59.9139, 10.7822);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -142,8 +174,12 @@ class DirectionalCompatibilityFilterTest {
     var passengerPickup = new WgsCoordinate(59.9239, 10.7522);
     // South (backtracking)
     var passengerDropoff = new WgsCoordinate(59.9139, 10.7522);
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(passengerPickup)
+      .withPassengerDropoff(passengerDropoff)
+      .build();
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -156,7 +192,12 @@ class DirectionalCompatibilityFilterTest {
 
     // Passenger going east (90° perpendicular)
     // Should accept with 90° tolerance (default 60° would reject)
-    assertTrue(customFilter.accepts(trip, OSLO_CENTER, OSLO_EAST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_CENTER)
+      .withPassengerDropoff(OSLO_EAST)
+      .build();
+
+    assertTrue(customFilter.accepts(trip, request, null));
   }
 
   @Test
@@ -169,7 +210,12 @@ class DirectionalCompatibilityFilterTest {
 
     // Passenger going northeast (~45° off)
     // Should reject with 30° tolerance (default 60° would accept)
-    assertFalse(customFilter.accepts(trip, OSLO_CENTER, OSLO_NORTHEAST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_CENTER)
+      .withPassengerDropoff(OSLO_NORTHEAST)
+      .build();
+
+    assertFalse(customFilter.accepts(trip, request, null));
   }
 
   @Test

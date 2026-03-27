@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
+import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
 import org.opentripplanner.ext.carpooling.filter.FilterChain;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
@@ -120,6 +121,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   @Override
   public List<Itinerary> routeDirect(RouteRequest request, LinkingContext linkingContext)
     throws RoutingValidationException {
+    var carpoolingRequest = CarpoolingRequest.of(request);
     if (!StreetMode.CARPOOL.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
@@ -145,15 +147,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     var candidateTrips = allTrips
       .stream()
-      .filter(trip ->
-        preFilters.accepts(
-          trip,
-          passengerPickup,
-          passengerDropoff,
-          passengerDepartureTime,
-          searchWindow
-        )
-      )
+      .filter(trip -> preFilters.accepts(trip, carpoolingRequest, searchWindow))
       .toList();
 
     LOG.debug(

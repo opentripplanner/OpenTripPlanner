@@ -30,7 +30,12 @@ class CapacityFilterTest {
   void accepts_tripWithCapacity_returnsTrue() {
     var trip = createTripWithStops(OSLO_CENTER, List.of(), OSLO_NORTH);
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -42,7 +47,12 @@ class CapacityFilterTest {
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Filter accepts because trip has capacity configured (even if currently full)
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -51,7 +61,12 @@ class CapacityFilterTest {
     var stop1 = createStop(0, 3);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -59,7 +74,12 @@ class CapacityFilterTest {
     var stops = List.of(createOriginStop(OSLO_CENTER), createDestinationStop(OSLO_NORTH, 1));
     var trip = createTripWithCapacity(0, stops);
 
-    assertFalse(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertFalse(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -68,9 +88,18 @@ class CapacityFilterTest {
     var stops = List.of(createOriginStop(OSLO_CENTER), createDestinationStop(OSLO_NORTH, 1));
     var trip = createTripWithCapacity(2, stops);
 
+    var request1 = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_SOUTH)
+      .withPassengerDropoff(OSLO_EAST)
+      .build();
+    var request2 = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_NORTH)
+      .withPassengerDropoff(OSLO_SOUTH)
+      .build();
+
     // Should accept regardless of passenger coordinates
-    assertTrue(filter.accepts(trip, OSLO_SOUTH, OSLO_EAST));
-    assertTrue(filter.accepts(trip, OSLO_NORTH, OSLO_SOUTH));
+    assertTrue(filter.accepts(trip, request1, null));
+    assertTrue(filter.accepts(trip, request2, null));
   }
 
   @Test
@@ -84,7 +113,12 @@ class CapacityFilterTest {
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2, stop3), OSLO_NORTH);
 
     // At some point there's capacity (positions 0, 2+)
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 
   @Test
@@ -100,6 +134,11 @@ class CapacityFilterTest {
 
     // Filter accepts because trip has capacity configured
     // The validator will determine if there's actual room for insertion
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
+    var request = new CarpoolingRequestBuilder()
+      .withPassengerPickup(OSLO_EAST)
+      .withPassengerDropoff(OSLO_WEST)
+      .build();
+
+    assertTrue(filter.accepts(trip, request, null));
   }
 }
