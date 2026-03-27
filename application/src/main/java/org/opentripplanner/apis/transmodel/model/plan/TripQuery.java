@@ -18,7 +18,6 @@ import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.ModeInputType;
 import org.opentripplanner.apis.transmodel.model.TransportModeSlack;
-import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
@@ -49,7 +48,8 @@ public class TripQuery {
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType penaltyForStreetMode,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    GraphQLInputObjectType locationInputType
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 
@@ -184,14 +184,14 @@ public class TripQuery {
         GraphQLArgument.newArgument()
           .name("from")
           .description("The start location")
-          .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
+          .type(new GraphQLNonNull(locationInputType))
           .build()
       )
       .argument(
         GraphQLArgument.newArgument()
           .name("to")
           .description("The destination location")
-          .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
+          .type(new GraphQLNonNull(locationInputType))
           .build()
       )
       .argument(

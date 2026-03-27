@@ -8,13 +8,18 @@ import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * A helper class for setting up and interacting with transit data for tests.
@@ -140,5 +145,39 @@ public final class TransitTestEnvironment {
    */
   public RaptorTransitDataFetcher raptorData() {
     return raptorData(defaultServiceDate);
+  }
+
+  /**
+   * Create a {@link RaptorRoutingRequestTransitData} for the default service date using the
+   * realtime Raptor data.
+   */
+  public RaptorRoutingRequestTransitData raptorRequestData() {
+    return raptorRequestData(false);
+  }
+
+  /**
+   * Create a {@link RaptorRoutingRequestTransitData} for the default service date.
+   *
+   * @param ignoreRealtimeUpdates if {@code true}, use the scheduled Raptor data; otherwise use
+   *                              the realtime Raptor data (mirrors the production flag in
+   *                              TransitRouter)
+   */
+  public RaptorRoutingRequestTransitData raptorRequestData(boolean ignoreRealtimeUpdates) {
+    var raptorTransitData = ignoreRealtimeUpdates
+      ? timetableRepository.getRaptorTransitData()
+      : timetableRepository.getRealtimeRaptorTransitData();
+    var transitSearchTimeZero = ServiceDateUtils.asStartOfService(
+      defaultServiceDate,
+      timetableRepository.getTimeZone()
+    );
+    return new RaptorRoutingRequestTransitData(
+      raptorTransitData,
+      TransitGroupPriorityService.empty(),
+      transitSearchTimeZero,
+      0,
+      0,
+      new DefaultTransitDataProviderFilterBuilder().build(),
+      RouteRequest.defaultValue()
+    );
   }
 }

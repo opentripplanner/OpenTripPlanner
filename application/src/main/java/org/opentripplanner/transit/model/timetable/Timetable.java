@@ -61,6 +61,20 @@ public class Timetable implements Serializable {
     return getTripTimes(trip.getId());
   }
 
+  /**
+   * Find TripTimes for a trip, falling back to the scheduled timetable if not found in this
+   * (potentially realtime) timetable. This handles the case where realtime updates move a trip
+   * into a new pattern whose timetable does not contain the trip.
+   */
+  @Nullable
+  public TripTimes getTripTimesWithScheduleFallback(Trip trip) {
+    var tripTimes = getTripTimes(trip);
+    if (tripTimes == null) {
+      tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    }
+    return tripTimes;
+  }
+
   @Nullable
   public TripTimes getTripTimes(FeedScopedId tripId) {
     return tripTimesIndex.get(tripId);

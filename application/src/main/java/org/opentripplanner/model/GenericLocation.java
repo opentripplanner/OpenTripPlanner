@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.api.request.TripLocation;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
@@ -14,7 +15,7 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  */
 public class GenericLocation {
 
-  public static final GenericLocation UNKNOWN = new GenericLocation(null, null, null, null);
+  public static final GenericLocation UNKNOWN = new GenericLocation(null, null, null, null, null);
 
   /**
    * A label for the place, if provided. This is pass-through information and does not affect
@@ -40,16 +41,35 @@ public class GenericLocation {
   @Nullable
   public final Double lng;
 
+  /**
+   * When set, the location is on-board a specific trip. The trip is identified by the trip
+   * reference, the stop by the stop ID, and the stop position in the pattern may be disambiguated
+   * by the scheduled departure time (for ring lines).
+   */
+  @Nullable
+  public final TripLocation tripLocation;
+
   public GenericLocation(
     @Nullable String label,
     @Nullable FeedScopedId stopId,
     @Nullable Double lat,
     @Nullable Double lng
   ) {
+    this(label, stopId, lat, lng, null);
+  }
+
+  public GenericLocation(
+    @Nullable String label,
+    @Nullable FeedScopedId stopId,
+    @Nullable Double lat,
+    @Nullable Double lng,
+    @Nullable TripLocation tripLocation
+  ) {
     this.label = label;
     this.stopId = stopId;
     this.lat = lat;
     this.lng = lng;
+    this.tripLocation = tripLocation;
   }
 
   public static GenericLocation fromStopId(FeedScopedId id) {
@@ -68,6 +88,10 @@ public class GenericLocation {
     return new GenericLocation(null, null, lat, lng);
   }
 
+  public static GenericLocation fromTripLocation(TripLocation tripLocation) {
+    return new GenericLocation(null, null, null, null, tripLocation);
+  }
+
   /**
    * Returns this as a Coordinate object.
    */
@@ -79,8 +103,17 @@ public class GenericLocation {
     return new Coordinate(this.lng, this.lat);
   }
 
+  /**
+   * Returns true if this location represents a position on-board a transit vehicle
+   * rather than a geographic location. On-board locations have no coordinates and
+   * are not linked to the street network.
+   */
+  public boolean isOnBoard() {
+    return tripLocation != null;
+  }
+
   public boolean isSpecified() {
-    return stopId != null || (lat != null && lng != null);
+    return stopId != null || (lat != null && lng != null) || isOnBoard();
   }
 
   @Override
@@ -93,13 +126,14 @@ public class GenericLocation {
       Objects.equals(label, that.label) &&
       Objects.equals(stopId, that.stopId) &&
       Objects.equals(lat, that.lat) &&
-      Objects.equals(lng, that.lng)
+      Objects.equals(lng, that.lng) &&
+      Objects.equals(tripLocation, that.tripLocation)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, stopId, lat, lng);
+    return Objects.hash(label, stopId, lat, lng, tripLocation);
   }
 
   @Override
@@ -114,6 +148,7 @@ public class GenericLocation {
     }
     buf.addObj(stopId);
     buf.addCoordinate(lat, lng);
+    buf.addObj(tripLocation);
     return buf.toString();
   }
 }

@@ -41,6 +41,8 @@ public class GraphQLUtils {
       case OUTSIDE_BOUNDS -> GraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
       case OUTSIDE_SERVICE_PERIOD -> GraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
       case WALKING_BETTER_THAN_TRANSIT -> GraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
+      // On-board access is not supported in the GTFS GraphQL API
+      case ON_BOARD_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME -> null;
     };
   }
 

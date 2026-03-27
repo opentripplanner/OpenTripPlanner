@@ -255,6 +255,25 @@ class RouteRequestTest {
   }
 
   @Test
+  void withOnBoardAccessAt() {
+    var boardingTime = Instant.parse("2025-05-17T10:05:00Z");
+    var iterationStep = Duration.ofSeconds(120);
+    var result = minimal.copyOf().withOnBoardAccessAt(boardingTime, iterationStep).buildRequest();
+
+    assertEquals(boardingTime, result.dateTime());
+    assertEquals(iterationStep, result.searchWindow());
+  }
+
+  @Test
+  void withOnBoardAccessAtTruncatesToSeconds() {
+    var boardingTime = Instant.parse("2025-05-17T10:05:00.999Z");
+    var iterationStep = Duration.ofSeconds(60);
+    var result = minimal.copyOf().withOnBoardAccessAt(boardingTime, iterationStep).buildRequest();
+
+    assertEquals(Instant.parse("2025-05-17T10:05:00Z"), result.dateTime());
+  }
+
+  @Test
   void testValidateMissingFrom() {
     expectOneRoutingValidationException(
       () -> minimal.copyOf().withFrom(GenericLocation.UNKNOWN).buildRequest(),

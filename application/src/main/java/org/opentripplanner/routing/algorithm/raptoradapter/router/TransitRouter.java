@@ -31,6 +31,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingOnBoardAccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DirectTransitRequestMapper;
@@ -39,6 +40,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Defau
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.TripLocation;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -131,15 +133,32 @@ public class TransitRouter {
       ? serverContext.transitService().getRaptorTransitData()
       : serverContext.transitService().getRealtimeRaptorTransitData();
 
+    var onBoardTripLocation = request.from() != null ? request.from().tripLocation : null;
+
     var requestTransitDataProvider = createRequestTransitDataProvider(raptorTransitData);
 
     debugTimingAggregator.finishedPatternFiltering();
 
-    var accessEgresses = fetchAccessEgresses();
+    AccessEgresses accessEgresses;
 
-    debugTimingAggregator.finishedAccessEgress(
-      accessEgresses.getAccesses().size(),
-      accessEgresses.getEgresses().size()
+    if (onBoardTripLocation != null) {
+      var access = resolveOnBoardAccess(onBoardTripLocation, requestTransitDataProvider);
+      var egressPaths = fetchEgress();
+      verifyEgress(egressPaths);
+      accessEgresses = new AccessEgresses(List.of(access), egressPaths);
+
+      debugTimingAggregator.finishedAccessEgress(1, egressPaths.size());
+    } else {
+      accessEgresses = fetchAccessEgresses();
+      debugTimingAggregator.finishedAccessEgress(
+        accessEgresses.getAccesses().size(),
+        accessEgresses.getEgresses().size()
+      );
+    }
+
+    var extraSearchForSorlandsbanen = createExtraMcRouterSearchForSorlandsbanen(
+      accessEgresses,
+      raptorTransitData
     );
 
     // Prepare transit search
@@ -160,7 +179,7 @@ public class TransitRouter {
     // Transit routing using Raptor
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
-      createExtraMcRouterSearch(accessEgresses, raptorTransitData)
+      extraSearchForSorlandsbanen
     );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
@@ -224,6 +243,14 @@ public class TransitRouter {
     debugTimingAggregator.finishedItineraryCreation();
 
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
+  }
+
+  private RoutingOnBoardAccess resolveOnBoardAccess(
+    TripLocation tripLocation,
+    RaptorRoutingRequestTransitData requestTransitDataProvider
+  ) {
+    var resolver = new OnBoardAccessResolver(serverContext.transitService());
+    return resolver.resolve(tripLocation, requestTransitDataProvider.onBoardTripPatternSearch());
   }
 
   private AccessEgresses fetchAccessEgresses() {
@@ -384,6 +411,15 @@ public class TransitRouter {
     );
   }
 
+  private void verifyEgress(Collection<?> egress) {
+    if (!egress.isEmpty()) {
+      return;
+    }
+    throw new RoutingValidationException(
+      List.of(new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.TO_PLACE))
+    );
+  }
+
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {
     boolean accessExist = !access.isEmpty();
     boolean egressExist = !egress.isEmpty();
@@ -432,10 +468,11 @@ public class TransitRouter {
   }
 
   /**
-   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance.
+   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance,
+   * specifically for the Sorlandsbanen OTP feature.
    */
   @Nullable
-  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearchForSorlandsbanen(
     AccessEgresses accessEgresses,
     RaptorTransitData raptorTransitData
   ) {
