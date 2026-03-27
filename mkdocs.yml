@@ -47,6 +47,7 @@ nav:
 - Home: 'index.md'
 - About:
     - Product Overview: 'Product-Overview.md'
+    - Features: 'Features.md'
     - Governance: 'Governance.md'
     - History: 'History.md'
     - Presentations: 'Presentations.md'
