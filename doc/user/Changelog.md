@@ -13,6 +13,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve compatibility with Swiss NeTEx data [#7427](https://github.com/opentripplanner/OpenTripPlanner/pull/7427)
 - fix: Introduce stable order for fareZones (tariffZones) [#7434](https://github.com/opentripplanner/OpenTripPlanner/pull/7434)
 - Prevent long routes mistakenly getting grouped across service-date [#7452](https://github.com/opentripplanner/OpenTripPlanner/pull/7452)
+- Migrate away from deprecated FeedScopedId.parse() [#7457](https://github.com/opentripplanner/OpenTripPlanner/pull/7457)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
