@@ -20,6 +20,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateErrorType;
@@ -100,6 +101,34 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly(
       "F:Pattern1[SCHEDULED]",
       "F:routeId::001:RT[ADDED]"
+    );
+  }
+
+  @Test
+  void testAddJourneyHasExtraJourneyAlteration() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = createValidAddedJourney(siri).buildEstimatedTimetableDeliveries();
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+
+    FeedScopedId tripId = id(ADDED_TRIP_ID);
+    TransitService transitService = env.transitService();
+
+    Trip trip = transitService.getTrip(tripId);
+    assertNotNull(trip);
+    assertEquals(
+      TripAlteration.EXTRA_JOURNEY,
+      trip.getNetexAlteration(),
+      "An extra journey trip should have EXTRA_JOURNEY alteration"
+    );
+
+    var tripOnServiceDate = transitService.getTripOnServiceDate(tripId);
+    assertNotNull(tripOnServiceDate);
+    assertEquals(
+      TripAlteration.EXTRA_JOURNEY,
+      tripOnServiceDate.getTripAlteration(),
+      "An extra journey TripOnServiceDate should have EXTRA_JOURNEY alteration"
     );
   }
 

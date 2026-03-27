@@ -30,6 +30,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -271,6 +272,7 @@ class AddedTripBuilder {
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withReplacementFor(replacedTrips)
+      .withTripAlteration(TripAlteration.EXTRA_JOURNEY)
       .build();
 
     try {
@@ -341,6 +343,7 @@ class AddedTripBuilder {
     tripBuilder.withHeadsign(NonLocalizedString.ofNullable(headsign));
 
     tripBuilder.withOperator(operator);
+    tripBuilder.withNetexAlteration(TripAlteration.EXTRA_JOURNEY);
 
     return tripBuilder.build();
   }
