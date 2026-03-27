@@ -18,7 +18,11 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   RoutingAccessEgress withPenalty(TimeAndCost penalty);
 
   /**
-   * Return the last state both in the case of access and egress.
+   * Return the terminal state of the A* street search that reached the transit stop. "Last"
+   * refers to the search order, not chronological order — for egress searches
+   * ({@code request.arriveBy() == true}) the state chain runs backward in time and is not
+   * reversed. Callers that need a chronological state chain must wrap this in a
+   * {@link org.opentripplanner.astar.model.GraphPath}.
    */
   State getLastState();
 
