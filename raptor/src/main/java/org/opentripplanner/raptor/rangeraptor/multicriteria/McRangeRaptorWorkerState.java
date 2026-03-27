@@ -33,9 +33,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   implements RaptorWorkerState<T> {
 
-  private static final boolean EARLY_PRUNING_ENABLED =
-    !"false".equals(System.getProperty("otp.raptor.earlyPruning", "true"));
-
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
@@ -44,17 +41,6 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final RaptorCostCalculator<T> calculatorGeneralizedCost;
   private final RaptorTransitCalculator<T> transitCalculator;
   private final Collection<McStopArrival<T>> onBoardAccessStopArrivals;
-
-  /**
-   * Early Pruning: best known destination arrival time. Used to prune transfers whose earliest
-   * possible arrival already exceeds this bound. Only arrival time is used as the pruning
-   * criterion — cost and round are not considered, so Pareto-optimal paths with worse arrival
-   * time but better cost may be pruned.
-   * See: Rohovyi et al., "Early Pruning for Public Transport Routing", 2026.
-   */
-  private int bestDestinationArrivalTime;
-  private final int[] egressStopIndices;
-  private final int[] egressMinDurations;
 
   /**
    * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -67,9 +53,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     McStopArrivalFactory<T> stopArrivalFactory,
     RaptorCostCalculator<T> calculatorGeneralizedCost,
     RaptorTransitCalculator<T> transitCalculator,
-    WorkerLifeCycle lifeCycle,
-    int[] egressStopIndices,
-    int[] egressMinDurations
+    WorkerLifeCycle lifeCycle
   ) {
     this.arrivals = arrivals;
     this.paths = paths;
@@ -78,9 +62,6 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     this.calculatorGeneralizedCost = calculatorGeneralizedCost;
     this.transitCalculator = transitCalculator;
     this.onBoardAccessStopArrivals = new ArrayList<>();
-    this.egressStopIndices = egressStopIndices;
-    this.egressMinDurations = egressMinDurations;
-    this.bestDestinationArrivalTime = transitCalculator.unreachedTime();
 
     // Attach to the RR life cycle
     lifeCycle.onSetupIteration(ignore -> setupIteration());
@@ -122,39 +103,13 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   /**
    * Set the time at a transit stops iff it is optimal.
-   * Transfers are expected to be sorted by duration (non-decreasing). This enables Early Pruning:
-   * once the earliest possible arrival plus transfer duration exceeds the best known destination
-   * arrival time, all subsequent (longer) transfers will too.
-   * See: Rohovyi et al., "Early Pruning for Public Transport Routing", 2026.
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
     var fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
 
-    if (EARLY_PRUNING_ENABLED) {
-      // Find the earliest arrival time among all Pareto-optimal arrivals at this stop.
-      int earliestArrivalTime = Integer.MAX_VALUE;
-      for (McStopArrival<T> arrival : fromArrivals) {
-        if (arrival.arrivalTime() < earliestArrivalTime) {
-          earliestArrivalTime = arrival.arrivalTime();
-        }
-      }
-
-      while (transfers.hasNext()) {
-        var transfer = transfers.next();
-        int bestPossibleArrival = earliestArrivalTime + transfer.durationInSeconds();
-        if (
-          exceedsTimeLimit(bestPossibleArrival) ||
-          !transitCalculator.isBefore(bestPossibleArrival, bestDestinationArrivalTime)
-        ) {
-          break;
-        }
-        transferToStop(fromArrivals, transfer);
-      }
-    } else {
-      while (transfers.hasNext()) {
-        transferToStop(fromArrivals, transfers.next());
-      }
+    while (transfers.hasNext()) {
+      transferToStop(fromArrivals, transfers.next());
     }
   }
 
@@ -253,20 +208,6 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
     arrivals.addStopArrival(arrival);
-    // Early Pruning: update best destination arrival time if this is an egress stop.
-    if (EARLY_PRUNING_ENABLED) {
-      int stop = arrival.stop();
-      int arrivalTime = arrival.arrivalTime();
-      for (int i = 0; i < egressStopIndices.length; i++) {
-        if (egressStopIndices[i] == stop) {
-          int destArrival = arrivalTime + egressMinDurations[i];
-          if (transitCalculator.isBefore(destArrival, bestDestinationArrivalTime)) {
-            bestDestinationArrivalTime = destArrival;
-          }
-          break;
-        }
-      }
-    }
   }
 
   private int calculateC1(PatternRide<T> ride, int alightStop, int alightTime, int alightSlack) {
