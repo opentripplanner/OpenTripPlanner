@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.extentions.extrasearch;
+package org.opentripplanner.raptor.extensions.extrasearch;
 
 import java.util.Collection;
 import java.util.function.BiFunction;

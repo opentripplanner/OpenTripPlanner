@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.extentions.direct.service;
+package org.opentripplanner.raptor.extensions.direct.service;
 
 import java.util.ArrayList;
 import java.util.BitSet;

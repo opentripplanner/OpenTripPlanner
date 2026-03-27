@@ -1,7 +1,7 @@
-package org.opentripplanner.raptor.extentions.direct.configure;
+package org.opentripplanner.raptor.extensions.direct.configure;
 
-import org.opentripplanner.raptor.extentions.direct.api.RaptorDirectTransitRequest;
-import org.opentripplanner.raptor.extentions.direct.service.DirectTransitSearch;
+import org.opentripplanner.raptor.extensions.direct.api.RaptorDirectTransitRequest;
+import org.opentripplanner.raptor.extensions.direct.service.DirectTransitSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 

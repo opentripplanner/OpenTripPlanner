@@ -29,7 +29,7 @@ public class RaptorArchitectureTest {
     RAPTOR_UTIL_COMPOSITE
   );
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
-  private static final Package RAPTOR_EXTENSIONS = RAPTOR.subPackage("extentions..");
+  private static final Package RAPTOR_EXTENSIONS = RAPTOR.subPackage("extensions..");
   private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
   private static final Package SERVICE = RAPTOR.subPackage("service");

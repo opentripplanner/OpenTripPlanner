@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.extentions.extrasearch.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;

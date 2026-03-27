@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.extentions.direct.service;
+package org.opentripplanner.raptor.extensions.direct.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
