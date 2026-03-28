@@ -3,7 +3,6 @@ package org.opentripplanner.astar;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
@@ -116,8 +115,8 @@ public abstract class AStarBuilder<
     return build().getShortestPathTree();
   }
 
-  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
-    return build().getPathsToTarget();
+  public Optional<GraphPath<State, Edge, Vertex>> getPathToTarget() {
+    return build().getPathToTarget();
   }
 
   private AStar<State, Edge, Vertex> build() {

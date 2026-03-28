@@ -79,26 +79,22 @@ public class BarrierRoutingTest {
         rr.withPreferences(p ->
           p.withBike(it -> it.withWalking(walking -> walking.withReluctance(1d)))
         ),
-      itineraries ->
-        itineraries
-          .stream()
-          .flatMap(i ->
-            Stream.of(
-              () -> assertEquals(1, i.legs().size()),
-              () -> assertEquals(TraverseMode.BICYCLE, i.streetLeg(0).getMode()),
-              () ->
-                assertEquals(
-                  List.of(false, true, false, true, false),
-                  i
-                    .legs()
-                    .get(0)
-                    .listWalkSteps()
-                    .stream()
-                    .map(WalkStep::isWalkingBike)
-                    .collect(Collectors.toList())
-                )
+      itinerary ->
+        Stream.of(
+          () -> assertEquals(1, itinerary.legs().size()),
+          () -> assertEquals(TraverseMode.BICYCLE, itinerary.streetLeg(0).getMode()),
+          () ->
+            assertEquals(
+              List.of(false, true, false, true, false),
+              itinerary
+                .legs()
+                .get(0)
+                .listWalkSteps()
+                .stream()
+                .map(WalkStep::isWalkingBike)
+                .collect(Collectors.toList())
             )
-          )
+        )
     );
     assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@NaA@_@Dm@Dq@a@KJy@@I@M@E??");
   }
@@ -148,10 +144,10 @@ public class BarrierRoutingTest {
       to,
       streetMode,
       ignored -> {},
-      itineraries ->
-        itineraries
+      itinerary ->
+        itinerary
+          .legs()
           .stream()
-          .flatMap(i -> i.legs().stream())
           .map(
             l ->
               () ->
@@ -179,7 +175,7 @@ public class BarrierRoutingTest {
     GenericLocation to,
     StreetMode streetMode,
     Consumer<RouteRequestBuilder> options,
-    Function<List<Itinerary>, Stream<Executable>> assertions
+    Function<Itinerary, Stream<Executable>> assertions
   ) {
     var builder = RouteRequest.of()
       .withDateTime(DATE_TIME)
@@ -197,7 +193,7 @@ public class BarrierRoutingTest {
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
+    var path = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       new NoopSiteResolver(),
@@ -207,11 +203,11 @@ public class BarrierRoutingTest {
       graph.ellipsoidToGeoidDifference
     );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
+    var itinerary = graphPathToItineraryMapper.mapToItinerary(path, request).get();
 
-    assertAll(assertions.apply(itineraries));
+    assertAll(assertions.apply(itinerary));
 
-    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
+    Geometry legGeometry = itinerary.legs().getFirst().legGeometry();
     temporaryVerticesContainer.close();
 
     return EncodedPolyline.of(legGeometry).points();
