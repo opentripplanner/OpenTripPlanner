@@ -300,6 +300,54 @@ class TransferMapperTest {
     assertEquals(2, ((TripTransferPoint) transfer.getFrom()).getStopPositionInPattern());
   }
 
+  /**
+   * When two visits to the same Quay use distinct ScheduledStopPoint IDs, the interchange
+   * reference is unambiguous — the SSP appears only once in the stop list, so both indexOf and
+   * lastIndexOf return the correct position. This is the ideal data modeling for loop patterns.
+   */
+  @Test
+  void distinctSspPerVisitDisambiguatesLoopPattern() {
+    var transferStopVisit1 = "TEST:ScheduledStopPoint:TransferStop_visit1";
+    var transferStopVisit2 = "TEST:ScheduledStopPoint:TransferStop_visit2";
+    var stopPointsIndex = Map.of(
+      FROM_JOURNEY_ID,
+      List.of(
+        "TEST:ScheduledStopPoint:Start",
+        "TEST:ScheduledStopPoint:StopA",
+        // Position 2: first visit (same Quay)
+        transferStopVisit1,
+        "TEST:ScheduledStopPoint:StopB",
+        "TEST:ScheduledStopPoint:StopC",
+        // Position 5: second visit (same Quay, different SSP)
+        transferStopVisit2,
+        "TEST:ScheduledStopPoint:End"
+      ),
+      TO_JOURNEY_ID,
+      List.of(transferStopVisit1, "TEST:ScheduledStopPoint:Destination")
+    );
+
+    var trips = createTripsIndex();
+    var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
+
+    // Interchange references the first-visit SSP
+    var interchange = new ServiceJourneyInterchange()
+      .withId(INTERCHANGE_ID)
+      .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
+      .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
+      .withFromPointRef(createStopRef(transferStopVisit1))
+      .withToPointRef(createStopRef(transferStopVisit1))
+      .withGuaranteed(true)
+      .withMaximumWaitTime(Duration.ofMinutes(5));
+
+    var transfer = mapper.mapToTransfer(interchange);
+
+    assertNotNull(transfer);
+    assertTrue(transfer.getTransferConstraint().isGuaranteed());
+    // The SSP is unique, so the position resolves correctly to the first visit
+    assertEquals(2, ((TripTransferPoint) transfer.getFrom()).getStopPositionInPattern());
+    assertEquals(0, ((TripTransferPoint) transfer.getTo()).getStopPositionInPattern());
+  }
+
   @Test
   void usesFirstIndexForToStop() {
     var trips = createTripsIndex();
