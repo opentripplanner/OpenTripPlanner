@@ -214,7 +214,7 @@ public class RealTimeRaptorTransitDataUpdater implements TimetableSnapshotUpdate
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
-          if (!pattern.isStopPatternModifiedInRealTime()) {
+          if (!pattern.isRealTimeTripPattern()) {
             continue;
           }
           var oldTimeTable = timetableProvider.apply(pattern.getId());
