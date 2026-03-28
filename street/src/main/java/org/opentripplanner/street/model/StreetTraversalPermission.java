@@ -38,11 +38,41 @@ public enum StreetTraversalPermission {
     return get(this.code | perm.code);
   }
 
+  public StreetTraversalPermission add(TraverseMode mode) {
+    if (mode.isWalking()) {
+      return get(this.code | StreetTraversalPermission.PEDESTRIAN.code);
+    }
+    if (mode.isCyclingIsh()) {
+      return get(this.code | StreetTraversalPermission.BICYCLE.code);
+    }
+    if (mode.isInCar()) {
+      return get(this.code | StreetTraversalPermission.CAR.code);
+    }
+    return this;
+  }
+
   /**
    * Returns intersection of allowed permissions between current permissions and given permissions
    */
   public StreetTraversalPermission intersection(StreetTraversalPermission perm) {
     return get(this.code & perm.code);
+  }
+
+  /**
+   * Returns intersection of allowed permissions between current permissions and the given modes.
+   */
+  public StreetTraversalPermission intersection(TraverseModeSet modes) {
+    StreetTraversalPermission result = StreetTraversalPermission.NONE;
+    if (modes.getWalk()) {
+      result = result.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+    if (modes.getBicycle()) {
+      result = result.add(StreetTraversalPermission.BICYCLE);
+    }
+    if (modes.getCar()) {
+      result = result.add(StreetTraversalPermission.CAR);
+    }
+    return intersection(result);
   }
 
   public StreetTraversalPermission remove(StreetTraversalPermission perm) {

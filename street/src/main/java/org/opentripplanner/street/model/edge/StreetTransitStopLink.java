@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This represents the connection between a street vertex and a transit vertex where going from the
@@ -29,6 +30,25 @@ public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVe
     StreetVertex tov
   ) {
     return connectToGraph(new StreetTransitStopLink(fromv, tov));
+  }
+
+  /**
+   * Either from or to needs to be a {@link TransitStopVertex} and the other vertex should be a
+   * {@link StreetVertex}.
+   */
+  public static StreetTransitStopLink createStreetTransitStopLink(Vertex from, Vertex to) {
+    if (from instanceof TransitStopVertex stop && to instanceof StreetVertex street) {
+      return connectToGraph(new StreetTransitStopLink(stop, street));
+    }
+    if (to instanceof TransitStopVertex stop && from instanceof StreetVertex street) {
+      return connectToGraph(new StreetTransitStopLink(street, stop));
+    }
+    throw new IllegalArgumentException(
+      "Vertices need to be a transit stop vertex and a street vertex. Got: " +
+        from.getClass() +
+        " and " +
+        to.getClass()
+    );
   }
 
   protected int getStreetToStopTime() {

@@ -1,15 +1,13 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import java.util.List;
+import java.util.Set;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -72,21 +70,10 @@ class TestGraph {
     VertexLinker linker = VertexLinkerTestFactory.of(graph);
 
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      linker.linkVertexPermanently(
+      linker.linkVertexBidirectionallyPermanently(
         tStop,
-        new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetTransitStopLink.createStreetTransitStopLink(
-              (TransitStopVertex) vertex,
-              streetVertex
-            ),
-            StreetTransitStopLink.createStreetTransitStopLink(
-              streetVertex,
-              (TransitStopVertex) vertex
-            )
-          )
+        Set.of(TraverseMode.WALK),
+        StreetTransitStopLink::createStreetTransitStopLink
       );
     }
   }

@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -45,10 +46,8 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
-import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -388,21 +387,10 @@ public class ConstantsForTests {
         graph.addVertex(stationVertex);
         VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor());
 
-        linker.linkVertexPermanently(
+        linker.linkVertexBidirectionallyPermanently(
           stationVertex,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                (VehicleRentalPlaceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                streetVertex,
-                (VehicleRentalPlaceVertex) vertex
-              )
-            )
+          Set.of(TraverseMode.WALK),
+          StreetVehicleRentalLink::createStreetVehicleRentalLink
         );
       }
     } catch (IOException e) {

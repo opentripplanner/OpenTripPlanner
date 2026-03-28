@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetMode.BIKE;
 import static org.opentripplanner.street.model.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.BIKE_TO_PARK;
 import static org.opentripplanner.street.model.StreetMode.CAR;
-import static org.opentripplanner.street.model.StreetMode.CAR_PICKUP;
 import static org.opentripplanner.street.model.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.street.model.StreetMode.FLEXIBLE;
@@ -15,6 +14,8 @@ import static org.opentripplanner.street.model.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,6 +32,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -143,16 +146,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   private static List<Arguments> testPedestrianLinkingTestCases() {
     var args = new ArrayList<Arguments>();
-    var modes = List.of(
-      WALK,
-      BIKE,
-      BIKE_TO_PARK,
-      BIKE_RENTAL,
-      SCOOTER_RENTAL,
-      FLEXIBLE,
-      CAR_PICKUP,
-      CAR_RENTAL
-    );
+    var modes = List.of(WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL);
 
     for (StreetMode mode : modes) {
       args.addAll(
@@ -169,8 +163,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   /**
-   * Only CAR linking is handled specially, since walking with a bike is always a possibility,
-   * and so no difference is made between BIKE/WALK:
+   * Some modes that allow multiple alternative street modes are handled in separate test cases.
    */
   @ParameterizedTest
   @MethodSource("testPedestrianLinkingTestCases")
@@ -183,19 +176,39 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   @Test
+  public void testBikeLinking() {
+    assertLinking(closeToCarSt(), ALL_TC, BIKE);
+    assertLinking(closeToAllSt(), ALL_TC, BIKE);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, BIKE);
+    assertLinking(closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC, BIKE);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, BIKE);
+    assertLinking(stopLocation, ALL_TC, BIKE);
+  }
+
+  @Test
+  public void testBikeParkLinking() {
+    assertLinking(closeToCarSt(), ALL_TC, BIKE_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, BIKE_TO_PARK);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, BIKE_TO_PARK);
+    assertLinking(closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC, BIKE_TO_PARK);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, BIKE_TO_PARK);
+    assertLinking(stopLocation, ALL_TC, BIKE_TO_PARK);
+  }
+
+  @Test
   public void testCarLinking() {
     assertLinking(closeToCarSt(), CAR_TC, CAR);
     assertLinking(closeToAllSt(), ALL_TC, CAR);
     assertLinking(closeToPedestrianSt(), ALL_TC, CAR);
     assertLinking(closeToPedestrianAndBicycleSt(), BICYCLE_CAR_TC, CAR);
     assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, CAR);
-    assertLinking(stopLocation, CAR_TC, CAR_TC, CAR);
+    assertLinking(stopLocation, CAR_TC, CAR);
   }
 
   @Test
   public void testCarParkLinking() {
     assertLinking(closeToCarSt(), CAR_TC, ALL_TC, CAR_TO_PARK);
-    assertLinking(closeToAllSt(), ALL_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, CAR_TO_PARK);
     assertLinking(closeToPedestrianSt(), ALL_TC, PEDESTRIAN_TC, CAR_TO_PARK);
     assertLinking(
       closeToPedestrianAndBicycleSt(),
@@ -207,23 +220,78 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(stopLocation, CAR_TC, ALL_TC, CAR_TO_PARK);
   }
 
+  @Test
+  public void testCarPickupLinking() {
+    assertLinking(closeToCarSt(), CAR_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToPedestrianSt(), ALL_TC, PEDESTRIAN_TC, CAR_TO_PARK);
+    assertLinking(
+      closeToPedestrianAndBicycleSt(),
+      BICYCLE_CAR_TC,
+      PEDESTRIAN_BICYCLE_TC,
+      CAR_TO_PARK
+    );
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, CAR_TO_PARK);
+    assertLinking(stopLocation, CAR_TC, ALL_TC, CAR_TO_PARK);
+  }
+
+  @Test
+  public void testFlexLinking() {
+    assertLinking(closeToCarSt(), CAR_TC, CAR_TC, FLEXIBLE);
+    assertLinking(closeToAllSt(), ALL_TC, FLEXIBLE);
+    assertLinking(closeToPedestrianSt(), PEDESTRIAN_TC, FLEXIBLE);
+    assertLinking(closeToPedestrianAndBicycleSt(), List.of(PEDESTRIAN_BICYCLE_TC), FLEXIBLE);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, BICYCLE_CAR_TC, FLEXIBLE);
+    assertLinking(stopLocation, List.of(CAR_TC, ALL_TC), List.of(CAR_TC, ALL_TC), FLEXIBLE);
+  }
+
   // TODO: Linking to wheelchair accessible streets is currently not implemented,
   //       is this relevant?
 
   private void assertLinking(
     GenericLocation location,
-    LinkingTestCase expectedStreetName,
+    LinkingTestCase expectedTestCase,
     StreetMode... streetModes
   ) {
-    assertLinking(location, expectedStreetName, expectedStreetName, streetModes);
+    assertLinking(location, List.of(expectedTestCase), List.of(expectedTestCase), streetModes);
   }
 
   private void assertLinking(
     GenericLocation location,
-    LinkingTestCase expectedFromStreetName,
-    LinkingTestCase expectedToStreetName,
+    List<LinkingTestCase> expectedTestCases,
     StreetMode... streetModes
   ) {
+    assertLinking(location, expectedTestCases, expectedTestCases, streetModes);
+  }
+
+  private void assertLinking(
+    GenericLocation location,
+    LinkingTestCase expectedFromTestCase,
+    LinkingTestCase expectedToTestCase,
+    StreetMode... streetModes
+  ) {
+    assertLinking(
+      location,
+      List.of(expectedFromTestCase),
+      List.of(expectedToTestCase),
+      streetModes
+    );
+  }
+
+  private void assertLinking(
+    GenericLocation location,
+    List<LinkingTestCase> expectedFromTestCases,
+    List<LinkingTestCase> expectedToTestCases,
+    StreetMode... streetModes
+  ) {
+    var expectedFromStreetNames = expectedFromTestCases
+      .stream()
+      .map(tc -> tc.name)
+      .toList();
+    var expectedToStreetNames = expectedToTestCases
+      .stream()
+      .map(tc -> tc.name)
+      .toList();
     var linker = VertexLinkerTestFactory.of(graph);
     for (final StreetMode streetMode : streetModes) {
       try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
@@ -235,11 +303,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           .withDirectMode(streetMode)
           .build();
         var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, request);
-        assertFromLink(
-          expectedFromStreetName.name(),
-          streetMode,
-          linkingContext.findVertices(location).iterator().next()
-        );
+        assertFromLinks(expectedFromStreetNames, linkingContext.findVertices(location));
 
         var request2 = LinkingContextRequest.of()
           .withFrom(ANY_PLACE)
@@ -247,49 +311,51 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           .withDirectMode(streetMode)
           .build();
         var linkingContext2 = linkingContextFactory.create(temporaryVerticesContainer, request2);
-        if (expectedToStreetName != null) {
-          assertToLink(
-            expectedToStreetName.name(),
-            streetMode,
-            linkingContext2.findVertices(location).iterator().next()
-          );
-        }
+        assertToLinks(expectedToStreetNames, linkingContext2.findVertices(location));
       }
     }
   }
 
-  private void assertFromLink(String streetName, StreetMode streetMode, Vertex fromVertex) {
-    var outgoing = fromVertex
-      .getOutgoing()
-      .iterator()
-      .next()
-      .getToVertex()
-      .getOutgoing()
-      .iterator()
-      .next();
+  private void assertFromLinks(List<String> streetNames, Set<Vertex> fromVertices) {
+    var outgoingNames = fromVertices
+      .stream()
+      .flatMap(vertex ->
+        vertex
+          .getOutgoing()
+          .stream()
+          .flatMap(e ->
+            e
+              .getToVertex()
+              .getOutgoing()
+              .stream()
+              .filter(edge -> edge instanceof StreetEdge)
+              .map(Edge::getDefaultName)
+          )
+      )
+      .toList();
 
-    assertEquals(
-      streetName,
-      outgoing.getDefaultName(),
-      String.format("%s should be linked to %s", streetMode, streetName)
-    );
+    assertThat(outgoingNames).containsExactlyElementsIn(streetNames);
   }
 
-  private void assertToLink(String streetName, StreetMode streetMode, Vertex toVertex) {
-    var outgoing = toVertex
-      .getIncoming()
-      .iterator()
-      .next()
-      .getFromVertex()
-      .getIncoming()
-      .iterator()
-      .next();
+  private void assertToLinks(List<String> streetNames, Set<Vertex> toVertices) {
+    var incomingNames = toVertices
+      .stream()
+      .flatMap(vertex ->
+        vertex
+          .getIncoming()
+          .stream()
+          .flatMap(e ->
+            e
+              .getFromVertex()
+              .getIncoming()
+              .stream()
+              .filter(edge -> edge instanceof StreetEdge)
+              .map(Edge::getDefaultName)
+          )
+      )
+      .collect(Collectors.toSet());
 
-    assertEquals(
-      streetName,
-      outgoing.getDefaultName(),
-      streetMode + " should be linked to " + streetName
-    );
+    assertThat(incomingNames).containsExactlyElementsIn(streetNames);
   }
 
   /**

@@ -26,9 +26,9 @@ public class BarrierVertexTest {
 
     StreetEdge bv_to_endVertex_forward = edge(bv, endVertex, 100, false);
 
-    assertTrue(bv_to_endVertex_forward.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(bv_to_endVertex_forward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(bv_to_endVertex_forward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(bv_to_endVertex_forward.isLinkableWith(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(bv_to_endVertex_forward.isLinkableWith(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(bv_to_endVertex_forward.isLinkableWith(new TraverseModeSet(TraverseMode.WALK)));
 
     assertFalse(bv_to_endVertex_forward.canTraverse(TraverseMode.CAR));
     assertTrue(bv_to_endVertex_forward.canTraverse(TraverseMode.BICYCLE));
@@ -36,9 +36,9 @@ public class BarrierVertexTest {
 
     StreetEdge endVertex_to_bv_backward = edge(endVertex, bv, 100, true);
 
-    assertTrue(endVertex_to_bv_backward.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(endVertex_to_bv_backward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(endVertex_to_bv_backward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(endVertex_to_bv_backward.isLinkableWith(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(endVertex_to_bv_backward.isLinkableWith(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(endVertex_to_bv_backward.isLinkableWith(new TraverseModeSet(TraverseMode.WALK)));
 
     assertFalse(endVertex_to_bv_backward.canTraverse(TraverseMode.CAR));
     assertTrue(endVertex_to_bv_backward.canTraverse(TraverseMode.BICYCLE));
@@ -46,9 +46,9 @@ public class BarrierVertexTest {
 
     StreetEdge bv_to_endVertex_backward = edge(bv, endVertex, 100, true);
 
-    assertTrue(bv_to_endVertex_backward.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(bv_to_endVertex_backward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(bv_to_endVertex_backward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(bv_to_endVertex_backward.isLinkableWith(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(bv_to_endVertex_backward.isLinkableWith(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(bv_to_endVertex_backward.isLinkableWith(new TraverseModeSet(TraverseMode.WALK)));
 
     assertFalse(bv_to_endVertex_backward.canTraverse(TraverseMode.CAR));
     assertTrue(bv_to_endVertex_backward.canTraverse(TraverseMode.BICYCLE));
@@ -56,9 +56,9 @@ public class BarrierVertexTest {
 
     StreetEdge endVertex_to_bv_forward = edge(endVertex, bv, 100, false);
 
-    assertTrue(endVertex_to_bv_forward.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(endVertex_to_bv_forward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(endVertex_to_bv_forward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(endVertex_to_bv_forward.isLinkableWith(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(endVertex_to_bv_forward.isLinkableWith(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(endVertex_to_bv_forward.isLinkableWith(new TraverseModeSet(TraverseMode.WALK)));
 
     assertFalse(endVertex_to_bv_forward.canTraverse(TraverseMode.CAR));
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.BICYCLE));
@@ -69,9 +69,9 @@ public class BarrierVertexTest {
     onlyWalkBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
     StreetEdge edge = edge(onlyWalkBollard, endVertex, 100, false);
 
-    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(edge.isLinkableWith(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(edge.isLinkableWith(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(edge.isLinkableWith(new TraverseModeSet(TraverseMode.WALK)));
 
     assertFalse(edge.canTraverse(TraverseMode.CAR));
     assertFalse(edge.canTraverse(TraverseMode.BICYCLE));

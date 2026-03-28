@@ -47,7 +47,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -351,12 +350,8 @@ public abstract class GraphRoutingTest {
       return new TemporaryStreetLocation(nearestPoint, new NonLocalizedString(name));
     }
 
-    public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {
-      return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
-    }
-
-    public TemporaryFreeEdge link(StreetVertex from, TemporaryVertex to) {
-      return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
+    public TemporaryFreeEdge link(Vertex from, Vertex to) {
+      return TemporaryFreeEdge.createTemporaryFreeEdge(from, to, StreetTraversalPermission.ALL);
     }
 
     // -- Vehicle rental
