@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +36,19 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     "g2012u00.gtx",
   };
   private final File cacheDirectory;
-  public final NEDTileSource tileSource;
+  private final NEDTileSource tileSource;
   private final List<GridCoverage2D> regionCoverages = new ArrayList<>();
+  private final URL datumUrl;
   private List<VerticalDatum> datums;
 
-  public NEDGridCoverageFactoryImpl(File cacheDirectory) {
-    this.cacheDirectory = cacheDirectory;
-    this.tileSource = new DegreeGridNEDTileSource();
-  }
-
-  public NEDGridCoverageFactoryImpl(File cacheDirectory, NEDTileSource tileSource) {
+  public NEDGridCoverageFactoryImpl(File cacheDirectory, URI datumUrl, NEDTileSource tileSource) {
     this.cacheDirectory = cacheDirectory;
     this.tileSource = tileSource;
+    try {
+      this.datumUrl = datumUrl.toURL();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -182,7 +185,6 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
    */
   private void fetchDatum() throws Exception {
     LOG.info("Attempting to fetch datum files from OTP project web server...");
-    URL datumUrl = new URL("http://dev.opentripplanner.org/resources/datum.zip");
     ZipInputStream zis = new ZipInputStream(datumUrl.openStream());
     /* Silly boilerplate because Java has no simple unzip-to-directory function. */
     for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
