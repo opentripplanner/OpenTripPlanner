@@ -489,6 +489,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return ret;
   }
 
+  /**
+   * Returns an efficient iterable that allows traversing the edge chain backwards.
+   */
   public Iterable<Edge> listBackEdges() {
     return () -> new BackEdgeIterator(this);
   }

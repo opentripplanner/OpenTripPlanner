@@ -73,7 +73,7 @@ public class TestStateBuilder {
   }
 
   /**
-   * Create an initial state that start in a car.
+   * Create an initial state that starts in a car.
    */
   public static TestStateBuilder ofDriving() {
     return new TestStateBuilder(StreetMode.CAR);

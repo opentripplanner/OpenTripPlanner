@@ -28,7 +28,7 @@ class BackEdgeIteratorTest {
 
   @MethodSource("cases")
   @ParameterizedTest
-  void emptyState(State state, int expectedSize) {
+  void countEdges(State state, int expectedSize) {
     var edges = ImmutableList.copyOf(state.listBackEdges());
     assertThat(edges).hasSize(expectedSize);
     assertThat(edges).doesNotContain(null);

@@ -3,6 +3,9 @@ package org.opentripplanner.street.search.state;
 import java.util.Iterator;
 import org.opentripplanner.street.model.edge.Edge;
 
+/**
+ * Iterator for traversing back edges in a state chain without any extra allocations.
+ */
 class BackEdgeIterator implements Iterator<Edge> {
 
   private State current;

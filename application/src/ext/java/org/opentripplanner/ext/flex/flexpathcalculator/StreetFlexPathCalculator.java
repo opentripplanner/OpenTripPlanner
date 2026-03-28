@@ -64,16 +64,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       return null;
     }
 
-    var path = FlexGraphPathAdapter.of(state);
-
-    // computing the linestring from the graph path is a surprisingly expensive operation
-    // so we delay it until it's actually needed. since most flex paths are never shown to the user
-    // this improves performance quite a bit.
-    return new FlexPath(
-      (int) path.distance(),
-      (int) state.getElapsedTimeSeconds(),
-      path.geometry()
-    );
+    return StateToFlexPathMapper.map(state);
   }
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {

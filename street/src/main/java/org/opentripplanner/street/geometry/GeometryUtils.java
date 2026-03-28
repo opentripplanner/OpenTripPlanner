@@ -1,5 +1,6 @@
 package org.opentripplanner.street.geometry;
 
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,16 +77,16 @@ public class GeometryUtils {
     Function<T, LineString> mapper
   ) {
     return concatenateLineStrings(
-      StreamSupport.stream(inputObjects.spliterator(), false).map(mapper).toList()
+      Iterables.transform(inputObjects, mapper::apply)
     );
   }
 
-  public static LineString concatenateLineStrings(List<LineString> lineStrings) {
+  public static LineString concatenateLineStrings(Iterable<LineString> lineStrings) {
     GeometryFactory factory = getGeometryFactory();
     Predicate<Coordinate[]> nonZeroLength = coordinates -> coordinates.length != 0;
+
     return factory.createLineString(
-      lineStrings
-        .stream()
+      StreamSupport.stream(lineStrings.spliterator(), false)
         .filter(Objects::nonNull)
         .map(LineString::getCoordinates)
         .filter(nonZeroLength)
