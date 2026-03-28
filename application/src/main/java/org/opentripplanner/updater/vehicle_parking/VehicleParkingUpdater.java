@@ -9,20 +9,19 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
-import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VehicleParkingHelper;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
@@ -162,7 +161,9 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
       List<DisposableEdgeCollection> disposableEdgeCollectionsForVertex = new ArrayList<>();
       for (var vehicleParkingVertex : vehicleParkingVertices) {
         var disposableEdges = linkVehicleParkingForRealtime(vehicleParkingVertex);
-        disposableEdgeCollectionsForVertex.addAll(disposableEdges);
+        if (disposableEdges != null) {
+          disposableEdgeCollectionsForVertex.add(disposableEdges);
+        }
 
         if (vehicleParkingVertex.getOutgoing().isEmpty()) {
           LOG.info("Vehicle parking {} unlinked", vehicleParkingVertex);
@@ -171,51 +172,25 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
       return disposableEdgeCollectionsForVertex;
     }
 
-    private List<DisposableEdgeCollection> linkVehicleParkingForRealtime(
+    @Nullable
+    private DisposableEdgeCollection linkVehicleParkingForRealtime(
       VehicleParkingEntranceVertex vehicleParkingEntranceVertex
     ) {
-      List<DisposableEdgeCollection> disposableEdgeCollections = new ArrayList<>();
+      var modes = new HashSet<TraverseMode>();
       if (vehicleParkingEntranceVertex.isWalkAccessible()) {
-        var disposableWalkEdges = linker.linkVertexForRealTime(
-          vehicleParkingEntranceVertex,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                (VehicleParkingEntranceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                streetVertex,
-                (VehicleParkingEntranceVertex) vertex
-              )
-            )
-        );
-        disposableEdgeCollections.add(disposableWalkEdges);
+        modes.add(TraverseMode.WALK);
       }
-
       if (vehicleParkingEntranceVertex.isCarAccessible()) {
-        var disposableCarEdges = linker.linkVertexForRealTime(
-          vehicleParkingEntranceVertex,
-          new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                (VehicleParkingEntranceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                streetVertex,
-                (VehicleParkingEntranceVertex) vertex
-              )
-            )
-        );
-        disposableEdgeCollections.add(disposableCarEdges);
+        modes.add(TraverseMode.CAR);
       }
-
-      return disposableEdgeCollections;
+      if (modes.isEmpty()) {
+        return null;
+      }
+      return linker.linkVertexBidirectionallyForRealTime(
+        vehicleParkingEntranceVertex,
+        modes,
+        StreetVehicleParkingLink::createStreetVehicleParkingLink
+      );
     }
 
     private void removeVehicleParkingEdgesFromGraph(

@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -13,23 +13,18 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VehicleParkingHelper;
 import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -48,8 +43,8 @@ import org.slf4j.LoggerFactory;
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
-  private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
-  private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
+  private static final Set<TraverseMode> WALK_ONLY = Set.of(TraverseMode.WALK);
+  private static final Set<TraverseMode> WALK_AND_CAR = Set.of(TraverseMode.WALK, TraverseMode.CAR);
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
@@ -159,134 +154,46 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * edge. This may lead to several links being created.
    */
   private void linkStopToStreetNetwork(TransitStopVertex tStop, StopLinkType linkType) {
-    vertexLinker.linkVertexPermanently(
+    var modes = linkType == StopLinkType.WALK_AND_CAR ? WALK_AND_CAR : WALK_ONLY;
+    vertexLinker.linkVertexBidirectionallyPermanently(
       tStop,
-      WALK_ONLY,
-      LinkingDirection.BIDIRECTIONAL,
-      (transitVertex, streetVertex) -> {
-        var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
-
-        if (linkType == StopLinkType.WALK_AND_CAR && !streetVertex.isConnectedToDriveableEdge()) {
-          linkToDriveableEdge(tStop);
-        }
-
-        return linkEdges;
-      }
-    );
-  }
-
-  /**
-   * If regular stops or group stops are used for flex trips, they also need to be connected to car
-   * routable street edges.
-   * <p>
-   * This does not apply to zones as street vertices store which zones they are part of.
-   *
-   * @see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
-   */
-  private void linkToDriveableEdge(TransitStopVertex tStop) {
-    vertexLinker.linkVertexPermanently(
-      tStop,
-      CAR_ONLY,
-      LinkingDirection.BIDIRECTIONAL,
-      (transitVertex, streetVertex) ->
-        createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
-    );
-  }
-
-  private static List<Edge> createStopLinkEdges(
-    TransitStopVertex vertex,
-    StreetVertex streetVertex
-  ) {
-    return List.of(
-      StreetTransitStopLink.createStreetTransitStopLink(vertex, streetVertex),
-      StreetTransitStopLink.createStreetTransitStopLink(streetVertex, vertex)
+      modes,
+      StreetTransitStopLink::createStreetTransitStopLink
     );
   }
 
   private void linkVehicleParkingWithLinker(VehicleParkingEntranceVertex vehicleParkingVertex) {
+    var modes = new HashSet<TraverseMode>();
     if (vehicleParkingVertex.isWalkAccessible()) {
-      vertexLinker.linkVertexPermanently(
-        vehicleParkingVertex,
-        new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              (VehicleParkingEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              streetVertex,
-              (VehicleParkingEntranceVertex) vertex
-            )
-          )
-      );
+      modes.add(TraverseMode.WALK);
     }
-
     if (vehicleParkingVertex.isCarAccessible()) {
-      vertexLinker.linkVertexPermanently(
-        vehicleParkingVertex,
-        new TraverseModeSet(TraverseMode.CAR),
-        LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              (VehicleParkingEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              streetVertex,
-              (VehicleParkingEntranceVertex) vertex
-            )
-          )
-      );
+      modes.add(TraverseMode.CAR);
     }
+    vertexLinker.linkVertexBidirectionallyPermanently(
+      vehicleParkingVertex,
+      modes,
+      StreetVehicleParkingLink::createStreetVehicleParkingLink
+    );
   }
 
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      vertexLinker.linkVertexPermanently(
+      vertexLinker.linkVertexBidirectionallyPermanently(
         tEntrance,
-        new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetTransitEntranceLink.createStreetTransitEntranceLink(
-              (TransitEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetTransitEntranceLink.createStreetTransitEntranceLink(
-              streetVertex,
-              (TransitEntranceVertex) vertex
-            )
-          )
+        WALK_ONLY,
+        StreetTransitEntranceLink::createStreetTransitEntranceLink
       );
     }
   }
 
   private void linkStationCentroids(Graph graph) {
-    BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
-      theStation,
-      streetVertex
-    ) ->
-      List.of(
-        StreetStationCentroidLink.createStreetStationLink(
-          (StationCentroidVertex) theStation,
-          streetVertex
-        ),
-        StreetStationCentroidLink.createStreetStationLink(
-          streetVertex,
-          (StationCentroidVertex) theStation
-        )
-      );
-
     for (StationCentroidVertex station : graph.getVerticesOfType(StationCentroidVertex.class)) {
-      vertexLinker.linkVertexPermanently(
+      vertexLinker.linkVertexBidirectionallyPermanently(
         station,
-        new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        stationAndStreetVertexLinker
+        WALK_ONLY,
+        StreetStationCentroidLink::createStreetStationLink
       );
     }
   }

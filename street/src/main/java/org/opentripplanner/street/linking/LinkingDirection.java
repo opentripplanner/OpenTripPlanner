@@ -2,7 +2,7 @@ package org.opentripplanner.street.linking;
 
 /**
  * Represents the direction of travel of the edges created when linking a vertex into the street
- * graph
+ * graph from the perspective of the main graph.
  */
 public enum LinkingDirection {
   /**

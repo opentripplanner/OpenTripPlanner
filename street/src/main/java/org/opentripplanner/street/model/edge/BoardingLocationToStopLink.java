@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This represents the connection between a boarding location and a transit vertex where going from the
@@ -32,6 +33,28 @@ public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitS
     StreetVertex tov
   ) {
     return connectToGraph(new BoardingLocationToStopLink(fromv, tov));
+  }
+
+  /**
+   * Either from or to needs to be a {@link TransitStopVertex} and the other vertex should be a
+   * {@link StreetVertex}.
+   */
+  public static BoardingLocationToStopLink createBoardingLocationToStopLink(
+    Vertex from,
+    Vertex to
+  ) {
+    if (from instanceof TransitStopVertex stop && to instanceof StreetVertex street) {
+      return connectToGraph(new BoardingLocationToStopLink(stop, street));
+    }
+    if (to instanceof TransitStopVertex stop && from instanceof StreetVertex street) {
+      return connectToGraph(new BoardingLocationToStopLink(street, stop));
+    }
+    throw new IllegalArgumentException(
+      "Vertices need to be a transit stop vertex and a street vertex. Got: " +
+        from.getClass() +
+        " and " +
+        to.getClass()
+    );
   }
 
   protected int getStreetToStopTime() {
