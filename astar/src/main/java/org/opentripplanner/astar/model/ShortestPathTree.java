@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
@@ -141,6 +142,7 @@ public class ShortestPathTree<
    * @return a 'best' state at that vertex
    */
   @SuppressWarnings("unchecked")
+  @Nullable
   public State getState(Vertex dest) {
     Object existing = stateSets.get(dest);
     if (existing == null) {
