@@ -115,7 +115,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           resolveBestNumberOfTransfers(),
           resolveArrivedAtDestinationCheck(),
           egressData[0],
-          egressData[1]
+          egressData[1],
+          ctx.nRounds(),
+          ctx.lifeCycle()
         ),
         StdWorkerState.class
       );
