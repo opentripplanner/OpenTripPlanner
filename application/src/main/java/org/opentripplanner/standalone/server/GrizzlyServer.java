@@ -78,6 +78,10 @@ public class GrizzlyServer {
       .setMaxPoolSize(nHandlerThreads)
       .setQueueLimit(-1);
 
+    if (OTPFeature.HttpResponseTimeMetrics.isOn()) {
+      threadPoolConfig.getInitialMonitoringConfig().addProbes(GrizzlyQueueWaitProbe.INSTANCE);
+    }
+
     /* HTTP (non-encrypted) listener */
     NetworkListener httpListener = new NetworkListener(
       "otp_insecure",
