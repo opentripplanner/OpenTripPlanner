@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.framework.filter;
 
 import java.util.List;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
@@ -19,6 +20,10 @@ public final class DecorateFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
+    if (OTPFeature.ParallelRouting.isOn()) {
+      return itineraries.stream().parallel().map(decorator::decorate).toList();
+    }
+
     return itineraries.stream().map(decorator::decorate).toList();
   }
 }
