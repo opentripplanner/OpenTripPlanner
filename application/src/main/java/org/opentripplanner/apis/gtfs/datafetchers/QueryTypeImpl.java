@@ -458,10 +458,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return null;
         case "stopAtDistance": {
           String[] parts = id.split(";");
-          var stop = transitService.getRegularStop(FeedScopedId.parseStrict(parts[1]));
+          var stopId = FeedScopedId.parseStrict(parts[1]);
 
           // TODO: Add geometry
-          return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
+          return new NearbyStop(stopId, Integer.parseInt(parts[0]), null, null);
         }
         case "TicketType":
           // TODO

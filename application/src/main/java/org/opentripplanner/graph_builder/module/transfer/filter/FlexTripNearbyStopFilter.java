@@ -23,8 +23,7 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
 
   @Override
   public boolean includeFromStop(FeedScopedId id, boolean reverseDirection) {
-    var stop = transitService.getStopLocation(id);
-    return !transitService.getFlexIndex().getFlexTripsByStop(stop).isEmpty();
+    return !transitService.getFlexIndex().getFlexTripsByStopId(id).isEmpty();
   }
 
   @Override
@@ -34,11 +33,11 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
   ) {
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = new MinMap<>();
     for (var it : nearbyStops) {
-      var stop = it.stop;
-      var flexTrips = transitService.getFlexIndex().getFlexTripsByStop(stop);
+      var stopId = it.stopId;
+      var flexTrips = transitService.getFlexIndex().getFlexTripsByStopId(stopId);
 
       for (FlexTrip<?, ?> trip : flexTrips) {
-        if (reverseDirection ? trip.isAlightingPossible(stop) : trip.isBoardingPossible(stop)) {
+        if (reverseDirection ? trip.isAlightingPossible(stopId) : trip.isBoardingPossible(stopId)) {
           closestStopForFlexTrip.putMin(trip, it);
         }
       }

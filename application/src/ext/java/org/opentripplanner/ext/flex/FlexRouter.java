@@ -242,8 +242,8 @@ public class FlexRouter {
     }
 
     @Override
-    public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
-      return flexIndex.getFlexTripsByStop(stopLocation);
+    public Collection<FlexTrip<?, ?>> getFlexTripsByStopId(FeedScopedId stopLocationId) {
+      return flexIndex.getFlexTripsByStopId(stopLocationId);
     }
 
     @Override

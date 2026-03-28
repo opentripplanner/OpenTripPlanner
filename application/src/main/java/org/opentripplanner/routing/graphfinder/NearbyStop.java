@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
@@ -17,24 +17,24 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public class NearbyStop implements Comparable<NearbyStop> {
 
-  public final StopLocation stop;
+  public final FeedScopedId stopId;
   public final double distance;
 
   public final List<Edge> edges;
   public final State state;
 
-  public NearbyStop(StopLocation stop, double distance, List<Edge> edges, State state) {
-    this.stop = Objects.requireNonNull(stop);
+  public NearbyStop(FeedScopedId stopId, double distance, List<Edge> edges, State state) {
+    this.stopId = Objects.requireNonNull(stopId);
     this.distance = distance;
     this.edges = edges;
     this.state = state;
   }
 
   /**
-   * Given a State at a StopVertex, bundle the StopVertex together with information about how far
+   * Given a State at a StopVertex, bundle the stop's id together with information about how far
    * away it is and the geometry of the path leading up to the given State.
    */
-  public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
+  public static NearbyStop nearbyStopForState(State state, FeedScopedId stopId) {
     double effectiveWalkDistance = 0.0;
     var graphPath = new GraphPath<>(state);
     var edges = new ArrayList<Edge>();
@@ -42,14 +42,14 @@ public class NearbyStop implements Comparable<NearbyStop> {
       effectiveWalkDistance += edge.getEffectiveWalkDistance();
       edges.add(edge);
     }
-    return new NearbyStop(stop, effectiveWalkDistance, edges, state);
+    return new NearbyStop(stopId, effectiveWalkDistance, edges, state);
   }
 
   /**
    * Create a NearbyStop with zero distance and no edges.
    */
-  public static NearbyStop ofZeroDistance(StopLocation stop, State state) {
-    return new NearbyStop(stop, 0d, Collections.emptyList(), state);
+  public static NearbyStop ofZeroDistance(FeedScopedId stopId, State state) {
+    return new NearbyStop(stopId, 0d, Collections.emptyList(), state);
   }
 
   /**
@@ -84,7 +84,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(stop, distance, edges, state);
+    return Objects.hash(stopId, distance, edges, state);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
     final NearbyStop that = (NearbyStop) o;
     return (
       Double.compare(that.distance, distance) == 0 &&
-      stop.equals(that.stop) &&
+      stopId.equals(that.stopId) &&
       Objects.equals(edges, that.edges) &&
       Objects.equals(state, that.state)
     );
@@ -108,7 +108,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
     return String.format(
       Locale.ROOT,
       "stop %s at %.1f meters%s%s",
-      stop,
+      stopId,
       distance,
       edges != null ? " (" + edges.size() + " edges)" : "",
       state != null ? " w/state" : ""

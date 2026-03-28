@@ -16,13 +16,13 @@ class NearbyStopTest {
   void testIsBetter() {
     // We only test the distance here, since the compareTo method used should have a more complete
     // unit-test including tests on state weight.
-    var a = new NearbyStop(MODEL.stop("A").build(), 20.0, null, null);
-    var b = new NearbyStop(MODEL.stop("A").build(), 30.0, null, null);
+    var a = new NearbyStop(MODEL.id("A"), 20.0, null, null);
+    var b = new NearbyStop(MODEL.id("A"), 30.0, null, null);
 
     assertTrue(a.isBetter(b));
     assertFalse(b.isBetter(a));
 
-    var sameDistance = new NearbyStop(MODEL.stop("A").build(), 20.0, null, null);
+    var sameDistance = new NearbyStop(MODEL.id("A"), 20.0, null, null);
     assertFalse(a.isBetter(sameDistance));
     assertFalse(sameDistance.isBetter(a));
   }

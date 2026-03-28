@@ -17,7 +17,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class FlexIndex {
 
-  private final Multimap<StopLocation, FlexTrip<?, ?>> flexTripsByStop = HashMultimap.create();
+  private final Multimap<FeedScopedId, FlexTrip<?, ?>> flexTripsByStopId = HashMultimap.create();
 
   private final Map<FeedScopedId, Route> routeById = new HashMap<>();
 
@@ -32,10 +32,10 @@ public class FlexIndex {
       for (StopLocation stop : flexTrip.getStops()) {
         if (stop instanceof GroupStop groupStop) {
           for (StopLocation stopElement : groupStop.getChildLocations()) {
-            flexTripsByStop.put(stopElement, flexTrip);
+            flexTripsByStopId.put(stopElement.getId(), flexTrip);
           }
         } else {
-          flexTripsByStop.put(stop, flexTrip);
+          flexTripsByStopId.put(stop.getId(), flexTrip);
         }
       }
 
@@ -57,8 +57,8 @@ public class FlexIndex {
     }
   }
 
-  public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
-    return flexTripsByStop.get(stopLocation);
+  public Collection<FlexTrip<?, ?>> getFlexTripsByStopId(FeedScopedId stopLocationId) {
+    return flexTripsByStopId.get(stopLocationId);
   }
 
   public boolean contains(Route route) {

@@ -90,7 +90,6 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(
         graph.hasStreets,
-        transitService::getRegularStop,
         transitService::findRegularStopsByBoundingBox,
         linkingContextFactory
       ),

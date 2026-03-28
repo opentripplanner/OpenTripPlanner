@@ -2,13 +2,16 @@ package org.opentripplanner.apis.transmodel.model.stop;
 
 import graphql.Scalars;
 import graphql.relay.Relay;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import java.util.Optional;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.service.TransitService;
 
 public class QuayAtDistanceType {
 
@@ -29,10 +32,7 @@ public class QuayAtDistanceType {
             relay.toGlobalId(
               "QAD",
               Optional.ofNullable((NearbyStop) environment.getSource())
-                .map(
-                  nearbyStop ->
-                    nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stop.getId())
-                )
+                .map(nearbyStop -> nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stopId))
                 .orElse(null)
             )
           )
@@ -42,7 +42,11 @@ public class QuayAtDistanceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
-          .dataFetcher(environment -> ((NearbyStop) environment.getSource()).stop)
+          .dataFetcher(environment ->
+            getTransitService(environment).getStopLocation(
+              ((NearbyStop) environment.getSource()).stopId
+            )
+          )
           .build()
       )
       .field(
@@ -54,5 +58,9 @@ public class QuayAtDistanceType {
           .build()
       )
       .build();
+  }
+
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitService();
   }
 }

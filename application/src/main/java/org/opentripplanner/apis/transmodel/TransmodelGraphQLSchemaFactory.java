@@ -794,8 +794,7 @@ public class TransmodelGraphQLSchemaFactory {
                 .filter(
                   stopAtDistance ->
                     environment.getArgument("authority") == null ||
-                    stopAtDistance.stop
-                      .getId()
+                    stopAtDistance.stopId
                       .getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority"))
                 )

@@ -14,14 +14,14 @@ class StopFinderTraverseVisitorTest {
 
   @Test
   void deduplicateStops() {
-    var visitor = new StopFinderTraverseVisitor(id -> STOP, 1000);
+    var visitor = new StopFinderTraverseVisitor(1000);
 
     assertEquals(List.of(), visitor.stopsFound());
     var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
 
     visitor.visitVertex(state1);
 
-    final NearbyStop nearbyStop = NearbyStop.nearbyStopForState(state1, STOP);
+    final NearbyStop nearbyStop = NearbyStop.nearbyStopForState(state1, STOP.getId());
 
     assertEquals(List.of(nearbyStop), visitor.stopsFound());
 

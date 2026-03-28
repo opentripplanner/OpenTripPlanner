@@ -26,8 +26,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
   private static final FlexTripEdge EDGE = new FlexTripEdge(
     StreetModelForTest.intersectionVertex(1, 1),
     StreetModelForTest.intersectionVertex(2, 2),
-    A.stop,
-    B.stop,
+    A.stop.getId(),
+    B.stop.getId(),
     null,
     1,
     2,
@@ -48,6 +48,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
+      .withFromStop(A.stop)
+      .withToStop(B.stop)
       .build();
     assertNotNull(leg.fareOffers());
     assertNotNull(leg.listTransitAlerts());
@@ -61,6 +63,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
     assertThrows(expectedType, () ->
       new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
     );
+    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFromStop(null).build());
+    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withToStop(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withAlerts(null).build());
     assertThrows(expectedType, () ->
       new FlexibleTransitLegBuilder().withFareProducts(null).build()
@@ -73,6 +77,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
+      .withFromStop(A.stop)
+      .withToStop(B.stop)
       .withFareProducts(List.of(ANY_FARE_OFFER))
       .withAlerts(Set.of(ALERT))
       .withEmissionPerPerson(EMISSION)
@@ -94,6 +100,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
+      .withFromStop(A.stop)
+      .withToStop(B.stop)
       .withFareProducts(List.of(ANY_FARE_OFFER))
       .withAlerts(Set.of(ALERT))
       .build();

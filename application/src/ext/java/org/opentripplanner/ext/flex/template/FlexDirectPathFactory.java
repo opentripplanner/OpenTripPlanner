@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
@@ -64,11 +64,11 @@ public class FlexDirectPathFactory {
       matcher
     ).calculateFlexEgressTemplates(streetEgresses, dates);
 
-    Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
-    streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
+    Multimap<FeedScopedId, NearbyStop> streetEgressByStopId = HashMultimap.create();
+    streetEgresses.forEach(it -> streetEgressByStopId.put(it.stopId, it));
 
     for (FlexAccessTemplate template : flexAccessTemplates) {
-      StopLocation transferStop = template.getTransferStop();
+      var transferStopId = template.getTransferStopId();
 
       // TODO: Document or reimplement this. Why are we using the egress to see if the
       //      access-transfer-stop (last-stop) is used by at least one egress-template?
@@ -80,9 +80,9 @@ public class FlexDirectPathFactory {
       //      Problem: Any asymmetrical restriction which apply/do not apply to the egress,
       //               but do not apply/apply to the access, like booking-notice.
       if (
-        flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
+        flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStopId().equals(transferStopId))
       ) {
-        for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
+        for (NearbyStop egress : streetEgressByStopId.get(transferStopId)) {
           createDirectGraphPath(template, egress, arriveBy, requestTime).ifPresent(
             directFlexPaths::add
           );
@@ -111,7 +111,7 @@ public class FlexDirectPathFactory {
       return Optional.empty();
     }
 
-    var flexEdge = accessTemplate.getFlexEdge(flexToVertex, egress.stop);
+    var flexEdge = accessTemplate.getFlexEdge(flexToVertex, egress.stopId);
 
     if (flexEdge == null) {
       return Optional.empty();

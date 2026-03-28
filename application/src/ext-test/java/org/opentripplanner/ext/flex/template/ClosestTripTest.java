@@ -61,7 +61,7 @@ class ClosestTripTest {
       }
 
       @Override
-      public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
+      public Collection<FlexTrip<?, ?>> getFlexTripsByStopId(FeedScopedId stopLocationId) {
         return List.of(FLEX_TRIP);
       }
 
@@ -96,7 +96,7 @@ class ClosestTripTest {
   private static Collection<ClosestTrip> closestTrips(Matcher<Trip> matcher) {
     return ClosestTrip.of(
       ADAPTER,
-      List.of(new NearbyStop(STOP, 100, List.of(), null)),
+      List.of(new NearbyStop(STOP.getId(), 100, List.of(), null)),
       matcher,
       List.of(FSD),
       true

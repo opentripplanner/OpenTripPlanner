@@ -7,7 +7,6 @@ import java.util.List;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -24,15 +23,12 @@ public class DirectFlexRouter {
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext
   ) {
-    var accessEgressRouter = new AccessEgressRouter(
-      new TransitServiceResolver(serverContext.transitService())
-    );
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
     // Prepare access/egress transfers
-    Collection<NearbyStop> accessStops = accessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       serverContext.listExtensionRequestContexts(request),
@@ -41,7 +37,7 @@ public class DirectFlexRouter {
       0,
       linkingContext
     );
-    Collection<NearbyStop> egressStops = accessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       serverContext.listExtensionRequestContexts(request),

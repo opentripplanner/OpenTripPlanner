@@ -4,6 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -20,6 +21,11 @@ public class TransitServiceResolver implements SiteResolver, StopResolver {
   @Override
   public RegularStop getStop(FeedScopedId id) {
     return Objects.requireNonNull(transitService.getRegularStop(id));
+  }
+
+  @Override
+  public StopLocation getStopLocation(FeedScopedId id) {
+    return Objects.requireNonNull(transitService.getStopLocation(id));
   }
 
   @Override

@@ -566,11 +566,11 @@ class UnscheduledTripTest {
       .build()
       .trip();
 
-    assertTrue(trip.isBoardingPossible(AREA_STOP1));
-    assertFalse(trip.isAlightingPossible(AREA_STOP1));
+    assertTrue(trip.isBoardingPossible(AREA_STOP1.getId()));
+    assertFalse(trip.isAlightingPossible(AREA_STOP1.getId()));
 
-    assertFalse(trip.isBoardingPossible(AREA_STOP2));
-    assertTrue(trip.isAlightingPossible(AREA_STOP2));
+    assertFalse(trip.isBoardingPossible(AREA_STOP2.getId()));
+    assertTrue(trip.isAlightingPossible(AREA_STOP2.getId()));
   }
 
   private static String timeToString(int time) {

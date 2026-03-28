@@ -2,7 +2,6 @@ package org.opentripplanner.routing.graphfinder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.street.model.edge.Edge;
@@ -16,14 +15,12 @@ import org.opentripplanner.utils.collection.ListUtils;
  */
 public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
-  private final StopResolver stopResolver;
   private final double radiusMeters;
 
   /** A list of closest stops found while walking the graph */
   private final List<NearbyStop> stopsFound = new ArrayList<>();
 
-  public StopFinderTraverseVisitor(StopResolver stopResolver, double radiusMeters) {
-    this.stopResolver = stopResolver;
+  public StopFinderTraverseVisitor(double radiusMeters) {
     this.radiusMeters = radiusMeters;
   }
 
@@ -34,8 +31,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     if (vertex instanceof TransitStopVertex tsv) {
-      var stop = Objects.requireNonNull(stopResolver.getStop(tsv.getId()));
-      stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
+      stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getId()));
     }
   }
 
@@ -46,7 +42,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
    * @return A de-duplicated list of nearby stops found by this visitor.
    */
   public List<NearbyStop> stopsFound() {
-    return ListUtils.distinctByKey(stopsFound, ns -> ns.stop);
+    return ListUtils.distinctByKey(stopsFound, ns -> ns.stopId);
   }
 
   /**
