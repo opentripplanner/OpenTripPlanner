@@ -1,10 +1,12 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.time.Duration;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class FlexConfig implements FlexParameters {
@@ -25,12 +27,14 @@ public class FlexConfig implements FlexParameters {
   private final Duration maxFlexTripDuration;
   private final Duration maxAccessWalkDuration;
   private final Duration maxEgressWalkDuration;
+  private final MaxStopCountLimit maxFlexStopCountLimit;
 
   private FlexConfig() {
-    maxTransferDuration = Duration.ofMinutes(5);
-    maxFlexTripDuration = Duration.ofMinutes(45);
-    maxAccessWalkDuration = Duration.ofMinutes(45);
-    maxEgressWalkDuration = Duration.ofMinutes(45);
+    maxTransferDuration = DEFAULT.maxTransferDuration();
+    maxFlexTripDuration = DEFAULT.maxFlexTripDuration();
+    maxAccessWalkDuration = DEFAULT.maxAccessWalkDuration();
+    maxEgressWalkDuration = DEFAULT.maxEgressWalkDuration();
+    maxFlexStopCountLimit = DEFAULT.maxFlexStopCountLimit();
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
@@ -40,7 +44,7 @@ public class FlexConfig implements FlexParameters {
       .summary("Configuration for flex routing.")
       .asObject();
 
-    this.maxTransferDuration = json
+    maxTransferDuration = json
       .of("maxTransferDuration")
       .since(V2_3)
       .summary(
@@ -87,6 +91,23 @@ public class FlexConfig implements FlexParameters {
       )
       .description(ACCESS_EGRESS_DESCRIPTION)
       .asDuration(DEFAULT.maxEgressWalkDuration());
+
+    maxFlexStopCountLimit = MaxStopCountLimit.of()
+      .withDefaultLimit(
+        json
+          .of("maxFlexStopCount")
+          .since(V2_10)
+          .summary(
+            "Maximal number of stops collected in the part of flex routing that is done by car"
+          )
+          .description(
+            """
+            Safety limit to prevent visiting too many stops.
+            """
+          )
+          .asInt(DEFAULT.maxFlexStopCountLimit().defaultLimit())
+      )
+      .build();
   }
 
   public Duration maxFlexTripDuration() {
@@ -103,5 +124,9 @@ public class FlexConfig implements FlexParameters {
 
   public Duration maxEgressWalkDuration() {
     return maxEgressWalkDuration;
+  }
+
+  public MaxStopCountLimit maxFlexStopCountLimit() {
+    return maxFlexStopCountLimit;
   }
 }

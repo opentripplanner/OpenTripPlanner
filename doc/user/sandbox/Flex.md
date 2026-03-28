@@ -51,6 +51,7 @@ following to `router-config.json`.
 |------------------------------------------------------|:----------:|-------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [maxAccessWalkDuration](#flex_maxAccessWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk to reach a flex stop or zone.                                      | *Optional* | `"PT45M"`     |  2.3  |
 | [maxEgressWalkDuration](#flex_maxEgressWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.           | *Optional* | `"PT45M"`     |  2.3  |
+| [maxFlexStopCount](#flex_maxFlexStopCount)           |  `integer` | Maximal number of stops collected in the part of flex routing that is done by car                                             | *Optional* | `200`         |  2.10 |
 | [maxFlexTripDuration](#flex_maxFlexTripDuration)     | `duration` | How long can a non-scheduled flex trip at maximum be.                                                                         | *Optional* | `"PT45M"`     |  2.3  |
 | [maxTransferDuration](#flex_maxTransferDuration)     | `duration` | How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. | *Optional* | `"PT5M"`      |  2.3  |
 
@@ -87,6 +88,16 @@ Depending on your service this might be what you want to do anyway: many flex se
 by passengers with mobility problems so offering a long walk might be problematic. In other words,
 if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
 services.
+
+
+<h4 id="flex_maxFlexStopCount">maxFlexStopCount</h4>
+
+**Since version:** `2.10` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `200`   
+**Path:** /flex 
+
+Maximal number of stops collected in the part of flex routing that is done by car
+
+Safety limit to prevent visiting too many stops.
 
 
 <h4 id="flex_maxFlexTripDuration">maxFlexTripDuration</h4>

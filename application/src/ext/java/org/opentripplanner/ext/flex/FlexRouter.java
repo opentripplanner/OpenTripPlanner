@@ -100,11 +100,13 @@ public class FlexRouter {
     if (graph.hasStreets) {
       this.accessFlexPathCalculator = new StreetFlexPathCalculator(
         false,
-        flexParameters.maxFlexTripDuration()
+        flexParameters.maxFlexTripDuration(),
+        flexParameters.maxFlexStopCountLimit().defaultLimit()
       );
       this.egressFlexPathCalculator = new StreetFlexPathCalculator(
         true,
-        flexParameters.maxFlexTripDuration()
+        flexParameters.maxFlexTripDuration(),
+        flexParameters.maxFlexStopCountLimit().defaultLimit()
       );
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
