@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -20,7 +18,6 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
@@ -32,9 +29,7 @@ import org.opentripplanner.routing.graphfinder.SiteResolver;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
-import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.internal.notes.StreetNotesService;
-import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -44,6 +39,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 
@@ -103,12 +99,9 @@ public class GraphPathToItineraryMapper {
   /**
    * Generates a TripPlan from a set of paths
    */
-  public List<Itinerary> mapItineraries(
-    List<GraphPath<State, Edge, Vertex>> paths,
-    RouteRequest request
-  ) {
+  public List<Itinerary> mapItineraries(List<StreetPath> paths, RouteRequest request) {
     List<Itinerary> itineraries = new LinkedList<>();
-    for (GraphPath<State, Edge, Vertex> path : paths) {
+    for (var path : paths) {
       Itinerary itinerary = generateItinerary(path, request);
       if (itinerary.legs().isEmpty()) {
         continue;
@@ -126,50 +119,53 @@ public class GraphPathToItineraryMapper {
    * @param path The graph path to base the itinerary on
    * @return The generated itinerary
    */
-  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path, RouteRequest request) {
+  public Itinerary generateItinerary(StreetPath path, RouteRequest request) {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
-    for (List<State> legStates : sliceStates(path.states)) {
-      if (OTPFeature.FlexRouting.isOn() && legStates.get(1).backEdge instanceof FlexTripEdge) {
-        legs.add(generateFlexLeg(legStates));
+    for (var subPath : slicePath(path)) {
+      if (
+        OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
+      ) {
+        legs.add(generateFlexLeg(subPath));
         previousStep = null;
         continue;
       }
-      StreetLeg leg = generateLeg(legStates, previousStep, request);
+      StreetLeg leg = generateLeg(subPath, previousStep, request);
       legs.add(leg);
 
       List<WalkStep> walkSteps = leg.listWalkSteps();
-      if (walkSteps.size() > 0) {
-        previousStep = walkSteps.get(walkSteps.size() - 1);
+      if (!walkSteps.isEmpty()) {
+        previousStep = walkSteps.getLast();
       } else {
         previousStep = null;
       }
     }
 
-    State lastState = path.states.getLast();
-    var cost = Cost.costOfSeconds(lastState.weight);
+    var cost = Cost.costOfSeconds(path.lastState().weight);
     var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
 
-    builder.withArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
-
-    calculateElevations(builder, path.edges);
+    builder.withArrivedAtDestinationWithRentedVehicle(
+      path.lastState().isRentingVehicleFromStation()
+    );
+    builder.addElevationChange(path.calculateElevations());
 
     return builder.build();
   }
 
   /**
-   * Slice a {@link State} list at the leg boundaries.
+   * Slice a street path at the leg boundaries.
    *
-   * @param states The list of input states
-   * @return A list of lists of states belonging to a single leg
+   * @param streetPath The path to slice of input states
+   * @return A list of subpaths representing the final legs
    */
-  private static List<List<State>> sliceStates(List<State> states) {
+  private static List<StreetPath> slicePath(StreetPath streetPath) {
+    var states = streetPath.states();
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
       return List.of();
     }
 
-    List<List<State>> legsStates = new LinkedList<>();
+    List<StreetPath> subPaths = new LinkedList<>();
 
     int previousBreak = 0;
 
@@ -190,7 +186,7 @@ public class GraphPathToItineraryMapper {
         int nextBreak = i;
 
         if (nextBreak > previousBreak) {
-          legsStates.add(states.subList(previousBreak, nextBreak + 1));
+          subPaths.add(streetPath.subPath(previousBreak, nextBreak + 1));
         }
 
         /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
@@ -207,38 +203,10 @@ public class GraphPathToItineraryMapper {
 
     // Final leg
     if (states.size() > previousBreak) {
-      legsStates.add(states.subList(previousBreak, states.size()));
+      subPaths.add(streetPath.subPath(previousBreak, states.size()));
     }
 
-    return legsStates;
-  }
-
-  /**
-   * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
-   *
-   * @param builder   The itinerary builder to calculate the elevation changes for
-   * @param edges     The edges that go with the itinerary
-   */
-  private static void calculateElevations(ItineraryBuilder builder, List<Edge> edges) {
-    for (Edge edge : edges) {
-      if (!(edge instanceof StreetEdge edgeWithElevation)) {
-        continue;
-      }
-      PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
-
-      if (coordinates == null) {
-        continue;
-      }
-      // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
-      if (coordinates.getDimension() != 2) {
-        continue;
-      }
-
-      for (int i = 0; i < coordinates.size() - 1; i++) {
-        double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
-        builder.addElevationChange(change);
-      }
-    }
+    return subPaths;
   }
 
   /**
@@ -345,7 +313,8 @@ public class GraphPathToItineraryMapper {
   /**
    * Generate a flex leg from the states belonging to the flex leg
    */
-  private Leg generateFlexLeg(List<State> states) {
+  private Leg generateFlexLeg(StreetPath path) {
+    var states = path.states();
     State fromState = states.get(0);
     State toState = states.get(1);
     FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
@@ -364,29 +333,16 @@ public class GraphPathToItineraryMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   * @param states       The list of states to base the leg on
+   * @param subPath       The street path to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
    *                     calculated correctly
    * @return The generated leg
    */
-  private StreetLeg generateLeg(List<State> states, WalkStep previousStep, RouteRequest request) {
-    List<Edge> edges = states
-      .stream()
-      // The first back edge is part of the previous leg, skip it
-      .skip(1)
-      // when linking an OSM boarding location, like a platform centroid, we create a link edge
-      // so we can see it in the debug UI's traversal permission layer but we don't want to show the
-      // link to the user so we remove it here
-      .filter(e -> !(e.backEdge instanceof BoardingLocationToStopLink))
-      .map(State::getBackEdge)
-      .toList();
+  private StreetLeg generateLeg(StreetPath subPath, WalkStep previousStep, RouteRequest request) {
+    var states = subPath.states();
 
     State firstState = states.get(0);
     State lastState = states.get(states.size() - 1);
-
-    double distanceMeters = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-
-    LineString geometry = GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
 
     var statesToWalkStepsMapper = new StatesToWalkStepsMapper(
       states,
@@ -414,10 +370,12 @@ public class GraphPathToItineraryMapper {
       .withEndTime(lastState.getTime().atZone(timeZone))
       .withFrom(makePlace(firstState, request))
       .withTo(makePlace(lastState, request))
-      .withDistanceMeters(distanceMeters)
-      .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
-      .withGeometry(geometry)
-      .withElevationProfile(makeElevation(edges, firstState.getRequest().geoidElevation()))
+      .withDistanceMeters(subPath.distanceMeters())
+      .withGeneralizedCost((int) subPath.weight())
+      .withGeometry(subPath.geometry())
+      .withElevationProfile(
+        makeElevation(subPath.edges(), firstState.getRequest().geoidElevation())
+      )
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())
       .withWalkingBike(false);

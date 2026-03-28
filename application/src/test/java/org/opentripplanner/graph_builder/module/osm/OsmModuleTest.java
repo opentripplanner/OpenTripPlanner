@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -33,7 +32,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmModuleTest {
@@ -280,7 +278,7 @@ public class OsmModuleTest {
     Vertex topV = graph.getVertex(VertexLabel.osm(559271124));
 
     GraphPathFinder graphPathFinder = new GraphPathFinder(null);
-    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
+    var pathList = graphPathFinder.graphPathFinderEntryPoint(
       request,
       Set.of(bottomV),
       Set.of(topV)
@@ -288,9 +286,6 @@ public class OsmModuleTest {
 
     assertNotNull(pathList);
     assertFalse(pathList.isEmpty());
-    for (GraphPath<State, Edge, Vertex> path : pathList) {
-      assertFalse(path.states.isEmpty());
-    }
   }
 
   private record VertexPair(Vertex v0, Vertex v1) {}

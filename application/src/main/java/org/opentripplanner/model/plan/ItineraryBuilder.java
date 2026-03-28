@@ -7,6 +7,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFare;
+import org.opentripplanner.street.search.ElevationChange;
 
 public class ItineraryBuilder {
 
@@ -127,12 +128,9 @@ public class ItineraryBuilder {
    *
    * Note! This is in addition to the elevation added for each leg elevation profile. TODO Why?
    */
-  public void addElevationChange(double change_m) {
-    if (change_m > 0.0) {
-      this.elevationGained_m += change_m;
-    } else {
-      this.elevationLost_m -= change_m;
-    }
+  public void addElevationChange(ElevationChange elevationChange) {
+    this.elevationGained_m += elevationChange.elevationGainedMeters();
+    this.elevationLost_m -= elevationChange.elevationLostMeters();
   }
 
   public ItineraryBuilder withMaxSlope(double wheelchairPreferencesMaxSlope, double maxSlope) {

@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -50,6 +49,7 @@ import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetPath;
 import org.opentripplanner.street.search.state.State;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -108,7 +108,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private List<Edge> highlightedEdges = new ArrayList<>(1000);
   private Coordinate highlightedCoordinate;
   private Edge highlightedEdge;
-  private GraphPath highlightedGraphPath;
+  private StreetPath highlightedStreetPath;
   protected double mouseModelX;
   protected double mouseModelY;
   private Point startDrag = null;
@@ -424,8 +424,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     drawLevel = DRAW_ALL;
   }
 
-  public void highlightGraphPath(GraphPath gp) {
-    highlightedGraphPath = gp;
+  public void highlightStreetPath(StreetPath sp) {
+    highlightedStreetPath = sp;
     // drawLevel = DRAW_ALL;
     // leave streets in grey
     drawLevel = DRAW_TRANSIT;
@@ -615,9 +615,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     );
   }
 
-  private void drawGraphPath(GraphPath<State, Edge, Vertex> gp) {
+  private void drawStreetPath(StreetPath sp) {
     // draw edges in different colors according to mode
-    for (State s : gp.states) {
+    for (State s : sp.states()) {
       Edge e = s.getBackEdge();
       if (e == null) {
         continue;
@@ -656,8 +656,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
     // mark key vertices
     lastLabelY = -999;
-    labelState(gp.states.getFirst(), "begin");
-    labelState(gp.states.getLast(), "end");
+    labelState(sp.states().getFirst(), "begin");
+    labelState(sp.states().getLast(), "end");
 
     if (VIDEO) {
       // freeze on final path for a few frames
@@ -839,8 +839,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       }
     }
     /* Draw highlighted graph path in another color */
-    if (highlightedGraphPath != null) {
-      drawGraphPath(highlightedGraphPath);
+    if (highlightedStreetPath != null) {
+      drawStreetPath(highlightedStreetPath);
     }
     /* Draw (single) highlighted edge in highlight color */
     if (highlightedEdge != null) {

@@ -2,7 +2,10 @@ package org.opentripplanner.astar;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 
@@ -39,5 +42,13 @@ public class TestAStarBuilder
   @Override
   protected DominanceFunction createDefaultDominanceFunction() {
     return null;
+  }
+
+  public ShortestPathTree<TestState, TestEdge, TestVertex> getShortestPathTree() {
+    return build().getShortestPathTree();
+  }
+
+  public List<GraphPath<TestState, TestEdge, TestVertex>> getPathsToTarget() {
+    return build().getPathsToTarget();
   }
 }

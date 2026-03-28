@@ -110,7 +110,7 @@ public class StreetGraphFinder implements GraphFinder {
         .withDominanceFunction(new DominanceFunctions.LeastWalk())
         .withRequest(request)
         .withFrom(linkerContext.findVertices(from))
-        .getShortestPathTree();
+        .run();
     }
   }
 }

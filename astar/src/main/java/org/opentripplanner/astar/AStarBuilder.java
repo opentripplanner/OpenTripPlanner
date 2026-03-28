@@ -3,11 +3,8 @@ package org.opentripplanner.astar;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
@@ -112,15 +109,7 @@ public abstract class AStarBuilder<
 
   protected abstract Duration streetRoutingTimeout();
 
-  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
-    return build().getShortestPathTree();
-  }
-
-  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
-    return build().getPathsToTarget();
-  }
-
-  private AStar<State, Edge, Vertex> build() {
+  protected AStar<State, Edge, Vertex> build() {
     final Set<Vertex> origin = arriveBy ? toVertices : fromVertices;
     final Set<Vertex> destination = arriveBy ? fromVertices : toVertices;
 
