@@ -16,7 +16,7 @@ class AllowMainModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean match(TransitMode transitMode, SubMode ignore) {
+  public boolean match(TransitMode transitMode, SubMode ignore, Integer ignore2) {
     return mainModes.contains(transitMode);
   }
 

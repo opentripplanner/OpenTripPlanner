@@ -6,6 +6,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
@@ -93,7 +94,7 @@ public class TripTimeOnDateMatcherFactory {
 
     if (!selector.transportModes().includeEverything()) {
       var transportModeFilter = AllowTransitModeFilter.of(
-        selector.transportModes().get().stream().toList()
+        selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
       );
       expr.matches(
         new GenericUnaryMatcher<>("transportMode", (TripTimeOnDate tripTime) ->

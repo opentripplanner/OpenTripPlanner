@@ -7,6 +7,7 @@ import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -17,7 +18,7 @@ public class SelectRequest implements Serializable {
     return new Builder();
   }
 
-  private final List<MainAndSubMode> transportModes;
+  private final List<NarrowedTransitMode> transportModes;
   private final AllowTransitModeFilter transportModeFilter;
   private final List<FeedScopedId> agencies;
   private final List<FeedScopedId> groupOfRoutes;
@@ -61,7 +62,11 @@ public class SelectRequest implements Serializable {
 
     return (
       this.transportModeFilter == null ||
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
+      this.transportModeFilter.match(
+        trip.getMode(),
+        trip.getNetexSubMode(),
+        trip.getRoute().getGtfsType()
+      )
     );
   }
 
@@ -72,7 +77,11 @@ public class SelectRequest implements Serializable {
     var trip = tripTimes.getTrip();
     return (
       this.transportModeFilter != null &&
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
+      this.transportModeFilter.match(
+        trip.getMode(),
+        trip.getNetexSubMode(),
+        trip.getRoute().getGtfsType()
+      )
     );
   }
 
@@ -85,7 +94,7 @@ public class SelectRequest implements Serializable {
       .toString();
   }
 
-  public List<MainAndSubMode> transportModes() {
+  public List<NarrowedTransitMode> transportModes() {
     return transportModes;
   }
 
@@ -127,7 +136,13 @@ public class SelectRequest implements Serializable {
       if (tripPattern.getContainsMultipleModes()) {
         return maybeValue;
       }
-      if (!this.transportModeFilter.match(tripPattern.getMode(), tripPattern.getNetexSubmode())) {
+      if (
+        !this.transportModeFilter.match(
+          tripPattern.getMode(),
+          tripPattern.getNetexSubmode(),
+          tripPattern.getRoute().getGtfsType()
+        )
+      ) {
         return false;
       }
     }
@@ -142,7 +157,7 @@ public class SelectRequest implements Serializable {
     if (transportModes.isEmpty()) {
       return "EMPTY";
     }
-    if (transportModes.stream().allMatch(MainAndSubMode::isMainModeOnly)) {
+    if (transportModes.stream().allMatch(NarrowedTransitMode::isMainModeOnly)) {
       int size = transportModes.size();
       int total = MainAndSubMode.all().size();
       if (size == total) {
@@ -152,26 +167,38 @@ public class SelectRequest implements Serializable {
         // If 3 or less of the main modes are *excluded* we guess that the user did exclude, and
         // not included everything. This make it much easier to read: "NOT [FERRY]" instead of
         // "[AIRPLANE, CABLE_CAR, CARPOOL, COACH ... "
-        return "NOT " + MainAndSubMode.toString(MainAndSubMode.notMainModes(transportModes));
+        return (
+          "NOT " +
+          MainAndSubMode.toString(
+            MainAndSubMode.notMainModes(
+              transportModes.stream().map(NarrowedTransitMode::toMainAndSubMode).toList()
+            )
+          )
+        );
       }
     }
-    return MainAndSubMode.toString(transportModes);
+    return NarrowedTransitMode.toString(transportModes);
   }
 
   public static class Builder {
 
-    private List<MainAndSubMode> transportModes = new ArrayList<>();
+    private List<NarrowedTransitMode> transportModes = new ArrayList<>();
     private List<FeedScopedId> agencies = new ArrayList<>();
     private List<FeedScopedId> groupOfRoutes = new ArrayList<>();
     private List<FeedScopedId> routes = new ArrayList<>();
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
+      this.transportModes = transportModes.stream().map(NarrowedTransitMode::of).toList();
+      return this;
+    }
+
+    public Builder withNarrowedTransportModes(List<NarrowedTransitMode> transportModes) {
       this.transportModes = transportModes;
       return this;
     }
 
     public Builder addTransportMode(MainAndSubMode transportMode) {
-      this.transportModes.add(transportMode);
+      this.transportModes.add(NarrowedTransitMode.of(transportMode));
       return this;
     }
 

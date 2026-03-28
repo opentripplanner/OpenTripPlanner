@@ -4773,6 +4773,15 @@ input PlanTransitModePreferenceInput {
   cost: TransitModePreferenceCostInput
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
+  """
+  If present and not null, further limits the transit mode selection. For a transit leg to match
+  PlanTransitModesInput, it must match one of the PlanTransitModePreferenceInputs given in the
+  field transit. A leg matches a PlanTransitModePreferenceInput if the mandatory TransitMode
+  field mode matches. If the boolean field replacement is present and not null, the leg must also
+  be a replacement (if true) or not be a replacement (if false). Whether a leg is a replacement
+  is recognized both by the NeTEx submode and the GTFS extended type, depending on the data source.
+  """
+  replacement: Boolean
 }
 
 """

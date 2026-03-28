@@ -468,12 +468,6 @@ public class GraphQLTypes {
     NO_INFORMATION,
   }
 
-  public enum GraphQLCarsAllowed {
-    ALLOWED,
-    NOT_ALLOWED,
-    NO_INFORMATION,
-  }
-
   public static class GraphQLBoardPreferencesInput {
 
     private java.time.Duration slack;
@@ -726,6 +720,12 @@ public class GraphQLTypes {
     public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
       this.rentalDuration = rentalDuration;
     }
+  }
+
+  public enum GraphQLCarsAllowed {
+    ALLOWED,
+    NOT_ALLOWED,
+    NO_INFORMATION,
   }
 
   public static class GraphQLCyclingOptimizationInput {
@@ -2281,6 +2281,7 @@ public class GraphQLTypes {
 
     private GraphQLTransitModePreferenceCostInput cost;
     private GraphQLTransitMode mode;
+    private Boolean replacement;
 
     public GraphQLPlanTransitModePreferenceInput(Map<String, Object> args) {
       if (args != null) {
@@ -2292,6 +2293,7 @@ public class GraphQLTypes {
         } else if (args.get("mode") != null) {
           this.mode = GraphQLTransitMode.valueOf((String) args.get("mode"));
         }
+        this.replacement = (Boolean) args.get("replacement");
       }
     }
 
@@ -2303,12 +2305,20 @@ public class GraphQLTypes {
       return this.mode;
     }
 
+    public Boolean getGraphQLReplacement() {
+      return this.replacement;
+    }
+
     public void setGraphQLCost(GraphQLTransitModePreferenceCostInput cost) {
       this.cost = cost;
     }
 
     public void setGraphQLMode(GraphQLTransitMode mode) {
       this.mode = mode;
+    }
+
+    public void setGraphQLReplacement(Boolean replacement) {
+      this.replacement = replacement;
     }
   }
 

@@ -988,8 +988,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<TripTimeOnDate> arrivalStoptime();
     public DataFetcher<GraphQLBikesAllowed> bikesAllowed();
-    public DataFetcher<GraphQLCarsAllowed> carsAllowed();
     public DataFetcher<String> blockId();
+    public DataFetcher<GraphQLCarsAllowed> carsAllowed();
     public DataFetcher<TripTimeOnDate> departureStoptime();
     public DataFetcher<String> directionId();
     public DataFetcher<Iterable<Iterable<Double>>> geometry();

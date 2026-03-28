@@ -33,6 +33,21 @@ public class ArgumentUtils {
     return null;
   }
 
+  @Nullable
+  static List<GraphQLTypes.GraphQLPlanTransitModePreferenceInput> getPlanTransitModes(
+    DataFetchingEnvironment environment
+  ) {
+    var transitModes = getTransitModes(environment);
+    if (transitModes != null) {
+      return transitModes
+        .stream()
+        .map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput::new)
+        .collect(Collectors.toList());
+    } else {
+      return null;
+    }
+  }
+
   /**
    * This methods returns parking preferences of the given type from argument structure:
    * preferences.street.type.parking. This methods circumvents a bug in graphql-codegen as getting a
