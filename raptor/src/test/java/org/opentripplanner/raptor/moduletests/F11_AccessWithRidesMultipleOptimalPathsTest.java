@@ -20,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
@@ -79,9 +78,6 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .latestArrivalTime(T00_30);
 
     data.withTransfer(STOP_B, transfer(STOP_C, D2_m)).withTransfer(STOP_C, transfer(STOP_D, D2_m));
-
-    // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   /**

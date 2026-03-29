@@ -27,6 +27,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * following segment. This is implemented using Pareto set event listeners.
  * </p>
  */
+@SuppressWarnings("ClassCanBeRecord")
 public class SearchContextViaSegments<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> parent;
@@ -76,7 +77,6 @@ public class SearchContextViaSegments<T extends RaptorTripSchedule> {
   /**
    * Returns the set of egress paths that lead directly to the destination in this segment.
    */
-  @Nullable
   public EgressPaths egressPaths() {
     return egressPaths;
   }

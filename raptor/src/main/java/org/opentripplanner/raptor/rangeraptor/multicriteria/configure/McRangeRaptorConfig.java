@@ -21,10 +21,11 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerS
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ViaConnectionStopArrivalEventListener;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalsEventListenerMapper;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McArrivalsEventListenerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.StopsWithArriveByTransitCriteriaResolver;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2.StopArrivalFactoryC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
@@ -120,17 +121,24 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   public McStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
+      var stopsWithArriveByTransitCriteria = StopsWithArriveByTransitCriteriaResolver.resolve(
+        contextSegment.accessPaths(),
+        contextSegment.egressPaths(),
+        contextSegment.viaConnections()
+      );
+
       // Glue arrivals to next-connection, egress/destination events, and debug-event on stops.
-      var listeners = ArrivalsEventListenerMapper.<T>map(
+      var listenersFactory = new McArrivalsEventListenerFactory<>(
         context().debugFactory(),
         createViaConnectionListeners(),
         contextSegment.egressPaths(),
         createDestinationArrivalPaths()
-      );
+      ).create();
 
       this.arrivals = new McStopArrivals<>(
         context().nStops(),
-        listeners,
+        stopsWithArriveByTransitCriteria,
+        listenersFactory.arrivalListeners(),
         createFactoryParetoComparator(),
         context().debugFactory()
       );

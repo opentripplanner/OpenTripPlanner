@@ -24,7 +24,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
@@ -92,9 +91,6 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .latestArrivalTime(T00_30);
 
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2_m));
-
-    // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {

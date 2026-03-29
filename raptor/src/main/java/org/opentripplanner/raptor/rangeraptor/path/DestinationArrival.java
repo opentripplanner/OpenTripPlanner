@@ -23,7 +23,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * later iteration makes it into the destination set - it should not erase
  * an earlier result unless it is faster. There is no check on total travel
  * duration for each stop, because it does not need to.
- *
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -85,11 +84,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   @Override
   public PathLegType arrivedBy() {
     return EGRESS;
-  }
-
-  @Override
-  public boolean arrivedAtDestination() {
-    return true;
   }
 
   @Override

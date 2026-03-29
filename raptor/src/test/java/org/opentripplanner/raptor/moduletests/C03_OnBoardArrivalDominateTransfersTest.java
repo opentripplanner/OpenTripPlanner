@@ -18,15 +18,25 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should be able to route access and transit arriving on-board and egress departing
- * on-board connecting to transit by transfers. Access and egress which arrive/depart at/from
- * the same stops by walking should not be possible.
+ * Egress stops must use the 4D Pareto comparator (arrivalTime, paretoRound, cost,
+ * arrivedOnBoard). Regular transit intermediary stops use the 3D comparator (no arrivedOnBoard
+ * dimension).
+ * <p>
+ * At stop C, two arrivals compete:
+ * <ol>
+ *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low,
+ *       arrivedOnBoard=false — does NOT fire walk egress</li>
+ *   <li>Transit via R1(A→B) + R2(B→C): round=2, arrives 0:15, cost higher,
+ *       arrivedOnBoard=true — fires walk egress</li>
+ * </ol>
+ * Arrival 1 strictly dominates arrival 2 in all three base dimensions (3D), so under the 3D
+ * comparator the transit is rejected and the walk egress never fires. The 4D comparator at C
+ * preserves both arrivals and finds the path.
  */
 public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConstants {
 
@@ -40,11 +50,12 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       .access("Walk 1m ~ A")
       .withTimetables(
         """
+        -- R1
         A     B
         0:05  0:08
-        --
-        B     C
-        0:12  0:15
+        -- R2
+              B     C
+              0:12  0:15
         """
       )
       .egress("C ~ Walk 1m")
@@ -56,8 +67,6 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10_m);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
