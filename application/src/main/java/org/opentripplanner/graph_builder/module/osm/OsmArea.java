@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -29,7 +30,7 @@ class OsmArea {
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
   final OsmEntity parent;
-  public MultiPolygon jtsMultiPolygon;
+  public PreparedPolygon jtsMultiPolygon;
 
   OsmArea(
     OsmEntity parent,
@@ -156,18 +157,18 @@ class OsmArea {
    * @return Point geometry inside the area
    */
   public Point findInteriorPoint() {
-    var centroid = jtsMultiPolygon.getCentroid();
+    var centroid = jtsMultiPolygon.getGeometry().getCentroid();
     if (jtsMultiPolygon.intersects(centroid)) {
       return centroid;
     }
-    return jtsMultiPolygon.getInteriorPoint();
+    return jtsMultiPolygon.getGeometry().getInteriorPoint();
   }
 
   public StreetTraversalPermission getPermission() {
     return parent.getPermission();
   }
 
-  private MultiPolygon calculateJTSMultiPolygon() {
+  private PreparedPolygon calculateJTSMultiPolygon() {
     List<Polygon> polygons = new ArrayList<>();
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
@@ -183,7 +184,7 @@ class OsmArea {
       );
     }
 
-    return jtsMultiPolygon;
+    return new PreparedPolygon(jtsMultiPolygon);
   }
 
   private boolean constructRingsRecursive(
