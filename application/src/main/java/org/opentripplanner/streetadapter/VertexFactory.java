@@ -8,8 +8,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
@@ -158,10 +156,6 @@ public class VertexFactory {
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParkingEntrance entrance) {
     return addToGraph(new VehicleParkingEntranceVertex(entrance));
-  }
-
-  public VehicleRentalPlaceVertex vehicleRentalPlace(VehicleRentalPlace station) {
-    return addToGraph(new VehicleRentalPlaceVertex(station));
   }
 
   public TransitPathwayNodeVertex transitPathwayNode(PathwayNode node) {

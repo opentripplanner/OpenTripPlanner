@@ -9,24 +9,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneApplier;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -149,7 +146,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     public void run(RealTimeUpdateContext context) {
       // Apply stations to graph
       Set<FeedScopedId> stationSet = new HashSet<>();
-      var vertexFactory = new VertexFactory(context.graph());
 
       /* add any new stations and update vehicle counts for existing stations */
       for (VehicleRentalPlace station : stations) {
@@ -158,22 +154,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         VehicleRentalPlaceVertex vehicleRentalVertex = verticesByStation.get(station.id());
 
         if (vehicleRentalVertex == null) {
-          vehicleRentalVertex = vertexFactory.vehicleRentalPlace(station);
+          vehicleRentalVertex = new VehicleRentalPlaceVertex(station);
+          context.graph().addVertex(vehicleRentalVertex);
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BIDIRECTIONAL,
-            (vertex, streetVertex) ->
-              List.of(
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  (VehicleRentalPlaceVertex) vertex,
-                  streetVertex
-                ),
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  streetVertex,
-                  (VehicleRentalPlaceVertex) vertex
-                )
-              )
+            StreetVehicleRentalLink::createBidirectionalLinks
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
             // Copy reference to pass into lambda
@@ -188,15 +175,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
               )
             );
           }
-          Set<RentalFormFactor> formFactors = Stream.concat(
-            station.availablePickupFormFactors(false).stream(),
-            station.availableDropoffFormFactors(false).stream()
-          ).collect(Collectors.toSet());
-          for (RentalFormFactor formFactor : formFactors) {
-            tempEdges.addEdge(
-              VehicleRentalEdge.createVehicleRentalEdge(vehicleRentalVertex, formFactor)
-            );
-          }
+          VehicleRentalEdge.createRentalEdgesForStation(vehicleRentalVertex, station, tempEdges);
           verticesByStation.put(station.id(), vehicleRentalVertex);
           tempEdgesByStation.put(station.id(), tempEdges);
         } else {
@@ -229,8 +208,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
-        var updater = new GeofencingVertexUpdater(context.graph()::findEdges);
-        latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
+        var applier = new GeofencingZoneApplier(context.graph()::findEdges);
+        latestModifiedEdges = applier.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
 
         var end = System.currentTimeMillis();

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,15 +14,13 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
-import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
- * Even though the data is kept on the vertex this updater operates mostly on edges which then
+ * Even though the data is kept on the vertex this class operates mostly on edges which then
  * delegate to the vertices.
  * <p>
  * This is because we want to drop the vehicle outside the geofencing zone rather than on the first
@@ -32,11 +30,11 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  * Perhaps this logic will be replaced with edge splitting where a new vertex is insert right on
  * the border of the zone.
  */
-class GeofencingVertexUpdater {
+public class GeofencingZoneApplier {
 
   private final Function<Envelope, Collection<Edge>> getEdgesForEnvelope;
 
-  public GeofencingVertexUpdater(Function<Envelope, Collection<Edge>> getEdgesForEnvelope) {
+  public GeofencingZoneApplier(Function<Envelope, Collection<Edge>> getEdgesForEnvelope) {
     this.getEdgesForEnvelope = getEdgesForEnvelope;
   }
 
@@ -44,7 +42,7 @@ class GeofencingVertexUpdater {
    * Applies the restrictions described in the geofencing zones to eges by adding
    * {@link RentalRestrictionExtension} to them.
    */
-  Map<StreetEdge, RentalRestrictionExtension> applyGeofencingZones(
+  public Map<StreetEdge, RentalRestrictionExtension> applyGeofencingZones(
     Collection<GeofencingZone> geofencingZones
   ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
