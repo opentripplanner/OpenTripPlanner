@@ -163,5 +163,4 @@ public class StreetSearchRequestBuilder {
   public StreetSearchRequest build() {
     return new StreetSearchRequest(this);
   }
-
 }

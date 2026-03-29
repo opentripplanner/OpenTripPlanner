@@ -1,5 +1,6 @@
 package org.opentripplanner.street.geometry;
 
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +9,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.locationtech.jts.algorithm.ConvexHull;
@@ -70,19 +72,31 @@ public class GeometryUtils {
     return makeLineString(Arrays.stream(coordinates).map(WgsCoordinate::asJtsCoordinate).toList());
   }
 
+   /// Convert an iterable of T by applying a mapping function to each element and concatenate the
+   /// resulting LineStrings.
+   ///
+   /// For the best performance and lowest number of allocations pass in an [Iterable] rather
+   /// than a materialized [Collection].
   public static <T> LineString concatenateLineStrings(
-    List<T> inputObjects,
+    Iterable<T> inputObjects,
     Function<T, LineString> mapper
   ) {
-    return concatenateLineStrings(inputObjects.stream().map(mapper).toList());
+    return concatenateLineStrings(
+      Iterables.transform(inputObjects, mapper::apply)
+    );
   }
 
-  public static LineString concatenateLineStrings(List<LineString> lineStrings) {
+  /// Convert an [Iterable] of [LineString] by applying a mapping function to each element and
+  /// concatenate the resulting LineStrings.
+  ///
+  /// For the best performance and lowest number of allocations pass in an [Iterable] rather
+  /// than a materialized [Collection].
+  public static LineString concatenateLineStrings(Iterable<LineString> lineStrings) {
     GeometryFactory factory = getGeometryFactory();
     Predicate<Coordinate[]> nonZeroLength = coordinates -> coordinates.length != 0;
+
     return factory.createLineString(
-      lineStrings
-        .stream()
+      StreamSupport.stream(lineStrings.spliterator(), false)
         .filter(Objects::nonNull)
         .map(LineString::getCoordinates)
         .filter(nonZeroLength)
