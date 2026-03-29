@@ -190,9 +190,7 @@ public class TemporaryPartialStreetEdgeTest {
     // All intersections take 0 seconds now.
     var calculator = new ConstantIntersectionTraversalCalculator();
 
-    var request2 = StreetSearchRequest.copyOf(request)
-      .withIntersectionTraversalCalculator(calculator)
-      .build();
+    var request2 = request.copyOf().withIntersectionTraversalCalculator(calculator).build();
     State s0NoCost = new State(v1, request2);
     State s1NoCost = e1.traverse(s0NoCost)[0];
     State s2NoCost = e2.traverse(s1NoCost)[0];

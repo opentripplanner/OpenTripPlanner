@@ -25,10 +25,7 @@ public class StreetEdgeTraversalDistanceTest {
     var edge = StreetModelFactory.streetEdge(v0, v1);
     var range = Range.closed(2000d, 3000d);
     assertThat(edge.getDistanceMeters()).isIn(range);
-    State s0 = new State(
-      v0,
-      StreetSearchRequest.copyOf(StreetSearchRequest.DEFAULT).withMode(mode).build()
-    );
+    State s0 = new State(v0, StreetSearchRequest.DEFAULT.copyOf().withMode(mode).build());
     State s1 = edge.traverse(s0)[0];
     assertThat(s1.getTraversalDistanceMeters()).isIn(range);
   }
