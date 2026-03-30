@@ -128,6 +128,25 @@ public class GraphQLDataFetchers {
     public DataFetcher<Trip> trip();
   }
 
+  /**
+   * A connection to a list of alerts that follows
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLAlertConnection {
+    public DataFetcher<Iterable<Edge<TransitAlert>>> edges();
+    public DataFetcher<Object> pageInfo();
+    public DataFetcher<Integer> totalCount();
+  }
+
+  /**
+   * An edge for the alert connection. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLAlertEdge {
+    public DataFetcher<String> cursor();
+    public DataFetcher<TransitAlert> node();
+  }
+
   /** Entity related to an alert */
   public interface GraphQLAlertEntity extends TypeResolver {}
 
@@ -697,6 +716,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Agency> agency();
     public DataFetcher<Iterable<TransitAlert>> alerts();
+    public DataFetcher<CountedConnection<TransitAlert>> alertsConnection();
     public DataFetcher<VehicleParking> bikePark();
     public DataFetcher<Iterable<VehicleParking>> bikeParks();
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();

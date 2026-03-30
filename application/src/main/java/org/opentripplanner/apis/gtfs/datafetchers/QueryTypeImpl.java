@@ -30,6 +30,7 @@ import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.AlertsConnectionFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.CanceledTripsFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
@@ -111,6 +112,16 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       Collection<TransitAlert> alerts = getTransitAlertService(environment).getAllAlerts();
       var args = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(environment.getArguments());
       return filterAlerts(alerts, args);
+    };
+  }
+
+  @Override
+  public DataFetcher<CountedConnection<TransitAlert>> alertsConnection() {
+    return environment -> {
+      var args = new GraphQLTypes.GraphQLQueryTypeAlertsConnectionArgs(environment.getArguments());
+      var request = AlertsConnectionFilterMapper.map(args.getGraphQLFilters());
+      var alerts = getTransitAlertService(environment).findAlerts(request);
+      return new SimpleCountedListConnection<>(List.copyOf(alerts)).get(environment);
     };
   }
 

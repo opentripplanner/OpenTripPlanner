@@ -1,0 +1,35 @@
+{
+  "data": {
+    "alertsConnection": {
+      "totalCount": 5,
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
+      "edges": [
+        {
+          "node": {
+            "id": "QWxlcnQ6RjpuZWl0aGVyLWhlYWRlci1ub3ItZGVzY3JpcHRpb24",
+            "headerDefault": "",
+            "headerDe": "",
+            "descriptionDefault": "",
+            "descriptionDe": "",
+            "urlDefault": null,
+            "urlDe": null
+          }
+        },
+        {
+          "node": {
+            "id": "QWxlcnQ6Rjpuby1oZWFkZXI",
+            "headerDefault": "Second string",
+            "headerDe": "Zweite Zeichenabfolge",
+            "descriptionDefault": "Second string",
+            "descriptionDe": "Zweite Zeichenabfolge",
+            "urlDefault": null,
+            "urlDe": null
+          }
+        }
+      ]
+    }
+  }
+}
