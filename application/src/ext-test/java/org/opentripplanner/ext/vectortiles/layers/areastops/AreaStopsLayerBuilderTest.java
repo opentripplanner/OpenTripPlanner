@@ -12,7 +12,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -54,8 +53,7 @@ class AreaStopsLayerBuilderTest {
     .build();
 
   private final TimetableRepository timetableRepository = new TimetableRepository(
-    siteRepositoryBuilder.withAreaStop(AREA_STOP).build(),
-    new Deduplicator()
+    siteRepositoryBuilder.withAreaStop(AREA_STOP).build()
   );
 
   @Test

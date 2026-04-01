@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.TimeLimit;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 /**
  * Represents an offer for a transit leg, encapsulating fare information and optional time limits.
  * This interface is used to determine fare products applicable to specific legs of transit,
- * and provide functionality for validating time-limited offers.
+ * and provide functionality for validating time-limited or transfer-limited offers.
  */
 sealed interface LegOffer {
   /**
@@ -27,11 +27,11 @@ sealed interface LegOffer {
     return new DefaultLegOffer(offer);
   }
 
-  static LegOffer of(FareOffer offer, TransitLeg startLeg, @Nullable TimeLimit timeLimit) {
-    if (timeLimit == null) {
+  static LegOffer of(FareOffer offer, TransitLeg startLeg, FareTransferRule transferRule) {
+    if (transferRule.timeLimit().isEmpty()) {
       return new DefaultLegOffer(offer);
     } else {
-      return new TimeLimitedOffer(offer, timeLimit, startLeg);
+      return new TimeLimitedOffer(offer, transferRule.timeLimit().get(), startLeg);
     }
   }
 

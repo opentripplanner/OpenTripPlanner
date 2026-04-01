@@ -21,7 +21,6 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
-import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * FEATURE UNDER TEST
@@ -31,8 +30,6 @@ import org.opentripplanner.utils.time.DurationUtils;
  * walking, but only get accepted when they are better on time and/or cost.
  */
 public class F02_EgressWithRidesTest implements RaptorTestConstants {
-
-  private static final int D1m59s = DurationUtils.durationInSeconds("1m59s");
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();

@@ -133,16 +133,19 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testCompareTo() {
-    var p0 = Path.dummyPath(0, 10, 20, 10, 10);
-    var p1 = Path.dummyPath(0, 11, 20, 10, 10);
-    var p2 = Path.dummyPath(0, 10, 19, 10, 10);
-    var p3 = Path.dummyPath(0, 10, 20, 9, 10);
-    var p4 = Path.dummyPath(0, 10, 20, 10, 9);
+    var p0 = Path.dummyPath(0, 10, 20, 3, 40, 50);
+    var p1 = Path.dummyPath(0, 11, 20, 3, 40, 50);
+    var p2 = Path.dummyPath(0, 10, 19, 3, 40, 50);
+    var p3 = Path.dummyPath(0, 10, 20, 2, 40, 50);
+    var p4 = Path.dummyPath(0, 10, 20, 3, 39, 50);
+    var p5 = Path.dummyPath(0, 10, 20, 3, 40, 49);
 
     // Order: < EndTime, > StartTime, < Cost, < Transfers
-    List<RaptorPath<?>> expected = List.of(p2, p1, p4, p3, p0);
+    List<RaptorPath<?>> expected = List.of(p2, p1, p4, p3, p5, p0);
 
-    List<RaptorPath<?>> paths = Stream.of(p4, p3, p2, p1, p0).sorted().collect(Collectors.toList());
+    List<RaptorPath<?>> paths = Stream.of(p5, p4, p3, p2, p1, p0)
+      .sorted()
+      .collect(Collectors.toList());
 
     assertEquals(expected, paths);
   }

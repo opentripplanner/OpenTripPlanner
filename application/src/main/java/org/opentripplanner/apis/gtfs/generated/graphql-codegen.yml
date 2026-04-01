@@ -27,7 +27,7 @@ config:
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Gram
     Duration: java.time.Duration
-    Cost: org.opentripplanner.framework.model.Cost
+    Cost: org.opentripplanner.core.model.basic.Cost
     CoordinateValue: Double
     Locale: java.util.Locale
     OffsetDateTime: java.time.OffsetDateTime
@@ -56,6 +56,7 @@ config:
     BookingInfo: org.opentripplanner.transit.model.timetable.booking.BookingInfo#BookingInfo
     BookingTime: org.opentripplanner.transit.model.timetable.booking.BookingTime#BookingTime
     CarPark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
+    CarsAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed#GraphQLCarsAllowed
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
@@ -91,6 +92,8 @@ config:
     PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState#GraphQLRealtimeState
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
+    ReplacedByRelation: org.opentripplanner.transit.model.network.ReplacedByRelation#ReplacedByRelation
+    ReplacementForRelation: org.opentripplanner.transit.model.network.ReplacementForRelation#ReplacementForRelation
     Route: org.opentripplanner.transit.model.network.Route#Route
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
     RoutingErrorCode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode#GraphQLRoutingErrorCode
@@ -121,7 +124,7 @@ config:
     FormFactor: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor
     PropulsionType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.service.vehiclerental.model.RentalVehicleType#RentalVehicleType
-    OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar
+    OpeningHours: org.opentripplanner.street.model.openinghours.OHCalendar#OHCalendar
     RideHailingEstimate: org.opentripplanner.ext.ridehailing.model.RideEstimate#RideEstimate
     RideHailingProvider: org.opentripplanner.apis.gtfs.model.RideHailingProvider#RideHailingProvider
     Currency: java.util.Currency#Currency

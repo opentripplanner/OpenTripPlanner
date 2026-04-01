@@ -21,7 +21,7 @@ public class HeuristicToRunResolverTest {
   public static final boolean EDT = true;
   public static final boolean LAT = true;
   public static final boolean WIN = true;
-  public static final boolean _x_ = false;
+  public static final boolean X_IGNORE = false;
 
   private boolean forward = false;
   private boolean reverse = false;
@@ -35,19 +35,19 @@ public class HeuristicToRunResolverTest {
     // Alternatives with both EAT & LAT FALSE is skipped.
     // Either EAT or LAT is required and request is not possible to create.
 
-    given(DEST, EDT, LAT, WIN).expect(_x_, REV);
-    given(DEST, EDT, LAT, _x_).expect(_x_, REV);
-    given(DEST, EDT, _x_, WIN).expect(_x_, REV);
-    given(DEST, EDT, _x_, _x_).expect(_x_, REV);
-    given(DEST, _x_, LAT, WIN).expect(_x_, REV);
-    given(DEST, _x_, LAT, _x_).expect(_x_, REV);
+    given(DEST, EDT, LAT, WIN).expect(X_IGNORE, REV);
+    given(DEST, EDT, LAT, X_IGNORE).expect(X_IGNORE, REV);
+    given(DEST, EDT, X_IGNORE, WIN).expect(X_IGNORE, REV);
+    given(DEST, EDT, X_IGNORE, X_IGNORE).expect(X_IGNORE, REV);
+    given(DEST, X_IGNORE, LAT, WIN).expect(X_IGNORE, REV);
+    given(DEST, X_IGNORE, LAT, X_IGNORE).expect(X_IGNORE, REV);
     // Skip alternatives with both EAT & LAT off.
-    given(_x_, EDT, LAT, WIN).expect(_x_, _x_);
-    given(_x_, EDT, LAT, _x_).expect(FWD, _x_);
-    given(_x_, EDT, _x_, WIN).expect(_x_, _x_);
-    given(_x_, EDT, _x_, _x_).expect(FWD, _x_);
-    given(_x_, _x_, LAT, WIN).expect(_x_, REV);
-    given(_x_, _x_, LAT, _x_).expect(_x_, REV);
+    given(X_IGNORE, EDT, LAT, WIN).expect(X_IGNORE, X_IGNORE);
+    given(X_IGNORE, EDT, LAT, X_IGNORE).expect(FWD, X_IGNORE);
+    given(X_IGNORE, EDT, X_IGNORE, WIN).expect(X_IGNORE, X_IGNORE);
+    given(X_IGNORE, EDT, X_IGNORE, X_IGNORE).expect(FWD, X_IGNORE);
+    given(X_IGNORE, X_IGNORE, LAT, WIN).expect(X_IGNORE, REV);
+    given(X_IGNORE, X_IGNORE, LAT, X_IGNORE).expect(X_IGNORE, REV);
     // Skip alternatives with both EAT & LAT off.
   }
 

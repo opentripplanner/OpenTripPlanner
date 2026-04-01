@@ -414,7 +414,7 @@ public class StopPlaceType {
     Duration timeRange,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     Integer departuresPerLineAndDestinationDisplay,
     Collection<FeedScopedId> authorityIdsWhiteListed,
     Collection<FeedScopedId> lineIdsWhiteListed,
@@ -427,7 +427,7 @@ public class StopPlaceType {
       stop,
       startTimeSeconds,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       includeCancelledTrips
     );

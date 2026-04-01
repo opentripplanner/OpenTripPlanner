@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import gnu.trove.set.hash.TIntHashSet;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -15,9 +16,9 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -34,11 +35,12 @@ class ClosestTripTest {
     .build();
 
   private static final LocalDate DATE = LocalDate.of(2025, 2, 28);
-  private static final FlexServiceDate FSD = new FlexServiceDate(
+  private static final FlexServiceDate FSD = FlexServiceDate.of(
     DATE,
     ServiceDateUtils.secondsSinceStartOfTime(DATE.atStartOfDay(ZoneIds.BERLIN), DATE),
-    10,
-    new TIntHashSet()
+    Instant.ofEpochSecond(10),
+    ZoneIds.BERLIN,
+    new ArrayList<>()
   );
   private static final StopLocation STOP = FLEX_TRIP.getStop(0);
   private static final FlexAccessEgressCallbackAdapter ADAPTER =

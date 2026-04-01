@@ -18,16 +18,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
@@ -124,6 +125,28 @@ class LinkingContextFactoryTest {
     var linkingContext = stopLinkingContextFactory.create(container, request);
     assertEquals(stopA, toStop(linkingContext.findVertices(from)));
     assertEquals(stopB, toStop(linkingContext.findVertices(to)));
+  }
+
+  @Test
+  void stopIdNoStreet() {
+    var stopLinkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
+      Set::of,
+      id -> Optional.empty()
+    );
+    var container = new TemporaryVerticesContainer();
+    var from = stopToLocation(stopA);
+    var to = stopToLocation(stopB);
+    var request = LinkingContextRequest.of()
+      .withFrom(from)
+      .withTo(to)
+      .withDirectMode(StreetMode.NOT_SET)
+      .build();
+    var linkingContext = stopLinkingContextFactory.create(container, request);
+
+    assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
+    assertEquals(stopB, toStop(linkingContext.toStopVertices()));
   }
 
   @Test

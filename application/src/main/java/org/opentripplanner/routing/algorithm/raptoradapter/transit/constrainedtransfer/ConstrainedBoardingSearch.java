@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

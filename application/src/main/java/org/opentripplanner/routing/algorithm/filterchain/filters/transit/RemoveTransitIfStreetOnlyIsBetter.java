@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 import java.util.List;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;

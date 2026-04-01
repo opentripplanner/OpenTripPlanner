@@ -8,29 +8,28 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 public interface RaptorTestConstants {
   // Time duration(D) constants, all values are in seconds
-  int D0s = 0;
-  int D1s = 1;
-  int D10s = 10;
-  int D11s = 11;
-  int D20s = 20;
-  int D30s = 30;
-  int D40s = 40;
-  int D1m = durationInSeconds("1m");
-  int D2m = durationInSeconds("2m");
-  int D3m = durationInSeconds("3m");
-  int D4m = durationInSeconds("4m");
-  int D5m = durationInSeconds("5m");
-  int D7m = durationInSeconds("7m");
-  int D8m = durationInSeconds("8m");
-  int D10m = durationInSeconds("10m");
-  int D11m = durationInSeconds("11m");
-  int D20m = durationInSeconds("20m");
-  int D24h = durationInSeconds("24h");
+  int D0_s = 0;
+  int D1_s = 1;
+  int D10_s = 10;
+  int D11_s = 11;
+  int D20_s = 20;
+  int D30_s = 30;
+  int D40_s = 40;
+  int D1_m = durationInSeconds("1m");
+  int D2_m = durationInSeconds("2m");
+  int D3_m = durationInSeconds("3m");
+  int D4_m = durationInSeconds("4m");
+  int D5_m = durationInSeconds("5m");
+  int D7_m = durationInSeconds("7m");
+  int D8_m = durationInSeconds("8m");
+  int D10_m = durationInSeconds("10m");
+  int D20_m = durationInSeconds("20m");
+  int D24_h = durationInSeconds("24h");
 
   /**
    * There are 86400 seconds in a "normal" day(24 * 60 * 60).
    */
-  int SECONDS_IN_A_DAY = (int) D24h;
+  int SECONDS_IN_A_DAY = (int) D24_h;
 
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);

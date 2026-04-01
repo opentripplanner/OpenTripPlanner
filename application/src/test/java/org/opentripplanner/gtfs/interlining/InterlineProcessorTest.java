@@ -16,7 +16,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.transfer.DefaultTransferService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -99,7 +99,7 @@ class InterlineProcessorTest implements PlanTestConstants {
     List<List<LocalDate>> serviceDates,
     String transfers
   ) {
-    var transferService = new DefaultTransferService();
+    var transferService = new DefaultConstrainedTransferService();
     var calendarServiceData = new CalendarServiceData();
     for (int i = 0; i < serviceIds.size(); i++) {
       calendarServiceData.putServiceDatesForServiceId(serviceIds.get(i), serviceDates.get(i));
@@ -123,7 +123,7 @@ class InterlineProcessorTest implements PlanTestConstants {
 
   @Test
   void staySeatedNotAllowed() {
-    var transferService = new DefaultTransferService();
+    var transferService = new DefaultConstrainedTransferService();
 
     var fromTrip = patterns.get(0).getScheduledTimetable().getTripTimes().get(0).getTrip();
     var toTrip = patterns.get(1).getScheduledTimetable().getTripTimes().get(0).getTrip();

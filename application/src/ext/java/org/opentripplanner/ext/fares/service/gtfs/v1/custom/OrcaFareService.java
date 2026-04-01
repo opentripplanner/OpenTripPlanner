@@ -117,7 +117,8 @@ public class OrcaFareService extends DefaultFareService {
     SKAGIT_LOCAL,
     SKAGIT_CROSS_COUNTY,
     UNKNOWN,
-    MONORAIL;
+    MONORAIL,
+    LINK_SHUTTLE;
 
     public TransferType getTransferType(FareType fareType, ZonedDateTime startTime) {
       if (usesOrca(fareType) && this.permitsFreeTransfers(startTime)) {
@@ -201,6 +202,9 @@ public class OrcaFareService extends DefaultFareService {
             // CommTrans operates some ST routes.
             yield RideType.SOUND_TRANSIT_BUS;
           }
+          if (route.getShortName().contains("Shuttle")) {
+            yield RideType.LINK_SHUTTLE;
+          }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
@@ -221,6 +225,9 @@ public class OrcaFareService extends DefaultFareService {
         } else if ("975".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
+        if (route.getShortName().contains("Shuttle")) {
+          yield RideType.LINK_SHUTTLE;
+        }
         yield RideType.KC_METRO;
       }
       case PIERCE_COUNTY_TRANSIT_AGENCY_ID -> {
@@ -235,7 +242,9 @@ public class OrcaFareService extends DefaultFareService {
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
-      case SOUND_TRANSIT_AGENCY_ID -> RideType.SOUND_TRANSIT;
+      case SOUND_TRANSIT_AGENCY_ID -> route.getShortName().contains("Shuttle")
+        ? RideType.LINK_SHUTTLE
+        : RideType.SOUND_TRANSIT;
       case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
       case SKAGIT_TRANSIT_AGENCY_ID -> Set.of("80X", "90X").contains(route.getShortName())
         ? RideType.SKAGIT_CROSS_COUNTY
@@ -285,7 +294,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare(fareType, rideType);
+      case youth, electronicYouth -> getYouthFare(rideType, defaultFare);
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
@@ -295,10 +304,6 @@ public class OrcaFareService extends DefaultFareService {
 
   private static Optional<Money> optionalUSD(float amount) {
     return Optional.of(usDollars(amount));
-  }
-
-  private static Optional<Money> getCTLocalReducedFare(Leg leg) {
-    return optionalUSD(1.00f);
   }
 
   /**
@@ -350,10 +355,11 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
-      case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
       case
+        COMM_TRANS_LOCAL_SWIFT,
         KC_METRO,
+        KC_WATER_TAXI_VASHON_ISLAND,
+        KC_WATER_TAXI_WEST_SEATTLE,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
@@ -392,16 +398,14 @@ public class OrcaFareService extends DefaultFareService {
     }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
-      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
-      case EVERETT_TRANSIT -> optionalUSD(0.5f);
+      case COMM_TRANS_LOCAL_SWIFT, KC_METRO -> optionalUSD(1.00f);
+      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL, EVERETT_TRANSIT -> optionalUSD(0.5f);
       case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
         SOUND_TRANSIT_T_LINK,
-        KC_METRO,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> optionalUSD(1f);
@@ -421,11 +425,17 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
-  private Optional<Money> getYouthFare(FareType fareType, RideType rideType) {
-    if (rideType == RideType.MONORAIL) {
-      return Optional.empty();
-    }
-    return Optional.of(ZERO_USD);
+  private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
+    return switch (rideType) {
+      case
+        UNKNOWN,
+        SKAGIT_TRANSIT,
+        SKAGIT_LOCAL,
+        SKAGIT_CROSS_COUNTY,
+        MONORAIL,
+        LINK_SHUTTLE -> Optional.empty();
+      default -> Optional.of(ZERO_USD);
+    };
   }
 
   /**
@@ -603,6 +613,8 @@ public class OrcaFareService extends DefaultFareService {
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct);
           fare.addFareProduct(leg, newFareOffer);
           purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));
+        } else {
+          fare.addFareProduct(leg, validAgencyFareProducts.getFirst());
         }
       } else {
         // Create a generic fare product for this leg

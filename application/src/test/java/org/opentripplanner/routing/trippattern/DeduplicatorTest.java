@@ -25,11 +25,11 @@ public class DeduplicatorTest {
   private static final String STRING_2 = new String("Abba");
   private static final String[] STRING_ARRAY = { "Alf" };
   private static final String[] STRING_ARRAY_2 = { "Alf" };
-  private static final String[][] STRING_2D_ARRAY = new String[][] {
+  private static final String[][] STRING_2_D_ARRAY = new String[][] {
     { "test_1", "test_2" },
     { "test_3", "test_4" },
   };
-  private static final String[][] STRING_2D_ARRAY_2 = new String[][] {
+  private static final String[][] STRING_2_D_ARRAY_2 = new String[][] {
     { "test_1", "test_2" },
     { "test_3", "test_4" },
   };
@@ -131,9 +131,9 @@ public class DeduplicatorTest {
 
   @Test
   public void deduplicateString2DArray() {
-    var deduplicatedArray = subject.deduplicateString2DArray(STRING_2D_ARRAY);
+    var deduplicatedArray = subject.deduplicateString2DArray(STRING_2_D_ARRAY);
 
-    assertSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
+    assertSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2_D_ARRAY_2));
 
     assertEquals(
       "Deduplicator{String: 4(4), String[]: 2(2), String[][]: 1(2)}",
@@ -142,7 +142,7 @@ public class DeduplicatorTest {
 
     subject.reset();
     // After reset the "old" entry is removed
-    assertNotSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
+    assertNotSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2_D_ARRAY_2));
   }
 
   @Test

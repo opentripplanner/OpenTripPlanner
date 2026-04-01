@@ -27,6 +27,7 @@ import java.util.function.Function;
 import javax.xml.stream.XMLStreamException;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
@@ -251,7 +252,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
     Siri siri;
     try {
-      siri = SiriXml.parseXml(data.toStringUtf8());
+      siri = SiriXml.parseXml(data.newInput());
     } catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }
@@ -306,7 +307,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       return otpHttpClient.getAndMap(
         dataInitializationUrl,
         initialGetDataTimeout,
-        Map.of("Content-Type", "application/xml"),
+        HttpHeaders.of(Map.of("Content-Type", "application/xml")),
         response -> ByteString.readFrom(response.body())
       );
     }

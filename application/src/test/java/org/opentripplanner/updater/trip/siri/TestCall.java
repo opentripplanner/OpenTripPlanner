@@ -11,7 +11,9 @@ import uk.org.siri.siri21.OccupancyEnumeration;
 public class TestCall implements CallWrapper {
 
   private final String stopPointRef;
+  private final int sortOrder;
   private final Boolean cancellation;
+  private final boolean extraCall;
   private final Boolean predictionInaccurate;
   private final OccupancyEnumeration occupancy;
   private final List<NaturalLanguageStringStructure> destinationDisplaies;
@@ -25,10 +27,13 @@ public class TestCall implements CallWrapper {
   private final ZonedDateTime actualDepartureTime;
   private final CallStatusEnumeration departureStatus;
   private final DepartureBoardingActivityEnumeration departureBoardingActivity;
+  private final boolean isRecorded;
 
   private TestCall(
     String stopPointRef,
+    int sortOrder,
     Boolean cancellation,
+    boolean extraCall,
     Boolean predictionInaccurate,
     OccupancyEnumeration occupancy,
     List<NaturalLanguageStringStructure> destinationDisplaies,
@@ -41,10 +46,13 @@ public class TestCall implements CallWrapper {
     ZonedDateTime expectedDepartureTime,
     ZonedDateTime actualDepartureTime,
     CallStatusEnumeration departureStatus,
-    DepartureBoardingActivityEnumeration departureBoardingActivity
+    DepartureBoardingActivityEnumeration departureBoardingActivity,
+    boolean isRecorded
   ) {
     this.stopPointRef = stopPointRef;
+    this.sortOrder = sortOrder;
     this.cancellation = cancellation;
+    this.extraCall = extraCall;
     this.predictionInaccurate = predictionInaccurate;
     this.occupancy = occupancy;
     this.destinationDisplaies = destinationDisplaies;
@@ -58,6 +66,7 @@ public class TestCall implements CallWrapper {
     this.actualDepartureTime = actualDepartureTime;
     this.departureStatus = departureStatus;
     this.departureBoardingActivity = departureBoardingActivity;
+    this.isRecorded = isRecorded;
   }
 
   public static TestCallBuilder of() {
@@ -67,6 +76,11 @@ public class TestCall implements CallWrapper {
   @Override
   public String getStopPointRef() {
     return stopPointRef;
+  }
+
+  @Override
+  public int getSortOrder() {
+    return sortOrder;
   }
 
   @Override
@@ -81,7 +95,7 @@ public class TestCall implements CallWrapper {
 
   @Override
   public boolean isExtraCall() {
-    return false;
+    return extraCall;
   }
 
   @Override
@@ -144,10 +158,17 @@ public class TestCall implements CallWrapper {
     return departureBoardingActivity;
   }
 
+  @Override
+  public boolean isRecorded() {
+    return isRecorded;
+  }
+
   public static class TestCallBuilder {
 
     private String stopPointRef = null;
+    private int sortOrder = 0;
     private Boolean cancellation = null;
+    private boolean extraCall = false;
     private Boolean predictionInaccurate = null;
     private OccupancyEnumeration occupancy = null;
     private List<NaturalLanguageStringStructure> destinationDisplaies = null;
@@ -161,14 +182,30 @@ public class TestCall implements CallWrapper {
     private ZonedDateTime actualDepartureTime = null;
     private CallStatusEnumeration departureStatus = null;
     private DepartureBoardingActivityEnumeration departureBoardingActivity = null;
+    private boolean isRecorded = false;
 
     public TestCallBuilder withStopPointRef(String stopPointRef) {
       this.stopPointRef = stopPointRef;
       return this;
     }
 
+    public TestCallBuilder withSortOrder(int sortOrder) {
+      this.sortOrder = sortOrder;
+      return this;
+    }
+
     public TestCallBuilder withCancellation(Boolean cancellation) {
       this.cancellation = cancellation;
+      return this;
+    }
+
+    public TestCallBuilder withExtraCall(boolean extraCall) {
+      this.extraCall = extraCall;
+      return this;
+    }
+
+    public TestCallBuilder withIsRecorded(Boolean recorded) {
+      this.isRecorded = recorded;
       return this;
     }
 
@@ -246,7 +283,9 @@ public class TestCall implements CallWrapper {
     public TestCall build() {
       return new TestCall(
         stopPointRef,
+        sortOrder,
         cancellation,
+        extraCall,
         predictionInaccurate,
         occupancy,
         destinationDisplaies,
@@ -259,7 +298,8 @@ public class TestCall implements CallWrapper {
         expectedDepartureTime,
         actualDepartureTime,
         departureStatus,
-        departureBoardingActivity
+        departureBoardingActivity,
+        isRecorded
       );
     }
   }

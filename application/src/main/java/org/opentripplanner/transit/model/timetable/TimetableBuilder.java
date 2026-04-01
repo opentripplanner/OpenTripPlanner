@@ -14,15 +14,19 @@ public class TimetableBuilder {
 
   private TripPattern pattern;
   private LocalDate serviceDate;
-  private final Map<FeedScopedId, TripTimes> tripTimes = new HashMap<>();
-  private final List<FrequencyEntry> frequencies = new ArrayList<>();
+  private final Map<FeedScopedId, TripTimes> tripTimes;
+  private final List<FrequencyEntry> frequencies;
 
-  TimetableBuilder() {}
+  TimetableBuilder() {
+    tripTimes = new HashMap<>();
+    frequencies = new ArrayList<>();
+  }
 
   TimetableBuilder(Timetable tt) {
     pattern = tt.getPattern();
     serviceDate = tt.getServiceDate();
-    frequencies.addAll(tt.getFrequencyEntries());
+    frequencies = new ArrayList<>(tt.getFrequencyEntries());
+    tripTimes = HashMap.newHashMap(tt.getTripTimes().size());
     addAllTripTimes(tt.getTripTimes());
   }
 
@@ -109,6 +113,10 @@ public class TimetableBuilder {
 
   List<TripTimes> createImmutableOrderedListOfTripTimes() {
     return tripTimes.values().stream().sorted().toList();
+  }
+
+  Map<FeedScopedId, TripTimes> createImmutableTripTimesIndex() {
+    return Map.copyOf(tripTimes);
   }
 
   TripPattern getPattern() {

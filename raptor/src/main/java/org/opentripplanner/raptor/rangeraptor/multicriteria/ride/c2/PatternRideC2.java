@@ -22,34 +22,13 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
   T trip
 ) implements PatternRide<T> {
   /**
-   * This is the function used to compare {@link PatternRideC2}s for a given pattern.
-   * <p>
-   * Since Raptor only compare rides for a given pattern and a given Raptor round, only 2 criteria
-   * are needed:
-   * <ul>
-   *   <li>
-   *     {@code tripSortIndex} - different trips should not exclude each other. The id can be
-   *     any board-/alight-time or sequence number that is uniq for all trips within a pattern.
-   *     It is only used to check if two trips are different.
-   *   </li>
-   *   <li>
-   *     {@code relative-cost} of riding a pattern. The cost is used to compare paths that have
-   *      boarded the same trip. Two paths riding different trips are not compared, due to the
-   *      first criteria. There is several ways to compute this cost, but you must include the
-   *      previous-stop-arrival-cost and the additional cost of boarding/riding the pattern.
-   *      We assume the cost increase with the same amount for all rides(same trip) traversing
-   *      down the pattern; Than we can safely ignore the cost added between each stop; Hence
-   *      calculating the "relative" board-cost. Remember to include the cost of transit. You
-   *      need to account for the cost of getting from A to B when comparing two
-   *      {@link PatternRideC2}s boarding at A and B.
-   *   </li>
-   * <p>
+   * See {@link PatternRide} for the pareto comparison strategy used by this comparator.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<
     PatternRideC2<T>
   > paretoComparatorRelativeCost(DominanceFunction dominanceFunctionC2) {
     return (l, r) ->
-      l.tripSortIndex != r.tripSortIndex ||
+      l.tripSortIndex < r.tripSortIndex ||
       l.relativeC1 < r.relativeC1 ||
       dominanceFunctionC2.leftDominateRight(l.c2, r.c2);
   }

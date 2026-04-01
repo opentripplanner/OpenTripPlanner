@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.paging;
 
 import java.time.Instant;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

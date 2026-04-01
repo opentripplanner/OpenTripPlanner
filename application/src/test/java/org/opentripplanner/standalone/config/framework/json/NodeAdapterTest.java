@@ -31,7 +31,7 @@ import org.opentripplanner.framework.model.Gram;
 
 public class NodeAdapterTest {
 
-  public static final Duration D3h = Duration.ofHours(3);
+  public static final Duration D3_h = Duration.ofHours(3);
   public static final String NON_UNUSED_PARAMETERS = "EXPECTED_NONE";
 
   @Test
@@ -381,7 +381,7 @@ public class NodeAdapterTest {
 
     // as optional duration
     assertEquals("PT1S", subject.of("k1").asDuration(null).toString());
-    assertEquals("PT3H", subject.of("missing-key").asDuration(D3h).toString());
+    assertEquals("PT3H", subject.of("missing-key").asDuration(D3_h).toString());
 
     // as required duration v2 (with unit)
     assertEquals("PT1S", subject.of("k1").asDuration().toString());
@@ -397,7 +397,7 @@ public class NodeAdapterTest {
   void asDurations() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
     assertEquals("[PT1S, PT2H]", subject.of("key1").asDurations(List.of()).toString());
-    assertEquals("[PT3H]", subject.of("missing-key").asDurations(List.of(D3h)).toString());
+    assertEquals("[PT3H]", subject.of("missing-key").asDurations(List.of(D3_h)).toString());
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 

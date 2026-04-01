@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * This class is responsible for filtering the list of access and egress before

@@ -86,9 +86,12 @@ the instructions in your submitted text.
 - Tie such series of PRs together with an "epic issue" that explains the overall plan.
 - Use GitHub issue references e.g. "related to #12" or "closes #13" to connect PRs and issues
 together.
-- Consider squashing and rebasing to make the PR history easier to understand, eliminating extra "
-  noise" commits like accidental changes to organization specific code, abandoned experiments, or
+- Consider squashing and rebasing to make the PR history easier to understand, eliminating extra
+  "noise" commits like accidental changes to organization specific code, abandoned experiments, or
   reverted configuration changes.
+- If you use AI tools to assist with your contributions, you remain fully responsible for the
+  quality and correctness of the changes. Only submit pull requests that you understand and can
+  explain. PRs that are unclear, low-quality, or generated as spam will be rejected.
 
 In turn, in order to prevent OTP2 from turning into a "
 big-ball-of-mud" (https://en.wikipedia.org/wiki/Big_ball_of_mud) and ensure development does not

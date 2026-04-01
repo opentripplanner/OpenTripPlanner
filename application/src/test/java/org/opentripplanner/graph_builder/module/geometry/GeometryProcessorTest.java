@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
-import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
-import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.moveMeters;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
+import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
+import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.distance;
+import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.moveMeters;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
@@ -18,10 +18,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.LineString;
 import org.opentest4j.AssertionFailedError;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -30,29 +30,39 @@ class GeometryProcessorTest {
 
   public static final FeedScopedId SHAPE_ID = id("s1");
 
-  private static final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
-  private static final RegularStop stopA = testModel.stop("A").withCoordinate(0, 0).build();
-  private static final RegularStop stopB = testModel.stop("B").withCoordinate(0.1, 0).build();
-  private static final RegularStop stopC = testModel.stop("C").withCoordinate(0.2, 0).build();
-  private static final RegularStop stopD = testModel.stop("D").withCoordinate(0.2, 0.1).build();
-  private static final RegularStop stopE = testModel.stop("E").withCoordinate(0.2, 0.2).build();
-  private static final RegularStop stopF = testModel.stop("F").withCoordinate(0.1, 0.2).build();
-  private static final RegularStop stopG = testModel.stop("G").withCoordinate(0, 0.2).build();
-  private static final RegularStop stopH = testModel.stop("H").withCoordinate(0, 0.1).build();
-  private static final RegularStop stopBL = testModel
-    .stop("BL")
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final RegularStop STOP_A = TEST_MODEL.stop("A").withCoordinate(0, 0).build();
+  private static final RegularStop STOP_B = TEST_MODEL.stop("B").withCoordinate(0.1, 0).build();
+  private static final RegularStop STOP_C = TEST_MODEL.stop("C").withCoordinate(0.2, 0).build();
+  private static final RegularStop STOP_D = TEST_MODEL.stop("D").withCoordinate(0.2, 0.1).build();
+  private static final RegularStop STOP_E = TEST_MODEL.stop("E").withCoordinate(0.2, 0.2).build();
+  private static final RegularStop STOP_F = TEST_MODEL.stop("F").withCoordinate(0.1, 0.2).build();
+  private static final RegularStop STOP_G = TEST_MODEL.stop("G").withCoordinate(0, 0.2).build();
+  private static final RegularStop STOP_H = TEST_MODEL.stop("H").withCoordinate(0, 0.1).build();
+  private static final RegularStop STOP_BL = TEST_MODEL.stop("BL")
     .withCoordinate(moveMeters(new WgsCoordinate(0.1, 0), 0, -1))
     .build();
-  private static final RegularStop stopBR = testModel
-    .stop("BR")
+  private static final RegularStop STOP_BR = TEST_MODEL.stop("BR")
     .withCoordinate(moveMeters(new WgsCoordinate(0.1, 0), 0, 1))
     .build();
-  private static final RegularStop stopX = testModel.stop("X").withCoordinate(0, -0.1).build();
-  private static final RegularStop stopY = testModel.stop("Y").withCoordinate(0, 0.3).build();
-  private static final SiteRepository repo = testModel
-    .siteRepositoryBuilder()
+  private static final RegularStop STOP_X = TEST_MODEL.stop("X").withCoordinate(0, -0.1).build();
+  private static final RegularStop STOP_Y = TEST_MODEL.stop("Y").withCoordinate(0, 0.3).build();
+  private static final SiteRepository REPO = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStops(
-      List.of(stopA, stopB, stopC, stopD, stopE, stopF, stopG, stopH, stopBL, stopBR, stopX, stopY)
+      List.of(
+        STOP_A,
+        STOP_B,
+        STOP_C,
+        STOP_D,
+        STOP_E,
+        STOP_F,
+        STOP_G,
+        STOP_H,
+        STOP_BL,
+        STOP_BR,
+        STOP_X,
+        STOP_Y
+      )
     )
     .build();
 
@@ -62,25 +72,25 @@ class GeometryProcessorTest {
     return Stream.of(
       Arguments.argumentSet(
         "empty shape",
-        List.of(stopA, stopB, stopC),
+        List.of(STOP_A, STOP_B, STOP_C),
         List.of(),
         List.of(makeLineString(0, 0, 0, 0.1), makeLineString(0, 0.1, 0, 0.2))
       ),
       Arguments.argumentSet(
         "shape point exactly at stops",
-        List.of(stopA, stopB, stopC),
+        List.of(STOP_A, STOP_B, STOP_C),
         List.of(new ShapePoint(0, 0, 0, null), new ShapePoint(1, 0.2, 0, null)),
         List.of(makeLineString(0, 0, 0, 0.1), makeLineString(0, 0.1, 0, 0.2))
       ),
       Arguments.argumentSet(
         "intermediate stop in the middle of a segment",
-        List.of(stopA, stopB, stopC),
+        List.of(STOP_A, STOP_B, STOP_C),
         List.of(new ShapePoint(0, 0, 0, null), new ShapePoint(1, 0.3, 0, null)),
         List.of(makeLineString(0, 0, 0, 0.1), makeLineString(0, 0.1, 0, 0.2))
       ),
       Arguments.argumentSet(
         "zigzag shape",
-        List.of(stopA, stopB, stopC),
+        List.of(STOP_A, STOP_B, STOP_C),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0, 0.1, null),
@@ -96,7 +106,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "simple double-back",
-        List.of(stopA, stopB, stopC, stopB, stopA),
+        List.of(STOP_A, STOP_B, STOP_C, STOP_B, STOP_A),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0.2, 0, null),
@@ -111,7 +121,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "double-back with stops on both sides of the road",
-        List.of(stopA, stopBL, stopC, stopBR, stopA),
+        List.of(STOP_A, STOP_BL, STOP_C, STOP_BR, STOP_A),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0.2, 0, null),
@@ -126,7 +136,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "double-back at a turning circle further than the stop",
-        List.of(stopA, stopC, stopA),
+        List.of(STOP_A, STOP_C, STOP_A),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0.3, 0, null),
@@ -140,7 +150,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "double-back at a turning circle further than the stop with two stops",
-        List.of(stopA, stopC, stopB, stopA),
+        List.of(STOP_A, STOP_C, STOP_B, STOP_A),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0.3, 0, null),
@@ -155,7 +165,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "calling on the other side of the road after turning back",
-        List.of(stopA, stopBR, stopA),
+        List.of(STOP_A, STOP_BR, STOP_A),
         // driving on the left, carriages approx. 2 m apart
         List.of(
           new ShapePoint(0, 0, -9e-6, null),
@@ -171,7 +181,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "simple loop",
-        List.of(stopA, stopB, stopC, stopD, stopE, stopF, stopG, stopH, stopA),
+        List.of(STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H, STOP_A),
         List.of(
           new ShapePoint(0, 0, 0, null),
           new ShapePoint(1, 0.2, 0, null),
@@ -192,7 +202,7 @@ class GeometryProcessorTest {
       ),
       Arguments.argumentSet(
         "loop and continue, passing some stops non-stop",
-        List.of(stopY, stopA, stopB, stopC, stopD, stopE, stopF, stopG, stopH, stopX),
+        List.of(STOP_Y, STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H, STOP_X),
         List.of(
           new ShapePoint(0, 0, 0.3, null),
           new ShapePoint(1, 0, 0, null),
@@ -216,19 +226,19 @@ class GeometryProcessorTest {
       Arguments.argumentSet(
         "loop and continue with double calling",
         List.of(
-          stopY,
-          stopG,
-          stopH,
-          stopA,
-          stopB,
-          stopC,
-          stopD,
-          stopE,
-          stopF,
-          stopG,
-          stopH,
-          stopA,
-          stopX
+          STOP_Y,
+          STOP_G,
+          STOP_H,
+          STOP_A,
+          STOP_B,
+          STOP_C,
+          STOP_D,
+          STOP_E,
+          STOP_F,
+          STOP_G,
+          STOP_H,
+          STOP_A,
+          STOP_X
         ),
         List.of(
           new ShapePoint(0, 0, 0.3, null),
@@ -259,12 +269,12 @@ class GeometryProcessorTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void test(List<RegularStop> stops, List<ShapePoint> shapePoints, List<LineString> expected) {
-    var builder = new TransitDataImportBuilder(repo, NOOP);
+    var builder = new TransitDataImportBuilder(REPO, NOOP);
 
     var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
     var stopTimes = IntStream.range(0, stops.size())
-      .mapToObj(index -> testModel.stopTime(trip, index, stops.get(index)))
+      .mapToObj(index -> TEST_MODEL.stopTime(trip, index, stops.get(index)))
       .toList();
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
@@ -278,14 +288,14 @@ class GeometryProcessorTest {
 
   @Test
   void testShapeDistance() {
-    var builder = new TransitDataImportBuilder(repo, NOOP);
+    var builder = new TransitDataImportBuilder(REPO, NOOP);
 
     var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
     var stopTimes = List.of(
-      testModel.stopTime(trip, 0, stopA),
-      testModel.stopTime(trip, 1, stopB),
-      testModel.stopTime(trip, 2, stopA)
+      TEST_MODEL.stopTime(trip, 0, STOP_A),
+      TEST_MODEL.stopTime(trip, 1, STOP_B),
+      TEST_MODEL.stopTime(trip, 2, STOP_A)
     );
     stopTimes.get(0).setShapeDistTraveled(0);
     stopTimes.get(1).setShapeDistTraveled(3);
@@ -317,7 +327,7 @@ class GeometryProcessorTest {
   @Test
   void ignoreInvalidReference() {
     var issueStore = new DefaultDataImportIssueStore();
-    var builder = new TransitDataImportBuilder(repo, issueStore);
+    var builder = new TransitDataImportBuilder(REPO, issueStore);
     builder
       .getShapePoints()
       .put(SHAPE_ID, List.of(new ShapePoint(0, 0, 0, 0.0), new ShapePoint(1, 1, 1, 1.0)));
@@ -325,7 +335,7 @@ class GeometryProcessorTest {
     var invalidRef = id("unknown");
     var trip = TimetableRepositoryForTest.trip("t").withShapeId(invalidRef).build();
 
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "8:00");
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "8:00");
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
     var processor = new GeometryProcessor(builder, 150, issueStore);

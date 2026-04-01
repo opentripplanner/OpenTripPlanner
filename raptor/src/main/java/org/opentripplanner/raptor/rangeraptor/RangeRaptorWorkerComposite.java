@@ -55,17 +55,6 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorRouterResult<T> result() {
-    if (result == null) {
-      this.result = new RouterResultPathAggregator(
-        children.stream().map(RangeRaptorWorker::result).toList(),
-        comparator
-      );
-    }
-    return result;
-  }
-
-  @Override
   public boolean hasMoreRounds() {
     for (RangeRaptorWorker<T> child : children) {
       if (child.hasMoreRounds()) {
@@ -76,16 +65,44 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void findTransitForRound() {
+  public void applyStreetStopAccess() {
     for (RangeRaptorWorker<T> child : children) {
-      child.findTransitForRound();
+      child.applyStreetStopAccess();
     }
   }
 
   @Override
-  public void findTransfersForRound() {
+  public void applyOnBoardStopAccess() {
     for (RangeRaptorWorker<T> child : children) {
-      child.findTransfersForRound();
+      child.applyOnBoardStopAccess();
+    }
+  }
+
+  @Override
+  public void applyOnBoardTripAccess(int iterationDepartureTime) {
+    for (RangeRaptorWorker<T> child : children) {
+      child.applyOnBoardTripAccess(iterationDepartureTime);
+    }
+  }
+
+  @Override
+  public void routeTransit() {
+    for (RangeRaptorWorker<T> child : children) {
+      child.routeTransit();
+    }
+  }
+
+  @Override
+  public void routeTransitUsingOnBoardTripAccess() {
+    for (RangeRaptorWorker<T> child : children) {
+      child.routeTransitUsingOnBoardTripAccess();
+    }
+  }
+
+  @Override
+  public void applyTransfers() {
+    for (RangeRaptorWorker<T> child : children) {
+      child.applyTransfers();
     }
   }
 
@@ -100,16 +117,13 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void findAccessOnStreetForRound() {
-    for (RangeRaptorWorker<T> child : children) {
-      child.findAccessOnStreetForRound();
+  public RaptorRouterResult<T> result() {
+    if (result == null) {
+      this.result = new RouterResultPathAggregator(
+        children.stream().map(RangeRaptorWorker::result).toList(),
+        comparator
+      );
     }
-  }
-
-  @Override
-  public void findAccessOnBoardForRound() {
-    for (RangeRaptorWorker<T> child : children) {
-      child.findAccessOnBoardForRound();
-    }
+    return result;
   }
 }

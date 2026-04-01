@@ -16,7 +16,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class GermanyMapperTest {
 
-  static final WayPropertySet wps = new GermanyMapper().buildWayPropertySet();
+  static final WayPropertySet WPS = new GermanyMapper().buildWayPropertySet();
   static float epsilon = 0.01f;
 
   /**
@@ -36,7 +36,7 @@ public class GermanyMapperTest {
       way.addTag("lit", "yes");
       way.addTag("oneway", "no");
       way.addTag("traffic_sign", "DE:239,1022-10");
-      assertEquals(1.2, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
+      assertEquals(1.2, WPS.getDataForWay(way).forward().bicycleSafety(), epsilon);
     }
 
     @Test
@@ -56,9 +56,9 @@ public class GermanyMapperTest {
       way.addTag("surface", "asphalt");
       way.addTag("width", "6.5");
       way.addTag("zone:traffic", "DE:urban");
-      assertEquals(0.9, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
+      assertEquals(0.9, WPS.getDataForWay(way).forward().bicycleSafety(), epsilon);
       // walk safety should be default
-      assertEquals(1, wps.getDataForWay(way).forward().walkSafety(), epsilon);
+      assertEquals(1, WPS.getDataForWay(way).forward().walkSafety(), epsilon);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class GermanyMapperTest {
       way.addTag("source:maxspeed", "sign");
       way.addTag("surface", "asphalt");
       way.addTag("tracktype", "grade1");
-      assertEquals(0.693, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
+      assertEquals(0.693, WPS.getDataForWay(way).forward().bicycleSafety(), epsilon);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class GermanyMapperTest {
       way.addTag("tracktype", "grade1");
       way.addTag("traffic_sign", "DE:260,1026-36");
       way.addTag("width", "2.5");
-      assertEquals(1.0, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
+      assertEquals(1.0, WPS.getDataForWay(way).forward().bicycleSafety(), epsilon);
     }
   }
 
@@ -103,7 +103,7 @@ public class GermanyMapperTest {
     way.addTag("tracktype", "grade1");
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(way).getPermission()
+      WPS.getDataForEntity(way).getPermission()
     );
 
     // https://www.openstreetmap.org/way/5155805
@@ -130,7 +130,7 @@ public class GermanyMapperTest {
     way.addTag("width:lanes:forward", "|1.4");
     way.addTag("zone:traffic", "DE:urban");
 
-    assertEquals(ALL, wps.getDataForEntity(way).getPermission());
+    assertEquals(ALL, WPS.getDataForEntity(way).getPermission());
   }
 
   @Nested
@@ -154,14 +154,14 @@ public class GermanyMapperTest {
       residential.addTag("highway", "residential");
 
       assertEquals(
-        wps.getDataForWay(both).forward().bicycleSafety(),
-        wps.getDataForWay(justLcn).forward().bicycleSafety(),
+        WPS.getDataForWay(both).forward().bicycleSafety(),
+        WPS.getDataForWay(justLcn).forward().bicycleSafety(),
         epsilon
       );
 
-      assertEquals(0.6859, wps.getDataForWay(both).forward().bicycleSafety(), epsilon);
+      assertEquals(0.6859, WPS.getDataForWay(both).forward().bicycleSafety(), epsilon);
 
-      assertEquals(0.98, wps.getDataForWay(residential).forward().bicycleSafety(), epsilon);
+      assertEquals(0.98, WPS.getDataForWay(residential).forward().bicycleSafety(), epsilon);
     }
 
     @Test
@@ -191,32 +191,32 @@ public class GermanyMapperTest {
       residential.addTag("highway", "residential");
 
       assertEquals(
-        wps.getDataForWay(justCyclestreet).forward().bicycleSafety(),
-        wps.getDataForWay(justLcn).forward().bicycleSafety(),
+        WPS.getDataForWay(justCyclestreet).forward().bicycleSafety(),
+        WPS.getDataForWay(justLcn).forward().bicycleSafety(),
         epsilon
       );
 
       assertEquals(
-        wps.getDataForWay(both).forward().bicycleSafety(),
-        wps.getDataForWay(justBicycleRoad).forward().bicycleSafety(),
+        WPS.getDataForWay(both).forward().bicycleSafety(),
+        WPS.getDataForWay(justBicycleRoad).forward().bicycleSafety(),
         epsilon
       );
 
       assertEquals(
-        wps.getDataForWay(both).forward().bicycleSafety(),
-        wps.getDataForWay(justCyclestreet).forward().bicycleSafety(),
+        WPS.getDataForWay(both).forward().bicycleSafety(),
+        WPS.getDataForWay(justCyclestreet).forward().bicycleSafety(),
         epsilon
       );
 
       assertEquals(
-        wps.getDataForWay(both).forward().bicycleSafety(),
-        wps.getDataForWay(justLcn).forward().bicycleSafety(),
+        WPS.getDataForWay(both).forward().bicycleSafety(),
+        WPS.getDataForWay(justLcn).forward().bicycleSafety(),
         epsilon
       );
 
-      assertEquals(0.6859, wps.getDataForWay(both).forward().bicycleSafety(), epsilon);
+      assertEquals(0.6859, WPS.getDataForWay(both).forward().bicycleSafety(), epsilon);
 
-      assertEquals(0.98, wps.getDataForWay(residential).forward().bicycleSafety(), epsilon);
+      assertEquals(0.98, WPS.getDataForWay(residential).forward().bicycleSafety(), epsilon);
     }
   }
 
@@ -226,15 +226,15 @@ public class GermanyMapperTest {
     var residential = new OsmWay();
     residential.addTag("highway", "residential");
     residential.addTag("junction", "roundabout");
-    assertEquals(ALL, wps.getDataForWay(residential).forward().getPermission());
-    assertEquals(PEDESTRIAN, wps.getDataForWay(residential).backward().getPermission());
+    assertEquals(ALL, WPS.getDataForWay(residential).forward().getPermission());
+    assertEquals(PEDESTRIAN, WPS.getDataForWay(residential).backward().getPermission());
 
     //https://www.openstreetmap.org/way/31109939
     var primary = new OsmWay();
     primary.addTag("highway", "primary");
     primary.addTag("junction", "roundabout");
-    assertEquals(BICYCLE_AND_CAR, wps.getDataForWay(primary).forward().getPermission());
-    assertEquals(NONE, wps.getDataForWay(primary).backward().getPermission());
+    assertEquals(BICYCLE_AND_CAR, WPS.getDataForWay(primary).forward().getPermission());
+    assertEquals(NONE, WPS.getDataForWay(primary).backward().getPermission());
   }
 
   @Test
@@ -247,8 +247,8 @@ public class GermanyMapperTest {
     residential.addTag("name", "Auf der Heide");
     residential.addTag("surface", "asphalt");
     assertEquals(
-      wps.getDataForWay(residential).forward().bicycleSafety(),
-      wps.getDataForWay(residential).backward().bicycleSafety(),
+      WPS.getDataForWay(residential).forward().bicycleSafety(),
+      WPS.getDataForWay(residential).backward().bicycleSafety(),
       epsilon
     );
   }
@@ -258,7 +258,7 @@ public class GermanyMapperTest {
     // https://www.openstreetmap.org/way/64359102
     var steps = new OsmWay();
     steps.addTag("highway", "steps");
-    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForEntity(steps).getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, WPS.getDataForEntity(steps).getPermission());
   }
 
   @Test
@@ -272,7 +272,7 @@ public class GermanyMapperTest {
     alzentalstr.addTag("surface", "asphalt");
     assertEquals(
       8.33333969116211,
-      wps.getCarSpeedForWay(alzentalstr, TraverseDirection.FORWARD),
+      WPS.getCarSpeedForWay(alzentalstr, TraverseDirection.FORWARD),
       epsilon
     );
 
@@ -281,7 +281,7 @@ public class GermanyMapperTest {
     autobahn.addTag("maxspeed", "none");
     assertEquals(
       33.33000183105469,
-      wps.getCarSpeedForWay(autobahn, TraverseDirection.FORWARD),
+      WPS.getCarSpeedForWay(autobahn, TraverseDirection.FORWARD),
       epsilon
     );
   }
@@ -294,8 +294,8 @@ public class GermanyMapperTest {
     var way = new OsmWay();
     way.addTag("public_transport", "platform");
     way.addTag("area", "yes");
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(way).getPermission());
+    assertEquals(PEDESTRIAN, WPS.getDataForEntity(way).getPermission());
     way.addTag("bicycle", "yes");
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(way).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, WPS.getDataForEntity(way).getPermission());
   }
 }

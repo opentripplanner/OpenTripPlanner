@@ -32,12 +32,12 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DirectTransitRequestMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -47,6 +47,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -136,7 +137,8 @@ public class TransitRouter {
     );
 
     // Prepare transit search
-    var raptorRequest = RaptorRequestMapper.<TripSchedule>mapRequest(
+
+    var mapper = RaptorRequestMapper.<TripSchedule>of(
       request,
       transitSearchTimeZero,
       serverContext.raptorConfig().isMultiThreaded(),
@@ -147,8 +149,9 @@ public class TransitRouter {
       this::listStopIndexes,
       linkingContext
     );
+    var raptorRequest = mapper.mapRaptorRequest();
 
-    // Route transit
+    // Transit routing using Raptor
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
       createExtraMcRouterSearch(accessEgresses, raptorTransitData)
@@ -157,9 +160,26 @@ public class TransitRouter {
 
     checkIfTransitConnectionExists(transitResponse);
 
+    Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
+
     debugTimingAggregator.finishedRaptorSearch();
 
-    Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
+    // Route Direct transit
+    var directRequest = DirectTransitRequestMapper.map(
+      request,
+      transitResponse.requestUsed().searchParams()
+    );
+    if (directRequest.isPresent()) {
+      debugTimingAggregator.startedDirectTransitSearch();
+      var directPaths = raptorService.findAllDirectTransit(
+        directRequest.get(),
+        requestTransitDataProvider
+      );
+      paths = new ArrayList<>(paths);
+      paths.addAll(directPaths);
+      debugTimingAggregator.finishedDirectTransitSearch();
+    }
+    debugTimingAggregator.startedItineraryCreation();
 
     // TODO VIA - Temporarily turn OptimizeTransfers OFF for VIA search until the service support via
     //            Remove '&& !request.isViaSearch()'
@@ -173,13 +193,13 @@ public class TransitRouter {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         raptorTransitData::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
-        serverContext.transitService().getTransferService(),
+        serverContext.transitService().getConstrainedTransferService(),
         requestTransitDataProvider,
         raptorTransitData.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
         raptorRequest.searchParams().viaLocations()
       );
-      paths = service.optimize(transitResponse.paths());
+      paths = service.optimize(paths);
     }
 
     // Create itineraries
@@ -274,7 +294,7 @@ public class TransitRouter {
 
     var nearbyStops = accessEgressRouter.findAccessEgresses(
       accessRequest,
-      streetRequest,
+      streetRequest.mode(),
       serverContext.listExtensionRequestContexts(accessRequest),
       type,
       durationLimit,

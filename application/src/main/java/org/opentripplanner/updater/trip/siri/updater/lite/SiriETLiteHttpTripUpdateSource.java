@@ -5,8 +5,8 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientException;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;

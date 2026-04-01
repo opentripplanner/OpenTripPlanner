@@ -22,8 +22,6 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -32,12 +30,12 @@ import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -49,6 +47,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ class WalkableAreaBuilder {
   private final SafetyValueNormalizer normalizer;
 
   // template for AreaEdge names
-  private static final String labelTemplate = "way (area) %s from %s to %s";
+  private static final String LABEL_TEMPLATE = "way (area) %s from %s to %s";
 
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
@@ -381,7 +380,7 @@ class WalkableAreaBuilder {
       mode = StreetMode.CAR;
     }
     // TODO: This is incorrect, the configured defaults are not used.
-    RouteRequest request = RouteRequest.defaultValue();
+    var request = StreetSearchRequest.of().withMode(mode).build();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
@@ -389,7 +388,6 @@ class WalkableAreaBuilder {
         .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .withDominanceFunction(new DominanceFunctions.EarliestArrival())
         .withRequest(request)
-        .withStreetRequest(new StreetRequest(mode))
         .withFrom(vertex)
         .getShortestPathTree();
 
@@ -492,7 +490,7 @@ class WalkableAreaBuilder {
       return Set.of();
     }
     String label = String.format(
-      labelTemplate,
+      LABEL_TEMPLATE,
       parent.getId(),
       vertex1.getLabel(),
       vertex2.getLabel()
@@ -518,7 +516,7 @@ class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    label = String.format(labelTemplate, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
+    label = String.format(LABEL_TEMPLATE, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
     name = namer.getName(parent, label);
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)

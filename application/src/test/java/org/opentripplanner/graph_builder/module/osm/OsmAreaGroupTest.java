@@ -42,23 +42,23 @@ class OsmAreaGroupTest {
     new OsmLevel(1.0, "1", OsmLevelSource.LEVEL_TAG)
   );
 
-  private static final TLongObjectHashMap<OsmNode> nodes = new TLongObjectHashMap<>();
+  private static final TLongObjectHashMap<OsmNode> NODES = new TLongObjectHashMap<>();
 
   static {
-    nodes.put(1, new OsmNode(0, 0));
-    nodes.put(2, new OsmNode(0, 1));
-    nodes.put(3, new OsmNode(1, 1));
-    nodes.put(4, new OsmNode(1, 0));
-    nodes.put(5, new OsmNode(-0.5, -1));
-    nodes.put(6, new OsmNode(-1, 0));
-    nodes.put(7, new OsmNode(1, 2));
-    nodes.put(8, new OsmNode(2, 2));
-    nodes.put(9, new OsmNode(2, 0));
-    nodes.put(10, new OsmNode(0, 2));
-    nodes.put(11, new OsmNode(-1, 3));
+    NODES.put(1, new OsmNode(0, 0));
+    NODES.put(2, new OsmNode(0, 1));
+    NODES.put(3, new OsmNode(1, 1));
+    NODES.put(4, new OsmNode(1, 0));
+    NODES.put(5, new OsmNode(-0.5, -1));
+    NODES.put(6, new OsmNode(-1, 0));
+    NODES.put(7, new OsmNode(1, 2));
+    NODES.put(8, new OsmNode(2, 2));
+    NODES.put(9, new OsmNode(2, 0));
+    NODES.put(10, new OsmNode(0, 2));
+    NODES.put(11, new OsmNode(-1, 3));
 
-    for (var key : nodes.keys()) {
-      nodes.get(key).setId(key);
+    for (var key : NODES.keys()) {
+      NODES.get(key).setId(key);
     }
 
     L0_1_2_3_4_1.addTag("highway", "living_street");
@@ -154,7 +154,7 @@ class OsmAreaGroupTest {
     BOLLARD_1_2_3.addTag("barrier", "bollard");
   }
 
-  private static final OsmProvider osmProvider = new TestOsmProvider(
+  private static final OsmProvider OSM_PROVIDER = new TestOsmProvider(
     List.of(),
     List.of(
       L0_1_2_3_4_1,
@@ -173,7 +173,7 @@ class OsmAreaGroupTest {
       BARRIER_3_1,
       BOLLARD_1_2_3
     ),
-    nodes.valueCollection().stream().toList()
+    NODES.valueCollection().stream().toList()
   );
 
   @Test
@@ -326,14 +326,14 @@ class OsmAreaGroupTest {
   }
 
   private static OsmArea createArea(OsmWay closedWay) {
-    return new OsmArea(closedWay, List.of(closedWay), List.of(), nodes);
+    return new OsmArea(closedWay, List.of(closedWay), List.of(), NODES);
   }
 
   private static Multimap<OsmNode, OsmWay> generateBarrierMap(OsmWay... barriers) {
     Multimap<OsmNode, OsmWay> result = HashMultimap.create();
     for (var barrier : barriers) {
       for (var nid : barrier.getNodeRefs().toArray()) {
-        result.put(nodes.get(nid), barrier);
+        result.put(NODES.get(nid), barrier);
       }
     }
     return result;

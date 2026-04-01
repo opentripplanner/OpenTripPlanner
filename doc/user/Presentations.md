@@ -1,6 +1,7 @@
 # Presentations related to OpenTripPlanner
 
 ## Presentations in English
+* [Many talks from the OpenTripPlanner Summit in Helsinki. September, 2025](https://media.ccc.de/c/otp2025)
 * [OpenTripPlanner past, present and the future. FOSDEM. Hannes Junnila. February, 2023](https://fosdem.org/2023/schedule/event/rot_opentripplanner/)
 * [OpenTripPlanner 2.2 webinar. Thomas Gran, Hannes Junnila and Leonard Ehrenfried. October, 2022](https://drive.google.com/file/d/1Gu5c2a95MF2xuZLSYdjcDjxbIaW5U5fZ/view)
 * [Use of OpenTripPlanner in Norway. Andreas Tryti, Andrew Byrd and Brede Dammen. March, 2021](https://www.youtube.com/watch?v=LSFFzHNHjZM)

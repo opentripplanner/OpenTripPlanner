@@ -12,16 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.DefaultTransferService;
-import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPriority;
-import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
+import org.opentripplanner.transfer.constrained.model.TransferPriority;
+import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class InterlineProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(InterlineProcessor.class);
-  private final DefaultTransferService transferService;
+  private final ConstrainedTransferService transferService;
   private final int maxInterlineDistance;
   private final DataImportIssueStore issueStore;
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed;
@@ -43,7 +43,7 @@ public class InterlineProcessor {
   private final Map<FeedScopedId, BitSet> daysOfServices = new HashMap<>();
 
   public InterlineProcessor(
-    DefaultTransferService transferService,
+    ConstrainedTransferService transferService,
     List<StaySeatedNotAllowed> staySeatedNotAllowed,
     int maxInterlineDistance,
     DataImportIssueStore issueStore,

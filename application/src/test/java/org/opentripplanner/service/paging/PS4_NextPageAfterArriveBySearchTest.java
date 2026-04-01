@@ -1,6 +1,6 @@
 package org.opentripplanner.service.paging;
 
-import static org.opentripplanner.service.paging.TestPagingModel.D30m;
+import static org.opentripplanner.service.paging.TestPagingModel.D30_m;
 import static org.opentripplanner.service.paging.TestPagingModel.T16_15_00;
 import static org.opentripplanner.service.paging.TestPagingModel.T16_30_00;
 import static org.opentripplanner.service.paging.TestPagingModel.T17_30_00;
@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
 
 class PS4_NextPageAfterArriveBySearchTest {
 
-  private static final Duration SEARCH_WINDOW_USED = D30m;
+  private static final Duration SEARCH_WINDOW_USED = D30_m;
   private final TestPagingModel model = TestPagingModel.testDataWithFewItinerariesCaseC();
 
   @Test

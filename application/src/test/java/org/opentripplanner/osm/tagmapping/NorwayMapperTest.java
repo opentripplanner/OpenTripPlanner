@@ -17,7 +17,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class NorwayMapperTest {
 
-  static final WayPropertySet wps = new NorwayMapper().buildWayPropertySet();
+  static final WayPropertySet WPS = new NorwayMapper().buildWayPropertySet();
 
   static int[] expectedMaxspeeds = { 90, 80, 70, 60, 50, 40, 30 };
 
@@ -89,22 +89,22 @@ public class NorwayMapperTest {
   @ParameterizedTest(name = "{0} should have a score of {1}")
   @MethodSource("createExpectedBicycleSafetyForMaxspeedCases")
   public void testBicycleSafetyForMaxspeed(OsmEntity way, Double expected) {
-    var result = wps.getDataForEntity(way).bicycleSafety();
+    var result = WPS.getDataForEntity(way).bicycleSafety();
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("createBicycleSafetyWithoutExplicitMaxspeed")
   public void testBicycleSafetyWithoutMaxspeed(OsmEntity way, Double expected) {
-    var result = wps.getDataForEntity(way).bicycleSafety();
+    var result = WPS.getDataForEntity(way).bicycleSafety();
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("createLinkRoadLikeMainCases")
   public void testBicycleSafetyLikeLinkRoad(OsmEntity mainRoad, OsmEntity linkRoad) {
-    var resultMain = wps.getDataForEntity(mainRoad).bicycleSafety();
-    var resultLink = wps.getDataForEntity(linkRoad).bicycleSafety();
+    var resultMain = WPS.getDataForEntity(mainRoad).bicycleSafety();
+    var resultLink = WPS.getDataForEntity(linkRoad).bicycleSafety();
 
     assertEquals(resultMain, resultLink);
   }
@@ -114,7 +114,7 @@ public class NorwayMapperTest {
     var way = new OsmEntityForTest();
     way.addTag("highway", "trunk");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(way).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(way).getPermission());
   }
 
   @Test
@@ -124,13 +124,13 @@ public class NorwayMapperTest {
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "3");
 
-    assertEquals(StreetTraversalPermission.NONE, wps.getDataForEntity(way1).getPermission());
+    assertEquals(StreetTraversalPermission.NONE, WPS.getDataForEntity(way1).getPermission());
 
     var way2 = new OsmEntityForTest();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "3");
 
-    assertEquals(StreetTraversalPermission.NONE, wps.getDataForEntity(way2).getPermission());
+    assertEquals(StreetTraversalPermission.NONE, WPS.getDataForEntity(way2).getPermission());
   }
 
   @Test
@@ -139,13 +139,13 @@ public class NorwayMapperTest {
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "1");
 
-    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForEntity(way1).getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, WPS.getDataForEntity(way1).getPermission());
 
     var way2 = new OsmEntityForTest();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "1");
 
-    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForEntity(way2).getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, WPS.getDataForEntity(way2).getPermission());
   }
 
   @Test
@@ -154,20 +154,20 @@ public class NorwayMapperTest {
     way1.addTag("highway", "trunk");
     way1.addTag("motorroad", "yes");
 
-    assertEquals(StreetTraversalPermission.CAR, wps.getDataForEntity(way1).getPermission());
+    assertEquals(StreetTraversalPermission.CAR, WPS.getDataForEntity(way1).getPermission());
 
     var way2 = new OsmEntityForTest();
     way2.addTag("highway", "primary");
     way2.addTag("motorroad", "yes");
 
-    assertEquals(StreetTraversalPermission.CAR, wps.getDataForEntity(way2).getPermission());
+    assertEquals(StreetTraversalPermission.CAR, WPS.getDataForEntity(way2).getPermission());
   }
 
   @Test
   public void testFootway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.footway()).getPermission()
+      WPS.getDataForEntity(WayTestData.footway()).getPermission()
     );
   }
 
@@ -175,7 +175,7 @@ public class NorwayMapperTest {
   public void testCycleway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.cycleway()).getPermission()
+      WPS.getDataForEntity(WayTestData.cycleway()).getPermission()
     );
   }
 
@@ -183,7 +183,7 @@ public class NorwayMapperTest {
   public void testBridleway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.bridleway()).getPermission()
+      WPS.getDataForEntity(WayTestData.bridleway()).getPermission()
     );
   }
 }

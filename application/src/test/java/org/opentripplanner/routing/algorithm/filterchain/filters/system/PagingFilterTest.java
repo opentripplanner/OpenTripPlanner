@@ -40,13 +40,13 @@ public class PagingFilterTest implements PlanTestConstants {
   private static final int LATE_END = T11_12;
 
   /** [11:04, 11:07, $300, Tx0, transit] */
-  private static final Itinerary early = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
+  private static final Itinerary EARLY = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
 
   /**  [11:03, 11:10, $636, Tx1, transit] */
-  private static final Itinerary middle = createMiddle(636);
+  private static final Itinerary MIDDLE = createMiddle(636);
 
   /** [11:00, 11:12, $840, Tx0, transit] */
-  private static final Itinerary late = newItinerary(A).bus(3, LATE_START, LATE_END, D).build();
+  private static final Itinerary LATE = newItinerary(A).bus(3, LATE_START, LATE_END, D).build();
 
   private static PagingFilter pagingFilter;
 
@@ -65,7 +65,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
   @BeforeEach
   public void setup() {
-    pagingFilter = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, middle);
+    pagingFilter = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, MIDDLE);
   }
 
   @Test
@@ -75,20 +75,20 @@ public class PagingFilterTest implements PlanTestConstants {
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithEarlierArrival() {
-    List<Itinerary> itineraries = List.of(early, middle, late);
+    List<Itinerary> itineraries = List.of(EARLY, MIDDLE, LATE);
 
     itineraries.forEach(it -> TestDebug.println(it.keyAsString()));
-    assertEquals(toStr(List.of(late)), toStr(pagingFilter.removeMatchesForTest(itineraries)));
+    assertEquals(toStr(List.of(LATE)), toStr(pagingFilter.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLowerGeneralizedCost() {
-    Itinerary middleHighCost = createMiddle(middle.generalizedCost() + 1);
+    Itinerary middleHighCost = createMiddle(MIDDLE.generalizedCost() + 1);
 
-    List<Itinerary> itineraries = List.of(middleHighCost, middle, late);
+    List<Itinerary> itineraries = List.of(middleHighCost, MIDDLE, LATE);
 
     assertEquals(
-      toStr(List.of(middleHighCost, late)),
+      toStr(List.of(middleHighCost, LATE)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
@@ -98,15 +98,15 @@ public class PagingFilterTest implements PlanTestConstants {
     int t0 = MIDDLE_START;
 
     Itinerary middleHighNumberOfTransfers = newItinerary(A)
-      .bus(21, t0, t0 + D1m, B)
-      .bus(22, t0 + D2m, t0 + D3m, C)
-      .bus(23, t0 + D4m, MIDDLE_END, D)
-      .build(middle.generalizedCost());
+      .bus(21, t0, t0 + D1_m, B)
+      .bus(22, t0 + D2_m, t0 + D3_m, C)
+      .bus(23, t0 + D4_m, MIDDLE_END, D)
+      .build(MIDDLE.generalizedCost());
 
-    List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, middle, late);
+    List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, MIDDLE, LATE);
 
     assertEquals(
-      toStr(List.of(middleHighNumberOfTransfers, late)),
+      toStr(List.of(middleHighNumberOfTransfers, LATE)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
@@ -115,14 +115,14 @@ public class PagingFilterTest implements PlanTestConstants {
   public void testPotentialDuplicateMarkedForDeletionWithLaterDepartureTime() {
     int t0 = MIDDLE_START;
     Itinerary middleEarlierDepartureTime = newItinerary(A)
-      .bus(2, t0 - D1m, t0 + D3m, B)
-      .bus(21, t0 + D4m, MIDDLE_END, C)
-      .build(middle.generalizedCost());
+      .bus(2, t0 - D1_m, t0 + D3_m, B)
+      .bus(21, t0 + D4_m, MIDDLE_END, C)
+      .build(MIDDLE.generalizedCost());
 
-    List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, middle, late);
+    List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, MIDDLE, LATE);
 
     assertEquals(
-      toStr(List.of(middleEarlierDepartureTime, late)),
+      toStr(List.of(middleEarlierDepartureTime, LATE)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
@@ -266,8 +266,8 @@ public class PagingFilterTest implements PlanTestConstants {
 
   private static TestItineraryBuilder createMiddleBuilder() {
     return newItinerary(A)
-      .bus(2, MIDDLE_START, MIDDLE_START + D2m, B)
-      .bus(21, MIDDLE_END - D3m, MIDDLE_END, D);
+      .bus(2, MIDDLE_START, MIDDLE_START + D2_m, B)
+      .bus(21, MIDDLE_END - D3_m, MIDDLE_END, D);
   }
 
   private static void assertItineraryEq(Itinerary expected, Itinerary actual) {

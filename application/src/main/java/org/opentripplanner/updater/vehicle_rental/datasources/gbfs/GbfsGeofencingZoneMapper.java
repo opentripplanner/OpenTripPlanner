@@ -7,9 +7,9 @@ import org.geojson.MultiPolygon;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.UnsupportedGeometryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

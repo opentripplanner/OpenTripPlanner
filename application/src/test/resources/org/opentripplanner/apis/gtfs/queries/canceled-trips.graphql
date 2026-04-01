@@ -1,5 +1,5 @@
 {
-  canceledTrips(first: 2, filters: { include: [{ modes: [BUS] }] }) {
+  canceledTrips(first: 2, filters: [{ include: [{ modes: [BUS] }] }]) {
     pageInfo {
       hasNextPage
       hasPreviousPage

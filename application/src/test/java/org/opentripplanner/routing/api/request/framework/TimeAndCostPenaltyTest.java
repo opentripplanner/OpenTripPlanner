@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -14,8 +14,8 @@ class TimeAndCostPenaltyTest {
 
   private static final double COST_FACTOR = 2.5;
   private static final double TIME_COEFFICIENT = 1.6;
-  private static final Duration D55s = Duration.ofSeconds(55);
-  public static final TimePenalty TIME_PENALTY = TimePenalty.of(D55s, TIME_COEFFICIENT);
+  private static final Duration D55_s = Duration.ofSeconds(55);
+  public static final TimePenalty TIME_PENALTY = TimePenalty.of(D55_s, TIME_COEFFICIENT);
 
   private final TimeAndCostPenalty subject = new TimeAndCostPenalty(TIME_PENALTY, COST_FACTOR);
 

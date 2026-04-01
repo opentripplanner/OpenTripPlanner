@@ -12,12 +12,12 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.CompactLineStringUtils;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.street.geometry.CompactLineStringUtils;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -108,7 +108,6 @@ public final class TripPattern
 
   private final boolean realTimeTripPattern;
   private final boolean stopPatternModifiedInRealTime;
-
   private final RoutingTripPattern routingTripPattern;
 
   TripPattern(TripPatternBuilder builder) {
@@ -419,7 +418,12 @@ public final class TripPattern
    * SiriTripPatternCache.
    *
    * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
+   *
+   * TODO RT_VP: this method is unreliable due to a design flaw in the current implementation of
+   *             {@link org.opentripplanner.updater.trip.patterncache.TripPatternCache}
+   *             See comment in TripPatternCache.
    */
+  @Deprecated
   @Nullable
   public TripPattern getOriginalTripPattern() {
     return originalTripPattern;

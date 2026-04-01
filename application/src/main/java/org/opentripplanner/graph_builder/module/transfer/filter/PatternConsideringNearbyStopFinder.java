@@ -5,8 +5,8 @@ import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.service.TransitService;
@@ -49,7 +49,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
-    StreetRequest streetRequest,
+    StreetMode streetMode,
     boolean reverseDirection
   ) {
     if (!(vertex instanceof TransitStopVertex stopVertex)) {
@@ -67,7 +67,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     var nearbyStops = delegateNearbyStopFinder.findNearbyStops(
       vertex,
       routingRequest,
-      streetRequest,
+      streetMode,
       reverseDirection
     );
 

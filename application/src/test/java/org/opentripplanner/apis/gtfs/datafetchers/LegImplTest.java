@@ -32,7 +32,7 @@ class LegImplTest implements PlanTestConstants {
 
   private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
   private static final AreaStop AREA_STOP = MODEL.areaStop("a1").build();
-  private static final RegularStop REGULAR_STOP = MODEL.stop("r1").build();
+  private static final RegularStop REGULAR_STOP = MODEL.stop("r1", 60.0, 10.0).build();
   private static final GroupStop GROUP_STOP = MODEL.groupStop("g1", REGULAR_STOP);
   private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     REGULAR_STOP,
@@ -60,7 +60,6 @@ class LegImplTest implements PlanTestConstants {
     .withEndTime(TIME)
     .withZoneId(TIME.getZone())
     .withServiceDate(TIME.toLocalDate())
-    .withDistanceMeters(1000)
     .withTripTimes(TRIP_TIMES)
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(4)

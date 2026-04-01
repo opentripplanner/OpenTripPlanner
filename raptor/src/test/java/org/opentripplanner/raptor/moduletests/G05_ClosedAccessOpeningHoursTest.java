@@ -47,7 +47,7 @@ public class G05_ClosedAccessOpeningHoursTest implements RaptorTestConstants {
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(30))
       .timetable(true)
-      .addAccessPaths(walk(STOP_A, D1m).openingHoursClosed(), walk(STOP_A, D7m))
+      .addAccessPaths(walk(STOP_A, D1_m).openingHoursClosed(), walk(STOP_A, D7_m))
       .addEgressPaths(free(STOP_E));
 
     ModuleTestDebugLogging.setupDebugLogging(data);
@@ -56,7 +56,7 @@ public class G05_ClosedAccessOpeningHoursTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     var expected = "Walk 7m ~ A ~ BUS R1 0:10 0:20 ~ E [0:03 0:20 17m Tₙ0 C₁2_040]";
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2m)))
+      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2_m)))
       .addMinDuration("17m", TX_0, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)

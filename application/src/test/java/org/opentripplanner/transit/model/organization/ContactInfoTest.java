@@ -16,7 +16,7 @@ class ContactInfoTest {
   private static final String EMAIL = "email@aaa.com";
   private static final String INFO_URL = "http://info.aaa.com";
 
-  private static final ContactInfo subject = ContactInfo.of()
+  private static final ContactInfo SUBJECT = ContactInfo.of()
     .withContactPerson(CONTACT_PERSON)
     .withPhoneNumber(PHONE)
     .withEMail(EMAIL)
@@ -29,15 +29,15 @@ class ContactInfoTest {
   @Test
   void copy() {
     // Create a copy, but do not change it
-    var copy = subject.copy().withContactPerson(CONTACT_PERSON).build();
+    var copy = SUBJECT.copy().withContactPerson(CONTACT_PERSON).build();
 
     // Then the build object should be the same
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change the contact person
-    copy = subject.copy().withContactPerson("New Person").build();
+    copy = SUBJECT.copy().withContactPerson("New Person").build();
 
-    assertNotSame(subject, copy);
+    assertNotSame(SUBJECT, copy);
     assertEquals("New Person", copy.getContactPerson());
     assertEquals(PHONE, copy.getPhoneNumber());
     assertEquals(EMAIL, copy.geteMail());
@@ -59,7 +59,7 @@ class ContactInfoTest {
         "bookingUrl: 'http://book.aaa.com', " +
         "additionalDetails: 'Extra info'" +
         "}",
-      subject.toString()
+      SUBJECT.toString()
     );
   }
 }

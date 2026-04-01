@@ -16,12 +16,12 @@ public interface RaptorTimers {
     }
 
     @Override
-    public void findTransitForRound(Runnable body) {
+    public void routeTransit(Runnable body) {
       body.run();
     }
 
     @Override
-    public void findTransfersForRound(Runnable body) {
+    public void applyTransfers(Runnable body) {
       body.run();
     }
 
@@ -42,13 +42,13 @@ public interface RaptorTimers {
    * This wrap finding all transit routes and updating the state with all transit-stop-arrivals
    * for a Range-Raptor round.
    */
-  void findTransitForRound(Runnable body);
+  void routeTransit(Runnable body);
 
   /**
    * This wrap finding all transfers and updating the state with all transfer-stop-arrivals
    * for a Range-Raptor round.
    */
-  void findTransfersForRound(Runnable body);
+  void applyTransfers(Runnable body);
 
   /**
    * Create a new instance with a new name prefix. Useful when creating a new request for heuristic.

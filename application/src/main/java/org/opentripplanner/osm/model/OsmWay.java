@@ -28,10 +28,6 @@ public class OsmWay extends OsmEntity {
     return nodes;
   }
 
-  public String toString() {
-    return "osm way " + id;
-  }
-
   /**
    * Returns true if way geometry is a closed loop
    */

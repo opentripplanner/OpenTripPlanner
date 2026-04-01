@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
@@ -21,7 +22,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -29,8 +30,7 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
 import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.streetadapter.VertexFactory;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -38,7 +38,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  */
 class VertexGenerator {
 
-  private static final String nodeLabelFormat = "osm:node:%d";
+  private static final String NODE_LABEL_FORMAT = "osm:node:%d";
 
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
@@ -121,7 +121,7 @@ class VertexGenerator {
 
       /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
       if (node.isBoardingLocation()) {
-        String label = String.format(nodeLabelFormat, node.getId());
+        String label = String.format(NODE_LABEL_FORMAT, node.getId());
         var refs = node.getMultiTagValues(boardingAreaRefTags);
         if (!refs.isEmpty()) {
           String name = node.getTag("name");
@@ -149,7 +149,9 @@ class VertexGenerator {
       }
 
       if (iv instanceof BarrierVertex bv) {
-        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
+        bv.setBarrierPermissions(
+          node.overridePermissions(BarrierVertex.DEFAULT_BARRIER_PERMISSIONS)
+        );
         if (
           bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
           !node.isWheelchairAccessible()

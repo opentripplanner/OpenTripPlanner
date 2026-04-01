@@ -1,7 +1,7 @@
 package org.opentripplanner._support.geometry;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 public class LineStrings {
 

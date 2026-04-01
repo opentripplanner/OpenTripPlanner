@@ -6,7 +6,6 @@ import java.util.OptionalInt;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.model.plan.leg.LegConstructionSupport;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
@@ -212,13 +211,6 @@ public record ScheduledTransitLegReference(
       .withServiceDate(serviceDate)
       .withTripOnServiceDate(tripOnServiceDate)
       .withZoneId(timeZone)
-      .withDistanceMeters(
-        LegConstructionSupport.computeDistanceMeters(
-          tripPattern,
-          updatedFromStopPositionInPattern,
-          updatedToStopPositionInPattern
-        )
-      )
       // TODO: What should we have here
       .withGeneralizedCost(0)
       .build();

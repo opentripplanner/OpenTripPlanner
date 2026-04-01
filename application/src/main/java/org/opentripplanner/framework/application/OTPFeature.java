@@ -106,6 +106,11 @@ public enum OTPFeature {
   /* Sandbox extension features - Must be turned OFF by default */
 
   ActuatorAPI(false, true, "Endpoint for actuators (service health status)."),
+  HttpResponseTimeMetrics(
+    false,
+    true,
+    "Record HTTP response time metrics per client. Requires ActuatorAPI to be enabled."
+  ),
   AsyncGraphQLFetchers(
     false,
     false,
@@ -137,6 +142,7 @@ public enum OTPFeature {
       "(transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default " +
       "for now, until this feature is well tested."
   ),
+  OjpApi(false, true, "OJP v2.0 API."),
   RealtimeResolver(
     false,
     true,

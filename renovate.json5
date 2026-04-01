@@ -7,7 +7,7 @@
   "labels": [
     "+Skip Changelog"
   ],
-  "rebaseWhen": "behind-base-branch",
+  "rebaseWhen": "conflicted",
   "enabledManagers": [
     "npm",
     "maven",

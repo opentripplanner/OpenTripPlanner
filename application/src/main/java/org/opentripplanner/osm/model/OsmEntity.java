@@ -22,13 +22,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -596,7 +596,7 @@ public abstract class OsmEntity {
     for (StringBuffer sb : i18n.values()) {
       sb.append(pattern, lastEnd, pattern.length());
     }
-    Map<String, String> out = new HashMap<>(i18n.size());
+    Map<String, String> out = HashMap.newHashMap(i18n.size());
     for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
       out.put(kv.getKey(), kv.getValue().toString());
     }

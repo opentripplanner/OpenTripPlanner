@@ -59,7 +59,7 @@ public class PatternAtStop {
    *                           search
    * @param startTime          Start time for the search.
    * @param timeRange          Searches forward for timeRange from startTime
-   * @param numberOfDepartures Number of departures to fetch
+   * @param numberOfDeparturesPerPattern Number of departures to fetch
    * @param arrivalDeparture   Filter by arrivals, departures, or both
    * @return A list of stop times
    */
@@ -67,7 +67,7 @@ public class PatternAtStop {
     TransitService transitService,
     Instant startTime,
     Duration timeRange,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     ArrivalDeparture arrivalDeparture
   ) {
     return transitService.findTripTimesOnDate(
@@ -75,7 +75,7 @@ public class PatternAtStop {
       pattern,
       startTime,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       true
     );

@@ -10,8 +10,8 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.CoordinateArrayListSequence;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 /**
  * This maps from the OpenGIS PolygonType to LocationTech geometry.

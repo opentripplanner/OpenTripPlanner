@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.issues;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 public record CouldNotApplyMultiLevelInfoToWay(
   OsmWay way,

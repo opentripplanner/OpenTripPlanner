@@ -5,9 +5,18 @@
   "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
     <module name="TreeWalker">
+        <module name="ArrayTypeStyle"/>
         <module name="AvoidStarImport"/>
+        <module name="ConstantName">
+            <!--Exceptions: underscore followed by lowercase SI unit and a number followed by lowercase x.-->
+            <property name="format" value="^[A-Z][A-Z0-9]*(?:_(?:[A-Za-z]+[0-9]+x?|[0-9]+x?|[A-Za-z]+))*$"/>
+        </module>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyStatement"/>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
         <module name="TrailingComment">
             <property name="format" value="^\s*$"/>
         </module>

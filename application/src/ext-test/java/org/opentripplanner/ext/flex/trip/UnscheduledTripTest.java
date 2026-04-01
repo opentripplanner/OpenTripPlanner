@@ -101,6 +101,37 @@ class UnscheduledTripTest {
   }
 
   @Test
+  void testMaxSpanDays() {
+    var stopTimes = List.of(
+      FlexStopTimesForTest.area("10:10", "14:10"),
+      FlexStopTimesForTest.area("11:10", "15:10")
+    );
+    var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
+
+    assertEquals(0, trip.maxSpanDays());
+  }
+
+  @Test
+  void testMaxSpanDaysOvernight() {
+    var stopTimes = List.of(
+      FlexStopTimesForTest.area("10:10", "14:10"),
+      FlexStopTimesForTest.area("21:10", "26:10")
+    );
+    var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
+    assertEquals(1, trip.maxSpanDays());
+  }
+
+  @Test
+  void testMaxSpanDaysNextDay() {
+    var stopTimes = List.of(
+      FlexStopTimesForTest.area("24:00", "26:00"),
+      FlexStopTimesForTest.area("24:00", "26:00")
+    );
+    var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
+    assertEquals(1, trip.maxSpanDays());
+  }
+
+  @Test
   void testUnscheduledTrip() {
     var fromStopTime = new StopTime();
     fromStopTime.setStop(AREA_STOP);

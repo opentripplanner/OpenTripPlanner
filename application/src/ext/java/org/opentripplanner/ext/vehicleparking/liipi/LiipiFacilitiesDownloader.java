@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class LiipiFacilitiesDownloader {
 
   private static final Logger LOG = LoggerFactory.getLogger(LiipiFacilitiesDownloader.class);
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final String jsonParsePath;
   private final BiFunction<
@@ -54,7 +55,7 @@ public class LiipiFacilitiesDownloader {
     }
 
     try {
-      return otpHttpClient.getAndMap(URI.create(url), Map.of(), response -> {
+      return otpHttpClient.getAndMap(URI.create(url), HttpHeaders.empty(), response -> {
         try {
           return parseJSON(response.body(), hubForPark);
         } catch (IllegalArgumentException e) {
@@ -86,7 +87,7 @@ public class LiipiFacilitiesDownloader {
 
     String facilitiesString = convertStreamToString(dataStream);
 
-    JsonNode rootNode = mapper.readTree(facilitiesString);
+    JsonNode rootNode = MAPPER.readTree(facilitiesString);
 
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";

@@ -50,7 +50,7 @@ public final class AccessEgressFunctions {
    *         No opening hours is better than being restricted
    *     </li>
    *     <li>
-   *         If Both have opening hours, both need to be accepted
+   *         If both have opening hours, both need to be accepted
    *     </li>
    * </ol>
    */
@@ -126,11 +126,11 @@ public final class AccessEgressFunctions {
     return groupBy(input, RaptorAccessEgress::stop);
   }
 
-  static TIntObjectMap<List<RaptorAccessEgress>> filterOnSegment(
-    TIntObjectMap<List<RaptorAccessEgress>> map,
+  static <T extends RaptorAccessEgress> TIntObjectMap<List<T>> filterOnSegment(
+    TIntObjectMap<List<T>> map,
     int segment
   ) {
-    TIntObjectMap<List<RaptorAccessEgress>> result = new TIntObjectHashMap<>();
+    TIntObjectMap<List<T>> result = new TIntObjectHashMap<>();
     for (int nRides : map.keys()) {
       for (var it : map.get(nRides)) {
         if (it != null && it.numberOfViaLocationsVisited() == segment) {
@@ -144,6 +144,13 @@ public final class AccessEgressFunctions {
       }
     }
     return result;
+  }
+
+  static <T extends RaptorAccessEgress> List<T> filterOnSegment(List<T> list, int segment) {
+    return list
+      .stream()
+      .filter(it -> it.numberOfViaLocationsVisited() == segment)
+      .toList();
   }
 
   /* private methods */

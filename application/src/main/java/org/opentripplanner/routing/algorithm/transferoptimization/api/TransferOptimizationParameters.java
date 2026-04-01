@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
  * @see org.opentripplanner.routing.algorithm.transferoptimization package documantation.
@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 public interface TransferOptimizationParameters {
   /**
    * If enabled, all paths will be optimized with respect to the transfer point to minimise the
-   * {@link org.opentripplanner.model.transfer.TransferConstraint#cost(TransferConstraint)}.
+   * {@link TransferConstraint#cost(TransferConstraint)}.
    */
   boolean optimizeTransferPriority();
 

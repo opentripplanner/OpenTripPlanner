@@ -49,13 +49,13 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       )
       .egress("C ~ Walk 1m")
       // We add a transfer here which arrive at C before R2, but it should not be used.
-      .withTransfer(STOP_B, transfer(STOP_C, D1m));
+      .withTransfer(STOP_B, transfer(STOP_C, D1_m));
 
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D10m);
+      .searchWindowInSeconds(D10_m);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }

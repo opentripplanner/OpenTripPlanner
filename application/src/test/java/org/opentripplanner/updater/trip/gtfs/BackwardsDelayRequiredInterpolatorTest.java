@@ -178,6 +178,47 @@ class BackwardsDelayRequiredInterpolatorTest {
   }
 
   @Test
+  void useScheduledTimeForMissingArrivalTime() {
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withDepartureTime(
+      0,
+      10
+    );
+    assertEquals(
+      OptionalInt.of(0),
+      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
+    );
+    assertEquals(SCHEDULED_TRIP_TIMES.getScheduledArrivalTime(0), builder.getArrivalTime(0));
+    assertEquals(10, builder.getDepartureTime(0));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertNull(builder.getArrivalTime(1));
+    assertNull(builder.getDepartureTime(1));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
+  }
+
+  @Test
+  void useDepartureTimeForMissingArrivalTime() {
+    var tripTimes = TripTimesFactory.tripTimes(
+      TRIP,
+      TimetableRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:10"),
+      new Deduplicator()
+    );
+    var realTimeTime = 5;
+    var builder = tripTimes
+      .createRealTimeWithoutScheduledTimes()
+      .withDepartureTime(0, realTimeTime);
+    assertEquals(
+      OptionalInt.of(0),
+      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
+    );
+    assertEquals(realTimeTime, builder.getArrivalTime(0));
+    assertEquals(realTimeTime, builder.getDepartureTime(0));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertNull(builder.getArrivalTime(1));
+    assertNull(builder.getDepartureTime(1));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
+  }
+
+  @Test
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     Assertions.assertThrows(IllegalArgumentException.class, () ->

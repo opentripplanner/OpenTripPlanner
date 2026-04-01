@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 /**
  * A linear function to calculate a new cost based on a cost value input.

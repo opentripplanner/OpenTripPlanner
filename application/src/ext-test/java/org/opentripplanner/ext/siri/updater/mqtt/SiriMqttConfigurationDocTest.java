@@ -29,7 +29,7 @@ public class SiriMqttConfigurationDocTest implements DocsTestConstants {
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-mqtt");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  public static final ObjectMapper mapper = new ObjectMapper();
+  public static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
    * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest

@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.support.graphql.injectdoc;
 
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationProfile> {
   DEFAULT,

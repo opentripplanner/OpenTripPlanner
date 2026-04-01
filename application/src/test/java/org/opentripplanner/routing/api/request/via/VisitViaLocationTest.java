@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class VisitViaLocationTest {
 
@@ -17,60 +17,60 @@ class VisitViaLocationTest {
   private static final Duration MINIMUM_WAIT_TIME = Duration.ofMinutes(5);
 
   @SuppressWarnings("DataFlowIssue")
-  private static final ViaLocation subject = new VisitViaLocation(
+  private static final ViaLocation SUBJECT = new VisitViaLocation(
     LABEL,
     MINIMUM_WAIT_TIME,
     List.of(ID),
-    List.of(WgsCoordinate.GREENWICH)
+    WgsCoordinate.GREENWICH
   );
 
   @Test
   void allowAsPassThroughPoint() {
-    assertFalse(subject.isPassThroughLocation());
+    assertFalse(SUBJECT.isPassThroughLocation());
   }
 
   @Test
   void minimumWaitTime() {
-    assertEquals(MINIMUM_WAIT_TIME, subject.minimumWaitTime());
+    assertEquals(MINIMUM_WAIT_TIME, SUBJECT.minimumWaitTime());
   }
 
   @Test
   void label() {
-    assertEquals(LABEL, subject.label());
+    assertEquals(LABEL, SUBJECT.label());
   }
 
   @Test
   void stopLocationIds() {
-    assertEquals("[F:1]", subject.stopLocationIds().toString());
+    assertEquals("[F:1]", SUBJECT.stopLocationIds().toString());
   }
 
   @Test
   void coordinates() {
-    assertEquals("[" + WgsCoordinate.GREENWICH + "]", subject.coordinates().toString());
+    assertEquals(WgsCoordinate.GREENWICH, SUBJECT.coordinate().get());
   }
 
   @Test
   void testToString() {
     assertEquals(
-      "VisitViaLocation{label: AName, minimumWaitTime: 5m, stopLocationIds: [F:1], coordinates: [(51.48, 0.0)]}",
-      subject.toString()
+      "VisitViaLocation{label: AName, minimumWaitTime: 5m, stopLocationIds: [F:1], coordinate: (51.48, 0.0)}",
+      SUBJECT.toString()
     );
   }
 
   @Test
   void testEqAndHashCode() {
-    var l = subject.label();
-    var mwt = subject.minimumWaitTime();
-    var ids = subject.stopLocationIds();
-    var cs = subject.coordinates();
+    var l = SUBJECT.label();
+    var mwt = SUBJECT.minimumWaitTime();
+    var ids = SUBJECT.stopLocationIds();
+    var cs = SUBJECT.coordinate();
 
-    AssertEqualsAndHashCode.verify(subject)
-      .sameAs(new VisitViaLocation(l, mwt, ids, cs))
+    AssertEqualsAndHashCode.verify(SUBJECT)
+      .sameAs(new VisitViaLocation(l, mwt, ids, cs.orElse(null)))
       .differentFrom(
-        new VisitViaLocation("other", mwt, ids, cs),
-        new VisitViaLocation(l, Duration.ZERO, ids, cs),
-        new VisitViaLocation(l, mwt, List.of(), cs),
-        new VisitViaLocation(l, mwt, ids, List.of())
+        new VisitViaLocation("other", mwt, ids, cs.orElse(null)),
+        new VisitViaLocation(l, Duration.ZERO, ids, cs.orElse(null)),
+        new VisitViaLocation(l, mwt, List.of(), cs.orElse(null)),
+        new VisitViaLocation(l, mwt, ids, null)
       );
   }
 }

@@ -36,16 +36,15 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transfer.TransferRepository;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -58,16 +57,16 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
   private static final Function<StopLocation, String> STOP_TO_ID = s -> s.getId().toString();
 
-  private static final Route route1 = TimetableRepositoryForTest.route("route1").build();
-  private static final Route route2 = TimetableRepositoryForTest.route("route2").build();
+  private static final Route ROUTE1 = TimetableRepositoryForTest.route("route1").build();
+  private static final Route ROUTE2 = TimetableRepositoryForTest.route("route2").build();
 
-  private static final RegularStop stop1 = TEST_MODEL.stop("ST:stop1", 1, 1).build();
-  private static final RegularStop stop2 = TEST_MODEL.stop("ST:stop2", 2, 1).build();
-  private static final RegularStop stop3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
+  private static final RegularStop STOP1 = TEST_MODEL.stop("ST:stop1", 1, 1).build();
+  private static final RegularStop STOP2 = TEST_MODEL.stop("ST:stop2", 2, 1).build();
+  private static final RegularStop STOP3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
 
-  private static final Graph graph = new Graph();
-  private static final TimetableRepository timetableRepository;
-  private static final TransferRepository transferRepository;
+  private static final Graph GRAPH = new Graph();
+  private static final TimetableRepository TIMETABLE_REPOSITORY;
+  private static final TransferRepository TRANSFER_REPOSITORY;
   private static final Map.Entry<String, Object> ARGUMENT_FROM = entry(
     "from",
     Map.of("place", "F:Quay:1")
@@ -81,35 +80,35 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private TransmodelRequestContext context;
 
   static {
-    var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
-      .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
-      .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
+    var itinerary = newItinerary(Place.forStop(STOP1), time("11:00"))
+      .bus(ROUTE1, 1, time("11:05"), time("11:20"), Place.forStop(STOP2))
+      .bus(ROUTE2, 2, time("11:20"), time("11:40"), Place.forStop(STOP3))
       .build();
     var patterns = itineraryPatterns(itinerary);
     var siteRepository = TEST_MODEL.siteRepositoryBuilder()
-      .withRegularStop(stop1)
-      .withRegularStop(stop2)
-      .withRegularStop(stop3)
+      .withRegularStop(STOP1)
+      .withRegularStop(STOP2)
+      .withRegularStop(STOP3)
       .build();
 
-    transferRepository = TransferServiceTestFactory.defaultTransferRepository();
-    timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
-    timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
+    TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
+    TIMETABLE_REPOSITORY = new TimetableRepository(siteRepository);
+    TIMETABLE_REPOSITORY.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
-      timetableRepository.addTripPattern(pattern.getId(), pattern);
+      TIMETABLE_REPOSITORY.addTripPattern(pattern.getId(), pattern);
       final int serviceCode = pattern
         .getScheduledTimetable()
         .getTripTimes()
         .getFirst()
         .getServiceCode();
-      timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
+      TIMETABLE_REPOSITORY.getServiceCodes().put(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
-    timetableRepository.index();
+    TIMETABLE_REPOSITORY.updateCalendarServiceData(calendarServiceData);
+    TIMETABLE_REPOSITORY.index();
   }
 
   @BeforeEach
@@ -129,9 +128,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .buildDefault();
 
     var otpServerRequestContext = TestServerContext.createServerContext(
-      graph,
-      timetableRepository,
-      transferRepository,
+      GRAPH,
+      TIMETABLE_REPOSITORY,
+      TRANSFER_REPOSITORY,
       new DefaultFareService(),
       null,
       defaultRequest
@@ -315,8 +314,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @Test
   void testViaLocations() {
-    final List<String> PTP1 = Stream.of(stop1, stop2, stop3).map(STOP_TO_ID).toList();
-    final List<String> PTP2 = Stream.of(stop3, stop2).map(STOP_TO_ID).toList();
+    final List<String> PTP1 = Stream.of(STOP1, STOP2, STOP3).map(STOP_TO_ID).toList();
+    final List<String> PTP2 = Stream.of(STOP3, STOP2).map(STOP_TO_ID).toList();
     final Map<String, Object> arguments = arguments(
       "passThroughPoints",
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))

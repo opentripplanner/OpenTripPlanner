@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
