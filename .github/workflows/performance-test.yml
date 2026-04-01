@@ -64,7 +64,7 @@ jobs:
           - location: helsinki
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v4
