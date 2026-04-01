@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D1_m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
@@ -58,6 +58,16 @@ public class ForwardRaptorTransitCalculatorTest {
   }
 
   @Test
+  public void isInIteration() {
+    var subject = create();
+
+    assertFalse(subject.isInIteration(59, 60));
+    assertTrue(subject.isInIteration(60, 60));
+    assertTrue(subject.isInIteration(119, 60));
+    assertFalse(subject.isInIteration(120, 60));
+  }
+
+  @Test
   public void rangeRaptorMinutes() {
     earliestDepartureTime = 500;
     searchWindowSizeInSeconds = 200;
@@ -76,7 +86,7 @@ public class ForwardRaptorTransitCalculatorTest {
     var subject = create();
     var transitData = new TestTransitData().withTransfer(
       STOP_A,
-      TestTransfer.transfer(STOP_B, D1m)
+      TestTransfer.transfer(STOP_B, D1_m)
     );
 
     // Expect transfer from stop A to stop B

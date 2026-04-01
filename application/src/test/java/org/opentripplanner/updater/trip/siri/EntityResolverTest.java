@@ -7,7 +7,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -36,7 +35,7 @@ class EntityResolverTest {
 
   @Test
   void resolveQuayId() {
-    var timetableRepository = new TimetableRepository(SITE_REPOSITORY, new Deduplicator());
+    var timetableRepository = new TimetableRepository(SITE_REPOSITORY);
     var transitService = new DefaultTransitService(timetableRepository);
     var resolver = new EntityResolver(transitService, FEED_ID);
     var stop = resolver.resolveQuay(STOP_1.getId().getId());
@@ -45,7 +44,7 @@ class EntityResolverTest {
 
   @Test
   void scheduledStopPointTakesPrecedence() {
-    var timetableRepository = new TimetableRepository(SITE_REPOSITORY, new Deduplicator());
+    var timetableRepository = new TimetableRepository(SITE_REPOSITORY);
     var transitService = new DefaultTransitService(timetableRepository);
     timetableRepository.addScheduledStopPointMapping(Map.of(SSP_ID, STOP_2));
     var resolver = new EntityResolver(transitService, FEED_ID);

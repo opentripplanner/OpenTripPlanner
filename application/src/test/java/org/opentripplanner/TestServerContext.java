@@ -16,9 +16,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -42,11 +40,13 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.TransferRepository;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -57,7 +57,7 @@ public class TestServerContext {
 
   private TestServerContext() {}
 
-  /** Create a context for unit testing using default RoutingRequest.*/
+  /** Create a context for unit testing using default RoutingRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
@@ -124,6 +124,7 @@ public class TestServerContext {
       graph,
       createLinkingContextFactory(graph, vertexLinker, transitService),
       Metrics.globalRegistry,
+      routerConfig.ojpApiParameters(),
       raptorConfig,
       createRealtimeVehicleService(transitService),
       List.of(),
@@ -140,6 +141,7 @@ public class TestServerContext {
       vertexLinker,
       createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
+      null,
       null,
       createEmissionsItineraryDecorator(),
       createStreetDetailsService(),

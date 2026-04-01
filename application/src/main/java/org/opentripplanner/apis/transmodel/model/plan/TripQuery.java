@@ -23,7 +23,7 @@ import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeT
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 public class TripQuery {
 
@@ -80,7 +80,7 @@ public class TripQuery {
             Normally this is when the search is performed (now), plus a small grace period to
             complete the booking. Services which must be booked before this time is excluded. The
             `latestBookingTime` and `minimumBookingPeriod` in `BookingArrangement` (flexible
-            services only) is used to enforce this. If this parameter is _not set_, no booking-time
+            services only) are used to enforce this. If this parameter is _not set_, no booking-time
             restrictions are applied - all journeys are listed.
             """
           )

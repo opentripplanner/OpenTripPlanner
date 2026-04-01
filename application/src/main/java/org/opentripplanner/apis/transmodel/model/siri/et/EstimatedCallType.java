@@ -220,6 +220,14 @@ public class EstimatedCallType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
+          .name("extraCall")
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .description("Whether this call is an extra call introduced by real-time data")
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isExtraCall())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("date")
           .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")

@@ -1,152 +1,92 @@
 package org.opentripplanner.ext.ojp.service;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Collection;
+import de.vdv.ojp20.OJP;
+import de.vdv.ojp20.OJPStopEventRequestStructure;
+import de.vdv.ojp20.OJPTripRequestStructure;
+import de.vdv.ojp20.PlaceContextStructure;
+import de.vdv.ojp20.PlaceRefStructure;
+import de.vdv.ojp20.siri.StopPointRefStructure;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
-import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.EntityNotFoundException;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.ArrivalDeparture;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.ext.ojp.mapping.RouteRequestMapper;
+import org.opentripplanner.ext.ojp.mapping.StopEventParamsMapper;
+import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
+import org.opentripplanner.ext.ojp.mapping.TripResponseMapper;
+import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Implements OJP specific business logic but delegates the bulk of the work to TransitService.
+ * Takes raw OJP requests, extracts information and forwards it to the underlying services.
  */
 public class OjpService {
 
-  private final TransitService transitService;
-  private final GraphFinder finder;
-  /**
-   * In order to avoid a DDOS attack we limit the number.
-   */
-  private final int MAX_DEPARTURES = 100;
+  private final CallAtStopService callAtStopService;
+  private final RoutingService routingService;
+  private final FeedScopedIdMapper idMapper;
+  private final ZoneId zoneId;
 
-  public OjpService(TransitService transitService, GraphFinder finder) {
-    this.transitService = transitService;
-    this.finder = finder;
-  }
-
-  /**
-   * Find calls at stop at a specific time. These are useful for departure/arrival boards.
-   */
-  public List<CallAtStop> findCallsAtStop(FeedScopedId id, StopEventRequestParams params)
-    throws EntityNotFoundException {
-    Collection<StopLocation> stops;
-    var stop = transitService.getStopLocation(id);
-    if (stop != null) {
-      stops = List.of(stop);
-    } else {
-      var station = transitService.getStopLocationsGroup(id);
-      if (station == null) {
-        throw new EntityNotFoundException("StopPointRef", id);
-      }
-      stops = station.getChildStops();
-    }
-    var calls = findCallsAtStop(stops, params);
-    return sort(params.numDepartures, calls);
-  }
-
-  /**
-   * Find calls at stop near a given coordinate at a specific time.
-   * <p>
-   * These are useful for departure/arrival boards.
-   */
-  public List<CallAtStop> findCallsAtStop(WgsCoordinate coordinate, StopEventRequestParams params) {
-    var calls = finder
-      .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
-      .stream()
-      .flatMap(nearbyStop -> {
-        List<StopLocation> stopLocations = List.of(nearbyStop.stop);
-        var calls1 = findCallsAtStop(stopLocations, params);
-        return sort(params.numDepartures, calls1)
-          .stream()
-          .map(tt -> tt.withWalkTime(nearbyStop.duration()));
-      })
-      .toList();
-
-    return sort(params.numDepartures(), calls);
-  }
-
-  /**
-   * Extract the feed language from its ID.
-   */
-  Optional<String> resolveLanguage(String feedId) {
-    return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
-  }
-
-  private static List<CallAtStop> sort(int numResults, List<CallAtStop> stopTimesInPatterns) {
-    return stopTimesInPatterns
-      .stream()
-      .sorted(CallAtStop.compareByScheduledDeparture())
-      .limit(numResults)
-      .toList();
-  }
-
-  private List<CallAtStop> findCallsAtStop(
-    Collection<StopLocation> stopLocations,
-    StopEventRequestParams params
+  public OjpService(
+    CallAtStopService callAtStopService,
+    RoutingService routingService,
+    FeedScopedIdMapper idMapper,
+    ZoneId zoneId
   ) {
-    if (params.numDepartures > MAX_DEPARTURES) {
-      throw new IllegalArgumentException(
-        "Number of departures must be less than " + MAX_DEPARTURES
-      );
-    }
-    var builder = TripTimeOnDateRequest.of(stopLocations)
-      .withTime(params.time)
-      .withArrivalDeparture(params.arrivalDeparture)
-      .withTimeWindow(params.timeWindow)
-      .withNumberOfDepartures(params.numDepartures)
-      .withExcludeAgencies(params.excludedAgencies)
-      .withExcludeRoutes(params.excludedRoutes)
-      .withExcludeModes(params.excludedModes)
-      .withSortOrder(TripTimeOnDate.compareByScheduledDeparture());
-
-    if (params.includesAgencies()) {
-      builder.withIncludeAgencies(params.includedAgencies);
-    }
-    if (params.includesRoutes()) {
-      builder.withIncludeRoutes(params.includedRoutes);
-    }
-    if (params.includesModes()) {
-      builder.withIncludeModes(params.includedModes);
-    }
-
-    var request = builder.build();
-    return transitService.findTripTimesOnDate(request).stream().map(CallAtStop::noWalking).toList();
+    this.callAtStopService = callAtStopService;
+    this.routingService = routingService;
+    this.idMapper = idMapper;
+    this.zoneId = zoneId;
   }
 
-  public record StopEventRequestParams(
-    Instant time,
-    ArrivalDeparture arrivalDeparture,
-    Duration timeWindow,
-    int maximumWalkDistance,
-    int numDepartures,
-    Set<FeedScopedId> includedAgencies,
-    Set<FeedScopedId> includedRoutes,
-    Set<FeedScopedId> excludedAgencies,
-    Set<FeedScopedId> excludedRoutes,
-    Set<TransitMode> includedModes,
-    Set<TransitMode> excludedModes
-  ) {
-    public boolean includesAgencies() {
-      return !includedAgencies.isEmpty();
-    }
+  public OJP handleStopEventRequest(OJPStopEventRequestStructure ser) {
+    var stopId = stopPointRef(ser);
+    var coordinate = coordinate(ser);
 
-    public boolean includesRoutes() {
-      return !includedRoutes().isEmpty();
-    }
+    var seMapper = new StopEventParamsMapper(zoneId, idMapper);
+    var params = seMapper.extractStopEventParams(ser);
 
-    public boolean includesModes() {
-      return !includedModes.isEmpty();
+    List<CallAtStop> callsAtStop = List.of();
+    if (stopId.isPresent()) {
+      callsAtStop = callAtStopService.findCallsAtStop(stopId.get(), params);
+    } else if (coordinate.isPresent()) {
+      callsAtStop = callAtStopService.findCallsAtStop(coordinate.get(), params);
     }
+    var optional = StopEventParamsMapper.mapOptionalFeatures(ser.getParams());
+    var mapper = new StopEventResponseMapper(
+      optional,
+      zoneId,
+      idMapper,
+      callAtStopService::resolveLanguage
+    );
+    return mapper.mapCalls(callsAtStop, ZonedDateTime.now());
+  }
+
+  public OJP handleTripRequest(OJPTripRequestStructure tr, RouteRequest routeRequest) {
+    var optionalFeatures = RouteRequestMapper.optionalFeatures(tr);
+    var rr = new RouteRequestMapper(idMapper, routeRequest).map(tr);
+    var tripPlan = routingService.route(rr);
+    var mapper = new TripResponseMapper(idMapper, optionalFeatures);
+    return mapper.mapTripPlan(tripPlan, ZonedDateTime.now());
+  }
+
+  private Optional<FeedScopedId> stopPointRef(OJPStopEventRequestStructure ser) {
+    return placeRefStructure(ser)
+      .map(PlaceRefStructure::getStopPointRef)
+      .map(StopPointRefStructure::getValue)
+      .map(idMapper::parse);
+  }
+
+  private Optional<WgsCoordinate> coordinate(OJPStopEventRequestStructure ser) {
+    return placeRefStructure(ser)
+      .map(PlaceRefStructure::getGeoPosition)
+      .map(c -> new WgsCoordinate(c.getLatitude(), c.getLongitude()));
+  }
+
+  private static Optional<PlaceRefStructure> placeRefStructure(OJPStopEventRequestStructure ser) {
+    return Optional.ofNullable(ser.getLocation()).map(PlaceContextStructure::getPlaceRef);
   }
 }

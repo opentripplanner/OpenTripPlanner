@@ -8,9 +8,9 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.apis.vectortiles.model.LayerType;
 import org.opentripplanner.ext.fares.service.NoopFareServiceFactory;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class DebugVectorTilesResourceTest {

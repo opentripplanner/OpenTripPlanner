@@ -1,18 +1,43 @@
 package org.opentripplanner.ext.flex.trip;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.areaWithContinuousStopping;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStop;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStopWithContinuousStopping;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.StopTime;
 
 class ScheduledDeviatedTripTest {
+
+  @Test
+  void testMaxSpanDays() {
+    var stopTimes = List.of(area("10:10", "10:15"), regularStop("10:40", "10:45"));
+    var trip = ScheduledDeviatedTrip.of(id("1")).withStopTimes(stopTimes).build();
+
+    assertEquals(0, trip.maxSpanDays());
+  }
+
+  @Test
+  void testMaxSpanDaysOvernight() {
+    var stopTimes = List.of(area("10:10", "10:15"), regularStop("26:00", "26:00"));
+    var trip = ScheduledDeviatedTrip.of(id("1")).withStopTimes(stopTimes).build();
+    assertEquals(1, trip.maxSpanDays());
+  }
+
+  @Test
+  void testMaxSpanDaysNextDay() {
+    var stopTimes = List.of(area("24:00", "24:00"), regularStop("26:00", "26:00"));
+    var trip = ScheduledDeviatedTrip.of(id("1")).withStopTimes(stopTimes).build();
+    assertEquals(1, trip.maxSpanDays());
+  }
 
   private static List<List<StopTime>> isScheduledDeviatedTripCases() {
     return List.of(

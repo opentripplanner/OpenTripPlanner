@@ -7,10 +7,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +42,7 @@ class GtfsRealtimeHttpVehiclePositionSource {
    */
   public List<VehiclePosition> getPositions() {
     try {
-      return otpHttpClient.getAndMap(url, headers.asMap(), response ->
-        this.getPositions(response.body())
-      );
+      return otpHttpClient.getAndMap(url, headers, response -> this.getPositions(response.body()));
     } catch (OtpHttpClientException e) {
       LOG.warn("Error reading vehicle positions from {}", url, e);
     }

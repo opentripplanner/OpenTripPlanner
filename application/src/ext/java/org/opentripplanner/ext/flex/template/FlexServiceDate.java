@@ -1,7 +1,16 @@
 package org.opentripplanner.ext.flex.template;
 
-import gnu.trove.set.TIntSet;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.Nullable;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * This class contains information used in a flex router, and depends on the date the search was
@@ -18,39 +27,80 @@ public class FlexServiceDate {
    */
   private final int secondsFromStartOfTime;
 
-  /** Which services are running on the date. */
-  private final TIntSet servicesRunning;
-
+  /**
+   * The requested booking time as seconds since the start of service for this date.
+   * Calculated relative to this specific service date's start-of-service.
+   */
   private final int requestedBookingTime;
 
-  public FlexServiceDate(
+  private final Set<FlexTrip<?, ?>> tripsRunning;
+
+  private FlexServiceDate(
     LocalDate serviceDate,
     int secondsFromStartOfTime,
     int requestedBookingTime,
-    TIntSet servicesRunning
+    Collection<FlexTrip<?, ?>> tripsRunning
   ) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
     this.requestedBookingTime = requestedBookingTime;
-    this.servicesRunning = servicesRunning;
+    this.tripsRunning = tripsRunning != null ? new HashSet<>(tripsRunning) : Set.of();
   }
 
-  LocalDate serviceDate() {
-    return serviceDate;
+  public static FlexServiceDate of(
+    LocalDate serviceDate,
+    int secondsFromStartOfTime,
+    @Nullable Instant requestedBookingTimeInstant,
+    ZoneId timeZone,
+    Collection<FlexTrip<?, ?>> tripsRunning
+  ) {
+    int requestedBookingTime;
+    if (requestedBookingTimeInstant == null) {
+      requestedBookingTime = RoutingBookingInfo.NOT_SET;
+    } else {
+      ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, timeZone);
+      requestedBookingTime = ServiceDateUtils.secondsSinceStartOfTime(
+        startOfService,
+        requestedBookingTimeInstant
+      );
+    }
+    return new FlexServiceDate(
+      serviceDate,
+      secondsFromStartOfTime,
+      requestedBookingTime,
+      tripsRunning
+    );
   }
 
   int secondsFromStartOfTime() {
     return secondsFromStartOfTime;
   }
 
+  /**
+   * The requested booking time as seconds since the start of service for this date.
+   */
   int requestedBookingTime() {
     return requestedBookingTime;
   }
 
   /**
-   * Return true if the given {@code serviceCode} is active and running.
+   * Return the service date this {@code FlexServiceDate} corresponds to.
    */
-  public boolean isTripServiceRunning(int serviceCode) {
-    return servicesRunning != null && servicesRunning.contains(serviceCode);
+  public LocalDate serviceDate() {
+    return serviceDate;
+  }
+
+  /**
+   * Return all trips running on the service date this {@code FlexServiceDate} corresponds to.
+   */
+  public Set<FlexTrip<?, ?>> tripsRunning() {
+    return tripsRunning;
+  }
+
+  /**
+   * Return true if the given {@code flexTrip} is active and running on {@link #serviceDate}.
+   */
+  public boolean isTripRunning(FlexTrip<?, ?> flexTrip) {
+    return tripsRunning.contains(flexTrip);
   }
 }

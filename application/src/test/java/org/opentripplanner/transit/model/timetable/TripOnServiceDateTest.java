@@ -18,7 +18,7 @@ class TripOnServiceDateTest {
   );
   public static final LocalDate SERVICE_DATE = LocalDate.now();
   public static final String TRIP_ID = "tripId";
-  private static final TripOnServiceDate subject = TripOnServiceDate.of(
+  private static final TripOnServiceDate SUBJECT = TripOnServiceDate.of(
     TimetableRepositoryForTest.id(ID)
   )
     .withTrip(TimetableRepositoryForTest.trip(TRIP_ID).build())
@@ -29,10 +29,10 @@ class TripOnServiceDateTest {
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy
-    var copy = subject.copy().build();
+    var copy = SUBJECT.copy().build();
 
     assertEquals(ID, copy.getId().getId());
     assertEquals(SERVICE_DATE, copy.getServiceDate());
@@ -43,16 +43,15 @@ class TripOnServiceDateTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(
-      subject.sameAs(subject.copy().withServiceDate(LocalDate.now().plusDays(1)).build())
+      SUBJECT.sameAs(SUBJECT.copy().withServiceDate(LocalDate.now().plusDays(1)).build())
     );
-    assertFalse(subject.sameAs(subject.copy().withTripAlteration(TripAlteration.PLANNED).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTripAlteration(TripAlteration.PLANNED).build()));
     assertFalse(
-      subject.sameAs(
-        subject
-          .copy()
+      SUBJECT.sameAs(
+        SUBJECT.copy()
           .withReplacementFor(
             List.of(TripOnServiceDate.of(TimetableRepositoryForTest.id("id2")).build())
           )

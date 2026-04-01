@@ -20,7 +20,7 @@ public class LegTest implements PlanTestConstants {
   private static final int START_TIME = T11_00;
 
   private final Itinerary ITINERARY = newItinerary(A, START_TIME)
-    .walk(D2m, B)
+    .walk(D2_m, B)
     .bus(21, T11_05, T11_15, C)
     .bicycle(T11_16, T11_20, E)
     .build();
@@ -100,7 +100,7 @@ public class LegTest implements PlanTestConstants {
   @Test
   public void isPartiallySameLeg() {
     final int startTime = START_TIME;
-    final int duration = D10m;
+    final int duration = D10_m;
     final int endTime = startTime + duration;
     final int fromStopIndex = 2;
     final int toStopIndex = 12;
@@ -136,7 +136,7 @@ public class LegTest implements PlanTestConstants {
 
     // Time do not overlap
     {
-      Leg walkLegAfter = leg(endTime, b -> b.walk(D12m, B));
+      Leg walkLegAfter = leg(endTime, b -> b.walk(D12_m, B));
       assertFalse(walkLeg.isPartiallySameLeg(walkLegAfter));
       assertFalse(walkLegAfter.isPartiallySameLeg(walkLeg));
     }
@@ -160,7 +160,7 @@ public class LegTest implements PlanTestConstants {
 
   @Test
   public void overlapInTime() {
-    int duration = D10m;
+    int duration = D10_m;
     var endTime = START_TIME + duration;
     var overlappingStartTime = START_TIME + duration - 1;
 
@@ -168,7 +168,7 @@ public class LegTest implements PlanTestConstants {
     Leg overlappingLeg = leg(overlappingStartTime, b ->
       b.walk(duration, B).build().legs().getFirst()
     );
-    Leg legAfter = leg(endTime, b -> b.walk(D12m, B));
+    Leg legAfter = leg(endTime, b -> b.walk(D12_m, B));
 
     // Overlap in time
     assertTrue(overlappingLeg.overlapInTime(subject));

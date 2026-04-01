@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
 
 /**
  * Vehicle parking updater class that extends the {@link ParkAPIUpdater}. Meant for reading car

@@ -13,5 +13,6 @@
     patterns(serviceDates: { start: "2024-05-23", end: "2024-05-30" }) {
       name
     }
+    isReplacement
   }
 }

@@ -4,11 +4,11 @@ import java.io.File;
 import java.net.URI;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 

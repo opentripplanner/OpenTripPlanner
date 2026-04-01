@@ -77,9 +77,9 @@ class ViaLocationMapperTest {
 
     var secondVia = result.get(1);
 
-    assertThat(secondVia.coordinates()).hasSize(1);
-    assertEquals(SECOND_LAT, secondVia.coordinates().get(0).latitude());
-    assertEquals(SECOND_LON, secondVia.coordinates().get(0).longitude());
+    assertThat(secondVia.coordinate()).isPresent();
+    assertEquals(SECOND_LAT, secondVia.coordinate().get().latitude());
+    assertEquals(SECOND_LON, secondVia.coordinate().get().longitude());
     assertFalse(secondVia.isPassThroughLocation());
 
     var thirdVia = result.get(2);
@@ -87,16 +87,16 @@ class ViaLocationMapperTest {
     assertEquals(LABEL_THIRD, thirdVia.label());
     assertEquals(MIN_WAIT_TIME_THIRD, thirdVia.minimumWaitTime());
     assertEquals(EXPECTED_IDS_AS_STRING_THIRD, thirdVia.stopLocationIds().toString());
-    assertThat(thirdVia.coordinates()).hasSize(1);
-    assertEquals(THIRD_LAT, thirdVia.coordinates().get(0).latitude());
-    assertEquals(THIRD_LON, thirdVia.coordinates().get(0).longitude());
+    assertThat(thirdVia.coordinate()).isPresent();
+    assertEquals(THIRD_LAT, thirdVia.coordinate().get().latitude());
+    assertEquals(THIRD_LON, thirdVia.coordinate().get().longitude());
     assertFalse(thirdVia.isPassThroughLocation());
 
     assertEquals(
       "[" +
-        "VisitViaLocation{label: TestLabel1, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2], coordinates: []}, " +
-        "VisitViaLocation{coordinates: [(30.5, 40.2)]}, " +
-        "VisitViaLocation{label: TestLabel3, minimumWaitTime: 10m, stopLocationIds: [F:ID3, F:ID4], coordinates: [(35.5, 45.5)]}" +
+        "VisitViaLocation{label: TestLabel1, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2]}, " +
+        "VisitViaLocation{coordinate: (30.5, 40.2)}, " +
+        "VisitViaLocation{label: TestLabel3, minimumWaitTime: 10m, stopLocationIds: [F:ID3, F:ID4], coordinate: (35.5, 45.5)}" +
         "]",
       result.toString()
     );

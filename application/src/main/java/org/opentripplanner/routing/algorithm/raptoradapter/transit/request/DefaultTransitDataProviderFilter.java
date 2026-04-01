@@ -4,11 +4,11 @@ import java.util.BitSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -38,7 +38,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
 
   private final Set<FeedScopedId> bannedTrips;
 
-  private final boolean hasSubModeFilters;
+  private final boolean hasTripLevelModeFilters;
 
   public DefaultTransitDataProviderFilter(DefaultTransitDataProviderFilterBuilder builder) {
     requireBikesAllowed = builder.requireBikesAllowed();
@@ -49,7 +49,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
     includeRealtimeCancellations = builder.includeRealtimeCancellations();
     bannedTrips = Set.copyOf(builder.bannedTrips());
     filters = builder.filters().toArray(TransitFilter[]::new);
-    hasSubModeFilters = builder.filters().stream().anyMatch(TransitFilter::isSubModePredicate);
+    hasTripLevelModeFilters = builder.filters().stream().anyMatch(TransitFilter::isModeSelective);
   }
 
   public static DefaultTransitDataProviderFilterBuilder of() {
@@ -73,7 +73,8 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
   public Predicate<TripTimes> createTripFilter(TripPattern tripPattern) {
     for (TransitFilter filter : filters) {
       if (filter.matchTripPattern(tripPattern)) {
-        var applyTripTimesFilters = hasSubModeFilters && tripPattern.getContainsMultipleModes();
+        var applyTripTimesFilters =
+          hasTripLevelModeFilters && tripPattern.getContainsMultipleModes();
         return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }

@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.model.StreetModelForTest;
 
 class FlexibleTransitLegTest implements PlanTestConstants {
 

@@ -5,8 +5,8 @@ import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

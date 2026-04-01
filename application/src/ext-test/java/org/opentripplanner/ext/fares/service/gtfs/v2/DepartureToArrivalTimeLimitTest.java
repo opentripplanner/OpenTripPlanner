@@ -29,7 +29,7 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
           .withFromLegGroup(LEG_GROUP)
           .withToLegGroup(LEG_GROUP)
           .withTransferCount(FareTransferRule.UNLIMITED_TRANSFERS)
-          .withFareProducts(List.of(TRANSFER_1))
+          .withFareProducts(TRANSFER_1)
           .withTimeLimit(TimeLimitType.DEPARTURE_TO_ARRIVAL, Duration.ofMinutes(10))
           .build()
       )

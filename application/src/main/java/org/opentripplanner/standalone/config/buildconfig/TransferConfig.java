@@ -5,8 +5,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import java.util.EnumMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.module.TransferParameters;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.street.model.StreetMode;
 
 public class TransferConfig {
 

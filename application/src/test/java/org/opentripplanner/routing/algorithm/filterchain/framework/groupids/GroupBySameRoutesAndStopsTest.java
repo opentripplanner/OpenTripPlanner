@@ -29,7 +29,7 @@ class GroupBySameRoutesAndStopsTest implements PlanTestConstants {
     .bus(routeB, 43, T11_33, T11_50, D)
     .build();
   Itinerary withWalking = newItinerary(F, T11_00)
-    .walk(D10m, A)
+    .walk(D10_m, A)
     .bus(routeA, 23, T11_10, T11_32, E)
     .bus(routeB, 43, T11_33, T11_50, D)
     .build();
@@ -37,7 +37,7 @@ class GroupBySameRoutesAndStopsTest implements PlanTestConstants {
   Itinerary i4 = newItinerary(A).bus(routeA, 31, T11_09, T11_20, D).build();
   Itinerary i5 = newItinerary(A).bus(routeB, 31, T11_09, T11_20, D).build();
 
-  Itinerary walkOnly = newItinerary(A, T11_00).walk(D10m, B).build();
+  Itinerary walkOnly = newItinerary(A, T11_00).walk(D10_m, B).build();
 
   @Test
   public void shouldMatchTimeshiftedDuplicates() {

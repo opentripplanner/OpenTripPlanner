@@ -48,10 +48,10 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        walk(STOP_B, D1m).openingHours("0:05", "0:08"),
-        walk(STOP_B, D1m).openingHours("0:10", "0:13")
+        walk(STOP_B, D1_m).openingHours("0:05", "0:08"),
+        walk(STOP_B, D1_m).openingHours("0:10", "0:13")
       )
-      .addEgressPaths(walk(STOP_C, D2m));
+      .addEgressPaths(walk(STOP_C, D2_m));
 
     requestBuilder
       .searchParams()

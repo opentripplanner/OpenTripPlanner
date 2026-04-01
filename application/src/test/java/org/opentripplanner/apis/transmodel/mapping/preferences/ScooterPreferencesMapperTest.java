@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.transmodel._support.TestDataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 class ScooterPreferencesMapperTest {
 

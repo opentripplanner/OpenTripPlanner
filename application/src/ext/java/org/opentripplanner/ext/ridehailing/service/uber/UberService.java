@@ -22,10 +22,11 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.ridehailing.service.oauth.UrlEncodedOAuthService;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,11 +187,13 @@ public class UberService extends CachingRideHailingService {
     }
   }
 
-  private Map<String, String> headers() throws IOException {
-    return Map.ofEntries(
-      entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),
-      entry(ACCEPT_LANGUAGE, "en_US"),
-      entry(CONTENT_TYPE, "application/json")
+  private HttpHeaders headers() throws IOException {
+    return HttpHeaders.of(
+      Map.ofEntries(
+        entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),
+        entry(ACCEPT_LANGUAGE, "en_US"),
+        entry(CONTENT_TYPE, "application/json")
+      )
     );
   }
 }

@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.updater;
 
 import java.time.Duration;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 
 public record DefaultSiriETUpdaterParameters(
   String configRef,

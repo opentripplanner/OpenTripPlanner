@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner focusing on travel by scheduled public transportation combined with bicycling, walking, and mobility services. This is OTP2 (dev-2.x branch), the second major version under active development.
 
-**Tech Stack:** Java 21, Maven, GraphQL API, GTFS/NeTEx transit data, OpenStreetMap
+**Tech Stack:** Java 25, Maven, GraphQL API, GTFS/NeTEx transit data, OpenStreetMap
 
 ## Essential Build Commands
 
@@ -237,7 +237,7 @@ Dashboard: https://otp-performance.leonard.io/
 ## Project Structure Notes
 
 - Maven multi-module project
-- Java 21 target
+- Java 25 target
 - Serialization version ID tracked in `pom.xml` property `otp.serialization.version.id`
 - Shaded JAR output: `otp-shaded/target/otp-shaded-VERSION.jar`
 - Client code: `client/src/` (MapLibre-based JavaScript client for testing)

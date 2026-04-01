@@ -13,10 +13,10 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.locationtech.jts.operation.valid.IsValidOp;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**

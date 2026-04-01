@@ -20,8 +20,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -85,7 +85,7 @@ public class RaptorTransitDataMapper {
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator = new TransferIndexGenerator(
-        transitService.getTransferService().listAll(),
+        transitService.getConstrainedTransferService().listAll(),
         allTripPatterns
       );
       constrainedTransfers = transferIndexGenerator.generateTransfers();
@@ -98,7 +98,7 @@ public class RaptorTransitDataMapper {
     return new RaptorTransitData(
       tripPatternsByStopByDate,
       transfersByStopIndex,
-      transitService.getTransferService(),
+      transitService.getConstrainedTransferService(),
       siteRepository,
       transferCache,
       constrainedTransfers,

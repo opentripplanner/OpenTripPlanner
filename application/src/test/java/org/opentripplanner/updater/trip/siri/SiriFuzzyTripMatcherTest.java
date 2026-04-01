@@ -1,18 +1,17 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 
@@ -30,7 +29,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var evj = estimatedVehicleJourney(env);
 
     var result = match(evj, env);
-    assertTrue(result.isSuccess());
+    assertEquals(TRIP_1_ID, result.trip().getId().getId());
   }
 
   @Test
@@ -42,9 +41,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
     var evj = estimatedVehicleJourney(env);
 
-    var result = match(evj, env);
-    assertTrue(result.isFailure());
-    assertEquals(MULTIPLE_FUZZY_TRIP_MATCHES, result.failureValue());
+    assertFailure(MULTIPLE_FUZZY_TRIP_MATCHES, () -> match(evj, env));
   }
 
   @Test
@@ -67,7 +64,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
       .buildEstimatedVehicleJourney();
 
     var result = match(journey, env);
-    assertTrue(result.isSuccess());
+    assertEquals(TRIP_1_ID, result.trip().getId().getId());
   }
 
   @Test
@@ -86,19 +83,17 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
       )
       .buildEstimatedVehicleJourney();
 
-    var result = match(journey, env);
-    assertTrue(result.isFailure());
-    assertEquals(NO_FUZZY_TRIP_MATCH, result.failureValue());
+    assertFailure(NO_FUZZY_TRIP_MATCH, () -> match(journey, env));
   }
 
-  private static Result<TripAndPattern, UpdateError.UpdateErrorType> match(
-    EstimatedVehicleJourney evj,
-    TransitTestEnvironment env
-  ) {
+  private static TripAndPattern match(EstimatedVehicleJourney evj, TransitTestEnvironment env)
+    throws UpdateException {
     var transitService = env.transitService();
     var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
+    var calls = CallWrapper.of(evj);
     return fuzzyMatcher.match(
       evj,
+      calls,
       new EntityResolver(transitService, env.feedId()),
       transitService::findTimetable,
       transitService::findNewTripPatternForModifiedTrip

@@ -3,10 +3,10 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.transfer.TransferRepository;
-import org.opentripplanner.transfer.internal.TransferIndex;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.internal.TransferIndex;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexTransferIndex extends TransferIndex {

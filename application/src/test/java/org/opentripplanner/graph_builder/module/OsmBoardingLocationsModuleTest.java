@@ -18,13 +18,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -32,11 +32,10 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -88,9 +87,8 @@ class OsmBoardingLocationsModuleTest {
       .withRegularStops(List.of(platform, busStop, floatingBusStop))
       .build();
 
-    var deduplicator = new Deduplicator();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepo, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepo);
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
@@ -305,7 +303,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
     new OsmBoardingLocationsModule(
       graph,
-      new TimetableRepository(siteRepo, new Deduplicator()),
+      new TimetableRepository(siteRepo),
       VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();

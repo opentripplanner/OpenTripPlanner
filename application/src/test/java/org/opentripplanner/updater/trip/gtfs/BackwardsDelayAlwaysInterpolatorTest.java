@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
@@ -90,6 +91,25 @@ class BackwardsDelayAlwaysInterpolatorTest {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
       assertEquals(reference.getDepartureDelay(i), builder.getDepartureDelay(i));
     }
+  }
+
+  @Test
+  void useDepartureTimeForMissingArrivalTime() {
+    var realTimeTime = 10;
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withDepartureTime(
+      0,
+      realTimeTime
+    );
+    assertEquals(
+      OptionalInt.of(0),
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
+    );
+    assertEquals(realTimeTime, builder.getArrivalTime(0));
+    assertEquals(realTimeTime, builder.getDepartureTime(0));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertNull(builder.getArrivalTime(1));
+    assertNull(builder.getDepartureTime(1));
+    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
   }
 
   @Test

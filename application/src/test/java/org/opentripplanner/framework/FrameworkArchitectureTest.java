@@ -3,11 +3,7 @@ package org.opentripplanner.framework;
 import static org.opentripplanner.OtpArchitectureModules.DOMAIN_CORE_FRAMEWORK;
 import static org.opentripplanner.OtpArchitectureModules.DOMAIN_CORE_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
-import static org.opentripplanner.OtpArchitectureModules.GEO_JSON;
-import static org.opentripplanner.OtpArchitectureModules.GEO_TOOLS;
 import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
-import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
-import static org.opentripplanner.OtpArchitectureModules.OPEN_GIS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_UTILS;
 
 import org.junit.jupiter.api.Test;
@@ -17,7 +13,6 @@ import org.opentripplanner._support.arch.Package;
 public class FrameworkArchitectureTest {
 
   private static final Package APACHE_HTTP = Package.of("org.apache.hc..");
-  private static final Package GUAVA_COLLECTIONS = Package.of("com.google.common.collect");
 
   private static final Module XML_MODULES = Module.of(
     Package.of("com.fasterxml.jackson.."),
@@ -27,7 +22,6 @@ public class FrameworkArchitectureTest {
   private static final Package APPLICATION = FRAMEWORK.subPackage("application");
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package FUNCTIONAL = FRAMEWORK.subPackage("functional");
-  private static final Package GEOMETRY = FRAMEWORK.subPackage("geometry");
   private static final Package I18N = DOMAIN_CORE_MODEL.subPackage("i18n");
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LOGGING = FRAMEWORK.subPackage("logging");
@@ -47,19 +41,6 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceFunctionalPackageDependencies() {
     FUNCTIONAL.verify();
-  }
-
-  @Test
-  void enforceGeometryPackageDependencies() {
-    GEOMETRY.dependsOn(
-      GEO_JSON,
-      GEO_TOOLS,
-      GNU_TROVE,
-      JTS_GEOM,
-      OPEN_GIS,
-      GUAVA_COLLECTIONS,
-      OTP_UTILS
-    ).verify();
   }
 
   @Test

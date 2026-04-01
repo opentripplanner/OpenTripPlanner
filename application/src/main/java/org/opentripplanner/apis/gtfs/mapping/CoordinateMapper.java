@@ -3,7 +3,7 @@ package org.opentripplanner.apis.gtfs.mapping;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class CoordinateMapper {
 

@@ -56,7 +56,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
       )
       .egress("D ~ Walk 20s");
 
-    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D30s));
+    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D30_s));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).timetable(true);
 

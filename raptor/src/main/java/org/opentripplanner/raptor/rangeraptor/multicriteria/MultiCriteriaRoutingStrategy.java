@@ -2,9 +2,12 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
+import java.util.Iterator;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -116,6 +119,40 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     }
   }
 
+  @Override
+  public void registerOnBoardAccessStopArrival(RaptorOnBoardAccess access, int boardTime) {
+    state.addOnBoardAccessStopArrival(access, boardTime);
+  }
+
+  @Override
+  public Iterator<? extends McStopArrival<T>> consumeOnBoardStopArrivals() {
+    return state.listOnBoardStopArrivals().iterator();
+  }
+
+  @Override
+  public boolean boardAsOnBoardAccess(
+    ArrivalView<T> prevArrival,
+    int stopPositionInPattern,
+    T trip
+  ) {
+    if (!(prevArrival instanceof McStopArrival<T> prevMcArrival)) {
+      throw new UnsupportedOperationException();
+    }
+
+    var boarding = boardingSupport.searchRegularTransfer(
+      prevArrival.arrivalTime(),
+      stopPositionInPattern,
+      slackProvider.boardSlack(trip.pattern().slackIndex())
+    );
+
+    if (boarding.empty()) {
+      return false;
+    }
+
+    board(prevMcArrival, prevArrival.stop(), boarding);
+    return true;
+  }
+
   private void board(
     McStopArrival<T> prevArrival,
     final int stopIndex,
@@ -169,17 +206,17 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     int boardSlack,
     RaptorConstrainedBoardingSearch<T> txSearch
   ) {
-    boardingSupport
-      .searchConstrainedTransfer(
-        prevArrival.mostRecentTransitArrival(),
-        prevArrival.arrivalTime(),
-        boardSlack,
-        txSearch
-      )
-      .boardWithFallback(
-        boarding -> board(prevArrival, stopIndex, boarding),
-        emptyBoarding -> boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack)
-      );
+    var boarding = boardingSupport.searchConstrainedTransfer(
+      prevArrival.mostRecentTransitArrival(),
+      prevArrival.arrivalTime(),
+      boardSlack,
+      txSearch
+    );
+    if (boarding.empty()) {
+      boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
+    } else if (!boarding.transferConstraint().isNotAllowed()) {
+      board(prevArrival, stopIndex, boarding);
+    }
   }
 
   /**

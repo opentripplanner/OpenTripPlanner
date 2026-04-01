@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources.params;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * This is temporary and will be removed in a future version of OTP.

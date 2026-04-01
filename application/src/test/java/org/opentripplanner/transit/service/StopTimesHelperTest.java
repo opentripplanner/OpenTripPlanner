@@ -22,7 +22,7 @@ class StopTimesHelperTest {
 
   static String feedId;
   private static DefaultTransitService transitService;
-  private static final LocalDate serviceDate = LocalDate.of(2021, Month.JULY, 26);
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2021, Month.JULY, 26);
   private static FeedScopedId stopId;
   private static TripPattern pattern;
   private static StopTimesHelper stopTimesHelper;
@@ -59,12 +59,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_zeroRequestedNumberOfDeparture() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       0,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertTrue(result.isEmpty());
@@ -77,12 +78,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_oneDeparture() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       1,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -108,7 +110,7 @@ class StopTimesHelperTest {
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate, stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE, stopTime.getServiceDay());
   }
 
   /**
@@ -118,12 +120,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_allDepartures() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       10,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -140,12 +143,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_noCanceledDepartures() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       10,
       ArrivalDeparture.BOTH,
       false,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -165,12 +169,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_noDepartures() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(6),
       2,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -189,12 +194,13 @@ class StopTimesHelperTest {
   void stopTimesForStop_nextDay() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(36),
       10,
       ArrivalDeparture.BOTH,
       true,
-      SORT_ORDER
+      SORT_ORDER,
+      null
     );
 
     assertEquals(
@@ -221,7 +227,7 @@ class StopTimesHelperTest {
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE.plusDays(1), stopTime.getServiceDay());
   }
 
   /**
@@ -232,7 +238,7 @@ class StopTimesHelperTest {
     var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       2,
       ArrivalDeparture.BOTH,
@@ -246,7 +252,7 @@ class StopTimesHelperTest {
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate, stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE, stopTime.getServiceDay());
   }
 
   /**
@@ -257,7 +263,7 @@ class StopTimesHelperTest {
     var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
-      serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(24),
       2,
       ArrivalDeparture.BOTH,
@@ -272,7 +278,7 @@ class StopTimesHelperTest {
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
 
-    assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE.plusDays(1), stopTime.getServiceDay());
   }
 
   /**
@@ -283,7 +289,7 @@ class StopTimesHelperTest {
     var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
-      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      SERVICE_DATE.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(48),
       2,
       ArrivalDeparture.BOTH,
@@ -297,14 +303,14 @@ class StopTimesHelperTest {
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate, stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE, stopTime.getServiceDay());
 
     stopTime = stopTimes.get(1);
 
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE.plusDays(1), stopTime.getServiceDay());
   }
 
   /**
@@ -314,7 +320,7 @@ class StopTimesHelperTest {
   void stopTimesForStopServiceDate() {
     var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
-      serviceDate,
+      SERVICE_DATE,
       ArrivalDeparture.BOTH,
       true
     );
@@ -342,7 +348,7 @@ class StopTimesHelperTest {
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
-    assertEquals(serviceDate, stopTime.getServiceDay());
+    assertEquals(SERVICE_DATE, stopTime.getServiceDay());
   }
 
   boolean hasCancelledTrips(List<StopTimesInPattern> stopTimes) {

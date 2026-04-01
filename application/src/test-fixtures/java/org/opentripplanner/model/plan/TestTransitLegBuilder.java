@@ -5,9 +5,12 @@ import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -65,6 +68,13 @@ public class TestTransitLegBuilder {
   public TestTransitLegBuilder withRoute(Route route) {
     this.trip = this.trip.copy().withRoute(route).build();
     return this;
+  }
+
+  public TestTransitLegBuilder withNetwork(FeedScopedId id) {
+    var route = TimetableRepositoryForTest.route(id)
+      .withGroupOfRoutes(List.of(GroupOfRoutes.of(id).build()))
+      .build();
+    return withRoute(route);
   }
 
   public TestTransitLeg build() {

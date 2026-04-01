@@ -16,7 +16,7 @@ class OperatorTest {
   private static final String URL = "http://info.aaa.com";
   private static final String PHONE = "+47 95566333";
 
-  private static final Operator subject = Operator.of(TimetableRepositoryForTest.id(ID))
+  private static final Operator SUBJECT = Operator.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withPhone(PHONE)
@@ -25,16 +25,16 @@ class OperatorTest {
   @Test
   void copy() {
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = SUBJECT.copy().withName(NAME).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withName("v2").build();
+    copy = SUBJECT.copy().withName("v2").build();
 
     // The two objects are not the same instance, but is equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
@@ -44,10 +44,10 @@ class OperatorTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPhone("X").build()));
   }
 }

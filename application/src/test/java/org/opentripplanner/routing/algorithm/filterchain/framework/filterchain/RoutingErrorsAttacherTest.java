@@ -15,7 +15,7 @@ class RoutingErrorsAttacherTest implements PlanTestConstants {
 
   @Test
   void walkingReturnsWalkingBetterThanTransitError() {
-    var walk = newItinerary(A, T11_06).walk(D12m, E).build();
+    var walk = newItinerary(A, T11_06).walk(D12_m, E).build();
     var bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
     var itins = flagAll(List.of(walk, bus));
     var errors = RoutingErrorsAttacher.computeErrors(itins, itins);

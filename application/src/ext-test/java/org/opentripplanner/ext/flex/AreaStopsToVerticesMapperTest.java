@@ -17,11 +17,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -37,10 +36,7 @@ class AreaStopsToVerticesMapperTest {
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 
-  public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
-    SITE_REPOSITORY,
-    new Deduplicator()
-  );
+  public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(SITE_REPOSITORY);
 
   static List<TestCase> testCases() {
     return List.of(

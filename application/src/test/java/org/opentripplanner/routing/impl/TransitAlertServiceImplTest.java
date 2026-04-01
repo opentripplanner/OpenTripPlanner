@@ -9,7 +9,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -36,8 +35,7 @@ class TransitAlertServiceImplTest {
     .build();
 
   private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
-    getSiteRepository(),
-    new Deduplicator()
+    getSiteRepository()
   );
 
   private static SiteRepository getSiteRepository() {

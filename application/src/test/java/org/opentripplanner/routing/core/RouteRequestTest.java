@@ -17,13 +17,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -34,6 +32,8 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.StreetMode;
 
 class RouteRequestTest {
 
@@ -43,7 +43,7 @@ class RouteRequestTest {
     "Via1",
     Duration.ofMinutes(10),
     List.of(),
-    List.of(new WgsCoordinate(59.5, 11.0))
+    new WgsCoordinate(59.5, 11.0)
   );
   private static final PassThroughViaLocation SECOND_VIA = new PassThroughViaLocation(
     "Via2",
@@ -53,7 +53,7 @@ class RouteRequestTest {
     "Via3",
     Duration.ofMinutes(10),
     List.of(new FeedScopedId("F", "2")),
-    List.of()
+    null
   );
   private static final List<ViaLocation> VIA = List.of(FIRST_VIA, SECOND_VIA, THIRD_VIA);
   private static final Instant DATE_TIME = LocalDateTime.of(2025, Month.MAY, 17, 11, 15).toInstant(
@@ -235,9 +235,9 @@ class RouteRequestTest {
         from:(60.0,10.0),
         to:(59.0,12.0),
         via: [
-          VisitViaLocation{label:Via1,minimumWaitTime:10m,coordinates:[(59.5,11.0)]},
+          VisitViaLocation{label:Via1,minimumWaitTime:10m,coordinate:(59.5,11.0)},
           PassThroughViaLocation{label:Via2,stopLocationIds:[F:1]},
-          VisitViaLocation{label:Via3,minimumWaitTime:10m,stopLocationIds:[F:2],coordinates:[]}
+          VisitViaLocation{label:Via3,minimumWaitTime:10m,stopLocationIds:[F:2]}
         ],
         dateTime:2025-05-17T11:15:00Z,
         arriveBy,
@@ -304,7 +304,7 @@ class RouteRequestTest {
     assertTrue(builder.buildDefault().allowTransferOptimization());
 
     builder.withViaLocations(
-      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
+      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), null))
     );
     assertFalse(builder.buildDefault().allowTransferOptimization());
   }

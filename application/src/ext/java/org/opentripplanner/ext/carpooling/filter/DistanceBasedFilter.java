@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling.filter;
 
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

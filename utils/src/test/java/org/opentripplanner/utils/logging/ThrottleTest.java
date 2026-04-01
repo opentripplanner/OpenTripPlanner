@@ -72,7 +72,7 @@ class ThrottleTest {
   }
 
   private List<Integer> createIntegerSequence(int size) {
-    List<Integer> events = new ArrayList<>();
+    List<Integer> events = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       events.add(i);
     }

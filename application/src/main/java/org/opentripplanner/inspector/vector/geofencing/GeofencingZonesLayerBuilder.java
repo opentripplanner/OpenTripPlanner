@@ -6,10 +6,10 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**

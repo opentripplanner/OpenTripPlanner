@@ -181,17 +181,17 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
 
     // We need *a* path - the transfer her can be any
     var originalPath = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1s)
+      .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, STOP_C)
       .walk(costCG, STOP_G)
       .bus(trip2, STOP_H)
       .walk(costHK, STOP_K)
       .bus(trip3, STOP_M)
-      .egress(D1s);
+      .egress(D1_s);
 
     RaptorPath<TestTripSchedule> expectedPath;
     {
-      var b = pathBuilder().c2(tc.points().size()).access(ITERATION_START_TIME, STOP_B, D1s);
+      var b = pathBuilder().c2(tc.points().size()).access(ITERATION_START_TIME, STOP_B, D1_s);
 
       if (tc.stopIndexA() == STOP_C) {
         b.bus(trip1, STOP_C).walk(costCG, STOP_G);
@@ -203,7 +203,7 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
       } else {
         b.bus(trip2, STOP_J).walk(costJL, STOP_L);
       }
-      expectedPath = b.bus(trip3, STOP_M).egress(D1s);
+      expectedPath = b.bus(trip3, STOP_M).egress(D1_s);
     }
 
     var firstTransfers = List.of(

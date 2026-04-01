@@ -1,6 +1,8 @@
 package org.opentripplanner.inspector.vector.edge;
 
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
 import com.google.common.collect.Lists;
@@ -89,14 +91,18 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
   private List<KeyValue> mapStreetEdge(StreetEdge se) {
     var props = Lists.newArrayList(
       kv("permission", streetPermissionAsString(se.getPermission())),
-      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
-      kv("walkSafetyFactor", roundTo2Decimals(se.getWalkSafetyFactor())),
       kv("noThruTraffic", noThruTrafficAsString(se)),
       kv("wheelchairAccessible", se.isWheelchairAccessible()),
       kv("maximumSlope", roundTo2Decimals(se.getMaxSlope())),
       kv("fromVertexLabel", se.getFromVertex().getLabel().toString()),
       kv("toVertexLabel", se.getToVertex().getLabel().toString())
     );
+    if (se.getPermission().allows(BICYCLE)) {
+      props.add(kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())));
+    }
+    if (se.getPermission().allows(WALK)) {
+      props.add(kv("walkSafetyFactor", roundTo2Decimals(se.getWalkSafetyFactor())));
+    }
     if (se.nameIsDerived()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
     } else {
@@ -152,7 +158,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       noThruPermission = noThruPermission.add(StreetTraversalPermission.PEDESTRIAN);
     }
     if (se.isBicycleNoThruTraffic()) {
-      noThruPermission = noThruPermission.add(StreetTraversalPermission.BICYCLE);
+      noThruPermission = noThruPermission.add(BICYCLE);
     }
     if (se.isMotorVehicleNoThruTraffic()) {
       noThruPermission = noThruPermission.add(StreetTraversalPermission.CAR);

@@ -157,7 +157,9 @@ class AbstractCsvParserTest {
     );
 
     subject.headersMatch();
-    while (subject.hasNext()) {}
+    while (subject.hasNext()) {
+      // Spinn trough all items so we can test the result
+    }
 
     var error1 = issueStore.listIssues().getFirst();
     var error2 = issueStore.listIssues().getLast();

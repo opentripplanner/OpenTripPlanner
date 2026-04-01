@@ -3,10 +3,11 @@ package org.opentripplanner.routing.api.request.via;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -20,14 +21,17 @@ public class VisitViaLocation extends AbstractViaLocation {
 
   private static final Duration MINIMUM_WAIT_TIME_MAX_LIMIT = Duration.ofHours(24);
 
+  @Nullable
   private final Duration minimumWaitTime;
-  private final List<WgsCoordinate> coordinates;
+
+  @Nullable
+  private final WgsCoordinate coordinate;
 
   public VisitViaLocation(
     @Nullable String label,
     @Nullable Duration minimumWaitTime,
     List<FeedScopedId> stopLocationIds,
-    List<WgsCoordinate> coordinates
+    @Nullable WgsCoordinate coordinate
   ) {
     super(label, stopLocationIds);
     this.minimumWaitTime = DurationUtils.requireNonNegative(
@@ -35,9 +39,9 @@ public class VisitViaLocation extends AbstractViaLocation {
       MINIMUM_WAIT_TIME_MAX_LIMIT,
       "minimumWaitTime"
     );
-    this.coordinates = List.copyOf(coordinates);
+    this.coordinate = coordinate;
 
-    if (stopLocationIds().isEmpty() && coordinates().isEmpty()) {
+    if (stopLocationIds().isEmpty() && this.coordinate == null) {
       throw new IllegalArgumentException(
         "A via location must have at least one stop location or a coordinate." +
           (label == null ? "" : " Label: " + label)
@@ -51,11 +55,9 @@ public class VisitViaLocation extends AbstractViaLocation {
    */
   @Nullable
   public GenericLocation coordinateLocation() {
-    if (coordinates.isEmpty()) {
+    if (coordinate == null) {
       return null;
     }
-    // TODO we will remove support for multiple coordinates
-    var coordinate = coordinates.getFirst();
     return new GenericLocation(label(), null, coordinate.latitude(), coordinate.longitude());
   }
 
@@ -75,8 +77,8 @@ public class VisitViaLocation extends AbstractViaLocation {
   }
 
   @Override
-  public List<WgsCoordinate> coordinates() {
-    return coordinates;
+  public Optional<WgsCoordinate> coordinate() {
+    return Optional.ofNullable(coordinate);
   }
 
   @Override
@@ -85,7 +87,7 @@ public class VisitViaLocation extends AbstractViaLocation {
       .addObj("label", label())
       .addDuration("minimumWaitTime", minimumWaitTime, Duration.ZERO)
       .addCol("stopLocationIds", stopLocationIds())
-      .addObj("coordinates", coordinates)
+      .addObj("coordinate", coordinate)
       .toString();
   }
 
@@ -103,12 +105,12 @@ public class VisitViaLocation extends AbstractViaLocation {
     VisitViaLocation that = (VisitViaLocation) o;
     return (
       Objects.equals(minimumWaitTime, that.minimumWaitTime) &&
-      Objects.equals(coordinates, that.coordinates)
+      Objects.equals(coordinate, that.coordinate)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), minimumWaitTime, coordinates);
+    return Objects.hash(super.hashCode(), minimumWaitTime, coordinate);
   }
 }

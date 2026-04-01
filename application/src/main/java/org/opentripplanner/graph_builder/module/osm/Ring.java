@@ -15,9 +15,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.street.geometry.CoordinateArrayListSequence;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 class Ring {
 

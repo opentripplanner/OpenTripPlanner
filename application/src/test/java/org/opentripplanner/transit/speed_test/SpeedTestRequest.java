@@ -22,6 +22,7 @@ public class SpeedTestRequest {
   private final SpeedTestCmdLineOpts opts;
   private final SpeedTestConfig config;
   private final SpeedTestProfile profile;
+  private final RouteRequest defaultRouteRequest;
   private final ZoneId timeZoneId;
 
   SpeedTestRequest(
@@ -29,12 +30,14 @@ public class SpeedTestRequest {
     SpeedTestCmdLineOpts opts,
     SpeedTestConfig config,
     SpeedTestProfile profile,
+    RouteRequest defaultRouteRequest,
     ZoneId timeZoneId
   ) {
     this.testCase = testCase;
     this.opts = opts;
     this.config = config;
     this.profile = profile;
+    this.defaultRouteRequest = defaultRouteRequest;
     this.timeZoneId = timeZoneId;
   }
 
@@ -43,7 +46,7 @@ public class SpeedTestRequest {
   }
 
   RouteRequest toRouteRequest() {
-    var builder = config.request.copyOf();
+    var builder = defaultRouteRequest.copyOf();
 
     var input = testCase.definition();
 
@@ -59,9 +62,13 @@ public class SpeedTestRequest {
 
     builder.withFrom(input.fromPlace()).withTo(input.toPlace());
 
+    if (input.viaLocation() != null) {
+      builder.withViaLocations(List.of(input.viaLocation()));
+    }
+
     // Filter the results inside the SpeedTest, not in the itineraries filter,
     // when ignoring street results. This will use the default which is 50.
-    if (!config.ignoreStreetResults) {
+    if (!config.ignoreStreetResults()) {
       builder.withNumItineraries(opts.numOfItineraries());
     }
     builder.withJourney(journeyBuilder -> {
@@ -117,6 +124,6 @@ public class SpeedTestRequest {
 
   private Instant time(int time) {
     // Note time may be negative and exceed 24 hours
-    return config.testDate.atStartOfDay(timeZoneId).plusSeconds(time).toInstant();
+    return config.testDate().atStartOfDay(timeZoneId).plusSeconds(time).toInstant();
   }
 }

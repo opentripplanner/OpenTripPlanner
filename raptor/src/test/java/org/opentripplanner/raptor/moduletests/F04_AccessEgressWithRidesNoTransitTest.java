@@ -56,13 +56,13 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
         12:00  13:00
         """
       )
-      .withTransfer(STOP_B, transfer(STOP_C, D5m));
+      .withTransfer(STOP_B, transfer(STOP_C, D5_m));
 
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_10)
       .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D10m);
+      .searchWindowInSeconds(D10_m);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }
@@ -76,8 +76,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
-          .addAccessPaths(flex(STOP_B, D2m))
-          .addEgressPaths(flex(STOP_C, D2m))
+          .addAccessPaths(flex(STOP_B, D2_m))
+          .addEgressPaths(flex(STOP_C, D2_m))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
@@ -103,8 +103,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
-          .addAccessPaths(flex(STOP_B, D2m).openingHours("0:12", "0:16"))
-          .addEgressPaths(flex(STOP_C, D2m))
+          .addAccessPaths(flex(STOP_B, D2_m).openingHours("0:12", "0:16"))
+          .addEgressPaths(flex(STOP_C, D2_m))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
@@ -127,8 +127,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
-          .addAccessPaths(flex(STOP_B, D2m))
-          .addEgressPaths(flex(STOP_C, D2m).openingHours("0:22", "0:26"))
+          .addAccessPaths(flex(STOP_B, D2_m))
+          .addEgressPaths(flex(STOP_C, D2_m).openingHours("0:22", "0:26"))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(TC_STANDARD, path + "[0:14 0:24 10m Tₙ1]")
@@ -153,8 +153,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
-          .addAccessPaths(flexAndWalk(STOP_C, D7m))
-          .addEgressPaths(flex(STOP_C, D2m))
+          .addAccessPaths(flexAndWalk(STOP_C, D7_m))
+          .addEgressPaths(flex(STOP_C, D2_m))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
@@ -178,8 +178,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
-          .addAccessPaths(flex(STOP_C, D2m))
-          .addEgressPaths(flexAndWalk(STOP_C, D7m))
+          .addAccessPaths(flex(STOP_C, D2_m))
+          .addEgressPaths(flexAndWalk(STOP_C, D7_m))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))

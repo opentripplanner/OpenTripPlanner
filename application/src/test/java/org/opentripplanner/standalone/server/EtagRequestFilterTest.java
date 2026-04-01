@@ -20,12 +20,18 @@ import org.opentripplanner.test.support.HttpForTest;
 
 class EtagRequestFilterTest {
 
-  static final String vectorTilesResponse = "some vector tiles";
-  static final String vectorTilesEtag = "\"20c17790\"";
+  static final String VECTOR_TILES_RESPONSE = "some vector tiles";
+  static final String VECTOR_TILES_ETAG = "\"20c17790\"";
 
   static Stream<Arguments> etagCases() {
     return Stream.of(
-      Arguments.of("GET", 200, APPLICATION_X_PROTOBUF, bytes(vectorTilesResponse), vectorTilesEtag),
+      Arguments.of(
+        "GET",
+        200,
+        APPLICATION_X_PROTOBUF,
+        bytes(VECTOR_TILES_RESPONSE),
+        VECTOR_TILES_ETAG
+      ),
       Arguments.of("GET", 404, APPLICATION_X_PROTOBUF, bytes("hello123"), null),
       Arguments.of("GET", 200, "application/json", bytes("{}"), null),
       Arguments.of("POST", 200, APPLICATION_X_PROTOBUF, bytes("hello123"), null),
@@ -59,8 +65,8 @@ class EtagRequestFilterTest {
 
   static Stream<Arguments> ifNoneMatchCases() {
     return Stream.of(
-      Arguments.of("XXX", 200, bytes(vectorTilesResponse)),
-      Arguments.of(vectorTilesEtag, 304, null)
+      Arguments.of("XXX", 200, bytes(VECTOR_TILES_RESPONSE)),
+      Arguments.of(VECTOR_TILES_ETAG, 304, null)
     );
   }
 
@@ -73,7 +79,7 @@ class EtagRequestFilterTest {
     var response = response(200, request);
     var headers = response.getHeaders();
     headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, APPLICATION_X_PROTOBUF);
-    var bytes = bytes(vectorTilesResponse);
+    var bytes = bytes(VECTOR_TILES_RESPONSE);
     response.setEntity(bytes);
 
     var filter = new EtagRequestFilter();

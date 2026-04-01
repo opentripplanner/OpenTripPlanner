@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.api.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D4m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D4_m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 
 import org.junit.jupiter.api.Test;
@@ -101,10 +101,10 @@ class RaptorValueTest {
 
   @Test
   public void testTestAccessEgress_Parse() {
-    var walk = TestAccessEgress.walk(STOP_A, D4m, 1233).withTimePenalty(17);
+    var walk = TestAccessEgress.walk(STOP_A, D4_m, 1233).withTimePenalty(17);
     var free = TestAccessEgress.free(STOP_A);
-    var flex = TestAccessEgress.flex(STOP_A, D4m, 2, 1233).withViaLocationsVisited(2);
-    var flex2 = TestAccessEgress.flexAndWalk(STOP_A, D4m, 2, 1233);
+    var flex = TestAccessEgress.flex(STOP_A, D4_m, 2, 1233).withViaLocationsVisited(2);
+    var flex2 = TestAccessEgress.flexAndWalk(STOP_A, D4_m, 2, 1233);
 
     assertEquals(walk, TestAccessEgress.of(walk.toString()));
     assertEquals(free, TestAccessEgress.of(free.toString()));

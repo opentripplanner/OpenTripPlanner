@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
@@ -26,10 +26,13 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 public class ItineraryTest implements PlanTestConstants {
 
   private static final Cost COST = Cost.costOfSeconds(720);
+  private static final double DISTANCE_DELTA = 0.01;
+  // Geometry-based distance from PlanTestConstants A (5.0, 8.0) to B (6.0, 8.5)
+  private static final double A_TO_B_DISTANCE = 124205.32;
 
   @Test
   void testDerivedFieldsWithWalkingOnly() {
-    Itinerary result = newItinerary(A, T11_00).walk(D5m, B).build();
+    Itinerary result = newItinerary(A, T11_00).walk(D5_m, B).build();
 
     // Expected fields on itinerary set
     assertEquals(ofMinutes(5), result.totalDuration());
@@ -72,7 +75,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(newTime(T11_10), firstLeg.endTime());
     assertEquals(TransitMode.BUS, result.transitLeg(0).mode());
     assertEquals(TimetableRepositoryForTest.id("55"), firstLeg.trip().getId());
-    assertEquals(7500, firstLeg.distanceMeters(), 1E-3);
+    assertEquals(A_TO_B_DISTANCE, firstLeg.distanceMeters(), DISTANCE_DELTA);
 
     assertEquals("A ~ BUS 55 11:00 11:10 ~ B [C₁720]", result.toStr());
   }
@@ -97,7 +100,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(newTime(T11_15), firstLeg.endTime());
     assertEquals(TransitMode.RAIL, result.transitLeg(0).mode());
     assertEquals(TimetableRepositoryForTest.id("20"), firstLeg.trip().getId());
-    assertEquals(15_000, firstLeg.distanceMeters(), 1E-3);
+    assertEquals(A_TO_B_DISTANCE, firstLeg.distanceMeters(), DISTANCE_DELTA);
 
     assertEquals("A ~ RAIL R2 11:05 11:15 ~ B [C₁720]", result.toStr());
   }
@@ -105,7 +108,7 @@ public class ItineraryTest implements PlanTestConstants {
   @Test
   void testDerivedFieldsWithWalAccessAndTwoTransitLegs() {
     Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T11_02)
-      .walk(D1m, B)
+      .walk(D1_m, B)
       .bus(21, T11_05, T11_10, C)
       .rail(110, T11_15, T11_30, D)
       .build();
@@ -125,10 +128,10 @@ public class ItineraryTest implements PlanTestConstants {
   @Test
   void testDerivedFieldsWithBusAndWalkingAccessAndEgress() {
     Itinerary result = newItinerary(A, T11_05)
-      .walk(D2m, B)
+      .walk(D2_m, B)
       // 3 minutes wait
       .bus(1, T11_10, T11_20, C)
-      .walk(D3m, D)
+      .walk(D3_m, D)
       .build();
 
     assertEquals(ofMinutes(18), result.totalDuration());
@@ -146,12 +149,12 @@ public class ItineraryTest implements PlanTestConstants {
   @Test
   void walkBusBusWalkTrainWalk() {
     Itinerary result = newItinerary(A, T11_00)
-      .walk(D2m, B)
+      .walk(D2_m, B)
       .bus(55, T11_04, T11_14, C)
       .bus(21, T11_16, T11_20, D)
-      .walk(D3m, E)
+      .walk(D3_m, E)
       .rail(20, T11_30, T11_50, F)
-      .walk(D1m, G)
+      .walk(D1_m, G)
       .build();
 
     assertEquals(ofMinutes(51), result.totalDuration());
@@ -172,7 +175,11 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void walkSeparateFromBike() {
-    var itin = newItinerary(A, T11_00).walk(D2m, B).bicycle(T11_05, T11_15, D).walk(D3m, E).build();
+    var itin = newItinerary(A, T11_00)
+      .walk(D2_m, B)
+      .bicycle(T11_05, T11_15, D)
+      .walk(D3_m, E)
+      .build();
 
     assertEquals(ofMinutes(15), itin.totalStreetDuration());
     assertEquals(ofMinutes(5), itin.totalWalkDuration());
@@ -183,7 +190,7 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void walkSeparateFromCar() {
-    var itin = newItinerary(A, T11_00).walk(D2m, B).carHail(D10m, D).walk(D3m, E).build();
+    var itin = newItinerary(A, T11_00).walk(D2_m, B).carHail(D10_m, D).walk(D3_m, E).build();
 
     assertEquals(ofMinutes(15), itin.totalStreetDuration());
     assertEquals(ofMinutes(5), itin.totalWalkDuration());
@@ -203,8 +210,8 @@ public class ItineraryTest implements PlanTestConstants {
   void normalization() {
     var zoneId = ZoneId.of("Europe/Oslo");
     var model = TimetableRepositoryForTest.of();
-    var stopA = model.stop("A").build();
-    var stopB = model.stop("B").build();
+    var stopA = model.stop("A", 60.0, 10.0).build();
+    var stopB = model.stop("B", 60.0, 10.01).build();
     var stopPattern = TimetableRepositoryForTest.stopPattern(stopA, stopB);
     var trip = TimetableRepositoryForTest.trip("trip1").build();
     var tripPattern = TimetableRepositoryForTest.tripPattern("p", trip.getRoute())
@@ -225,7 +232,6 @@ public class ItineraryTest implements PlanTestConstants {
           .withTripPattern(tripPattern)
           .withBoardStopIndexInPattern(0)
           .withAlightStopIndexInPattern(1)
-          .withDistanceMeters(17.5)
           .withServiceDate(startTime.toLocalDate())
           .withZoneId(zoneId)
           .build()

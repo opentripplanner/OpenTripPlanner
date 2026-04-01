@@ -2,10 +2,10 @@ package org.opentripplanner.updater.trip.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper.mapTransitMainMode;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.spi.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
 
 import java.time.LocalDate;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -34,7 +34,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateException;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -68,13 +68,17 @@ class AddedTripBuilder {
   private final String headsign;
   private final List<TripOnServiceDate> replacedTrips;
   private final StopTimesMapper stopTimesMapper;
+  private final DeduplicatorService deduplicator;
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
     TransitEditorService transitService,
+    DeduplicatorService deduplicator,
     EntityResolver entityResolver,
-    Function<Trip, FeedScopedId> getTripPatternId
+    Function<Trip, FeedScopedId> getTripPatternId,
+    List<CallWrapper> calls
   ) {
+    this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
     // Added ServiceJourneyId
     String estimatedVehicleJourneyCode = estimatedVehicleJourney.getEstimatedVehicleJourneyCode();
@@ -100,7 +104,7 @@ class AddedTripBuilder {
       : lineRef;
     replacedRoute = entityResolver.resolveRoute(externalLineRef);
 
-    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
+    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     shortName = getFirstStringFromList(estimatedVehicleJourney.getPublishedLineNames());
 
@@ -113,7 +117,7 @@ class AddedTripBuilder {
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
     headsign = getFirstStringFromList(estimatedVehicleJourney.getDestinationNames());
 
-    calls = CallWrapper.of(estimatedVehicleJourney);
+    this.calls = calls;
 
     this.transitService = transitService;
     this.entityResolver = entityResolver;
@@ -126,6 +130,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     TransitEditorService transitService,
+    DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
     FeedScopedId tripId,
@@ -146,6 +151,7 @@ class AddedTripBuilder {
     String dataSource
   ) {
     this.transitService = transitService;
+    this.deduplicator = deduplicator;
     this.entityResolver = entityResolver;
     this.timeZone = transitService.getTimeZone();
     this.getTripPatternId = getTripPatternId;
@@ -168,18 +174,18 @@ class AddedTripBuilder {
     stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
   }
 
-  Result<TripUpdate, UpdateError> build() {
+  TripUpdate build() throws UpdateException {
     if (calls.size() < 2) {
-      return UpdateError.result(tripId, TOO_FEW_STOPS, dataSource);
+      throw UpdateException.of(tripId, TOO_FEW_STOPS);
     }
 
     if (serviceDate == null) {
-      return UpdateError.result(tripId, NO_START_DATE, dataSource);
+      throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
-      return UpdateError.result(tripId, NO_START_DATE, dataSource);
+      throw UpdateException.of(tripId, NO_START_DATE);
     }
 
     boolean isAddedRoute = false;
@@ -187,7 +193,7 @@ class AddedTripBuilder {
     if (route == null) {
       Agency agency = resolveAgency();
       if (agency == null) {
-        return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY, dataSource);
+        throw UpdateException.of(tripId, CANNOT_RESOLVE_AGENCY);
       }
       route = createRoute(agency);
       isAddedRoute = true;
@@ -212,7 +218,7 @@ class AddedTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        return UpdateError.result(tripId, UNKNOWN_STOP, dataSource);
+        throw UpdateException.of(tripId, UNKNOWN_STOP);
       }
 
       aimedStopTimes.add(stopTime);
@@ -225,11 +231,9 @@ class AddedTripBuilder {
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
-    var tripTimes = TripTimesFactory.tripTimes(
-      trip,
-      aimedStopTimes,
-      transitService.getDeduplicator()
-    ).withServiceCode(transitService.getServiceCode(trip.getServiceId()));
+    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
+      transitService.getServiceCode(trip.getServiceId())
+    );
     tripTimes.validateNonIncreasingTimes();
 
     TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
@@ -270,19 +274,18 @@ class AddedTripBuilder {
       .build();
 
     try {
-      return Result.success(
-        new TripUpdate(
-          stopPattern,
-          builder.build(),
-          serviceDate,
-          tripOnServiceDate,
-          pattern,
-          isAddedRoute,
-          dataSource
-        )
+      return new TripUpdate(
+        stopPattern,
+        builder.build(),
+        serviceDate,
+        tripOnServiceDate,
+        pattern,
+        isAddedRoute,
+        dataSource,
+        null
       );
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e, dataSource);
+      throw DataValidationExceptionMapper.map(e);
     }
   }
 

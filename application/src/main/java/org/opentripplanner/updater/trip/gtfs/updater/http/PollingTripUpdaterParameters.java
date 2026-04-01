@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.updater.http;
 
 import java.time.Duration;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;

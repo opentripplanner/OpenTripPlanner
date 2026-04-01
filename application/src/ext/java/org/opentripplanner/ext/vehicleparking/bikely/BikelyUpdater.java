@@ -14,13 +14,13 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.updater.spi.DataSource;
@@ -58,7 +58,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
       parameters.url(),
       POST_PARAMS,
       Duration.ofSeconds(30),
-      parameters.httpHeaders().asMap(),
+      parameters.httpHeaders(),
       response -> {
         try {
           var lots = new ArrayList<VehicleParking>();

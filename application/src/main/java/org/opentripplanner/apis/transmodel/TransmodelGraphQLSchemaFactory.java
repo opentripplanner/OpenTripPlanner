@@ -108,6 +108,8 @@ import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQu
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
+import org.opentripplanner.apis.transmodel.model.timetable.ReplacedByRelationType;
+import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
@@ -167,6 +169,8 @@ public class TransmodelGraphQLSchemaFactory {
   private final ViaTripQuery viaTripQueryFactory;
   private final GroupOfLinesType groupOfLinesTypeFactory;
   private final DatedServiceJourneyQuery datedServiceJourneyQueryFactory;
+  private final ReplacedByRelationType replacedByRelationTypeFactory;
+  private final ReplacementForRelationType replacementForRelationTypeFactory;
 
   private final Relay relay = new Relay();
 
@@ -199,6 +203,8 @@ public class TransmodelGraphQLSchemaFactory {
     this.viaTripQueryFactory = new ViaTripQuery(idMapper);
     this.groupOfLinesTypeFactory = new GroupOfLinesType(idMapper);
     this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idMapper);
+    this.replacedByRelationTypeFactory = new ReplacedByRelationType();
+    this.replacementForRelationTypeFactory = new ReplacementForRelationType();
   }
 
   public GraphQLSchema create() {
@@ -350,11 +356,16 @@ public class TransmodelGraphQLSchemaFactory {
       TimetabledPassingTimeType.REF
     );
 
+    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
+    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
+
     GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
       journeyPatternType,
       estimatedCallType,
-      quayType
+      quayType,
+      replacedByRelationType,
+      replacementForRelationType
     );
 
     GraphQLOutputType timetabledPassingTime = TimetabledPassingTimeType.create(

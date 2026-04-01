@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
+import static org.opentripplanner.OtpArchitectureModules.GEOMETRY;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.GOOGLE_COLLECTIONS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
@@ -46,6 +47,7 @@ public class TimetableRepositoryArchitectureTest {
   @Test
   void enforceSitePackageDependencies() {
     SITE.dependsOn(
+      GEOMETRY,
       FRAMEWORK_UTILS,
       JACKSON_ANNOTATIONS,
       GEO_UTILS,
@@ -59,6 +61,7 @@ public class TimetableRepositoryArchitectureTest {
   void enforceNetworkPackageDependencies() {
     // TODO OTP2 temporarily allow circular dependency between network and timetable
     NETWORK.dependsOn(
+      GEOMETRY,
       FRAMEWORK_UTILS,
       GEO_UTILS,
       TRANSIT_FRAMEWORK,

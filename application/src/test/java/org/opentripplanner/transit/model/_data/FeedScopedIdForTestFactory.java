@@ -9,4 +9,8 @@ public class FeedScopedIdForTestFactory {
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
   }
+
+  public static FeedScopedId id(int id) {
+    return id(String.valueOf(id));
+  }
 }

@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
-import static org.opentripplanner.routing.api.request.StreetMode.WALK;
+import static org.opentripplanner.street.model.StreetMode.BIKE;
+import static org.opentripplanner.street.model.StreetMode.WALK;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 class RaptorTransferIndexTest {

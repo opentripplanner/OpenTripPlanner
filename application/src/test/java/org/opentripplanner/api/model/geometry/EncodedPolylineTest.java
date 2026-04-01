@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 class EncodedPolylineTest {
 

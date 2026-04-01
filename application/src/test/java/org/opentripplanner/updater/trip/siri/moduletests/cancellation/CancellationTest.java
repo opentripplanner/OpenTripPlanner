@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
@@ -58,7 +59,7 @@ class CancellationTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertEquals(1, result.successful());
+    assertSuccess(result);
     assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).realTimeState());
   }
 
@@ -77,7 +78,7 @@ class CancellationTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertEquals(1, result.successful());
+    assertSuccess(result);
     assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).realTimeState());
   }
 
@@ -129,7 +130,7 @@ class CancellationTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
     var creationResult = siri.applyEstimatedTimetable(creation);
-    assertEquals(1, creationResult.successful());
+    assertSuccess(creationResult);
     assertEquals(
       "ADDED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.tripData(ADDED_TRIP_ID).showTimetable()
@@ -168,7 +169,7 @@ class CancellationTest implements RealtimeTestConstants {
       .buildEstimatedTimetableDeliveries();
 
     var modificationResult = siri.applyEstimatedTimetable(modification);
-    assertEquals(1, modificationResult.successful());
+    assertSuccess(modificationResult);
     TransitTestEnvironment transitTestEnvironment = siri.realtimeTestEnvironment();
     assertEquals(
       "MODIFIED | A 0:00:15 0:00:15 | D 0:00:25 0:00:25",
@@ -191,6 +192,6 @@ class CancellationTest implements RealtimeTestConstants {
 
     var cancellationResult = siri.applyEstimatedTimetable(cancellation);
 
-    assertEquals(1, cancellationResult.successful());
+    assertSuccess(cancellationResult);
   }
 }
