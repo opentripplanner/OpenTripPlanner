@@ -157,16 +157,15 @@ public class VertexLinker {
 
   /** project this linestring to an equirectangular projection */
   private static LineString equirectangularProject(LineString geometry, double xScale) {
-    Coordinate[] coords = new Coordinate[geometry.getNumPoints()];
+    var coords = new double[geometry.getNumPoints() * 2];
 
-    for (int i = 0; i < coords.length; i++) {
+    for (int i = 0; i < geometry.getNumPoints(); i++) {
       Coordinate c = geometry.getCoordinateN(i);
-      c = (Coordinate) c.clone();
-      c.x *= xScale;
-      coords[i] = c;
+      coords[i*2] = c.x * xScale;
+      coords[(i*2)+1] = c.y;
     }
 
-    return GEOMETRY_FACTORY.createLineString(coords);
+    return GeometryUtils.makeLineString(coords);
   }
 
   /**
