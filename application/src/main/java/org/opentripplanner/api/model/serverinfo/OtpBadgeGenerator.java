@@ -31,8 +31,7 @@ public class OtpBadgeGenerator {
   private static final int MARGIN = 50;
   private static final int TEXT_INSET = 5;
   private static final int FONT_WIDTH = 82;
-  private static final String TEMPLATE =
-    """
+  private static final String TEMPLATE = """
     <svg width="{{svgWidth}}" height="20" viewBox="0 0 {{width}} 200"
         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{{label}}: {{body}}">
       <title>{{label}}: {{body}}</title>

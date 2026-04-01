@@ -38,7 +38,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
   public void setup() {
     data
       //Given slacks: transfer 1m, board 30s, alight 10s
-      .withSlackProvider(new TestSlackProvider(D1m, D30s, D10s))
+      .withSlackProvider(new TestSlackProvider(D1_m, D30_s, D10_s))
       // Start walking 1m before: 30s walk + 30s board-slack
       .access("Flex+Walk 2m Rₙ1 ~ B")
       .withRoute(
@@ -63,7 +63,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       // Only one iteration is needed - the access should be time-shifted
-      .searchWindowInSeconds(D3m);
+      .searchWindowInSeconds(D3_m);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }

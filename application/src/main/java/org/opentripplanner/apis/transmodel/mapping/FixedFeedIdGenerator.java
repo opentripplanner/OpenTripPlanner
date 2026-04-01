@@ -29,13 +29,13 @@ public class FixedFeedIdGenerator {
       fixedFeedId = feedIds.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
       LOG.warn(
         "More than one feedId exist in the list of agencies. The feed-id used by" +
-        "most agencies will be picked."
+          "most agencies will be picked."
       );
     }
     LOG.info(
       "Starting Transmodel GraphQL Schema with fixed FeedId: '" +
-      fixedFeedId +
-      "'. All FeedScopedIds in API will be assumed to belong to this agency."
+        fixedFeedId +
+        "'. All FeedScopedIds in API will be assumed to belong to this agency."
     );
     return fixedFeedId;
   }

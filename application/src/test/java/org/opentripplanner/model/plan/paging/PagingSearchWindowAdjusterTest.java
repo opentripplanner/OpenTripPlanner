@@ -14,53 +14,59 @@ class PagingSearchWindowAdjusterTest {
   private static final boolean CROP_TAIL = true;
   private static final boolean CROP_HEAD = false;
 
-  private static final Duration D0s = Duration.ZERO;
-  private static final Duration D10m = duration("10m");
-  private static final Duration D30m = duration("30m");
-  private static final Duration D50m = duration("50m");
-  private static final Duration D1h = duration("1h");
-  private static final Duration D1h10m = duration("1h10m");
-  private static final Duration D1h20m = duration("1h20m");
-  private static final Duration D2h = duration("2h");
-  private static final Duration D4h = duration("4h");
-  private static final Duration D5h = duration("5h");
-  private static final Duration D6h = duration("6h");
-  private static final Duration D1d = duration("1d");
-  private static final List<Duration> LIST_OF_DURATIONS = List.of(D5h, D1h20m, D30m, D10m);
+  private static final Duration D0_s = Duration.ZERO;
+  private static final Duration D10_m = duration("10m");
+  private static final Duration D30_m = duration("30m");
+  private static final Duration D50_m = duration("50m");
+  private static final Duration D1_h = duration("1h");
+  private static final Duration D1_h_10_m = duration("1h10m");
+  private static final Duration D1_h_20_m = duration("1h20m");
+  private static final Duration D2_h = duration("2h");
+  private static final Duration D4_h = duration("4h");
+  private static final Duration D5_h = duration("5h");
+  private static final Duration D1_d = duration("1d");
+  private static final List<Duration> LIST_OF_DURATIONS = List.of(D5_h, D1_h_20_m, D30_m, D10_m);
 
   private final Instant time = Instant.parse("2022-01-15T12:00:00Z");
 
   private final PagingSearchWindowAdjuster subject = new PagingSearchWindowAdjuster(
-    D10m,
-    D1d,
+    D10_m,
+    D1_d,
     LIST_OF_DURATIONS
   );
 
   @Test
   void decreaseSearchWindow() {
-    assertEquals(D1h10m, subject.decreaseSearchWindow(D2h, time, time.plus(D1h10m), CROP_TAIL));
-    assertEquals(D50m, subject.decreaseSearchWindow(D2h, time, time.plus(D1h10m), CROP_HEAD));
+    assertEquals(
+      D1_h_10_m,
+      subject.decreaseSearchWindow(D2_h, time, time.plus(D1_h_10_m), CROP_TAIL)
+    );
+    assertEquals(D50_m, subject.decreaseSearchWindow(D2_h, time, time.plus(D1_h_10_m), CROP_HEAD));
 
-    assertEquals(D4h, subject.decreaseSearchWindow(D5h, time, time.plus(D4h), CROP_TAIL));
-    assertEquals(D1h, subject.decreaseSearchWindow(D5h, time, time.plus(D4h), CROP_HEAD));
+    assertEquals(D4_h, subject.decreaseSearchWindow(D5_h, time, time.plus(D4_h), CROP_TAIL));
+    assertEquals(D1_h, subject.decreaseSearchWindow(D5_h, time, time.plus(D4_h), CROP_HEAD));
   }
 
   @Test
   void keepSearchWindow() {
-    assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m, 5, 5));
-    assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m, 1, 1));
-    assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m, 1, 3));
+    assertEquals(D30_m, subject.increaseOrKeepSearchWindow(D30_m, 5, 5));
+    assertEquals(D30_m, subject.increaseOrKeepSearchWindow(D30_m, 1, 1));
+    assertEquals(D30_m, subject.increaseOrKeepSearchWindow(D30_m, 1, 3));
   }
 
   @Test
   void increaseSearchWindow() {
     var expectedList = new ArrayList<>(LIST_OF_DURATIONS);
-    expectedList.add(D0s);
+    expectedList.add(D0_s);
 
     for (int n = 0; n < expectedList.size(); ++n) {
       var expected = expectedList.get(n);
-      assertEquals(expected, subject.increaseOrKeepSearchWindow(D0s, 20, n), "n=" + n);
-      assertEquals(expected.plus(D30m), subject.increaseOrKeepSearchWindow(D30m, 20, n), "n=" + n);
+      assertEquals(expected, subject.increaseOrKeepSearchWindow(D0_s, 20, n), "n=" + n);
+      assertEquals(
+        expected.plus(D30_m),
+        subject.increaseOrKeepSearchWindow(D30_m, 20, n),
+        "n=" + n
+      );
     }
   }
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**

@@ -10,8 +10,7 @@ record TestCase(
   int stopIndexB,
   boolean fromAToB,
   List<RaptorViaLocation> points
-)
-  implements RaptorTestConstants {
+) implements RaptorTestConstants {
   static TestCaseBuilder testCase(String description) {
     return new TestCaseBuilder(description);
   }
@@ -56,7 +55,14 @@ record TestCase(
         .append(fromAToB ? " to " : " and ")
         .append(stopIndexToName(stopIndexB));
     }
-    buf.append(". ").append(points.stream().map(p -> p.toString(this::stopIndexToName)).toList());
+    buf
+      .append(". ")
+      .append(
+        points
+          .stream()
+          .map(p -> p.toString(this::stopIndexToName))
+          .toList()
+      );
     return buf.toString();
   }
 

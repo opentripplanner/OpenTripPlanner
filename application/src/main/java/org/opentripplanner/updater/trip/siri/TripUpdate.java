@@ -12,17 +12,19 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 /**
  * Represents the SIRI real-time update of a single trip.
  *
- * @param stopPattern            the stop pattern to which belongs the updated trip.
- * @param tripTimes              the new trip times for the updated trip.
- * @param serviceDate            the service date for which this update applies (updates are valid
- *                               only for one service date)
- * @param addedTripOnServiceDate optionally if this trip update adds a new trip, the
- *                               TripOnServiceDate corresponding to this new trip.
- * @param addedTripPattern       optionally if this trip update adds a new trip pattern , the new
- *                               trip pattern to this new trip.
- * @param routeCreation          true if an added trip cannot be registered under an existing route
- *                               and a new route must be created.
- * @param dataSource             the dataSource of the real-time update.
+ * @param stopPattern                  the stop pattern to which belongs the updated trip.
+ * @param tripTimes                    the new trip times for the updated trip.
+ * @param serviceDate                  the service date for which this update applies (updates are valid
+ *                                     only for one service date)
+ * @param addedTripOnServiceDate       optionally if this trip update adds a new trip, the
+ *                                     TripOnServiceDate corresponding to this new trip.
+ * @param addedTripPattern             optionally if this trip update adds a new trip pattern , the new
+ *                                     trip pattern to this new trip.
+ * @param routeCreation                true if an added trip cannot be registered under an existing route
+ *                                     and a new route must be created.
+ * @param dataSource                   the dataSource of the real-time update.
+ * @param hideTripInScheduledPattern when non-null, signals the snapshot manager to mark the trip
+ *                                     as deleted in this pattern.
  */
 record TripUpdate(
   StopPattern stopPattern,
@@ -31,7 +33,8 @@ record TripUpdate(
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   @Nullable TripPattern addedTripPattern,
   boolean routeCreation,
-  @Nullable String dataSource
+  @Nullable String dataSource,
+  @Nullable TripPattern hideTripInScheduledPattern
 ) {
   public TripUpdate {
     Objects.requireNonNull(stopPattern);
@@ -48,7 +51,7 @@ record TripUpdate(
     LocalDate serviceDate,
     String dataSource
   ) {
-    this(stopPattern, updatedTripTimes, serviceDate, null, null, false, dataSource);
+    this(stopPattern, updatedTripTimes, serviceDate, null, null, false, dataSource, null);
   }
 
   /**
@@ -63,5 +66,18 @@ record TripUpdate(
    */
   public boolean tripCreation() {
     return addedTripOnServiceDate != null;
+  }
+
+  TripUpdate withHideTripInScheduledPattern(@Nullable TripPattern pattern) {
+    return new TripUpdate(
+      stopPattern,
+      tripTimes,
+      serviceDate,
+      addedTripOnServiceDate,
+      addedTripPattern,
+      routeCreation,
+      dataSource,
+      pattern
+    );
   }
 }

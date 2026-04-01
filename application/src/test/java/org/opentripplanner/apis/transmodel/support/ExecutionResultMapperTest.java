@@ -5,6 +5,10 @@ import static org.opentripplanner.utils.lang.StringUtils.quoteReplace;
 
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
+import jakarta.ws.rs.core.StreamingOutput;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 class ExecutionResultMapperTest {
@@ -17,21 +21,21 @@ class ExecutionResultMapperTest {
 
   private static String RESULT_SERIALIZED = quoteReplace(
     "{" +
-    "'errors':[" +
-    "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
-    "]," +
-    "'data':'Test'" +
-    "}"
+      "'errors':[" +
+      "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
+      "]," +
+      "'data':'Test'" +
+      "}"
   );
 
   private static String TIMEOUT_RESPONSE = quoteReplace(
     "{" +
-    "'errors':[{" +
-    "'message':'TIMEOUT! The request is too resource intensive.'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'ApiProcessingTimeout'}" +
-    "}]" +
-    "}"
+      "'errors':[{" +
+      "'message':'TIMEOUT! The request is too resource intensive.'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'ApiProcessingTimeout'}" +
+      "}]" +
+      "}"
   );
 
   public static final String TOO_LARGE_MESSAGE =
@@ -39,55 +43,62 @@ class ExecutionResultMapperTest {
 
   private static final String TOO_LARGE_RESPONSE = quoteReplace(
     "{'" +
-    "errors':[{" +
-    "'message':'" +
-    TOO_LARGE_MESSAGE +
-    "'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'ResponseTooLarge'}" +
-    "}]" +
-    "}"
+      "errors':[{" +
+      "'message':'" +
+      TOO_LARGE_MESSAGE +
+      "'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'ResponseTooLarge'}" +
+      "}]" +
+      "}"
   );
 
   public static final String SYSTEM_ERROR_MESSAGE = "A system error!";
 
   public static final String SYSTEM_ERROR_RESPONSE = quoteReplace(
     "{" +
-    "'errors':[{" +
-    "'message':'" +
-    SYSTEM_ERROR_MESSAGE +
-    "'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'InternalServerError'}" +
-    "}]" +
-    "}"
+      "'errors':[{" +
+      "'message':'" +
+      SYSTEM_ERROR_MESSAGE +
+      "'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'InternalServerError'}" +
+      "}]" +
+      "}"
   );
 
   @Test
-  void okResponse() {
+  void okResponse() throws IOException {
     var response = ExecutionResultMapper.okResponse(OK_RESULT_WITH_DATA_AND_ERROR);
     assertEquals(200, response.getStatus());
-    assertEquals(RESULT_SERIALIZED, response.getEntity().toString());
+    assertEquals(RESULT_SERIALIZED, readEntity(response));
   }
 
   @Test
-  void timeoutResponse() {
+  void timeoutResponse() throws IOException {
     var response = ExecutionResultMapper.timeoutResponse();
     assertEquals(422, response.getStatus());
-    assertEquals(TIMEOUT_RESPONSE, response.getEntity().toString());
+    assertEquals(TIMEOUT_RESPONSE, readEntity(response));
   }
 
   @Test
-  void tooLargeResponse() {
+  void tooLargeResponse() throws IOException {
     var response = ExecutionResultMapper.tooLargeResponse(TOO_LARGE_MESSAGE);
     assertEquals(422, response.getStatus());
-    assertEquals(TOO_LARGE_RESPONSE, response.getEntity().toString());
+    assertEquals(TOO_LARGE_RESPONSE, readEntity(response));
   }
 
   @Test
-  void systemErrorResponse() {
+  void systemErrorResponse() throws IOException {
     var response = ExecutionResultMapper.systemErrorResponse(SYSTEM_ERROR_MESSAGE);
     assertEquals(500, response.getStatus());
-    assertEquals(SYSTEM_ERROR_RESPONSE, response.getEntity().toString());
+    assertEquals(SYSTEM_ERROR_RESPONSE, readEntity(response));
+  }
+
+  private static String readEntity(jakarta.ws.rs.core.Response response) throws IOException {
+    var streaming = (StreamingOutput) response.getEntity();
+    var baos = new ByteArrayOutputStream();
+    streaming.write(baos);
+    return baos.toString(StandardCharsets.UTF_8);
   }
 }

@@ -12,9 +12,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
 
-  private static final int BOARD_SLACK = D20s;
-  private static final int ALIGHT_SLACK = D10s;
-  private static final int TRANSFER_SLACK = D1m;
+  private static final int BOARD_SLACK = D20_s;
+  private static final int ALIGHT_SLACK = D10_s;
+  private static final int TRANSFER_SLACK = D1_m;
   private static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = new TestSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,

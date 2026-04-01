@@ -11,8 +11,7 @@ public record PrunedStopIsland(
   int restricted,
   int removed,
   String stopLabels
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Unlinked stops from pruned walk subgraph %s of %d street vertices and %d stops %s. Edge changes: %d to nothru, %d to no walking, %d erased";
 

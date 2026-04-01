@@ -27,7 +27,7 @@ public class PointsOnLinkType {
           .name("points")
           .description(
             "The encoded points of the polyline. Be aware that the string could contain escape characters that need to be accounted for. " +
-            "(https://www.freeformatter.com/javascript-escape.html)"
+              "(https://www.freeformatter.com/javascript-escape.html)"
           )
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> encodedPolyline(env).points())

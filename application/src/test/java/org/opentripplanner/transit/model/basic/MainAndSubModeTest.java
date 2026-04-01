@@ -31,7 +31,10 @@ class MainAndSubModeTest {
   public void notMainModes() {
     assertEquals(MainAndSubMode.all(), MainAndSubMode.notMainModes(List.of()));
     assertEquals(
-      MainAndSubMode.all().stream().filter(m -> !BUS.equals(m)).toList(),
+      MainAndSubMode.all()
+        .stream()
+        .filter(m -> !BUS.equals(m))
+        .toList(),
       MainAndSubMode.notMainModes(List.of(BUS))
     );
   }

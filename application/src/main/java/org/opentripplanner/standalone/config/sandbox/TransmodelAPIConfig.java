@@ -29,7 +29,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
       .summary("Hide the FeedId in all API output, and add it to input.")
       .description(
         "Only turn this feature on if you have unique ids across all feeds, without the " +
-        "feedId prefix."
+          "feedId prefix."
       )
       .asBoolean(false);
     tracingHeaderTags = c
@@ -43,7 +43,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
       .summary("The maximum number of fields in a GraphQL result")
       .description(
         "Enforce rate limiting based on query complexity; Queries that return too much data are" +
-        " cancelled."
+          " cancelled."
       )
       .asInt(1_000_000);
   }

@@ -5,8 +5,8 @@ import org.opentripplanner.framework.error.OtpError;
 /**
  * Details about why a {@link TripTimes} instance is invalid.
  */
-public record TimetableValidationError(ErrorCode code, int stopIndex, Trip trip)
-  implements OtpError {
+public record TimetableValidationError(ErrorCode code, int stopIndex, Trip trip) implements
+  OtpError {
   @Override
   public String errorCode() {
     return code.name();

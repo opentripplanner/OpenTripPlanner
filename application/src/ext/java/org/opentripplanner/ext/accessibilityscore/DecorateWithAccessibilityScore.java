@@ -3,6 +3,7 @@ package org.opentripplanner.ext.accessibilityscore;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
@@ -11,7 +12,6 @@ import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.WheelchairTraversalInformation;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

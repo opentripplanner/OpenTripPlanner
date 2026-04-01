@@ -58,7 +58,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
       arrival.stop(),
       arrival.arrivalTime(),
       arrival.travelDuration(),
-      arrival.c1()
+      arrival.c1(),
+      arrival.c2()
     );
 
     if (rejected) {
@@ -79,8 +80,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
           arrival,
           null,
           "The element is rejected because the destination is not reachable within the limit " +
-          "based on heuristic. Details: " +
-          details
+            "based on heuristic. Details: " +
+            details
         );
     }
   }
@@ -88,8 +89,12 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   /**
    * This is used to make an optimistic guess for the best possible arrival at the destination,
    * using the given arrival and a pre-calculated heuristics.
+   * <p>
+   * The C2 value is passed through since we don't have any clue on what it's used for. There is
+   * no heuristic calculation for the C2 value. Destination pruning can only be used if this
+   * is ok.
    */
-  private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost) {
+  private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost, int c2) {
     HeuristicAtStop h = get(stop);
 
     if (h == HeuristicAtStop.UNREACHED) {
@@ -100,7 +105,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
     int departureTime = minArrivalTime - minTravelDuration;
-    return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost);
+    return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost, c2);
   }
 
   private String rejectErrorMessage(int stop) {

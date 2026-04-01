@@ -43,7 +43,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   @BeforeEach
   void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
-    data.withSlackProvider(new TestSlackProvider(D1m, D30s, D10s));
+    data.withSlackProvider(new TestSlackProvider(D1_m, D30_s, D10_s));
 
     data
       // Start walking 1m before: 30s walk + 30s board-slack
@@ -51,16 +51,16 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       .withRoute(
         // Pattern arrive at stop 2 at 0:03:00
         route(pattern("R1", STOP_B, STOP_C)).withTimetable(
-          schedule().departures("00:02:11 00:03:11").arrDepOffset(D10s)
+          schedule().departures("00:02:11 00:03:11").arrDepOffset(D10_s)
         )
       )
       .withRoute(
         // earliest-departure-time: 0:03:00 + 10s + 1m + 30s = 0:04:40
         route(pattern("R2", STOP_C, STOP_D)).withTimetable(
           // Missed by 1 second
-          schedule().departures("00:04:40 00:05:10").arrDepOffset(D10s),
+          schedule().departures("00:04:40 00:05:10").arrDepOffset(D10_s),
           // Exact match
-          schedule().departures("00:04:41 00:05:11").arrDepOffset(D10s)
+          schedule().departures("00:04:41 00:05:11").arrDepOffset(D10_s)
         )
       )
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
@@ -70,7 +70,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D3m);
+      .searchWindowInSeconds(D3_m);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }

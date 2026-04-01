@@ -77,12 +77,11 @@ public class MixinPropertiesBuilder {
     TraverseDirection direction,
     Consumer<MixinDirectionalPropertiesBuilder> action
   ) {
-    var builder =
-      switch (direction) {
-        case DIRECTIONLESS -> defaultBuilder;
-        case FORWARD -> forwardBuilder;
-        case BACKWARD -> backwardBuilder;
-      };
+    var builder = switch (direction) {
+      case DIRECTIONLESS -> defaultBuilder;
+      case FORWARD -> forwardBuilder;
+      case BACKWARD -> backwardBuilder;
+    };
     action.accept(builder);
     return this;
   }

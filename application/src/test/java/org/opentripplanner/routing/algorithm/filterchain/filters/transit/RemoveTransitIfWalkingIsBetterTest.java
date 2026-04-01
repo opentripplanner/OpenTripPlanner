@@ -18,8 +18,9 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
     // When:
-    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter()
-      .removeMatchesForTest(List.of(i1, i2));
+    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter().removeMatchesForTest(
+      List.of(i1, i2)
+    );
 
     // Then:
     assertEquals(toStr(List.of(i1, i2)), toStr(result));
@@ -28,19 +29,20 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
   @Test
   public void filterAwayTransitWithLongerWalk() {
     // a walk itinerary
-    Itinerary walk = newItinerary(A, 6).walk(D2m, E).build();
+    Itinerary walk = newItinerary(A, 6).walk(D2_m, E).build();
 
     // a bicycle itinerary will not be filtered
     Itinerary bicycle = newItinerary(A).bicycle(6, 9, E).build();
 
     // transit which has more walking as plain walk should be dropped
-    Itinerary i1 = newItinerary(A, 6).walk(D3m, D).bus(1, 9, 10, E).build();
+    Itinerary i1 = newItinerary(A, 6).walk(D3_m, D).bus(1, 9, 10, E).build();
 
     // transit which has less walking than plain walk should be kept
-    Itinerary i2 = newItinerary(A, 6).walk(D1m, B).bus(2, 7, 10, E).build();
+    Itinerary i2 = newItinerary(A, 6).walk(D1_m, B).bus(2, 7, 10, E).build();
 
-    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter()
-      .removeMatchesForTest(List.of(i1, i2, bicycle, walk));
+    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter().removeMatchesForTest(
+      List.of(i1, i2, bicycle, walk)
+    );
 
     assertEquals(toStr(List.of(i2, bicycle, walk)), toStr(result));
   }

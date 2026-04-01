@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.framework;
 
-import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -14,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -39,7 +39,6 @@ public class Deduplicator implements DeduplicatorService, Serializable {
 
   private final Map<String, Integer> effectCounter = new HashMap<>();
 
-  @Inject
   public Deduplicator() {}
 
   /** Free up any memory used by the deduplicator. */
@@ -173,8 +172,9 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       return null;
     }
 
-    Map<List<?>, List<?>> canonicalLists =
-      this.canonicalLists.computeIfAbsent(clazz, key -> new HashMap<>());
+    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(clazz, key ->
+      new HashMap<>()
+    );
 
     @SuppressWarnings("unchecked")
     List<T> canonical = (List<T>) canonicalLists.get(original);

@@ -17,7 +17,7 @@ public class TripUpdateBuilder {
   public static final String ROUTE_NAME = "A route that was added dynamically";
   private static final StopTimeUpdate.ScheduleRelationship DEFAULT_SCHEDULE_RELATIONSHIP =
     StopTimeUpdate.ScheduleRelationship.SCHEDULED;
-  private static final int NO_VALUE = -1;
+  private static final int NO_STOP_SEQUENCE = -989898;
   private static final int NO_DELAY = Integer.MIN_VALUE;
   private final GtfsRealtime.TripDescriptor.Builder tripDescriptorBuilder;
   private final GtfsRealtime.TripUpdate.Builder tripUpdateBuilder;
@@ -80,7 +80,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -98,7 +98,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -116,7 +116,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       delay,
       delay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -138,7 +138,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -156,7 +156,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -178,7 +178,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
@@ -193,8 +193,8 @@ public class TripUpdateBuilder {
 
   public TripUpdateBuilder addStopTimeWithArrivalAndDeparture(
     int stopSequence,
-    String arrivalTime,
-    String departureTime
+    @Nullable String arrivalTime,
+    @Nullable String departureTime
   ) {
     return addStopTime(
       null,
@@ -339,7 +339,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
@@ -357,7 +357,7 @@ public class TripUpdateBuilder {
       stopId,
       time,
       time,
-      NO_VALUE,
+      NO_STOP_SEQUENCE,
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
@@ -401,6 +401,16 @@ public class TripUpdateBuilder {
     return this;
   }
 
+  public TripUpdateBuilder withServiceDate(String s) {
+    tripDescriptorBuilder.setStartDate(s);
+    return this;
+  }
+
+  public TripUpdateBuilder withRouteId(String routeId) {
+    tripDescriptorBuilder.setRouteId(routeId);
+    return this;
+  }
+
   private TripUpdateBuilder addStopTime(
     @Nullable String stopId,
     @Nullable String arrivalTime,
@@ -424,7 +434,7 @@ public class TripUpdateBuilder {
       stopTimeUpdateBuilder.setStopId(stopId);
     }
 
-    if (stopSequence > NO_VALUE) {
+    if (stopSequence != NO_STOP_SEQUENCE) {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
@@ -452,38 +462,33 @@ public class TripUpdateBuilder {
       }
     }
 
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder =
-      stopTimeUpdateBuilder.getArrivalBuilder();
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder =
-      stopTimeUpdateBuilder.getDepartureBuilder();
-
     if (arrivalTime != null) {
       var epochSeconds = midnight.plusSeconds(TimeUtils.time(arrivalTime)).toEpochSecond();
-      arrivalBuilder.setTime(epochSeconds);
+      stopTimeUpdateBuilder.getArrivalBuilder().setTime(epochSeconds);
     }
 
     if (departureTime != null) {
       var epochSeconds = midnight.plusSeconds(TimeUtils.time(departureTime)).toEpochSecond();
-      departureBuilder.setTime(epochSeconds);
+      stopTimeUpdateBuilder.getDepartureBuilder().setTime(epochSeconds);
     }
 
     if (scheduledArrivalTime != null) {
       var epochSeconds = midnight.plusSeconds(TimeUtils.time(scheduledArrivalTime)).toEpochSecond();
-      arrivalBuilder.setScheduledTime(epochSeconds);
+      stopTimeUpdateBuilder.getArrivalBuilder().setScheduledTime(epochSeconds);
     }
 
     if (scheduledDepartureTime != null) {
       var epochSeconds = midnight
         .plusSeconds(TimeUtils.time(scheduledDepartureTime))
         .toEpochSecond();
-      departureBuilder.setScheduledTime(epochSeconds);
+      stopTimeUpdateBuilder.getDepartureBuilder().setScheduledTime(epochSeconds);
     }
 
     if (arrivalDelay != NO_DELAY) {
-      arrivalBuilder.setDelay(arrivalDelay);
+      stopTimeUpdateBuilder.getArrivalBuilder().setDelay(arrivalDelay);
     }
     if (departureDelay != NO_DELAY) {
-      departureBuilder.setDelay(departureDelay);
+      stopTimeUpdateBuilder.getDepartureBuilder().setDelay(departureDelay);
     }
 
     return this;

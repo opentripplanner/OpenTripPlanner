@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.EmpiricalDelayCsvDataReader;
@@ -14,7 +15,6 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -29,7 +29,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(EmpiricalDelayGraphBuilder.class);
 
   private final Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> dataSources;
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
   private final DataImportIssueStore issueStore;
   private final EmpiricalDelayParameters parameters;
   private final EmpiricalDelayRepository repository;
@@ -37,7 +37,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
 
   public EmpiricalDelayGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> dataSources,
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
     EmpiricalDelayParameters parameters,
     EmpiricalDelayRepository repository,

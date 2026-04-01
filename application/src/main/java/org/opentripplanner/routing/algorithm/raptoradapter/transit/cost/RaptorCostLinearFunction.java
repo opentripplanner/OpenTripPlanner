@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Objects;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
@@ -74,8 +74,8 @@ class RaptorCostLinearFunction {
     return isZero()
       ? "ZERO FUNCTION"
       : LinearFunctionSerialization.serialize(
-        RaptorCostConverter.raptorCostToDuration(constant),
-        RaptorCostConverter.toOtpDomainFactor(coefficient)
-      );
+          RaptorCostConverter.raptorCostToDuration(constant),
+          RaptorCostConverter.toOtpDomainFactor(coefficient)
+        );
   }
 }

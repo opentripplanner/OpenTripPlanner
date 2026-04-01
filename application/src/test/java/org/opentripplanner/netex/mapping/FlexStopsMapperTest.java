@@ -15,8 +15,8 @@ import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -119,12 +119,11 @@ class FlexStopsMapperTest {
     10.878374152208456
   );
   private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS =
-    new KeyListStructure()
-      .withKeyValue(
-        new KeyValueStructure()
-          .withKey("FlexibleStopAreaType")
-          .withValue("UnrestrictedPublicTransportAreas")
-      );
+    new KeyListStructure().withKeyValue(
+      new KeyValueStructure()
+        .withKey("FlexibleStopAreaType")
+        .withValue("UnrestrictedPublicTransportAreas")
+    );
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final SiteRepositoryBuilder siteRepositoryBuilder = testModel.siteRepositoryBuilder();
@@ -296,16 +295,13 @@ class FlexStopsMapperTest {
     return new FlexibleArea()
       .withId(flexibleAreaId)
       .withPolygon(
-        new PolygonType()
-          .withExterior(
-            new AbstractRingPropertyType()
-              .withAbstractRing(
-                MappingSupport.createJaxbElement(
-                  new LinearRingType()
-                    .withPosList(new DirectPositionListType().withValue(areaPosList))
-                )
-              )
+        new PolygonType().withExterior(
+          new AbstractRingPropertyType().withAbstractRing(
+            MappingSupport.createJaxbElement(
+              new LinearRingType().withPosList(new DirectPositionListType().withValue(areaPosList))
+            )
           )
+        )
       );
   }
 

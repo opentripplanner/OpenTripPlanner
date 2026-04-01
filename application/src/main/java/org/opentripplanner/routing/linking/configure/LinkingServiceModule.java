@@ -1,13 +1,15 @@
 package org.opentripplanner.routing.linking.configure;
 
-import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
+import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import dagger.Module;
 import dagger.Provides;
-import org.opentripplanner.routing.graph.Graph;
+import java.util.Optional;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -22,7 +24,8 @@ public class LinkingServiceModule {
     return new VertexLinker(
       graph,
       COMPUTE_AREA_VISIBILITY_LINES,
-      streetLimitationParametersService.maxAreaNodes()
+      streetLimitationParametersService.maxAreaNodes(),
+      OTPFeature.FlexRouting.isOn()
     );
   }
 
@@ -40,7 +43,11 @@ public class LinkingServiceModule {
     return new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService::findStopOrChildIds
+      transitService::findStopOrChildIds,
+      id -> {
+        var group = transitService.getStopLocationsGroup(id);
+        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
+      }
     );
   }
 }

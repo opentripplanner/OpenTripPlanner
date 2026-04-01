@@ -20,7 +20,7 @@ import org.opentripplanner.core.framework.resources.ResourceBundleSingleton;
  */
 public class LocalizedString implements I18NString, Serializable {
 
-  private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
+  private static final Pattern PATTERN_MATCHER = Pattern.compile("\\{(.*?)}");
 
   //Key which specifies translation
   private final String key;
@@ -88,10 +88,12 @@ public class LocalizedString implements I18NString, Serializable {
     //in string formatting with values from way tags values
     String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
     if (this.params != null) {
-      translation = patternMatcher.matcher(translation).replaceAll("%s");
+      translation = PATTERN_MATCHER.matcher(translation).replaceAll("%s");
       return String.format(
         translation,
-        Arrays.stream(params).map(i -> i.toString(locale)).toArray(Object[]::new)
+        Arrays.stream(params)
+          .map(i -> i.toString(locale))
+          .toArray(Object[]::new)
       );
     } else {
       return translation;

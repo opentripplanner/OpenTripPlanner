@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.leg.LegConstructionSupport;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -242,9 +241,6 @@ public class AlternativeLegs {
       .withServiceDate(serviceDay)
       .withZoneId(timeZone)
       .withTripOnServiceDate(tripOnServiceDate)
-      .withDistanceMeters(
-        LegConstructionSupport.computeDistanceMeters(pattern, boardingPosition, alightingPosition)
-      )
       .build();
   }
 

@@ -10,7 +10,9 @@ import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.ojp.config.OjpApiConfig;
 import org.opentripplanner.ext.ojp.config.TriasApiConfig;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -55,6 +57,7 @@ public class RouterConfig implements Serializable {
   private final GtfsApiConfig gtfsApi;
   private final VectorTileConfig vectorTileConfig;
   private final TriasApiParameters triasApiParameters;
+  private final OjpApiParameters ojpApiParameters;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -83,6 +86,7 @@ public class RouterConfig implements Serializable {
     this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileConfig = VectorTileConfig.mapVectorTilesParameters(root, "vectorTiles");
     this.triasApiParameters = TriasApiConfig.mapParameters("triasApi", root);
+    this.ojpApiParameters = OjpApiConfig.mapParameters("ojpApi", root);
     this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -144,6 +148,10 @@ public class RouterConfig implements Serializable {
 
   public TriasApiParameters triasApiParameters() {
     return triasApiParameters;
+  }
+
+  public OjpApiParameters ojpApiParameters() {
+    return ojpApiParameters;
   }
 
   public GtfsApiParameters gtfsApiParameters() {

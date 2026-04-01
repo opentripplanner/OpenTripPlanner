@@ -16,9 +16,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -27,8 +27,9 @@ import org.opentripplanner.transit.service.SiteRepository;
 
 public class PlaceTest {
 
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createPoint(new Coordinate(11, 60));
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createPoint(
+    new Coordinate(11, 60)
+  );
   private static final NonLocalizedString DEFAULT_PLACE_NAME = NonLocalizedString.ofNullable(
     "defaultName"
   );

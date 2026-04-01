@@ -70,7 +70,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
         """
       )
       // We will test board- and alight-slack in a separate test
-      .withSlackProvider(new TestSlackProvider(D1m, D0s, D0s));
+      .withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));
 
     requestBuilder
       .searchParams()
@@ -78,7 +78,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .earliestDepartureTime(T00_02)
       .latestArrivalTime(T00_30);
 
-    data.withTransfer(STOP_B, transfer(STOP_C, D2m)).withTransfer(STOP_C, transfer(STOP_D, D2m));
+    data.withTransfer(STOP_B, transfer(STOP_C, D2_m)).withTransfer(STOP_C, transfer(STOP_D, D2_m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
     ModuleTestDebugLogging.setupDebugLogging(data);
@@ -98,7 +98,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     var flexAndTransit = startFlexAccess + endR2AndWalk + "[0:03 0:23 20m Tₙ1 C₁2_640]";
 
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3m)))
+      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3_m)))
       .addMinDuration("19m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexTransferTransit, flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(flexTransferTransit))
@@ -126,7 +126,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     var flexAndTransit = startFlexAccess + endR2AndWalk + "[0:03 0:21 18m Tₙ1 C₁2_400]";
 
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1m)))
+      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1_m)))
       .addMinDuration("17m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(transitAndTransit))

@@ -11,12 +11,12 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.error.OtpError;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -231,7 +231,12 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
-  public boolean isRecordedStop(int stopPos) {
+  public boolean hasArrived(int stopPosition) {
+    return false;
+  }
+
+  @Override
+  public boolean hasDeparted(int stopPosition) {
     return false;
   }
 
@@ -242,6 +247,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public boolean isPredictionInaccurate(int stopPos) {
+    return false;
+  }
+
+  @Override
+  public boolean isExtraCall(int stopPos) {
     return false;
   }
 

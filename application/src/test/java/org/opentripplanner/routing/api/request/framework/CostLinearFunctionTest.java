@@ -12,22 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.utils.time.DurationUtils;
 
 class CostLinearFunctionTest {
 
-  private static final Duration D2m = Duration.ofMinutes(2);
-  private static final Cost COST_1s = Cost.costOfSeconds(1);
-  private static final Cost COST_2s = Cost.costOfSeconds(2);
-  private static final Cost COST_10s = Cost.costOfSeconds(10);
-  private static final Cost COST_11s = Cost.costOfSeconds(11);
-  private static final Cost COST_61s = Cost.costOfSeconds(61);
+  private static final Duration D2_m = Duration.ofMinutes(2);
+  private static final Cost COST_1_s = Cost.costOfSeconds(1);
+  private static final Cost COST_2_s = Cost.costOfSeconds(2);
+  private static final Cost COST_10_s = Cost.costOfSeconds(10);
+  private static final Cost COST_11_s = Cost.costOfSeconds(11);
+  private static final Cost COST_61_s = Cost.costOfSeconds(61);
 
   @Test
   void parse() {
-    assertEquals(CostLinearFunction.of(D2m, 3.0), CostLinearFunction.of("2m+3t"));
+    assertEquals(CostLinearFunction.of(D2_m, 3.0), CostLinearFunction.of("2m+3t"));
   }
 
   @Test
@@ -52,7 +52,7 @@ class CostLinearFunctionTest {
 
   @Test
   void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
-    assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of(D2m, -0.01));
+    assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of(D2_m, -0.01));
     var ex = assertThrows(IllegalArgumentException.class, () ->
       CostLinearFunction.of(Duration.ZERO, 100.1)
     );
@@ -61,7 +61,7 @@ class CostLinearFunctionTest {
 
   @Test
   void testToStringIsParsableAndCanBeUsedForSerialization() {
-    var original = CostLinearFunction.of(D2m, 1.7);
+    var original = CostLinearFunction.of(D2_m, 1.7);
     var copy = CostLinearFunction.of(original.toString());
     assertEquals(original, copy);
   }
@@ -103,10 +103,10 @@ class CostLinearFunctionTest {
     var subject = CostLinearFunction.of(function);
 
     assertEquals(exp0s, subject.calculate(Cost.ZERO).toCentiSeconds());
-    assertEquals(exp1s, subject.calculate(COST_1s).toCentiSeconds());
-    assertEquals(exp2s, subject.calculate(COST_2s).toCentiSeconds());
-    assertEquals(exp10s, subject.calculate(COST_10s).toCentiSeconds());
-    assertEquals(exp11s, subject.calculate(COST_11s).toCentiSeconds());
-    assertEquals(exp61s, subject.calculate(COST_61s).toCentiSeconds());
+    assertEquals(exp1s, subject.calculate(COST_1_s).toCentiSeconds());
+    assertEquals(exp2s, subject.calculate(COST_2_s).toCentiSeconds());
+    assertEquals(exp10s, subject.calculate(COST_10_s).toCentiSeconds());
+    assertEquals(exp11s, subject.calculate(COST_11_s).toCentiSeconds());
+    assertEquals(exp61s, subject.calculate(COST_61_s).toCentiSeconds());
   }
 }

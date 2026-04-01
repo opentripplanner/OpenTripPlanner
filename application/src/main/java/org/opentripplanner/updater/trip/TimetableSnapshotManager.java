@@ -7,19 +7,21 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.util.ConcurrentPublished;
-import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
  */
 public final class TimetableSnapshotManager {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotManager.class);
 
   private final RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater;
 
@@ -127,18 +129,6 @@ public final class TimetableSnapshotManager {
   }
 
   /**
-   * If a previous realtime update has changed which trip pattern is associated with the given trip
-   * on the given service date, this method will dissociate the trip from that pattern and remove
-   * the trip's timetables from that pattern on that particular service date.
-   * <p>
-   * For this service date, the trip will revert to its original trip pattern from the scheduled
-   * data, remaining on that pattern unless it's changed again by a future realtime update.
-   */
-  public void revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
-  }
-
-  /**
    * Remove realtime data from previous service dates from the snapshot. This is useful so that
    * instances that run for multiple days don't accumulate a lot of realtime data for past
    * dates which would increase memory consumption.
@@ -178,10 +168,37 @@ public final class TimetableSnapshotManager {
    *
    * @return whether the update was actually applied
    */
-  public Result<UpdateSuccess, UpdateError> updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
+  public UpdateSuccess updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
+    var trip = realTimeTripUpdate.updatedTripTimes().getTrip();
+    var serviceDate = realTimeTripUpdate.serviceDate();
+
+    // Phase 1: Revert previous real-time modifications if requested
+    if (realTimeTripUpdate.revertPreviousRealTimeUpdates()) {
+      buffer.revertTripToScheduledTripPattern(trip.getId(), serviceDate);
+    }
+
+    // Phase 2: Mark trip as deleted in scheduled pattern if moving to a modified pattern
+    var scheduledPattern = realTimeTripUpdate.hideTripInScheduledPattern();
+    if (scheduledPattern != null) {
+      var scheduledTripTimes = scheduledPattern.getScheduledTimetable().getTripTimes(trip);
+      if (scheduledTripTimes != null) {
+        var builder = scheduledTripTimes.createRealTimeFromScheduledTimes();
+        builder.deleteTrip();
+        buffer.update(
+          RealTimeTripUpdate.of(scheduledPattern, builder.build(), serviceDate).build()
+        );
+      } else if (LOG.isDebugEnabled()) {
+        LOG.debug(
+          "Trip {} not found in scheduled pattern {}, skipping deletion.",
+          trip.getId(),
+          scheduledPattern.logName()
+        );
+      }
+    }
+
+    // Phase 3: Apply the main update
     buffer.update(realTimeTripUpdate);
-    // The time tables are finished during the commit
-    return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
+    return UpdateSuccess.noWarnings(realTimeTripUpdate.producer());
   }
 
   /**

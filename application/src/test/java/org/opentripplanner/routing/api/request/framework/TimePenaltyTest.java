@@ -11,11 +11,11 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 class TimePenaltyTest {
 
-  public static final Duration D2m = Duration.ofMinutes(2);
+  public static final Duration D2_m = Duration.ofMinutes(2);
 
   @Test
   void parse() {
-    assertEquals(TimePenalty.of(D2m, 3.0), TimePenalty.of("2m+3t"));
+    assertEquals(TimePenalty.of(D2_m, 3.0), TimePenalty.of("2m+3t"));
     assertEquals(TimePenalty.ZERO, TimePenalty.of(null));
     assertEquals(TimePenalty.ZERO, TimePenalty.of(""));
   }
@@ -35,7 +35,7 @@ class TimePenaltyTest {
 
   @Test
   void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
-    assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2m, -0.01));
+    assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2_m, -0.01));
     var ex = assertThrows(IllegalArgumentException.class, () ->
       TimePenalty.of(Duration.ZERO, 100.1)
     );
@@ -44,7 +44,7 @@ class TimePenaltyTest {
 
   @Test
   void testToStringIsParsableAndCanBeUsedForSerialization() {
-    var original = TimePenalty.of(D2m, 1.7);
+    var original = TimePenalty.of(D2_m, 1.7);
     var copy = TimePenalty.of(original.toString());
     assertEquals(original, copy);
   }
@@ -59,13 +59,13 @@ class TimePenaltyTest {
 
   @Test
   void calculate() {
-    var subject = TimePenalty.of(D2m, 0.5);
+    var subject = TimePenalty.of(D2_m, 0.5);
     assertEquals(120 + 150, subject.calculate(Duration.ofMinutes(5)).toSeconds());
   }
 
   @Test
   void modifies() {
-    var subject = TimePenalty.of(D2m, 0.5);
+    var subject = TimePenalty.of(D2_m, 0.5);
     assertTrue(subject.modifies());
     assertFalse(TimePenalty.ZERO.modifies());
   }

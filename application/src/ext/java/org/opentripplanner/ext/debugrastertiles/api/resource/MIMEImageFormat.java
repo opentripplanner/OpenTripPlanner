@@ -6,7 +6,7 @@ import java.util.Collection;
 
 class MIMEImageFormat {
 
-  public static final Collection<String> acceptedTypes = Arrays.asList(
+  public static final Collection<String> ACCEPTED_TYPES = Arrays.asList(
     "png",
     "gif",
     "jpeg",
@@ -18,7 +18,7 @@ class MIMEImageFormat {
   public MIMEImageFormat(String s) {
     String[] parts = s.split("/");
     if (parts.length == 2 && parts[0].equals("image")) {
-      if (acceptedTypes.contains(parts[1])) {
+      if (ACCEPTED_TYPES.contains(parts[1])) {
         type = parts[1];
       } else {
         throw new BadRequestException("unsupported image format: " + parts[1]);

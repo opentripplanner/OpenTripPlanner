@@ -28,7 +28,7 @@ class RealTimeTripTimesTest {
 
   private static final String TRIP_ID = "testTripId";
 
-  private static final List<FeedScopedId> stopIds = List.of(
+  private static final List<FeedScopedId> STOP_IDS = List.of(
     id("A"),
     id("B"),
     id("C"),
@@ -44,10 +44,10 @@ class RealTimeTripTimesTest {
 
     List<StopTime> stopTimes = new LinkedList<>();
 
-    for (int i = 0; i < stopIds.size(); ++i) {
+    for (int i = 0; i < STOP_IDS.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TEST_MODEL.stop(stopIds.get(i).getId(), 0.0, 0.0).build();
+      RegularStop stop = TEST_MODEL.stop(STOP_IDS.get(i).getId(), 0.0, 0.0).build();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);

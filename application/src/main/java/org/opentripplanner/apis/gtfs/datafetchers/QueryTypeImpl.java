@@ -30,6 +30,7 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.CanceledTripsFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
@@ -38,6 +39,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
+import org.opentripplanner.framework.graphql.CountedConnection;
+import org.opentripplanner.framework.graphql.SimpleCountedListConnection;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -320,17 +323,17 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       List<TransitMode> filterByModes = args.getGraphQLFilterByModes() != null
         ? args
-          .getGraphQLFilterByModes()
-          .stream()
-          .map(mode -> {
-            try {
-              return TransitMode.valueOf(mode.name());
-            } catch (IllegalArgumentException ignored) {
-              return null;
-            }
-          })
-          .filter(Objects::nonNull)
-          .toList()
+            .getGraphQLFilterByModes()
+            .stream()
+            .map(mode -> {
+              try {
+                return TransitMode.valueOf(mode.name());
+              } catch (IllegalArgumentException ignored) {
+                return null;
+              }
+            })
+            .filter(Objects::nonNull)
+            .toList()
         : null;
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
@@ -398,11 +401,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .listBikeParks()
-              .stream()
-              .filter(bikePark -> bikePark.getId().equals(bikeParkId))
-              .findAny()
-              .orElse(null);
+                .listBikeParks()
+                .stream()
+                .filter(bikePark -> bikePark.getId().equals(bikeParkId))
+                .findAny()
+                .orElse(null);
         case "BikeRentalStation":
           return vehicleRentalStationService == null
             ? null
@@ -420,11 +423,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .listCarParks()
-              .stream()
-              .filter(carPark -> carPark.getId().equals(carParkId))
-              .findAny()
-              .orElse(null);
+                .listCarParks()
+                .stream()
+                .filter(carPark -> carPark.getId().equals(carParkId))
+                .findAny()
+                .orElse(null);
         case "Cluster":
           // TODO
           return null;
@@ -437,13 +440,12 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
           Relay.ResolvedGlobalId internalId = new Relay().fromGlobalId(parts[1]);
 
-          Object place = node()
-            .get(
-              DataFetchingEnvironmentImpl.newDataFetchingEnvironment(environment)
-                .source(new Object())
-                .arguments(Map.of("id", internalId))
-                .build()
-            );
+          Object place = node().get(
+            DataFetchingEnvironmentImpl.newDataFetchingEnvironment(environment)
+              .source(new Object())
+              .arguments(Map.of("id", internalId))
+              .build()
+          );
 
           return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
         }
@@ -472,11 +474,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .listVehicleParkings()
-              .stream()
-              .filter(bikePark -> bikePark.getId().equals(vehicleParkingId))
-              .findAny()
-              .orElse(null);
+                .listVehicleParkings()
+                .stream()
+                .filter(bikePark -> bikePark.getId().equals(vehicleParkingId))
+                .findAny()
+                .orElse(null);
         default:
           return null;
       }
@@ -818,10 +820,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
-  public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
+  public DataFetcher<CountedConnection<TripOnServiceDate>> canceledTrips() {
     return environment -> {
-      var trips = getTransitService(environment).listCanceledTrips();
-      return new SimpleListConnection<>(trips).get(environment);
+      var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+      var trips = getTransitService(environment).findCanceledTrips(request);
+      return new SimpleCountedListConnection<>(trips).get(environment);
     };
   }
 
@@ -972,6 +975,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {
     RoutingResponse res = context.routingService().route(request);
+    res.getDebugTimingAggregator().finishedRendering();
     return DataFetcherResult.<RoutingResponse>newResult()
       .data(res)
       .localContext(Map.of("locale", request.preferences().locale()))

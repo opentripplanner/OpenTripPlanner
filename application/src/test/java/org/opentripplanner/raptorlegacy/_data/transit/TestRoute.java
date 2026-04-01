@@ -3,13 +3,13 @@ package org.opentripplanner.raptorlegacy._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -121,27 +121,27 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
       var trip = timetable().getTripSchedule(i);
       if (toTrip == trip) {
         this.transferConstraintsForwardSearch.addConstraintTransfers(
-            fromTrip,
-            fromStopPos,
-            trip,
-            i,
-            toStopPos,
-            trip.arrival(toStopPos),
-            constraint
-          );
+          fromTrip,
+          fromStopPos,
+          trip,
+          i,
+          toStopPos,
+          trip.arrival(toStopPos),
+          constraint
+        );
       }
       // Reverse search transfer, the {@code source/target} is the trips in order of the
       // reverse search, which is opposite from {@code from/to} in the result path.
       if (fromTrip == trip) {
         this.transferConstraintsReverseSearch.addConstraintTransfers(
-            toTrip,
-            toStopPos,
-            trip,
-            i,
-            fromStopPos,
-            trip.departure(fromStopPos),
-            constraint
-          );
+          toTrip,
+          toStopPos,
+          trip,
+          i,
+          fromStopPos,
+          trip.departure(fromStopPos),
+          constraint
+        );
       }
     }
   }

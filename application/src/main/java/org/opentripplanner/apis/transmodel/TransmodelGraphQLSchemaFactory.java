@@ -108,6 +108,8 @@ import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQu
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
+import org.opentripplanner.apis.transmodel.model.timetable.ReplacedByRelationType;
+import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
@@ -167,6 +169,8 @@ public class TransmodelGraphQLSchemaFactory {
   private final ViaTripQuery viaTripQueryFactory;
   private final GroupOfLinesType groupOfLinesTypeFactory;
   private final DatedServiceJourneyQuery datedServiceJourneyQueryFactory;
+  private final ReplacedByRelationType replacedByRelationTypeFactory;
+  private final ReplacementForRelationType replacementForRelationTypeFactory;
 
   private final Relay relay = new Relay();
 
@@ -199,6 +203,8 @@ public class TransmodelGraphQLSchemaFactory {
     this.viaTripQueryFactory = new ViaTripQuery(idMapper);
     this.groupOfLinesTypeFactory = new GroupOfLinesType(idMapper);
     this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idMapper);
+    this.replacedByRelationTypeFactory = new ReplacedByRelationType();
+    this.replacementForRelationTypeFactory = new ReplacementForRelationType();
   }
 
   public GraphQLSchema create() {
@@ -350,11 +356,16 @@ public class TransmodelGraphQLSchemaFactory {
       TimetabledPassingTimeType.REF
     );
 
+    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
+    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
+
     GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
       journeyPatternType,
       estimatedCallType,
-      quayType
+      quayType,
+      replacedByRelationType,
+      replacementForRelationType
     );
 
     GraphQLOutputType timetabledPassingTime = TimetabledPassingTimeType.create(
@@ -565,7 +576,7 @@ public class TransmodelGraphQLSchemaFactory {
               .type(MULTI_MODAL_MODE)
               .description(
                 "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-                " Does not affect mono modal stop places that do not belong to a multi modal stop place."
+                  " Does not affect mono modal stop places that do not belong to a multi modal stop place."
               )
               .defaultValue("parent")
               .build()
@@ -731,8 +742,8 @@ public class TransmodelGraphQLSchemaFactory {
           .name("quaysByRadius")
           .description(
             "Get all quays within the specified walking radius from a location. There are no maximum " +
-            "limits for the input parameters, but the query will timeout and return if the parameters " +
-            "are too high."
+              "limits for the input parameters, but the query will timeout and return if the parameters " +
+              "are too high."
           )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(
@@ -897,7 +908,7 @@ public class TransmodelGraphQLSchemaFactory {
               .type(MULTI_MODAL_MODE)
               .description(
                 "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-                " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace"
+                  " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace"
               )
               .defaultValue("parent")
               .build()

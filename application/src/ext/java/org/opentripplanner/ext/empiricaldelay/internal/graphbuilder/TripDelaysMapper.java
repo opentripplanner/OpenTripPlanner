@@ -6,24 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.internal.model.DelayAtStopDto;
 import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysAgregator;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class TripDelaysMapper {
 
   private final Map<FeedScopedId, List<FeedScopedId>> stopIdsByTripId;
   private final DataImportIssueStore issueStore;
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
 
   TripDelaysMapper(
     Map<FeedScopedId, List<FeedScopedId>> stopIdsByTripId,
     DataImportIssueStore issueStore,
-    Deduplicator deduplicator
+    DeduplicatorService deduplicator
   ) {
     this.stopIdsByTripId = stopIdsByTripId;
     this.issueStore = issueStore;

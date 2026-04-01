@@ -11,9 +11,9 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 
 public class MaxLimitTest implements PlanTestConstants {
 
-  private static final Itinerary i1 = newItinerary(A, 6).walk(1, B).build();
-  private static final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
-  private static final Itinerary i3 = newItinerary(A).bus(21, 6, 8, B).build();
+  private static final Itinerary I1 = newItinerary(A, 6).walk(1, B).build();
+  private static final Itinerary I2 = newItinerary(A).bicycle(6, 8, B).build();
+  private static final Itinerary I3 = newItinerary(A).bus(21, 6, 8, B).build();
 
   @Test
   public void name() {
@@ -24,21 +24,21 @@ public class MaxLimitTest implements PlanTestConstants {
   @Test
   public void testNormalFilterMaxLimit3() {
     MaxLimit subject = new MaxLimit("Test", 3);
-    List<Itinerary> itineraries = List.of(i1, i2, i3);
+    List<Itinerary> itineraries = List.of(I1, I2, I3);
     assertEquals(toStr(itineraries), toStr(subject.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testNormalFilterMaxLimit1() {
     MaxLimit subject = new MaxLimit("Test", 1);
-    List<Itinerary> itineraries = List.of(i1, i2, i3);
-    assertEquals(toStr(List.of(i1)), toStr(subject.removeMatchesForTest(itineraries)));
+    List<Itinerary> itineraries = List.of(I1, I2, I3);
+    assertEquals(toStr(List.of(I1)), toStr(subject.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testNormalFilterMaxLimit0() {
     MaxLimit subject = new MaxLimit("Test", 0);
-    List<Itinerary> itineraries = List.of(i1, i2, i3);
+    List<Itinerary> itineraries = List.of(I1, I2, I3);
     var result = subject.removeMatchesForTest(itineraries);
     assertEquals(toStr(List.of()), toStr(result));
   }

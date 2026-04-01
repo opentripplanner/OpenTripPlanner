@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -21,8 +20,7 @@ public class DigitransitStationPropertyMapperTest {
 
   @Test
   void map() {
-    var deduplicator = new Deduplicator();
-    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository());
     timetableRepository.index();
     var transitService = new TestTransitService(timetableRepository);
 

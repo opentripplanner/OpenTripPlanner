@@ -7,14 +7,4 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
  *
  * @author novalis
  */
-public class NotePicker {
-
-  public OsmSpecifier specifier;
-
-  public NoteProperties noteProperties;
-
-  public NotePicker(OsmSpecifier specifier, NoteProperties noteProperties) {
-    this.specifier = specifier;
-    this.noteProperties = noteProperties;
-  }
-}
+public record NotePicker(OsmSpecifier specifier, NoteProperties noteProperties) {}

@@ -83,8 +83,8 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
   public TransitArrival<T> previousTransit(int boardStopIndex) {
     throw new IllegalStateException(
       "The implementation of this interface is not compatible with the request" +
-      "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
-      "with constrained transfers."
+        "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
+        "with constrained transfers."
     );
   }
 

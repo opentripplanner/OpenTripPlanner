@@ -30,7 +30,11 @@ public class ListCompositeDataSource implements CompositeDataSource {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Override
   public DataSource entry(String name) {
-    return children.stream().filter(it -> name.equals(it.name())).findFirst().orElse(null);
+    return children
+      .stream()
+      .filter(it -> name.equals(it.name()))
+      .findFirst()
+      .orElse(null);
   }
 
   @Override

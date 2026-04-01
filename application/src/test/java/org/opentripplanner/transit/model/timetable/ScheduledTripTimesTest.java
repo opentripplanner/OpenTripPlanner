@@ -10,9 +10,9 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.utils.time.TimeUtils;
 

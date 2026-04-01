@@ -10,7 +10,6 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSec
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,6 @@ public class GtfsRtUpdaterConfigDocTest {
     "vehicle-positions"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest

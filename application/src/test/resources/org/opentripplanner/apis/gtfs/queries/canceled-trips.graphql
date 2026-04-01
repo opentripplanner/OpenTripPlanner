@@ -1,11 +1,12 @@
 {
-  canceledTrips(first: 2) {
+  canceledTrips(first: 2, filters: [{ include: [{ modes: [BUS] }] }]) {
     pageInfo {
       hasNextPage
       hasPreviousPage
       startCursor
       endCursor
     }
+    totalCount
     edges {
       node {
         serviceDate

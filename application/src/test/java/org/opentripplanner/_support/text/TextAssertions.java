@@ -37,7 +37,7 @@ public final class TextAssertions {
       if (i == END_OF_TEXT || j == END_OF_TEXT || !exp.equals(act)) {
         Assertions.fail(
           "Expected%s: <%s>%n".formatted(lineText(i), exp) +
-          "Actual  %s: <%s>%n".formatted(lineText(j), act)
+            "Actual  %s: <%s>%n".formatted(lineText(j), act)
         );
       }
     }

@@ -210,12 +210,20 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description(
             "Whether stop is cancelled. This means that either the " +
-            "ServiceJourney has a planned cancellation, the ServiceJourney has been " +
-            "cancelled by real-time data, or this particular StopPoint has been " +
-            "cancelled. This also means that both boarding and alighting has been " +
-            "cancelled."
+              "ServiceJourney has a planned cancellation, the ServiceJourney has been " +
+              "cancelled by real-time data, or this particular StopPoint has been " +
+              "cancelled. This also means that both boarding and alighting has been " +
+              "cancelled."
           )
           .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isCanceledEffectively())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("extraCall")
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .description("Whether this call is an extra call introduced by real-time data")
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isExtraCall())
           .build()
       )
       .field(

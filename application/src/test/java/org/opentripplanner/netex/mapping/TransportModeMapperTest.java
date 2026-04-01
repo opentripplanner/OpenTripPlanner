@@ -86,8 +86,9 @@ class TransportModeMapperTest {
     ),
     entry(
       AllVehicleModesOfTransportEnumeration.WATER,
-      new TransportSubmodeStructure()
-        .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)
+      new TransportSubmodeStructure().withWaterSubmode(
+        WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY
+      )
     )
   );
 
@@ -133,8 +134,9 @@ class TransportModeMapperTest {
   void checkSubModePrecedenceOverMainMode() throws UnsupportedModeException {
     var transitMode = transportModeMapper.map(
       AllVehicleModesOfTransportEnumeration.BUS,
-      new TransportSubmodeStructure()
-        .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)
+      new TransportSubmodeStructure().withWaterSubmode(
+        WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY
+      )
     );
     assertEquals(TransitMode.FERRY, transitMode.mainMode());
     assertEquals("internationalPassengerFerry", transitMode.subMode());

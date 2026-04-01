@@ -10,8 +10,8 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.CoordinateArrayListSequence;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 /**
  * This maps from the OpenGIS PolygonType to LocationTech geometry.
@@ -40,9 +40,9 @@ class OpenGisMapper {
   private static CoordinateSequence mapCoordinateSequence(
     AbstractRingPropertyType abstractRingPropertyType
   ) {
-    List<Double> posList =
-      ((LinearRingType) abstractRingPropertyType.getAbstractRing().getValue()).getPosList()
-        .getValue();
+    List<Double> posList = ((LinearRingType) abstractRingPropertyType
+        .getAbstractRing()
+        .getValue()).getPosList().getValue();
 
     // Convert a single list of alternating lat/lon values into coordinates
     ArrayList<Coordinate> coordinates = new ArrayList<>();

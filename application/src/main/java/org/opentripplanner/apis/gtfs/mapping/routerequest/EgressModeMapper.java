@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Maps egress street mode from API to internal model or vice versa.
@@ -30,7 +30,8 @@ public class EgressModeMapper {
       case CAR_PICKUP -> GraphQLTypes.GraphQLPlanEgressMode.CAR_PICKUP;
       case FLEXIBLE -> GraphQLTypes.GraphQLPlanEgressMode.FLEX;
       case SCOOTER_RENTAL -> GraphQLTypes.GraphQLPlanEgressMode.SCOOTER_RENTAL;
-      case WALK,
+      case
+        WALK,
         CAR_HAILING,
         CARPOOL,
         CAR_TO_PARK,

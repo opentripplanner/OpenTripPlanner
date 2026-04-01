@@ -8,12 +8,13 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -42,7 +43,7 @@ public final class StreetPreferences implements Serializable {
     this.accessEgress = AccessEgressPreferences.DEFAULT;
     this.intersectionTraversalModel = IntersectionTraversalModel.SIMPLE;
     this.maxDirectDuration = durationForStreetModeOf(ofHours(4));
-    this.routingTimeout = Duration.ofSeconds(5);
+    this.routingTimeout = StreetSearchRequest.DEFAULT.timeout();
   }
 
   private StreetPreferences(Builder builder) {

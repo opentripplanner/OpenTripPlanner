@@ -41,12 +41,11 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int matches = 0;
 
     for (var test : conditions) {
-      var match =
-        switch (direction) {
-          case DIRECTIONLESS -> test.match(way);
-          case FORWARD -> test.matchForward(way);
-          case BACKWARD -> test.matchBackward(way);
-        };
+      var match = switch (direction) {
+        case DIRECTIONLESS -> test.match(way);
+        case FORWARD -> test.matchForward(way);
+        case BACKWARD -> test.matchBackward(way);
+      };
 
       int tagScore = toTagScore(match);
       score += tagScore;

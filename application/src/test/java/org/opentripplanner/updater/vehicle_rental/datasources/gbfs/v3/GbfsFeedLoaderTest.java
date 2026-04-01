@@ -13,9 +13,9 @@ import org.mobilitydata.gbfs.v3_0.system_regions.GBFSSystemRegions;
 import org.mobilitydata.gbfs.v3_0.vehicle_status.GBFSVehicleStatus;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -25,15 +25,16 @@ import org.slf4j.LoggerFactory;
  */
 class GbfsFeedLoaderTest {
 
-  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
-    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
+  private static final OtpHttpClient OTP_HTTP_CLIENT = new OtpHttpClientFactory().create(
+    LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
+  );
 
   @Test
   void getV30Feed() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
       HttpHeaders.empty(),
-      otpHttpClient
+      OTP_HTTP_CLIENT
     );
 
     assertTrue(loader.update());

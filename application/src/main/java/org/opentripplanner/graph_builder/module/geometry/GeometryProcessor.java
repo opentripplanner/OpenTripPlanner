@@ -18,8 +18,6 @@ import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
@@ -28,6 +26,8 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class GeometryProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
-  private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   private final TransitDataImportBuilder builder;
   // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey =
@@ -200,7 +200,7 @@ public class GeometryProcessor {
           geometry.getCoordinates(),
           2
         );
-        geometry = geometryFactory.createLineString(sequence);
+        geometry = GEOMETRY_FACTORY.createLineString(sequence);
       }
       geoms[i] = geometry;
     }
@@ -259,6 +259,7 @@ public class GeometryProcessor {
         for (
           Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator();
           it.hasNext();
+
         ) {
           IndexedLineSegment segment = it.next();
           if (segment.index > maxSegmentIndex) {
@@ -447,7 +448,7 @@ public class GeometryProcessor {
     };
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
 
-    return geometryFactory.createLineString(sequence);
+    return GEOMETRY_FACTORY.createLineString(sequence);
   }
 
   private boolean isValid(Geometry geometry, StopLocation s0, StopLocation s1) {
@@ -502,7 +503,7 @@ public class GeometryProcessor {
         geometry.getCoordinates(),
         2
       );
-      geometry = geometryFactory.createLineString(sequence);
+      geometry = GEOMETRY_FACTORY.createLineString(sequence);
 
       if (!isValid(geometry, st0.getStop(), st1.getStop())) {
         issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
@@ -531,8 +532,8 @@ public class GeometryProcessor {
         // therefore this just a safety check to detect a programmer error.
         throw new IllegalStateException(
           "Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(
-              shapeId
-            )
+            shapeId
+          )
         );
       }
       if (last == null || last.sequence() != sp.sequence()) {
@@ -575,7 +576,7 @@ public class GeometryProcessor {
     }
 
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
-    geometry = geometryFactory.createLineString(sequence);
+    geometry = GEOMETRY_FACTORY.createLineString(sequence);
     geometriesByShapeId.put(shapeId, geometry);
 
     // If we don't have distances here, we can't calculate them ourselves because we can't

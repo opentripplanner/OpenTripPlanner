@@ -106,6 +106,11 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                                        | *Optional* | `false`          |  2.0  |
 |       [allowedNetworks](#rd_car_rental_allowedNetworks)                                                      |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                                        | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_car_rental_bannedNetworks)                                                        |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                                     | *Optional* |                  |  2.1  |
+| [directTransitSearch](#rd_directTransitSearch)                                                               |        `object`        | Extend the search result with extra results using a direct transit search                                                                                | *Optional* |                  |  2.9  |
+|    [costRelaxFunction](#rd_directTransitSearch_costRelaxFunction)                                            | `cost-linear-function` | The generalized-cost window for which paths to include.                                                                                                  | *Optional* | `"15m + 1.50 t"` |  2.9  |
+|    enabled                                                                                                   |        `boolean`       | Enable the direct transit search                                                                                                                         | *Optional* | `false`          |  2.9  |
+|    [extraAccessEgressReluctance](#rd_directTransitSearch_extraAccessEgressReluctance)                        |        `double`        | Add an extra cost factor to access/egress legs for these results                                                                                         | *Optional* | `1.0`            |  2.9  |
+|    [maxAccessEgressDuration](#rd_directTransitSearch_maxAccessEgressDuration)                                |       `duration`       | A limit on the duration of access/egress for the direct transit search                                                                                   | *Optional* |                  |  2.9  |
 | elevator                                                                                                     |        `object`        | Elevator preferences.                                                                                                                                    | *Optional* |                  |  2.9  |
 |    boardCost                                                                                                 |        `integer`       | What is the cost of boarding a elevator?                                                                                                                 | *Optional* | `15`             |  2.9  |
 |    boardSlack                                                                                                |       `duration`       | How long it takes to get on an elevator, on average.                                                                                                     | *Optional* | `"PT1M30S"`      |  2.9  |
@@ -691,6 +696,59 @@ The vehicle rental networks which may be used. If empty all networks may be used
 **Path:** /routingDefaults/car/rental 
 
 The vehicle rental networks which may not be used. If empty, no networks are banned.
+
+<h3 id="rd_directTransitSearch">directTransitSearch</h3>
+
+**Since version:** `2.9` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Extend the search result with extra results using a direct transit search
+
+The direct transit search finds results using a single transit leg, limited to a specified
+cost relaxation. It will include results even if they are not optimal in regard to the criteria
+in the main raptor search.
+
+This feature is off by default!
+
+
+<h3 id="rd_directTransitSearch_costRelaxFunction">costRelaxFunction</h3>
+
+**Since version:** `2.9` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.50 t"`   
+**Path:** /routingDefaults/directTransitSearch 
+
+The generalized-cost window for which paths to include.
+
+A generalized-cost relax function of `2x + 10m` will include paths that have a cost up
+to 2 times plus 10 minutes compared to the cheapest path. I.e. if the cheapest path has
+a cost of 100m the results will include paths with a cost 210m.
+
+
+<h3 id="rd_directTransitSearch_extraAccessEgressReluctance">extraAccessEgressReluctance</h3>
+
+**Since version:** `2.9` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Path:** /routingDefaults/directTransitSearch 
+
+Add an extra cost factor to access/egress legs for these results
+
+The cost for access/egress will be multiplied by this reluctance. This can be used to limit
+the amount of walking.
+
+
+<h3 id="rd_directTransitSearch_maxAccessEgressDuration">maxAccessEgressDuration</h3>
+
+**Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/directTransitSearch 
+
+A limit on the duration of access/egress for the direct transit search
+
+This will limit the duration of access/egress for this search only. The default is the
+as for the regular search. Setting this to a higher value than what is used for the regular
+search will have have no effect.
+
+If set to zero, the search won't include results where access or egress is necessary. In
+this case the direct transit search will only be used when searching to and from a stop
+or station.
+
 
 <h3 id="rd_itineraryFilters">itineraryFilters</h3>
 
@@ -1361,6 +1419,12 @@ include stairs as a last result.
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
       "stairsReluctance" : 100
+    },
+    "directTransitSearch" : {
+      "enabled" : false,
+      "costRelaxFunction" : "15m + 1.5t",
+      "maxAccessEgressDuration" : "5m",
+      "extraAccessEgressReluctance" : 2
     }
   }
 }

@@ -73,11 +73,18 @@ public final class IntUtils {
   public static int[] concat(Collection<Integer> a, Collection<Integer> b) {
     List<Integer> all = new ArrayList<>(a);
     all.addAll(b);
-    return all.stream().mapToInt(it -> it).toArray();
+    return all
+      .stream()
+      .mapToInt(it -> it)
+      .toArray();
   }
 
   public static double standardDeviation(List<Integer> v) {
-    double average = v.stream().mapToInt(it -> it).average().orElse(0d);
+    double average = v
+      .stream()
+      .mapToInt(it -> it)
+      .average()
+      .orElse(0d);
 
     double sum = 0.0;
     for (double num : v) {

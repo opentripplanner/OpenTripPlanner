@@ -161,7 +161,7 @@ public class RealTimeRaptorTransitDataUpdater implements TimetableSnapshotUpdate
         tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
         newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
-        if (transferIndexGenerator != null && tripPattern.isCreatedByRealtimeUpdater()) {
+        if (transferIndexGenerator != null && tripPattern.isStopPatternModifiedInRealTime()) {
           transferIndexGenerator.addRealtimeTrip(
             tripPattern,
             timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())
@@ -214,7 +214,7 @@ public class RealTimeRaptorTransitDataUpdater implements TimetableSnapshotUpdate
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
-          if (!pattern.isCreatedByRealtimeUpdater()) {
+          if (!pattern.isStopPatternModifiedInRealTime()) {
             continue;
           }
           var oldTimeTable = timetableProvider.apply(pattern.getId());

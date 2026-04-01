@@ -294,7 +294,8 @@ public class AtlantaFareService extends DefaultFareService {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
         return switch (fromRideType) {
-          case MARTA,
+          case
+            MARTA,
             XPRESS_AFTERNOON,
             XPRESS_MORNING,
             COBB_LOCAL,
@@ -311,7 +312,8 @@ public class AtlantaFareService extends DefaultFareService {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
         return switch (fromRideType) {
-          case MARTA,
+          case
+            MARTA,
             COBB_EXPRESS,
             GCT_EXPRESS_Z1,
             GCT_EXPRESS_Z2,

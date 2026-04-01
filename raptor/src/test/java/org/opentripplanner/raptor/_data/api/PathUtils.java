@@ -43,7 +43,10 @@ public class PathUtils {
   }
 
   public static String[] withoutCost(String... paths) {
-    return Stream.of(paths).map(path -> withoutCost(path)).toList().toArray(new String[0]);
+    return Stream.of(paths)
+      .map(path -> withoutCost(path))
+      .toList()
+      .toArray(new String[0]);
   }
 
   public static String pathsToString(

@@ -136,8 +136,8 @@ public class LegType {
           .dataFetcher(environment ->
             ((Leg) environment.getSource()).trip() != null
               ? TransmodelTransportSubmode.fromValue(
-                ((Leg) environment.getSource()).trip().getNetexSubMode()
-              )
+                  ((Leg) environment.getSource()).trip().getNetexSubMode()
+                )
               : null
           )
           .build()

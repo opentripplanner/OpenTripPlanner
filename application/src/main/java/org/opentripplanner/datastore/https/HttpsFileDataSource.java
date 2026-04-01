@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.time.Duration;
-import java.util.Map;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
@@ -75,7 +75,7 @@ final class HttpsFileDataSource implements DataSource {
     InputStream in;
 
     try {
-      in = otpHttpClient.getAsInputStream(uri, HTTP_GET_REQUEST_TIMEOUT, Map.of());
+      in = otpHttpClient.getAsInputStream(uri, HTTP_GET_REQUEST_TIMEOUT, HttpHeaders.empty());
     } catch (IOException e) {
       throw new IllegalStateException(e.getLocalizedMessage(), e);
     }

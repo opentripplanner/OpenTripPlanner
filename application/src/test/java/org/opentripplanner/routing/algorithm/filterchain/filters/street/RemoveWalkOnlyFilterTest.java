@@ -14,7 +14,7 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public class RemoveWalkOnlyFilterTest {
 
-  private static final int D5m = DurationUtils.durationInSeconds("5m");
+  private static final int D5_m = DurationUtils.durationInSeconds("5m");
 
   private static final int T10_10 = TimeUtils.hm2time(10, 10);
   private static final int T10_20 = TimeUtils.hm2time(10, 20);
@@ -32,8 +32,8 @@ public class RemoveWalkOnlyFilterTest {
     Itinerary w2 = newItinerary(A, T10_10).walk(20, B).walk(12, E).build();
     Itinerary t1 = newItinerary(A).bicycle(T10_10, T10_20, E).build();
     Itinerary t2 = newItinerary(A).bus(31, T10_10, T10_20, E).build();
-    Itinerary t3 = newItinerary(A, T10_10).walk(D5m, B).bus(31, T10_10, T10_20, E).build();
-    Itinerary t4 = newItinerary(A).bicycle(T10_10, T10_20, B).walk(D5m, E).build();
+    Itinerary t3 = newItinerary(A, T10_10).walk(D5_m, B).bus(31, T10_10, T10_20, E).build();
+    Itinerary t4 = newItinerary(A).bicycle(T10_10, T10_20, B).walk(D5_m, E).build();
 
     var input = List.of(t1, w1, t2, w2, t3, t4);
     var expected = List.of(t1, t2, t3, t4);

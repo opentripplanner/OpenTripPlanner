@@ -4,13 +4,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import graphql.schema.GraphQLObjectType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 
 class EmpiricalDelayTypeTest {
-
-  private static final GraphQLObjectType subject = EmpiricalDelayType.create();
 
   @Test
   void create() {

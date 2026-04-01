@@ -113,7 +113,7 @@ class EmissionAggregator {
       OtpError.of(
         "EmissionMissingTripStopPattern",
         "No trip with stop pattern found for trip (%s). Trip or stop-pattern is missing. " +
-        "The trip is skipped.",
+          "The trip is skipped.",
         tripId
       )
     );
@@ -174,7 +174,7 @@ class EmissionAggregator {
         OtpError.of(
           "EmissionMissingTripHop",
           "Warning! All hops in a trip (%s) should have an emission value. " +
-          "Hop %s does not have an emission value.",
+            "Hop %s does not have an emission value.",
           tripId,
           buf.toString()
         )
@@ -187,7 +187,7 @@ class EmissionAggregator {
           OtpError.of(
             "EmissionTripHopDuplicates",
             "Warning! The emission import contains duplicate rows for the same hop for " +
-            "trip (%s). An average value is used.",
+              "trip (%s). An average value is used.",
             tripId
           )
         );

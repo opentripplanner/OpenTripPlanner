@@ -45,8 +45,8 @@ class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<Strin
     return Issue.issue(
       "JourneyPatternDuplicateStopPoints",
       "JourneyPattern contains duplicate StopPointInJourneyPattern. " +
-      "ServiceJourney will be skipped. " +
-      "ServiceJourney=%s, JourneyPattern=%s, Duplicate StopPointInJourneyPattern=%s",
+        "ServiceJourney will be skipped. " +
+        "ServiceJourney=%s, JourneyPattern=%s, Duplicate StopPointInJourneyPattern=%s",
       sj.getId(),
       journeyPatternId,
       duplicateStopPointId

@@ -54,13 +54,13 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     var tripB = data.getRoute(1).getTripSchedule(0);
 
     data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
+    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10_m));
     data.withTransferCost(100);
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * C1_ONE_STOP))
-      .addEgressPaths(walk(STOP_D, D1m));
+      .addAccessPaths(flex(STOP_A, D3_m, ONE_RIDE, 2 * C1_ONE_STOP))
+      .addEgressPaths(walk(STOP_D, D1_m));
 
     requestBuilder
       .searchParams()

@@ -22,7 +22,7 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
 
   @Override
   public DataFetcher<DebugOutput> debugOutput() {
-    return environment -> getSource(environment).getDebugTimingAggregator().finishedRendering();
+    return environment -> getSource(environment).getDebugTimingAggregator().getDebugOutput();
   }
 
   @Override

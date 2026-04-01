@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Instant;
-import org.opentripplanner.framework.model.NormalizedCost;
+import org.opentripplanner.core.model.basic.NormalizedCost;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**

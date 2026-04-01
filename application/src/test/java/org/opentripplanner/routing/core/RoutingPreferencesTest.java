@@ -19,7 +19,10 @@ public class RoutingPreferencesTest {
     var same = pref.copyOf().build();
     assertSame(pref, same);
     // Change one thing to force making a copy
-    var copy = pref.copyOf().withCar(c -> c.withReluctance(3.5)).build();
+    var copy = pref
+      .copyOf()
+      .withCar(c -> c.withReluctance(3.5))
+      .build();
     assertNotSame(pref.car(), copy.car());
 
     // Immutable classes should not change
@@ -36,7 +39,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithCarChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withCar(c -> c.withReluctance(3.5)).build();
+    var copy = pref
+      .copyOf()
+      .withCar(c -> c.withReluctance(3.5))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.car(), copy.car());
@@ -46,7 +52,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithBikeChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.of().withBike(b -> b.withReluctance(2.5)).build();
+    var copy = pref
+      .of()
+      .withBike(b -> b.withReluctance(2.5))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.bike(), copy.bike());
@@ -56,7 +65,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithScooterChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withScooter(b -> b.withReluctance(2.5)).build();
+    var copy = pref
+      .copyOf()
+      .withScooter(b -> b.withReluctance(2.5))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.scooter(), copy.scooter());
@@ -66,7 +78,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithWalkChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withWalk(w -> w.withReluctance(2.5)).build();
+    var copy = pref
+      .copyOf()
+      .withWalk(w -> w.withReluctance(2.5))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.walk(), copy.walk());
@@ -76,7 +91,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithTransferChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withTransfer(t -> t.withSlack(Duration.ofSeconds(2))).build();
+    var copy = pref
+      .copyOf()
+      .withTransfer(t -> t.withSlack(Duration.ofSeconds(2)))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.transfer(), copy.transfer());
@@ -108,7 +126,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithTransitChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withTransit(t -> t.withDefaultBoardSlackSec(2)).build();
+    var copy = pref
+      .copyOf()
+      .withTransit(t -> t.withDefaultBoardSlackSec(2))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.transit(), copy.transit());
@@ -118,7 +139,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithStreetChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withStreet(s -> s.withTurnReluctance(2)).build();
+    var copy = pref
+      .copyOf()
+      .withStreet(s -> s.withTurnReluctance(2))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.street(), copy.street());
@@ -127,7 +151,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithItineraryFilterChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withItineraryFilter(i -> i.withGroupSimilarityKeepOne(2)).build();
+    var copy = pref
+      .copyOf()
+      .withItineraryFilter(i -> i.withGroupSimilarityKeepOne(2))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.itineraryFilter(), copy.itineraryFilter());
@@ -137,7 +164,10 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithSystemChanges() {
     var pref = RoutingPreferences.DEFAULT;
-    var copy = pref.copyOf().withSystem(s -> s.withGeoidElevation(true)).build();
+    var copy = pref
+      .copyOf()
+      .withSystem(s -> s.withGeoidElevation(true))
+      .build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.system(), copy.system());

@@ -80,11 +80,11 @@ public class TileJson implements Serializable {
     String path
   ) {
     return "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-        HttpUtils.getBaseAddress(uri, headers),
-        ignoreRouterId,
-        path,
-        String.join(",", layers)
-      );
+      HttpUtils.getBaseAddress(uri, headers),
+      ignoreRouterId,
+      path,
+      String.join(",", layers)
+    );
   }
 
   /**
@@ -100,10 +100,10 @@ public class TileJson implements Serializable {
     var strippedPath = StringUtils.stripStart(overridePath, "/");
     strippedPath = StringUtils.stripEnd(strippedPath, "/");
     return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-        HttpUtils.getBaseAddress(uri, headers),
-        strippedPath,
-        String.join(",", layers)
-      );
+      HttpUtils.getBaseAddress(uri, headers),
+      strippedPath,
+      String.join(",", layers)
+    );
   }
 
   private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {

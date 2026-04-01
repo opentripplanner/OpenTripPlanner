@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
@@ -109,9 +109,9 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
         var c = new McRangeRaptorConfig<>(
           ctxSegment,
           passThroughPointsService
-        ).connectWithNextLegArrivals(nextStopArrivals);
+        ).connectWithNextSegmentArrivals(nextStopArrivals);
         var w = createWorker(ctxSegment, c.state(), c.strategy());
-        worker = RangeRaptorWorkerComposite.of(w, worker);
+        worker = RangeRaptorWorkerComposite.of(c.createPathParetoComparator(), w, worker);
         nextStopArrivals = c.stopArrivals();
       }
     } else {

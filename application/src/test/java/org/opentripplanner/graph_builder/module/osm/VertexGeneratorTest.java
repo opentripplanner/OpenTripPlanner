@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
@@ -123,14 +123,22 @@ class VertexGeneratorTest {
 
     assertEquals(
       0,
-      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
+      issueStore
+        .listIssues()
+        .stream()
+        .filter(x -> x instanceof BarrierIntersectingHighway)
+        .count()
     );
     var barrierVertexOnBarrier = subject.getVertexForOsmNode(n3, w1, NORMAL);
     assertInstanceOf(OsmVertex.class, barrierVertexOnBarrier);
     assertFalse(barrierVertexOnBarrier instanceof BarrierVertex);
     assertEquals(
       1,
-      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
+      issueStore
+        .listIssues()
+        .stream()
+        .filter(x -> x instanceof BarrierIntersectingHighway)
+        .count()
     );
     var barrierVertexNotOnBarrier = subject.getVertexForOsmNode(n10, w1, NORMAL);
     assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);

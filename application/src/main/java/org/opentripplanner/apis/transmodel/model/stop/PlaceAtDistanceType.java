@@ -98,7 +98,10 @@ public class PlaceAtDistanceType {
     places.sort(Comparator.comparing(PlaceAtDistance::distance));
 
     Set<Object> uniquePlaces = new HashSet<>();
-    return places.stream().filter(s -> uniquePlaces.add(s.place())).collect(Collectors.toList());
+    return places
+      .stream()
+      .filter(s -> uniquePlaces.add(s.place()))
+      .collect(Collectors.toList());
   }
 
   private static Stream<PlaceAtDistance> getStopPlaces(

@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 public final class OptimizationTypeMapper {
 

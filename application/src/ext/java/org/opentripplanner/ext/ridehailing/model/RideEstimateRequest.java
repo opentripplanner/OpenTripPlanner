@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.ridehailing.model;
 
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public record RideEstimateRequest(
   WgsCoordinate startPosition,

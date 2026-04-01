@@ -35,15 +35,17 @@ public class GqlUtil {
   }
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .vehicleRentalService();
+    return (
+      (TransmodelRequestContext) environment.getContext()
+    ).getServerContext().vehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(
     DataFetchingEnvironment environment
   ) {
-    return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .vehicleParkingService();
+    return (
+      (TransmodelRequestContext) environment.getContext()
+    ).getServerContext().vehicleParkingService();
   }
 
   public static GraphFinder getGraphFinder(DataFetchingEnvironment environment) {

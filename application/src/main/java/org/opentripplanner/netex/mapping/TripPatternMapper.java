@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -21,7 +22,6 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -168,11 +168,11 @@ class TripPatternMapper {
       return Optional.empty();
     }
 
-    List<Trip> trips = new ArrayList<>();
+    List<Trip> trips = new ArrayList<>(serviceJourneys.size());
     ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
-    HashMap<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+    HashMap<Trip, List<StopTime>> tripStopTimes = HashMap.newHashMap(serviceJourneys.size());
     Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
-    ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
+    ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>(serviceJourneys.size());
 
     for (ServiceJourney serviceJourney : serviceJourneys) {
       Trip trip = mapTrip(journeyPattern, serviceJourney);

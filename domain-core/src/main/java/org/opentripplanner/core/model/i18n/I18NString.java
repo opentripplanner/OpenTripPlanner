@@ -42,7 +42,7 @@ public interface I18NString {
     if (hasNoValue(value)) {
       throw new IllegalArgumentException(
         "Value can not be null, empty or just whitespace: " +
-        (value == null ? "null" : "'" + value + "'")
+          (value == null ? "null" : "'" + value + "'")
       );
     }
     return value;

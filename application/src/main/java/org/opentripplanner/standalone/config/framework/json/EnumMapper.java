@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.framework.json;
 
 import java.util.Arrays;
 import java.util.Optional;
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**

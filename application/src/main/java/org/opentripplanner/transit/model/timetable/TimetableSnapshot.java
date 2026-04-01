@@ -2,9 +2,12 @@ package org.opentripplanner.transit.model.timetable;
 
 import static org.opentripplanner.utils.collection.CollectionUtils.getByNullableKey;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
@@ -135,6 +138,10 @@ public class TimetableSnapshot {
   private final Map<Trip, TripPattern> realTimeAddedPatternForTrip;
   private final Multimap<Route, TripPattern> realTimeAddedPatternsForRoute;
   private final Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById;
+  private final ListMultimap<
+    FeedScopedId,
+    TripOnServiceDate
+  > realTimeAddedReplacedByTripOnServiceDateById;
   private final Map<
     TripIdAndServiceDate,
     TripOnServiceDate
@@ -161,13 +168,14 @@ public class TimetableSnapshot {
       new HashMap<>(),
       HashMultimap.create(),
       new HashMap<>(),
+      ArrayListMultimap.create(),
       new HashMap<>(),
       HashMultimap.create(),
       false
     );
   }
 
-  private TimetableSnapshot(
+  TimetableSnapshot(
     Map<FeedScopedId, SortedSet<Timetable>> timetables,
     Map<TripIdAndServiceDate, TripPattern> realTimeNewTripPatternsForModifiedTrips,
     Map<FeedScopedId, Route> realtimeAddedRoutes,
@@ -175,6 +183,7 @@ public class TimetableSnapshot {
     Map<Trip, TripPattern> realTimeAddedPatternForTrip,
     Multimap<Route, TripPattern> realTimeAddedPatternsForRoute,
     Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById,
+    ListMultimap<FeedScopedId, TripOnServiceDate> realTimeAddedReplacedByTripOnServiceDateById,
     Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay,
     SetMultimap<StopLocation, TripPattern> patternsForStop,
     boolean readOnly
@@ -186,6 +195,8 @@ public class TimetableSnapshot {
     this.realTimeAddedPatternForTrip = realTimeAddedPatternForTrip;
     this.realTimeAddedPatternsForRoute = realTimeAddedPatternsForRoute;
     this.realTimeAddedTripOnServiceDateById = realTimeAddedTripOnServiceDateById;
+    this.realTimeAddedReplacedByTripOnServiceDateById =
+      realTimeAddedReplacedByTripOnServiceDateById;
     this.realTimeAddedTripOnServiceDateForTripAndDay = realTimeAddedTripOnServiceDateForTripAndDay;
     this.patternsForStop = patternsForStop;
     this.readOnly = readOnly;
@@ -319,7 +330,7 @@ public class TimetableSnapshot {
     swapTimetable(pattern, tt, updated);
 
     Trip trip = updatedTripTimes.getTrip();
-    if (pattern.isCreatedByRealtimeUpdater()) {
+    if (pattern.isStopPatternModifiedInRealTime()) {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();
       TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
@@ -343,6 +354,12 @@ public class TimetableSnapshot {
 
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
+        for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
+          realTimeAddedReplacedByTripOnServiceDateById.put(
+            replacementFor.getId(),
+            tripOnServiceDate
+          );
+        }
         realTimeAddedTripOnServiceDateForTripAndDay.put(
           new TripIdAndServiceDate(tripId, serviceDate),
           tripOnServiceDate
@@ -382,6 +399,7 @@ public class TimetableSnapshot {
       Map.copyOf(realTimeAddedPatternForTrip),
       ImmutableSetMultimap.copyOf(realTimeAddedPatternsForRoute),
       Map.copyOf(realTimeAddedTripOnServiceDateById),
+      ImmutableListMultimap.copyOf(realTimeAddedReplacedByTripOnServiceDateById),
       Map.copyOf(realTimeAddedTripOnServiceDateForTripAndDay),
       ImmutableSetMultimap.copyOf(patternsForStop),
       true
@@ -410,11 +428,13 @@ public class TimetableSnapshot {
       feedId
     );
     boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
+    boolean patternsForStopWereCleared = clearPatternsForStop(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
       newTripPatternsForModifiedTripsWereCleared ||
-      addedTripPatternsWereCleared
+      addedTripPatternsWereCleared ||
+      patternsForStopWereCleared
     ) {
       dirty = true;
     }
@@ -486,7 +506,7 @@ public class TimetableSnapshot {
     validateNotReadOnly();
 
     boolean modified = false;
-    for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext();) {
+    for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext(); ) {
       FeedScopedId patternId = it.next();
       SortedSet<Timetable> sortedTimetables = timetables.get(patternId);
       SortedSet<Timetable> toKeepTimetables = new TreeSet<>(new SortedTimetableComparator());
@@ -510,6 +530,7 @@ public class TimetableSnapshot {
       Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator =
         realTimeNewTripPatternsForModifiedTrips.entrySet().iterator();
       iterator.hasNext();
+
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
       if (!serviceDate.isBefore(tripIdAndServiceDate.serviceDate())) {
@@ -521,6 +542,10 @@ public class TimetableSnapshot {
     return modified;
   }
 
+  public Collection<TripOnServiceDate> getRealTimeReplacedByTripOnServiceDate(FeedScopedId id) {
+    return realTimeAddedReplacedByTripOnServiceDateById.get(id);
+  }
+
   public boolean isDirty() {
     if (readOnly) {
       return false;
@@ -528,6 +553,7 @@ public class TimetableSnapshot {
     return dirty;
   }
 
+  @Override
   public String toString() {
     String d = readOnly ? "committed" : String.format("%d dirty", dirtyTimetables.size());
     return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
@@ -544,7 +570,15 @@ public class TimetableSnapshot {
     return (
       dirtyTimetables.isEmpty() &&
       timetables.isEmpty() &&
-      realTimeNewTripPatternsForModifiedTrips.isEmpty()
+      realTimeNewTripPatternsForModifiedTrips.isEmpty() &&
+      patternsForStop.isEmpty() &&
+      realtimeAddedRoutes.isEmpty() &&
+      realTimeAddedTrips.isEmpty() &&
+      realTimeAddedPatternForTrip.isEmpty() &&
+      realTimeAddedPatternsForRoute.isEmpty() &&
+      realTimeAddedTripOnServiceDateById.isEmpty() &&
+      realTimeAddedReplacedByTripOnServiceDateById.isEmpty() &&
+      realTimeAddedTripOnServiceDateForTripAndDay.isEmpty()
     );
   }
 
@@ -591,7 +625,9 @@ public class TimetableSnapshot {
   /**
    * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
    *
-   * */
+   * @param feedId feed id to clear out
+   * @return true if realTimeAddedTrips changed as a result of the call
+   */
   private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
     // it is sufficient to test for the removal of added trips, since other indexed entities are
     // added only if a new trip is added.
@@ -601,20 +637,33 @@ public class TimetableSnapshot {
     realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
     realTimeAddedTripOnServiceDateForTripAndDay
       .keySet()
-      .removeIf(tripOnServiceDate -> feedId.equals(tripOnServiceDate.tripId().getFeedId()));
+      .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
     realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
     realTimeAddedPatternsForRoute
       .keySet()
       .removeIf(route -> feedId.equals(route.getId().getFeedId()));
     realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedReplacedByTripOnServiceDateById
+      .keySet()
+      .removeIf(id -> feedId.equals(id.getFeedId()));
     return removedEntry;
   }
 
   /**
-   * Add the patterns to the stop index, only if they come from a modified pattern
+   * Clear all trip patterns from patternsForStop matching the provided feed id.
+   *
+   * @param feedId feed id to clear out
+   * @return true if patternsForStop changed as a result of the call
+   */
+  private boolean clearPatternsForStop(String feedId) {
+    return patternsForStop.values().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
+  }
+
+  /**
+   * Add the patterns to the stop index, only if they come from a real-time pattern.
    */
   private void addPatternToIndex(TripPattern tripPattern) {
-    if (tripPattern.isCreatedByRealtimeUpdater()) {
+    if (tripPattern.isRealTimeTripPattern()) {
       //TODO - SIRI: Add pattern to index?
 
       for (var stop : tripPattern.getStops()) {

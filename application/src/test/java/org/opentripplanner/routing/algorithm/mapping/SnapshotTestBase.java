@@ -45,11 +45,11 @@ import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryM
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -62,14 +62,16 @@ import org.opentripplanner.utils.time.DurationUtils;
  */
 public abstract class SnapshotTestBase {
 
-  private static final DateTimeFormatter apiDateFormatter = DateTimeFormatter.ofPattern(
+  private static final DateTimeFormatter API_DATE_FORMATTER = DateTimeFormatter.ofPattern(
     "MM-dd-yyyy"
   );
-  private static final DateTimeFormatter apiTimeFormatter = DateTimeFormatter.ofPattern("H:mm%20a");
-  private static final SnapshotSerializer snapshotSerializer = new SnapshotItinerarySerializer();
-  private static final ItineraryMapper itineraryMapper = new ItineraryMapper(Locale.ENGLISH, true);
+  private static final DateTimeFormatter API_TIME_FORMATTER = DateTimeFormatter.ofPattern(
+    "H:mm%20a"
+  );
+  private static final SnapshotSerializer SNAPSHOT_SERIALIZER = new SnapshotItinerarySerializer();
+  private static final ItineraryMapper ITINERARY_MAPPER = new ItineraryMapper(Locale.ENGLISH, true);
 
-  static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
+  static final boolean VERBOSE = Boolean.getBoolean("otp.test.verbose");
 
   protected OtpServerRequestContext serverContext;
 
@@ -181,8 +183,8 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {
-    expect(itineraryMapper.mapItineraries(itineraries))
-      .serializer(snapshotSerializer)
+    expect(ITINERARY_MAPPER.mapItineraries(itineraries))
+      .serializer(SNAPSHOT_SERIALIZER)
       .toMatchSnapshot();
   }
 
@@ -223,7 +225,7 @@ public abstract class SnapshotTestBase {
   }
 
   private static String asJsonString(Object object) {
-    return snapshotSerializer.apply(new Object[] { object });
+    return SNAPSHOT_SERIALIZER.apply(new Object[] { object });
   }
 
   private List<Itinerary> retrieveItineraries(RouteRequest request) {
@@ -232,7 +234,7 @@ public abstract class SnapshotTestBase {
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
 
-    if (verbose) {
+    if (VERBOSE) {
       printItineraries(
         itineraries,
         startMillis,
@@ -276,8 +278,8 @@ public abstract class SnapshotTestBase {
       "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&arriveBy=%s&wheelchair=%s",
       formatPlace(request.from()),
       formatPlace(request.to()),
-      dateTime.toLocalDate().format(apiDateFormatter),
-      dateTime.toLocalTime().format(apiTimeFormatter),
+      dateTime.toLocalDate().format(API_DATE_FORMATTER),
+      dateTime.toLocalTime().format(API_TIME_FORMATTER),
       modes,
       request.arriveBy(),
       request.preferences().wheelchair()

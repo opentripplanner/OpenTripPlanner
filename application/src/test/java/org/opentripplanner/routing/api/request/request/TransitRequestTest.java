@@ -105,7 +105,11 @@ class TransitRequestTest {
         subject.copyOf().disable().build(),
         subject.copyOf().withPriorityGroupsByAgency(List.of()).build(),
         subject.copyOf().addPriorityGroupsGlobal(List.of()).build(),
-        subject.copyOf().withRaptorDebugging(d -> d.withStops("")).build().toString()
+        subject
+          .copyOf()
+          .withRaptorDebugging(d -> d.withStops(""))
+          .build()
+          .toString()
       );
   }
 

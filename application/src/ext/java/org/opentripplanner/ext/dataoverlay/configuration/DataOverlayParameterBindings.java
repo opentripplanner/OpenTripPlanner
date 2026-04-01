@@ -15,7 +15,10 @@ public class DataOverlayParameterBindings implements Serializable {
   }
 
   public Optional<ParameterBinding> getParameterBinding(ParameterName name) {
-    return parameters.stream().filter(it -> it.getName() == name).findFirst();
+    return parameters
+      .stream()
+      .filter(it -> it.getName() == name)
+      .findFirst();
   }
 
   @Override

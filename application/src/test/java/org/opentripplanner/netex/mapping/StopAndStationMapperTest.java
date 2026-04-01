@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -367,11 +367,13 @@ class StopAndStationMapperTest {
   private AccessibilityAssessment createAccessibilityAssessment(
     LimitationStatusEnumeration wheelChairAccess
   ) {
-    var accessibilityLimitation = new AccessibilityLimitation()
-      .withWheelchairAccess(wheelChairAccess);
+    var accessibilityLimitation = new AccessibilityLimitation().withWheelchairAccess(
+      wheelChairAccess
+    );
 
-    var limitations = new AccessibilityLimitations_RelStructure()
-      .withAccessibilityLimitation(accessibilityLimitation);
+    var limitations = new AccessibilityLimitations_RelStructure().withAccessibilityLimitation(
+      accessibilityLimitation
+    );
 
     return new AccessibilityAssessment().withLimitations(limitations);
   }

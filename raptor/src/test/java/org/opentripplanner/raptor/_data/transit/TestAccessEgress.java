@@ -37,6 +37,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int openUntil;
   private final boolean closed;
   private final int timePenalty;
+  private final int numberOfViaLocationsVisited;
 
   private TestAccessEgress(Builder builder) {
     this.stop = builder.stop;
@@ -49,6 +50,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.closed = builder.closed;
     this.timePenalty = builder.timePenalty;
     this.c1 = builder.c1;
+    this.numberOfViaLocationsVisited = builder.numberOfViaLocationsVisited;
 
     if (free) {
       assertEquals(0, durationInSeconds);
@@ -178,6 +180,15 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
   public TestAccessEgress withTimePenalty(int timePenalty) {
     return this.copyOf().withTimePenalty(timePenalty).build();
+  }
+
+  public TestAccessEgress withViaLocationsVisited(int numberOfViaLocationsVisited) {
+    return this.copyOf().withViaLocationsVisited(numberOfViaLocationsVisited).build();
+  }
+
+  @Override
+  public int numberOfViaLocationsVisited() {
+    return numberOfViaLocationsVisited;
   }
 
   protected Builder copyOf() {
@@ -326,6 +337,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     private boolean free = false;
     private boolean closed = false;
     private int timePenalty = RaptorConstants.TIME_NOT_SET;
+    private int numberOfViaLocationsVisited = RaptorConstants.ZERO;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -344,6 +356,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.openUntil = original.openUntil;
       this.closed = original.closed;
       this.timePenalty = original.timePenalty;
+      this.numberOfViaLocationsVisited = original.numberOfViaLocationsVisited;
     }
 
     public Builder(RaptorAccessEgressToStringParser data) {
@@ -360,10 +373,13 @@ public class TestAccessEgress implements RaptorAccessEgress {
           case C1 -> withCost(field.value());
           case RIDES -> withNRides(field.value());
           case TIME_PENALTY -> withTimePenalty(field.value());
-          case C2,
+          case VIAS -> withViaLocationsVisited(field.value());
+          case
+            C2,
             TRANSFERS,
             TRANSFER_PRIORITY,
             WAIT_TIME_COST -> throw new IllegalArgumentException(field.toString());
+          default -> throw new IllegalArgumentException(field.type().toString());
         }
       }
       if (!RaptorConstants.isSet(c1)) {
@@ -397,14 +413,19 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return this;
     }
 
+    Builder withViaLocationsVisited(int numberOfViaLocationsVisited) {
+      this.numberOfViaLocationsVisited = numberOfViaLocationsVisited;
+      return this;
+    }
+
     Builder withOpeningHours(int openFrom, int openUntil) {
       if (openFrom > openUntil) {
         throw new IllegalStateException(
           "Must open before is close. Opens at " +
-          TimeUtils.timeToStrCompact(openFrom) +
-          " and close at " +
-          TimeUtils.timeToStrCompact(openUntil) +
-          "."
+            TimeUtils.timeToStrCompact(openFrom) +
+            " and close at " +
+            TimeUtils.timeToStrCompact(openUntil) +
+            "."
         );
       }
       this.closed = false;

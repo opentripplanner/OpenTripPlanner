@@ -19,7 +19,7 @@ class AgencyTest {
   private static final String FARE_URL = "http://fare.aaa.com";
   private static final String LANG = "image";
 
-  private static final Agency subject = Agency.of(TimetableRepositoryForTest.id(ID))
+  private static final Agency SUBJECT = Agency.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withTimezone(TIMEZONE)
@@ -30,19 +30,19 @@ class AgencyTest {
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = SUBJECT.copy().withName(NAME).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withName("v2").build();
+    copy = SUBJECT.copy().withName("v2").build();
 
     // The two objects are not the same instance, but is equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
@@ -55,13 +55,13 @@ class AgencyTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withTimezone("CET").build()));
-    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withFareUrl("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withLang("X").build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTimezone("CET").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPhone("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withFareUrl("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withLang("X").build()));
   }
 }

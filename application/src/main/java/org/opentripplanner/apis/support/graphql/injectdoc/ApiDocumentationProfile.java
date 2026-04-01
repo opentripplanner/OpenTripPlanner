@@ -1,13 +1,12 @@
 package org.opentripplanner.apis.support.graphql.injectdoc;
 
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationProfile> {
   DEFAULT,
   ENTUR;
 
-  private static final String TYPE_DOC =
-    """
+  private static final String TYPE_DOC = """
     List of available custom documentation profiles. A profile is used to inject custom
     documentation like type and field description or a deprecated reason.
 

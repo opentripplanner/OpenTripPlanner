@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 /**
@@ -50,7 +50,9 @@ public class GroupOfStations
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .toList();
   }
 
   public Collection<StopLocationsGroup> getChildStations() {

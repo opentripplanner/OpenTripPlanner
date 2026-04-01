@@ -2,10 +2,10 @@ package org.opentripplanner.routing.via.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 
 @Module

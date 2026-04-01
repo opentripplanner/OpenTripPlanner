@@ -13,20 +13,22 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
@@ -109,7 +111,8 @@ class LinkingContextFactoryTest {
     var stopLinkingContextFactory = new LinkingContextFactory(
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      Set::of
+      Set::of,
+      id -> Optional.empty()
     );
     var container = new TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
@@ -125,6 +128,28 @@ class LinkingContextFactoryTest {
   }
 
   @Test
+  void stopIdNoStreet() {
+    var stopLinkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
+      Set::of,
+      id -> Optional.empty()
+    );
+    var container = new TemporaryVerticesContainer();
+    var from = stopToLocation(stopA);
+    var to = stopToLocation(stopB);
+    var request = LinkingContextRequest.of()
+      .withFrom(from)
+      .withTo(to)
+      .withDirectMode(StreetMode.NOT_SET)
+      .build();
+    var linkingContext = stopLinkingContextFactory.create(container, request);
+
+    assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
+    assertEquals(stopB, toStop(linkingContext.toStopVertices()));
+  }
+
+  @Test
   void stationId() {
     var mapping = ImmutableMultimap.<FeedScopedId, FeedScopedId>builder()
       .putAll(OMEGA_ID, stopC.getId(), stopD.getId())
@@ -132,7 +157,8 @@ class LinkingContextFactoryTest {
     var stopLinkingContextFactory = new LinkingContextFactory(
       graph,
       new VertexCreationService(VertexLinkerTestFactory.of(graph)),
-      mapping::get
+      mapping::get,
+      id -> Optional.empty()
     );
     var container = new TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId("station", OMEGA_ID.getFeedId(), OMEGA_ID.getId());
@@ -143,6 +169,56 @@ class LinkingContextFactoryTest {
       .build();
     var linkingContext = stopLinkingContextFactory.create(container, request);
     assertThat(toStops(linkingContext.findVertices(from))).containsExactly(stopC, stopD);
+  }
+
+  @Test
+  void stationCentroidForCar() {
+    var multiModalStation = testModel
+      .multiModalStation("MultiModal")
+      .withCoordinate(CENTER.moveEastMeters(DISTANCE))
+      .withChildStations(List.of(stationAlpha))
+      .build();
+    var stopLinkingContextFactory = new LinkingContextFactory(
+      graph,
+      new VertexCreationService(VertexLinkerTestFactory.of(graph)),
+      id -> Set.of(),
+      id -> {
+        if (id.equals(stationAlpha.getId())) {
+          return Optional.of(stationAlpha.getCoordinate());
+        }
+        return id.equals(multiModalStation.getId())
+          ? Optional.of(multiModalStation.getCoordinate())
+          : Optional.empty();
+      }
+    );
+    var container = new TemporaryVerticesContainer();
+    var from = GenericLocation.fromStopId(
+      stationAlpha.getName().toString(),
+      stationAlpha.getId().getFeedId(),
+      stationAlpha.getId().getId()
+    );
+    var to = GenericLocation.fromStopId(
+      multiModalStation.getName().toString(),
+      multiModalStation.getId().getFeedId(),
+      multiModalStation.getId().getId()
+    );
+    var request = LinkingContextRequest.of()
+      .withFrom(from)
+      .withTo(to)
+      .withDirectMode(StreetMode.CAR)
+      .build();
+    var linkingContext = stopLinkingContextFactory.create(container, request);
+    var fromVertices = linkingContext.findVertices(from);
+    var fromVertex = fromVertices.iterator().next();
+    assertEquals(stationAlpha.getCoordinate(), fromVertex.toWgsCoordinate());
+    var fromOutgoing = fromVertex.getOutgoing();
+    assertTrue(outgoingEdgeIsTraversableWith(fromOutgoing, TraverseMode.CAR));
+
+    var toVertices = linkingContext.findVertices(to);
+    var toVertex = toVertices.iterator().next();
+    assertEquals(multiModalStation.getCoordinate(), toVertex.toWgsCoordinate());
+    var toIncoming = toVertex.getIncoming();
+    assertTrue(incomingEdgeIsTraversableWith(toIncoming, TraverseMode.CAR));
   }
 
   @Test
@@ -164,7 +240,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void locationsShouldBeRoutableWithTheGivenModes() {
-    try (var container = new TemporaryVerticesContainer();) {
+    try (var container = new TemporaryVerticesContainer()) {
       var from = GenericLocation.fromCoordinate(0.5, 0.5);
       var to = GenericLocation.fromCoordinate(0.6, 0.4);
       var via = GenericLocation.fromCoordinate(0.4, 0.6);
@@ -225,7 +301,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void verticesShouldInheritNamesFromLocations() {
-    try (var container = new TemporaryVerticesContainer();) {
+    try (var container = new TemporaryVerticesContainer()) {
       var from = new GenericLocation("First", null, 0.5, 0.5);
       var via = new GenericLocation("Second", null, 0.4, 0.6);
       var to = new GenericLocation("Third", null, 0.6, 0.4);
@@ -251,7 +327,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void verticesShouldHaveDefaultNames() {
-    try (var container = new TemporaryVerticesContainer();) {
+    try (var container = new TemporaryVerticesContainer()) {
       var from = GenericLocation.fromCoordinate(0.5, 0.5);
       var to = GenericLocation.fromCoordinate(0.6, 0.4);
       var via = GenericLocation.fromCoordinate(0.4, 0.6);

@@ -7,11 +7,11 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingPara
 import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetConstants;
 
 /**

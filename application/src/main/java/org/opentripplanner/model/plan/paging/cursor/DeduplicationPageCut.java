@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Instant;
-import org.opentripplanner.framework.model.NormalizedCost;
+import org.opentripplanner.core.model.basic.NormalizedCost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 
 /**
@@ -17,8 +17,7 @@ record DeduplicationPageCut(
   NormalizedCost generalizedCost,
   int numOfTransfers,
   boolean onStreet
-)
-  implements ItinerarySortKey {
+) implements ItinerarySortKey {
   @Override
   public Instant startTimeAsInstant() {
     return departureTime;

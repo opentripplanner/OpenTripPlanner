@@ -71,10 +71,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle
   ) {
-    this.paths = new ParetoSet<>(
-      paretoComparator,
-      debugHandlerFactory.paretoSetDebugPathListener()
-    );
+    this.paths = ParetoSet.of(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
     this.transitCalculator = transitCalculator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
@@ -131,14 +128,27 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     return paths.isEmpty();
   }
 
-  public boolean qualify(int departureTime, int arrivalTime, int numberOfTransfers, int cost) {
+  public boolean qualify(
+    int departureTime,
+    int arrivalTime,
+    int numberOfTransfers,
+    int cost,
+    int c2
+  ) {
     return paths.qualify(
-      Path.dummyPath(iterationDepartureTime, departureTime, arrivalTime, numberOfTransfers, cost)
+      Path.dummyPath(
+        iterationDepartureTime,
+        departureTime,
+        arrivalTime,
+        numberOfTransfers,
+        cost,
+        c2
+      )
     );
   }
 
   public Collection<RaptorPath<T>> listPaths() {
-    return paths;
+    return paths.stream().toList();
   }
 
   public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {

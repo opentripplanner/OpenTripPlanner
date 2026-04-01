@@ -9,9 +9,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Set;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
@@ -79,7 +79,7 @@ public class VehicleRentalSourceFactory {
       .summary("The name of the network to override the one derived from the source data.")
       .description(
         "GBFS feeds must include a system_id which will be used as the default `network`. These " +
-        "ids are sometimes not helpful so setting this property will override it."
+          "ids are sometimes not helpful so setting this property will override it."
       )
       .asString(null);
   }

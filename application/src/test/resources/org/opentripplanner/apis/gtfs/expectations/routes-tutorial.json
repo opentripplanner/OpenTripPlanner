@@ -150,6 +150,16 @@
           "name": "Agency Test"
         },
         "mode": "TROLLEYBUS"
+      },
+      {
+        "longName": "Long name for replacement bus",
+        "shortName": "Rreplacement",
+        "gtfsId": "F:replacement",
+        "agency": {
+          "gtfsId": "F:A1",
+          "name": "Agency Test"
+        },
+        "mode": "BUS"
       }
     ]
   }

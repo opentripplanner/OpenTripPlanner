@@ -29,8 +29,8 @@ public enum ConfigType {
   LOCALE(
     JsonType.string,
     "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific " +
-    "geographical, political, or cultural region. For more information see the [Java Locale]" +
-    "(https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html).",
+      "geographical, political, or cultural region. For more information see the [Java Locale]" +
+      "(https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html).",
     "en_US",
     "nn_NO"
   ),
@@ -38,8 +38,8 @@ public enum ConfigType {
   DATE_OR_PERIOD(
     JsonType.string,
     "A _local date_, or a _period_ relative to today. The local date has the format " +
-    "`YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer " +
-    "number.",
+      "`YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer " +
+      "number.",
     "P1Y",
     "-P3M2D",
     "P1D"
@@ -47,8 +47,8 @@ public enum ConfigType {
   DURATION(
     JsonType.string,
     "A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where " +
-    "`n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not " +
-    "case sensitive.",
+      "`n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not " +
+      "case sensitive.",
     "3h",
     "2m",
     "1d5h2m3s",
@@ -64,7 +64,7 @@ public enum ConfigType {
   URI(
     JsonType.string,
     "An URI path to a resource like a file or a URL. Relative URIs are resolved relative " +
-    "to the OTP base path.",
+      "to the OTP base path.",
     "http://foo.bar/",
     "file:///Users/jon/local/file",
     "graph.obj"

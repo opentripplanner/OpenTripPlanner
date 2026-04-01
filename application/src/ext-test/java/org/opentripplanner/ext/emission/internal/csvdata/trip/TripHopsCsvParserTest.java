@@ -10,8 +10,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class TripHopsCsvParserTest {
 
-  private static final String DATA =
-    """
+  private static final String DATA = """
     trip_id, from_stop_id, from_stop_sequence, not_used, co2
     F:1, NSR:Quay:1, 1, xyz, 28.0
     F:1, NSR:Quay:2, 2, abc, 38.0

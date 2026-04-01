@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alert.siri;
 
 import java.time.Duration;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 
 public record SiriSXUpdaterParameters(
   String configRef,
@@ -13,5 +13,4 @@ public record SiriSXUpdaterParameters(
   Duration timeout,
   boolean blockReadinessUntilInitialized,
   HttpHeaders requestHeaders
-)
-  implements SiriSXUpdater.Parameters {}
+) implements SiriSXUpdater.Parameters {}
