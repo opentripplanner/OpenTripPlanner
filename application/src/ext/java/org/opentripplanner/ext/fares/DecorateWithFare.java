@@ -20,7 +20,7 @@ public class DecorateWithFare implements ItineraryDecorator {
     if (itinerary.isFlaggedForDeletion()) {
       return itinerary;
     }
-    
+
     var fare = fareService.calculateFares(itinerary);
     return (fare != null)
       ? ItineraryFaresDecorator.decorateItineraryWithFare(itinerary, fare)
