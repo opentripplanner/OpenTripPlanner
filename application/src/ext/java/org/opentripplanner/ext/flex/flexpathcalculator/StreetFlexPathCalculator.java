@@ -64,7 +64,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       return null;
     }
 
-    return StateToFlexPathMapper.map(state);
+    return StateToFlexPathMapper.map(state, fromv, tov);
   }
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
