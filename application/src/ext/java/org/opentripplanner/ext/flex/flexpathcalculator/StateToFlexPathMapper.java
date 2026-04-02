@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import java.util.function.Supplier;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -29,9 +30,7 @@ class StateToFlexPathMapper {
     // computing the linestring from the graph path is a surprisingly expensive operation
     // so we delay it until it's actually needed. since most flex paths are never shown to the user
     // this improves performance quite a bit.
-    Supplier<LineString> geometrySupplier = () -> {
-      return bezierCurve(origin.getCoordinate(), destination.getCoordinate());
-    };
+    Supplier<LineString> geometrySupplier = () -> bezierCurve(origin.getCoordinate(), destination.getCoordinate());
 
     return new FlexPath(
       (int) state.getTraversalDistanceMeters(),
@@ -43,8 +42,7 @@ class StateToFlexPathMapper {
   private static LineString bezierCurve(Coordinate start, Coordinate end) {
     double heightFactor = 0.05; // Adjust for more/less curve
     double midX = (start.x + end.x) / 2;
-    double midY = (start.y + end.y) / 2;
-    Coordinate control = new Coordinate(midX, midY + heightFactor);
+    double midY = (start.y + end.y) / 2 * heightFactor;
 
     // Create a Bezier curve by densifying the curve
     int numPoints = 20;
@@ -53,11 +51,13 @@ class StateToFlexPathMapper {
     for (int i = 0; i < numPoints; i++) {
       double t = (double) i / (numPoints - 1);
       // Quadratic Bezier interpolation
-      double x = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * control.x + t * t * end.x;
-      double y = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * control.y + t * t * end.y;
+      double x = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * midX + t * t * end.x;
+      double y = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * midY + t * t * end.y;
       curvePoints[i * 2] = x;
       curvePoints[(i * 2) + 1] = y;
     }
+
+    LiteCoordinateSequenceFactory.
 
     return GeometryUtils.makeLineString(curvePoints);
   }
