@@ -12,11 +12,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
-import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -32,8 +30,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 
 public class GeometryUtils {
 
-  private static final CoordinateSequenceFactory CSF = new PackedCoordinateSequenceFactory();
-  private static final LiteCoordinateSequenceFactory LITE_CSF= new LiteCoordinateSequenceFactory();
+  private static final PackedCoordinateSequenceFactory CSF = new PackedCoordinateSequenceFactory();
   private static final GeometryFactory GF = new GeometryFactory(CSF);
 
   public static <T> Geometry makeConvexHull(
@@ -52,11 +49,7 @@ public class GeometryUtils {
   }
 
   public static LineString makeLineString(double... coords) {
-    Coordinate[] coordinates = new Coordinate[coords.length / 2];
-    for (int i = 0; i < coords.length; i += 2) {
-      coordinates[i / 2] = new Coordinate(coords[i], coords[i + 1]);
-    }
-    var seq = LITE_CSF.create(coordinates);
+    var seq = CSF.create(coords, 2);
     return new LineString(seq, GF);
   }
 
