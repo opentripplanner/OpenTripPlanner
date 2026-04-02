@@ -42,7 +42,7 @@ class StateToFlexPathMapper {
   private static LineString bezierCurve(Coordinate start, Coordinate end) {
     double heightFactor = 0.05; // Adjust for more/less curve
     double midX = (start.x + end.x) / 2;
-    double midY = (start.y + end.y) / 2 * heightFactor;
+    double midY = ((start.y + end.y) / 2 ) + heightFactor;
 
     // Create a Bezier curve by densifying the curve
     int numPoints = 20;
@@ -56,8 +56,6 @@ class StateToFlexPathMapper {
       curvePoints[i * 2] = x;
       curvePoints[(i * 2) + 1] = y;
     }
-
-    LiteCoordinateSequenceFactory.
 
     return GeometryUtils.makeLineString(curvePoints);
   }

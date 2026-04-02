@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -32,6 +33,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 public class GeometryUtils {
 
   private static final CoordinateSequenceFactory CSF = new PackedCoordinateSequenceFactory();
+  private static final LiteCoordinateSequenceFactory LITE_CSF= new LiteCoordinateSequenceFactory();
   private static final GeometryFactory GF = new GeometryFactory(CSF);
 
   public static <T> Geometry makeConvexHull(
@@ -50,12 +52,12 @@ public class GeometryUtils {
   }
 
   public static LineString makeLineString(double... coords) {
-    GeometryFactory factory = getGeometryFactory();
     Coordinate[] coordinates = new Coordinate[coords.length / 2];
     for (int i = 0; i < coords.length; i += 2) {
       coordinates[i / 2] = new Coordinate(coords[i], coords[i + 1]);
     }
-    return factory.createLineString(coordinates);
+    var seq = LITE_CSF.create(coordinates);
+    return new LineString(seq, GF);
   }
 
   public static LineString makeLineString(List<Coordinate> coordinates) {
