@@ -15,9 +15,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.street.geometry.CoordinateArrayListSequence;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 class Ring {
 
@@ -91,7 +91,7 @@ class Ring {
     List<Polygon> polygonHoles = new ArrayList<>();
     for (Ring ring : holes) {
       Polygon polygon = factory.createPolygon(ring.shell, new LinearRing[0]);
-      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext();) {
+      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext(); ) {
         Polygon otherHole = it.next();
         if (otherHole.relate(polygon, "F***1****")) {
           polygon = (Polygon) polygon.union(otherHole);

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
@@ -120,7 +121,7 @@ class OtpHttpClientTest {
   void httpGetRequest(String url) throws IOException {
     var uri = UriBuilder.fromUri(url).build();
 
-    var stream = OTP_HTTP_CLIENT.getAsInputStream(uri, Duration.ofSeconds(30), Map.of());
+    var stream = OTP_HTTP_CLIENT.getAsInputStream(uri, Duration.ofSeconds(30), HttpHeaders.empty());
     var bytes = IOUtils.toByteArray(stream);
 
     assertNotEquals(0, bytes.length, "Empty response body for %s".formatted(url));
@@ -130,7 +131,7 @@ class OtpHttpClientTest {
   void shouldAccessResponseHeaders() {
     URI uri = URI.create("http://localhost:" + port + "/json");
 
-    String result = client.getAndMap(uri, Map.of(), response -> {
+    String result = client.getAndMap(uri, HttpHeaders.empty(), response -> {
       // Verify we can access headers
       assertTrue(response.header("Content-Type").isPresent());
       assertEquals("application/json", response.header("Content-Type").get());
@@ -156,7 +157,7 @@ class OtpHttpClientTest {
   void shouldAccessHeadersCaseInsensitively() {
     URI uri = URI.create("http://localhost:" + port + "/json");
 
-    client.getAndMap(uri, Map.of(), response -> {
+    client.getAndMap(uri, HttpHeaders.empty(), response -> {
       // Test case insensitivity
       assertTrue(response.header("content-type").isPresent());
       assertTrue(response.header("CONTENT-TYPE").isPresent());
@@ -176,7 +177,7 @@ class OtpHttpClientTest {
   void shouldAccessMultiValueHeaders() {
     URI uri = URI.create("http://localhost:" + port + "/multi-header");
 
-    client.getAndMap(uri, Map.of(), response -> {
+    client.getAndMap(uri, HttpHeaders.empty(), response -> {
       List<String> cookies = response.headerValues("Set-Cookie");
       assertNotNull(cookies);
       assertEquals(3, cookies.size());
@@ -196,7 +197,7 @@ class OtpHttpClientTest {
   void shouldAccessCacheHeaders() {
     URI uri = URI.create("http://localhost:" + port + "/cache");
 
-    client.getAndMap(uri, Map.of(), response -> {
+    client.getAndMap(uri, HttpHeaders.empty(), response -> {
       assertTrue(response.header("Cache-Control").isPresent());
       assertEquals("max-age=3600", response.header("Cache-Control").get());
 
@@ -216,7 +217,7 @@ class OtpHttpClientTest {
     ObjectMapper mapper = new ObjectMapper();
 
     // This uses the helper method which internally uses ResponseMapper
-    var result = client.getAndMapAsJsonObject(uri, Map.of(), mapper, Map.class);
+    var result = client.getAndMapAsJsonObject(uri, HttpHeaders.empty(), mapper, Map.class);
 
     assertNotNull(result);
     assertEquals("Hello, World!", result.get("message"));
@@ -226,7 +227,7 @@ class OtpHttpClientTest {
   void shouldProvideBodyStreamThatCanBeRead() {
     URI uri = URI.create("http://localhost:" + port + "/text");
 
-    String result = client.getAndMap(uri, Map.of(), response -> {
+    String result = client.getAndMap(uri, HttpHeaders.empty(), response -> {
       assertTrue(response.header("Content-Type").isPresent());
       assertEquals("text/plain", response.header("Content-Type").get());
 
@@ -244,7 +245,7 @@ class OtpHttpClientTest {
   void shouldProvideAllHeadersAsMap() {
     URI uri = URI.create("http://localhost:" + port + "/json");
 
-    client.getAndMap(uri, Map.of(), response -> {
+    client.getAndMap(uri, HttpHeaders.empty(), response -> {
       Map<String, List<String>> headers = response.headers();
       assertNotNull(headers);
 
@@ -261,7 +262,7 @@ class OtpHttpClientTest {
   void shouldWorkWithTimeout() {
     URI uri = URI.create("http://localhost:" + port + "/json");
 
-    String result = client.getAndMap(uri, Duration.ofSeconds(5), Map.of(), response -> {
+    String result = client.getAndMap(uri, Duration.ofSeconds(5), HttpHeaders.empty(), response -> {
       assertTrue(response.header("Content-Type").isPresent());
       try {
         return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
@@ -276,7 +277,7 @@ class OtpHttpClientTest {
   @Test
   void shouldAccessStatusCode() {
     URI uri = URI.create("http://localhost:" + port + "/json");
-    client.getAndMap(uri, Map.of(), response -> {
+    client.getAndMap(uri, HttpHeaders.empty(), response -> {
       assertEquals(200, response.statusCode());
       return null;
     });

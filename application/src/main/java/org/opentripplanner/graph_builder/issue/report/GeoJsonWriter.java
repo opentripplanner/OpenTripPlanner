@@ -35,7 +35,10 @@ public class GeoJsonWriter {
    * @return true if a GeoJSON was written, false if not
    */
   boolean writeFile() {
-    var filteredIssues = issues.stream().filter(issue -> issue.getGeometry() != null).toList();
+    var filteredIssues = issues
+      .stream()
+      .filter(issue -> issue.getGeometry() != null)
+      .toList();
 
     if (filteredIssues.isEmpty()) {
       return false;

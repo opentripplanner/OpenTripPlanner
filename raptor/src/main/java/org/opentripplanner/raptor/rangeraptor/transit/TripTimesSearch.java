@@ -234,19 +234,19 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   private IllegalStateException notFoundException(String hint, String lbl, int time) {
     return new IllegalStateException(
       "Trip not found: " +
-      hint +
-      ". " +
-      " [FromStop: " +
-      fromStop +
-      ", toStop: " +
-      toStop +
-      ", " +
-      lbl +
-      ": " +
-      TimeUtils.timeToStrLong(time) +
-      ", pattern: " +
-      schedule.pattern().debugInfo() +
-      "]"
+        hint +
+        ". " +
+        " [FromStop: " +
+        fromStop +
+        ", toStop: " +
+        toStop +
+        ", " +
+        lbl +
+        ": " +
+        TimeUtils.timeToStrLong(time) +
+        ", pattern: " +
+        schedule.pattern().debugInfo() +
+        "]"
     );
   }
 }

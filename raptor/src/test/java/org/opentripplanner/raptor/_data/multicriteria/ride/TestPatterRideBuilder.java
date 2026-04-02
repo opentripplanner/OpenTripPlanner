@@ -79,25 +79,25 @@ public class TestPatterRideBuilder {
 
     return includeC2
       ? new PatternRideC2<>(
-        prevArrival,
-        boardStopIndex,
-        boardPos,
-        boardTime,
-        boardC1,
-        relativeC1,
-        c2,
-        trip.tripSortIndex(),
-        trip
-      )
+          prevArrival,
+          boardStopIndex,
+          boardPos,
+          boardTime,
+          boardC1,
+          relativeC1,
+          c2,
+          trip.tripSortIndex(),
+          trip
+        )
       : new PatternRideC1<>(
-        prevArrival,
-        boardStopIndex,
-        boardPos,
-        boardTime,
-        boardC1,
-        relativeC1,
-        trip.tripSortIndex(),
-        trip
-      );
+          prevArrival,
+          boardStopIndex,
+          boardPos,
+          boardTime,
+          boardC1,
+          relativeC1,
+          trip.tripSortIndex(),
+          trip
+        );
   }
 }

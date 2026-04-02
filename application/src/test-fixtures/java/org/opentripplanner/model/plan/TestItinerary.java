@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.util.List;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 public class TestItinerary {
 

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareOffer;
@@ -18,10 +19,9 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -511,7 +511,9 @@ public interface Leg {
     var start = fareZones(this.from());
     var end = fareZones(this.to());
 
-    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
+    return Stream.of(intermediate, start, end)
+      .flatMap(s -> s)
+      .collect(Collectors.toSet());
   }
 
   /**

@@ -54,7 +54,7 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
   void assignedThenRevertedStopIds() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Pattern1[SCHEDULED]"), env.raptorData().summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
@@ -70,8 +70,8 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | D 9:50 9:50 | B 10:01 10:01 | C 10:02 10:02",
       env.tripData(TRIP_1_ID).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertEquals(List.of("F:Route1::rt#1[UPDATED]"), env.raptorData().summarizePatterns());
+    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertEquals(List.of("F:Route1::001:RT[UPDATED]"), env.raptorData().summarizePatterns());
 
     var tripUpdate2 = rt
       .tripUpdateScheduled(TRIP_1_ID)
@@ -85,8 +85,8 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | E 9:55 9:55 | B 10:01 10:01 | C 10:02 10:02",
       env.tripData(TRIP_1_ID).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertEquals(List.of("F:Route1::rt#2[UPDATED]"), env.raptorData().summarizePatterns());
+    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertEquals(List.of("F:Route1::002:RT[UPDATED]"), env.raptorData().summarizePatterns());
 
     var tripUpdate3 = rt
       .tripUpdateScheduled(TRIP_1_ID)
@@ -101,7 +101,7 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       env.tripData(TRIP_1_ID).showTimetable()
     );
 
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Pattern1[UPDATED]"), env.raptorData().summarizePatterns());
   }
 
@@ -109,8 +109,8 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
   void reuseRealtimeTripPatterns() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).addTrip(TRIP_2_INPUT).build();
 
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Pattern1[SCHEDULED,SCHEDULED]"), env.raptorData().summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
@@ -133,10 +133,10 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "SCHEDULED | A 11:00 11:00 | B 11:01 11:01 | C 11:02 11:02",
       env.tripData(TRIP_2_ID).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(
-      List.of("F:Pattern1[SCHEDULED]", "F:Route1::rt#1[UPDATED]"),
+      List.of("F:Pattern1[SCHEDULED]", "F:Route1::001:RT[UPDATED]"),
       env.raptorData().summarizePatterns()
     );
 
@@ -149,9 +149,12 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | E 11:01 11:01 | B 11:02 11:02 | C 11:03 11:03",
       env.tripData(TRIP_2_ID).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertTrue(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertEquals(List.of("F:Route1::rt#1[UPDATED,UPDATED]"), env.raptorData().summarizePatterns());
+    assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertTrue(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertEquals(
+      List.of("F:Route1::001:RT[UPDATED,UPDATED]"),
+      env.raptorData().summarizePatterns()
+    );
 
     assertSuccess(rt.applyTripUpdate(tripUpdate2));
     assertEquals(
@@ -162,10 +165,10 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | E 11:01 11:01 | B 11:02 11:02 | C 11:03 11:03",
       env.tripData(TRIP_2_ID).showTimetable()
     );
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertTrue(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertTrue(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(
-      List.of("F:Pattern1[SCHEDULED]", "F:Route1::rt#1[UPDATED]"),
+      List.of("F:Pattern1[SCHEDULED]", "F:Route1::001:RT[UPDATED]"),
       env.raptorData().summarizePatterns()
     );
 
@@ -177,8 +180,8 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
         )
       )
     );
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Pattern1[UPDATED,UPDATED]"), env.raptorData().summarizePatterns());
   }
 
@@ -186,13 +189,17 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
   void reuseRealtimeTripPatternsOnDifferentServiceDates() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).addTrip(TRIP_2_INPUT).build();
 
-    assertFalse(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
     assertFalse(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
     );
-    assertFalse(env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
     assertFalse(
-      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
       List.of("F:Pattern1[SCHEDULED,SCHEDULED]"),
@@ -239,16 +246,20 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "SCHEDULED | A 11:00 11:00 | B 11:01 11:01 | C 11:02 11:02",
       env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertTrue(env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+    assertTrue(
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertTrue(
+      env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertFalse(
-      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
-      List.of("F:Route1::rt#1[UPDATED,UPDATED]"),
+      List.of("F:Route1::001:RT[UPDATED,UPDATED]"),
       env.raptorData(SERVICE_DATE).summarizePatterns()
     );
     assertEquals(
@@ -275,20 +286,24 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | E 11:01 11:01 | B 11:02 11:02 | C 11:03 11:03",
       env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).showTimetable()
     );
-    assertTrue(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertTrue(env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
     assertTrue(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertTrue(
-      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertTrue(
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertTrue(
+      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
-      List.of("F:Route1::rt#1[UPDATED,UPDATED]"),
+      List.of("F:Route1::001:RT[UPDATED,UPDATED]"),
       env.raptorData(SERVICE_DATE).summarizePatterns()
     );
     assertEquals(
-      List.of("F:Route1::rt#1[UPDATED,UPDATED]"),
+      List.of("F:Route1::001:RT[UPDATED,UPDATED]"),
       env.raptorData(SERVICE_DATE_PLUS).summarizePatterns()
     );
 
@@ -309,20 +324,24 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
       "UPDATED | E 11:01 11:01 | B 11:02 11:02 | C 11:03 11:03",
       env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).showTimetable()
     );
-    assertFalse(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertTrue(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+    assertFalse(
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertTrue(
-      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertTrue(
+      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
       List.of("F:Pattern1[SCHEDULED,SCHEDULED]"),
       env.raptorData(SERVICE_DATE).summarizePatterns()
     );
     assertEquals(
-      List.of("F:Route1::rt#1[UPDATED,UPDATED]"),
+      List.of("F:Route1::001:RT[UPDATED,UPDATED]"),
       env.raptorData(SERVICE_DATE_PLUS).summarizePatterns()
     );
 
@@ -336,13 +355,17 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
         )
       )
     );
-    assertFalse(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
     assertFalse(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertFalse(
-      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_2_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_2_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
       List.of("F:Pattern1[UPDATED,UPDATED]"),
@@ -358,8 +381,8 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
   void reuseScheduledTripPatterns() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).addTrip(TRIP_2_INPUT).build();
 
-    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isCreatedByRealtimeUpdater());
-    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isCreatedByRealtimeUpdater());
+    assertFalse(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
+    assertFalse(env.tripData(TRIP_2_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Pattern1[SCHEDULED,SCHEDULED]"), env.raptorData().summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
@@ -405,9 +428,11 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
   void reuseScheduledTripPatternsOnDifferentServiceDates() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
-    assertFalse(env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isCreatedByRealtimeUpdater());
     assertFalse(
-      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isCreatedByRealtimeUpdater()
+      env.tripData(TRIP_1_ID, SERVICE_DATE).tripPattern().isStopPatternModifiedInRealTime()
+    );
+    assertFalse(
+      env.tripData(TRIP_1_ID, SERVICE_DATE_PLUS).tripPattern().isStopPatternModifiedInRealTime()
     );
     assertEquals(
       List.of("F:Pattern1[SCHEDULED]"),

@@ -183,7 +183,7 @@ public class NetexConfig {
       .since(V2_2)
       .summary(
         "This field is used to identify the specific NeTEx feed. It is used instead of " +
-        "the feed_id field in GTFS file feed_info.txt."
+          "the feed_id field in GTFS file feed_info.txt."
       );
   }
 }

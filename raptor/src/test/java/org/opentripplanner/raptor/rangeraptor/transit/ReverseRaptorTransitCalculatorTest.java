@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D1_m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
@@ -59,6 +59,16 @@ public class ReverseRaptorTransitCalculatorTest {
   }
 
   @Test
+  public void isInIteration() {
+    var subject = create();
+
+    assertFalse(subject.isInIteration(60, 120));
+    assertTrue(subject.isInIteration(61, 120));
+    assertTrue(subject.isInIteration(120, 120));
+    assertFalse(subject.isInIteration(121, 120));
+  }
+
+  @Test
   public void rangeRaptorMinutes() {
     latestArrivalTime = 500;
     searchWindowSizeInSeconds = 200;
@@ -75,8 +85,10 @@ public class ReverseRaptorTransitCalculatorTest {
   @Test
   public void getTransfers() {
     var subject = create();
-    var transitData = new TestTransitData()
-      .withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D1m));
+    var transitData = new TestTransitData().withTransfer(
+      STOP_A,
+      TestTransfer.transfer(STOP_B, D1_m)
+    );
 
     // Expect transfer from stop A to stop B (reversed)
     var transfersFromStopB = subject.getTransfers(transitData, STOP_B);

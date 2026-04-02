@@ -129,8 +129,8 @@ public class ServiceJourneyType {
           .name("serviceAlteration")
           .deprecate(
             "The service journey alteration will be moved out of SJ and grouped " +
-            "together with the SJ and date. In Netex this new type is called " +
-            "DatedServiceJourney. We will create artificial DSJs for the old SJs."
+              "together with the SJ and date. In Netex this new type is called " +
+              "DatedServiceJourney. We will create artificial DSJs for the old SJs."
           )
           .type(EnumTypes.SERVICE_ALTERATION)
           .dataFetcher(environment -> trip(environment).getNetexAlteration())
@@ -155,8 +155,10 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPattern")
           .description(
-            "JourneyPattern for the service journey, according to scheduled data. If the " +
-            "ServiceJourney is not included in the scheduled data, null is returned."
+            """
+            JourneyPattern for the service journey, according to scheduled data. If the
+            ServiceJourney is not included in the scheduled data, null is returned.
+            """
           )
           .type(journeyPatternType)
           .dataFetcher(env -> GqlUtil.getTransitService(env).findPattern(trip(env)))
@@ -166,8 +168,10 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .description(
-            "Quays visited by service journey, according to scheduled data. If the " +
-            "ServiceJourney is not included in the scheduled data, an empty list is returned."
+            """
+            Quays visited by service journey, according to scheduled data. If the
+            ServiceJourney is not included in the scheduled data, an empty list is returned.
+            """
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .argument(
@@ -231,9 +235,11 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
-            "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). " +
-            "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
-            "known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
+            """
+            Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available).
+            NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is
+            known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead.
+            """
           )
           .argument(
             GraphQLArgument.newArgument()
@@ -302,6 +308,36 @@ public class ServiceJourneyType {
           .type(bookingArrangementType)
           .deprecate(
             "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`"
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("isReplacement")
+          .description(
+            """
+            Is this a replacement ServiceJourney? In NeTEx/SIRI-sourced data this can be set by
+            either a replacement submode, or a replacement link in a DatedServiceJourney. Only
+            true for GTFS-sourced data if set by the extended GTFS type.
+            """
+          )
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .isReplacementTrip(trip(environment))
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("replacementsExist")
+          .description("Are there replacement DatedServiceJourneys for this ServiceJourney?")
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .replacementsExist(trip(environment))
           )
           .build()
       )

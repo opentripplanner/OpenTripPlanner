@@ -18,16 +18,18 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.internal.VertexCreationService.LocationType;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -44,6 +46,10 @@ public class LinkingContextFactory {
   private final Graph graph;
   private final VertexCreationService vertexCreationService;
   private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
+  /**
+   * This can be either a station, a multi-modal station or a group of stations.
+   */
+  private final Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid;
 
   /**
    * Construct a factory when stop locations are potentially used for locations.
@@ -51,18 +57,20 @@ public class LinkingContextFactory {
   public LinkingContextFactory(
     Graph graph,
     VertexCreationService vertexCreationService,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
+    Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
     this.resolveSiteIds = resolveSiteIds;
+    this.findStopLocationsGroupCentroid = findStopLocationsGroupCentroid;
   }
 
   /**
    * Construct a factory when stop locations are not used for locations.
    */
   public LinkingContextFactory(Graph graph, VertexCreationService vertexCreationService) {
-    this(graph, vertexCreationService, id -> Set.of());
+    this(graph, vertexCreationService, id -> Set.of(), id -> Optional.empty());
   }
 
   /**
@@ -89,8 +97,10 @@ public class LinkingContextFactory {
     checkIfVerticesFound(
       from,
       fromVertices,
+      fromStopVertices,
       to,
       toVertices,
+      toStopVertices,
       visitViaLocationsWithCoordinates,
       verticesForVisitViaLocationsWithCoordinates
     );
@@ -340,46 +350,66 @@ public class LinkingContextFactory {
           c.latitude(),
           c.longitude()
         );
+      } else {
+        // For car routing, we use station's coordinate instead of child stops' if stop location is
+        // a station.
+        var coordinate = findStopLocationsGroupCentroid.apply(location.stopId);
+        if (coordinate.isPresent()) {
+          var c = coordinate.get();
+          location = new GenericLocation(
+            location.label,
+            location.stopId,
+            c.latitude(),
+            c.longitude()
+          );
+        }
       }
     }
     return location.getCoordinate() != null
       ? Optional.of(
-        vertexCreationService.createVertexFromCoordinate(
-          container,
-          location.getCoordinate(),
-          location.label,
-          List.of(TraverseMode.CAR),
-          type
+          vertexCreationService.createVertexFromCoordinate(
+            container,
+            location.getCoordinate(),
+            location.label,
+            List.of(TraverseMode.CAR),
+            type
+          )
         )
-      )
       : Optional.empty();
   }
 
   private void checkIfVerticesFound(
     GenericLocation from,
     Set<Vertex> fromVertices,
+    Set<TransitStopVertex> fromStopVertices,
     @Nullable GenericLocation to,
     Set<Vertex> toVertices,
+    Set<TransitStopVertex> toStopVertices,
     List<GenericLocation> visitViaLocationsWithCoordinates,
     Map<GenericLocation, Set<Vertex>> visitViaLocationVertices
   ) {
     List<RoutingError> routingErrors = new ArrayList<>();
 
     // check that vertices where found if from-location was specified
-    if (isDisconnected(fromVertices, LocationType.FROM)) {
+    if (fromStopVertices.isEmpty() && isDisconnected(fromVertices, LocationType.FROM)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(from), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (to != null && to.isSpecified() && isDisconnected(toVertices, LocationType.TO)) {
+    if (
+      to != null &&
+      to.isSpecified() &&
+      toStopVertices.isEmpty() &&
+      isDisconnected(toVertices, LocationType.TO)
+    ) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(to), InputField.TO_PLACE)
       );
     }
 
-    // check that vertices where found if visit via locations with coordinates were specified
+    // check that vertices were found if visit via locations with coordinates were specified
     if (!visitViaLocationsWithCoordinates.isEmpty()) {
       var errors = visitViaLocationVertices
         .entrySet()
@@ -407,23 +437,17 @@ public class LinkingContextFactory {
   }
 
   private static boolean isDisconnected(Set<Vertex> vertices, LocationType type) {
-    // Not connected if linking was not attempted, and vertices were not specified in the request.
-    if (vertices.isEmpty()) {
-      return true;
-    }
-
     Predicate<Vertex> isNotTransit = Predicate.not(TransitStopVertex.class::isInstance);
     Predicate<Vertex> hasNoIncoming = v -> v.getIncoming().isEmpty();
     Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
 
     // Not connected if linking did not create incoming/outgoing edges depending on the
     // location type.
-    Predicate<Vertex> isNotConnected =
-      switch (type) {
-        case FROM -> isNotTransit.and(hasNoOutgoing);
-        case TO -> isNotTransit.and(hasNoIncoming);
-        case VISIT_VIA_LOCATION -> hasNoIncoming.or(hasNoOutgoing);
-      };
+    Predicate<Vertex> isNotConnected = switch (type) {
+      case FROM -> hasNoOutgoing;
+      case TO -> hasNoIncoming;
+      case VISIT_VIA_LOCATION -> hasNoIncoming.or(hasNoOutgoing);
+    };
 
     return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
   }

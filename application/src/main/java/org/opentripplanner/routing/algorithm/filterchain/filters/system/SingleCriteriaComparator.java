@@ -49,8 +49,10 @@ public interface SingleCriteriaComparator {
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   static SingleCriteriaComparator compareTransitGroupsPriority() {
     return (left, right) ->
-      GROUP_PRIORITY_CALCULATOR.dominanceFunction()
-        .leftDominateRight(left.generalizedCost2().get(), right.generalizedCost2().get());
+      GROUP_PRIORITY_CALCULATOR.dominanceFunction().leftDominateRight(
+        left.generalizedCost2().get(),
+        right.generalizedCost2().get()
+      );
   }
 
   static SingleCriteriaComparator compareLessThan(final ToIntFunction<Itinerary> op) {

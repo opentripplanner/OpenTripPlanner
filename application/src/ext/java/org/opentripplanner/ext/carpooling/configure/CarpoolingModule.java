@@ -9,7 +9,7 @@ import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 

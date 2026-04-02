@@ -59,8 +59,8 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     .times(STOP_TIME_ONE, STOP_TIME_TWO, STOP_TIME_THREE)
     .build();
 
-  private final int EGRESS_START = STOP_TIME_THREE + D1m;
-  private final int EGRESS_END = EGRESS_START + D5m;
+  private final int EGRESS_START = STOP_TIME_THREE + D1_m;
+  private final int EGRESS_END = EGRESS_START + D5_m;
 
   @Test
   public void testEmptySetDoesReturnEmtySet() {

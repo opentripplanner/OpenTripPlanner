@@ -79,8 +79,11 @@ public sealed interface EntitySelector {
     }
   }
 
-  record StopAndRoute(FeedScopedId stopId, FeedScopedId routeId, Set<StopCondition> stopConditions)
-    implements EntitySelector {
+  record StopAndRoute(
+    FeedScopedId stopId,
+    FeedScopedId routeId,
+    Set<StopCondition> stopConditions
+  ) implements EntitySelector {
     public StopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
       this(stopId, routeId, Set.of());
     }
@@ -116,8 +119,7 @@ public sealed interface EntitySelector {
     FeedScopedId tripId,
     LocalDate serviceDate,
     Set<StopCondition> stopConditions
-  )
-    implements EntitySelector {
+  ) implements EntitySelector {
     public StopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
       this(stopId, tripId, null, Set.of());
     }

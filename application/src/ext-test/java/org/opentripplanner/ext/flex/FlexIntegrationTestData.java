@@ -8,16 +8,15 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
-import org.opentripplanner.model.calendar.LocalDateInterval;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -44,9 +43,8 @@ public final class FlexIntegrationTestData {
   }
 
   private static TestOtpModel buildFlexGraph(File file) {
-    var deduplicator = new Deduplicator();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository());
     GtfsBundle gtfsBundle = GtfsBundleTestFactory.forTest(file);
     GtfsModule module = GtfsModuleTestFactory.forTest(
       List.of(gtfsBundle),

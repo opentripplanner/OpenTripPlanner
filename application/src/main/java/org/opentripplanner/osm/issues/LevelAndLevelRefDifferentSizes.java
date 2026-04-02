@@ -7,8 +7,7 @@ public record LevelAndLevelRefDifferentSizes(
   int levelListLength,
   int nameListLength,
   OsmEntity entity
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "%s : 'level:ref' info can not be used because " +
     "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +

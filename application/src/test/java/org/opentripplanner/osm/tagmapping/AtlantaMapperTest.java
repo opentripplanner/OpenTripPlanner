@@ -9,12 +9,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 class AtlantaMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
-
-  static {
-    AtlantaMapper source = new AtlantaMapper();
-    source.populateProperties(wps);
-  }
+  private static final WayPropertySet WPS = new AtlantaMapper().buildWayPropertySet();
 
   // Most OSM trunk roads in Atlanta are (large) city roads that are permitted for all modes.
   // (The default TagMapper implementation is car-only.)
@@ -35,7 +30,7 @@ class AtlantaMapperTest {
     peachtreeRd.addTag("surface", "asphalt");
     peachtreeRd.addTag("tiger:county", "Fulton, GA");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(peachtreeRd).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(peachtreeRd).getPermission());
   }
 
   @Test
@@ -52,7 +47,7 @@ class AtlantaMapperTest {
 
     assertEquals(
       StreetTraversalPermission.ALL,
-      wps.getDataForWay(morelandRamp).forward().getPermission()
+      WPS.getDataForWay(morelandRamp).forward().getPermission()
     );
   }
 
@@ -72,6 +67,6 @@ class AtlantaMapperTest {
     tenthSt.addTag("tiger:county", "Fulton, GA");
     tenthSt.addTag("tiger:reviewed", "no");
     // Some other params omitted.
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(tenthSt).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(tenthSt).getPermission());
   }
 }

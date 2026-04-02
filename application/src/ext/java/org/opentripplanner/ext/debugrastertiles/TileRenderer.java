@@ -3,7 +3,7 @@ package org.opentripplanner.ext.debugrastertiles;
 import java.awt.Graphics2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Interface for a slippy map tile renderer.

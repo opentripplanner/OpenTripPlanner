@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.AllWaysOfElevatorNodeOnSameLevel;
@@ -21,9 +22,9 @@ import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmLevelSource;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.model.Level;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
@@ -32,8 +33,7 @@ import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.streetadapter.VertexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +146,14 @@ class ElevatorProcessor {
       }
 
       List<OsmElevatorKey> osmElevatorKeys = new ArrayList<>(vertices.keySet());
-      if (osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).distinct().count() == 1) {
+      if (
+        osmElevatorKeys
+          .stream()
+          .map(key -> verticeLevels.get(key))
+          .distinct()
+          .count() ==
+        1
+      ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
       // Sort to make logic correct and create a deterministic order.
@@ -174,7 +181,10 @@ class ElevatorProcessor {
         .orElse(-1L);
       createElevatorHopEdges(
         elevatorHopVertices,
-        osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).toList(),
+        osmElevatorKeys
+          .stream()
+          .map(key -> verticeLevels.get(key))
+          .toList(),
         wheelchair,
         !node.isBicycleDenied(),
         (int) travelTime

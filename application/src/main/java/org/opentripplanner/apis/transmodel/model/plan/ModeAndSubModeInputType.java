@@ -16,7 +16,7 @@ public class ModeAndSubModeInputType {
         .name("transportMode")
         .description(
           "A transportMode that should be allowed for this search. You can further" +
-          "narrow it down by specifying a list of transportSubModes"
+            "narrow it down by specifying a list of transportSubModes"
         )
         .type(TRANSPORT_MODE)
         .build()
@@ -26,9 +26,9 @@ public class ModeAndSubModeInputType {
         .name("transportSubModes")
         .description(
           "The allowed transportSubModes for this search. If this element is not" +
-          "present or null, it will default to all transportSubModes for the specified" +
-          "TransportMode. Be aware that all transportSubModes have an associated " +
-          "TransportMode, which must match what is specified in the transportMode field."
+            "present or null, it will default to all transportSubModes for the specified" +
+            "TransportMode. Be aware that all transportSubModes have an associated " +
+            "TransportMode, which must match what is specified in the transportMode field."
         )
         .type(new GraphQLList(EnumTypes.TRANSPORT_SUBMODE))
         .build()

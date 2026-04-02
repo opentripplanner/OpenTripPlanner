@@ -2,9 +2,9 @@ package org.opentripplanner.graph_builder.issues;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 public record BarrierIntersectingHighway(OsmNode node) implements DataImportIssue {
   private static final String FMT =

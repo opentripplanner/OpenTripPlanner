@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 class ScooterPreferencesTest {
 
@@ -72,12 +72,12 @@ class ScooterPreferencesTest {
     assertEquals("ScooterPreferences{}", ScooterPreferences.DEFAULT.toString());
     assertEquals(
       "ScooterPreferences{" +
-      "speed: 2.0, " +
-      "reluctance: 1.2, " +
-      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "optimizeType: TRIANGLE, " +
-      "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
-      "}",
+        "speed: 2.0, " +
+        "reluctance: 1.2, " +
+        "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
+        "optimizeType: TRIANGLE, " +
+        "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
+        "}",
       subject.toString()
     );
   }

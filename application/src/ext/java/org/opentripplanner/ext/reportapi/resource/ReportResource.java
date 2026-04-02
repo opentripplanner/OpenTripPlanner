@@ -12,9 +12,9 @@ import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.ext.reportapi.model.TransitGroupPriorityReport;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 @Path("/report")
@@ -22,17 +22,17 @@ import org.opentripplanner.transit.service.TransitService;
 public class ReportResource {
 
   /** Since the computation is pretty expensive only allow it every 5 minutes */
-  private static final CachedValue<GraphStats> cachedStats = new CachedValue<>(
+  private static final CachedValue<GraphStats> CACHED_STATS = new CachedValue<>(
     Duration.ofMinutes(5)
   );
 
-  private final TransferService transferService;
+  private final ConstrainedTransferService transferService;
   private final TransitService transitService;
   private final RouteRequest defaultRequest;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OtpServerRequestContext requestContext) {
-    this.transferService = requestContext.transitService().getTransferService();
+    this.transferService = requestContext.transitService().getConstrainedTransferService();
     this.transitService = requestContext.transitService();
     this.defaultRequest = requestContext.defaultRouteRequest();
   }
@@ -58,7 +58,7 @@ public class ReportResource {
   @Path("/graph.json")
   public Response stats(@Context OtpServerRequestContext serverRequestContext) {
     return Response.status(Response.Status.OK)
-      .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext)))
+      .entity(CACHED_STATS.get(() -> GraphReportBuilder.build(serverRequestContext)))
       .type("application/json")
       .build();
   }

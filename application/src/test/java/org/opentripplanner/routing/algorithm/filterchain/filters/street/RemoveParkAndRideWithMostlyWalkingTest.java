@@ -14,8 +14,8 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public class RemoveParkAndRideWithMostlyWalkingTest {
 
-  private static final int D5m = DurationUtils.durationInSeconds("5m");
-  private static final int D3h = DurationUtils.durationInSeconds("3h");
+  private static final int D5_m = DurationUtils.durationInSeconds("5m");
+  private static final int D3_h = DurationUtils.durationInSeconds("3h");
 
   private static final int T10_10 = TimeUtils.hm2time(10, 10);
   private static final int T10_20 = TimeUtils.hm2time(10, 20);
@@ -31,9 +31,9 @@ public class RemoveParkAndRideWithMostlyWalkingTest {
   @Test
   public void filter() {
     Itinerary w1 = newItinerary(A, T10_10).walk(20, E).build();
-    Itinerary t1 = newItinerary(A).drive(T10_10, T10_20, B).walk(D5m, E).build();
-    Itinerary t2 = newItinerary(A).drive(T10_10, T10_20, B).walk(D5m, E).build();
-    Itinerary t3 = newItinerary(A).drive(T10_10, T10_20, B).walk(D3h, E).build();
+    Itinerary t1 = newItinerary(A).drive(T10_10, T10_20, B).walk(D5_m, E).build();
+    Itinerary t2 = newItinerary(A).drive(T10_10, T10_20, B).walk(D5_m, E).build();
+    Itinerary t3 = newItinerary(A).drive(T10_10, T10_20, B).walk(D3_h, E).build();
 
     var input = List.of(w1, t1, t2, t3);
     var expected = List.of(w1, t1, t2);

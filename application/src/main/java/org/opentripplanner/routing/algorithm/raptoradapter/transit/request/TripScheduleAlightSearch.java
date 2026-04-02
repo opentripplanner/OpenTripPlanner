@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
@@ -32,7 +31,6 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
 
   private int latestAlightTime;
   private int stopPositionInPattern;
-  private IntUnaryOperator arrivalTimes;
 
   private T candidateTrip;
   private int candidateTripIndex = RaptorConstants.NOT_FOUND;
@@ -102,7 +100,6 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   ) {
     this.latestAlightTime = latestAlightTime;
     this.stopPositionInPattern = stopPositionInPattern;
-    this.arrivalTimes = timetable.getArrivalTimes(stopPositionInPattern);
     this.candidateTrip = null;
     this.candidateTripIndex = RaptorConstants.NOT_FOUND;
 
@@ -162,7 +159,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   @Nullable
   private RaptorBoardOrAlightEvent<T> findBoardingSearchForwardInTime(int tripIndexLowerBound) {
     for (int i = tripIndexLowerBound; i < nTrips; ++i) {
-      if (arrivalTimes.applyAsInt(i) <= latestAlightTime) {
+      if (timetable.arrivalTime(stopPositionInPattern, i) <= latestAlightTime) {
         candidateTripIndex = i;
       } else {
         // this trip arrives too late. We can break out of the loop since
@@ -187,7 +184,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
     final int tripIndexUpperBound
   ) {
     for (int i = tripIndexUpperBound - 1; i >= 0; --i) {
-      if (arrivalTimes.applyAsInt(i) <= latestAlightTime) {
+      if (timetable.arrivalTime(stopPositionInPattern, i) <= latestAlightTime) {
         candidateTrip = timetable.getTripSchedule(i);
         candidateTripIndex = i;
         return this;
@@ -214,7 +211,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
     while (upper - lower > binarySearchThreshold) {
       int m = (lower + upper) / 2;
 
-      if (arrivalTimes.applyAsInt(m) <= latestAlightTime) {
+      if (timetable.arrivalTime(stopPositionInPattern, m) <= latestAlightTime) {
         lower = m;
       } else {
         upper = m;

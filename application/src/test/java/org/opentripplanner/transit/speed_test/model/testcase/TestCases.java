@@ -95,12 +95,18 @@ public class TestCases {
       List<TestCaseDefinition> defs = definitions;
 
       if (!includeIds.isEmpty()) {
-        defs = defs.stream().filter(it -> includeIds.contains(it.id())).toList();
+        defs = defs
+          .stream()
+          .filter(it -> includeIds.contains(it.id()))
+          .toList();
       }
 
       // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
       if (!includeCategories.isEmpty()) {
-        defs = defs.stream().filter(c -> includeCategories.contains(c.category())).toList();
+        defs = defs
+          .stream()
+          .filter(c -> includeCategories.contains(c.category()))
+          .toList();
       }
 
       List<TestCase> cases = defs

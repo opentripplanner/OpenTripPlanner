@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -195,7 +195,10 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
     FeedScopedId patternId = TimetableRepositoryForTest.id(
-      trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
+      trips
+        .stream()
+        .map(t -> t.getId().getId())
+        .collect(Collectors.joining(":"))
     );
     TripPatternBuilder tpb = TripPattern.of(patternId)
       .withRoute(route)

@@ -44,8 +44,8 @@ public class ViaTripQuery {
           .name("dateTime")
           .description(
             "Date and time for the earliest time the user is willing to start the journey " +
-            "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
-            "(arriveBy=true). Defaults to now"
+              "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
+              "(arriveBy=true). Defaults to now"
           )
           .type(dateTimeScalar)
           .build()
@@ -91,8 +91,8 @@ public class ViaTripQuery {
           .name("pageCursor")
           .description(
             "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from " +
-            "the last response and keep the original request as is. This will enable you to " +
-            "search for itineraries in the next or previous time-window."
+              "the last response and keep the original request as is. This will enable you to " +
+              "search for itineraries in the next or previous time-window."
           )
           .type(Scalars.GraphQLString)
           .build()
@@ -122,9 +122,9 @@ public class ViaTripQuery {
           .name("segments")
           .description(
             "The requests for the individual segments of the search. The first segment is from " +
-            "the start location (`from`) to the first entry in the `via` locations list and the " +
-            "last is from the last entry in the `via` locations list to the end location (`to`). " +
-            "Note that the list must have length of exactly one greater than the `via` field."
+              "the start location (`from`) to the first entry in the `via` locations list and the " +
+              "last is from the last entry in the `via` locations list to the end location (`to`). " +
+              "Note that the list must have length of exactly one greater than the `via` field."
           )
           .type(new GraphQLList(new GraphQLNonNull(viaSegmentInputType)))
       )
@@ -133,9 +133,9 @@ public class ViaTripQuery {
           .name("numTripPatterns")
           .description(
             "The maximum number of trip patterns segment to return. Note! This reduces the number " +
-            "of trip patterns AFTER the OTP travel search is done in a post-filtering process. " +
-            "There is little/no performance gain in reducing the number of trip patterns returned. " +
-            "See also the trip meta-data on how to implement paging."
+              "of trip patterns AFTER the OTP travel search is done in a post-filtering process. " +
+              "There is little/no performance gain in reducing the number of trip patterns returned. " +
+              "See also the trip meta-data on how to implement paging."
           )
           .defaultValueProgrammatic(routing.request.numItineraries())
           .type(Scalars.GraphQLInt)
@@ -146,7 +146,7 @@ public class ViaTripQuery {
           .name("wheelchairAccessible")
           .description(
             "Whether the trip must be wheelchair accessible. Supported for the street part to " +
-            "the search, not implemented for the transit yet."
+              "the search, not implemented for the transit yet."
           )
           .type(Scalars.GraphQLBoolean)
           .defaultValueProgrammatic(routing.request.journey().wheelchair())
@@ -157,8 +157,8 @@ public class ViaTripQuery {
           .name("locale")
           .description(
             "The preferable language to use for text targeted the end user. Note! The data " +
-            "quality is limited, only stop and quay names are translates, and not in all " +
-            "places of the API."
+              "quality is limited, only stop and quay names are translates, and not in all " +
+              "places of the API."
           )
           .type(EnumTypes.LOCALE)
           .defaultValueProgrammatic("no")

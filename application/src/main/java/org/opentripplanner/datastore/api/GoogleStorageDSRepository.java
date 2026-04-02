@@ -12,5 +12,4 @@ import org.opentripplanner.framework.application.OTPFeature;
  */
 @Qualifier
 @Target({ ElementType.METHOD, ElementType.PARAMETER })
-public @interface GoogleStorageDSRepository {
-}
+public @interface GoogleStorageDSRepository {}

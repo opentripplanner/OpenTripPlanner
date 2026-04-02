@@ -25,8 +25,7 @@ public record TestRaptorPath(
   int numberOfTransfers,
   int c1,
   int c2
-)
-  implements RaptorPath<RaptorTripSchedule> {
+) implements RaptorPath<RaptorTripSchedule> {
   private static final String NOT_IMPLEMENTED_MESSAGE =
     "Use the real Path implementation if you need legs...";
 

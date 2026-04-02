@@ -21,49 +21,41 @@ class ArrivalParetoSetComparatorFactoryTest {
   private static final int ARRIVAL_TIME_EARLY = 12;
   private static final int ARRIVAL_TIME_LATE = 13;
 
-  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1 =
+  private static final ArrivalParetoSetComparatorFactory<A> COMPARATOR_C1 =
     ArrivalParetoSetComparatorFactory.factory(RelaxFunction.NORMAL, null);
 
-  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1AndC2 =
+  private static final ArrivalParetoSetComparatorFactory<A> COMPARATOR_C1_AND_C2 =
     ArrivalParetoSetComparatorFactory.factory(RelaxFunction.NORMAL, (left, right) -> left > right);
 
   @Test
   void compareArrivalTimeRoundAndCost() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      comparatorC1
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT)
+      )
     );
     // Arrival-time is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Pareto-round is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // C1 is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
+      )
     );
   }
 
@@ -71,49 +63,39 @@ class ArrivalParetoSetComparatorFactoryTest {
   void compareArrivalTimeRoundAndCostWithC2() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
+      )
     );
     // Arrival-time is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Pareto-round is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // C1 is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
+      )
     );
 
     // C2 is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundAndCost().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
   }
 
@@ -121,57 +103,45 @@ class ArrivalParetoSetComparatorFactoryTest {
   void compareArrivalTimeRoundCostAndOnBoardArrivalWithC2() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Arrival-time is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Pareto-round is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // C1 is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Arrived on-board is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
+      )
     );
     // C2 is better
     assertTrue(
-      comparatorC1AndC2
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1_AND_C2.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
   }
 
@@ -179,48 +149,38 @@ class ArrivalParetoSetComparatorFactoryTest {
   void compareArrivalTimeRoundCostAndOnBoardArrival() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      comparatorC1
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_BOARD)
+      )
     );
     // Arrival-time is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Pareto-round is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_777, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // C1 is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_100, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
+      )
     );
     // Arrived on-board is better
     assertTrue(
-      comparatorC1
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
-        )
+      COMPARATOR_C1.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
+      )
     );
   }
 

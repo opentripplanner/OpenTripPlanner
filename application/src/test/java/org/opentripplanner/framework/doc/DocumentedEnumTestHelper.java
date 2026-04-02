@@ -3,6 +3,8 @@ package org.opentripplanner.framework.doc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import org.opentripplanner.core.model.doc.DocumentedEnum;
+
 public class DocumentedEnumTestHelper {
 
   public static void verifyHasDocumentation(DocumentedEnum[] allDocumentedValues) {

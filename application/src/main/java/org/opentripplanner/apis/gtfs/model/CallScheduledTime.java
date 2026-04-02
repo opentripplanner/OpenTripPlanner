@@ -6,8 +6,10 @@ import javax.annotation.Nullable;
 
 public sealed interface CallScheduledTime
   permits CallScheduledTime.TimeWindow, CallScheduledTime.ArrivalDepartureTime {
-  record ArrivalDepartureTime(@Nullable OffsetDateTime arrival, @Nullable OffsetDateTime departure)
-    implements CallScheduledTime {
+  record ArrivalDepartureTime(
+    @Nullable OffsetDateTime arrival,
+    @Nullable OffsetDateTime departure
+  ) implements CallScheduledTime {
     public ArrivalDepartureTime(
       @Nullable ZonedDateTime arrival,
       @Nullable ZonedDateTime departure

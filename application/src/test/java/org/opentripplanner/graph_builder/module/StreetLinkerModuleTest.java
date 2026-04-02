@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner._support.geometry.Coordinates.KONGSBERG_PLATFORM_1;
-import static org.opentripplanner.routing.linking.VisibilityMode.TRAVERSE_AREA_EDGES;
+import static org.opentripplanner.street.linking.VisibilityMode.TRAVERSE_AREA_EDGES;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -14,15 +14,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -30,7 +31,6 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -82,8 +82,11 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TimetableRepositoryForTest.of()
-        .unscheduledTrip("flex", model.stop(), model.stop());
+      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip(
+        "flex",
+        model.stop(),
+        model.stop()
+      );
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -112,8 +115,11 @@ class StreetLinkerModuleTest {
   void linkFlexStopWithBoardingLocation() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel().withStopLinkedToBoardingLocation();
-      var flexTrip = TimetableRepositoryForTest.of()
-        .unscheduledTrip("flex", model.stop(), model.stop());
+      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip(
+        "flex",
+        model.stop(),
+        model.stop()
+      );
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -211,7 +217,7 @@ class StreetLinkerModuleTest {
         .build();
       builder.withRegularStop(stop);
 
-      timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
+      timetableRepository = new TimetableRepository(builder.build());
 
       stopVertex = TransitStopVertex.of()
         .withId(stop.getId())
@@ -223,7 +229,7 @@ class StreetLinkerModuleTest {
 
       module = new StreetLinkerModule(
         graph,
-        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0),
+        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         timetableRepository,
         DataImportIssueStore.NOOP
@@ -267,11 +273,7 @@ class StreetLinkerModuleTest {
         })
         .toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
-      var tripTimes = TripTimesFactory.tripTimes(
-        trip,
-        stopTimes,
-        timetableRepository.getDeduplicator()
-      );
+      var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DeduplicatorService.NOOP);
       TripPattern tripPattern = TimetableRepositoryForTest.tripPattern(
         "carsAllowedTripPattern",
         route

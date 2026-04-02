@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
+import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.transit.model.basic.Distance;
 
 class DistanceMatcher {
 

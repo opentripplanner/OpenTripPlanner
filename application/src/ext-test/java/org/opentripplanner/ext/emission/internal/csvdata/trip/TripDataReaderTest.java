@@ -57,8 +57,8 @@ class TripDataReaderTest implements EmissionTestData {
     var ex = assertThrows(HeadersDoNotMatch.class, () -> subject.read(null));
     assertEquals(
       "The header does not match the expected values. File: em-on-routes.txt\n" +
-      "\twas: [route_id,avg_co2_per_vehicle_per_km,avg_passenger_count]\n" +
-      "\texpected: [trip_id, from_stop_id, from_stop_sequence, co2]",
+        "\twas: [route_id,avg_co2_per_vehicle_per_km,avg_passenger_count]\n" +
+        "\texpected: [trip_id, from_stop_id, from_stop_sequence, co2]",
       ex.getMessage()
     );
   }

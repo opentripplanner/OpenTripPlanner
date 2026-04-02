@@ -4,15 +4,15 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -145,7 +145,10 @@ public class CarpoolItineraryMapper {
     Vertex fromVertex = firstSegment.states.getFirst().getVertex();
     Vertex toVertex = lastSegment.states.getLast().getVertex();
 
-    var allEdges = sharedSegments.stream().flatMap(seg -> seg.edges.stream()).toList();
+    var allEdges = sharedSegments
+      .stream()
+      .flatMap(seg -> seg.edges.stream())
+      .toList();
 
     CarpoolLeg carpoolLeg = CarpoolLeg.of()
       .withStartTime(startTime)

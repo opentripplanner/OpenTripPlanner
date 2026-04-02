@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 
@@ -48,7 +48,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
+    assertFailure(UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
   @Test
@@ -73,6 +73,6 @@ class NegativeTimesTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(updates);
 
-    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME, result);
+    assertFailure(UpdateErrorType.NEGATIVE_DWELL_TIME, result);
   }
 }

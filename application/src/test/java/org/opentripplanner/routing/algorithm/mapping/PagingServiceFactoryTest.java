@@ -63,12 +63,12 @@ class PagingServiceFactoryTest {
     );
     assertEquals(
       "PagingService{" +
-      "raptorSearchWindowUsed: 2h30m, " +
-      "earliestDepartureTime: 2023-11-11T10:00:00Z, " +
-      "latestArrivalTime: 2023-11-11T11:30:00Z, " +
-      "itinerariesSortOrder: STREET_AND_ARRIVAL_TIME, " +
-      "numberOfItineraries: 50" +
-      "}",
+        "raptorSearchWindowUsed: 2h30m, " +
+        "earliestDepartureTime: 2023-11-11T10:00:00Z, " +
+        "latestArrivalTime: 2023-11-11T11:30:00Z, " +
+        "itinerariesSortOrder: STREET_AND_ARRIVAL_TIME, " +
+        "numberOfItineraries: 50" +
+        "}",
       subject.toString()
     );
   }

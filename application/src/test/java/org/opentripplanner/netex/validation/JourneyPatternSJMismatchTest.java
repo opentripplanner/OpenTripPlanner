@@ -104,7 +104,9 @@ class JourneyPatternSJMismatchTest {
     }
 
     ServiceJourneyPatternBuilder withPointsInSequence(int... orders) {
-      var items = Arrays.stream(orders).mapToObj(order -> pointInPattern(order, ACCESS)).toList();
+      var items = Arrays.stream(orders)
+        .mapToObj(order -> pointInPattern(order, ACCESS))
+        .toList();
       points.withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
         items
       );

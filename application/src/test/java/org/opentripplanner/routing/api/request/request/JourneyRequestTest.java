@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.street.model.StreetMode;
 
 class JourneyRequestTest {
 

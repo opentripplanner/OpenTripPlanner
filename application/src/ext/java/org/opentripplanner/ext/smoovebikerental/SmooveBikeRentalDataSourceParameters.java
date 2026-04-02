@@ -2,7 +2,7 @@ package org.opentripplanner.ext.smoovebikerental;
 
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -16,8 +16,7 @@ public record SmooveBikeRentalDataSourceParameters(
   boolean overloadingAllowed,
   HttpHeaders httpHeaders,
   Set<RentalPickupType> rentalPickupTypes
-)
-  implements VehicleRentalDataSourceParameters {
+) implements VehicleRentalDataSourceParameters {
   /**
    * Each updater can be assigned a unique network ID in the configuration to prevent returning
    * bikes at stations for another network.

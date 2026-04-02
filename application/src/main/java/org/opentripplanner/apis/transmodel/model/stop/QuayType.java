@@ -25,9 +25,9 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
@@ -226,7 +226,7 @@ public class QuayType {
               .name("numberOfDeparturesPerLineAndDestinationDisplay")
               .description(
                 "Limit the number of departures per line and destination display returned. The parameter is only applied " +
-                "when the value is between 1 and 'numberOfDepartures'."
+                  "when the value is between 1 and 'numberOfDepartures'."
               )
               .type(Scalars.GraphQLInt)
               .build()
@@ -245,12 +245,12 @@ public class QuayType {
               .type(EnumTypes.ARRIVAL_DEPARTURE)
               .description(
                 "Filters results by either departures, arrivals or both. " +
-                "For departures forBoarding has to be true and the departure " +
-                "time has to be within the specified time range. For arrivals, " +
-                "forAlight has to be true and the arrival time has to be within " +
-                "the specified time range. If both are asked for, either the " +
-                "conditions for arrivals or the conditions for departures will " +
-                "have to be true for an EstimatedCall to show."
+                  "For departures forBoarding has to be true and the departure " +
+                  "time has to be within the specified time range. For arrivals, " +
+                  "forAlight has to be true and the arrival time has to be within " +
+                  "the specified time range. If both are asked for, either the " +
+                  "conditions for arrivals or the conditions for departures will " +
+                  "have to be true for an EstimatedCall to show."
               )
               .defaultValue(ArrivalDeparture.DEPARTURES)
               .build()

@@ -88,11 +88,11 @@ public class CharacterEscapeFormatter {
         } else {
           throw new IllegalStateException(
             "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'.".formatted(
-                escapeChar,
-                ch,
-                i,
-                encodedText
-              )
+              escapeChar,
+              ch,
+              i,
+              encodedText
+            )
           );
         }
         prevEsc = false;

@@ -5,7 +5,7 @@ import java.util.function.IntSupplier;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
 public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBuilder> {

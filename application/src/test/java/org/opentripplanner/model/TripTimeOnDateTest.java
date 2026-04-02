@@ -50,30 +50,50 @@ class TripTimeOnDateTest {
   }
 
   @Test
-  void isRecordedStop() {
+  void hasArrivedStop() {
     var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
       .createRealTimeFromScheduledTimes()
-      .withRecorded(1)
+      .withHasArrived(1, true)
       .build();
 
     var subject = new TripTimeOnDate(tripTimes, 0, pattern);
-
-    assertFalse(subject.isRecordedStop());
+    assertFalse(subject.hasArrived());
 
     subject = new TripTimeOnDate(tripTimes, 1, pattern);
+    assertTrue(subject.hasArrived());
+  }
 
-    assertTrue(subject.isRecordedStop());
+  @Test
+  void hasDepartedStop() {
+    var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
+    var trip = TimetableRepositoryForTest.trip("123").build();
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
+
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
+      .createRealTimeFromScheduledTimes()
+      .withHasDeparted(1, true)
+      .build();
+
+    var subject = new TripTimeOnDate(tripTimes, 0, pattern);
+    assertFalse(subject.hasDeparted());
+
+    subject = new TripTimeOnDate(tripTimes, 1, pattern);
+    assertTrue(subject.hasDeparted());
   }
 
   @Test
   void previousTimes() {
     var subject = tripTimeOnDate();
 
-    var ids = subject.previousTimes().stream().map(t -> t.getStop().getId().toString()).toList();
+    var ids = subject
+      .previousTimes()
+      .stream()
+      .map(t -> t.getStop().getId().toString())
+      .toList();
     assertEquals(List.of("F:stop-10", "F:stop-20"), ids);
     assertThat(subject.previousTimes().getFirst().previousTimes()).isEmpty();
   }
@@ -96,7 +116,11 @@ class TripTimeOnDateTest {
   @Test
   void nextTimes() {
     var subject = tripTimeOnDate();
-    var ids = subject.nextTimes().stream().map(t -> t.getStop().getId().toString()).toList();
+    var ids = subject
+      .nextTimes()
+      .stream()
+      .map(t -> t.getStop().getId().toString())
+      .toList();
     assertEquals(List.of("F:stop-40", "F:stop-50"), ids);
     var secondLast = subject.nextTimes().getFirst();
     var lastStop = secondLast
@@ -149,7 +173,7 @@ class TripTimeOnDateTest {
     var testModel = TimetableRepositoryForTest.of();
     var trip = TimetableRepositoryForTest.trip("123").build();
     var siteRepository = testModel.siteRepositoryBuilder().build();
-    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository);
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(trip)
       .withDepartureTimes(new int[] { 0, 1 })
@@ -186,6 +210,9 @@ class TripTimeOnDateTest {
   }
 
   private List<String> mapTripTimeOnDateToStopId(List<TripTimeOnDate> tripTimes) {
-    return tripTimes.stream().map(t -> t.getStop().getId().toString()).toList();
+    return tripTimes
+      .stream()
+      .map(t -> t.getStop().getId().toString())
+      .toList();
   }
 }

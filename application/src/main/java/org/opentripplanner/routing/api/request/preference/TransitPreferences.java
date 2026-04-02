@@ -5,8 +5,9 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -31,6 +32,7 @@ public final class TransitPreferences implements Serializable {
   private final boolean includePlannedCancellations;
   private final boolean includeRealtimeCancellations;
   private final RaptorPreferences raptor;
+  private final DirectTransitPreferences directTransitPreferences;
 
   private TransitPreferences() {
     this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
@@ -42,6 +44,7 @@ public final class TransitPreferences implements Serializable {
     this.includePlannedCancellations = false;
     this.includeRealtimeCancellations = false;
     this.raptor = RaptorPreferences.DEFAULT;
+    this.directTransitPreferences = DirectTransitPreferences.DEFAULT;
   }
 
   private TransitPreferences(Builder builder) {
@@ -55,6 +58,7 @@ public final class TransitPreferences implements Serializable {
     this.includePlannedCancellations = builder.includePlannedCancellations;
     this.includeRealtimeCancellations = builder.includeRealtimeCancellations;
     this.raptor = requireNonNull(builder.raptor);
+    this.directTransitPreferences = requireNonNull(builder.directTransitPreferences);
   }
 
   public static Builder of() {
@@ -169,6 +173,12 @@ public final class TransitPreferences implements Serializable {
     return raptor;
   }
 
+  public Optional<DirectTransitPreferences> directTransit() {
+    return directTransitPreferences.enabled()
+      ? Optional.of(directTransitPreferences)
+      : Optional.empty();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -188,7 +198,8 @@ public final class TransitPreferences implements Serializable {
       ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&
       includePlannedCancellations == that.includePlannedCancellations &&
       includeRealtimeCancellations == that.includeRealtimeCancellations &&
-      raptor.equals(that.raptor)
+      raptor.equals(that.raptor) &&
+      directTransitPreferences.equals(that.directTransitPreferences)
     );
   }
 
@@ -204,7 +215,8 @@ public final class TransitPreferences implements Serializable {
       ignoreRealtimeUpdates,
       includePlannedCancellations,
       includeRealtimeCancellations,
-      raptor
+      raptor,
+      directTransitPreferences
     );
   }
 
@@ -234,6 +246,11 @@ public final class TransitPreferences implements Serializable {
         includeRealtimeCancellations != DEFAULT.includeRealtimeCancellations
       )
       .addObj("raptor", raptor, DEFAULT.raptor)
+      .addObj(
+        "directTransitPreferences",
+        directTransitPreferences,
+        DEFAULT.directTransitPreferences
+      )
       .toString();
   }
 
@@ -252,6 +269,7 @@ public final class TransitPreferences implements Serializable {
     private boolean includePlannedCancellations;
     private boolean includeRealtimeCancellations;
     private RaptorPreferences raptor;
+    private DirectTransitPreferences directTransitPreferences;
 
     public Builder(TransitPreferences original) {
       this.original = original;
@@ -265,6 +283,7 @@ public final class TransitPreferences implements Serializable {
       this.includePlannedCancellations = original.includePlannedCancellations;
       this.includeRealtimeCancellations = original.includeRealtimeCancellations;
       this.raptor = original.raptor;
+      this.directTransitPreferences = original.directTransitPreferences;
     }
 
     public TransitPreferences original() {
@@ -331,6 +350,13 @@ public final class TransitPreferences implements Serializable {
 
     public Builder withRaptor(Consumer<RaptorPreferences.Builder> body) {
       this.raptor = raptor.copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder withDirectTransitPreferences(Consumer<DirectTransitPreferences.Builder> body) {
+      var builder = directTransitPreferences.copyOf();
+      body.accept(builder);
+      this.directTransitPreferences = builder.build();
       return this;
     }
 

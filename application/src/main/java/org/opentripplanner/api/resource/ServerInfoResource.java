@@ -74,8 +74,10 @@ public class ServerInfoResource {
         .entity("The 'label' parameter contains unexpected characters...")
         .build();
     }
-    var version =
-      "%s (%s)".formatted(SERVER_INFO.version.getVersion(), SERVER_INFO.otpSerializationVersionId);
+    var version = "%s (%s)".formatted(
+      SERVER_INFO.version.getVersion(),
+      SERVER_INFO.otpSerializationVersionId
+    );
     var svg = generateOtpBadgeSvg(label, color, version);
     var cacheControl = new CacheControl();
     cacheControl.setNoCache(true);

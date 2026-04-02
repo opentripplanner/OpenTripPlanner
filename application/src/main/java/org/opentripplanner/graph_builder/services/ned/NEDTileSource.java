@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.services.ned;
 
 import java.io.File;
 import java.util.List;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * A source of NED tiles for NEDGridCoverageFactoryImpl -- maybe the USGS streaming server, maybe

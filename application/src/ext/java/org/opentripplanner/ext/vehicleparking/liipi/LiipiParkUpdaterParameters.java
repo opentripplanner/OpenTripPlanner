@@ -21,8 +21,7 @@ public record LiipiParkUpdaterParameters(
   String utilizationsUrl,
   ZoneId timeZone,
   String hubsUrl
-)
-  implements VehicleParkingUpdaterParameters {
+) implements VehicleParkingUpdaterParameters {
   @Override
   public Duration frequency() {
     return Duration.ofSeconds(utilizationsFrequencySec);

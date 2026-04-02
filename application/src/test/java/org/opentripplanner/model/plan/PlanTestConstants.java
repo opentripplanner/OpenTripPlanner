@@ -19,13 +19,13 @@ public interface PlanTestConstants {
   float CAR_SPEED = 25.0f;
 
   // Time duration(D) constants, all values are in seconds
-  int D1m = DurationUtils.durationInSeconds("1m");
-  int D2m = DurationUtils.durationInSeconds("2m");
-  int D3m = DurationUtils.durationInSeconds("3m");
-  int D4m = DurationUtils.durationInSeconds("4m");
-  int D5m = DurationUtils.durationInSeconds("5m");
-  int D10m = DurationUtils.durationInSeconds("10m");
-  int D12m = DurationUtils.durationInSeconds("12m");
+  int D1_m = DurationUtils.durationInSeconds("1m");
+  int D2_m = DurationUtils.durationInSeconds("2m");
+  int D3_m = DurationUtils.durationInSeconds("3m");
+  int D4_m = DurationUtils.durationInSeconds("4m");
+  int D5_m = DurationUtils.durationInSeconds("5m");
+  int D10_m = DurationUtils.durationInSeconds("10m");
+  int D12_m = DurationUtils.durationInSeconds("12m");
 
   // Time constants, all values are in seconds
   int T11_00 = time("11:00");

@@ -24,9 +24,9 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
     int transitDuration = durationInSeconds("5m");
 
     var path = subject
-      .access(time("10:00:15"), STOP_A, D1m)
+      .access(time("10:00:15"), STOP_A, D1_m)
       .bus("L1", time("10:02"), transitDuration, STOP_B)
-      .egress(D2m);
+      .egress(D2_m);
 
     var transitLeg = path.accessLeg().nextLeg().asTransitLeg();
     int boardCost = C1_CALCULATOR.boardingCost(
@@ -46,14 +46,14 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       STOP_B
     );
 
-    int accessEgressCost = C1_CALCULATOR.costEgress(walk(STOP_B, D2m + D1m));
+    int accessEgressCost = C1_CALCULATOR.costEgress(walk(STOP_B, D2_m + D1_m));
 
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(
       "Walk 1m 10:00:15 10:01:15 C₁120 ~ A 45s " +
-      "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
-      "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
-      "[10:00:15 10:09:15 9m Tₙ0 C₁768]",
+        "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
+        "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
+        "[10:00:15 10:09:15 9m Tₙ0 C₁768]",
       path.toStringDetailed(RaptorTestConstants::stopIndexToName)
     );
   }

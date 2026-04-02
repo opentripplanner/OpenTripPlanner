@@ -68,7 +68,13 @@ them.
 
 ## Variables
 
-We follow the [standard of using camelCase](https://google.github.io/styleguide/javaguide.html#s5.2.5-non-constant-field-names) with a lower-case first letter for variable, parameter, and field names. However, variables of numeric types _may_ include units as an underscore-separated suffix. For example, `length_mm` or `duration_msec`. The reason is that case is significant in metric prefixes (e.g. `M` for mega- versus `m` for milli-). The underscore also reinforces that these are units rather than part of the base variable name. In constants, use the full word: `SLACK_IN_SECONDS`, not ~~`SLACK_S`~~.
+We follow the [standard of using camelCase](https://google.github.io/styleguide/javaguide.html#s5.2.5-non-constant-field-names) with a lower-case first letter for variable,
+parameter, and field names. However, variables of numeric types _may_ include units as an
+underscore-separated suffix. For example, `length_mm` or `duration_msec`. The reason is that case is
+significant in metric prefixes (e.g. `M` for mega- versus `m` for milli-). The underscore also
+reinforces that these are units rather than part of the base variable name. In constants,
+preferably use the full word: `SLACK_SECONDS`, not ~~`SLACK_S`~~, but we also allow units to be
+written in lower case like `DISTANCE_3_km`.
 
 
 ## Service, Model and Repository

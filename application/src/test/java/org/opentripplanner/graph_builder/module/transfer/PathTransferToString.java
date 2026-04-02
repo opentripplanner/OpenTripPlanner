@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.transfer;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.PathTransfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 
 class PathTransferToString {
 
@@ -14,10 +14,10 @@ class PathTransferToString {
       .stream()
       .map(tx ->
         "%3s - %3s, %dm".formatted(
-            tx.from.getName(),
-            tx.to.getName(),
-            Math.round(tx.getDistanceMeters())
-          )
+          tx.from.getName(),
+          tx.to.getName(),
+          Math.round(tx.getDistanceMeters())
+        )
       )
       .sorted()
       .collect(Collectors.joining("\n"));

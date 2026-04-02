@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -14,16 +13,14 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
  */
 public interface TripSearchTimetable<T extends RaptorTripSchedule> extends RaptorTimeTable<T> {
   /**
-   * Get the arrival times of all trips at a specific stop index, sorted by time. The returned
-   * function takes the trip index in the TimeTable as input and returns the arrival time as
-   * seconds from midnight on the search date.
+   * Get the arrival time of a specific trip at a specific stop, in seconds from midnight on the
+   * search date.
    */
-  IntUnaryOperator getArrivalTimes(int stopPositionInPattern);
+  int arrivalTime(int stopPositionInPattern, int tripIndex);
 
   /**
-   * Get the departure times of all trips at a specific stop index, sorted by time. The returned
-   * function takes the trip index in the TimeTable as input and returns the departure time as
-   * seconds from midnight on the search date.
+   * Get the departure time of a specific trip at a specific stop, in seconds from midnight on the
+   * search date.
    */
-  IntUnaryOperator getDepartureTimes(int stopPositionInPattern);
+  int departureTime(int stopPositionInPattern, int tripIndex);
 }

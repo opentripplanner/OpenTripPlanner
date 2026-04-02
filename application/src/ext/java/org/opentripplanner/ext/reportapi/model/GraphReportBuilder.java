@@ -11,7 +11,7 @@ public class GraphReportBuilder {
   public static GraphStats build(OtpServerRequestContext context) {
     var transitService = context.transitService();
     var graph = context.graph();
-    var constrainedTransfers = transitService.getTransferService().listAll();
+    var constrainedTransfers = transitService.getConstrainedTransferService().listAll();
 
     var constrainedTransferCounts = countValues(constrainedTransfers, transfer -> {
       var transferConstraint = transfer.getTransferConstraint();

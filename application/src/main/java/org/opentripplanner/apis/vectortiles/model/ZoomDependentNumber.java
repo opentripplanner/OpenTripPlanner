@@ -11,6 +11,7 @@ import org.opentripplanner.framework.json.ObjectMappers;
  */
 public record ZoomDependentNumber(List<ZoomStop> stops) {
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
+
   public JsonNode toJson() {
     var interpolation = new ArrayList<>();
     interpolation.add("interpolate");

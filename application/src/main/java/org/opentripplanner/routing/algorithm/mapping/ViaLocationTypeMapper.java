@@ -44,7 +44,7 @@ public class ViaLocationTypeMapper {
       .stream()
       .anyMatch(viaLocation ->
         viaLocation
-          .coordinates()
+          .coordinate()
           .stream()
           .anyMatch(coordinate -> coordinate.asJtsCoordinate().equals(location.getCoordinate()))
       );

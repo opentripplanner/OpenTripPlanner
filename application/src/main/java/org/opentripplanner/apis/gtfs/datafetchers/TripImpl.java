@@ -21,7 +21,9 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.CarsAllowedMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -172,6 +174,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
+  public DataFetcher<GraphQLCarsAllowed> carsAllowed() {
+    return environment -> CarsAllowedMapper.map(getSource(environment).getCarsAllowed());
+  }
+
+  @Override
   public DataFetcher<String> blockId() {
     return environment -> getSource(environment).getGtfsBlockId();
   }
@@ -251,8 +258,24 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
+  public DataFetcher<Boolean> isReplacement() {
+    return environment ->
+      getTransitService(environment)
+        .getReplacementHelper()
+        .isReplacementTrip(getSource(environment));
+  }
+
+  @Override
   public DataFetcher<TripPattern> pattern() {
     return this::getTripPattern;
+  }
+
+  @Override
+  public DataFetcher<Boolean> replacementsExist() {
+    return environment ->
+      getTransitService(environment)
+        .getReplacementHelper()
+        .replacementsExist(getSource(environment));
   }
 
   @Override

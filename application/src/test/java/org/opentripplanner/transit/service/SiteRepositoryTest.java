@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
@@ -24,8 +24,9 @@ class SiteRepositoryTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createPoint(COOR_A.asJtsCoordinate());
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createPoint(
+    COOR_A.asJtsCoordinate()
+  );
   public static final NonLocalizedString NAME = NonLocalizedString.ofNullable("Name");
   private static final FeedScopedId ID = TimetableRepositoryForTest.id("A");
   private static final Station STATION = Station.of(ID)

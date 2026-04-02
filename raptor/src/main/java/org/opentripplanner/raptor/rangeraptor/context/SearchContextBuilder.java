@@ -57,12 +57,12 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
     // TODO VIA - This need to be changed if we allow mixing visit-via and pass-through
     return request.searchParams().isVisitViaSearch()
       ? request
-        .searchParams()
-        .viaLocations()
-        .stream()
-        .map(RaptorViaLocation::connections)
-        .map(ViaConnections::new)
-        .toList()
+          .searchParams()
+          .viaLocations()
+          .stream()
+          .map(RaptorViaLocation::connections)
+          .map(ViaConnections::new)
+          .toList()
       : List.of();
   }
 

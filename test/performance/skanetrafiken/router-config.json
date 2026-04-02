@@ -1,0 +1,26 @@
+{
+  "configVersion": "Performance Test Skanetrafiken",
+  "routingDefaults": {
+    "walk": {
+      "speed": 1.38,
+      "reluctance": 5
+    },
+    "transferSlack": "3m",
+    "waitReluctance": 0.175,
+    "maxDirectStreetDuration": "1h1m",
+    "boardSlackForMode": {
+      "RAIL": "12m"
+    }
+  },
+  "transit": {
+    "dynamicSearchWindow": {
+      "maxWindow": "24h"
+    },
+    "stopBoardAlightDuringTransferCost": {
+      "DISCOURAGED": 3000,
+      "ALLOWED": 150,
+      "RECOMMENDED": 60,
+      "PREFERRED": 0
+    }
+  }
+}

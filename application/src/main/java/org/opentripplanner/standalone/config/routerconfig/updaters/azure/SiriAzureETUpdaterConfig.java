@@ -30,8 +30,8 @@ public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
         .summary("Time on which time breaks into new day.")
         .description(
           "It is common that operating day date breaks a little bit later than midnight so " +
-          "that the switch happens when traffic is at the lowest point. Parameter uses 24-hour format. " +
-          "If the switch happens on 4 am then set this field to 4."
+            "that the switch happens when traffic is at the lowest point. Parameter uses 24-hour format. " +
+            "If the switch happens on 4 am then set this field to 4."
         )
         .asInt(0);
 

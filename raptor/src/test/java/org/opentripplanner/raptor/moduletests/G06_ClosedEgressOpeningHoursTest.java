@@ -48,7 +48,7 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
       .searchWindow(Duration.ofMinutes(20))
       .timetable(true)
       .addAccessPaths(free(STOP_A))
-      .addEgressPaths(walk(STOP_E, D1m).openingHoursClosed(), walk(STOP_E, D5m));
+      .addEgressPaths(walk(STOP_E, D1_m).openingHoursClosed(), walk(STOP_E, D5_m));
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }
@@ -57,7 +57,7 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
     var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m Tₙ0 C₁1_500]";
 
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2m)))
+      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2_m)))
       .addMinDuration("10m", TX_0, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)

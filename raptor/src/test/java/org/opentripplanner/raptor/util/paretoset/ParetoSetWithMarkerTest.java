@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Test;
 
 public class ParetoSetWithMarkerTest {
 
-  private final ParetoSetWithMarker<Vector> subject = new ParetoSetWithMarker<>(
-    (l, r) -> l.u < r.u || l.v < r.v
-  );
+  private final ParetoSet<Vector> subject = ParetoSet.of((l, r) -> l.u < r.u || l.v < r.v);
 
   @Test
   public void verifyMarkerIsInitializedToZero() {
@@ -121,7 +119,7 @@ public class ParetoSetWithMarkerTest {
     return new Vector(u, v);
   }
 
-  private String toString(ParetoSetWithMarker<Vector> set) {
+  private String toString(ParetoSet<Vector> set) {
     if (set.isEmpty()) {
       return "{}";
     }

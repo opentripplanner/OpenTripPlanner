@@ -101,8 +101,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       } catch (Exception e) {
         LOG.error(
           "Failed to clean HTML report directory: " +
-          reportDirectory.path() +
-          ". HTML report won't be generated!",
+            reportDirectory.path() +
+            ". HTML report won't be generated!",
           e
         );
         return false;

@@ -11,8 +11,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class TripTimeDelayCsvParserTest {
 
-  private static final String DEFAUT_INPUT =
-    """
+  private static final String DEFAUT_INPUT = """
     empirical_delay_service_id, trip_id, stop_id, stop_sequence, p50, p90
     WEEKDAYS, VYG:ServiceJourney:BUS-2280_374435-R, NSR:Quay:1, 1, 2, 8
     WEEKEND, RUT:ServiceJourney:bc0092f0102605437e3e49cc3a88d0ba, NSR:Quay:10001, 39, 0, 200

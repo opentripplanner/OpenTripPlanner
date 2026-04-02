@@ -10,7 +10,8 @@ public class RelativeDirectionMapper {
 
   public static RelativeDirection map(RelativeDirection relativeDirection) {
     return switch (relativeDirection) {
-      case DEPART,
+      case
+        DEPART,
         SLIGHTLY_LEFT,
         HARD_LEFT,
         LEFT,

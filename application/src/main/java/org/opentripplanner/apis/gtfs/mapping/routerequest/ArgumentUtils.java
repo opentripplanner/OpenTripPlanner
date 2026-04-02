@@ -45,9 +45,9 @@ public class ArgumentUtils {
   static Map<String, Object> getParking(DataFetchingEnvironment environment, String type) {
     return (
       (Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((Map<
-                String,
-                Object
-              >) environment.getArgument("preferences")).get("street")).get(type)).get("parking")
+              String,
+              Object
+            >) environment.getArgument("preferences")).get("street")).get(type)).get("parking")
     );
   }
 

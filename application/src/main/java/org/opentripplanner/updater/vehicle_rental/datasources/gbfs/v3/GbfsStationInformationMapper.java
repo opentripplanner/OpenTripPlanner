@@ -74,7 +74,12 @@ class GbfsStationInformationMapper {
         station
           .getVehicleTypesCapacity()
           .stream()
-          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .flatMap(e ->
+            e
+              .getVehicleTypeIds()
+              .stream()
+              .map(t -> Map.entry(t, e.getCount()))
+          )
           .filter(e ->
             vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
@@ -91,7 +96,12 @@ class GbfsStationInformationMapper {
         station
           .getVehicleDocksCapacity()
           .stream()
-          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .flatMap(e ->
+            e
+              .getVehicleTypeIds()
+              .stream()
+              .map(t -> Map.entry(t, e.getCount()))
+          )
           .filter(e ->
             vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
@@ -130,7 +140,10 @@ class GbfsStationInformationMapper {
       station.getName() != null &&
       !station.getName().isEmpty() &&
       station.getName().stream().allMatch(Objects::nonNull) &&
-      station.getName().stream().allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getText())) &&
+      station
+        .getName()
+        .stream()
+        .allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getText())) &&
       station
         .getName()
         .stream()

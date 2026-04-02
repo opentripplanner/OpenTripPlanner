@@ -105,8 +105,9 @@ public class StopPlaceType {
               .build()
           )
           .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getName()
-                .toString(GqlUtil.getLocale(environment)))
+            (((MonoOrMultiModalStation) environment.getSource()).getName().toString(
+                GqlUtil.getLocale(environment)
+              ))
           )
           .build()
       )
@@ -305,7 +306,7 @@ public class StopPlaceType {
               .name("numberOfDeparturesPerLineAndDestinationDisplay")
               .description(
                 "Limit the number of departures per line and destination display returned. The parameter is only applied " +
-                "when the value is between 1 and 'numberOfDepartures'."
+                  "when the value is between 1 and 'numberOfDepartures'."
               )
               .type(Scalars.GraphQLInt)
               .build()
@@ -413,7 +414,7 @@ public class StopPlaceType {
     Duration timeRange,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
-    int numberOfDepartures,
+    int numberOfDeparturesPerPattern,
     Integer departuresPerLineAndDestinationDisplay,
     Collection<FeedScopedId> authorityIdsWhiteListed,
     Collection<FeedScopedId> lineIdsWhiteListed,
@@ -426,7 +427,7 @@ public class StopPlaceType {
       stop,
       startTimeSeconds,
       timeRange,
-      numberOfDepartures,
+      numberOfDeparturesPerPattern,
       arrivalDeparture,
       includeCancelledTrips
     );

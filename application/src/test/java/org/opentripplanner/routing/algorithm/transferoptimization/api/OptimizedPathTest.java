@@ -71,13 +71,13 @@ class OptimizedPathTest implements RaptorTestConstants {
     var exp = BasicPathTestCase.BASIC_PATH_AS_STRING.replace(
       "C₁8_154 C₂7]",
       C1.format(generalizedCost) +
-      " " +
-      C2.format(c2) +
-      " " +
-      TRANSFER_PRIORITY.format(transferPriorityCost) +
-      " " +
-      WAIT_TIME_COST.format(generalizedCostWaitTimeOptimized) +
-      "]"
+        " " +
+        C2.format(c2) +
+        " " +
+        TRANSFER_PRIORITY.format(transferPriorityCost) +
+        " " +
+        WAIT_TIME_COST.format(generalizedCostWaitTimeOptimized) +
+        "]"
     );
 
     assertEquals(exp, path.toString(this::stopIndexToName));

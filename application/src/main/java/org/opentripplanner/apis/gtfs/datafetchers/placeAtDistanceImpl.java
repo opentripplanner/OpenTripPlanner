@@ -55,8 +55,8 @@ public class placeAtDistanceImpl implements GraphQLDataFetchers.GraphQLPlaceAtDi
       return new Relay.ResolvedGlobalId(
         "placeAtDistance",
         placeAtDistance.distance() +
-        ";" +
-        new Relay().toGlobalId(globalId.getType(), globalId.getId())
+          ";" +
+          new Relay().toGlobalId(globalId.getType(), globalId.getId())
       );
     };
   }

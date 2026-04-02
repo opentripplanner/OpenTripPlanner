@@ -32,13 +32,13 @@ public class DataOverlayConfigMapper {
         .of("indexVariables")
         .since(NA)
         .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .description(/*TODO DOC*/ "TODO")
         .asObjects(DataOverlayConfigMapper::mapIndexVariable),
       node
         .of("requestParameters")
         .since(NA)
         .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .description(/*TODO DOC*/ "TODO")
         .asObjects(DataOverlayConfigMapper::mapRequestParameter)
     );
   }

@@ -23,7 +23,7 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean isSubMode() {
+  public boolean isModeSelective() {
     return true;
   }
 

@@ -131,10 +131,10 @@ class StopMapper {
     if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
         "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
-            Stop.LOCATION_TYPE_STOP,
-            gtfsStop.getLocationType(),
-            gtfsStop
-          )
+          Stop.LOCATION_TYPE_STOP,
+          gtfsStop.getLocationType(),
+          gtfsStop
+        )
       );
     }
   }

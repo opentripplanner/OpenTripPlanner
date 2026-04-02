@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
 
-  private static final Color[] colors = {
+  private static final Color[] COLORS = {
     // no limitations = light gray
     new Color(200, 200, 200),
     // no walk thru traffic = yellow
@@ -59,7 +59,7 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
         label = "No" + label + " thru traffic";
       }
 
-      return EdgeVisualAttributes.optional(colors[colorIndex], label);
+      return EdgeVisualAttributes.optional(COLORS[colorIndex], label);
     }
     return Optional.empty();
   }

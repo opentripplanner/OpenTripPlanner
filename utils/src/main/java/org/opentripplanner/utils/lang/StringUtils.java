@@ -59,8 +59,8 @@ public class StringUtils {
     if (value == null || value.isBlank()) {
       throw new IllegalArgumentException(
         errorMessage.formatted(placeholders) +
-        " [Value cannot be null, empty or just whitespace: " +
-        (value == null ? "null]" : "'" + value + "']")
+          " [Value cannot be null, empty or just whitespace: " +
+          (value == null ? "null]" : "'" + value + "']")
       );
     }
     return value;

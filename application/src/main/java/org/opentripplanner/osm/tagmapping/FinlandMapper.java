@@ -36,7 +36,8 @@ class FinlandMapper extends OsmTagMapper {
   );
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     TriFunction<
       StreetTraversalPermission,
       Float,
@@ -185,9 +186,9 @@ class FinlandMapper extends OsmTagMapper {
 
     // Automobile speeds in Finland.
     // General speed limit is 80kph unless signs says otherwise.
-    props.defaultCarSpeed = 22.22f;
+    props.setDefaultCarSpeed(22.22f);
     // 120kph is the max speed limit in Finland
-    props.maxPossibleCarSpeed = 33.34f;
+    props.setMaxPossibleCarSpeed(33.34f);
     // = 100kph. Varies between 80 - 120 kph depending on road and season.
     props.setCarSpeed("highway=motorway", 27.77f);
     // = 54kph
@@ -219,7 +220,7 @@ class FinlandMapper extends OsmTagMapper {
     props.setCarSpeed("highway=track", 4.5f);
     props.setCarSpeed("highway=pedestrian", 4.5f);
 
-    super.populateProperties(props);
+    return props.addPickers(super.buildWayPropertySet()).build();
   }
 
   @Override

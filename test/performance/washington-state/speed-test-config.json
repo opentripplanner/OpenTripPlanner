@@ -3,10 +3,5 @@
   "testDate": "2024-10-17",
   "feedId": "1",
   // Default: "graph.obj"
-  "graph": "graph.obj",
-  "flex": {
-    "maxAccessWalkDuration": "10m",
-    "maxEgressWalkDuration": "10m"
-  }
-
+  "graph": "graph.obj"
 }

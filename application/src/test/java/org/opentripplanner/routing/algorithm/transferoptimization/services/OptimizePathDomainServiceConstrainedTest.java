@@ -2,20 +2,20 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
-import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
+import static org.opentripplanner.transfer.constrained.model.TransferPriority.ALLOWED;
+import static org.opentripplanner.transfer.constrained.model.TransferPriority.NOT_ALLOWED;
+import static org.opentripplanner.transfer.constrained.model.TransferPriority.PREFERRED;
+import static org.opentripplanner.transfer.constrained.model.TransferPriority.RECOMMENDED;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.PathUtils;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.TransferPriority;
 
 /**
  * <pre>
@@ -61,11 +61,11 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
 
   TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
     List.of(
-      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1m).build(),
-      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2m).build(),
-      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3m).build(),
-      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4m).build(),
-      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5m).build(),
+      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5_m).build(),
       TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED).build(),
       TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED).build(),
       TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED).build(),
@@ -140,9 +140,9 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     var original = OptimizePathDomainServiceTest.pathBuilder()
       .access(START_TIME_T1, STOP_A)
       .bus(trip1, STOP_B)
-      .walk(D1m, STOP_C)
+      .walk(D1_m, STOP_C)
       .bus(trip2, egressStop)
-      .egress(D0s);
+      .egress(D0_s);
 
     var subject = OptimizePathDomainServiceTest.subject(transfers, null);
 

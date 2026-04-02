@@ -40,24 +40,24 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     //Given slack: transfer 30s, board 0s, alight 0s
-    data.withSlackProvider(new TestSlackProvider(D30s, D0s, D0s));
+    data.withSlackProvider(new TestSlackProvider(D30_s, D0_s, D0_s));
 
     data
       // Start walking 1m before: 30s walk + 30s board-slack
       .access("Walk 30s ~ B")
       .withRoute(
         route(pattern("R1", STOP_B, STOP_C)).withTimetable(
-          schedule().departures("00:02:00, 00:03:10").arrDepOffset(D10s)
+          schedule().departures("00:02:00, 00:03:10").arrDepOffset(D10_s)
         )
       )
       // It is not possible to transfer from D -> C
-      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s))
+      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30_s))
       .withRoute(
         route(pattern("R2", STOP_D, STOP_E)).withTimetable(
           // Missed by 1 second
-          schedule().departures("00:03:59, 00:05:09").arrDepOffset(D10s),
+          schedule().departures("00:03:59, 00:05:09").arrDepOffset(D10_s),
           // Exact match
-          schedule().departures("00:04:00, 00:05:10").arrDepOffset(D10s)
+          schedule().departures("00:04:00, 00:05:10").arrDepOffset(D10_s)
         )
       )
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
@@ -67,7 +67,7 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D3m);
+      .searchWindowInSeconds(D3_m);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }
