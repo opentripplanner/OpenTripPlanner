@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.search.state.TestStateBuilder.ofDriving;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 class StateToFlexPathMapperTest {
@@ -14,7 +15,9 @@ class StateToFlexPathMapperTest {
   @Test
   void departAt() {
     var state = ofDriving().streetEdge().streetEdge().streetEdge().build();
-    var flexPath = StateToFlexPathMapper.map(state);
+    var from = ImmutableList.copyOf(state.listBackEdges()).getFirst().getFromVertex();
+    var to = state.getVertex();
+    var flexPath = StateToFlexPathMapper.map(state, from, to);
     assertEquals(EXPECTED_DISTANCE, flexPath.distanceMeters, EPSILON);
     assertEquals(EXPECTED_DURATION, flexPath.durationSeconds, EPSILON);
     assertEquals("LINESTRING (1 1, 2 2, 3 3, 4 4)", flexPath.getGeometry().toString());
@@ -23,7 +26,9 @@ class StateToFlexPathMapperTest {
   @Test
   void arriveBy() {
     var state = ofDriving().streetEdge().streetEdge().streetEdge().build().reverse();
-    var flexPath = StateToFlexPathMapper.map(state);
+    var from = ImmutableList.copyOf(state.listBackEdges()).getFirst().getFromVertex();
+    var to = state.getVertex();
+    var flexPath = StateToFlexPathMapper.map(state, from, to);
     assertEquals(EXPECTED_DISTANCE, flexPath.distanceMeters, EPSILON);
     assertEquals(EXPECTED_DURATION, flexPath.durationSeconds, EPSILON);
     assertEquals("LINESTRING (1 1, 2 2, 3 3, 4 4)", flexPath.getGeometry().toString());
