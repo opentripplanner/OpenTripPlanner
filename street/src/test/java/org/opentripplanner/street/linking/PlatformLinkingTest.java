@@ -33,7 +33,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 
 public class PlatformLinkingTest {
 
@@ -473,38 +472,16 @@ public class PlatformLinkingTest {
     );
     for (TransitStopVertex tStop : graph.listStopVertices()) {
       if (permanent) {
-        linker.linkVertexPermanently(
+        linker.linkVertexBidirectionallyPermanently(
           tStop,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
+          Set.of(TraverseMode.WALK),
+          StreetTransitStopLink::createStreetTransitStopLink
         );
       } else {
-        linker.linkVertexForRealTime(
+        linker.linkVertexBidirectionallyForRealTime(
           tStop,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
+          Set.of(TraverseMode.WALK),
+          StreetTransitStopLink::createStreetTransitStopLink
         );
       }
     }

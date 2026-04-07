@@ -120,20 +120,20 @@ public class StreetEdgeTest {
   }
 
   @Test
-  void testModeSetCanTraverse() {
+  void testIsLinkableWith() {
     StreetEdge e = streetEdge(v1, v2, 1.0, ALL);
 
     TraverseModeSet modes = TraverseModeSet.allModes();
-    assertTrue(e.canTraverse(modes));
+    assertTrue(e.isLinkableWith(modes));
 
     modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
-    assertTrue(e.canTraverse(modes));
+    assertTrue(e.isLinkableWith(modes));
 
     e = streetEdge(v1, v2, 1.0, StreetTraversalPermission.CAR);
-    assertFalse(e.canTraverse(modes));
+    assertFalse(e.isLinkableWith(modes));
 
     modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
-    assertTrue(e.canTraverse(modes));
+    assertTrue(e.isLinkableWith(modes));
   }
 
   /**

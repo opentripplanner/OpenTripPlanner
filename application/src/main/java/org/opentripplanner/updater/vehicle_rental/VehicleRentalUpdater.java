@@ -19,13 +19,11 @@ import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
-import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
@@ -159,21 +157,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         if (vehicleRentalVertex == null) {
           vehicleRentalVertex = vertexFactory.vehicleRentalPlace(station);
-          DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
+          DisposableEdgeCollection tempEdges = linker.linkVertexBidirectionallyForRealTime(
             vehicleRentalVertex,
-            new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BIDIRECTIONAL,
-            (vertex, streetVertex) ->
-              List.of(
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  (VehicleRentalPlaceVertex) vertex,
-                  streetVertex
-                ),
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  streetVertex,
-                  (VehicleRentalPlaceVertex) vertex
-                )
-              )
+            Set.of(TraverseMode.WALK),
+            StreetVehicleRentalLink::createStreetVehicleRentalLink
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
             // Copy reference to pass into lambda

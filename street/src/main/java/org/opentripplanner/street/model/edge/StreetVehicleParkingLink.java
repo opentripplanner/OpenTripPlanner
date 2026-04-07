@@ -6,6 +6,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.ParkingRequest;
 import org.opentripplanner.street.search.state.State;
@@ -18,21 +19,32 @@ public class StreetVehicleParkingLink extends Edge {
 
   private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
-  private StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
+  private StreetVehicleParkingLink(Vertex fromv, VehicleParkingEntranceVertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = tov;
   }
 
-  private StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
+  private StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, Vertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = fromv;
   }
 
-  public static StreetVehicleParkingLink createStreetVehicleParkingLink(
-    StreetVertex fromv,
-    VehicleParkingEntranceVertex tov
-  ) {
-    return connectToGraph(new StreetVehicleParkingLink(fromv, tov));
+  /**
+   * Either from or to needs to be a {@link VehicleParkingEntranceVertex}.
+   */
+  public static StreetVehicleParkingLink createStreetVehicleParkingLink(Vertex from, Vertex to) {
+    if (from instanceof VehicleParkingEntranceVertex entrance) {
+      return connectToGraph(new StreetVehicleParkingLink(entrance, to));
+    }
+    if (to instanceof VehicleParkingEntranceVertex entrance) {
+      return connectToGraph(new StreetVehicleParkingLink(from, entrance));
+    }
+    throw new IllegalArgumentException(
+      "One of the vertices needs to be an entrance vertex. Got: " +
+        from.getClass() +
+        " and " +
+        to.getClass()
+    );
   }
 
   public static StreetVehicleParkingLink createStreetVehicleParkingLink(

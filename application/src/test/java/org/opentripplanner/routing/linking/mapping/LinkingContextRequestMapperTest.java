@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -51,5 +52,24 @@ class LinkingContextRequestMapperTest {
     assertEquals(ACCESS_MODE, subject.accessMode());
     assertEquals(EGRESS_MODE, subject.egressMode());
     assertEquals(TRANSFER_MODE, subject.transferMode());
+  }
+
+  @Test
+  void mapWithoutTransit() {
+    var requestWithoutTransit = REQUEST.copyOf()
+      .withJourney(journey -> journey.withTransit(TransitRequestBuilder::disable))
+      .buildRequest();
+    var subject = LinkingContextRequestMapper.map(requestWithoutTransit);
+    assertEquals(FROM, subject.from());
+    assertEquals(TO, subject.to());
+    assertThat(subject.viaLocationsWithCoordinates()).hasSize(1);
+    assertEquals(
+      VIA.getFirst().coordinate().map(WgsCoordinate::asJtsCoordinate).get(),
+      subject.viaLocationsWithCoordinates().getFirst().getCoordinate()
+    );
+    assertEquals(DIRECT_MODE, subject.directMode());
+    assertEquals(StreetMode.NOT_SET, subject.accessMode());
+    assertEquals(StreetMode.NOT_SET, subject.egressMode());
+    assertEquals(StreetMode.NOT_SET, subject.transferMode());
   }
 }
