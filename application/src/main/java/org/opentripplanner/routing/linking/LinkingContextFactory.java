@@ -33,6 +33,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
  * This is a factory that is responsible for linking origin, destination and visit via locations
@@ -273,20 +274,19 @@ public class LinkingContextFactory {
       return Set.of();
     }
 
-    // Differentiate between driving and non-driving, as driving is not available from transit stops
-    List<TraverseMode> modes = streetModes
+    Set<TraverseModeSet> modes = streetModes
       .stream()
-      .map(streetMode -> vertexCreationService.getTraverseModeForLinker(streetMode, type))
-      .distinct()
-      .toList();
+      .map(streetMode -> VertexCreationService.getTraverseModeForLinker(streetMode, type))
+      .collect(Collectors.toSet());
 
     var results = new HashSet<Vertex>();
     if (location.stopId != null) {
-      if (!modes.stream().allMatch(TraverseMode::isInCar)) {
+      if (modes.stream().anyMatch(modeSet -> modeSet.getBicycle() || modeSet.getWalk())) {
         results.addAll(getStreetVerticesForStop(location));
       }
-      if (modes.stream().anyMatch(TraverseMode::isInCar)) {
-        // Ensure that there is a car routable vertex (that can originate from stop's coordinate).
+      if (modes.stream().anyMatch(TraverseModeSet::getCar)) {
+        // Ensure that there is a car routable vertex that can originate from stop's coordinate as
+        // transit stops might not be linked for cars.
         var carRoutableVertex = getCarRoutableStreetVertex(container, location, type);
         carRoutableVertex.ifPresent(results::add);
       }
@@ -295,15 +295,8 @@ public class LinkingContextFactory {
     // If no vertices found from stop ID lookup and coordinates are available, use coordinates as fallback
     if (results.isEmpty() && location.getCoordinate() != null) {
       // Connect a temporary vertex from coordinate to graph
-      results.add(
-        vertexCreationService.createVertexFromCoordinate(
-          container,
-          location.getCoordinate(),
-          location.label,
-          modes,
-          type
-        )
-      );
+      var request = VertexCreationService.createVertexCreationRequest(location, modes, type);
+      results.add(vertexCreationService.createVertexFromCoordinate(container, request));
     }
 
     return results;
@@ -365,17 +358,15 @@ public class LinkingContextFactory {
         }
       }
     }
-    return location.getCoordinate() != null
-      ? Optional.of(
-          vertexCreationService.createVertexFromCoordinate(
-            container,
-            location.getCoordinate(),
-            location.label,
-            List.of(TraverseMode.CAR),
-            type
-          )
-        )
-      : Optional.empty();
+    if (location.getCoordinate() == null) {
+      return Optional.empty();
+    }
+    var request = VertexCreationService.createVertexCreationRequest(
+      location,
+      Set.of(new TraverseModeSet(TraverseMode.CAR)),
+      type
+    );
+    return Optional.of(vertexCreationService.createVertexFromCoordinate(container, request));
   }
 
   private void checkIfVerticesFound(

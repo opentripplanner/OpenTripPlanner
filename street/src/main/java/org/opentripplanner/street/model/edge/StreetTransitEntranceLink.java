@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This represents the connection between a street vertex and a transit vertex belonging the street
@@ -34,6 +35,25 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
     StreetVertex tov
   ) {
     return connectToGraph(new StreetTransitEntranceLink(fromv, tov));
+  }
+
+  /**
+   * Either from or to needs to be a {@link TransitEntranceVertex} and the other vertex should be a
+   * {@link StreetVertex}.
+   */
+  public static StreetTransitEntranceLink createStreetTransitEntranceLink(Vertex from, Vertex to) {
+    if (from instanceof TransitEntranceVertex entrance && to instanceof StreetVertex street) {
+      return connectToGraph(new StreetTransitEntranceLink(entrance, street));
+    }
+    if (to instanceof TransitEntranceVertex entrance && from instanceof StreetVertex street) {
+      return connectToGraph(new StreetTransitEntranceLink(street, entrance));
+    }
+    throw new IllegalArgumentException(
+      "Vertices need to be a transit entrance vertex and a street vertex. Got: " +
+        from.getClass() +
+        " and " +
+        to.getClass()
+    );
   }
 
   public boolean isEntrance() {

@@ -12,14 +12,17 @@ public class LinkingContextRequestMapper {
       request.pageCursor() != null
     );
     var directMode = emptyDirectModeHandler.resolveDirectMode();
-    return LinkingContextRequest.of()
+    var builder = LinkingContextRequest.of()
       .withFrom(request.from())
       .withTo(request.to())
       .withViaLocationsWithCoordinates(request.listViaLocationsWithCoordinates())
-      .withAccessMode(request.journey().access().mode())
-      .withEgressMode(request.journey().egress().mode())
-      .withDirectMode(directMode)
-      .withTransferMode(request.journey().transfer().mode())
-      .build();
+      .withDirectMode(directMode);
+    if (request.journey().transit().enabled()) {
+      builder
+        .withAccessMode(request.journey().access().mode())
+        .withEgressMode(request.journey().egress().mode())
+        .withTransferMode(request.journey().transfer().mode());
+    }
+    return builder.build();
   }
 }

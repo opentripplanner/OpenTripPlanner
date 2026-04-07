@@ -3,6 +3,7 @@ package org.opentripplanner.service.vehiclerental.street;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -13,12 +14,12 @@ public class StreetVehicleRentalLink extends Edge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
-  private StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
+  private StreetVehicleRentalLink(Vertex fromv, VehicleRentalPlaceVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = tov;
   }
 
-  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
+  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, Vertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
   }
@@ -35,6 +36,24 @@ public class StreetVehicleRentalLink extends Edge {
     StreetVertex tov
   ) {
     return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
+  }
+
+  /**
+   * Either from or to needs to be a {@link VehicleRentalPlaceVertex}.
+   */
+  public static StreetVehicleRentalLink createStreetVehicleRentalLink(Vertex from, Vertex to) {
+    if (from instanceof VehicleRentalPlaceVertex rentalPlace) {
+      return connectToGraph(new StreetVehicleRentalLink(rentalPlace, to));
+    }
+    if (to instanceof VehicleRentalPlaceVertex rentalPlace) {
+      return connectToGraph(new StreetVehicleRentalLink(from, rentalPlace));
+    }
+    throw new IllegalArgumentException(
+      "One of the vertices needs to be a rental place vertex. Got: " +
+        from.getClass() +
+        " and " +
+        to.getClass()
+    );
   }
 
   @Override
