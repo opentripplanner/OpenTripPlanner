@@ -2537,6 +2537,13 @@ eventemitter3@^5.0.1:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
   integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
+extract-files@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/extract-files/-/extract-files-13.0.0.tgz#9065073dedbcfb5e2ae8a90988cf609834b217ec"
+  integrity sha512-FXD+2Tsr8Iqtm3QZy1Zmwscca7Jx3mMC5Crr+sEP1I303Jy1CYMuYCm7hRTplFNg3XdUavErkxnTzpaqdSoi6g==
+  dependencies:
+    is-plain-obj "^4.1.0"
+
 fast-glob@^3.1.1:
   version "3.2.7"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.7.tgz#fd6cb7a2d7e9aa7a7846111e85a196d6b2f766a1"
@@ -2867,6 +2874,11 @@ is-number@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
+
+is-plain-obj@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-4.1.0.tgz#d65025edec3657ce032fd7db63c97883eaed71f0"
+  integrity sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==
 
 is-relative@^1.0.0:
   version "1.0.0"

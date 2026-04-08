@@ -62,6 +62,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.StepFeatureTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopCallImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.StopInPatternImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnRouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnTripImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopRelationshipImpl;
@@ -176,6 +177,7 @@ public class SchemaFactory {
         .type(typeWiring.build(LocationImpl.class))
         .type(typeWiring.build(LocationGroupImpl.class))
         .type(typeWiring.build(stopAtDistanceImpl.class))
+        .type(typeWiring.build(StopInPatternImpl.class))
         .type(typeWiring.build(StoptimeImpl.class))
         .type(typeWiring.build(StoptimesInPatternImpl.class))
         .type(typeWiring.build(TicketTypeImpl.class))
