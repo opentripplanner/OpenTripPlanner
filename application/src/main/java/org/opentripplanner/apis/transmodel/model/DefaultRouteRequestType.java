@@ -51,8 +51,8 @@ public class DefaultRouteRequestType {
           .name("maxDirectStreetDuration")
           .description(
             "This is the maximum duration in seconds for a direct street search. " +
-            "This is a performance limit and should therefore be set high. " +
-            "Use filters to limit what is presented to the client."
+              "This is a performance limit and should therefore be set high. " +
+              "Use filters to limit what is presented to the client."
           )
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.street().maxDirectDuration().defaultValueSeconds())

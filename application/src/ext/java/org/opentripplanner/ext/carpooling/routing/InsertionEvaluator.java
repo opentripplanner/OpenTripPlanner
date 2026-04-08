@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
+import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateDuration;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -57,24 +58,18 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Routes all baseline segments and caches the results.
+   * Routes all segments of routePoints.
    *
    * @return Array of routed segments, or null if any segment fails to route
    */
   @SuppressWarnings("unchecked")
-  private GraphPath<State, Edge, Vertex>[] routeBaselineSegments(List<WgsCoordinate> routePoints) {
+  private GraphPath<State, Edge, Vertex>[] routeSegments(List<WgsCoordinate> routePoints) {
     GraphPath<State, Edge, Vertex>[] segments = new GraphPath[routePoints.size() - 1];
 
     for (int i = 0; i < routePoints.size() - 1; i++) {
       var fromCoord = routePoints.get(i);
       var toCoord = routePoints.get(i + 1);
-      GenericLocation from = GenericLocation.fromCoordinate(
-        fromCoord.latitude(),
-        fromCoord.longitude()
-      );
-      GenericLocation to = GenericLocation.fromCoordinate(toCoord.latitude(), toCoord.longitude());
-
-      GraphPath<State, Edge, Vertex> segment = routingFunction.route(from, to, linkingContext);
+      GraphPath<State, Edge, Vertex> segment = routeSegment(fromCoord, toCoord);
       if (segment == null) {
         LOG.debug("Baseline routing failed for segment {} → {}", i, i + 1);
         return null;
@@ -84,6 +79,18 @@ public class InsertionEvaluator {
     }
 
     return segments;
+  }
+
+  private GraphPath<State, Edge, Vertex> routeSegment(WgsCoordinate from, WgsCoordinate to) {
+    GenericLocation fromGenericLocation = GenericLocation.fromCoordinate(
+      from.latitude(),
+      from.longitude()
+    );
+    GenericLocation toGenericLocation = GenericLocation.fromCoordinate(
+      to.latitude(),
+      to.longitude()
+    );
+    return routingFunction.route(fromGenericLocation, toGenericLocation, linkingContext);
   }
 
   /**
@@ -107,7 +114,7 @@ public class InsertionEvaluator {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    GraphPath<State, Edge, Vertex>[] baselineSegments = routeBaselineSegments(trip.routePoints());
+    GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(trip.routePoints());
     if (baselineSegments == null) {
       LOG.warn("Could not route baseline for trip {}", trip.getId());
       return null;
@@ -115,9 +122,22 @@ public class InsertionEvaluator {
 
     Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments);
 
+    GraphPath<State, Edge, Vertex> pathBetweenOriginAndDestination = routeSegment(
+      trip.stops().getFirst().getCoordinate(),
+      trip.stops().getLast().getCoordinate()
+    );
+
+    if (pathBetweenOriginAndDestination == null) {
+      LOG.warn("Could not create route between start and stop for trip {}", trip.getId());
+      return null;
+    }
+
+    Duration durationBetweenOriginAndDestination = calculateDuration(
+      pathBetweenOriginAndDestination
+    );
+
     InsertionCandidate bestCandidate = null;
     Duration minAdditionalDuration = INITIAL_ADDITIONAL_DURATION;
-    Duration baselineDuration = cumulativeDurations[cumulativeDurations.length - 1];
 
     for (InsertionPosition position : viablePositions) {
       InsertionCandidate candidate = evaluateInsertion(
@@ -128,7 +148,7 @@ public class InsertionEvaluator {
         passengerDropoff,
         baselineSegments,
         cumulativeDurations,
-        baselineDuration
+        durationBetweenOriginAndDestination
       );
 
       if (candidate == null) {
@@ -168,7 +188,7 @@ public class InsertionEvaluator {
     WgsCoordinate passengerDropoff,
     GraphPath<State, Edge, Vertex>[] baselineSegments,
     Duration[] originalCumulativeDurations,
-    Duration baselineDuration
+    Duration durationBetweenOriginAndDestination
   ) {
     // Build modified route segments by reusing cached baseline segments
     List<GraphPath<State, Edge, Vertex>> modifiedSegments = buildModifiedSegments(
@@ -217,7 +237,7 @@ public class InsertionEvaluator {
       pickupPos,
       dropoffPos,
       modifiedSegments,
-      baselineDuration,
+      durationBetweenOriginAndDestination,
       totalDuration
     );
   }

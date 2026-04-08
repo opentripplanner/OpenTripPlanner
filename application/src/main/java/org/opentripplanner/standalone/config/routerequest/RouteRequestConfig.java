@@ -21,7 +21,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
@@ -37,6 +36,7 @@ import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -234,7 +234,7 @@ public class RouteRequestConfig {
               )
               .description(
                 "Sometimes there is a need to configure a longer alighting times for specific " +
-                "modes, such as airplanes or ferries."
+                  "modes, such as airplanes or ferries."
               )
               .asEnumMap(TransitMode.class, Duration.class)
           )
@@ -340,6 +340,8 @@ public class RouteRequestConfig {
     if (relaxTransitGroupPriorityValue != null) {
       builder.withRelaxTransitGroupPriority(CostLinearFunction.of(relaxTransitGroupPriorityValue));
     }
+
+    builder.withDirectTransitPreferences(it -> DirectTransitRequestConfig.map(c, it));
   }
 
   private static void mapBikePreferences(NodeAdapter root, BikePreferences.Builder builder) {
@@ -371,7 +373,7 @@ public class RouteRequestConfig {
           )
           .description(
             "This is the cost that is used when boarding while cycling. " +
-            "This is usually higher that walkBoardCost."
+              "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())
       )
@@ -587,7 +589,7 @@ public class RouteRequestConfig {
           .since(V2_2)
           .summary(
             "The maximum time a street routing request is allowed to take before returning the " +
-            "results."
+              "results."
           )
           .description(
             """
@@ -634,7 +636,7 @@ public class RouteRequestConfig {
           )
           .description(
             "This is the cost that is used when boarding while driving. " +
-            "This can be different compared to the boardCost while walking or cycling."
+              "This can be different compared to the boardCost while walking or cycling."
           )
           .asInt(dft.boardCost())
       )
@@ -746,7 +748,7 @@ public class RouteRequestConfig {
             .of("dataOverlay")
             .since(V2_1)
             .summary("The filled request parameters for penalties and thresholds values")
-            .description(/*TODO DOC*/"TODO")
+            .description(/*TODO DOC*/ "TODO")
             .asObject()
         )
       );

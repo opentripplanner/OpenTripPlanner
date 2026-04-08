@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -22,7 +23,6 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -576,10 +576,10 @@ public class NetexMapper {
       issueStore.add(
         "NetexImportTimeZone",
         "No timezone set for the current NeTEx input data file. The import " +
-        "start-of-period is set to " +
-        time +
-        " UTC, used to check entity validity " +
-        "periods."
+          "start-of-period is set to " +
+          time +
+          " UTC, used to check entity validity " +
+          "periods."
       );
       return time;
     }

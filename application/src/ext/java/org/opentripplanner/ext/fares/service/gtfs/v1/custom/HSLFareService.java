@@ -133,13 +133,23 @@ public class HSLFareService extends DefaultFareService {
       if (ruleZones != null) {
         // evaluate boolean ride.zones AND rule.zones
         Set<String> zoneIntersection = new HashSet<String>(
-          leg.fareZones().stream().map(z -> z.getId().getId()).toList()
+          leg
+            .fareZones()
+            .stream()
+            .map(z -> z.getId().getId())
+            .toList()
         );
         // don't add temporarily visited zones
         zoneIntersection.retainAll(ruleZones);
         zones.addAll(zoneIntersection);
       } else {
-        zones.addAll(leg.fareZones().stream().map(z -> z.getId().getId()).toList());
+        zones.addAll(
+          leg
+            .fareZones()
+            .stream()
+            .map(z -> z.getId().getId())
+            .toList()
+        );
       }
     }
 

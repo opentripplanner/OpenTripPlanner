@@ -21,7 +21,6 @@ import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
-import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
@@ -34,9 +33,11 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.geometry.CompactElevationProfile;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -138,7 +139,7 @@ public class SerializedGraphObject implements Serializable {
       if (graphOutput.exists()) {
         LOG.info(
           "Graph already exists and will be overwritten at the end of the " +
-          "build process. Graph: {}",
+            "build process. Graph: {}",
           graphOutput.path()
         );
       }
@@ -213,7 +214,6 @@ public class SerializedGraphObject implements Serializable {
       serObj.reconstructEdgeLists();
       serObj.timetableRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.timetableRepository.index();
-      serObj.transferRepository.index();
       logSerializationCompleteStatus(serObj.graph, serObj.timetableRepository);
       return serObj;
     } catch (IOException e) {
@@ -231,9 +231,9 @@ public class SerializedGraphObject implements Serializable {
       );
       throw new OtpAppException(
         "Unable to load graph. The deserialization failed. Is the " +
-        "loaded graph build with the same OTP version as you are using to load it? " +
-        "Graph: " +
-        sourceDescription
+          "loaded graph build with the same OTP version as you are using to load it? " +
+          "Graph: " +
+          sourceDescription
       );
     }
   }
@@ -262,8 +262,8 @@ public class SerializedGraphObject implements Serializable {
       if (!expFileHeader.equals(graphFileHeader)) {
         throw new OtpAppException(
           "The graph file is incompatible with this version of OTP. " +
-          "The OTP serialization version id '%s' do not match the id " +
-          "'%s' in '%s' file-header.",
+            "The OTP serialization version id '%s' do not match the id " +
+            "'%s' in '%s' file-header.",
           expFileHeader.otpSerializationVersionId(),
           graphFileHeader.otpSerializationVersionId(),
           sourceName
@@ -291,7 +291,9 @@ public class SerializedGraphObject implements Serializable {
   ) {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
-    var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
+    var nTransfers = f.formatNumber(
+      timetableRepository.getConstrainedTransferService().listAll().size()
+    );
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());

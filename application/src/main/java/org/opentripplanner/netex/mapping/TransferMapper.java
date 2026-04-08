@@ -5,15 +5,15 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPriority;
-import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.netex.issues.InterchangeMaxWaitTimeNotGuaranteed;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
 import org.opentripplanner.netex.issues.InterchangeWithoutConstraint;
 import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
+import org.opentripplanner.transfer.constrained.model.TransferPriority;
+import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
@@ -144,11 +144,10 @@ public class TransferMapper {
     String errorMessage;
 
     if (scheduledStopPoints != null) {
-      var index =
-        switch (label) {
-          case Label.TO -> scheduledStopPoints.indexOf(sspId);
-          case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
-        };
+      var index = switch (label) {
+        case Label.TO -> scheduledStopPoints.indexOf(sspId);
+        case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
+      };
       if (index >= 0) {
         return index;
       }

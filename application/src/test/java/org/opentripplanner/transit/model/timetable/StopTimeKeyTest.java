@@ -12,24 +12,24 @@ class StopTimeKeyTest {
   private static final String ID = "1";
   private static final int STOP_SEQUENCE_NUMBER = 1;
 
-  private static final StopTimeKey subject = StopTimeKey.of(
+  private static final StopTimeKey SUBJECT = StopTimeKey.of(
     TimetableRepositoryForTest.id(ID),
     STOP_SEQUENCE_NUMBER
   ).build();
 
   @Test
   void copy() {
-    assertEquals(ID + "_#" + STOP_SEQUENCE_NUMBER, subject.getId().getId());
+    assertEquals(ID + "_#" + STOP_SEQUENCE_NUMBER, SUBJECT.getId().getId());
 
     // Make a copy
-    var copy = subject.copy().build();
+    var copy = SUBJECT.copy().build();
 
     assertEquals(ID + "_#" + STOP_SEQUENCE_NUMBER, copy.getId().getId());
   }
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
   }
 }

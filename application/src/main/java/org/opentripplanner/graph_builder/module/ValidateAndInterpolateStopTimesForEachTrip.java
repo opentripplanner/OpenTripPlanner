@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.HopSpeedFast;
@@ -15,6 +14,7 @@ import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -255,9 +255,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         if (j == lastStop + 1) {
           throw new RuntimeException(
             "Could not interpolate arrival/departure time on stop " +
-            i +
-            " (missing final stop time) on trip " +
-            st0.getTrip()
+              i +
+              " (missing final stop time) on trip " +
+              st0.getTrip()
           );
         }
         numInterpStops = j - i;

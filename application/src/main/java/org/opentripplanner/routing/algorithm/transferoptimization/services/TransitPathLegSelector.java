@@ -45,10 +45,10 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
     if (fromStopPosition > prevStopPosition) {
       throw new IllegalStateException(
         "The next method must be called with decreasing time limits. " +
-        "fromStopPosition=" +
-        fromStopPosition +
-        ", previousStopPosition=" +
-        prevStopPosition
+          "fromStopPosition=" +
+          fromStopPosition +
+          ", previousStopPosition=" +
+          prevStopPosition
       );
     }
     prevStopPosition = fromStopPosition;

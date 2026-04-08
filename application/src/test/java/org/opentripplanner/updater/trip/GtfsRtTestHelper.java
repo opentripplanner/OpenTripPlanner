@@ -5,6 +5,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.util.List;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
@@ -20,6 +21,7 @@ public class GtfsRtTestHelper {
     this.transitTestEnvironment = transitTestEnvironment;
     this.gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
       transitTestEnvironment.timetableRepository(),
+      DeduplicatorService.NOOP,
       transitTestEnvironment.timetableSnapshotManager(),
       transitTestEnvironment::defaultServiceDate
     );

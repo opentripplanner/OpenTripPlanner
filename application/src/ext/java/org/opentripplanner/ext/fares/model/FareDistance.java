@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
-import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.core.model.basic.Distance;
 
 /** Represents a distance metric used in distance-based fare computation*/
 public sealed interface FareDistance {

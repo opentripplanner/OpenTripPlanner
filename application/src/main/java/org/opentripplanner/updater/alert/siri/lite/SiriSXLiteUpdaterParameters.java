@@ -2,8 +2,8 @@ package org.opentripplanner.updater.alert.siri.lite;
 
 import java.net.URI;
 import java.time.Duration;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdater;
-import org.opentripplanner.updater.spi.HttpHeaders;
 
 public record SiriSXLiteUpdaterParameters(
   String configRef,
@@ -13,8 +13,7 @@ public record SiriSXLiteUpdaterParameters(
   Duration earlyStart,
   Duration timeout,
   HttpHeaders requestHeaders
-)
-  implements SiriSXUpdater.Parameters {
+) implements SiriSXUpdater.Parameters {
   @Override
   public String requestorRef() {
     return "OpenTripPlanner";

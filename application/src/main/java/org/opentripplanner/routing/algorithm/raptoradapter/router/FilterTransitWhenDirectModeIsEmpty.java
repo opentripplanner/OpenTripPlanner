@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * <p>

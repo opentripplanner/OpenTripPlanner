@@ -75,9 +75,8 @@ public class SiriAlertsUpdateHandler {
         int addedCounter = 0;
         int expiredCounter = 0;
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-          boolean expireSituation =
-            (sxElement.getProgress() != null &&
-              sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
+          boolean expireSituation = (sxElement.getProgress() != null &&
+            sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
 
           if (sxElement.getSituationNumber() == null) {
             continue;

@@ -66,10 +66,10 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
     return oneIterationOnly()
       ? IntIterators.singleValueIterator(earliestDepartureTime)
       : IntIterators.intDecIterator(
-        earliestDepartureTime + searchWindowInSeconds,
-        earliestDepartureTime,
-        iterationStep
-      );
+          earliestDepartureTime + searchWindowInSeconds,
+          earliestDepartureTime,
+          iterationStep
+        );
   }
 
   @Override
@@ -80,6 +80,30 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   @Override
   public boolean oneIterationOnly() {
     return searchWindowInSeconds <= iterationStep;
+  }
+
+  /**
+   * Note: This implementation is an identical copy of the one in
+   * {@link ReverseRaptorTransitCalculator}, because introducing a common ancestor with
+   * iterationStep for these two calculators could have a performance hit and also add complexity.
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isInIteration(int subjectTime, int iterationDepartureTime) {
+    // A <= x
+    boolean iterationDepartureBeforeOrEqSubject = !isAfter(iterationDepartureTime, subjectTime);
+    if (oneIterationOnly()) {
+      return iterationDepartureBeforeOrEqSubject;
+    }
+
+    // x < B
+    boolean subjectBeforeIterationWindowEnd = isBefore(
+      subjectTime,
+      plusDuration(iterationDepartureTime, iterationStep)
+    );
+
+    // A <= x < B
+    return iterationDepartureBeforeOrEqSubject && subjectBeforeIterationWindowEnd;
   }
 
   @Override

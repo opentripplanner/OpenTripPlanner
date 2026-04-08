@@ -51,10 +51,10 @@ public class GraphFileHeader implements Serializable {
     if (buf.length < HEADER_LENGTH) {
       throw new OtpAppException(
         "Input file header is not large enough. At least " +
-        HEADER_LENGTH +
-        " bytes is needed. " +
-        "Input: " +
-        prettyBytesToString(buf)
+          HEADER_LENGTH +
+          " bytes is needed. " +
+          "Input: " +
+          prettyBytesToString(buf)
       );
     }
     String header = new String(buf, 0, HEADER_LENGTH, CHARSET);
@@ -63,9 +63,9 @@ public class GraphFileHeader implements Serializable {
     if (!m.matches()) {
       throw new OtpAppException(
         "The file is no recognized as an OTP Graph file. The header do not match \"" +
-        HEADER_PATTERN.pattern() +
-        "\".\n\tInput: " +
-        prettyBytesToString(buf)
+          HEADER_PATTERN.pattern() +
+          "\".\n\tInput: " +
+          prettyBytesToString(buf)
       );
     }
     return new GraphFileHeader(m.group(1));

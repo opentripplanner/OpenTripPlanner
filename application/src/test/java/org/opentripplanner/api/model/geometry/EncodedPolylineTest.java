@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 class EncodedPolylineTest {
 
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createLineString(new Coordinate[] { new Coordinate(60.0, 9.0), new Coordinate(63.1, 10.3) });
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
+    new Coordinate[] { new Coordinate(60.0, 9.0), new Coordinate(63.1, 10.3) }
+  );
 
   private EncodedPolyline subject = EncodedPolyline.of(GEOMETRY);
 

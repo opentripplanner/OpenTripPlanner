@@ -13,11 +13,10 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
-import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaGroup;
@@ -85,14 +84,6 @@ public class PruneIslands implements GraphBuilderModule {
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
       streetLinkerModule.linkTransitStops(graph, timetableRepository);
-      int isolated = 0;
-      for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-        if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
-          issueStore.add(new IsolatedStop(tStop));
-          isolated++;
-        }
-      }
-      LOG.info("{} stops remain isolated", isolated);
     }
 
     // clean up pruned street vertices
@@ -248,7 +239,7 @@ public class PruneIslands implements GraphBuilderModule {
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-            adaptivePruningDistance
+              adaptivePruningDistance
             : 1.0;
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
@@ -263,7 +254,7 @@ public class PruneIslands implements GraphBuilderModule {
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-            adaptivePruningDistance
+              adaptivePruningDistance
             : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
@@ -301,13 +292,12 @@ public class PruneIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
-    StreetMode streetMode =
-      switch (traverseMode) {
-        case WALK -> StreetMode.WALK;
-        case BICYCLE -> StreetMode.BIKE;
-        case CAR -> StreetMode.CAR;
-        default -> throw new IllegalArgumentException();
-      };
+    StreetMode streetMode = switch (traverseMode) {
+      case WALK -> StreetMode.WALK;
+      case BICYCLE -> StreetMode.BIKE;
+      case CAR -> StreetMode.CAR;
+      default -> throw new IllegalArgumentException();
+    };
 
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
@@ -368,7 +358,7 @@ public class PruneIslands implements GraphBuilderModule {
         continue;
       }
       Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
-      for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
+      for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext(); ) {
         Vertex subnode = vIter.next();
         newgraphs.put(subnode, subgraph);
       }
@@ -391,7 +381,7 @@ public class PruneIslands implements GraphBuilderModule {
     int removed = 0;
     int restricted = 0;
     //iterate over the street vertex of the subgraph
-    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
+    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext(); ) {
       Vertex v = vIter.next();
       Collection<Edge> outgoing = new ArrayList<>(v.getOutgoing());
       for (Edge e : outgoing) {
@@ -472,7 +462,7 @@ public class PruneIslands implements GraphBuilderModule {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
       List<VertexLabel> stopLabels = new ArrayList<>();
-      for (Iterator<TransitStopVertex> vIter = island.stopIterator(); vIter.hasNext();) {
+      for (Iterator<TransitStopVertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
         TransitStopVertex v = vIter.next();
         stopLabels.add(v.getLabel());
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());

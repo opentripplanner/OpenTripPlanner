@@ -35,9 +35,9 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
     return locations == null || locations.isEmpty()
       ? NOOP
       : locations
-        .stream()
-        .map(RaptorViaLocation::asBitSet)
-        .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
+          .stream()
+          .map(RaptorViaLocation::asBitSet)
+          .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
   }
 
   @Override

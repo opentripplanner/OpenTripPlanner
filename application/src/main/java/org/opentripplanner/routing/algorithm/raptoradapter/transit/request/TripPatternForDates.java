@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.function.IntUnaryOperator;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -14,7 +14,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -209,25 +208,13 @@ public class TripPatternForDates
   }
 
   @Override
-  public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
-    final int base = stopPositionInPattern * numberOfTripSchedules;
-    return (int tripIndex) -> arrivalTimes[base + tripIndex];
+  public int arrivalTime(int stopPositionInPattern, int tripIndex) {
+    return arrivalTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
   }
 
   @Override
-  public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
-    final int base = stopPositionInPattern * numberOfTripSchedules;
-    return (int tripIndex) -> departureTimes[base + tripIndex];
-  }
-
-  public IntUnaryOperator getArrivalTimesForTrip(int tripIndex) {
-    return (int stopPositionInPattern) ->
-      arrivalTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
-  }
-
-  public IntUnaryOperator getDepartureTimesForTrip(int tripIndex) {
-    return (int stopPositionInPattern) ->
-      departureTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
+  public int departureTime(int stopPositionInPattern, int tripIndex) {
+    return departureTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
   }
 
   @Override
@@ -289,7 +276,12 @@ public class TripPatternForDates
   ) {
     var departureTimes = Arrays.stream(tripPatternForDates)
       .map(TripPatternForDate::tripTimes)
-      .map(l -> l.stream().mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN)).toArray())
+      .map(l ->
+        l
+          .stream()
+          .mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN))
+          .toArray()
+      )
       .toList();
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }

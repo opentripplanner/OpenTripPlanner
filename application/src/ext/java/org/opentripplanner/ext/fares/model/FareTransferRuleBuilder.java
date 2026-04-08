@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -46,6 +47,10 @@ public class FareTransferRuleBuilder {
   public FareTransferRuleBuilder withFareProducts(Collection<FareProduct> fareProducts) {
     this.fareProducts = fareProducts;
     return this;
+  }
+
+  public FareTransferRuleBuilder withFareProducts(FareProduct... fareProductB) {
+    return withFareProducts(Arrays.asList(fareProductB));
   }
 
   public FeedScopedId id() {

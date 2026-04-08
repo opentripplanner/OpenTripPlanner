@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
 import java.util.List;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 /**
  * The responsibility of this class is to create TripTimes based on StopTimes. The

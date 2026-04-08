@@ -18,12 +18,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -258,13 +258,13 @@ public class NetexNordicBundleSmokeTest {
     assertEquals("[2018-11-01]", dates.get(0).toString());
     assertEquals(
       "[2017-12-21, 2017-12-22, 2017-12-25, 2017-12-26, 2017-12-27, 2017-12-28, " +
-      "2017-12-29, 2018-01-02, 2018-01-03, 2018-01-04]",
+        "2017-12-29, 2018-01-02, 2018-01-03, 2018-01-04]",
       dates.get(1).toString()
     );
     assertEquals(
       "[2017-12-21, 2017-12-22, 2017-12-23, 2017-12-24, 2017-12-25, 2017-12-26, " +
-      "2017-12-27, 2017-12-28, 2017-12-29, 2017-12-30, 2017-12-31, 2018-01-02, " +
-      "2018-01-03, 2018-01-04]",
+        "2017-12-27, 2017-12-28, 2017-12-29, 2017-12-30, 2017-12-31, 2018-01-02, " +
+        "2018-01-03, 2018-01-04]",
       dates.get(2).toString()
     );
   }

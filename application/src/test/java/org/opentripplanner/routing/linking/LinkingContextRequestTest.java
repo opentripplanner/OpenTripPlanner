@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 class LinkingContextRequestTest {
 
@@ -89,13 +89,13 @@ class LinkingContextRequestTest {
     assertEquals("LinkingContextRequest{from: Unknown location}", defaultRequest.toString());
     assertEquals(
       "LinkingContextRequest{" +
-      "from: (1.0, 2.0), " +
-      "to: (3.0, 4.0), " +
-      "viaLocationsWithCoordinates: [(5.0, 6.0), (7.0, 8.0)], " +
-      "accessMode: WALK, " +
-      "egressMode: BIKE_RENTAL, " +
-      "directMode: CAR, " +
-      "transferMode: WALK}",
+        "from: (1.0, 2.0), " +
+        "to: (3.0, 4.0), " +
+        "viaLocationsWithCoordinates: [(5.0, 6.0), (7.0, 8.0)], " +
+        "accessMode: WALK, " +
+        "egressMode: BIKE_RENTAL, " +
+        "directMode: CAR, " +
+        "transferMode: WALK}",
       subject.toString()
     );
   }

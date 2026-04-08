@@ -13,10 +13,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -26,7 +25,6 @@ import org.opentripplanner.transit.model.organization.AgencyBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.organization.OperatorBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -66,7 +64,7 @@ public class TimetableRepositoryTestBuilder {
   }
 
   public TimetableRepository build(SiteRepository siteRepository) {
-    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository);
     timetableRepository.initTimeZone(timeZone);
 
     for (var agency : agencies) {
@@ -183,16 +181,19 @@ public class TimetableRepositoryTestBuilder {
     var tripBuilder = Trip.of(id(tripInput.id()))
       .withRoute(route)
       .withHeadsign(tripInput.headsign())
-      .withServiceId(serviceId);
+      .withServiceId(serviceId)
+      .withMode(tripInput.mode())
+      .withNetexSubmode(tripInput.netexSubmode())
+      .withNetexInternalPlanningCode(tripInput.netexInternalPlanningCode());
     if (customizer != null) {
       customizer.accept(tripBuilder);
     }
     var trip = tripBuilder.build();
 
-    var stopPattern = stopPattern(tripInput.stopLocations());
+    var stopTimes = tripInput.stopTimes(trip);
+    var stopPattern = stopPattern(stopTimes);
     var tripPattern = getOrCreateTripPattern(stopPattern, route);
 
-    var stopTimes = tripInput.stopTimes(trip);
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     addTripTimesToPattern(tripPattern, tripTimes);
@@ -270,12 +271,13 @@ public class TimetableRepositoryTestBuilder {
     tripOnServiceDates.add(tripOnServiceDate);
   }
 
-  private static StopPattern stopPattern(List<StopLocation> stops) {
-    var builder = StopPattern.create(stops.size());
-    for (int i = 0; i < stops.size(); i++) {
-      builder.stops.with(i, stops.get(i));
-      builder.pickups.with(i, PickDrop.SCHEDULED);
-      builder.dropoffs.with(i, PickDrop.SCHEDULED);
+  private static StopPattern stopPattern(List<StopTime> stopTimes) {
+    var builder = StopPattern.create(stopTimes.size());
+    for (int i = 0; i < stopTimes.size(); i++) {
+      var st = stopTimes.get(i);
+      builder.stops.with(i, st.getStop());
+      builder.pickups.with(i, st.getPickupType());
+      builder.dropoffs.with(i, st.getDropOffType());
     }
     return builder.build();
   }

@@ -38,17 +38,17 @@ public class OneOfInputValidator {
     if (fieldsInInput.isEmpty()) {
       throw new IllegalArgumentException(
         "No entries in '%s @oneOf'. One of '%s' must be set.".formatted(
-            inputTypeName,
-            String.join("', '", definedFields)
-          )
+          inputTypeName,
+          String.join("', '", definedFields)
+        )
       );
     }
     if (fieldsInInput.size() > 1) {
       throw new IllegalArgumentException(
         "Only one entry in '%s @oneOf' is allowed. Set: '%s'".formatted(
-            inputTypeName,
-            String.join("', '", fieldsInInput)
-          )
+          inputTypeName,
+          String.join("', '", fieldsInInput)
+        )
       );
     }
 

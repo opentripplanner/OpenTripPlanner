@@ -1,0 +1,23 @@
+package org.opentripplanner.street.linking;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+class LinkingDirectionTest {
+
+  @Test
+  void allowOutgoing() {
+    assertFalse(LinkingDirection.INCOMING.allowOutgoing());
+    assertTrue(LinkingDirection.OUTGOING.allowOutgoing());
+    assertTrue(LinkingDirection.BIDIRECTIONAL.allowOutgoing());
+  }
+
+  @Test
+  void allowIncoming() {
+    assertTrue(LinkingDirection.INCOMING.allowIncoming());
+    assertFalse(LinkingDirection.OUTGOING.allowIncoming());
+    assertTrue(LinkingDirection.BIDIRECTIONAL.allowIncoming());
+  }
+}

@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import org.opentripplanner.street.model.StreetMode;
+
 public class RequestModesBuilder {
 
   private StreetMode accessMode;

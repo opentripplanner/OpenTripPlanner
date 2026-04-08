@@ -14,13 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -149,12 +149,14 @@ class ServiceLinkMapperTest {
     journeyPattern.setLinksInSequence(
       new LinksInJourneyPattern_RelStructure()
         .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
-          new ServiceLinkInJourneyPattern_VersionedChildStructure()
-            .withServiceLinkRef(new ServiceLinkRefStructure().withRef("RUT:ServiceLink:1"))
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:1")
+          )
         )
         .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
-          new ServiceLinkInJourneyPattern_VersionedChildStructure()
-            .withServiceLinkRef(new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2"))
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2")
+          )
         )
     );
 
@@ -219,16 +221,19 @@ class ServiceLinkMapperTest {
     journeyPattern.setLinksInSequence(
       new LinksInJourneyPattern_RelStructure()
         .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
-          new ServiceLinkInJourneyPattern_VersionedChildStructure()
-            .withServiceLinkRef(new ServiceLinkRefStructure().withRef("RUT:ServiceLink:1"))
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:1")
+          )
         )
         .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
-          new ServiceLinkInJourneyPattern_VersionedChildStructure()
-            .withServiceLinkRef(new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2"))
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2")
+          )
         )
         .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
-          new ServiceLinkInJourneyPattern_VersionedChildStructure()
-            .withServiceLinkRef(new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2"))
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2")
+          )
         )
     );
 
@@ -257,23 +262,26 @@ class ServiceLinkMapperTest {
   }
 
   private SimplePoint_VersionStructure getLocation(double latitude, double longitude) {
-    return new SimplePoint_VersionStructure()
-      .withLocation(
-        new LocationStructure()
-          .withLongitude(BigDecimal.valueOf(longitude))
-          .withLatitude(BigDecimal.valueOf(latitude))
-      );
+    return new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure()
+        .withLongitude(BigDecimal.valueOf(longitude))
+        .withLatitude(BigDecimal.valueOf(latitude))
+    );
   }
 
   private ServiceLink createServiceLink(String id, String from, String to, Double[] coordinates) {
-    DirectPositionListType directPositionListType = new DirectPositionListType()
-      .withValue(coordinates);
-    LinkSequenceProjection linkSequenceProjection = new LinkSequenceProjection()
-      .withLineString(new LineStringType().withPosList(directPositionListType));
+    DirectPositionListType directPositionListType = new DirectPositionListType().withValue(
+      coordinates
+    );
+    LinkSequenceProjection linkSequenceProjection = new LinkSequenceProjection().withLineString(
+      new LineStringType().withPosList(directPositionListType)
+    );
     JAXBElement<LinkSequenceProjection_VersionStructure> linkSequenceProjection_versionStructure =
       MappingSupport.createJaxbElement(linkSequenceProjection);
-    Projections_RelStructure projections_relStructure = new Projections_RelStructure()
-      .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
+    Projections_RelStructure projections_relStructure =
+      new Projections_RelStructure().withProjectionRefOrProjection(
+        linkSequenceProjection_versionStructure
+      );
 
     return new ServiceLink()
       .withId(id)
@@ -297,8 +305,9 @@ class ServiceLinkMapperTest {
     var linkSequenceProjection_versionStructure = MappingSupport.createJaxbElement(
       linkSequenceProjection
     );
-    var projections_relStructure = new Projections_RelStructure()
-      .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
+    var projections_relStructure = new Projections_RelStructure().withProjectionRefOrProjection(
+      linkSequenceProjection_versionStructure
+    );
 
     return new ServiceLink()
       .withId(id)

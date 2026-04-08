@@ -15,7 +15,7 @@ import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 
 public class GqlUtilTest {
 
-  static final ExecutionContext executionContext;
+  static final ExecutionContext EXECUTION_CONTEXT;
   private static final String TEST_ARGUMENT = "testArgument";
 
   static {
@@ -24,7 +24,7 @@ public class GqlUtilTest {
       .locale(Locale.ENGLISH)
       .build();
 
-    executionContext = DataFetchingSupport.executionContext(executionInput);
+    EXECUTION_CONTEXT = DataFetchingSupport.executionContext(executionInput);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetPositiveNonNullIntegerArgumentWithoutValue() {
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext).build();
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
     assertThrows(IllegalArgumentException.class, () ->
       GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
@@ -66,14 +66,14 @@ public class GqlUtilTest {
   private static DataFetchingEnvironment buildEnvWithTestValue(Integer value) {
     Map<String, Object> argsMap = new HashMap<>();
     argsMap.put(TEST_ARGUMENT, value);
-    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
       .arguments(argsMap)
       .build();
   }
 
   @Test
   void testGetLocaleWithLangArgument() {
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("lang", "fr"))
       .build();
@@ -85,7 +85,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithLanguageArgument() {
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("language", "fr"))
       .build();
@@ -97,7 +97,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithBothArguments() {
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("lang", "de", "language", "fr"))
       .build();
@@ -109,7 +109,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithoutArguments() {
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
       .locale(Locale.ENGLISH)
       .build();
 

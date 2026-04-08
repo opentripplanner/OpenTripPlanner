@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class StreetRequest implements Serializable {

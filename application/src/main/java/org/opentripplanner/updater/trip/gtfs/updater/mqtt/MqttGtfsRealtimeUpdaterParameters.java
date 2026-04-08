@@ -13,5 +13,4 @@ public record MqttGtfsRealtimeUpdaterParameters(
   boolean fuzzyTripMatching,
   ForwardsDelayPropagationType forwardsDelayPropagationType,
   BackwardsDelayPropagationType backwardsDelayPropagationType
-)
-  implements UrlUpdaterParameters {}
+) implements UrlUpdaterParameters {}

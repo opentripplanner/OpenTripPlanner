@@ -3,13 +3,13 @@ package org.opentripplanner.updater.alert.gtfs;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -59,10 +59,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
-    final FeedMessage feed = otpHttpClient.getAndMap(
-      URI.create(url),
-      this.headers.asMap(),
-      response -> FeedMessage.parseFrom(response.body())
+    final FeedMessage feed = otpHttpClient.getAndMap(URI.create(url), this.headers, response ->
+      FeedMessage.parseFrom(response.body())
     );
 
     long feedTimestamp = feed.getHeader().getTimestamp();

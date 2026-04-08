@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * A base class for caching API responses from ride hailing services.
@@ -36,10 +36,8 @@ public abstract class CachingRideHailingService implements RideHailingService {
     );
   }
 
-  protected abstract List<ArrivalTime> queryArrivalTimes(
-    WgsCoordinate position,
-    boolean wheelchair
-  ) throws IOException;
+  protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position, boolean wheelchair)
+    throws IOException;
 
   /**
    * Get the ride estimate for a specific start and end pair.

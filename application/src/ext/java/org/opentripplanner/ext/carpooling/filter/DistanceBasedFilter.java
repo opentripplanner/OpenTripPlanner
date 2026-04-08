@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling.filter;
 
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class DistanceBasedFilter implements TripFilter {
       ) {
         LOG.debug(
           "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). " +
-          "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
+            "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
           trip.getId(),
           i,
           segmentStart,

@@ -57,8 +57,8 @@ public class CommandLineParameters {
   @Parameter(
     names = { "--buildStreet" },
     description = "Build street graph from OSM and DEM data. Load files from local file " +
-    "system or data sources listed in build config. The '--save' parameter is " +
-    "implied. Outputs 'streetGraph.obj'."
+      "system or data sources listed in build config. The '--save' parameter is " +
+      "implied. Outputs 'streetGraph.obj'."
   )
   public boolean buildStreet = false;
 
@@ -71,14 +71,14 @@ public class CommandLineParameters {
   @Parameter(
     names = { "--loadStreet" },
     description = "Load 'streetGraph.obj' and build transit data on top of it. The " +
-    "'--build' parameter is implied. Can be used with '--save' and '--serve'."
+      "'--build' parameter is implied. Can be used with '--save' and '--serve'."
   )
   public boolean loadStreet = false;
 
   @Parameter(
     names = { "--save" },
     description = "Save the 'graph.obj' to local disk or data source " +
-    "given in the build config file."
+      "given in the build config file."
   )
   public boolean save = false;
 
@@ -97,7 +97,7 @@ public class CommandLineParameters {
   @Parameter(
     names = { "--bindAddress" },
     description = "Specify which network interface to bind to by address. 0.0.0.0 means all " +
-    "interfaces."
+      "interfaces."
   )
   public String bindAddress = DEFAULT_BIND_ADDRESS;
 

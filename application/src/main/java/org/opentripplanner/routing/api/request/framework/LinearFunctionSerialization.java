@@ -7,9 +7,10 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
@@ -27,7 +28,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <p>
  * The constant is parsed with {@link DurationUtils#duration(String)}. In the case where
  * the function is a function of cost the duration should be converted to a cost using
- * {@link org.opentripplanner.framework.model.Cost#costOfSeconds(int)}.
+ * {@link Cost#costOfSeconds(int)}.
  */
 public class LinearFunctionSerialization {
 

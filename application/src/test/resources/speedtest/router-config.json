@@ -1,0 +1,9 @@
+{
+  "configVersion": "SpeedTest integration test",
+  "routingDefaults": {
+    "itineraryFilters": {
+      // We do not want the filter chain to remove itineraries
+      "debug": "LIST_ALL"
+    }
+  }
+}

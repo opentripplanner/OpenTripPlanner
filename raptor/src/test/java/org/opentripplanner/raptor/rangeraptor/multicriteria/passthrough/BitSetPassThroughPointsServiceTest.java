@@ -69,7 +69,7 @@ class BitSetPassThroughPointsServiceTest {
     SUBJECT.updateC2Value(expectedSeqNr, newC2 ->
       fail(
         "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
-        newC2
+          newC2
       )
     );
     assertTrue(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION));

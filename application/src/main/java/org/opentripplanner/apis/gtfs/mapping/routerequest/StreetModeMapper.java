@@ -3,8 +3,8 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Mapping and validation methods for StreetModes.
@@ -57,12 +57,16 @@ public class StreetModeMapper {
     if (!modes.contains(StreetMode.WALK)) {
       throw new IllegalArgumentException(
         "For the time being, WALK needs to be added as a mode for a leg when using " +
-        modes +
-        " and these two can't be used in the same leg."
+          modes +
+          " and these two can't be used in the same leg."
       );
     }
     // Walk is currently always used as an implied mode when mode is not car.
-    return modes.stream().filter(mode -> mode != StreetMode.WALK).findFirst().get();
+    return modes
+      .stream()
+      .filter(mode -> mode != StreetMode.WALK)
+      .findFirst()
+      .get();
   }
 
   /**

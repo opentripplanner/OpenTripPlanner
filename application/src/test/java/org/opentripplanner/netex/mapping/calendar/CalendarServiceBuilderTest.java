@@ -80,14 +80,14 @@ public class CalendarServiceBuilderTest {
     }
     fail(
       "Unable fo find service date. " +
-      "ServiceId=" +
-      serviceId +
-      ", " +
-      "date=" +
-      serviceDate +
-      ", " +
-      "list=" +
-      list
+        "ServiceId=" +
+        serviceId +
+        ", " +
+        "date=" +
+        serviceDate +
+        ", " +
+        "list=" +
+        list
     );
   }
 }

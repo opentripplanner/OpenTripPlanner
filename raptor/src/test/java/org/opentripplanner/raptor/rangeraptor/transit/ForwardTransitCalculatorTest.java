@@ -16,15 +16,15 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 public class ForwardTransitCalculatorTest implements RaptorTestConstants {
 
   public static final int T00_31 = hm2time(0, 31);
-  public static final int BOARD_SLACK = D20s;
-  public static final int ALIGHT_SLACK = D10s;
-  public static final int TRANSFER_SLACK = D1m;
+  public static final int BOARD_SLACK = D20_s;
+  public static final int ALIGHT_SLACK = D10_s;
+  public static final int TRANSFER_SLACK = D1_m;
 
   private static final int STOP = 8;
 
-  private static final RaptorAccessEgress WALK_8m = walk(STOP, D8m);
-  private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
-  private static final RaptorAccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
+  private static final RaptorAccessEgress WALK_8_m = walk(STOP, D8_m);
+  private static final RaptorAccessEgress FLEX_1x_8_m = flex(STOP, D8_m, 1);
+  private static final RaptorAccessEgress FLEX_AND_WALK_1x_8_m = flexAndWalk(STOP, D8_m, 1);
 
   private final TransitCalculator<TestTripSchedule> subject = new ForwardTransitCalculator<>();
 
@@ -37,23 +37,23 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
   @Test
   void calculateEgressDepartureTime() {
     // No time-shift expected for a regular walking egress
-    assertEquals(T00_30, subject.calculateEgressDepartureTime(T00_30, WALK_8m, TRANSFER_SLACK));
+    assertEquals(T00_30, subject.calculateEgressDepartureTime(T00_30, WALK_8_m, TRANSFER_SLACK));
     // Transfers slack should be added if the egress arrive on-board
     assertEquals(
       T00_30 + TRANSFER_SLACK,
-      subject.calculateEgressDepartureTime(T00_30, FLEX_1x_8m, TRANSFER_SLACK)
+      subject.calculateEgressDepartureTime(T00_30, FLEX_1x_8_m, TRANSFER_SLACK)
     );
     // Transfers slack is added if the flex egress arrive by walking as well
     assertEquals(
       T00_30 + TRANSFER_SLACK,
-      subject.calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, TRANSFER_SLACK)
+      subject.calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8_m, TRANSFER_SLACK)
     );
     // No time-shift expected if egress is within opening hours
     assertEquals(
       T00_30,
       subject.calculateEgressDepartureTime(
         T00_30,
-        walk(STOP, D8m).openingHours(T00_00, T01_00),
+        walk(STOP, D8_m).openingHours(T00_00, T01_00),
         TRANSFER_SLACK
       )
     );
@@ -62,17 +62,17 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_30,
       subject.calculateEgressDepartureTime(
         T00_10,
-        walk(STOP, D8m).openingHours(T00_30, T01_00),
+        walk(STOP, D8_m).openingHours(T00_30, T01_00),
         TRANSFER_SLACK
       )
     );
     // Egress should be time-shifted to the next opening hours if departure time is after
     // opening hours
     assertEquals(
-      T00_10 + D24h,
+      T00_10 + D24_h,
       subject.calculateEgressDepartureTime(
         T00_31,
-        walk(STOP, D8m).openingHours(T00_10, T00_30),
+        walk(STOP, D8_m).openingHours(T00_10, T00_30),
         TRANSFER_SLACK
       )
     );
@@ -89,13 +89,13 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
     // No time-shift expected for a regular walking egress
     assertEquals(
       T00_30,
-      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, WALK_8m, TRANSFER_SLACK)
+      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, WALK_8_m, TRANSFER_SLACK)
     );
 
     // Transfers slack should be added if the egress arrive on-board
     assertEquals(
       T00_30 + TRANSFER_SLACK,
-      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, FLEX_1x_8m, TRANSFER_SLACK)
+      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, FLEX_1x_8_m, TRANSFER_SLACK)
     );
 
     // Transfers slack is added if the flex egress arrive by walking as well
@@ -103,7 +103,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_30 + TRANSFER_SLACK,
       subject.calculateEgressDepartureTimeWithoutTimeShift(
         T00_30,
-        FLEX_AND_WALK_1x_8m,
+        FLEX_AND_WALK_1x_8_m,
         TRANSFER_SLACK
       )
     );
@@ -113,7 +113,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_30,
       subject.calculateEgressDepartureTimeWithoutTimeShift(
         T00_30,
-        walk(STOP, D8m).openingHours(T00_00, T01_00),
+        walk(STOP, D8_m).openingHours(T00_00, T01_00),
         TRANSFER_SLACK
       )
     );
@@ -123,7 +123,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_10,
       subject.calculateEgressDepartureTimeWithoutTimeShift(
         T00_10,
-        walk(STOP, D8m).openingHours(T00_30, T01_00),
+        walk(STOP, D8_m).openingHours(T00_30, T01_00),
         TRANSFER_SLACK
       )
     );
@@ -133,7 +133,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_31,
       subject.calculateEgressDepartureTimeWithoutTimeShift(
         T00_31,
-        walk(STOP, D8m).openingHours(T00_10, T00_30),
+        walk(STOP, D8_m).openingHours(T00_10, T00_30),
         TRANSFER_SLACK
       )
     );

@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class TripPlanMapperTest {
 

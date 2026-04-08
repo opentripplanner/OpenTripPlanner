@@ -5,9 +5,10 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.street.search.request.RentalRequest;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -23,7 +24,8 @@ public final class VehicleRentalPreferences implements Serializable {
    * Default slope sensitivity for electric-assist vehicles.
    * 0.0 = motor fully compensates (ignore slope), 1.0 = no assistance (full slope effect).
    */
-  public static final double DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY = 0.3;
+  public static final double DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY =
+    RentalRequest.DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY;
 
   private final Duration pickupTime;
   private final Cost pickupCost;

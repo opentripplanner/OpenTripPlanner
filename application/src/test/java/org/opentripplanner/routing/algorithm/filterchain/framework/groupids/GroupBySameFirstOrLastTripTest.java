@@ -16,7 +16,7 @@ public class GroupBySameFirstOrLastTripTest implements PlanTestConstants {
   @Test
   public void nonTransitShouldHaveAEmptyKey() {
     GroupBySameFirstOrLastTrip group = new GroupBySameFirstOrLastTrip(
-      newItinerary(A, T11_00).walk(D10m, A).build()
+      newItinerary(A, T11_00).walk(D10_m, A).build()
     );
 
     assertEquals(0, group.getKeySet().size());
@@ -47,7 +47,7 @@ public class GroupBySameFirstOrLastTripTest implements PlanTestConstants {
       newItinerary(A).bus(11, T11_00, T11_05, B).build()
     );
     GroupBySameFirstOrLastTrip nonTransit = new GroupBySameFirstOrLastTrip(
-      newItinerary(A, T11_00).walk(D5m, B).build()
+      newItinerary(A, T11_00).walk(D5_m, B).build()
     );
     // Make sure transit have 1 leg in the key-set
     assertEquals(1, transit.getKeySet().size());
@@ -59,10 +59,10 @@ public class GroupBySameFirstOrLastTripTest implements PlanTestConstants {
   @Test
   public void twoNonTransitKeySetShouldNotMatch() {
     GroupBySameFirstOrLastTrip nonTransitA = new GroupBySameFirstOrLastTrip(
-      newItinerary(A, T11_00).walk(D5m, B).build()
+      newItinerary(A, T11_00).walk(D5_m, B).build()
     );
     GroupBySameFirstOrLastTrip nonTransitB = new GroupBySameFirstOrLastTrip(
-      newItinerary(A, T11_00).walk(D5m, B).build()
+      newItinerary(A, T11_00).walk(D5_m, B).build()
     );
     assertFalse(nonTransitA.match(nonTransitB));
     assertFalse(nonTransitB.match(nonTransitA));
@@ -100,7 +100,7 @@ public class GroupBySameFirstOrLastTripTest implements PlanTestConstants {
     // Should filter out non transit legs during comparison
     assertMatch(
       newItinerary(A).bus(ID_1, T11_00, T11_05, D).build(),
-      newItinerary(A, T11_00).walk(D5m, B).bus(ID_1, T11_10, T11_15, C).walk(D5m, D).build(),
+      newItinerary(A, T11_00).walk(D5_m, B).bus(ID_1, T11_10, T11_15, C).walk(D5_m, D).build(),
       true
     );
 

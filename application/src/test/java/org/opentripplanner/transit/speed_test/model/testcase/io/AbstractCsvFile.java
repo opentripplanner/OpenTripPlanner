@@ -30,6 +30,7 @@ abstract class AbstractCsvFile<T> {
   private static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
   private static final char CSV_DELIMITER = ',';
   private static final String ARRAY_DELIMITER = "|";
+  private static final String LF = "\n";
 
   private final File file;
   private final String[] headers;
@@ -75,7 +76,9 @@ abstract class AbstractCsvFile<T> {
    */
   public void write(List<T> rows) {
     try (PrintWriter out = new PrintWriter(file, CHARSET_UTF_8)) {
-      out.println(headerRow());
+      out.print(headerRow());
+      // use LF explicitly
+      out.print(LF);
 
       for (T row : rows) {
         boolean first = true;
@@ -86,7 +89,8 @@ abstract class AbstractCsvFile<T> {
           first = false;
           out.print(cell(row, header).replace(CSV_DELIMITER, '_'));
         }
-        out.println();
+        // use LF explicitly
+        out.print(LF);
       }
       out.flush();
       LOG.info("INFO - New CSV file with is saved to '" + file.getAbsolutePath() + "'.");

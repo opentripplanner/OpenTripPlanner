@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.io.TestHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -40,8 +40,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -197,8 +198,9 @@ class GbfsFeedMapperTest {
       true,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -258,8 +260,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -287,8 +290,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),

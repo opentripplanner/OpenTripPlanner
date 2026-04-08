@@ -115,6 +115,32 @@ into the set. This is because 7 < 9 (comparing the 1st criterion of element 1), 
 (comparing with the 2nd criterion of elements 2 and 3). `[6,7]` would not make it into the set
 because the existing element `[5,6]` is better than the new element for both criteria.
 
+
+## Via-Location Search (chained-segments)
+
+Via-location search enables routing through one or more intermediate via points. The design
+composes multiple Raptor searches together, with one search per segment between consecutive via
+points. For example, a journey from A to C via B requires two segments: A→B and B→C.
+
+When the search arrives at a via point stop, the arrival state is transferred to the next segment's
+search for that same stop using stop arrival events. This allows the subsequent segment to continue
+from where the previous segment ended. At the completion of all segment searches, the results are
+aggregated into complete paths that traverse all via points in order.
+
+One or more via points may be reached via access/egress. To support this, the access and egress are
+inserted in the "correct" segment, and the result is collected from all segments. The destination
+can be reached from any segment (if egress contains the via points), not just the last one.
+
+The via-location implementation does not change the routing implementation, it just wires it up
+differently. This maintains the performance characteristics and optimizations of the
+underlying Raptor algorithm while extending it to support via-point routing.
+
+Important code for this is found in:
+ - `RangeRaptorWorkerComposite` - chains Raptor searches together
+ - `RouterResultPathAggregator` - aggregates results
+ - `ViaConnectionStopArrivalEventListener` - copies stop arrivals from one segment to the next
+
+
 # Features
 
 ## Algorithm implementation

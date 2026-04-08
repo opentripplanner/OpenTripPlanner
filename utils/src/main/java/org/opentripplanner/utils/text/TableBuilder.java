@@ -34,7 +34,12 @@ public class TableBuilder {
 
   List<Table.Align> aligns() {
     // if no alightment is set, default to left aligned
-    return aligns != null ? aligns : headers.stream().map(it -> Table.Align.Left).toList();
+    return aligns != null
+      ? aligns
+      : headers
+          .stream()
+          .map(it -> Table.Align.Left)
+          .toList();
   }
 
   /**
@@ -109,9 +114,9 @@ public class TableBuilder {
       if (minWidths.size() != numberOfColumns()) {
         throw new IllegalStateException(
           "Number minWidths does not match number of columns. MinWidths=" +
-          minWidths.size() +
-          ", columns=" +
-          numberOfColumns()
+            minWidths.size() +
+            ", columns=" +
+            numberOfColumns()
         );
       }
       width0 = Math.max(width0, minWidths.get(column));

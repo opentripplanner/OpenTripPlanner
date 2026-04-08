@@ -38,10 +38,10 @@ class AbstractCsvParserTest {
   private static final String VALID_DATA =
     FILE_HEADER +
     """
-    F:1, 1, 28.0, 1, 2025-10-31
-    F:2, 2, 38.0, 0, 20250101
-    F:3, 3, 48.0, 1, 2025-02-28
-    """;
+      F:1, 1, 28.0, 1, 2025-10-31
+      F:2, 2, 38.0, 0, 20250101
+      F:3, 3, 48.0, 1, 2025-02-28
+      """;
 
   @Test
   void headersDoesNotExistForEmptyFile() {
@@ -95,10 +95,10 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      , 1, 28.0, 1, 2025-01-01
-      F:2, 2, 38.0, 1, 2025-01-01
-      """
+        """
+        , 1, 28.0, 1, 2025-01-01
+        F:2, 2, 38.0, 1, 2025-01-01
+        """
     );
 
     assertTrue(subject.headersMatch());
@@ -121,11 +121,11 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      F:1, 1, 28.0, 1, 2025-01-01
-      F:2, not an int, 38.0, 1, 2025-01-01
-      F:3, 1, 28.0, 1, 2025-01-01
-      """
+        """
+        F:1, 1, 28.0, 1, 2025-01-01
+        F:2, not an int, 38.0, 1, 2025-01-01
+        F:3, 1, 28.0, 1, 2025-01-01
+        """
     );
 
     assertTrue(subject.headersMatch());
@@ -138,7 +138,7 @@ class AbstractCsvParserTest {
     assertEquals("TestFormat", intParseError.getType());
     assertEquals(
       "Unable to parse value 'not an int' for 'int' of type int: 'F:2, not an int, 38.0, 1, " +
-      "2025-01-01' (@line:3)",
+        "2025-01-01' (@line:3)",
       intParseError.getMessage()
     );
     assertEquals(1, issueStore.listIssues().size());
@@ -150,14 +150,16 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      F:1, 1, 3.0, 1, 2025-01-32
-      F:2, 2, 5.0, 0, 87-01-01
-      """
+        """
+        F:1, 1, 3.0, 1, 2025-01-32
+        F:2, 2, 5.0, 0, 87-01-01
+        """
     );
 
     subject.headersMatch();
-    while (subject.hasNext()) {}
+    while (subject.hasNext()) {
+      // Spinn trough all items so we can test the result
+    }
 
     var error1 = issueStore.listIssues().getFirst();
     var error2 = issueStore.listIssues().getLast();
@@ -166,12 +168,12 @@ class AbstractCsvParserTest {
     //assertEquals("TestFormat", error2.getType());
     assertEquals(
       "Unable to parse value '2025-01-32' for 'localDate' of type local-date: " +
-      "'F:1, 1, 3.0, 1, 2025-01-32' (@line:2)",
+        "'F:1, 1, 3.0, 1, 2025-01-32' (@line:2)",
       error1.getMessage()
     );
     assertEquals(
       "Unable to parse value '87-01-01' for 'localDate' of type local-date: " +
-      "'F:2, 2, 5.0, 0, 87-01-01' (@line:3)",
+        "'F:2, 2, 5.0, 0, 87-01-01' (@line:3)",
       error2.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size());
@@ -183,12 +185,12 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      F:1, -1, 1.0, 1, 20250101
-      F:2, 0, 1.0, 1, 20250101
-      F:3, 100, 1.0, 1, 2025-01-01
-      F:4, 101, 1.0, 1, 2025-01-01
-      """
+        """
+        F:1, -1, 1.0, 1, 20250101
+        F:2, 0, 1.0, 1, 20250101
+        F:3, 100, 1.0, 1, 2025-01-01
+        F:4, 101, 1.0, 1, 2025-01-01
+        """
     );
 
     assertTrue(subject.headersMatch());
@@ -203,12 +205,12 @@ class AbstractCsvParserTest {
     assertEquals("TestOutsideRange", valueTooBig.getType());
     assertEquals(
       "The int value '-1' for int is outside expected range [0, 100]: 'F:1, -1, 1.0, 1, " +
-      "20250101' (@line:2)",
+        "20250101' (@line:2)",
       valueTooSmall.getMessage()
     );
     assertEquals(
       "The int value '101' for int is outside expected range [0, 100]: 'F:4, 101, 1.0, 1, " +
-      "2025-01-01' (@line:5)",
+        "2025-01-01' (@line:5)",
       valueTooBig.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size(), () -> issueStore.listIssues().toString());
@@ -220,10 +222,10 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      F:1, 1, 28.0, 1, 2025-01-01
-      F:2, 2, not a double, 1, 2025-01-01
-      """
+        """
+        F:1, 1, 28.0, 1, 2025-01-01
+        F:2, 2, not a double, 1, 2025-01-01
+        """
     );
 
     assertTrue(subject.headersMatch());
@@ -235,7 +237,7 @@ class AbstractCsvParserTest {
     assertEquals("TestFormat", doubleParseError.getType());
     assertEquals(
       "Unable to parse value 'not a double' for 'double' of type double: 'F:2, 2, " +
-      "not a double, 1, 2025-01-01' (@line:3)",
+        "not a double, 1, 2025-01-01' (@line:3)",
       doubleParseError.getMessage()
     );
     assertEquals(1, issueStore.listIssues().size());
@@ -247,12 +249,12 @@ class AbstractCsvParserTest {
     var subject = new TestCsvParser(
       issueStore,
       FILE_HEADER +
-      """
-      F:1, 1, -0.000001, 1, 2025-01-01
-      F:2, 2, 0.0, 1, 2025-01-01
-      F:3, 3, 99.999999, 1, 2025-01-01
-      F:4, 4, 100.0, 1, 2025-01-01
-      """
+        """
+        F:1, 1, -0.000001, 1, 2025-01-01
+        F:2, 2, 0.0, 1, 2025-01-01
+        F:3, 3, 99.999999, 1, 2025-01-01
+        F:4, 4, 100.0, 1, 2025-01-01
+        """
     );
 
     assertTrue(subject.headersMatch());

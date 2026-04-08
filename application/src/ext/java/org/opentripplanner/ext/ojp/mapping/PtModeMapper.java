@@ -24,7 +24,8 @@ public class PtModeMapper {
 
   public static TransitMode map(VehicleModesOfTransportEnumeration mode) {
     return switch (mode) {
-      case RAIL,
+      case
+        RAIL,
         RAILWAY_SERVICE,
         LIGHT_RAILWAY_SERVICE,
         URBAN_RAILWAY_SERVICE,
@@ -41,6 +42,7 @@ public class PtModeMapper {
       case FUNICULAR, FUNICULAR_SERVICE, RACK_RAIL_SERVICE -> TransitMode.FUNICULAR;
       case TROLLEY_BUS, TROLLEY_BUS_SERVICE, TROLLEYBUS_SERVICE -> TransitMode.TROLLEYBUS;
       case TAXI_SERVICE, TAXI -> TransitMode.TAXI;
+      case SNOW_AND_ICE -> TransitMode.SNOW_AND_ICE;
       default -> throw new IllegalArgumentException("Unknown mode: " + mode);
     };
   }

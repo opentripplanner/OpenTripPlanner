@@ -43,14 +43,14 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
       )
       .access("Flex+Walk 2m Rₙ1 ~ A", "Flex 5m Rₙ1 ~ A")
       .egress("D ~ Flex+Walk 2m Rₙ1", "D ~ Flex 5m Rₙ1")
-      .withTransfer(STOP_A, transfer(STOP_B, D10s))
-      .withTransfer(STOP_C, transfer(STOP_D, D10s));
+      .withTransfer(STOP_A, transfer(STOP_B, D10_s))
+      .withTransfer(STOP_C, transfer(STOP_D, D10_s));
 
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D10m);
+      .searchWindowInSeconds(D10_m);
   }
 
   static List<RaptorModuleTestCase> testCases() {

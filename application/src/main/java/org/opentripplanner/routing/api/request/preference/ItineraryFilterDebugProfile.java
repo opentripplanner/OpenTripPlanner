@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * This enum controls the number of itineraries returned with debug information - itineraries

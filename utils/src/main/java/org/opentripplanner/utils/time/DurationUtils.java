@@ -220,10 +220,10 @@ public class DurationUtils {
     if (value.compareTo(maxLimit) >= 0) {
       throw new IllegalArgumentException(
         "Duration %s can't be longer or equals too %s: %s".formatted(
-            subject,
-            durationToStr(maxLimit),
-            value
-          )
+          subject,
+          durationToStr(maxLimit),
+          value
+        )
       );
     }
     return value;

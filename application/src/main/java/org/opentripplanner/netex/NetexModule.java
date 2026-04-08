@@ -1,6 +1,8 @@
 package org.opentripplanner.netex;
 
 import java.util.List;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -12,14 +14,12 @@ import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesF
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VehicleParkingHelper;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**

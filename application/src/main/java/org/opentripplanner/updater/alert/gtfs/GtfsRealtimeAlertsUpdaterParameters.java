@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alert.gtfs;
 
 import java.time.Duration;
-import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record GtfsRealtimeAlertsUpdaterParameters(
@@ -12,5 +12,4 @@ public record GtfsRealtimeAlertsUpdaterParameters(
   boolean fuzzyTripMatching,
   Duration frequency,
   HttpHeaders headers
-)
-  implements PollingGraphUpdaterParameters {}
+) implements PollingGraphUpdaterParameters {}

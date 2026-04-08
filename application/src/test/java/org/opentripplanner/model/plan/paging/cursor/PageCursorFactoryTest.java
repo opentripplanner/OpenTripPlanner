@@ -10,7 +10,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -204,8 +204,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant latestRemovedDeparture,
     ItinerarySortKey pageCut,
     Cost generalizedCostMaxLimit
-  )
-    implements PageCursorInput {
+  ) implements PageCursorInput {
     public TestPageCursorInput(Itinerary removedItinerary, Cost generalizedCostMaxLimit) {
       this(
         removedItinerary.startTimeAsInstant(),
@@ -214,6 +213,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         generalizedCostMaxLimit
       );
     }
+
     public TestPageCursorInput() {
       this(null, null, null, null);
     }

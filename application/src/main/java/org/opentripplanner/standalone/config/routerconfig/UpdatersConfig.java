@@ -122,8 +122,8 @@ public class UpdatersConfig implements UpdatersParameters {
         .summary("How long a snapshot should be cached.")
         .description(
           "If a timetable snapshot is requested less than this number of milliseconds after the previous snapshot, then return the same instance. " +
-          "Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. " +
-          "Applies to GTFS-RT and Siri updates."
+            "Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. " +
+            "Applies to GTFS-RT and Siri updates."
         )
         .asDuration(dflt.maxSnapshotFrequency()),
       c

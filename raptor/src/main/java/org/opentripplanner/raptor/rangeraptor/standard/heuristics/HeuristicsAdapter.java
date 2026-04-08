@@ -77,10 +77,10 @@ public class HeuristicsAdapter implements Heuristics {
   public HeuristicAtStop createHeuristicAtStop(int stop) {
     return reached(stop)
       ? new HeuristicAtStop(
-        bestTravelDuration(stop),
-        bestNumOfTransfers(stop),
-        bestGeneralizedCost(stop)
-      )
+          bestTravelDuration(stop),
+          bestNumOfTransfers(stop),
+          bestGeneralizedCost(stop)
+        )
       : HeuristicAtStop.UNREACHED;
   }
 

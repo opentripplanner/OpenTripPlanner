@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor.api.model.RaptorValueType.C2;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.RIDES;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.TRANSFERS;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.TRANSFER_PRIORITY;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.VIAS;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.WAIT_TIME_COST;
 
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,11 @@ class RaptorValueFormatterTest {
   @Test
   void formatNumOfRides() {
     assertEquals("Rₙ1", RIDES.format(1));
+  }
+
+  @Test
+  void formatNumOfVias() {
+    assertEquals("Vₙ1", VIAS.format(1));
   }
 
   @Test

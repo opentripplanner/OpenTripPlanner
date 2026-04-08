@@ -11,16 +11,16 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSDataset;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSVersion;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
@@ -196,7 +196,7 @@ public class VehicleRentalServiceDirectoryFetcher {
       } else {
         // Load from remote URL
         var otpHttpClient = new OtpHttpClientFactory().create(LOG);
-        var jsonNode = otpHttpClient.getAndMapAsJsonNode(url, Map.of(), OBJECT_MAPPER);
+        var jsonNode = otpHttpClient.getAndMapAsJsonNode(url, HttpHeaders.empty(), OBJECT_MAPPER);
         manifestContent = OBJECT_MAPPER.writeValueAsString(jsonNode);
         LOG.info("Loaded GBFS manifest from URL: {}", url);
       }

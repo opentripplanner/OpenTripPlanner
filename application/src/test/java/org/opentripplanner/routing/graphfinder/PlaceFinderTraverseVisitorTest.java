@@ -11,13 +11,12 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
@@ -52,15 +51,14 @@ public class PlaceFinderTraverseVisitorTest {
   static final RegularStop STOP3 = model.stop("stop-3").withCoordinate(1.002, 1.002).build();
   static final RegularStop STOP4 = model.stop("stop-4").withCoordinate(1.003, 1.003).build();
 
-  static final Route r = route("r").build();
+  static final Route R = route("r").build();
 
-  static final TimetableRepository timetableRepo = new TimetableRepository(
-    model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build(),
-    new Deduplicator()
+  static final TimetableRepository TIMETABLE_REPO = new TimetableRepository(
+    model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build()
   );
 
   static {
-    TripPatternBuilder t = tripPattern("trip", r);
+    TripPatternBuilder t = tripPattern("trip", R);
     var st1 = new StopTime();
     st1.setStop(STOP1);
     st1.setArrivalTime(T11_00);
@@ -69,24 +67,24 @@ public class PlaceFinderTraverseVisitorTest {
     st2.setStop(STOP2);
     st2.setArrivalTime(T11_05);
     t.withStopPattern(new StopPattern(List.of(st1, st2)));
-    timetableRepo.addTripPattern(id("tp1"), t.build());
+    TIMETABLE_REPO.addTripPattern(id("tp1"), t.build());
 
     var st3 = new StopTime();
     st3.setStop(STOP3);
     st3.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st3)));
-    timetableRepo.addTripPattern(id("tp2"), t.build());
+    TIMETABLE_REPO.addTripPattern(id("tp2"), t.build());
 
     var st4 = new StopTime();
     st4.setStop(STOP4);
     st4.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st4)));
-    timetableRepo.addTripPattern(id("tp3"), t.build());
+    TIMETABLE_REPO.addTripPattern(id("tp3"), t.build());
 
-    timetableRepo.index();
+    TIMETABLE_REPO.index();
   }
 
-  static DefaultTransitService transitService = new DefaultTransitService(timetableRepo);
+  static DefaultTransitService transitService = new DefaultTransitService(TIMETABLE_REPO);
 
   @Test
   void stopsOnly() {

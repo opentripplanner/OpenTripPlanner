@@ -2,7 +2,7 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.geometry.WgsCoordinate.GREENWICH;
+import static org.opentripplanner.street.geometry.WgsCoordinate.GREENWICH;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
 
@@ -86,7 +86,7 @@ class DefaultRealtimeVehicleServiceTest {
     var realtimePattern = tripPattern("realtime-added", ROUTE)
       .withStopPattern(STOP_PATTERN)
       .withOriginalTripPattern(PATTERN1)
-      .withCreatedByRealtimeUpdater(true)
+      .withRealTimeStopPatternModified()
       .build();
     service.setRealtimeVehiclesForFeed(FEED_ID, ImmutableListMultimap.of(realtimePattern, VEHICLE));
     var updates = service.getRealtimeVehicles(PATTERN1);

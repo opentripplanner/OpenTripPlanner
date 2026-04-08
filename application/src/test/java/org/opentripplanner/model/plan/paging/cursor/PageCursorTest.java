@@ -24,7 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -104,19 +104,19 @@ class PageCursorTest implements PlanTestConstants {
   public void testToString() {
     assertEquals(
       "PageCursor{type: NEXT_PAGE, sortOrder: STREET_AND_ARRIVAL_TIME, " +
-      "edt: " +
-      EDT_STR +
-      ", searchWindow: 2h}",
+        "edt: " +
+        EDT_STR +
+        ", searchWindow: 2h}",
       subjectDepartAfter.toString()
     );
     assertEquals(
       "PageCursor{type: PREVIOUS_PAGE, sortOrder: STREET_AND_DEPARTURE_TIME, " +
-      "edt: " +
-      EDT_STR +
-      ", lat: " +
-      LAT_STR +
-      ", searchWindow: 2h, generalizedCostMaxLimit: $200, " +
-      "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
+        "edt: " +
+        EDT_STR +
+        ", lat: " +
+        LAT_STR +
+        ", searchWindow: 2h, generalizedCostMaxLimit: $200, " +
+        "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
       subjectArriveBy.toString()
     );
   }

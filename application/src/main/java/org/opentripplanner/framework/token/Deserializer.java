@@ -58,9 +58,9 @@ class Deserializer {
     if (version != matchVersion) {
       throw new IllegalStateException(
         "Version does not match. Token version: " +
-        version +
-        ", schema version: " +
-        definition.version()
+          version +
+          ", schema version: " +
+          definition.version()
       );
     }
   }

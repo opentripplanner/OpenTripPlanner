@@ -25,7 +25,10 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
       return new DependentFareOffer(
         startTime,
         product,
-        dependencies.stream().map(fp -> FareOffer.of(startTime, fp)).collect(Collectors.toSet())
+        dependencies
+          .stream()
+          .map(fp -> FareOffer.of(startTime, fp))
+          .collect(Collectors.toSet())
       );
     }
   }
@@ -58,8 +61,7 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     ZonedDateTime startTime,
     FareProduct fareProduct,
     Set<FareOffer> dependencies
-  )
-    implements FareOffer {
+  ) implements FareOffer {
     public DependentFareOffer {
       Objects.requireNonNull(fareProduct);
       Objects.requireNonNull(dependencies);

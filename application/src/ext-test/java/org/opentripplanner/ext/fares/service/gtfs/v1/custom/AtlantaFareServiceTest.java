@@ -22,12 +22,12 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareModelForTest;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -208,7 +208,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     assertTrue(fares.getLegProducts().isEmpty());
     var itineraryProducts = fares.getItineraryProducts();
     assertFalse(itineraryProducts.isEmpty());
-    var fp = itineraryProducts.stream().filter(p -> p.name().equals("regular")).findAny().get();
+    var fp = itineraryProducts
+      .stream()
+      .filter(p -> p.name().equals("regular"))
+      .findAny()
+      .get();
     assertEquals(Money.usDollars(3.49f), fp.price());
   }
 

@@ -91,15 +91,15 @@ class NetexFeedParametersTest {
     assertEquals("NetexFeedParameters{ignoredFeatures: [PARKING]}", DEFAULT.toString());
     assertEquals(
       "NetexFeedParameters{" +
-      "source: https://my.test.com, " +
-      "feedId: FEED_ID, " +
-      "sharedFilePattern: '[sharedFil]+', " +
-      "sharedGroupFilePattern: '[sharedGoupFil]+', " +
-      "groupFilePattern: '[groupFile]+', " +
-      "ignoreFilePattern: '[ignoreFl]+', " +
-      "ignoredFeatures: [PARKING], " +
-      "ferryIdsNotAllowedForBicycle: [Ferry:Id]" +
-      "}",
+        "source: https://my.test.com, " +
+        "feedId: FEED_ID, " +
+        "sharedFilePattern: '[sharedFil]+', " +
+        "sharedGroupFilePattern: '[sharedGoupFil]+', " +
+        "groupFilePattern: '[groupFile]+', " +
+        "ignoreFilePattern: '[ignoreFl]+', " +
+        "ignoredFeatures: [PARKING], " +
+        "ferryIdsNotAllowedForBicycle: [Ferry:Id]" +
+        "}",
       subject.toString()
     );
   }

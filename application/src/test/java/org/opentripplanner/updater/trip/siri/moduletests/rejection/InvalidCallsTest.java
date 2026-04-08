@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.trip.siri.moduletests.rejection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.STOP_MISMATCH;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_MANY_STOPS;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.spi.UpdateErrorType.STOP_MISMATCH;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;

@@ -10,5 +10,4 @@ import javax.inject.Qualifier;
  */
 @Qualifier
 @Target({ ElementType.METHOD, ElementType.PARAMETER })
-public @interface OtpBaseDirectory {
-}
+public @interface OtpBaseDirectory {}

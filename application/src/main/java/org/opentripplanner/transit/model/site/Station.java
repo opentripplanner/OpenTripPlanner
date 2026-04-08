@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.framework.geometry.GeometryUtils.getGeometryFactory;
+import static org.opentripplanner.street.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.ZoneId;
@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
 
@@ -204,8 +204,9 @@ public class Station
       stationPoint = getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
       childGeometries.add(stationPoint);
     }
-    var geometryCollection = getGeometryFactory()
-      .createGeometryCollection(childGeometries.toArray(new Geometry[] {}));
+    var geometryCollection = getGeometryFactory().createGeometryCollection(
+      childGeometries.toArray(new Geometry[] {})
+    );
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
     var geometries = stationPoint != null

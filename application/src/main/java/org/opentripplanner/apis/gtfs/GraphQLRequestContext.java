@@ -9,13 +9,13 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transfer.TransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 public record GraphQLRequestContext(
   RoutingService routingService,
   TransitService transitService,
-  TransferService transferService,
+  RegularTransferService transferService,
   FareService fareService,
   VehicleRentalService vehicleRentalService,
   VehicleParkingService vehicleParkingService,

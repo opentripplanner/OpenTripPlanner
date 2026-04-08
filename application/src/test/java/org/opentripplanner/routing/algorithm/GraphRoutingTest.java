@@ -11,23 +11,24 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking.VehicleParkingEntranceCreator;
-import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VehicleParkingHelper;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
@@ -51,13 +52,10 @@ import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.transfer.TransferServiceTestFactory;
+import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -91,9 +89,8 @@ public abstract class GraphRoutingTest {
     private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
-      var deduplicator = new Deduplicator();
       graph = new Graph();
-      timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+      timetableRepository = new TimetableRepository(new SiteRepository());
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -106,14 +103,6 @@ public abstract class GraphRoutingTest {
 
     public TimetableRepository timetableRepository() {
       return timetableRepository;
-    }
-
-    public <T extends Vertex> T v(VertexLabel label) {
-      return vertex(label);
-    }
-
-    public <T extends Vertex> T vertex(VertexLabel label) {
-      return (T) graph.getVertex(label);
     }
 
     // -- Street network

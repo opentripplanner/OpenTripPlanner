@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.filterchain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.A;
-import static org.opentripplanner.model.plan.PlanTestConstants.D1m;
-import static org.opentripplanner.model.plan.PlanTestConstants.D2m;
+import static org.opentripplanner.model.plan.PlanTestConstants.D1_m;
+import static org.opentripplanner.model.plan.PlanTestConstants.D2_m;
 import static org.opentripplanner.model.plan.PlanTestConstants.E;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_06;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_09;
@@ -126,9 +126,9 @@ class DeleteResultHandlerTest {
       List<Boolean> expected
     ) {
       this.numItineraries = numItineraries;
-      this.i1 = newItinerary(A, T11_06).walk(D2m, E).build();
+      this.i1 = newItinerary(A, T11_06).walk(D2_m, E).build();
       this.i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
-      this.i3 = newItinerary(A).bus(20, T11_33, T11_33 + D1m, E).build();
+      this.i3 = newItinerary(A).bus(20, T11_33, T11_33 + D1_m, E).build();
       addSystemNotice(i2, i2Tag);
       addSystemNotice(i3, i3Tag);
       this.expected = expected(List.of(i1, i2, i3), expected);

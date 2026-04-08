@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 class RouteRequestMapperWalkTest {
 

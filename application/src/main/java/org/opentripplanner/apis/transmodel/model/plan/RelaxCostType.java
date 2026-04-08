@@ -8,8 +8,8 @@ import graphql.language.StringValue;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import java.util.Map;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.graphql.scalar.CostScalarFactory;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -44,8 +44,8 @@ public class RelaxCostType {
         .name(CONSTANT)
         .description(
           "The constant value to add to the limit. Must be a positive number. The value is " +
-          "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
-          "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
+            "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
+            "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
         )
         .defaultValueProgrammatic("0s")
         .type(CostScalarFactory.costScalar())

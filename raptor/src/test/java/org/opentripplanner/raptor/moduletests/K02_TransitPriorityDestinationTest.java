@@ -10,9 +10,9 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_A;
-import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_B;
-import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_C;
+import static org.opentripplanner.raptor.api.request.TestGroupPriorityCalculator.GROUP_A;
+import static org.opentripplanner.raptor.api.request.TestGroupPriorityCalculator.GROUP_B;
+import static org.opentripplanner.raptor.api.request.TestGroupPriorityCalculator.GROUP_C;
 
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,19 +25,19 @@ import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
+import org.opentripplanner.raptor.api.request.TestGroupPriorityCalculator;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator;
 
 /**
  * FEATURE UNDER TEST
- *
+ * <p>
  * Raptor should be able to handle route request with transit-priority.
  */
 public class K02_TransitPriorityDestinationTest {
 
   private static final RaptorTransitGroupPriorityCalculator PRIORITY_GROUP_CALCULATOR =
-    TestGroupPriorityCalculator.PRIORITY_CALCULATOR;
-  private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
+    new TestGroupPriorityCalculator();
+  private static final int C1_SLACK_90_s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
@@ -87,7 +87,7 @@ public class K02_TransitPriorityDestinationTest {
     requestBuilder.withMultiCriteria(mc ->
       // Raptor cost 9000 ~= 90 seconds slack
       mc
-        .withRelaxC1(value -> value + C1_SLACK_90s)
+        .withRelaxC1(value -> value + C1_SLACK_90_s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );
   }

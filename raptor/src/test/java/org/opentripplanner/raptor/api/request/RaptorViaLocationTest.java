@@ -22,7 +22,7 @@ class RaptorViaLocationTest implements RaptorTestConstants {
   private static final String VIA_LABEL = "Via";
   private static final String PASS_THROUGH_LABEL = "PassThrough";
   private static final int TX_C1 = 3000;
-  private static final int TX_DURATION = D30s;
+  private static final int TX_DURATION = D30_s;
   private static final TestTransfer TRANSFER = TestTransfer.transfer(STOP_C, TX_DURATION, TX_C1);
 
   private final RaptorViaLocation subject = RaptorViaLocation.via(VIA_LABEL, MINIMUM_WAIT_TIME)

@@ -22,14 +22,15 @@ public record InsertionCandidate(
   int pickupPosition,
   int dropoffPosition,
   List<GraphPath<State, Edge, Vertex>> routeSegments,
-  Duration baselineDuration,
+  Duration durationBetweenOriginAndDestination,
   Duration totalDuration
 ) {
   /**
-   * Calculates the additional duration caused by inserting this passenger.
+   * Calculates the difference between the total duration when inserting this passenger,
+   * and the duration when driving directly from the start to the end of the trip.
    */
   public Duration additionalDuration() {
-    return totalDuration.minus(baselineDuration);
+    return totalDuration.minus(durationBetweenOriginAndDestination);
   }
 
   /**

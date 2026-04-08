@@ -16,7 +16,9 @@ import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -33,15 +35,13 @@ import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,7 +197,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         if (gtfsBundle.parameters().blockBasedInterlining()) {
           new InterlineProcessor(
-            timetableRepository.getTransferService(),
+            timetableRepository.getConstrainedTransferService(),
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,

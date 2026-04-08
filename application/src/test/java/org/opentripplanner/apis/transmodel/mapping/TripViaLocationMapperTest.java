@@ -20,17 +20,16 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class TripViaLocationMapperTest {
 
-  private static final Duration D1m = Duration.ofMinutes(1);
+  private static final Duration D1_m = Duration.ofMinutes(1);
   private static final String LABEL = "TestLabel";
   private static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
   private static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
   private static final String EXPECTED_IDS_AS_STRING = "[F:ID1, F:ID2]";
-  private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH =
-    """
+  private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH = """
     Unfortunately the 'placeIds' is not required. Making it required would be a breaking change,
     so wee just ignore it."
     """;
@@ -53,7 +52,7 @@ class TripViaLocationMapperTest {
     assertEquals(EXPECTED_IDS_AS_STRING, via.stopLocationIds().toString());
     assertFalse(via.isPassThroughLocation());
     assertEquals(
-      "[VisitViaLocation{label: TestLabel, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2], coordinates: []}]",
+      "[VisitViaLocation{label: TestLabel, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2]}]",
       result.toString()
     );
   }
@@ -142,7 +141,7 @@ class TripViaLocationMapperTest {
   @Test
   void testOneOf() {
     Map<String, Object> input = Map.ofEntries(
-      entry(FIELD_VISIT, visitInput("A", D1m, List.of("F:99"), null)),
+      entry(FIELD_VISIT, visitInput("A", D1_m, List.of("F:99"), null)),
       entry(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT))
     );
     var ex = assertThrows(IllegalArgumentException.class, () ->

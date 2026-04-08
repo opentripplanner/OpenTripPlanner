@@ -9,8 +9,8 @@ public class BannedInputType {
     .name("InputBanned")
     .description(
       "Filter trips by disallowing lines involving certain elements. If both lines and " +
-      "authorities are specified, only one must be valid for each line to be banned. If a " +
-      "line is both banned and whitelisted, it will be counted as banned."
+        "authorities are specified, only one must be valid for each line to be banned. If a " +
+        "line is both banned and whitelisted, it will be counted as banned."
     )
     .field(GqlUtil.newIdListInputField("lines", "Set of ids for lines that should not be used"))
     .field(
@@ -23,14 +23,14 @@ public class BannedInputType {
       GqlUtil.newIdListInputField(
         "quays",
         "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding or alighting. Trip patterns " +
-        "that travel through the quay will still be permitted."
+          "that travel through the quay will still be permitted."
       )
     )
     .field(
       GqlUtil.newIdListInputField(
         "quaysHard",
         "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding, alighting or traveling " +
-        "thorugh."
+          "thorugh."
       )
     )
     .field(

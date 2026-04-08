@@ -638,9 +638,9 @@ public class ParameterBuilder {
     } catch (Exception e) {
       throw error(
         "The parameter value '%s' is not of type %s.".formatted(
-            child.asText(),
-            elementType.docName()
-          ),
+          child.asText(),
+          elementType.docName()
+        ),
         e
       );
     }
@@ -650,9 +650,9 @@ public class ParameterBuilder {
     return EnumMapper.mapToEnum(value, ofType).orElseThrow(() -> {
       throw error(
         "The parameter value '%s' is not legal. Expected one of %s.".formatted(
-            value,
-            List.of(ofType.getEnumConstants())
-          )
+          value,
+          List.of(ofType.getEnumConstants())
+        )
       );
     });
   }
@@ -662,9 +662,9 @@ public class ParameterBuilder {
     if (enumValue.isEmpty()) {
       warning(
         "The enum value '%s' is not legal. Expected one of %s.".formatted(
-            value,
-            List.of(ofType.getEnumConstants())
-          )
+          value,
+          List.of(ofType.getEnumConstants())
+        )
       );
       return Optional.empty();
     }
@@ -700,8 +700,8 @@ public class ParameterBuilder {
       case 3 -> new Locale(parts[0], parts[1], parts[2]);
       default -> throw error(
         "The parameter is not a valid Locale: '" +
-        text +
-        "'. Use: <Language>[_<country>[_<variant>]]."
+          text +
+          "'. Use: <Language>[_<country>[_<variant>]]."
       );
     };
   }
@@ -715,8 +715,8 @@ public class ParameterBuilder {
     } catch (URISyntaxException e) {
       throw error(
         "Unable to parse URI parameter value '%s'. Not parsable by java.net.URI class.".formatted(
-            text
-          ),
+          text
+        ),
         e
       );
     }
@@ -728,8 +728,8 @@ public class ParameterBuilder {
     } catch (DateTimeException e) {
       throw error(
         "Unable to parse parameter value: '" +
-        text +
-        "'. Expected a value parsable by java.time.ZoneId class."
+          text +
+          "'. Expected a value parsable by java.time.ZoneId class."
       );
     }
   }

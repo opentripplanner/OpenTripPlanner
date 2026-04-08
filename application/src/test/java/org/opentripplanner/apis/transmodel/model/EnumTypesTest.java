@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
@@ -97,7 +97,10 @@ class EnumTypesTest {
   void assertAllRoutingErrorCodesAreMapped() {
     var expected = EnumSet.allOf(RoutingErrorCode.class);
     var values = EnumSet.copyOf(
-      ROUTING_ERROR_CODE.getValues().stream().map(it -> (RoutingErrorCode) it.getValue()).toList()
+      ROUTING_ERROR_CODE.getValues()
+        .stream()
+        .map(it -> (RoutingErrorCode) it.getValue())
+        .toList()
     );
     assertEquals(expected, values);
   }

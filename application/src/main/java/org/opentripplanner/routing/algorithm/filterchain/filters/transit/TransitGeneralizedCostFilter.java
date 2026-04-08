@@ -4,7 +4,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -59,10 +59,10 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
   private Cost getWaitTimeCost(Itinerary a, Itinerary b) {
     return Cost.costOfSeconds(
       intervalRelaxFactor *
-      Math.min(
-        Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),
-        Math.abs(ChronoUnit.SECONDS.between(a.endTime(), b.endTime()))
-      )
+        Math.min(
+          Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),
+          Math.abs(ChronoUnit.SECONDS.between(a.endTime(), b.endTime()))
+        )
     );
   }
 }

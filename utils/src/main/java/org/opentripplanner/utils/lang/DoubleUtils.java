@@ -82,11 +82,11 @@ public class DoubleUtils {
     if (value < min || value > max) {
       throw new IllegalArgumentException(
         "The %s is not in range[%s, %s]: %s".formatted(
-            field,
-            formatTwoDecimals(min),
-            formatTwoDecimals(max),
-            formatTwoDecimals(value)
-          )
+          field,
+          formatTwoDecimals(min),
+          formatTwoDecimals(max),
+          formatTwoDecimals(value)
+        )
       );
     }
     return value;

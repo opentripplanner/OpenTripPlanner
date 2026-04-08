@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D2m;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D30s;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D1_m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D2_m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D30_s;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
@@ -88,7 +88,7 @@ class J02_ViaStopSearchTest {
   @Test
   @DisplayName(
     "Basic via search with just one route. You should be forced to get off the " +
-    "first trip and wait for the next one at the specified via stop."
+      "first trip and wait for the next one at the specified via stop."
   )
   void viaSearchAlightingAtViaStop() {
     data
@@ -118,9 +118,9 @@ class J02_ViaStopSearchTest {
   @Test
   @DisplayName(
     "Basic via search with just two routes. You should be forced to get off the first route, " +
-    "then transfer and BOARD the second trip at the specified via stop. This test that via works " +
-    "at the boarding stop. We will add better options for the transfer to see that the given via " +
-    "stop is used over the alternatives."
+      "then transfer and BOARD the second trip at the specified via stop. This test that via works " +
+      "at the boarding stop. We will add better options for the transfer to see that the given via " +
+      "stop is used over the alternatives."
   )
   void viaSearchArrivingByTransferAtViaStop() {
     data
@@ -134,7 +134,7 @@ class J02_ViaStopSearchTest {
         """
       )
       // Walk 1 minute to transfer from D to C - this is the only way to visit stop C
-      .withTransfer(STOP_D, transfer(STOP_C, D1m));
+      .withTransfer(STOP_D, transfer(STOP_C, D1_m));
 
     data.access("Walk 30s ~ A").egress("E ~ Walk 30s");
 
@@ -147,7 +147,7 @@ class J02_ViaStopSearchTest {
     // Verify that we alight the first trip at stop C and board the second trip
     assertEquals(
       "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ D ~ Walk 1m ~ C ~ BUS R2 0:25 0:40 ~ E ~ Walk 30s " +
-      "[0:01:30 0:40:30 39m Tₙ1 C₁3_660]",
+        "[0:01:30 0:40:30 39m Tₙ1 C₁3_660]",
       pathsToString(result)
     );
   }
@@ -155,19 +155,19 @@ class J02_ViaStopSearchTest {
   @Test
   @DisplayName(
     "Via stop as the first stop in the journey - only the access will be used for the first " +
-    "part, no transit. Access arrival should be copied over to 'next' worker."
+      "part, no transit. Access arrival should be copied over to 'next' worker."
   )
   void accessWalkToViaStopWithoutTransit() {
     data.withTimetables(
       """
-      A B C D
-      0:02 0:05 0:10 0:15
-      """ +
-      // We add another trip to allow riding trip one - via B - then ride trip two, this
-      // is not a pareto-optimal solution and should only appear if there is something wrong.
-      """
-      0:12 0:15 0:20 0:25
-      """
+        A B C D
+        0:02 0:05 0:10 0:15
+        """ +
+        // We add another trip to allow riding trip one - via B - then ride trip two, this
+        // is not a pareto-optimal solution and should only appear if there is something wrong.
+        """
+        0:12 0:15 0:20 0:25
+        """
     );
 
     // We will add access to A, B, and C, but since the B stop is the via point we expect that to
@@ -194,9 +194,9 @@ class J02_ViaStopSearchTest {
   @Test
   @DisplayName(
     "Via stop as the last stop in the journey - only the egress will be used for the last " +
-    "part, no transit. The transit arrival at the via stop should be copied over to the " +
-    "next worker and then this should be used to add the egress - without any transfers or" +
-    "more transit."
+      "part, no transit. The transit arrival at the via stop should be copied over to the " +
+      "next worker and then this should be used to add the egress - without any transfers or" +
+      "more transit."
   )
   void transitToViaStopThenTakeEgressWalkToDestination() {
     data.withTimetables(
@@ -214,14 +214,14 @@ class J02_ViaStopSearchTest {
     // be used
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_C)
       // We allow egress from B, C, and D - if the via search works as expected, only egress from C
       // should be used - egress from B has not visited via stop C, and egress from stop D would
       // require a transfer at stop C to visit the via stop - this is not an optimal path.
-      .addEgressPaths(walk(STOP_B, D30s))
-      .addEgressPaths(walk(STOP_C, D30s))
-      .addEgressPaths(walk(STOP_D, D30s));
+      .addEgressPaths(walk(STOP_B, D30_s))
+      .addEgressPaths(walk(STOP_C, D30_s))
+      .addEgressPaths(walk(STOP_D, D30_s));
 
     assertEquals(
       PathUtils.join(
@@ -254,18 +254,18 @@ class J02_ViaStopSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_B_THEN_D)
-      .addEgressPaths(walk(STOP_F, D30s));
+      .addEgressPaths(walk(STOP_F, D30_s));
 
     // Verify that both via points are included
     assertEquals(
       "Walk 30s ~ A " +
-      "~ BUS R1 0:02 0:05 ~ B " +
-      "~ BUS R1 0:15 0:25 ~ D " +
-      "~ BUS R1 0:35 0:45 ~ F " +
-      "~ Walk 30s " +
-      "[0:01:30 0:45:30 44m Tₙ2 C₁4_700]",
+        "~ BUS R1 0:02 0:05 ~ B " +
+        "~ BUS R1 0:15 0:25 ~ D " +
+        "~ BUS R1 0:35 0:45 ~ F " +
+        "~ Walk 30s " +
+        "[0:01:30 0:45:30 44m Tₙ2 C₁4_700]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -286,17 +286,17 @@ class J02_ViaStopSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_C_THEN_B)
-      .addEgressPaths(walk(STOP_D, D30s));
+      .addEgressPaths(walk(STOP_D, D30_s));
 
     assertEquals(
       "Walk 30s ~ A " +
-      "~ BUS R1 0:05 0:15 ~ C " +
-      "~ BUS R1 0:25 0:30 ~ B " +
-      "~ BUS R1 0:40 0:45 ~ D " +
-      "~ Walk 30s " +
-      "[0:04:30 0:45:30 41m Tₙ2 C₁4_320]",
+        "~ BUS R1 0:05 0:15 ~ C " +
+        "~ BUS R1 0:25 0:30 ~ B " +
+        "~ BUS R1 0:40 0:45 ~ D " +
+        "~ Walk 30s " +
+        "[0:04:30 0:45:30 41m Tₙ2 C₁4_320]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -318,10 +318,10 @@ class J02_ViaStopSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
-      .addAccessPaths(walk(STOP_B, D2m))
+      .addAccessPaths(walk(STOP_A, D30_s))
+      .addAccessPaths(walk(STOP_B, D2_m))
       .addViaLocations(VIA_LOCATION_STOP_A_OR_B)
-      .addEgressPaths(walk(STOP_C, D30s));
+      .addEgressPaths(walk(STOP_C, D30_s));
 
     // Both routes are pareto optimal.
     // Route 2 is faster, but it contains more walking
@@ -356,15 +356,15 @@ class J02_ViaStopSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(List.of(RaptorViaLocation.via("B", minWaitTime).addViaStop(STOP_B).build()))
-      .addEgressPaths(walk(STOP_C, D30s));
+      .addEgressPaths(walk(STOP_C, D30_s));
 
     // We expect to bard the second trip at 0:05:45, since the minWaitTime is 45s and the
     // transfer slack is 60s.
     assertEquals(
       "Walk 30s ~ A ~ BUS R1 0:02 0:04 ~ B ~ BUS R2 0:05:45 0:11 ~ C ~ Walk 30s " +
-      "[0:01:30 0:11:30 10m Tₙ1 C₁1_860]",
+        "[0:01:30 0:11:30 10m Tₙ1 C₁1_860]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }

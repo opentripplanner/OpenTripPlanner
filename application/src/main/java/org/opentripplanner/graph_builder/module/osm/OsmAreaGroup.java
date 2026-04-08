@@ -18,12 +18,12 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,8 +181,8 @@ class OsmAreaGroup {
         for (OsmArea area : areaSet) {
           LOG.debug(
             "Failed to create merged area for " +
-            area +
-            ".  This area might not be at fault; it might be one of the other areas in this list."
+              area +
+              ".  This area might not be at fault; it might be one of the other areas in this list."
           );
           out.add(new OsmAreaGroup(Arrays.asList(area)));
         }

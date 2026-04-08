@@ -146,7 +146,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
         .summary("How far outside its boundaries should the tile contain information.")
         .description(
           "The value is a fraction of the tile size. If you are having problem with icons and " +
-          "shapes being clipped at tile edges, then increase this number."
+            "shapes being clipped at tile edges, then increase this number."
         )
         .asDouble(EXPANSION_FACTOR),
       node
@@ -190,6 +190,5 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
     int cacheMaxSeconds,
     double expansionFactor,
     LayerFilters.FilterType filterType
-  )
-    implements LayerParameters<VectorTilesResource.LayerType> {}
+  ) implements LayerParameters<VectorTilesResource.LayerType> {}
 }

@@ -17,7 +17,7 @@ public class PassThroughViaLocation extends AbstractViaLocation {
     if (stopLocationIds.isEmpty()) {
       throw new IllegalArgumentException(
         "A pass-through via-location must have at least one stop location." +
-        (label == null ? "" : " Label: " + label)
+          (label == null ? "" : " Label: " + label)
       );
     }
   }

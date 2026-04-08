@@ -4,10 +4,11 @@ import static org.opentripplanner.transit.model.timetable.TimetableValidationErr
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_DEPARTURE_TIME;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 
 public class RealTimeTripTimesBuilder {
@@ -20,6 +21,10 @@ public class RealTimeTripTimesBuilder {
   private RealTimeState realTimeState;
 
   private final StopRealTimeState[] stopRealTimeStates;
+
+  private final BitSet extraCalls;
+  private final BitSet hasArrived;
+  private final BitSet hasDeparted;
 
   @Nullable
   private I18NString tripHeadsign;
@@ -47,9 +52,12 @@ public class RealTimeTripTimesBuilder {
     departureTimes = new Integer[numStops];
     stopRealTimeStates = new StopRealTimeState[numStops];
     Arrays.fill(stopRealTimeStates, StopRealTimeState.DEFAULT);
+    extraCalls = new BitSet(numStops);
     stopHeadsigns = new I18NString[numStops];
     occupancyStatus = new OccupancyStatus[numStops];
     Arrays.fill(occupancyStatus, OccupancyStatus.NO_DATA_AVAILABLE);
+    hasArrived = new BitSet(numStops);
+    hasDeparted = new BitSet(numStops);
   }
 
   /**
@@ -199,8 +207,16 @@ public class RealTimeTripTimesBuilder {
     return stopRealTimeStates.clone();
   }
 
-  public RealTimeTripTimesBuilder withRecorded(int stop) {
-    return withStopRealTimeState(stop, StopRealTimeState.RECORDED);
+  public BitSet extraCalls() {
+    return (BitSet) extraCalls.clone();
+  }
+
+  public BitSet hasArrived() {
+    return (BitSet) hasArrived.clone();
+  }
+
+  public BitSet hasDeparted() {
+    return (BitSet) hasDeparted.clone();
   }
 
   public RealTimeTripTimesBuilder withCanceled(int stop) {
@@ -217,6 +233,27 @@ public class RealTimeTripTimesBuilder {
 
   public RealTimeTripTimesBuilder withStopRealTimeState(int stop, StopRealTimeState state) {
     this.stopRealTimeStates[stop] = state;
+    return this;
+  }
+
+  public RealTimeTripTimesBuilder withExtraCall(int stop, boolean extraCall) {
+    this.extraCalls.set(stop, extraCall);
+    return this;
+  }
+
+  public RealTimeTripTimesBuilder withHasArrived(int stop, boolean arrived) {
+    if (stop > numberOfStops()) {
+      throw new IllegalArgumentException("Stop index out of range");
+    }
+    this.hasArrived.set(stop, arrived);
+    return this;
+  }
+
+  public RealTimeTripTimesBuilder withHasDeparted(int stop, boolean departed) {
+    if (stop > numberOfStops()) {
+      throw new IllegalArgumentException("Stop index out of range");
+    }
+    this.hasDeparted.set(stop, departed);
     return this;
   }
 

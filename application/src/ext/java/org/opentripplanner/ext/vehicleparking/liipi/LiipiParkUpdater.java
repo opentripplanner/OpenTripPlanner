@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
+import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.updater.spi.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
       parameters.utilizationsUrl(),
       "",
       parkPatchMapper::parseUtilization,
-      Map.of(),
+      HttpHeaders.empty(),
       otpHttpClientFactory.create(LOG)
     );
     this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();

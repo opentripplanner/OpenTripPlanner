@@ -188,8 +188,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     assertFalse(
-      ((EntitySelector.Stop) entitySelector).stopConditions()
-        .contains(StopCondition.EXCEPTIONAL_STOP)
+      ((EntitySelector.Stop) entitySelector).stopConditions().contains(
+        StopCondition.EXCEPTIONAL_STOP
+      )
     );
     assertFalse(
       StopConditionsHelper.matchesStopCondition(

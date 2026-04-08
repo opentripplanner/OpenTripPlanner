@@ -79,6 +79,14 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract int latestArrivalTime(int stopIndex);
 
   /**
+   * The maximum number of whole days that this trip spans from its service date midnight to the
+   * latest arrival at any stop. For most trips this is zero(0) - all times are on the same
+   * service-day(operation day). For a nightbus which ends at 02:45+1d this is 1. For multi-day
+   * services like coastal ferries it can span several days.
+   */
+  public abstract long maxSpanDays();
+
+  /**
    * Return number-of-stops this trip visit.
    */
   public abstract int numberOfStops();

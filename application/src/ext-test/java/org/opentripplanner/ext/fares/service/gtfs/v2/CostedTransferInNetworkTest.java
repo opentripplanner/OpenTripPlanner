@@ -43,7 +43,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
           .withFromLegGroup(LEG_GROUP)
           .withToLegGroup(LEG_GROUP)
           .withTransferCount(FareTransferRule.UNLIMITED_TRANSFERS)
-          .withFareProducts(List.of(TRANSFER_1))
+          .withFareProducts(TRANSFER_1)
           .build()
       )
     )

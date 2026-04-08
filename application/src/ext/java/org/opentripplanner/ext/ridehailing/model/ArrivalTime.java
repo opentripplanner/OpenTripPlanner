@@ -11,5 +11,4 @@ public record ArrivalTime(
   String rideType,
   String displayName,
   Duration duration
-)
-  implements Ride {}
+) implements Ride {}

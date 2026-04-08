@@ -12,11 +12,11 @@ public class OsmUrlGenerator {
     var lat = c.y;
     var lon = c.x;
     return "https://www.openstreetmap.org/?mlat=%s&mlon=%s#map=%s/%s/%s".formatted(
-        lat,
-        lon,
-        zoom,
-        lat,
-        lon
-      );
+      lat,
+      lon,
+      zoom,
+      lat,
+      lon
+    );
   }
 }

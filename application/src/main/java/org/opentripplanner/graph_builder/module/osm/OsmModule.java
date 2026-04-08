@@ -22,8 +22,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.edgelevelinfo.DefaultInclinedEdgeLevelInfoProcessor;
@@ -36,14 +34,15 @@ import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -258,7 +257,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmArea> areas,
     Multimap<OsmNode, OsmWay> barriers
   ) {
-    Map<OsmArea, Set<OsmLevel>> areasLevels = new HashMap<>(areas.size());
+    Map<OsmArea, Set<OsmLevel>> areasLevels = HashMap.newHashMap(areas.size());
     for (OsmArea area : areas) {
       areasLevels.put(area, osmdb.getLevelSetForEntity(area.parent));
     }
@@ -355,7 +354,7 @@ public class OsmModule implements GraphBuilderModule {
       double lastLat = -1;
       double lastLon = -1;
       String lastLevel = null;
-      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
+      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
         long nodeId = iter.next();
         OsmNode node = osmdb.getNode(nodeId);
         if (node == null) {
@@ -438,8 +437,9 @@ public class OsmModule implements GraphBuilderModule {
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 
-          geometry = GeometryUtils.getGeometryFactory()
-            .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
+          geometry = GeometryUtils.getGeometryFactory().createLineString(
+            segmentCoordinates.toArray(new Coordinate[0])
+          );
           segmentCoordinates.clear();
         } else {
           segmentCoordinates.add(osmEndNode.getCoordinate());
@@ -452,12 +452,9 @@ public class OsmModule implements GraphBuilderModule {
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
           fromVertex = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
-          String ele = segmentStartOsmNode.getTag("ele");
-          if (ele != null) {
-            Double elevation = ElevationUtils.parseEleTag(ele);
-            if (elevation != null) {
-              elevationData.put(fromVertex, elevation);
-            }
+          var ele = segmentStartOsmNode.parseEleTag();
+          if (ele.isPresent()) {
+            elevationData.put(fromVertex, ele.getAsDouble());
           }
         } else {
           // subsequent iterations
@@ -465,12 +462,9 @@ public class OsmModule implements GraphBuilderModule {
         }
 
         toVertex = vertexGenerator.getVertexForOsmNode(osmEndNode, way, NORMAL);
-        String ele = osmEndNode.getTag("ele");
-        if (ele != null) {
-          Double elevation = ElevationUtils.parseEleTag(ele);
-          if (elevation != null) {
-            elevationData.put(toVertex, elevation);
-          }
+        var ele = osmEndNode.parseEleTag();
+        if (ele.isPresent()) {
+          elevationData.put(toVertex, ele.getAsDouble());
         }
         if (elevatorProcessor.isElevatorWay(way)) {
           // Elevator way processing is done after the basic graph has been built.
@@ -714,7 +708,10 @@ public class OsmModule implements GraphBuilderModule {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getName(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
+    float carSpeed = way
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(way, direction, issueStore);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(fromVertex)
@@ -738,10 +735,12 @@ public class OsmModule implements GraphBuilderModule {
 
   private float getMaxCarSpeed() {
     float maxSpeed = 0f;
-    for (var provider : providers) {
-      var carSpeed = provider.getOsmTagMapper().getMaxUsedCarSpeed(provider.getWayPropertySet());
-      if (carSpeed > maxSpeed) {
-        maxSpeed = carSpeed;
+    for (var e : graph.getEdges()) {
+      if (e instanceof StreetEdge se) {
+        var carSpeed = se.getCarSpeed();
+        if (carSpeed > maxSpeed) {
+          maxSpeed = carSpeed;
+        }
       }
     }
     return maxSpeed;

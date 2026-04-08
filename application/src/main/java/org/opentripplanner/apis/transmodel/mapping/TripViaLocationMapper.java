@@ -14,10 +14,10 @@ import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
 import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 @SuppressWarnings("unchecked")
 class TripViaLocationMapper {
@@ -82,10 +82,12 @@ class TripViaLocationMapper {
     return c == null ? List.of() : idMapper.parseList(c);
   }
 
-  private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
-    return CoordinateInputType.mapToWgsCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
-      .map(List::of)
-      .orElseGet(List::of);
+  @Nullable
+  private static WgsCoordinate mapCoordinate(Map<String, Object> map) {
+    return CoordinateInputType.mapToWgsCoordinate(
+      ViaLocationInputType.FIELD_COORDINATE,
+      map
+    ).orElse(null);
   }
 
   /**

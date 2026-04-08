@@ -22,9 +22,9 @@ public record HeuristicAtStop(int minTravelDuration, int minNumTransfers, int mi
     return this == UNREACHED
       ? "[]"
       : ("[" +
-        (DurationUtils.durationToStr(minTravelDuration) + " ") +
-        (minNumTransfers + "tx ") +
-        OtpNumberFormat.formatCostCenti(minCost) +
-        "]");
+          (DurationUtils.durationToStr(minTravelDuration) + " ") +
+          (minNumTransfers + "tx ") +
+          OtpNumberFormat.formatCostCenti(minCost) +
+          "]");
   }
 }

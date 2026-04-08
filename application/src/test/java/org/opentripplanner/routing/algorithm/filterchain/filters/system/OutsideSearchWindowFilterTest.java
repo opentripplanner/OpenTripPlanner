@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 public class OutsideSearchWindowFilterTest implements PlanTestConstants {
 
-  private static final Duration SEARCH_WINDOW_10m = Duration.ofMinutes(10);
+  private static final Duration SEARCH_WINDOW_10_m = Duration.ofMinutes(10);
   private final int startTime = time("09:30");
   private final int endTime = time("09:40");
 
@@ -43,7 +43,7 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
     List<Itinerary> expected = flaggedForRemoval ? input : List.of();
     var subject = new OutsideSearchWindowFilter(
       TestItineraryBuilder.newTime(time(edt)).toInstant(),
-      SEARCH_WINDOW_10m
+      SEARCH_WINDOW_10_m
     );
     var result = subject.flagForRemoval(input);
     assertEquals(expected, result, description);
@@ -63,12 +63,12 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
     int t9_38 = time("9:38");
     // results from the street & flex routers are not aware of the search window
     return Stream.of(
-      newItinerary(A, t9_28).walk(D2m, B),
-      newItinerary(A, t9_38).walk(D12m, B),
+      newItinerary(A, t9_28).walk(D2_m, B),
+      newItinerary(A, t9_38).walk(D12_m, B),
       newItinerary(A, t9_28).bicycle(t9_28, t9_38, B),
       newItinerary(A, t9_28).flex(t9_28, t9_38, B),
       newItinerary(A, t9_28).flex(t9_38, time("9:48"), B),
-      newItinerary(A, time("9:20")).flex(time("9:20"), t9_28, B).walk(D12m, C)
+      newItinerary(A, time("9:20")).flex(time("9:20"), t9_28, B).walk(D12_m, C)
     ).map(b -> b.withIsSearchWindowAware(false).build());
   }
 
@@ -78,7 +78,7 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
     var edt = "9:20";
     var subject = new OutsideSearchWindowFilter(
       TestItineraryBuilder.newTime(time(edt)).toInstant(),
-      SEARCH_WINDOW_10m
+      SEARCH_WINDOW_10_m
     );
     assertThat(subject.flagForRemoval(List.of(itin))).isEmpty();
   }

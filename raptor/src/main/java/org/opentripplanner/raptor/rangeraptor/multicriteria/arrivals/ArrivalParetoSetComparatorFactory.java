@@ -110,8 +110,8 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
       public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
         return (l, r) ->
           (c2DominanceFunction.leftDominateRight(l.c2(), r.c2())
-              ? McStopArrival.relaxedCompareBase(relaxC1, l, r)
-              : McStopArrival.compareBase(l, r)) ||
+            ? McStopArrival.relaxedCompareBase(relaxC1, l, r)
+            : McStopArrival.compareBase(l, r)) ||
           McStopArrival.compareArrivedOnBoard(l, r);
       }
     };

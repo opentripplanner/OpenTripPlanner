@@ -199,13 +199,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
               stop != null && route != null
                 ? new StopOnRouteModel(stop, route)
                 : getUnknownForAlertEntityPair(
-                  stop,
-                  route,
-                  stopId.toString(),
-                  routeId.toString(),
-                  "stop",
-                  "route"
-                )
+                    stop,
+                    route,
+                    stopId.toString(),
+                    routeId.toString(),
+                    "stop",
+                    "route"
+                  )
             );
           }
           if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
@@ -217,13 +217,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
               stop != null && trip != null
                 ? new StopOnTripModel(stop, trip)
                 : getUnknownForAlertEntityPair(
-                  stop,
-                  trip,
-                  stopId.toString(),
-                  tripId.toString(),
-                  "stop",
-                  "trip"
-                )
+                    stop,
+                    trip,
+                    stopId.toString(),
+                    tripId.toString(),
+                    "stop",
+                    "trip"
+                  )
             );
           }
           if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
@@ -234,13 +234,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
               agency != null
                 ? new RouteTypeModel(agency, routeType, agency.getId().getFeedId())
                 : getUnknownForAlertEntityPair(
-                  agency,
-                  routeType,
-                  null,
-                  Integer.toString(routeType),
-                  "agency",
-                  "route type"
-                )
+                    agency,
+                    routeType,
+                    null,
+                    Integer.toString(routeType),
+                    "agency",
+                    "route type"
+                  )
             );
           }
           if (entitySelector instanceof EntitySelector.RouteType) {
@@ -254,20 +254,20 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
             Route route = getTransitService(environment).getRoute(routeId);
             return route != null
               ? getTransitService(environment)
-                .findPatterns(route)
-                .stream()
-                .filter(pattern -> pattern.getDirection() == direction)
-                .collect(Collectors.toList())
+                  .findPatterns(route)
+                  .stream()
+                  .filter(pattern -> pattern.getDirection() == direction)
+                  .collect(Collectors.toList())
               : List.of(
-                getUnknownForAlertEntityPair(
-                  route,
-                  direction,
-                  null,
-                  direction.name(),
-                  "route",
-                  "direction"
-                )
-              );
+                  getUnknownForAlertEntityPair(
+                    route,
+                    direction,
+                    null,
+                    direction.name(),
+                    "route",
+                    "direction"
+                  )
+                );
           }
           if (entitySelector instanceof EntitySelector.Unknown) {
             final List<Object> objects = List.of(

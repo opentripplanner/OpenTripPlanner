@@ -1,0 +1,6 @@
+{
+  "ojpApi": {
+    "hideFeedId": true,
+    "hardcodedInputFeedId": "ch"
+  }
+}

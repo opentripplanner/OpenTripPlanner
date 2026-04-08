@@ -79,14 +79,14 @@ class TransferPreferencesTest {
     assertEquals("TransferPreferences{}", TransferPreferences.DEFAULT.toString());
     assertEquals(
       "TransferPreferences{" +
-      "cost: $200, " +
-      "slack: 2m30s, " +
-      "waitReluctance: 0.95, " +
-      "maxTransfers: 17, " +
-      "maxAdditionalTransfers: 7, " +
-      "optimization: TransferOptimizationPreferences{backTravelWaitTimeFactor: 2.5}, " +
-      "nonpreferredCost: $30000" +
-      "}",
+        "cost: $200, " +
+        "slack: 2m30s, " +
+        "waitReluctance: 0.95, " +
+        "maxTransfers: 17, " +
+        "maxAdditionalTransfers: 7, " +
+        "optimization: TransferOptimizationPreferences{backTravelWaitTimeFactor: 2.5}, " +
+        "nonpreferredCost: $30000" +
+        "}",
       subject.toString()
     );
   }

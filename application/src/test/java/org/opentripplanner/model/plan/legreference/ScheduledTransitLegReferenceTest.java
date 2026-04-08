@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -41,8 +41,8 @@ class ScheduledTransitLegReferenceTest {
   public static final FeedScopedId STOP_1_ID = id("STOP1");
   public static final FeedScopedId STOP_2_ID = id("STOP2");
 
-  public static final FeedScopedId STOP_3A_ID = id("STOP3A");
-  public static final FeedScopedId STOP_3B_ID = id("STOP3B");
+  public static final FeedScopedId STOP_3_A_ID = id("STOP3A");
+  public static final FeedScopedId STOP_3_B_ID = id("STOP3B");
   private static TransitService transitService;
   private static final FeedScopedId SIMPLE_TRIP_ID = id("trip");
   private static final FeedScopedId TRIP_ID_WITH_MULTIPLE_CALLS = id("multiple_calls");
@@ -54,10 +54,10 @@ class ScheduledTransitLegReferenceTest {
 
     RegularStop stop1 = TEST_MODEL.stop(STOP_1_ID.getId(), 0, 0).build();
     RegularStop stop2 = TEST_MODEL.stop(STOP_2_ID.getId(), 0, 0).build();
-    RegularStop stop3a = TEST_MODEL.stop(STOP_3A_ID.getId(), 0, 0)
+    RegularStop stop3a = TEST_MODEL.stop(STOP_3_A_ID.getId(), 0, 0)
       .withParentStation(parentStation)
       .build();
-    RegularStop stop3b = TEST_MODEL.stop(STOP_3B_ID.getId(), 0, 0)
+    RegularStop stop3b = TEST_MODEL.stop(STOP_3_B_ID.getId(), 0, 0)
       .withParentStation(parentStation)
       .build();
 
@@ -68,10 +68,7 @@ class ScheduledTransitLegReferenceTest {
       .withRegularStop(stop3a)
       .withRegularStop(stop3b)
       .build();
-    TimetableRepository timetableRepository = new TimetableRepository(
-      siteRepository,
-      new Deduplicator()
-    );
+    TimetableRepository timetableRepository = new TimetableRepository(siteRepository);
     timetableRepository.setUpdaterManager(
       new GraphUpdaterManager(
         new DefaultRealTimeUpdateContext(new Graph(), timetableRepository, new TimetableSnapshot()),
@@ -198,7 +195,7 @@ class ScheduledTransitLegReferenceTest {
       0,
       2,
       STOP_1_ID,
-      STOP_3B_ID,
+      STOP_3_B_ID,
       null
     );
     assertNotNull(scheduledTransitLegReference.getLeg(transitService));
@@ -212,7 +209,7 @@ class ScheduledTransitLegReferenceTest {
       0,
       2,
       STOP_1_ID,
-      STOP_3B_ID,
+      STOP_3_B_ID,
       null
     );
     var leg = scheduledTransitLegReference.getLeg(transitService);
@@ -233,7 +230,7 @@ class ScheduledTransitLegReferenceTest {
       0,
       2,
       STOP_1_ID,
-      STOP_3B_ID,
+      STOP_3_B_ID,
       null
     );
     var leg = scheduledTransitLegReference.getLeg(transitService);
@@ -254,7 +251,7 @@ class ScheduledTransitLegReferenceTest {
       0,
       1,
       STOP_1_ID,
-      STOP_3A_ID,
+      STOP_3_A_ID,
       null
     );
     var leg = scheduledTransitLegReference.getLeg(transitService);
@@ -273,7 +270,7 @@ class ScheduledTransitLegReferenceTest {
       0,
       1,
       STOP_1_ID,
-      STOP_3B_ID,
+      STOP_3_B_ID,
       null
     );
     var leg = scheduledTransitLegReference.getLeg(transitService);
@@ -310,7 +307,7 @@ class ScheduledTransitLegReferenceTest {
       SERVICE_DATE,
       0,
       2,
-      STOP_3A_ID,
+      STOP_3_A_ID,
       STOP_1_ID,
       null
     );

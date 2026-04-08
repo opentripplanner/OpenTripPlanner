@@ -97,8 +97,8 @@ public abstract sealed class Result<T, E> {
     } else {
       throw new RuntimeException(
         "Value %s is not a failure. Check isFailure() before calling failureValue().".formatted(
-            value()
-          )
+          value()
+        )
       );
     }
   }
@@ -136,8 +136,8 @@ public abstract sealed class Result<T, E> {
     } else {
       throw new RuntimeException(
         "Value %s is not a success. Check isSuccess() before calling successValue().".formatted(
-            value()
-          )
+          value()
+        )
       );
     }
   }

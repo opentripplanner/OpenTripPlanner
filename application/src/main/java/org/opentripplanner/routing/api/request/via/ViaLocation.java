@@ -2,9 +2,10 @@ package org.opentripplanner.routing.api.request.via;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Defines a via location which the journey must route through. At least one stop location or
@@ -47,10 +48,10 @@ public interface ViaLocation {
   List<FeedScopedId> stopLocationIds();
 
   /**
-   * A list of coordinates used together with the {@code stopLocationIds} as the via location.
-   * This is optional, an empty list is returned if no coordinates are available.
+   * A coordinate used together with the {@code stopLocationIds} as the via location.
+   * This is optional.
    */
-  default List<WgsCoordinate> coordinates() {
-    return List.of();
+  default Optional<WgsCoordinate> coordinate() {
+    return Optional.empty();
   }
 }

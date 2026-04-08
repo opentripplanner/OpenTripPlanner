@@ -95,7 +95,11 @@ public class MetricsLogging {
 
     final Map<String, Long> issueCount = issueSummary.asMap();
 
-    var totalIssues = issueCount.values().stream().mapToLong(i -> i).sum();
+    var totalIssues = issueCount
+      .values()
+      .stream()
+      .mapToLong(i -> i)
+      .sum();
     Metrics.globalRegistry.gauge("graph_build_issues_total", totalIssues);
 
     issueCount.forEach((issueType, number) ->

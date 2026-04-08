@@ -15,5 +15,4 @@ public record RideEstimate(
   Money maxPrice,
   String rideType,
   String productName
-)
-  implements Ride {}
+) implements Ride {}

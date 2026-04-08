@@ -6,7 +6,7 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 public class MaxStopCountLimitTest {
 

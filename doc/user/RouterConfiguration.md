@@ -37,11 +37,13 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |               |  2.1  |
 | gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |               |  2.8  |
 |    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |               |   na  |
+| [ojpApi](sandbox/OjpApi.md)                                                               |        `object`       | Configuration for the OJP API.                                                                                                                                                                                       | *Optional* |               |  2.9  |
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |               |  2.0  |
 | [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |               |  2.4  |
 |    [apiDocumentationProfile](#server_apiDocumentationProfile)                             |         `enum`        | List of available custom documentation profiles. A profile is used to inject custom documentation like type and field description or a deprecated reason.  Currently, ONLY the Transmodel API supports this feature. | *Optional* | `"default"`   |  2.7  |
 |    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                                                                                                                                           | *Optional* | `"PT-1S"`     |  2.4  |
+|    [httpResponseTimeMetrics](#server_httpResponseTimeMetrics)                             |        `object`       | Configuration for HTTP response time metrics.                                                                                                                                                                        | *Optional* |               |  2.9  |
 |    [traceParameters](#server_traceParameters)                                             |       `object[]`      | Trace OTP request using HTTP request/response parameter(s) combined with logging.                                                                                                                                    | *Optional* |               |  2.4  |
 |          generateIdIfMissing                                                              |       `boolean`       | If `true` a unique value is generated if no http request header is provided, or the value is missing.                                                                                                                | *Optional* | `false`       |  2.4  |
 |          httpRequestHeader                                                                |        `string`       | The header-key to use when fetching the trace parameter value                                                                                                                                                        | *Optional* |               |  2.4  |
@@ -146,6 +148,19 @@ This timeout limits the server-side processing time for a given API request. Thi
 network latency nor waiting time in the HTTP server thread pool. The default value is
 `-1s`(no timeout). The timeout is applied to all APIs (Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
+
+
+<h3 id="server_httpResponseTimeMetrics">httpResponseTimeMetrics</h3>
+
+**Since version:** `2.9` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /server 
+
+Configuration for HTTP response time metrics.
+
+When enabled, records response time metrics per client. The client is identified by a
+configurable HTTP header (`clientHeader`). Only clients in the `monitoredClients` list are
+tracked individually; unknown clients are grouped under "other" to prevent metric
+cardinality explosion. Requires the ActuatorAPI feature to be enabled.
 
 
 <h3 id="server_traceParameters">traceParameters</h3>
@@ -642,6 +657,12 @@ Used to group requests when monitoring OTP.
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
       "stairsReluctance" : 100
+    },
+    "directTransitSearch" : {
+      "enabled" : false,
+      "costRelaxFunction" : "15m + 1.5t",
+      "maxAccessEgressDuration" : "5m",
+      "extraAccessEgressReluctance" : 2
     }
   },
   "flex" : {

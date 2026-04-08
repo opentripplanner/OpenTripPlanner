@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.rejection;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.time.LocalDate;

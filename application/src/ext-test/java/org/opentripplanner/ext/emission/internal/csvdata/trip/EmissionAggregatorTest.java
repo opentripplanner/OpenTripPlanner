@@ -71,12 +71,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionMissingTripHop(Warning! All hops in a trip (E:T:1) should have an emission value. " +
-      "Hop 2 and 3 does not have an emission value.)",
+        "Hop 2 and 3 does not have an emission value.)",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionTripHopDuplicates(Warning! The emission import contains duplicate rows for " +
-      "the same hop for trip (E:T:1). An average value is used.)",
+        "the same hop for trip (E:T:1). An average value is used.)",
       subject.listIssues().get(1).toString()
     );
     assertEquals(
@@ -98,12 +98,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopIdMismatch(Emission 'from_stop_id' (C) not found in stop pattern for trip " +
-      "(E:T:1): TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
+        "(E:T:1): TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopIdMismatch(Emission 'from_stop_id' (B) not found in stop pattern for trip " +
-      "(E:T:1): TripHopsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
+        "(E:T:1): TripHopsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
       subject.listIssues().get(1).toString()
     );
   }
@@ -119,12 +119,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopSeqNr(The emission 'from_stop_sequence' (0) is out of bounds [1, 3]: " +
-      "TripHopsRow[tripId=T:1, fromStopId=A, fromStopSequence=0, co2=3g])",
+        "TripHopsRow[tripId=T:1, fromStopId=A, fromStopSequence=0, co2=3g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopSeqNr(The emission 'from_stop_sequence' (4) is out of bounds [1, 3]: " +
-      "TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
+        "TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
       subject.listIssues().get(1).toString()
     );
   }
@@ -141,7 +141,7 @@ class EmissionAggregatorTest {
     assertEquals(1, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionMissingTripStopPattern(No trip with stop pattern found for trip (E:T:1). " +
-      "Trip or stop-pattern is missing. The trip is skipped.)",
+        "Trip or stop-pattern is missing. The trip is skipped.)",
       subject.listIssues().get(0).toString()
     );
   }

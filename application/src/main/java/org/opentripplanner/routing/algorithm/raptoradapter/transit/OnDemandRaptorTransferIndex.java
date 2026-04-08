@@ -90,7 +90,10 @@ class OnDemandRaptorTransferIndex implements RaptorTransferIndex {
       .stream()
       .filter(s -> s.transfer.allowsMode(mode))
       .flatMap(s ->
-        s.transfer.asRaptorTransfer(request).stream().map(rt -> rt.reverseOf(s.fromStopIndex))
+        s.transfer
+          .asRaptorTransfer(request)
+          .stream()
+          .map(rt -> rt.reverseOf(s.fromStopIndex))
       )
       .collect(toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b))
       .values();

@@ -122,16 +122,17 @@ public class DatedServiceJourneyQuery {
         );
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder =
-          TripOnServiceDateRequest.of(operatingDays)
-            .withAgencies(authorities)
-            .withRoutes(lines)
-            .withServiceJourneys(serviceJourneys)
-            .withReplacementFor(replacementFor);
+          TripOnServiceDateRequest.of()
+            .withIncludeServiceDates(operatingDays)
+            .withIncludeAgencies(authorities)
+            .withIncludeRoutes(lines)
+            .withIncludeServiceJourneys(serviceJourneys)
+            .withIncludeReplacementFor(replacementFor);
 
         tripOnServiceDateRequestBuilder =
-          tripOnServiceDateRequestBuilder.withNetexInternalPlanningCodes(privateCodes);
+          tripOnServiceDateRequestBuilder.withIncludeNetexInternalPlanningCodes(privateCodes);
 
-        tripOnServiceDateRequestBuilder = tripOnServiceDateRequestBuilder.withAlterations(
+        tripOnServiceDateRequestBuilder = tripOnServiceDateRequestBuilder.withIncludeAlterations(
           alterations
         );
 

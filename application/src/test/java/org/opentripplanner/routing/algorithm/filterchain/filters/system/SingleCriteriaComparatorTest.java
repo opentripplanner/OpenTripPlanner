@@ -28,30 +28,30 @@ class SingleCriteriaComparatorTest {
   private static final int END_LOW = 2000;
 
   // [Tx, Cost] => [0, 1240]
-  private static final Itinerary zeroTransferLowCost = newItinerary(A)
+  private static final Itinerary ZERO_TRANSFER_LOW_COST = newItinerary(A)
     .bus(1, START, END_LOW, B)
     .walk(60, C)
     .build();
   // [Tx, Cost] => [0, 1360]
-  private static final Itinerary zeroTransferHighCost = newItinerary(A)
+  private static final Itinerary ZERO_TRANSFER_HIGH_COST = newItinerary(A)
     .bus(1, START, END_LOW, B)
     .walk(120, C)
     .build();
   // [Tx, Cost] => [1, 1240]
-  private static final Itinerary oneTransferLowCost = newItinerary(A)
+  private static final Itinerary ONE_TRANSFER_LOW_COST = newItinerary(A)
     .bus(1, START, TX_AT, B)
     .bus(2, TX_AT, END_LOW, C)
     .build();
 
   @BeforeAll
   static void setUp() {
-    assertEquals(0, zeroTransferLowCost.numberOfTransfers());
-    assertEquals(0, zeroTransferHighCost.numberOfTransfers());
-    assertEquals(1, oneTransferLowCost.numberOfTransfers());
+    assertEquals(0, ZERO_TRANSFER_LOW_COST.numberOfTransfers());
+    assertEquals(0, ZERO_TRANSFER_HIGH_COST.numberOfTransfers());
+    assertEquals(1, ONE_TRANSFER_LOW_COST.numberOfTransfers());
 
-    int expectedCost = zeroTransferLowCost.generalizedCost();
-    assertTrue(expectedCost < zeroTransferHighCost.generalizedCost());
-    assertEquals(expectedCost, oneTransferLowCost.generalizedCost());
+    int expectedCost = ZERO_TRANSFER_LOW_COST.generalizedCost();
+    assertTrue(expectedCost < ZERO_TRANSFER_HIGH_COST.generalizedCost());
+    assertEquals(expectedCost, ONE_TRANSFER_LOW_COST.generalizedCost());
   }
 
   @Test
@@ -66,9 +66,9 @@ class SingleCriteriaComparatorTest {
     var subject = SingleCriteriaComparator.compareNumTransfers();
 
     // leftDominanceExist
-    assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
-    assertTrue(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
-    assertFalse(subject.leftDominanceExist(oneTransferLowCost, zeroTransferLowCost));
+    assertFalse(subject.leftDominanceExist(ZERO_TRANSFER_HIGH_COST, ZERO_TRANSFER_LOW_COST));
+    assertTrue(subject.leftDominanceExist(ZERO_TRANSFER_LOW_COST, ONE_TRANSFER_LOW_COST));
+    assertFalse(subject.leftDominanceExist(ONE_TRANSFER_LOW_COST, ZERO_TRANSFER_LOW_COST));
 
     // strict order expected
     assertTrue(subject.strictOrder());
@@ -79,9 +79,9 @@ class SingleCriteriaComparatorTest {
     var subject = SingleCriteriaComparator.compareGeneralizedCost();
 
     // leftDominanceExist
-    assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
-    assertTrue(subject.leftDominanceExist(zeroTransferLowCost, zeroTransferHighCost));
-    assertFalse(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
+    assertFalse(subject.leftDominanceExist(ZERO_TRANSFER_HIGH_COST, ZERO_TRANSFER_LOW_COST));
+    assertTrue(subject.leftDominanceExist(ZERO_TRANSFER_LOW_COST, ZERO_TRANSFER_HIGH_COST));
+    assertFalse(subject.leftDominanceExist(ZERO_TRANSFER_LOW_COST, ONE_TRANSFER_LOW_COST));
 
     // strict order expected
     assertTrue(subject.strictOrder());

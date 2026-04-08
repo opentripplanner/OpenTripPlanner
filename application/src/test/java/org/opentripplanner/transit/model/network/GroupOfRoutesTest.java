@@ -17,7 +17,7 @@ public class GroupOfRoutesTest {
   private static final String NAME = "test_name";
   private static final String DESCRIPTION = "description";
 
-  private static final GroupOfRoutes subject = GroupOfRoutes.of(TimetableRepositoryForTest.id(ID))
+  private static final GroupOfRoutes SUBJECT = GroupOfRoutes.of(TimetableRepositoryForTest.id(ID))
     .withPrivateCode(PRIVATE_CODE)
     .withShortName(SHORT_NAME)
     .withName(NAME)
@@ -27,17 +27,17 @@ public class GroupOfRoutesTest {
   @Test
   public void copy() {
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = SUBJECT.copy().withName(NAME).build();
 
     // Same object should be returned if nothing changed
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withName("v2").build();
+    copy = SUBJECT.copy().withName("v2").build();
 
     // The two objects are not the same instance, but is equal(same id)
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
+    assertNotSame(copy, SUBJECT);
+    assertEquals(copy, SUBJECT);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals(PRIVATE_CODE, copy.getPrivateCode());
@@ -49,12 +49,12 @@ public class GroupOfRoutesTest {
   @Test
   public void sameValue() {
     // Make a copy, and set the same name (nothing is changed)
-    var other = subject.copy().build();
-    assertTrue(subject.sameAs(other));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withPrivateCode("X").build()));
+    var other = SUBJECT.copy().build();
+    assertTrue(SUBJECT.sameAs(other));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withDescription("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withShortName("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPrivateCode("X").build()));
   }
 }

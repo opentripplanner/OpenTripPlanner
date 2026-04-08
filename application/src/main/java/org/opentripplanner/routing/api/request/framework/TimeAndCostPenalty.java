@@ -2,9 +2,9 @@ package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
 import java.util.Objects;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.utils.lang.Units;
 
 /**
  * The time and cost penalty is used to calculate an extra penalty on time and cost.

@@ -44,7 +44,11 @@ public class DefaultRealtimeVehicleService
     Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
     temp.putAll(vehicles);
     // remove all previous updates for this specific feed id
-    vehicles.keys().stream().filter(p -> p.getFeedId().equals(feedId)).forEach(temp::removeAll);
+    vehicles
+      .keys()
+      .stream()
+      .filter(p -> p.getFeedId().equals(feedId))
+      .forEach(temp::removeAll);
     // transform keys and put all fresh updates into map
     updates.forEach((pattern, vehicles) -> {
       if (pattern.getOriginalTripPattern() != null) {
