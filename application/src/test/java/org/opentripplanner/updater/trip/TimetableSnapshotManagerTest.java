@@ -183,10 +183,12 @@ class TimetableSnapshotManagerTest {
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
       .withArrivalDelay(1, 60)
-      .withDepartureDelay(1, 60)
-      .build();
+      .withDepartureDelay(1, 60);
+    rtTripTimes.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
 
-    manager.updateBuffer(RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build());
+    manager.updateBuffer(
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes.build(), TODAY).build()
+    );
 
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
@@ -205,11 +207,11 @@ class TimetableSnapshotManagerTest {
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
       .withArrivalDelay(1, 60)
-      .withDepartureDelay(1, 60)
-      .build();
+      .withDepartureDelay(1, 60);
+    rtTripTimes.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
 
     manager.updateBuffer(
-      RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
+      RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes.build(), TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
     );
@@ -237,12 +239,13 @@ class TimetableSnapshotManagerTest {
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
       .withArrivalDelay(1, 60)
-      .withDepartureDelay(1, 60)
-      .build();
+      .withDepartureDelay(1, 60);
+    rtTripTimes.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
 
     // Setup: move the trip to the modified pattern
+    var realTimeTripTimes = rtTripTimes.build();
     manager.updateBuffer(
-      RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
+      RealTimeTripUpdate.of(MODIFIED_PATTERN, realTimeTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
     );
@@ -252,7 +255,7 @@ class TimetableSnapshotManagerTest {
 
     // Now revert and update on the scheduled pattern
     manager.updateBuffer(
-      RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY)
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, realTimeTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
@@ -276,12 +279,13 @@ class TimetableSnapshotManagerTest {
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
       .withArrivalDelay(1, 60)
-      .withDepartureDelay(1, 60)
-      .build();
+      .withDepartureDelay(1, 60);
+    rtTripTimes.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
+    var realTimeTripTimes = rtTripTimes.build();
 
     // Setup: move the trip to the first modified pattern
     manager.updateBuffer(
-      RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
+      RealTimeTripUpdate.of(MODIFIED_PATTERN, realTimeTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
     );
@@ -292,7 +296,7 @@ class TimetableSnapshotManagerTest {
     // Now revert from the first modified pattern, delete from scheduled, and update on the
     // second modified pattern
     manager.updateBuffer(
-      RealTimeTripUpdate.of(SECOND_MODIFIED_PATTERN, rtTripTimes, TODAY)
+      RealTimeTripUpdate.of(SECOND_MODIFIED_PATTERN, realTimeTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
@@ -323,12 +327,11 @@ class TimetableSnapshotManagerTest {
   @Test
   void updateBufferCancelScheduledTrip() {
     var manager = createManager();
-    var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .cancelTrip()
-      .build();
+    var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
+    canceledTripTimes.realTimeMetadataBuilder().cancelTrip();
 
     manager.updateBuffer(
-      RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes.build(), TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
@@ -346,12 +349,11 @@ class TimetableSnapshotManagerTest {
   @Test
   void updateBufferDeleteScheduledTrip() {
     var manager = createManager();
-    var deletedTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .deleteTrip()
-      .build();
+    var deletedTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
+    deletedTripTimes.realTimeMetadataBuilder().deleteTrip();
 
     manager.updateBuffer(
-      RealTimeTripUpdate.of(SCHEDULED_PATTERN, deletedTripTimes, TODAY)
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, deletedTripTimes.build(), TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );
@@ -387,11 +389,10 @@ class TimetableSnapshotManagerTest {
     assertEquals(MODIFIED_PATTERN, manager.getNewTripPatternForModifiedTrip(TRIP.getId(), TODAY));
 
     // Now revert and cancel on the scheduled pattern
-    var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .cancelTrip()
-      .build();
+    var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
+    canceledTripTimes.realTimeMetadataBuilder().cancelTrip();
     manager.updateBuffer(
-      RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes.build(), TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );

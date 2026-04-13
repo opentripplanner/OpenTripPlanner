@@ -208,7 +208,7 @@ class RealTimeTripTimesTest {
     builder.withDepartureTime(5, 421);
     builder.withArrivalTime(6, 481);
     builder.withDepartureTime(6, 481);
-    builder.withCanceled(6);
+    builder.realTimeMetadataBuilder().withCanceled(6);
     builder.withArrivalTime(7, 420);
 
     var error = assertThrows(DataValidationException.class, builder::build);
@@ -229,7 +229,7 @@ class RealTimeTripTimesTest {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withDepartureTime(5, 300);
-    builder.withCanceled(6);
+    builder.realTimeMetadataBuilder().withCanceled(6);
     builder.withArrivalTime(7, 320);
 
     var error = assertThrows(DataValidationException.class, builder::build);
@@ -249,8 +249,8 @@ class RealTimeTripTimesTest {
   public void testPositiveHopTimeWithTerminalCancellation() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    builder.withCanceled(0);
-    builder.withCanceled(1);
+    builder.realTimeMetadataBuilder().withCanceled(0);
+    builder.realTimeMetadataBuilder().withCanceled(1);
     builder.withArrivalTime(2, 0);
     builder.withDepartureTime(2, 10);
 
@@ -271,12 +271,12 @@ class RealTimeTripTimesTest {
   public void testMultipleStopCancellations() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    builder.withCanceled(1);
-    builder.withCanceled(2);
-    builder.withCanceled(3);
-    builder.withCanceled(4);
-    builder.withCanceled(5);
-    builder.withCanceled(6);
+    builder.realTimeMetadataBuilder().withCanceled(1);
+    builder.realTimeMetadataBuilder().withCanceled(2);
+    builder.realTimeMetadataBuilder().withCanceled(3);
+    builder.realTimeMetadataBuilder().withCanceled(4);
+    builder.realTimeMetadataBuilder().withCanceled(5);
+    builder.realTimeMetadataBuilder().withCanceled(6);
     builder.withArrivalTime(7, 350);
     builder.withDepartureTime(7, 350);
 
@@ -297,13 +297,13 @@ class RealTimeTripTimesTest {
   public void testMultipleStopCancellations2() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    builder.withCanceled(1);
-    builder.withCanceled(2);
+    builder.realTimeMetadataBuilder().withCanceled(1);
+    builder.realTimeMetadataBuilder().withCanceled(2);
     builder.withArrivalTime(3, 90);
     builder.withDepartureTime(3, 90);
-    builder.withCanceled(4);
-    builder.withCanceled(5);
-    builder.withCanceled(6);
+    builder.realTimeMetadataBuilder().withCanceled(4);
+    builder.realTimeMetadataBuilder().withCanceled(5);
+    builder.realTimeMetadataBuilder().withCanceled(6);
     builder.withArrivalTime(7, 240);
     builder.withDepartureTime(7, 240);
 
@@ -338,14 +338,14 @@ class RealTimeTripTimesTest {
   @Test
   public void testCancel() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-    builder.cancelTrip();
+    builder.realTimeMetadataBuilder().cancelTrip();
     assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
   }
 
   @Test
   public void testNoData() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-    builder.withNoData(1);
+    builder.realTimeMetadataBuilder().withNoData(1);
     var updatedTripTimesA = builder.build();
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
@@ -356,9 +356,9 @@ class RealTimeTripTimesTest {
   public void testRealTimeUpdated() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     assertFalse(builder.build().isRealTimeUpdated(1));
-    builder.withRealTimeState(RealTimeState.UPDATED);
+    builder.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
     assertTrue(builder.build().isRealTimeUpdated(1));
-    builder.withNoData(1);
+    builder.realTimeMetadataBuilder().withNoData(1);
     var updatedTripTimesA = builder.build();
     assertTrue(updatedTripTimesA.isRealTimeUpdated(0));
     assertFalse(updatedTripTimesA.isRealTimeUpdated(1));

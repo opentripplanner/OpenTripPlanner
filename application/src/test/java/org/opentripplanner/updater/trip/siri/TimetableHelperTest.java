@@ -26,6 +26,11 @@ import org.opentripplanner.transit.service.SiteRepository;
 import uk.org.siri.siri21.CallStatusEnumeration;
 import uk.org.siri.siri21.OccupancyEnumeration;
 
+/**
+ * Tests TimetableHelper (timing, headsigns, extra calls, arrived/departed) together with
+ * RealTimeInfoUpdater (occupancy, cancellation, prediction inaccuracy) since both are called
+ * in sequence by the trip builders.
+ */
 public class TimetableHelperTest {
 
   private static final String FEED_ID = "FEED_ID";
@@ -89,7 +94,7 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(true)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
+    applyUpdatesAtStop(0, false, false, estimatedCall, null);
 
     assertEquals(
       "Occupancy:MANY_SEATS_AVAILABLE Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
@@ -106,7 +111,7 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(true)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
+    applyUpdatesAtStop(0, false, false, estimatedCall, null);
 
     assertEquals(
       "Occupancy:FULL Cancelled:true Extra:false Arrived:false Departed:false Inaccurate:false",
@@ -125,7 +130,7 @@ public class TimetableHelperTest {
       .withActualDepartureTime(actualTime)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+    applyUpdatesAtStop(0, false, false, recordedCall, null);
 
     assertEquals(
       "Occupancy:FULL Cancelled:true Extra:false Arrived:false Departed:false Inaccurate:false",
@@ -143,7 +148,7 @@ public class TimetableHelperTest {
       .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+    applyUpdatesAtStop(0, false, false, recordedCall, null);
 
     assertEquals(
       "Occupancy:FULL Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
@@ -162,7 +167,7 @@ public class TimetableHelperTest {
       .withIsRecorded(true)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+    applyUpdatesAtStop(0, false, false, recordedCall, null);
 
     assertEquals(
       "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:true Departed:true Inaccurate:false",
@@ -181,7 +186,7 @@ public class TimetableHelperTest {
       .withArrivalStatus(CallStatusEnumeration.ARRIVED)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+    applyUpdatesAtStop(0, false, false, recordedCall, null);
 
     assertEquals(
       "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:true Departed:false Inaccurate:false",
@@ -193,15 +198,7 @@ public class TimetableHelperTest {
   public void testApplyUpdates_JourneyDefaultValues() {
     CallWrapper recordedCall = TestCall.of().withStopPointRef(STOP_ID).build();
 
-    TimetableHelper.applyUpdates(
-      START_OF_SERVICE,
-      builder,
-      0,
-      false,
-      true,
-      recordedCall,
-      OccupancyEnumeration.STANDING_AVAILABLE
-    );
+    applyUpdatesAtStop(0, false, true, recordedCall, OccupancyEnumeration.STANDING_AVAILABLE);
 
     assertEquals(
       "Occupancy:STANDING_ROOM_ONLY Cancelled:false Extra:false Arrived:false Departed:false Inaccurate:true",
@@ -222,7 +219,7 @@ public class TimetableHelperTest {
       .withIsRecorded(true)
       .build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
+    applyUpdatesAtStop(0, false, false, recordedCall, null);
 
     assertEquals(
       "Occupancy:NO_DATA_AVAILABLE Cancelled:false Extra:false Arrived:true Departed:false Inaccurate:false",
@@ -234,11 +231,32 @@ public class TimetableHelperTest {
   public void testApplyUpdates_ExtraCall_EstimatedCall() {
     CallWrapper estimatedCall = TestCall.of().withExtraCall(true).build();
 
-    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
+    applyUpdatesAtStop(0, false, false, estimatedCall, null);
 
     assertEquals(
       "Occupancy:NO_DATA_AVAILABLE Cancelled:false Extra:true Arrived:false Departed:false Inaccurate:false",
       showStatuses(0)
+    );
+  }
+
+  /**
+   * Applies updates at a stop using both TimetableHelper and RealTimeInfoUpdater, mirroring the
+   * production call sequence in the trip builders.
+   */
+  private void applyUpdatesAtStop(
+    int stopIndex,
+    boolean isLastStop,
+    boolean isJourneyPredictionInaccurate,
+    CallWrapper call,
+    OccupancyEnumeration journeyOccupancy
+  ) {
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, stopIndex, isLastStop, call);
+    SiriRealTimeMetadataHelper.updateRealTimeMetadataAtStop(
+      builder.realTimeMetadataBuilder(),
+      stopIndex,
+      call,
+      journeyOccupancy,
+      isJourneyPredictionInaccurate
     );
   }
 

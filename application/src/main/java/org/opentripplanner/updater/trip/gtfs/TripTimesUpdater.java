@@ -121,11 +121,11 @@ class TripTimesUpdater {
         // Set status to cancelled
         updatedPickups.put(pos, PickDrop.CANCELLED);
         updatedDropoffs.put(pos, PickDrop.CANCELLED);
-        builder.withCanceled(pos);
+        builder.realTimeMetadataBuilder().withCanceled(pos);
       } else if (scheduleRelationship == ScheduleRelationship.NO_DATA) {
         // Set status to NO_DATA and delays to 0.
         // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-        builder.withNoData(pos);
+        builder.realTimeMetadataBuilder().withNoData(pos);
       } else {
         // Else the status is SCHEDULED, update times as needed.
         if (!update.isArrivalValid()) {
@@ -147,7 +147,7 @@ class TripTimesUpdater {
     tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);
 
     // Make sure that updated trip times have the correct real time state
-    builder.withRealTimeState(RealTimeState.UPDATED);
+    builder.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
 
     // Validate for non-increasing times. Log error if present.
     try {
@@ -228,7 +228,7 @@ class TripTimesUpdater {
       final var addedStopTime = stopAndStopTimeUpdates.get(stopIndex).stopTimeUpdate();
 
       if (addedStopTime.isSkipped()) {
-        builder.withCanceled(stopIndex);
+        builder.realTimeMetadataBuilder().withCanceled(stopIndex);
       }
 
       setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
@@ -240,8 +240,9 @@ class TripTimesUpdater {
       }
     }
 
+    builder.realTimeMetadataBuilder().withRealTimeState(realTimeState);
     // Set service code of new trip times
-    builder.withServiceCode(serviceCode).withRealTimeState(realTimeState);
+    builder.withServiceCode(serviceCode);
 
     tripUpdate.tripHeadsign().ifPresent(builder::withTripHeadsign);
     tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);

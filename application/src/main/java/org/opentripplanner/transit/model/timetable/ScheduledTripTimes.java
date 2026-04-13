@@ -73,6 +73,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   private final int[] gtfsSequenceOfStopIndex;
 
+  /**
+   * Cached default values (Scheduled trip, no updates) to avoid allocation on every call of Getter
+   */
+  private final TripRealTimeMetadata tripRealTimeMetadata;
+
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift();
     this.serviceCode = builder.serviceCode();
@@ -85,6 +90,9 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     this.headsigns = builder.headsigns();
     this.headsignVias = builder.headsignVias();
     this.gtfsSequenceOfStopIndex = builder.gtfsSequenceOfStopIndex();
+    this.tripRealTimeMetadata = TripRealTimeMetadata.defaultRealTimeMetadata(
+      builder.arrivalTimes().length
+    );
     validate();
   }
 
@@ -294,6 +302,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   @Override
   public OccupancyStatus getOccupancyStatus(int ignore) {
     return OccupancyStatus.NO_DATA_AVAILABLE;
+  }
+
+  @Override
+  public TripRealTimeMetadata getRealTimeMetadata() {
+    return this.tripRealTimeMetadata;
   }
 
   @Override

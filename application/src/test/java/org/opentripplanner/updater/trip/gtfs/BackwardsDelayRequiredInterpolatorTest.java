@@ -55,13 +55,19 @@ class BackwardsDelayRequiredInterpolatorTest {
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.DEFAULT,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
       assertEquals(reference.getDepartureDelay(i), builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.DEFAULT,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
   }
 
@@ -85,13 +91,19 @@ class BackwardsDelayRequiredInterpolatorTest {
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.NO_DATA,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
       assertEquals(reference.getDepartureDelay(i), builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.DEFAULT,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
   }
 
@@ -100,9 +112,11 @@ class BackwardsDelayRequiredInterpolatorTest {
     var firstUpdateIndex = 2;
     var canceledIndex = 1;
     var delay = 3;
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
-      .withArrivalDelay(firstUpdateIndex, delay)
-      .withCanceled(canceledIndex);
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
+      firstUpdateIndex,
+      delay
+    );
+    builder.realTimeMetadataBuilder().withCanceled(canceledIndex);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
@@ -114,7 +128,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(
         i == canceledIndex ? StopRealTimeState.CANCELLED : StopRealTimeState.NO_DATA,
-        builder.getStopRealTimeState(i)
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
       );
     }
   }
@@ -134,13 +148,22 @@ class BackwardsDelayRequiredInterpolatorTest {
     );
     assertEquals(0, builder.getArrivalTime(0));
     assertEquals(0, builder.getDepartureTime(0));
-    assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(0));
+    assertEquals(
+      StopRealTimeState.NO_DATA,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(0)
+    );
     assertEquals(150, builder.getArrivalTime(1));
     assertEquals(150, builder.getDepartureTime(1));
-    assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(1));
+    assertEquals(
+      StopRealTimeState.NO_DATA,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(1)
+    );
     assertEquals(150, builder.getArrivalTime(2));
     assertNull(builder.getDepartureTime(2));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(2));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(2)
+    );
   }
 
   @Test
@@ -163,17 +186,26 @@ class BackwardsDelayRequiredInterpolatorTest {
     for (var i = 0; i < firstUpdateIndex; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.NO_DATA,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
     // the arrival should be fill in as well
     assertEquals(0, builder.getArrivalDelay(firstUpdateIndex));
     // TODO: It is not possible to specify NO_DATA just for the arrival yet
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(firstUpdateIndex));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(firstUpdateIndex)
+    );
     // nothing after the first given update should be touched
     for (var i = firstUpdateIndex + 1; i < STOP_COUNT; i++) {
       assertEquals(reference.getArrivalDelay(i), builder.getArrivalDelay(i));
       assertEquals(reference.getDepartureDelay(i), builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.DEFAULT,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
   }
 
@@ -189,10 +221,16 @@ class BackwardsDelayRequiredInterpolatorTest {
     );
     assertEquals(SCHEDULED_TRIP_TIMES.getScheduledArrivalTime(0), builder.getArrivalTime(0));
     assertEquals(10, builder.getDepartureTime(0));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(0)
+    );
     assertNull(builder.getArrivalTime(1));
     assertNull(builder.getDepartureTime(1));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(1)
+    );
   }
 
   @Test
@@ -212,10 +250,16 @@ class BackwardsDelayRequiredInterpolatorTest {
     );
     assertEquals(realTimeTime, builder.getArrivalTime(0));
     assertEquals(realTimeTime, builder.getDepartureTime(0));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(0)
+    );
     assertNull(builder.getArrivalTime(1));
     assertNull(builder.getDepartureTime(1));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(1)
+    );
   }
 
   @Test

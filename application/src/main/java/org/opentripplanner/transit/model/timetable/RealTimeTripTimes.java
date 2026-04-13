@@ -29,8 +29,6 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   private final int[] arrivalTimes;
   private final int[] departureTimes;
-  private final RealTimeState realTimeState;
-  private final StopRealTimeState[] stopRealTimeStates;
   private final BitSet extraCalls;
   private final BitSet hasArrived;
   private final BitSet hasDeparted;
@@ -39,22 +37,21 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   private final I18NString tripHeadsign;
 
   private final I18NString[] stopHeadsigns;
-  private final OccupancyStatus[] occupancyStatus;
   private final Accessibility wheelchairAccessibility;
+
+  private final TripRealTimeMetadata tripRealTimeMetadata;
 
   RealTimeTripTimes(RealTimeTripTimesBuilder builder) {
     scheduledTripTimes = builder.scheduledTripTimes();
     arrivalTimes = builder.arrivalTimes();
     departureTimes = builder.departureTimes();
-    realTimeState = builder.realTimeState();
-    stopRealTimeStates = builder.stopRealTimeStates();
     extraCalls = builder.extraCalls();
     tripHeadsign = builder.tripHeadsign();
     stopHeadsigns = builder.stopHeadsigns();
-    occupancyStatus = builder.occupancyStatus();
     wheelchairAccessibility = builder.wheelchairAccessibility();
     hasArrived = builder.hasArrived();
     hasDeparted = builder.hasDeparted();
+    tripRealTimeMetadata = builder.realTimeMetadataBuilder().build();
     validateNonIncreasingTimes();
   }
 
@@ -65,15 +62,13 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.scheduledTripTimes = scheduledTripTimes;
     this.arrivalTimes = original.arrivalTimes;
     this.departureTimes = original.departureTimes;
-    this.realTimeState = original.realTimeState;
-    this.stopRealTimeStates = original.stopRealTimeStates;
     this.extraCalls = original.extraCalls;
     this.tripHeadsign = original.tripHeadsign;
     this.stopHeadsigns = original.stopHeadsigns;
-    this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
     this.hasArrived = original.hasArrived;
     this.hasDeparted = original.hasDeparted;
+    this.tripRealTimeMetadata = original.tripRealTimeMetadata;
   }
 
   /**
@@ -86,15 +81,13 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       .build();
     this.arrivalTimes = IntUtils.shiftArray(timeShift, original.arrivalTimes);
     this.departureTimes = IntUtils.shiftArray(timeShift, original.departureTimes);
-    this.realTimeState = original.realTimeState;
-    this.stopRealTimeStates = original.stopRealTimeStates;
     this.extraCalls = original.extraCalls;
     this.tripHeadsign = original.tripHeadsign;
     this.stopHeadsigns = original.stopHeadsigns;
-    this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
     this.hasArrived = original.hasArrived;
     this.hasDeparted = original.hasDeparted;
+    this.tripRealTimeMetadata = original.tripRealTimeMetadata;
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -186,7 +179,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   }
 
   public boolean isCancelledStop(int stopPos) {
-    return isStopRealTimeStates(stopPos, StopRealTimeState.CANCELLED);
+    return tripRealTimeMetadata.hasStopRealTimeState(stopPos, StopRealTimeState.CANCELLED);
   }
 
   @Override
@@ -200,11 +193,14 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   }
 
   public boolean isNoDataStop(int stopPos) {
-    return isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA);
+    return tripRealTimeMetadata.hasStopRealTimeState(stopPos, StopRealTimeState.NO_DATA);
   }
 
   public boolean isPredictionInaccurate(int stopPos) {
-    return isStopRealTimeStates(stopPos, StopRealTimeState.INACCURATE_PREDICTIONS);
+    return tripRealTimeMetadata.hasStopRealTimeState(
+      stopPos,
+      StopRealTimeState.INACCURATE_PREDICTIONS
+    );
   }
 
   public boolean isExtraCall(int stopPos) {
@@ -213,8 +209,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   public boolean isRealTimeUpdated(int stopPos) {
     return (
-      realTimeState != RealTimeState.SCHEDULED &&
-      !isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA)
+      tripRealTimeMetadata.realTimeState() != RealTimeState.SCHEDULED &&
+      !tripRealTimeMetadata.hasStopRealTimeState(stopPos, StopRealTimeState.NO_DATA)
     );
   }
 
@@ -223,14 +219,12 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
    */
   @Override
   public OccupancyStatus getOccupancyStatus(int stopPos) {
-    if (this.occupancyStatus == null) {
-      return OccupancyStatus.NO_DATA_AVAILABLE;
-    }
-    return this.occupancyStatus[stopPos];
+    return tripRealTimeMetadata.getOccupancyStatusForStop(stopPos);
   }
 
-  OccupancyStatus[] copyOccupancyStatus() {
-    return occupancyStatus.clone();
+  @Override
+  public TripRealTimeMetadata getRealTimeMetadata() {
+    return tripRealTimeMetadata;
   }
 
   @Override
@@ -245,7 +239,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   @Override
   public boolean isScheduled() {
-    return realTimeState == RealTimeState.SCHEDULED;
+    return tripRealTimeMetadata.realTimeState() == RealTimeState.SCHEDULED;
   }
 
   @Override
@@ -255,17 +249,17 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   @Override
   public boolean isCanceled() {
-    return realTimeState == RealTimeState.CANCELED;
+    return tripRealTimeMetadata.realTimeState() == RealTimeState.CANCELED;
   }
 
   @Override
   public boolean isDeleted() {
-    return realTimeState == RealTimeState.DELETED;
+    return tripRealTimeMetadata.realTimeState() == RealTimeState.DELETED;
   }
 
   @Override
   public RealTimeState getRealTimeState() {
-    return realTimeState;
+    return tripRealTimeMetadata.realTimeState();
   }
 
   /**
@@ -354,20 +348,6 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return scheduledTripTimes.getTrip();
   }
 
-  StopRealTimeState[] copyStopRealTimeStates() {
-    return stopRealTimeStates.clone();
-  }
-
-  /**
-   * The real-time states for a given stops. If the state is DEFAULT for a stop,
-   * the {@link #getRealTimeState()} should determine the realtime state of the stop.
-   * <p>
-   * This is only for API-purposes (does not affect routing).
-   */
-  private boolean isStopRealTimeStates(int stopPos, StopRealTimeState state) {
-    return stopRealTimeStates != null && stopRealTimeStates[stopPos] == state;
-  }
-
   I18NString[] copyStopHeadsigns() {
     return stopHeadsigns.clone();
   }
@@ -385,11 +365,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&
       Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
       Objects.deepEquals(departureTimes, that.departureTimes) &&
-      realTimeState == that.realTimeState &&
-      Objects.deepEquals(stopRealTimeStates, that.stopRealTimeStates) &&
       Objects.equals(tripHeadsign, that.tripHeadsign) &&
       Objects.deepEquals(stopHeadsigns, that.stopHeadsigns) &&
-      Objects.deepEquals(occupancyStatus, that.occupancyStatus) &&
+      Objects.deepEquals(tripRealTimeMetadata, that.tripRealTimeMetadata) &&
       wheelchairAccessibility == that.wheelchairAccessibility
     );
   }
@@ -400,12 +378,10 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       scheduledTripTimes,
       Arrays.hashCode(arrivalTimes),
       Arrays.hashCode(departureTimes),
-      realTimeState,
-      Arrays.hashCode(stopRealTimeStates),
       tripHeadsign,
       Arrays.hashCode(stopHeadsigns),
-      Arrays.hashCode(occupancyStatus),
-      wheelchairAccessibility
+      wheelchairAccessibility,
+      tripRealTimeMetadata
     );
   }
 }

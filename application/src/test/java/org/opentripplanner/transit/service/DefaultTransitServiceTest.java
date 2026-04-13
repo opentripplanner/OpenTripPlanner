@@ -155,10 +155,13 @@ class DefaultTransitServiceTest {
     var deduplicator = new Deduplicator();
     var timetableRepository = new TimetableRepository(siteRepository);
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
-    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
-      .createRealTimeFromScheduledTimes()
-      .cancelTrip()
-      .build();
+    var canceledTripTimesBuilder = TripTimesFactory.tripTimes(
+      TRIP,
+      canceledStopTimes,
+      deduplicator
+    ).createRealTimeFromScheduledTimes();
+    canceledTripTimesBuilder.realTimeMetadataBuilder().cancelTrip();
+    var canceledTripTimes = canceledTripTimesBuilder.build();
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)

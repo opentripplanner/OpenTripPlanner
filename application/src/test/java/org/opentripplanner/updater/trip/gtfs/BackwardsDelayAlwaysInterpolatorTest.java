@@ -106,10 +106,16 @@ class BackwardsDelayAlwaysInterpolatorTest {
     );
     assertEquals(realTimeTime, builder.getArrivalTime(0));
     assertEquals(realTimeTime, builder.getDepartureTime(0));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(0));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(0)
+    );
     assertNull(builder.getArrivalTime(1));
     assertNull(builder.getDepartureTime(1));
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(1));
+    assertEquals(
+      StopRealTimeState.DEFAULT,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(1)
+    );
   }
 
   @Test

@@ -117,6 +117,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -272,12 +273,10 @@ class GraphQLIntegrationTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    var realTimeFromScheduledTimes = tripTimes2.createRealTimeFromScheduledTimes();
+    realTimeFromScheduledTimes.realTimeMetadataBuilder().cancelTrip();
     timetableSnapshot.update(
-      RealTimeTripUpdate.of(
-        pattern,
-        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
-        secondDate
-      ).build()
+      RealTimeTripUpdate.of(pattern, realTimeFromScheduledTimes.build(), secondDate).build()
     );
 
     var routes = Stream.concat(
@@ -558,6 +557,7 @@ class GraphQLIntegrationTest {
             builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
           }
 
+          builder.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
           return stl.copyOf().withTripTimes(builder.build()).build();
         }
         return tl;

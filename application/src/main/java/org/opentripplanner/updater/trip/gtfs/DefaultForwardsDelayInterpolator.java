@@ -33,11 +33,15 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
         firstRealUpdateSeen = true;
       }
       if (noTimeGiven) {
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.DEFAULT) {
-          builder.withStopRealTimeState(i, propagatedState);
+        if (
+          builder.realTimeMetadataBuilder().getStopRealTimeState(i) == StopRealTimeState.DEFAULT
+        ) {
+          builder.realTimeMetadataBuilder().withRealTimeStateAtStop(i, propagatedState);
         }
 
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.CANCELLED) {
+        if (
+          builder.realTimeMetadataBuilder().getStopRealTimeState(i) == StopRealTimeState.CANCELLED
+        ) {
           if (firstCanceledStop == null) {
             firstCanceledStop = i;
           }
@@ -49,7 +53,10 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
         // only fill in times for NO_DATA stops after the first updated stop
         // otherwise, it is the job of the backward interpolator to fill in the times backward
         // see bug https://github.com/opentripplanner/OpenTripPlanner/issues/7097 for details
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA && firstRealUpdateSeen) {
+        if (
+          builder.realTimeMetadataBuilder().getStopRealTimeState(i) == StopRealTimeState.NO_DATA &&
+          firstRealUpdateSeen
+        ) {
           // for NO_DATA stops, try to use the scheduled time. However, if the schedule time is
           // earlier than the delayed departure of the previous stop, we cannot set an earlier time
           // than that.
@@ -73,7 +80,10 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
       delay = builder.getArrivalDelay(i);
 
       if (builder.getDepartureDelay(i) == null) {
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA && firstRealUpdateSeen) {
+        if (
+          builder.realTimeMetadataBuilder().getStopRealTimeState(i) == StopRealTimeState.NO_DATA &&
+          firstRealUpdateSeen
+        ) {
           // for NO_DATA stops, try to use the scheduled time. However, if the schedule time is
           // earlier than the delayed arrival of this stop, we cannot set an earlier time
           // than that.
@@ -125,7 +135,7 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
       }
       firstCanceledStop = null;
 
-      var state = builder.getStopRealTimeState(i);
+      var state = builder.realTimeMetadataBuilder().getStopRealTimeState(i);
       // NO_DATA should be propagated per the spec, SKIPPED should not
       // GTFS does not support INACCURATE_PREDICTIONS, but I think it should be propagated as well
       if (state == StopRealTimeState.NO_DATA || state == StopRealTimeState.INACCURATE_PREDICTIONS) {

@@ -160,21 +160,35 @@ class ExtraCallTripBuilder {
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
+      CallWrapper call = calls.get(stopSequence);
       TimetableHelper.applyUpdates(
         departureDate,
         builder,
         stopSequence,
         stopSequence == (calls.size() - 1),
-        isJourneyPredictionInaccurate,
-        calls.get(stopSequence),
-        occupancy
+        call
+      );
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataAtStop(
+        builder.realTimeMetadataBuilder(),
+        stopSequence,
+        call,
+        occupancy,
+        isJourneyPredictionInaccurate
       );
     }
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      builder.cancelTrip();
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataForJourney(
+        builder.realTimeMetadataBuilder(),
+        null,
+        RealTimeState.CANCELED
+      );
     } else {
-      builder.withRealTimeState(RealTimeState.MODIFIED);
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataForJourney(
+        builder.realTimeMetadataBuilder(),
+        null,
+        RealTimeState.MODIFIED
+      );
     }
 
     /* Validate */

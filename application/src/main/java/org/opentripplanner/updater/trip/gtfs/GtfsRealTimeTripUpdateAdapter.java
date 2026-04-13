@@ -439,8 +439,8 @@ public class GtfsRealTimeTripUpdateAdapter {
           if (tripTimes != null && tripTimes.getRealTimeState() == RealTimeState.ADDED) {
             var builder = tripTimes.createRealTimeFromScheduledTimes();
             switch (cancelationType) {
-              case CANCEL -> builder.cancelTrip();
-              case DELETE -> builder.deleteTrip();
+              case CANCEL -> builder.realTimeMetadataBuilder().cancelTrip();
+              case DELETE -> builder.realTimeMetadataBuilder().deleteTrip();
             }
             return snapshotManager.updateBuffer(
               RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.serviceDate()).build()
@@ -463,8 +463,8 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     var builder = tripTimes.createRealTimeFromScheduledTimes();
     switch (cancelationType) {
-      case CANCEL -> builder.cancelTrip();
-      case DELETE -> builder.deleteTrip();
+      case CANCEL -> builder.realTimeMetadataBuilder().cancelTrip();
+      case DELETE -> builder.realTimeMetadataBuilder().deleteTrip();
     }
     return snapshotManager.updateBuffer(
       RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.serviceDate())

@@ -78,7 +78,7 @@ class DefaultForwardsDelayInterpolatorTest {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     builder.withArrivalDelay(3, 300);
     builder.withArrivalDelay(8, 60);
-    builder.withNoData(10);
+    builder.realTimeMetadataBuilder().withNoData(10);
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     // stops 0 to 2 are handled by the backwards propagator, which is outside the scope of the test
     for (var i = 3; i < 8; ++i) {
@@ -93,7 +93,7 @@ class DefaultForwardsDelayInterpolatorTest {
       // for NO_DATA stop, we assume that they run as scheduled in the internal model
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
-      assertEquals(NO_DATA, builder.getStopRealTimeState(i));
+      assertEquals(NO_DATA, builder.realTimeMetadataBuilder().getStopRealTimeState(i));
     }
     // we need to propagate backwards from stop 3 before building
     assertEquals(
@@ -123,7 +123,7 @@ class DefaultForwardsDelayInterpolatorTest {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     builder.withArrivalDelay(0, 450);
     builder.withDepartureDelay(0, 450);
-    builder.withNoData(1);
+    builder.realTimeMetadataBuilder().withNoData(1);
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     // for stop 1, the scheduled time is earlier than the delayed departure at stop 0
     assertNotEquals(0, builder.getArrivalDelay(1));
@@ -148,7 +148,7 @@ class DefaultForwardsDelayInterpolatorTest {
     ).createRealTimeWithoutScheduledTimes();
     builder.withArrivalDelay(0, 450);
     builder.withDepartureDelay(0, 450);
-    builder.withNoData(1);
+    builder.realTimeMetadataBuilder().withNoData(1);
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     // for stop 1, the scheduled arrival time is earlier than the delayed departure at stop 0
     assertNotEquals(0, builder.getArrivalDelay(1));
@@ -160,22 +160,28 @@ class DefaultForwardsDelayInterpolatorTest {
 
   @Test
   void noRealTimeIsProvided() {
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
-      .withCanceled(5)
-      .withInaccuratePredictions(7);
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
+    builder.realTimeMetadataBuilder().withCanceled(5);
+    builder.realTimeMetadataBuilder().withInaccuratePredictions(7);
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     for (var i = 0; i < STOP_COUNT; ++i) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
     }
     for (var i = 0; i < 5; ++i) {
-      assertEquals(DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(DEFAULT, builder.realTimeMetadataBuilder().getStopRealTimeState(i));
     }
-    assertEquals(StopRealTimeState.CANCELLED, builder.getStopRealTimeState(5));
+    assertEquals(
+      StopRealTimeState.CANCELLED,
+      builder.realTimeMetadataBuilder().getStopRealTimeState(5)
+    );
     // SKIPPED stop does not propagate
-    assertEquals(DEFAULT, builder.getStopRealTimeState(6));
+    assertEquals(DEFAULT, builder.realTimeMetadataBuilder().getStopRealTimeState(6));
     for (var i = 7; i < STOP_COUNT; ++i) {
-      assertEquals(StopRealTimeState.INACCURATE_PREDICTIONS, builder.getStopRealTimeState(i));
+      assertEquals(
+        StopRealTimeState.INACCURATE_PREDICTIONS,
+        builder.realTimeMetadataBuilder().getStopRealTimeState(i)
+      );
     }
     builder.build();
   }
@@ -183,7 +189,9 @@ class DefaultForwardsDelayInterpolatorTest {
   @Test
   void noDataOnly() {
     var interpolator = new DefaultForwardsDelayInterpolator();
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
+    builder
+      .realTimeMetadataBuilder()
       .withNoData(0)
       .withNoData(1)
       .withNoData(2)
@@ -198,7 +206,7 @@ class DefaultForwardsDelayInterpolatorTest {
       .forEach(i -> {
         assertEquals(0, builder.getArrivalDelay(i));
         assertEquals(0, builder.getDepartureDelay(i));
-        assertEquals(NO_DATA, builder.getStopRealTimeState(i));
+        assertEquals(NO_DATA, builder.realTimeMetadataBuilder().getStopRealTimeState(i));
       });
     assertNotNull(builder.build());
   }
@@ -207,6 +215,10 @@ class DefaultForwardsDelayInterpolatorTest {
   void canceledStops() {
     // Stops 4 to 10 takes 1800 seconds scheduled, 900 seconds actual
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalTime(3, 3000)
+      .withArrivalTime(10, 4200);
+    builder
+      .realTimeMetadataBuilder()
       .withCanceled(0)
       .withCanceled(1)
       .withCanceled(2)
@@ -216,9 +228,8 @@ class DefaultForwardsDelayInterpolatorTest {
       .withCanceled(8)
       .withCanceled(9)
       .withCanceled(18)
-      .withCanceled(19)
-      .withArrivalTime(3, 3000)
-      .withArrivalTime(10, 4200);
+      .withCanceled(19);
+
     assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
     // 0 to 2 should not be touched at all, it is the job for the backward interpolator
     assertNull(builder.getDepartureTime(0));

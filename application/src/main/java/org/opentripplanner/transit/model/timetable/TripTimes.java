@@ -186,6 +186,8 @@ public interface TripTimes<T extends TripTimes> extends Serializable, Comparable
    */
   OccupancyStatus getOccupancyStatus(int stopPos);
 
+  TripRealTimeMetadata getRealTimeMetadata();
+
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.
    * <p>

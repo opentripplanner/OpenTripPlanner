@@ -27,6 +27,7 @@ import org.opentripplanner.transit.model._data.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -64,16 +65,9 @@ class ScheduledTransitLegTest {
   private static final int GENERALIZED_COST = 980;
   private static final ZoneId ZONE_ID = ZoneIds.BERLIN;
   private static final Duration DELAY = Duration.ofMinutes(4);
-  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES =
-    TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .withDepartureTime(
-        BOARD_STOP_INDEX_IN_PATTERN,
-        TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
-      )
-      .build();
+  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES = makeRealTimeTripTimes();
   private static final ViaLocationType FROM_VIA_LOCATION_TYPE = ViaLocationType.PASS_THROUGH;
   private static final ViaLocationType TO_VIA_LOCATION_TYPE = ViaLocationType.VISIT;
-
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
@@ -82,7 +76,6 @@ class ScheduledTransitLegTest {
   private static final List<FareProduct> FARE_PRODUCTS = List.of(
     FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );
-
   private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
     .withTripTimes(REAL_TIME_TRIP_TIMES)
     .withTripPattern(PATTERN)
@@ -99,6 +92,15 @@ class ScheduledTransitLegTest {
     .withFromViaLocationType(FROM_VIA_LOCATION_TYPE)
     .withToViaLocationType(TO_VIA_LOCATION_TYPE)
     .build();
+
+  private static RealTimeTripTimes makeRealTimeTripTimes() {
+    var realTimeTripTimes = TRIP_TIMES.createRealTimeFromScheduledTimes().withDepartureTime(
+      BOARD_STOP_INDEX_IN_PATTERN,
+      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
+    );
+    realTimeTripTimes.realTimeMetadataBuilder().withRealTimeState(RealTimeState.UPDATED);
+    return realTimeTripTimes.build();
+  }
 
   @Test
   void testMinimalSetOfFieldsSet() {

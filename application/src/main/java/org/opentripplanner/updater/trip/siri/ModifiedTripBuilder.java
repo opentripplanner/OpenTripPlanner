@@ -133,15 +133,7 @@ class ModifiedTripBuilder {
       return cancelTrip(builder);
     }
 
-    applyUpdates(builder);
-
-    if (pattern.getStopPattern().equals(stopPattern)) {
-      // This is the first update, and StopPattern has not been changed
-      builder.withRealTimeState(RealTimeState.UPDATED);
-    } else {
-      // This update modified stopPattern
-      builder.withRealTimeState(RealTimeState.MODIFIED);
-    }
+    applyUpdates(builder, stopPattern);
 
     int numStopsInUpdate = builder.numberOfStops();
     int numStopsInPattern = pattern.numberOfStops();
@@ -174,7 +166,7 @@ class ModifiedTripBuilder {
    * Full cancellation of a trip.
    */
   private TripUpdate cancelTrip(RealTimeTripTimesBuilder builder) {
-    builder.cancelTrip();
+    builder.realTimeMetadataBuilder().cancelTrip();
     return new TripUpdate(pattern.getStopPattern(), builder.build(), serviceDate, dataSource);
   }
 
@@ -183,7 +175,7 @@ class ModifiedTripBuilder {
    * Precondition: the number of calls is equal to the number of stops in the pattern (this is
    * verified before calling this method).
    */
-  private void applyUpdates(RealTimeTripTimesBuilder builder) {
+  private void applyUpdates(RealTimeTripTimesBuilder builder, StopPattern stopPattern) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
@@ -218,12 +210,34 @@ class ModifiedTripBuilder {
         builder,
         stopIndex,
         stopIndex == (stopsInPattern.size() - 1),
-        predictionInaccurate,
+        matchingCall
+      );
+
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataAtStop(
+        builder.realTimeMetadataBuilder(),
+        stopIndex,
         matchingCall,
-        occupancy
+        occupancy,
+        predictionInaccurate
       );
 
       alreadyVisited.add(matchingCall);
+    }
+
+    if (pattern.getStopPattern().equals(stopPattern)) {
+      // This is the first update, and StopPattern has not been changed
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataForJourney(
+        builder.realTimeMetadataBuilder(),
+        null,
+        RealTimeState.UPDATED
+      );
+    } else {
+      // This update modified stopPattern
+      SiriRealTimeMetadataHelper.updateRealTimeMetadataForJourney(
+        builder.realTimeMetadataBuilder(),
+        null,
+        RealTimeState.MODIFIED
+      );
     }
   }
 
