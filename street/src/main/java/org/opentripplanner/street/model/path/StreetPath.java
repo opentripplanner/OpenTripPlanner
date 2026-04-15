@@ -76,10 +76,9 @@ public class StreetPath {
       .stream()
       .filter(Edge::includeGeometryInPath)
       .map(Edge::getGeometry)
-      .filter(Objects::nonNull)
-      .toList();
+      .filter(Objects::nonNull);
 
-    return GeometryUtils.concatenateLineStrings(geometries);
+    return GeometryUtils.concatenateLineStrings(geometries::iterator);
   }
 
   /// Get all the states of this path
@@ -87,7 +86,7 @@ public class StreetPath {
     return states;
   }
 
-  /// Get the last state in the patn
+  /// Get the last state in the path
   public State lastState() {
     return states.getLast();
   }

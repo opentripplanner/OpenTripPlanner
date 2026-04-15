@@ -148,14 +148,16 @@ public final class CompactLineStringUtils {
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
     int intermediateCount = coords == null ? 0 : coords.length / 2;
-    Coordinate[] c = new Coordinate[intermediateCount + 2];
-    c[0] = new Coordinate(x0, y0);
+    double[] c = new double[(intermediateCount + 2) * 2];
+    c[0] = x0;
+    c[1] = y0;
     if (coords != null) {
       int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
       int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
-      decodeDeltaCoordinates(coords, c, 1, oix, oiy);
+      decodeDeltaCoordinates(coords, c, 2, oix, oiy);
     }
-    c[c.length - 1] = new Coordinate(x1, y1);
+    c[c.length - 2] = x1;
+    c[c.length - 1] = y1;
     LineString out = GeometryUtils.makeLineString(c);
     return reverse ? out.reverse() : out;
   }
@@ -167,26 +169,26 @@ public final class CompactLineStringUtils {
   public static LineString uncompactLineString(byte[] packedCoords, boolean reverse) {
     int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
     if (coords == null || coords.length == 0) {
-      return GeometryUtils.makeLineString(new Coordinate[0]);
+      return GeometryUtils.makeLineString(new double[0]);
     }
-    Coordinate[] c = new Coordinate[coords.length / 2];
+    double[] c = new double[coords.length];
     decodeDeltaCoordinates(coords, c, 0, 0, 0);
     LineString out = GeometryUtils.makeLineString(c);
     return reverse ? out.reverse() : out;
   }
 
   /**
-   * Decode delta-encoded coordinate pairs into a Coordinate array.
+   * Decode delta-encoded coordinate pairs into a flat double array.
    *
    * @param coords  Delta-encoded int pairs [dx0, dy0, dx1, dy1, ...]
-   * @param out     Target array to write decoded coordinates into
+   * @param out     Target array to write decoded coordinates into (flat: [x0, y0, x1, y1, ...])
    * @param offset  Starting index in {@code out} to write to
    * @param oix     Initial x in fixed-point (start of delta chain)
    * @param oiy     Initial y in fixed-point (start of delta chain)
    */
   private static void decodeDeltaCoordinates(
     int[] coords,
-    Coordinate[] out,
+    double[] out,
     int offset,
     int oix,
     int oiy
@@ -195,7 +197,8 @@ public final class CompactLineStringUtils {
     for (int i = 0; i < count; i++) {
       int ix = oix + coords[i * 2];
       int iy = oiy + coords[i * 2 + 1];
-      out[offset + i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
+      out[offset + i * 2] = ix / FIXED_FLOAT_MULT;
+      out[offset + i * 2 + 1] = iy / FIXED_FLOAT_MULT;
       oix = ix;
       oiy = iy;
     }
