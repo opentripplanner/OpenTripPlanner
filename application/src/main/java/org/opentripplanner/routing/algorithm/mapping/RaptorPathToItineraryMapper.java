@@ -168,7 +168,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .egress()
       .findOriginal(RoutingAccessEgress.class)
       .stream()
-      .anyMatch(leg -> leg.getFinalState().isRentingVehicleFromStation());
+      .anyMatch(leg -> leg.getFinalStates().getFirst().isRentingVehicleFromStation());
     builder.withArrivedAtDestinationWithRentedVehicle(arrivedOnRental);
 
     if (optimizedPath != null) {
@@ -477,12 +477,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     RaptorAccessEgress accessEgress,
     ZonedDateTime startTime
   ) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
-      .map(RoutingAccessEgress::getFinalState)
-      .map(StreetPath::new)
-      .map(path -> streetPathToLegsMapper.map(path, request, startTime))
-      .orElseThrow();
+    var routingAccessEgress = accessEgress.findOriginal(RoutingAccessEgress.class).orElseThrow();
+    var paths = routingAccessEgress.getFinalStates().stream().map(StreetPath::new).toList();
+    var delay = Duration.between(paths.getFirst().startTime(), startTime);
+    return paths
+      .stream()
+      .flatMap(path -> streetPathToLegsMapper.map(path, request, delay).stream())
+      .toList();
   }
 
   private TimeAndCost mapAccessEgressPenalty(RaptorAccessEgress accessEgress) {
