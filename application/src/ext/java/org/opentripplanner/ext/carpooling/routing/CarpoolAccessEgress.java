@@ -270,13 +270,13 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * other walk.
    */
   @Override
-  public State getFinalState() {
+  public List<State> getFinalStates() {
     if (startLabel.stop() != null) {
       var firstSegment = walkToPickup() != null ? walkToPickup() : sharedSegments().getFirst();
-      return firstSegment.states.getFirst();
+      return List.of(firstSegment.states.getFirst());
     }
     var lastSegment = walkFromDropoff() != null ? walkFromDropoff() : sharedSegments().getLast();
-    return lastSegment.states.getLast();
+    return List.of(lastSegment.states.getLast());
   }
 
   /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */
