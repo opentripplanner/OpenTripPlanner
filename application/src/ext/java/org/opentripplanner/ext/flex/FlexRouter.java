@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -144,7 +145,8 @@ public class FlexRouter {
     for (DirectFlexPath it : directFlexPaths) {
       var startTime = startOfTime.plusSeconds(it.startTime());
       var path = new StreetPath(it.state());
-      var legs = streetPathToLegsMapper.map(path, request, startTime);
+      var delay = Duration.between(path.startTime(), startTime);
+      var legs = streetPathToLegsMapper.map(path, request, delay);
       var itinerary = LegsToItineraryMapper.map(legs, false, path.calculateElevations());
       itinerary.ifPresent(itineraries::add);
     }
