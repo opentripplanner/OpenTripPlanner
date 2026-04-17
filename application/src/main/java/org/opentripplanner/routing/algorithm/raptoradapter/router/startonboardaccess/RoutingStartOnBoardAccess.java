@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess;
 
+import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
@@ -69,8 +70,8 @@ public final class RoutingStartOnBoardAccess
    * On-board access has no street state since it does not originate from a street search.
    */
   @Override
-  public State getFinalState() {
-    return null;
+  public List<State> getFinalStates() {
+    return List.of();
   }
 
   @Override
