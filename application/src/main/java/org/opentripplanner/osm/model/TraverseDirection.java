@@ -10,22 +10,24 @@ public enum TraverseDirection {
   /**
    * Traverse in the direction the way is defined, from the beginning node to the end node.
    */
-  FORWARD,
+  FORWARD(":forward"),
   /**
    * Traverse against the direction the way is defined, from the end node to the beginning node.
    */
-  BACKWARD,
+  BACKWARD(":backward"),
   /**
    * Traverse not in a specific direction of the way, for example, across an area or through a node.
    */
-  DIRECTIONLESS;
+  DIRECTIONLESS("");
+
+  private final String tagSuffix;
+
+  TraverseDirection(String tagSuffix) {
+    this.tagSuffix = tagSuffix;
+  }
 
   public String tagSuffix() {
-    if (this == DIRECTIONLESS) {
-      return "";
-    }
-
-    return ":" + name().toLowerCase();
+    return tagSuffix;
   }
 
   public TraverseDirection reverse() {

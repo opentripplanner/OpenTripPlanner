@@ -84,8 +84,7 @@ public class GraphBuilderModules {
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
-          config.osmCacheDataInMem,
-          issueStore
+          config.osmCacheDataInMem
         )
       );
     }

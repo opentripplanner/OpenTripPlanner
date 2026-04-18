@@ -144,8 +144,9 @@ public abstract class OsmEntity {
     "bicycle",
     "vehicle"
   );
-  public static final Set<String> NO_ACCESS_TAGS = Set.of("no", "license", "dismount");
-  public static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION =
+  private static final Set<String> WALK_ONLY_HIGHWAYS = Set.of("footway", "step", "corridor");
+  private static final Set<String> NO_ACCESS_TAGS = Set.of("no", "license", "dismount");
+  private static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION =
     Map.of(
       StreetTraversalPermission.CAR,
       "motorcar",
@@ -341,7 +342,7 @@ public abstract class OsmEntity {
   @Nullable
   public String getTag(String tag) {
     tag = tag.toLowerCase();
-    if (tags != null && tags.containsKey(tag)) {
+    if (tags != null) {
       return tags.get(tag);
     }
     return null;
@@ -516,7 +517,12 @@ public abstract class OsmEntity {
    * Takes a tag key and checks if the value is any of those in {@code oneOfTags}.
    */
   public boolean isOneOfTags(String key, Set<String> oneOfTags) {
-    return oneOfTags.stream().anyMatch(value -> isTag(key, value));
+    var value = getTag(key);
+    if (value == null) {
+      return false;
+    } else {
+      return oneOfTags.contains(value);
+    }
   }
 
   /**
@@ -658,7 +664,7 @@ public abstract class OsmEntity {
       return Optional.empty();
     }
 
-    if ("foot".equals(mode) && !isOneOfTags("highway", Set.of("footway", "step", "corridor"))) {
+    if ("foot".equals(mode) && !isOneOfTags("highway", WALK_ONLY_HIGHWAYS)) {
       return Optional.empty();
     }
 

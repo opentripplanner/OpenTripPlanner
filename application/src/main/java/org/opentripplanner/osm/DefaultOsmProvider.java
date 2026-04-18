@@ -3,14 +3,12 @@ package org.opentripplanner.osm;
 import crosby.binary.file.BlockInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneId;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
@@ -41,21 +39,14 @@ public class DefaultOsmProvider implements OsmProvider {
 
   /** For tests */
   public DefaultOsmProvider(File file, boolean cacheDataInMem) {
-    this(
-      new FileDataSource(file, FileType.OSM),
-      OsmTagMapperSource.DEFAULT,
-      null,
-      cacheDataInMem,
-      DataImportIssueStore.NOOP
-    );
+    this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
   }
 
   public DefaultOsmProvider(
     DataSource dataSource,
     OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
-    boolean cacheDataInMem,
-    DataImportIssueStore issueStore
+    boolean cacheDataInMem
   ) {
     this.source = dataSource;
     this.zoneId = zoneId;
@@ -102,21 +93,12 @@ public class DefaultOsmProvider implements OsmProvider {
     return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
   }
 
-  private void parsePhase(OsmParser parser, OsmParserPhase phase) throws IOException {
+  private void parsePhase(OsmParser parser, OsmParserPhase phase) {
     parser.setPhase(phase);
-    BlockInputStream in = null;
-    try {
-      in = new BlockInputStream(createInputStream(phase), parser);
+    try (BlockInputStream in = new BlockInputStream(createInputStream(phase), parser)) {
       in.process();
-    } finally {
-      // Close
-      try {
-        if (in != null) {
-          in.close();
-        }
-      } catch (Exception e) {
-        LOG.error(e.getMessage(), e);
-      }
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
     }
   }
 
