@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.model.GraphPath;
@@ -97,19 +98,15 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
-   * Generates a TripPlan from a set of paths
+   * Generates a TripPlan from a path
    */
-  public List<Itinerary> mapItineraries(List<StreetPath> paths, RouteRequest request) {
-    List<Itinerary> itineraries = new LinkedList<>();
-    for (var path : paths) {
-      Itinerary itinerary = generateItinerary(path, request);
-      if (itinerary.legs().isEmpty()) {
-        continue;
-      }
-      itineraries.add(itinerary);
+  public Optional<Itinerary> mapToItinerary(StreetPath path, RouteRequest request) {
+    Itinerary itinerary = generateItinerary(path, request);
+    if (itinerary.legs().isEmpty()) {
+      return Optional.empty();
     }
 
-    return itineraries;
+    return Optional.of(itinerary);
   }
 
   /**

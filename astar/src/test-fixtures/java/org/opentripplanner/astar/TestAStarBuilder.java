@@ -2,7 +2,7 @@ package org.opentripplanner.astar;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -48,7 +48,7 @@ public class TestAStarBuilder
     return build().getShortestPathTree();
   }
 
-  public List<GraphPath<TestState, TestEdge, TestVertex>> getPathsToTarget() {
-    return build().getPathsToTarget();
+  public Optional<GraphPath<TestState, TestEdge, TestVertex>> getPathToTarget() {
+    return build().getPathToTarget();
   }
 }

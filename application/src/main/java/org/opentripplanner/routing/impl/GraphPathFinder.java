@@ -3,6 +3,7 @@ package org.opentripplanner.routing.impl;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -67,7 +68,7 @@ public class GraphPathFinder {
    * This no longer does "trip banning" to find multiple itineraries. It just searches once trying
    * to find a non-transit path.
    */
-  public List<StreetPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
+  public Optional<StreetPath> getPath(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
     StreetPreferences preferences = request.preferences().street();
 
     StreetSearchBuilder streetSearch = StreetSearchBuilder.of()
@@ -94,20 +95,21 @@ public class GraphPathFinder {
     long searchBeginTime = System.currentTimeMillis();
     LOG.debug("BEGIN SEARCH");
 
-    var paths = streetSearch.getPathsToTarget();
+    var path = streetSearch.getPathToTarget();
 
-    LOG.debug("we have {} paths", paths.size());
+    if (path.isPresent()) {
+      LOG.debug("Found a path");
+    } else {
+      LOG.debug("Found no paths");
+    }
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    return paths;
+    return path;
   }
 
   /**
-   * Try to find N paths through the Graph
+   * Try to find a path through the Graph
    */
-  public List<StreetPath> graphPathFinderEntryPoint(
-    RouteRequest request,
-    LinkingContext linkingContext
-  ) {
+  public StreetPath graphPathFinderEntryPoint(RouteRequest request, LinkingContext linkingContext) {
     return graphPathFinderEntryPoint(
       request,
       linkingContext.findVertices(request.from()),
@@ -115,7 +117,7 @@ public class GraphPathFinder {
     );
   }
 
-  public List<StreetPath> graphPathFinderEntryPoint(
+  public StreetPath graphPathFinderEntryPoint(
     RouteRequest request,
     Set<Vertex> from,
     Set<Vertex> to
@@ -123,40 +125,42 @@ public class GraphPathFinder {
     OTPRequestTimeoutException.checkForTimeout();
     var reqTime = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
 
-    var paths = getPaths(request, from, to);
+    var path = getPath(request, from, to).orElseThrow(() -> {
+      logNoPathsFound(request);
+      return new PathNotFoundException();
+    });
 
     // Detect and report that most obnoxious of bugs: path reversal asymmetry.
-    // Removing paths might result in an empty list, so do this check before the empty list check.
-    var gpi = paths.iterator();
-    while (gpi.hasNext()) {
-      var graphPath = gpi.next();
-      // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-      if (request.arriveBy()) {
-        if (graphPath.endTimeAccurate().isAfter(reqTime)) {
-          LOG.error(
-            "A graph path arrives {} after the requested time {}. This implies a bug.",
-            graphPath.endTimeAccurate(),
-            reqTime
-          );
-          gpi.remove();
-        }
-      } else {
-        if (graphPath.startTimeAccurate().isBefore(reqTime)) {
-          LOG.error(
-            "A graph path leaves {} before the requested time {}. This implies a bug.",
-            graphPath.startTimeAccurate(),
-            reqTime
-          );
-          gpi.remove();
-        }
+    // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
+    if (request.arriveBy()) {
+      if (path.endTimeAccurate().isAfter(reqTime)) {
+        LOG.error(
+          "A street path arrives {} after the requested time {}. This implies a bug.",
+          path.endTimeAccurate(),
+          reqTime
+        );
+        logAndThrowNoPathsFound(request);
+      }
+    } else {
+      if (path.startTimeAccurate().isBefore(reqTime)) {
+        LOG.error(
+          "A street path leaves {} before the requested time {}. This implies a bug.",
+          path.startTimeAccurate(),
+          reqTime
+        );
+        logAndThrowNoPathsFound(request);
       }
     }
 
-    if (paths.isEmpty()) {
-      LOG.debug("Path not found: {} : {}", request.from(), request.to());
-      throw new PathNotFoundException();
-    }
+    return path;
+  }
 
-    return paths;
+  private void logNoPathsFound(RouteRequest request) {
+    LOG.debug("Path not found: {} : {}", request.from(), request.to());
+  }
+
+  private void logAndThrowNoPathsFound(RouteRequest request) {
+    logNoPathsFound(request);
+    throw new PathNotFoundException();
   }
 }

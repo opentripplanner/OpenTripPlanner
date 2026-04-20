@@ -6,6 +6,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -105,12 +106,6 @@ public class CarpoolStreetRouter implements CarpoolRouter {
       .withFrom(fromVertex)
       .withTo(toVertex);
 
-    var paths = streetSearch.getPathsToTarget();
-
-    if (paths.isEmpty()) {
-      return null;
-    }
-
-    return paths.getFirst().toGraphPath();
+    return streetSearch.getPathToTarget().map(StreetPath::toGraphPath).orElse(null);
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
@@ -11,31 +10,25 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 
 public class ItinerariesHelper {
 
-  public static List<Itinerary> decorateItinerariesWithRequestData(
-    List<Itinerary> itineraries,
+  public static Itinerary decorateItineraryWithRequestData(
+    Itinerary itinerary,
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences
   ) {
     if (!wheelchairEnabled) {
-      return itineraries;
+      return itinerary;
     }
-    var result = new ArrayList<Itinerary>();
-    boolean dirty = false;
 
-    for (Itinerary it : itineraries) {
-      // Communicate the fact that the only way we were able to get a response
-      // was by removing a slope limit.
-      OptionalDouble maxSlope = getMaxSlope(it);
-      if (maxSlope.isPresent()) {
-        dirty = true;
-        itineraries.add(
-          it.copyOf().withMaxSlope(wheelchairPreferences.maxSlope(), maxSlope.getAsDouble()).build()
-        );
-      } else {
-        result.add(it);
-      }
+    // Communicate the fact that the only way we were able to get a response
+    // was by removing a slope limit.
+    OptionalDouble maxSlope = getMaxSlope(itinerary);
+    if (maxSlope.isPresent()) {
+      return itinerary
+        .copyOf()
+        .withMaxSlope(wheelchairPreferences.maxSlope(), maxSlope.getAsDouble())
+        .build();
     }
-    return dirty ? result : itineraries;
+    return itinerary;
   }
 
   private static OptionalDouble getMaxSlope(Itinerary it) {

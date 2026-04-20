@@ -278,14 +278,9 @@ public class OsmModuleTest {
     Vertex topV = graph.getVertex(VertexLabel.osm(559271124));
 
     GraphPathFinder graphPathFinder = new GraphPathFinder();
-    var pathList = graphPathFinder.graphPathFinderEntryPoint(
-      request,
-      Set.of(bottomV),
-      Set.of(topV)
-    );
+    var path = graphPathFinder.graphPathFinderEntryPoint(request, Set.of(bottomV), Set.of(topV));
 
-    assertNotNull(pathList);
-    assertFalse(pathList.isEmpty());
+    assertNotNull(path);
   }
 
   private record VertexPair(Vertex v0, Vertex v1) {}

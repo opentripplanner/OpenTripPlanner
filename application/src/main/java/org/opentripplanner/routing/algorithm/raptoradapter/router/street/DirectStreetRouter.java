@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -23,19 +22,22 @@ import org.opentripplanner.street.model.StreetMode;
  */
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(
+  /**
+   * @return a direct street itinerary.
+   */
+  public static Optional<Itinerary> route(
     OtpServerRequestContext serverContext,
     RouteRequest request,
     LinkingContext linkingContext
   ) {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
-      return Collections.emptyList();
+      return Optional.empty();
     }
     OTPRequestTimeoutException.checkForTimeout();
     try {
       var maxCarSpeed = serverContext.streetLimitationParametersService().maxCarSpeed();
       if (!straightLineDistanceIsWithinLimit(request, maxCarSpeed, linkingContext)) {
-        return Collections.emptyList();
+        return Optional.empty();
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
@@ -53,15 +55,16 @@ public class DirectStreetRouter {
         serverContext.streetDetailsService(),
         serverContext.graph().ellipsoidToGeoidDifference
       );
-      List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths, request);
-      response = ItinerariesHelper.decorateItinerariesWithRequestData(
-        response,
-        request.journey().wheelchair(),
-        request.preferences().wheelchair()
+      var response = graphPathToItineraryMapper.mapToItinerary(paths, request);
+      return response.map(itinerary ->
+        ItinerariesHelper.decorateItineraryWithRequestData(
+          itinerary,
+          request.journey().wheelchair(),
+          request.preferences().wheelchair()
+        )
       );
-      return response;
     } catch (PathNotFoundException e) {
-      return Collections.emptyList();
+      return Optional.empty();
     }
   }
 
