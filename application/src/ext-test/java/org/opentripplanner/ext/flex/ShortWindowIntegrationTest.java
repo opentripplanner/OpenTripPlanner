@@ -26,7 +26,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -110,8 +110,7 @@ public class ShortWindowIntegrationTest {
   }
 
   private static RoutingResponse getItineraries(GenericLocation from, GenericLocation to) {
-
-     RouteRequest request = RouteRequest.of()
+    RouteRequest request = RouteRequest.of()
       .withDateTime(TIME)
       .withFrom(from)
       .withTo(to)
@@ -129,6 +128,5 @@ public class ShortWindowIntegrationTest {
       .buildRequest();
 
     return service.route(request);
-
   }
 }
