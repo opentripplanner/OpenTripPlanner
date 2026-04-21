@@ -14,9 +14,13 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
@@ -278,18 +282,29 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
-  @Test
-  void makeSureEmissionDecoratorIsAddedToTheFilterChainTest() {
+  @ParameterizedTest
+  @MethodSource("testDecoratorCases")
+  void testDecorator(boolean debug) {
     final Box<String> state = Box.of("I");
     ItineraryDecorator emissionDecorator = it -> {
       state.modify(v -> v + "+C");
       return it;
     };
-    createBuilder(false, false, 10)
+    var result = createBuilder(false, debug, 10)
       .withEmissions(emissionDecorator)
       .build()
       .filter(List.of(i1, i2));
-    assertEquals("I+C+C", state.get());
+
+    assertEquals(toStr(debug ? List.of(i1, i2) : List.of(i1)), toStr(result));
+    // the decorator should not run on deleted itineraries
+    assertEquals(debug ? "I+C+C" : "I+C", state.get());
+  }
+
+  public static Stream<Arguments> testDecoratorCases() {
+    return Stream.of(
+      Arguments.argumentSet("normal filter", false),
+      Arguments.argumentSet("debug filter", true)
+    );
   }
 
   @Nested

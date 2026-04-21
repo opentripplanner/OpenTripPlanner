@@ -38,7 +38,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveOtherThanSameLegsMaxGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DecorateFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimit;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
@@ -519,28 +518,27 @@ public class ItineraryListFilterChainBuilder {
     // Do the final itineraries sort
     addSort(filters, SortOrderComparator.comparator(sortOrder));
 
+    List<ItineraryDecorator> decorators = new ArrayList<>();
+
     // Decorate itineraries
     {
       if (transitAlertService != null) {
-        addDecorateFilter(
-          filters,
-          new DecorateTransitAlert(transitAlertService, getMultiModalStation)
-        );
+        decorators.add(new DecorateTransitAlert(transitAlertService, getMultiModalStation));
       }
 
       // Sandbox filters to decorate itineraries
 
       if (accessibilityScore) {
         // TODO: This should be injected to avoid circular dependencies (dep. on sandbox here)
-        addDecorateFilter(filters, new DecorateWithAccessibilityScore(wheelchairMaxSlope));
+        decorators.add(new DecorateWithAccessibilityScore(wheelchairMaxSlope));
       }
 
       if (emissionDecorator != null) {
-        addDecorateFilter(filters, emissionDecorator);
+        decorators.add(emissionDecorator);
       }
 
       if (fareDecorator != null) {
-        addDecorateFilter(filters, fareDecorator);
+        decorators.add(fareDecorator);
       }
 
       if (rideHailingDecorator != null) {
@@ -548,7 +546,7 @@ public class ItineraryListFilterChainBuilder {
       }
 
       if (stopConsolidationDecorator != null) {
-        addDecorateFilter(filters, stopConsolidationDecorator);
+        decorators.add(stopConsolidationDecorator);
       }
     }
 
@@ -559,7 +557,12 @@ public class ItineraryListFilterChainBuilder {
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .build();
 
-    return new ItineraryListFilterChain(filters, debugHandler, pageCursorInputAggregator);
+    return new ItineraryListFilterChain(
+      filters,
+      decorators,
+      debugHandler,
+      pageCursorInputAggregator
+    );
   }
 
   public ItineraryListFilterChainBuilder withFilterDirectFlexBySearchWindow(boolean b) {
@@ -657,13 +660,6 @@ public class ItineraryListFilterChainBuilder {
     RemoveItineraryFlagger removeFilter
   ) {
     filters.add(new RemoveFilter(removeFilter));
-  }
-
-  private static void addDecorateFilter(
-    List<ItineraryListFilter> filters,
-    ItineraryDecorator decorator
-  ) {
-    filters.add(new DecorateFilter(decorator));
   }
 
   private RemoveItineraryFlagger createMaxLimitFilter(String filterName, int maxLimit) {
