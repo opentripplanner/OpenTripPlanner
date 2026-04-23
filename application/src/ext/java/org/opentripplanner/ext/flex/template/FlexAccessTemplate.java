@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.flex.template;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -25,7 +25,7 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
     int alightStopPosition,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    Duration maxTransferDuration
+    FlexParameters parameters
   ) {
     super(
       trip,
@@ -35,7 +35,7 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       alightStopPosition,
       date,
       calculator,
-      maxTransferDuration
+      parameters
     );
   }
 
@@ -90,7 +90,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       boardStopPosition,
       alightStopPosition,
       serviceDate,
-      flexPath
+      flexPath,
+      flexParameters
     );
   }
 }

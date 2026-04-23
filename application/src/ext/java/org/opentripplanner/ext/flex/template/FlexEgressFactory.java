@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.flex.template;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -18,12 +18,12 @@ public class FlexEgressFactory {
   public FlexEgressFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator pathCalculator,
-    Duration maxTransferDuration,
+    FlexParameters flexParameters,
     Matcher<Trip> matcher
   ) {
     this.callbackService = callbackService;
     this.matcher = matcher;
-    this.templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
+    this.templateFactory = FlexTemplateFactory.of(pathCalculator, flexParameters);
   }
 
   public List<FlexAccessEgress> createFlexEgresses(

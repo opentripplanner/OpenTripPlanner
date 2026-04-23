@@ -32,7 +32,8 @@ class FlexibleTransitLegTest implements PlanTestConstants {
     1,
     2,
     LocalDate.of(2025, 1, 15),
-    new FlexPath(1000, 600, () -> GeometryUtils.makeLineString(1, 1, 2, 2))
+    new FlexPath(1000, 600, () -> GeometryUtils.makeLineString(1, 1, 2, 2)),
+    FlexParameters.defaultValues()
   );
   private static final TransitAlert ALERT = TransitAlert.of(id("alert"))
     .withHeaderText(I18NString.of("alert 1"))

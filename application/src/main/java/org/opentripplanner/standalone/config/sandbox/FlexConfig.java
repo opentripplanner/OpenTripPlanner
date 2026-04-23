@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class FlexConfig implements FlexParameters {
@@ -20,18 +21,17 @@ public class FlexConfig implements FlexParameters {
     if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
     services.
     """;
+  public static final String AREA_STOP_DESCRIPTION = """
+    Area stops is the internal OTP name. In GTFS they are called "locations" and
+    NeTEx FlexibleArea.
+    """;
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;
   private final Duration maxAccessWalkDuration;
   private final Duration maxEgressWalkDuration;
-
-  private FlexConfig() {
-    maxTransferDuration = Duration.ofMinutes(5);
-    maxFlexTripDuration = Duration.ofMinutes(45);
-    maxAccessWalkDuration = Duration.ofMinutes(45);
-    maxEgressWalkDuration = Duration.ofMinutes(45);
-  }
+  private final Cost areaStopAlightCost;
+  private final Cost areaStopBoardCost;
 
   public FlexConfig(NodeAdapter root, String parameterName) {
     var json = root
@@ -87,6 +87,27 @@ public class FlexConfig implements FlexParameters {
       )
       .description(ACCESS_EGRESS_DESCRIPTION)
       .asDuration(DEFAULT.maxEgressWalkDuration());
+
+    var areaStop = json
+      .of("areaStops")
+      .summary(
+        "Configuration properties for area stops. These stops are called 'locations' in GTFS and 'flexible stops' in NeTEx."
+      )
+      .asObject();
+    areaStopBoardCost = Cost.costOfSeconds(
+      areaStop
+        .of("boardCost")
+        .summary("Cost to board an area stop, in seconds.")
+        .description(AREA_STOP_DESCRIPTION)
+        .asInt(DEFAULT.areaStopBoardCost().toSeconds())
+    );
+    areaStopAlightCost = Cost.costOfSeconds(
+      areaStop
+        .of("alightCost")
+        .summary("Cost to alight an area stop, in seconds.")
+        .description(AREA_STOP_DESCRIPTION)
+        .asInt(DEFAULT.areaStopAlightCost().toSeconds())
+    );
   }
 
   public Duration maxFlexTripDuration() {
@@ -103,5 +124,15 @@ public class FlexConfig implements FlexParameters {
 
   public Duration maxEgressWalkDuration() {
     return maxEgressWalkDuration;
+  }
+
+  @Override
+  public Cost areaStopBoardCost() {
+    return areaStopBoardCost;
+  }
+
+  @Override
+  public Cost areaStopAlightCost() {
+    return areaStopAlightCost;
   }
 }

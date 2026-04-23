@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.flex.template;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -17,19 +17,19 @@ import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 class FlexTemplateFactory {
 
   private final FlexPathCalculator calculator;
-  private final Duration maxTransferDuration;
+  private final FlexParameters params;
   private NearbyStop nearbyStop;
   private int stopPos;
   private FlexTrip<?, ?> trip;
   private FlexServiceDate date;
 
-  private FlexTemplateFactory(FlexPathCalculator calculator, Duration maxTransferDuration) {
+  private FlexTemplateFactory(FlexPathCalculator calculator, FlexParameters params) {
     this.calculator = Objects.requireNonNull(calculator);
-    this.maxTransferDuration = Objects.requireNonNull(maxTransferDuration);
+    this.params = Objects.requireNonNull(params);
   }
 
-  static FlexTemplateFactory of(FlexPathCalculator calculator, Duration maxTransferDuration) {
-    return new FlexTemplateFactory(calculator, maxTransferDuration);
+  static FlexTemplateFactory of(FlexPathCalculator calculator, FlexParameters flexParameters) {
+    return new FlexTemplateFactory(calculator, flexParameters);
   }
 
   List<FlexAccessTemplate> createAccessTemplates(ClosestTrip closestTrip) {
@@ -133,7 +133,7 @@ class FlexTemplateFactory {
       alightStopPosition,
       date,
       setupCalculator(flexTrip),
-      maxTransferDuration
+      params
     );
   }
 
@@ -151,7 +151,7 @@ class FlexTemplateFactory {
       alightStopPosition,
       date,
       setupCalculator(flexTrip),
-      maxTransferDuration
+      params
     );
   }
 
