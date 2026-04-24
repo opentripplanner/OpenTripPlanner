@@ -3,12 +3,11 @@ package org.opentripplanner.graph_builder.module.nearbystops;
 import java.time.Duration;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.service.TransitService;
 
 public class StraightLineNearbyStopFinder implements NearbyStopFinder {
@@ -29,12 +28,7 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
    * Find nearby stops using straight line distance.
    */
   @Override
-  public List<NearbyStop> findNearbyStops(
-    Vertex vertex,
-    RouteRequest routingRequest,
-    StreetMode streetMode,
-    boolean reverseDirection
-  ) {
+  public List<NearbyStop> findNearbyStops(Vertex vertex, StreetSearchRequest request) {
     return findNearbyStopsViaDirectTransfers(vertex);
   }
 

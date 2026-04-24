@@ -14,6 +14,8 @@ import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.service.TransitService;
 
 public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransferFactory {
@@ -45,9 +47,13 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     WgsCoordinate coordinate
   ) {
     var nearbyStopFinder = createNearbyStopFinder(radiusAsDuration);
-
-    var toStops = findNearbyStops(nearbyStopFinder, location, request, false);
-    var fromStops = findNearbyStops(nearbyStopFinder, location, request, true);
+    var toRequest = StreetSearchRequestMapper.map(request)
+      .withMode(request.journey().transfer().mode())
+      .withArriveBy(false)
+      .build();
+    var toStops = findNearbyStops(nearbyStopFinder, location, toRequest);
+    var fromRequest = toRequest.copyOf().withArriveBy(true).build();
+    var fromStops = findNearbyStops(nearbyStopFinder, location, fromRequest);
 
     var transfers = new ArrayList<ViaCoordinateTransfer>();
 
@@ -87,11 +93,9 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   private List<NearbyStop> findNearbyStops(
     NearbyStopFinder finder,
     Vertex viaVertex,
-    RouteRequest request,
-    boolean reverseDirection
+    StreetSearchRequest request
   ) {
-    var transferMode = request.journey().transfer().mode();
-    var r = finder.findNearbyStops(viaVertex, request, transferMode, reverseDirection);
+    var r = finder.findNearbyStops(viaVertex, request);
     return r
       .stream()
       .filter(it -> !transitService.getStopLocation(it.stopId).transfersNotAllowed())

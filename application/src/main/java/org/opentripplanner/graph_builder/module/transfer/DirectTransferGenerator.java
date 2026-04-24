@@ -27,6 +27,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -381,10 +382,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
       StreetMode mode = transferProfile.journey().transfer().mode();
+      var streetSearchRequest = StreetSearchRequestMapper.map(transferProfile)
+        .withMode(transferProfile.journey().transfer().mode())
+        .withArriveBy(false)
+        .build();
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
-        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+        .findNearbyStops(ts0, streetSearchRequest);
       var repository = timetableRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
@@ -409,10 +414,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests()) {
       // Flex transfer requests only use the WALK mode.
       StreetMode mode = StreetMode.WALK;
+      var streetSearchRequest = StreetSearchRequestMapper.map(transferProfile)
+        .withMode(mode)
+        .withArriveBy(true)
+        .build();
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
-        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), true);
+        .findNearbyStops(ts0, streetSearchRequest);
       // This code is for finding transfers from AreaStops to Stops, transfers
       // from Stops to AreaStops and between Stops are already covered above.
       var repository = timetableRepository.getSiteRepository();
@@ -488,9 +497,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     HashMap<StreetMode, NearbyStopFinder> nearbyStopFinder
   ) {
     StreetMode mode = transferProfile.journey().transfer().mode();
-    var nearbyStops = nearbyStopFinder
-      .get(mode)
-      .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+    var streetSearchRequest = StreetSearchRequestMapper.map(transferProfile)
+      .withMode(transferProfile.journey().transfer().mode())
+      .withArriveBy(false)
+      .build();
+    var nearbyStops = nearbyStopFinder.get(mode).findNearbyStops(ts0, streetSearchRequest);
     var repository = timetableRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
       var nearbyStop = repository.getStopLocation(sd.stopId);

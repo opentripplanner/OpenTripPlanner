@@ -6,12 +6,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 
 public class NearbyStopFactory {
 
@@ -20,22 +18,15 @@ public class NearbyStopFactory {
    */
   public static List<NearbyStop> nearbyStopsForTransitStopVertices(
     Set<TransitStopVertex> stopVertices,
-    boolean reverseDirection,
-    RouteRequest routeRequest,
-    StreetMode mode
+    StreetSearchRequest request
   ) {
     if (stopVertices.isEmpty()) {
       return List.of();
     }
 
-    var streetSearchRequest = StreetSearchRequestMapper.mapToTransferRequest(routeRequest)
-      .withArriveBy(reverseDirection)
-      .withMode(mode)
-      .build();
-
     return stopVertices
       .stream()
-      .map(s -> ofZeroDistance(s.getId(), new State(s, streetSearchRequest)))
+      .map(s -> ofZeroDistance(s.getId(), new State(s, request)))
       .toList();
   }
 
@@ -45,9 +36,7 @@ public class NearbyStopFactory {
    */
   public static List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
     Collection<? extends Vertex> vertices,
-    boolean reverseDirection,
-    RouteRequest routeRequest,
-    StreetMode mode
+    StreetSearchRequest request
   ) {
     var transitStops = vertices
       .stream()
@@ -55,6 +44,6 @@ public class NearbyStopFactory {
       .map(v -> (TransitStopVertex) v)
       .collect(Collectors.toSet());
 
-    return nearbyStopsForTransitStopVertices(transitStops, reverseDirection, routeRequest, mode);
+    return nearbyStopsForTransitStopVertices(transitStops, request);
   }
 }
