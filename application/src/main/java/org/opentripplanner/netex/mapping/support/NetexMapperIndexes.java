@@ -87,7 +87,7 @@ public class NetexMapperIndexes {
     Multimap<String, DatedServiceJourney> dsjBySJId = ArrayListMultimap.create();
     for (DatedServiceJourney dsj : datedServiceJourneys.localValues()) {
       // The validation step ensure no NPE occurs here
-      String sjId = dsj.getJourneyRef().get(0).getValue().getRef();
+      String sjId = dsj.getJourneyRef().getValue().getRef();
       dsjBySJId.put(sjId, dsj);
     }
     return dsjBySJId;
