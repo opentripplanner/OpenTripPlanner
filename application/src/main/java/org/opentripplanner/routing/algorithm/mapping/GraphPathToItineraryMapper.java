@@ -35,6 +35,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.model.path.StreetPathSegment;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -121,32 +122,33 @@ public class GraphPathToItineraryMapper {
    */
   public Itinerary generateItinerary(StreetPath path, RouteRequest request) {
     List<Leg> legs = new ArrayList<>();
-    WalkStep previousStep = null;
-    for (var subPath : slicePath(path)) {
-      if (
-        OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
-      ) {
-        legs.add(generateFlexLeg(subPath));
-        previousStep = null;
-        continue;
-      }
-      StreetLeg leg = generateLeg(subPath, previousStep, request);
-      legs.add(leg);
+    for (var segment : path.segments()) {
+      WalkStep previousStep = null;
+      for (var subSegment : sliceSegment(segment)) {
+        if (
+          OTPFeature.FlexRouting.isOn() &&
+          subSegment.states().get(1).backEdge instanceof FlexTripEdge
+        ) {
+          legs.add(generateFlexLeg(subSegment));
+          previousStep = null;
+          continue;
+        }
+        StreetLeg leg = generateLeg(subSegment, previousStep, request);
+        legs.add(leg);
 
-      List<WalkStep> walkSteps = leg.listWalkSteps();
-      if (!walkSteps.isEmpty()) {
-        previousStep = walkSteps.getLast();
-      } else {
-        previousStep = null;
+        List<WalkStep> walkSteps = leg.listWalkSteps();
+        if (!walkSteps.isEmpty()) {
+          previousStep = walkSteps.getLast();
+        } else {
+          previousStep = null;
+        }
       }
     }
 
-    var cost = Cost.costOfSeconds(path.lastState().weight);
+    var cost = Cost.costOfSeconds(path.weight());
     var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
 
-    builder.withArrivedAtDestinationWithRentedVehicle(
-      path.lastState().isRentingVehicleFromStation()
-    );
+    builder.withArrivedAtDestinationWithRentedVehicle(path.arrivedToDestinationOnRentedVehicle());
     builder.addElevationChange(path.calculateElevations());
 
     return builder.build();
@@ -155,17 +157,17 @@ public class GraphPathToItineraryMapper {
   /**
    * Slice a street path at the leg boundaries.
    *
-   * @param streetPath The path to slice of input states
+   * @param segment The segment to split
    * @return A list of subpaths representing the final legs
    */
-  private static List<StreetPath> slicePath(StreetPath streetPath) {
-    var states = streetPath.states();
+  private static List<StreetPathSegment> sliceSegment(StreetPathSegment segment) {
+    var states = segment.states();
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
       return List.of();
     }
 
-    List<StreetPath> subPaths = new LinkedList<>();
+    List<StreetPathSegment> subSegments = new LinkedList<>();
 
     int previousBreak = 0;
 
@@ -186,7 +188,7 @@ public class GraphPathToItineraryMapper {
         int nextBreak = i;
 
         if (nextBreak > previousBreak) {
-          subPaths.add(streetPath.subPath(previousBreak, nextBreak + 1));
+          subSegments.add(segment.subSegment(previousBreak, nextBreak + 1));
         }
 
         /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
@@ -203,10 +205,10 @@ public class GraphPathToItineraryMapper {
 
     // Final leg
     if (states.size() > previousBreak) {
-      subPaths.add(streetPath.subPath(previousBreak, states.size()));
+      subSegments.add(segment.subSegment(previousBreak, states.size()));
     }
 
-    return subPaths;
+    return subSegments;
   }
 
   /**
@@ -313,8 +315,8 @@ public class GraphPathToItineraryMapper {
   /**
    * Generate a flex leg from the states belonging to the flex leg
    */
-  private Leg generateFlexLeg(StreetPath path) {
-    var states = path.states();
+  private Leg generateFlexLeg(StreetPathSegment segment) {
+    var states = segment.states();
     State fromState = states.get(0);
     State toState = states.get(1);
     FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
@@ -333,13 +335,17 @@ public class GraphPathToItineraryMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   * @param subPath       The street path to base the leg on
+   * @param subSegment   The street path segment to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
    *                     calculated correctly
    * @return The generated leg
    */
-  private StreetLeg generateLeg(StreetPath subPath, WalkStep previousStep, RouteRequest request) {
-    var states = subPath.states();
+  private StreetLeg generateLeg(
+    StreetPathSegment subSegment,
+    WalkStep previousStep,
+    RouteRequest request
+  ) {
+    var states = subSegment.states();
 
     State firstState = states.get(0);
     State lastState = states.get(states.size() - 1);
@@ -370,11 +376,11 @@ public class GraphPathToItineraryMapper {
       .withEndTime(lastState.getTime().atZone(timeZone))
       .withFrom(makePlace(firstState, request))
       .withTo(makePlace(lastState, request))
-      .withDistanceMeters(subPath.distanceMeters())
-      .withGeneralizedCost((int) subPath.weight())
-      .withGeometry(subPath.geometry())
+      .withDistanceMeters(subSegment.distanceMeters())
+      .withGeneralizedCost((int) subSegment.weight())
+      .withGeometry(subSegment.geometry())
       .withElevationProfile(
-        makeElevation(subPath.edges(), firstState.getRequest().geoidElevation())
+        makeElevation(subSegment.edges(), firstState.getRequest().geoidElevation())
       )
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())

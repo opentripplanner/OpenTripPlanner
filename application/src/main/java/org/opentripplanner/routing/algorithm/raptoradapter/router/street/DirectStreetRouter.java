@@ -14,6 +14,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.path.StreetPath;
 
 /**
  * Generates "direct" street routes, i.e. those that do not use transit and are on the street
@@ -43,7 +44,11 @@ public class DirectStreetRouter {
         serverContext.listExtensionRequestContexts(request),
         maxCarSpeed
       );
-      var paths = gpFinder.graphPathFinderEntryPoint(request, linkingContext);
+      var paths = gpFinder
+        .graphPathFinderEntryPoint(request, linkingContext)
+        .stream()
+        .map(StreetPath::new)
+        .toList();
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

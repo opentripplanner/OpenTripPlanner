@@ -12,7 +12,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.model.path.StreetPathSegment;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -67,7 +67,7 @@ public class GraphPathFinder {
    * This no longer does "trip banning" to find multiple itineraries. It just searches once trying
    * to find a non-transit path.
    */
-  public List<StreetPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
+  public List<StreetPathSegment> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
     StreetPreferences preferences = request.preferences().street();
 
     StreetSearchBuilder streetSearch = StreetSearchBuilder.of()
@@ -104,7 +104,7 @@ public class GraphPathFinder {
   /**
    * Try to find N paths through the Graph
    */
-  public List<StreetPath> graphPathFinderEntryPoint(
+  public List<StreetPathSegment> graphPathFinderEntryPoint(
     RouteRequest request,
     LinkingContext linkingContext
   ) {
@@ -115,7 +115,7 @@ public class GraphPathFinder {
     );
   }
 
-  public List<StreetPath> graphPathFinderEntryPoint(
+  public List<StreetPathSegment> graphPathFinderEntryPoint(
     RouteRequest request,
     Set<Vertex> from,
     Set<Vertex> to

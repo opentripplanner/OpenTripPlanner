@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search;
+package org.opentripplanner.street.model.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -17,8 +16,8 @@ class StreetPathTest {
   @Test
   void startTime() {
     var state = startState().streetEdge().build();
-    var path = new StreetPath(state);
-    assertEquals(START_TIME, path.startTime());
+    var segment = new StreetPathSegment(state);
+    assertEquals(START_TIME, segment.startTime());
   }
 
   @Test
@@ -27,9 +26,9 @@ class StreetPathTest {
       .testEdge(b -> b.withDurationSeconds(10))
       .testEdge(b -> b.withDurationSeconds(10))
       .build();
-    var path = new StreetPath(state);
+    var segment = new StreetPathSegment(state);
 
-    assertEquals(START_TIME.plus(Duration.ofSeconds(20)), path.endTime());
+    assertEquals(START_TIME.plus(Duration.ofSeconds(20)), segment.endTime());
   }
 
   @Test
@@ -38,9 +37,9 @@ class StreetPathTest {
       .testEdge(b -> b.withWeight(10))
       .testEdge(b -> b.withWeight(10))
       .build();
-    var path = new StreetPath(state);
+    var segment = new StreetPathSegment(state);
 
-    assertEquals(20.0, path.weight());
+    assertEquals(20.0, segment.weight());
   }
 
   @Test
@@ -49,8 +48,8 @@ class StreetPathTest {
       .testEdge(b -> b.withDistanceMeters(10))
       .testEdge(b -> b.withDistanceMeters(10))
       .build();
-    var path = new StreetPath(state);
-    assertEquals(20.0, path.distanceMeters());
+    var segment = new StreetPathSegment(state);
+    assertEquals(20.0, segment.distanceMeters());
   }
 
   @Test
@@ -61,9 +60,9 @@ class StreetPathTest {
       .testEdge(b -> b.withDurationSeconds(3))
       .testEdge(b -> b.withDurationSeconds(4))
       .build();
-    var path = new StreetPath(state).subPath(1, 4);
+    var segment = new StreetPathSegment(state).subSegment(1, 4);
 
-    assertEquals(Duration.ofSeconds(5), path.duration());
+    assertEquals(Duration.ofSeconds(5), segment.duration());
   }
 
   @Test
@@ -72,26 +71,26 @@ class StreetPathTest {
       .testEdge()
       .testEdge(b -> b.withIncludeGeometryInPath(false))
       .build();
-    var path = new StreetPath(state);
+    var segment = new StreetPathSegment(state);
 
     // Make sure we ignore the last leg
-    assertEquals("LINESTRING (1 1, 2 2)", path.geometry().toString());
+    assertEquals("LINESTRING (1 1, 2 2)", segment.geometry().toString());
   }
 
   @Test
-  void subPath() {
+  void subSegment() {
     var state = startState()
       .testEdge(b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10))
       .testEdge(b -> b.withDurationSeconds(5).withWeight(5).withDistanceMeters(5))
       .testEdge(b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10))
       .build();
 
-    var path = new StreetPath(state);
-    var subPath = path.subPath(1, 3);
-    assertEquals(START_TIME.plus(Duration.ofSeconds(10)), subPath.startTime());
-    assertEquals(START_TIME.plus(Duration.ofSeconds(15)), subPath.endTime());
-    assertEquals(5.0, subPath.weight());
-    assertEquals(5.0, subPath.distanceMeters());
+    var path = new StreetPathSegment(state);
+    var subSegment = path.subSegment(1, 3);
+    assertEquals(START_TIME.plus(Duration.ofSeconds(10)), subSegment.startTime());
+    assertEquals(START_TIME.plus(Duration.ofSeconds(15)), subSegment.endTime());
+    assertEquals(5.0, subSegment.weight());
+    assertEquals(5.0, subSegment.distanceMeters());
   }
 
   private TestStateBuilder startState() {
