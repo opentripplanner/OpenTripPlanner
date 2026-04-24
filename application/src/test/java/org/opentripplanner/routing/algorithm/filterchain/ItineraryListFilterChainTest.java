@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,13 +15,9 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
@@ -36,7 +33,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.utils.lang.Box;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -282,29 +278,39 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
-  @ParameterizedTest
-  @MethodSource("testDecoratorCases")
-  void testDecorator(boolean debug) {
-    final Box<String> state = Box.of("I");
-    ItineraryDecorator emissionDecorator = it -> {
-      state.modify(v -> v + "+C");
-      return it;
-    };
-    var result = createBuilder(false, debug, 10)
+  private static class TestDecorator implements ItineraryDecorator {
+
+    String state = "I";
+
+    @Override
+    public Itinerary decorate(Itinerary itinerary) {
+      state = state + "+C";
+      return itinerary;
+    }
+  }
+
+  @Test
+  void shouldOnlyApplyDecoratorWhenItineraryIsntFilteredOut() {
+    var emissionDecorator = new TestDecorator();
+    var result = createBuilder(false, false, 10)
       .withEmissions(emissionDecorator)
       .build()
       .filter(List.of(i1, i2));
 
-    assertEquals(toStr(debug ? List.of(i1, i2) : List.of(i1)), toStr(result));
-    // the decorator should not run on deleted itineraries
-    assertEquals(debug ? "I+C+C" : "I+C", state.get());
+    assertThat(result).containsExactly(i1);
+    assertEquals("I+C", emissionDecorator.state);
   }
 
-  public static Stream<Arguments> testDecoratorCases() {
-    return Stream.of(
-      Arguments.argumentSet("normal filter", false),
-      Arguments.argumentSet("debug filter", true)
-    );
+  @Test
+  void shouldApplyDecoratorWhenAllItinerariesAreKeptInDebug() {
+    var emissionDecorator = new TestDecorator();
+    var result = createBuilder(false, true, 10)
+      .withEmissions(emissionDecorator)
+      .build()
+      .filter(List.of(i1, i2));
+
+    assertThat(result).containsExactly(i1, i2);
+    assertEquals("I+C+C", emissionDecorator.state);
   }
 
   @Nested
