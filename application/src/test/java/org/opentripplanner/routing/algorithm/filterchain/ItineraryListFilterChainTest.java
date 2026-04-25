@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +33,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.utils.lang.Box;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -278,18 +278,39 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
+  private static class TestDecorator implements ItineraryDecorator {
+
+    String state = "I";
+
+    @Override
+    public Itinerary decorate(Itinerary itinerary) {
+      state = state + "+C";
+      return itinerary;
+    }
+  }
+
   @Test
-  void makeSureEmissionDecoratorIsAddedToTheFilterChainTest() {
-    final Box<String> state = Box.of("I");
-    ItineraryDecorator emissionDecorator = it -> {
-      state.modify(v -> v + "+C");
-      return it;
-    };
-    createBuilder(false, false, 10)
+  void shouldOnlyApplyDecoratorWhenItineraryIsntFilteredOut() {
+    var emissionDecorator = new TestDecorator();
+    var result = createBuilder(false, false, 10)
       .withEmissions(emissionDecorator)
       .build()
       .filter(List.of(i1, i2));
-    assertEquals("I+C+C", state.get());
+
+    assertThat(result).containsExactly(i1);
+    assertEquals("I+C", emissionDecorator.state);
+  }
+
+  @Test
+  void shouldApplyDecoratorWhenAllItinerariesAreKeptInDebug() {
+    var emissionDecorator = new TestDecorator();
+    var result = createBuilder(false, true, 10)
+      .withEmissions(emissionDecorator)
+      .build()
+      .filter(List.of(i1, i2));
+
+    assertThat(result).containsExactly(i1, i2);
+    assertEquals("I+C+C", emissionDecorator.state);
   }
 
   @Nested
