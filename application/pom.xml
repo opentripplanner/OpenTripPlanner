@@ -12,6 +12,13 @@
     <name>OpenTripPlanner - Application</name>
 
     <dependencies>
+        <dependency>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>street</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+    </dependency>
         <!-- project dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
