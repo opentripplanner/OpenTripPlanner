@@ -356,12 +356,13 @@ public class StreetPathToLegsMapper {
     /* For the from/to vertices to be in the correct place for vehicle parking
      * the state for actually parking (traversing the VehicleParkEdge) is excluded
      * from the list of states.
-     * This adds the time for parking to the walking leg.
+     * This adds the time and cost for parking to the walking leg.
      */
     var previousStateIsVehicleParking =
       firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
+    var extraWeight = firstState.getWeight() - startTimeState.getWeight();
 
     StreetLegBuilder leg = StreetLeg.of()
       .withMode(resolveMode(states))
@@ -370,7 +371,7 @@ public class StreetPathToLegsMapper {
       .withFrom(makePlace(firstState, request))
       .withTo(makePlace(lastState, request))
       .withDistanceMeters(subPath.distanceMeters())
-      .withGeneralizedCost((int) subPath.weight())
+      .withGeneralizedCost((int) (subPath.weight() + extraWeight))
       .withGeometry(subPath.geometry())
       .withElevationProfile(
         makeElevation(subPath.edges(), firstState.getRequest().geoidElevation())
