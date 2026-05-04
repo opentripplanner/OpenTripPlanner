@@ -1,9 +1,17 @@
 package org.opentripplanner.framework.snapshot.domain.transfer;
 
-import org.opentripplanner.framework.snapshot.domain.world.NewStopUsedByTripPattern;
-import org.opentripplanner.framework.snapshot.event.DomainEventHandlerTransfers;
+import java.util.function.Supplier;
+import org.opentripplanner.framework.snapshot.domain.NewStopUsedByTripPattern;
+import org.opentripplanner.framework.snapshot.domain.transfer.repository.MutableTransferSnapshot;
+import org.opentripplanner.framework.snapshot.event.EventHandler;
 
-public class NewStopHandler implements DomainEventHandlerTransfers<NewStopUsedByTripPattern> {
+public class NewStopHandler implements EventHandler<NewStopUsedByTripPattern> {
+
+  private final Supplier<MutableTransferSnapshot> mutableTransferSnapshotSupplier;
+
+  public NewStopHandler(Supplier<MutableTransferSnapshot> mutableTransferSnapshotSupplier) {
+    this.mutableTransferSnapshotSupplier = mutableTransferSnapshotSupplier;
+  }
 
 
   @Override
@@ -12,7 +20,8 @@ public class NewStopHandler implements DomainEventHandlerTransfers<NewStopUsedBy
   }
 
   @Override
-  public void handle(NewStopUsedByTripPattern event, TransferRepo transfers) {
+  public void handle(NewStopUsedByTripPattern event) {
+    MutableTransferSnapshot transfers = mutableTransferSnapshotSupplier.get();
     transfers.setNumberOfRecalculations(transfers.getNumberOfRecalculations() + 1);
   }
 }
