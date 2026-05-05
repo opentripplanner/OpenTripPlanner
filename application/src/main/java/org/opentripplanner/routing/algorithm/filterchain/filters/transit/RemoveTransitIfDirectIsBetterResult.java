@@ -4,14 +4,14 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The RemoveTransitIfStreetOnlyIsBetter filter removes itineraries from a list of itineraries based on
+ * The RemoveTransitIfDirectIsBetter filter removes itineraries from a list of itineraries based on
  * a generalizedCostMaxLimit. Transit itineraries that have a higher generalized cost than the limit
  * will be filtered away. This results class is used as input for the PageCursor.
  */
-public record RemoveTransitIfStreetOnlyIsBetterResult(Cost generalizedCostMaxLimit) {
+public record RemoveTransitIfDirectIsBetterResult(Cost generalizedCostMaxLimit) {
   @Override
   public String toString() {
-    return ToStringBuilder.of(RemoveTransitIfStreetOnlyIsBetterResult.class)
+    return ToStringBuilder.of(RemoveTransitIfDirectIsBetterResult.class)
       .addObj("generalizedCostMaxLimit", generalizedCostMaxLimit)
       .toString();
   }

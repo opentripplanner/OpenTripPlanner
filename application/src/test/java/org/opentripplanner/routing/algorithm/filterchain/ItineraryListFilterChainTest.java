@@ -122,7 +122,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
     assertEquals("[]", toStringOfTags(i1.systemNotices()));
     assertEquals(
-      "[transit-vs-street-filter, transit-vs-walk-filter]",
+      "[transit-vs-direct-filter, transit-vs-walk-filter]",
       toStringOfTags(i2.systemNotices())
     );
     assertEquals("[outside-search-window]", toStringOfTags(i3.systemNotices()));
@@ -188,7 +188,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   void testRoutingErrorsOriginDestinationTooCloseTest() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .withRemoveWalkAllTheWayResults(true)
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+      .withRemoveTransitWithHigherCostThanBestDirect(
         CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
       .build();
@@ -305,7 +305,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     var sortOrder = arriveBy ? STREET_AND_DEPARTURE_TIME : STREET_AND_ARRIVAL_TIME;
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+      .withRemoveTransitWithHigherCostThanBestDirect(
         CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
       .withDebugEnabled(ofDebugEnabled(debug));
@@ -407,20 +407,20 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     }
 
     @Test
-    void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
+    void removeTransitWithHigherCostThanBestDirectDisabled() {
       // Allow non-optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(null)
+        .withRemoveTransitWithHigherCostThanBestDirect(null)
         .withRemoveTransitIfWalkingIsBetter(false)
         .build();
       assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
     }
 
     @Test
-    void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
+    void removeTransitWithHigherCostThanBestDirectEnabled() {
       // Enable filter and remove bus itinerary
       ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        .withRemoveTransitWithHigherCostThanBestDirect(
           CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
         )
         .build();

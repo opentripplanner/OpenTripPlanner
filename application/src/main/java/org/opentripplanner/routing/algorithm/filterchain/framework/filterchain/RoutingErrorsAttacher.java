@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
@@ -50,7 +50,7 @@ public class RoutingErrorsAttacher {
         it
           .systemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
+          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfDirectIsBetter.TAG));
       Predicate<Itinerary> isWorseThanWalking = it ->
         it
           .systemNotices()

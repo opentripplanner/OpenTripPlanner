@@ -30,7 +30,7 @@ public final class ItineraryFilterPreferences {
   private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-  private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+  private final CostLinearFunction removeTransitWithHigherCostThanBestDirect;
   private final boolean filterDirectFlexBySearchWindow;
 
   private ItineraryFilterPreferences() {
@@ -49,7 +49,7 @@ public final class ItineraryFilterPreferences {
       CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
       0.4
     );
-    this.removeTransitWithHigherCostThanBestOnStreetOnly = CostLinearFunction.of(
+    this.removeTransitWithHigherCostThanBestDirect = CostLinearFunction.of(
       Duration.ofMinutes(1),
       1.3
     );
@@ -74,8 +74,8 @@ public final class ItineraryFilterPreferences {
     this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
-    this.removeTransitWithHigherCostThanBestOnStreetOnly = Objects.requireNonNull(
-      builder.removeTransitWithHigherCostThanBestOnStreetOnly
+    this.removeTransitWithHigherCostThanBestDirect = Objects.requireNonNull(
+      builder.removeTransitWithHigherCostThanBestDirect
     );
     this.filterDirectFlexBySearchWindow = builder.filterDirectFlexBySearchWindow;
   }
@@ -136,8 +136,8 @@ public final class ItineraryFilterPreferences {
     return transitGeneralizedCostLimit;
   }
 
-  public CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly() {
-    return removeTransitWithHigherCostThanBestOnStreetOnly;
+  public CostLinearFunction removeTransitWithHigherCostThanBestDirect() {
+    return removeTransitWithHigherCostThanBestDirect;
   }
 
   public boolean filterDirectFlexBySearchWindow() {
@@ -182,9 +182,9 @@ public final class ItineraryFilterPreferences {
         DEFAULT.transitGeneralizedCostLimit
       )
       .addObj(
-        "removeTransitWithHigherCostThanBestOnStreetOnly",
-        removeTransitWithHigherCostThanBestOnStreetOnly,
-        DEFAULT.removeTransitWithHigherCostThanBestOnStreetOnly
+        "removeTransitWithHigherCostThanBestDirect",
+        removeTransitWithHigherCostThanBestDirect,
+        DEFAULT.removeTransitWithHigherCostThanBestDirect
       )
       .addBoolIfTrue(
         "removeItinerariesWithSameRoutesAndStops",
@@ -220,8 +220,8 @@ public final class ItineraryFilterPreferences {
       removeItinerariesWithSameRoutesAndStops == that.removeItinerariesWithSameRoutesAndStops &&
       Objects.equals(nonTransitGeneralizedCostLimit, that.nonTransitGeneralizedCostLimit) &&
       Objects.equals(
-        removeTransitWithHigherCostThanBestOnStreetOnly,
-        that.removeTransitWithHigherCostThanBestOnStreetOnly
+        removeTransitWithHigherCostThanBestDirect,
+        that.removeTransitWithHigherCostThanBestDirect
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
       filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
@@ -243,7 +243,7 @@ public final class ItineraryFilterPreferences {
       parkAndRideDurationRatio,
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
-      removeTransitWithHigherCostThanBestOnStreetOnly,
+      removeTransitWithHigherCostThanBestDirect,
       filterDirectFlexBySearchWindow
     );
   }
@@ -263,7 +263,7 @@ public final class ItineraryFilterPreferences {
     private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-    private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+    private CostLinearFunction removeTransitWithHigherCostThanBestDirect;
     private boolean filterDirectFlexBySearchWindow;
 
     public ItineraryFilterPreferences original() {
@@ -340,11 +340,10 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-      CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly
+    public Builder withRemoveTransitWithHigherCostThanBestDirect(
+      CostLinearFunction removeTransitWithHigherCostThanBestDirect
     ) {
-      this.removeTransitWithHigherCostThanBestOnStreetOnly =
-        removeTransitWithHigherCostThanBestOnStreetOnly;
+      this.removeTransitWithHigherCostThanBestDirect = removeTransitWithHigherCostThanBestDirect;
       return this;
     }
 
@@ -365,8 +364,8 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
-      this.removeTransitWithHigherCostThanBestOnStreetOnly =
-        original.removeTransitWithHigherCostThanBestOnStreetOnly;
+      this.removeTransitWithHigherCostThanBestDirect =
+        original.removeTransitWithHigherCostThanBestDirect;
       this.filterDirectFlexBySearchWindow = original.filterDirectFlexBySearchWindow;
     }
 

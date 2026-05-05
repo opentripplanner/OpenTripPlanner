@@ -36,7 +36,7 @@ public interface PageCursorInput {
 
   /**
    * Transit itineraries that have a higher generalized cost than the limit will
-   * be filtered away in the {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+   * be filtered away in the {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter}
    * filter.
    */
   Cost generalizedCostMaxLimit();

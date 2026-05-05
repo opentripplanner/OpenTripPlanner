@@ -9,25 +9,25 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries based on generalizedCost, compared with an on-street-all-the-way itinerary
- * (if it exists). If an itinerary cost exceeds the limit computed from the best
- * all-the-way-on-street itinerary, then the transit itinerary is removed.
+ * Filter itineraries based on generalizedCost, compared with the best direct itinerary
+ * (street-only or direct-flex, if it exists). If an itinerary cost exceeds the limit computed
+ * from the best direct itinerary, then the transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
+public class RemoveTransitIfDirectIsBetter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 
   @Nullable
   private final Cost generalizedCostMaxLimit;
 
-  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
+  private RemoveTransitIfDirectIsBetterResult removeTransitIfDirectIsBetterResult = null;
 
   /**
-   * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
+   * Constructs the RemoveTransitIfDirectIsBetter filter.
    * @param costLimitFunction the cost limit function to use with the filter
    * @param generalizedCostMaxLimit this limit is not null when paging is used
    */
-  public RemoveTransitIfStreetOnlyIsBetter(
+  public RemoveTransitIfDirectIsBetter(
     CostLinearFunction costLimitFunction,
     @Nullable Cost generalizedCostMaxLimit
   ) {
@@ -39,7 +39,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
    * to know which filters removed
    */
-  public static final String TAG = "transit-vs-street-filter";
+  public static final String TAG = "transit-vs-direct-filter";
 
   @Override
   public String name() {
@@ -48,43 +48,41 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    Cost minStreetCost = null;
+    Cost minDirectCost = null;
 
     if (generalizedCostMaxLimit != null) {
-      // The best street only cost is used from the cursor, if it can be found.
-      minStreetCost = generalizedCostMaxLimit;
+      // The best direct cost is used from the cursor, if it can be found.
+      minDirectCost = generalizedCostMaxLimit;
     } else {
-      // Find the best street-all-the-way option.
-      OptionalInt minStreetCostOption = itineraries
+      // Find the best direct option (street-only or direct-flex).
+      OptionalInt minDirectCostOption = itineraries
         .stream()
-        .filter(Itinerary::isStreetOnly)
+        .filter(it -> it.isStreetOnly() || it.isDirectFlex())
         .mapToInt(Itinerary::generalizedCost)
         .min();
 
-      if (minStreetCostOption.isPresent()) {
-        minStreetCost = Cost.costOfSeconds(minStreetCostOption.getAsInt());
+      if (minDirectCostOption.isPresent()) {
+        minDirectCost = Cost.costOfSeconds(minDirectCostOption.getAsInt());
       }
     }
 
     // If no cost is found an empty list is returned.
-    if (minStreetCost == null) {
+    if (minDirectCost == null) {
       return List.of();
     }
 
     // This result is used for paging. It is collected by an aggregator.
-    removeTransitIfStreetOnlyIsBetterResult = new RemoveTransitIfStreetOnlyIsBetterResult(
-      minStreetCost
-    );
+    removeTransitIfDirectIsBetterResult = new RemoveTransitIfDirectIsBetterResult(minDirectCost);
 
-    var limit = costLimitFunction.calculate(minStreetCost).toSeconds();
+    var limit = costLimitFunction.calculate(minDirectCost).toSeconds();
 
     // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
       .stream()
       // we use the cost without the access/egress penalty since we don't want to give
-      // searches that are only on the street network an unfair advantage (they don't have
-      // access/egress so cannot have these penalties)
-      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
+      // direct itineraries an unfair advantage (they don't have access/egress so cannot
+      // have these penalties)
+      .filter(it -> !it.isStreetOnly() && !it.isDirectFlex() && it.generalizedCost() >= limit)
       .toList();
   }
 
@@ -93,7 +91,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     return false;
   }
 
-  public RemoveTransitIfStreetOnlyIsBetterResult getRemoveTransitIfStreetOnlyIsBetterResult() {
-    return removeTransitIfStreetOnlyIsBetterResult;
+  public RemoveTransitIfDirectIsBetterResult getRemoveTransitIfDirectIsBetterResult() {
+    return removeTransitIfDirectIsBetterResult;
   }
 }

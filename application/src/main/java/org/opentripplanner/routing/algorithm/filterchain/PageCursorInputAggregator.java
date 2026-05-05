@@ -3,16 +3,16 @@ package org.opentripplanner.routing.algorithm.filterchain;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 
 /**
- * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for PageCursorInput.
+ * This class aggregates results from NumItinerariesFilter and RemoveTransitIfDirectIsBetter for PageCursorInput.
  */
 public class PageCursorInputAggregator {
 
   private final NumItinerariesFilter numItinerariesFilter;
-  private final RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter;
+  private final RemoveTransitIfDirectIsBetter removeTransitIfDirectIsBetter;
   private final Consumer<PageCursorInput> pageCursorInputSubscriber;
 
   public static PageCursorInputAggregator.Builder of() {
@@ -21,13 +21,13 @@ public class PageCursorInputAggregator {
 
   private PageCursorInputAggregator() {
     this.numItinerariesFilter = null;
-    this.removeTransitIfStreetOnlyIsBetter = null;
+    this.removeTransitIfDirectIsBetter = null;
     this.pageCursorInputSubscriber = null;
   }
 
   private PageCursorInputAggregator(Builder builder) {
     this.numItinerariesFilter = builder.numItinerariesFilter();
-    this.removeTransitIfStreetOnlyIsBetter = builder.removeTransitIfStreetOnlyIsBetter();
+    this.removeTransitIfDirectIsBetter = builder.removeTransitIfDirectIsBetter();
     this.pageCursorInputSubscriber = builder.pageCursorInputSubscriber();
   }
 
@@ -46,12 +46,12 @@ public class PageCursorInputAggregator {
         .withPageCut(numItinerariesFilter.getNumItinerariesFilterResult().pageCut());
     }
     if (
-      removeTransitIfStreetOnlyIsBetter != null &&
-      removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
+      removeTransitIfDirectIsBetter != null &&
+      removeTransitIfDirectIsBetter.getRemoveTransitIfDirectIsBetterResult() != null
     ) {
       pageCursorInputBuilder = pageCursorInputBuilder.withGeneralizedCostMaxLimit(
-        removeTransitIfStreetOnlyIsBetter
-          .getRemoveTransitIfStreetOnlyIsBetterResult()
+        removeTransitIfDirectIsBetter
+          .getRemoveTransitIfDirectIsBetterResult()
           .generalizedCostMaxLimit()
       );
     }
@@ -62,12 +62,12 @@ public class PageCursorInputAggregator {
   public static class Builder {
 
     private NumItinerariesFilter numItinerariesFilter;
-    private RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter;
+    private RemoveTransitIfDirectIsBetter removeTransitIfDirectIsBetter;
     private Consumer<PageCursorInput> pageCursorInputSubscriber;
 
     public Builder(PageCursorInputAggregator original) {
       this.numItinerariesFilter = original.numItinerariesFilter;
-      this.removeTransitIfStreetOnlyIsBetter = original.removeTransitIfStreetOnlyIsBetter;
+      this.removeTransitIfDirectIsBetter = original.removeTransitIfDirectIsBetter;
       this.pageCursorInputSubscriber = original.pageCursorInputSubscriber;
     }
 
@@ -80,14 +80,14 @@ public class PageCursorInputAggregator {
       return this;
     }
 
-    public RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter() {
-      return removeTransitIfStreetOnlyIsBetter;
+    public RemoveTransitIfDirectIsBetter removeTransitIfDirectIsBetter() {
+      return removeTransitIfDirectIsBetter;
     }
 
-    public Builder withRemoveTransitIfStreetOnlyIsBetter(
-      RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter
+    public Builder withRemoveTransitIfDirectIsBetter(
+      RemoveTransitIfDirectIsBetter removeTransitIfDirectIsBetter
     ) {
-      this.removeTransitIfStreetOnlyIsBetter = removeTransitIfStreetOnlyIsBetter;
+      this.removeTransitIfDirectIsBetter = removeTransitIfDirectIsBetter;
       return this;
     }
 

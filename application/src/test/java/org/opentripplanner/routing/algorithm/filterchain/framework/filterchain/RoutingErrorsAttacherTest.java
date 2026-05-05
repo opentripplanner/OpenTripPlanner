@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class RoutingErrorsAttacherTest implements PlanTestConstants {
@@ -37,10 +37,7 @@ class RoutingErrorsAttacherTest implements PlanTestConstants {
   public static List<Itinerary> flagAll(List<Itinerary> itineraries) {
     itineraries.forEach(i ->
       i.flagForDeletion(
-        new SystemNotice(
-          RemoveTransitIfStreetOnlyIsBetter.TAG,
-          "This itinerary is marked as deleted."
-        )
+        new SystemNotice(RemoveTransitIfDirectIsBetter.TAG, "This itinerary is marked as deleted.")
       )
     );
     return itineraries;

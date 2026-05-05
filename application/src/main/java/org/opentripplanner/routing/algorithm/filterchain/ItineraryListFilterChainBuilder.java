@@ -33,7 +33,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax.Mc
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
@@ -72,7 +72,7 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCropSection = ListSection.TAIL;
-  private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+  private CostLinearFunction removeTransitWithHigherCostThanBestDirect;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
@@ -219,20 +219,19 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
-   * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
-   * with an on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
+   * Direct searches (walk, bicycle, car, direct-flex) are not pruning the transit search, so in
+   * some cases we get "silly" transit itineraries that are marginally better on travel-duration
+   * compared with a direct itinerary. Use this method to filter such itineraries.
    * <p>
    * The filter removes all itineraries with a generalized-cost that is higher than the best
-   * on-street-all-the-way itinerary.
+   * direct itinerary.
    * <p>
-   * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
-   * exist.
+   * This filter only has an effect if a direct itinerary (street-only or direct-flex) exists.
    */
-  public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+  public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestDirect(
     CostLinearFunction value
   ) {
-    this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+    this.removeTransitWithHigherCostThanBestDirect = value;
     return this;
   }
 
@@ -240,7 +239,7 @@ public class ItineraryListFilterChainBuilder {
    * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This filter removes such
    * itineraries.
    * <p>
-   * This filter only have an effect, if a walk-all-the-way itinerary exist.
+   * This filter only have an effect, if a walk-only itinerary exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitIfWalkingIsBetter(boolean value) {
     this.removeTransitIfWalkingIsBetter = value;
@@ -287,10 +286,10 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the search is done with a page cursor that contains an encoded best street only cost, then
-   * this function adds the information to the {@link RemoveTransitIfStreetOnlyIsBetter} filter.
+   * If the search is done with a page cursor that contains an encoded best direct cost, then
+   * this function adds the information to the {@link RemoveTransitIfDirectIsBetter} filter.
    *
-   * @param generalizedCostMaxLimit the best street only cost used in filtering.
+   * @param generalizedCostMaxLimit the best direct cost used in filtering.
    */
   public ItineraryListFilterChainBuilder withGeneralizedCostMaxLimit(Cost generalizedCostMaxLimit) {
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
@@ -320,9 +319,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by and
-   * remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that poor
-   * transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
+   * If set, walk-only itineraries are removed. This happens AFTER e.g. the group-by and
+   * remove-transit-with-higher-cost-than-best-direct filter. This make sure that poor transit
+   * itineraries are filtered away before the walk-only itinerary is removed.
    */
   public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
     this.removeWalkAllTheWayResults = enable;
@@ -399,7 +398,7 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
     NumItinerariesFilter numItinerariesFilter = null;
-    RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter = null;
+    RemoveTransitIfDirectIsBetter removeTransitIfDirectIsBetter = null;
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
@@ -448,13 +447,13 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-      // Filter transit itineraries by comparing against non-transit using generalized-cost
-      if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        removeTransitIfStreetOnlyIsBetter = new RemoveTransitIfStreetOnlyIsBetter(
-          removeTransitWithHigherCostThanBestOnStreetOnly,
+      // Filter transit itineraries by comparing against direct itineraries using generalized-cost
+      if (removeTransitWithHigherCostThanBestDirect != null) {
+        removeTransitIfDirectIsBetter = new RemoveTransitIfDirectIsBetter(
+          removeTransitWithHigherCostThanBestDirect,
           generalizedCostMaxLimit
         );
-        addRemoveFilter(filters, removeTransitIfStreetOnlyIsBetter);
+        addRemoveFilter(filters, removeTransitIfDirectIsBetter);
       }
 
       if (removeTransitIfWalkingIsBetter) {
@@ -555,7 +554,7 @@ public class ItineraryListFilterChainBuilder {
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
     PageCursorInputAggregator pageCursorInputAggregator = PageCursorInputAggregator.of()
       .withNumItinerariesFilter(numItinerariesFilter)
-      .withRemoveTransitIfStreetOnlyIsBetter(removeTransitIfStreetOnlyIsBetter)
+      .withRemoveTransitIfDirectIsBetter(removeTransitIfDirectIsBetter)
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .build();
 

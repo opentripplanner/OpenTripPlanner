@@ -7,7 +7,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This class stores input for the PageCursor. The input is related to the NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter.
+ * This class stores input for the PageCursor. The input is related to the NumItinerariesFilter and RemoveTransitIfDirectIsBetter.
  * <p>
  * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to
  * keep and whether it should crop at the head or the tail of the list. This class keeps
@@ -15,9 +15,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * details about the first itinerary removed (bottom of the head, or top of the tail) and whether
  * itineraries were cropped at the head or the tail.
  * <p>
- * The {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
- * filter removes transit itineraries if the best street only itinerary has a lower cost.
- * This class stores the cost of the best street only itinerary for use with paging.
+ * The {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfDirectIsBetter}
+ * filter removes transit itineraries if the best direct itinerary has a lower cost.
+ * This class stores the cost of the best direct itinerary for use with paging.
  */
 public class DefaultPageCursorInput implements PageCursorInput {
 

@@ -151,17 +151,17 @@ public class ItineraryFiltersConfig {
           )
           .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+      .withRemoveTransitWithHigherCostThanBestDirect(
         c
-          .of("removeTransitWithHigherCostThanBestOnStreetOnly")
+          .of("removeTransitWithHigherCostThanBestDirect")
           .since(V2_4)
           .summary(
-            "Limit function for generalized-cost computed from street-only itineries applied to transit itineraries."
+            "Limit function for generalized-cost computed from direct itineraries applied to transit itineraries."
           )
           .description(
             """
-            The max-limit is applied to itineraries with transit *legs*, and only itineraries
-            without transit legs are considered when calculating the minimum cost. The smallest
+            The max-limit is applied to itineraries with transit *legs*, and only direct itineraries
+            (street-only or direct-flex) are considered when calculating the minimum cost. The smallest
             generalized-cost value is used as input to the function. The function is used to calculate a
             *max-limit*. The max-limit is then used to filter *transit* itineraries by
             *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
@@ -169,7 +169,7 @@ public class ItineraryFiltersConfig {
             a plain walk itinerary, it will be removed even if the cost limit function would keep it.
             """
           )
-          .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
+          .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestDirect())
       )
       .withBikeRentalDistanceRatio(
         c
