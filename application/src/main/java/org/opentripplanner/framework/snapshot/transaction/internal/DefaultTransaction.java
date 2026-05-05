@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.opentripplanner.framework.snapshot.transaction.Transaction;
 
 final class DefaultTransaction implements Transaction {
+
   private static final AtomicLong ID_SEQUENCE = new AtomicLong(0);
   private final long id;
 

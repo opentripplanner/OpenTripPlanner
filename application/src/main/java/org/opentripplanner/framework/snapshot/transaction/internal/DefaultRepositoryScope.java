@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.snapshot.transaction.internal;
 
-
 import org.opentripplanner.framework.snapshot.transaction.RepositoryHandle;
 import org.opentripplanner.framework.snapshot.transaction.RepositoryScope;
 import org.opentripplanner.framework.snapshot.transaction.Transaction;
@@ -14,7 +13,7 @@ import org.opentripplanner.framework.snapshot.transaction.Transaction;
  * all {@link #snapshot(RepositoryHandle)} calls within the same scope resolve against the same
  * transaction.
  */
-public class DefaultRepositoryScope implements RepositoryScope {
+class DefaultRepositoryScope implements RepositoryScope {
 
   private final Transaction transaction;
 

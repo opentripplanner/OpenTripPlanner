@@ -33,8 +33,7 @@ class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S
     }
   }
 
-  @Override
-  public Supplier<T> mutableSnapshot() {
+  Supplier<T> mutableSnapshot() {
     return this::currentMutableSnapshot;
   }
 

@@ -1,5 +1,7 @@
 package org.opentripplanner.framework.snapshot.transaction;
 
+import java.util.function.Consumer;
+
 /**
  * An opaque identity token representing a single committed state of the repository set.
  *
@@ -10,9 +12,8 @@ package org.opentripplanner.framework.snapshot.transaction;
  * duration of a request, and the snapshots are eligible for garbage collection once the scope is
  * released.
  *
- * <p>A new token is minted on every {@link RepositoryRegistry#commit()} call. Readers that
+ * <p>A new token is minted on every {@link UpdateManager#submit(Consumer)} call. Readers that
  * captured an older token continue to see the state as of that commit; readers that create a new
  * {@link RepositoryScope} after the commit see the updated state.
  */
-public interface Transaction {
-}
+public interface Transaction {}

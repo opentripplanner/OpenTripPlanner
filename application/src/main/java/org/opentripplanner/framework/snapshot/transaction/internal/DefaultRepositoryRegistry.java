@@ -7,17 +7,20 @@ import org.opentripplanner.framework.snapshot.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.snapshot.transaction.RepositoryScope;
 import org.opentripplanner.framework.snapshot.transaction.Transaction;
 import org.opentripplanner.framework.snapshot.transaction.TransactionalRepository;
+import org.opentripplanner.framework.snapshot.transaction.UpdateManager;
 
 /**
  * Default implementation of {@link RepositoryRegistry}.
  *
  * <p>Wraps a {@link InMemoryRepositoryTransactionManager} to coordinate transactions across all
  * registered repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
- * {@link InMemoryTransactionalRepository} internally and returns a {@link RepositoryHandle} typed
- * against the public {@link TransactionalRepository} interface — the concrete implementation class
- * is never exposed to callers.
+ * {@link InMemoryTransactionalRepository} internally and returns a {@link RepositoryHandle} that
+ * also implements the package-private {@link WritableHandle} interface, allowing
+ * {@link org.opentripplanner.framework.snapshot.transaction.internal.DefaultWriteContext} to obtain
+ * mutable snapshot access via an internal cast without exposing it on the public
+ * {@link RepositoryHandle} API.
  */
-public class DefaultRepositoryRegistry implements RepositoryRegistry {
+class DefaultRepositoryRegistry implements RepositoryRegistry {
 
   private final InMemoryRepositoryTransactionManager transactionManager =
     new InMemoryRepositoryTransactionManager();
@@ -32,17 +35,7 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
       lifecycle,
       transactionManager
     );
-    return new RepositoryHandle<>() {
-      @Override
-      public S readOnlySnapshot(Transaction transaction) {
-        return repo.snapshot(transaction);
-      }
-
-      @Override
-      public Supplier<T> mutableSnapshot() {
-        return repo.mutableSnapshot();
-      }
-    };
+    return new WritableRepositoryHandle<>(repo);
   }
 
   @Override
@@ -50,8 +43,36 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
     return new DefaultRepositoryScope(transactionManager.requestScopedTransaction());
   }
 
-  @Override
-  public void commit() {
-    transactionManager.commit();
+  /**
+   * Returns the transaction manager for use during wiring of the
+   * {@link UpdateManager}.
+   */
+  InMemoryRepositoryTransactionManager transactionManager() {
+    return transactionManager;
+  }
+
+  /**
+   * A {@link RepositoryHandle} that also implements {@link WritableHandle}, allowing the
+   * {@link org.opentripplanner.framework.snapshot.update.internal.DefaultWriteContext} to obtain
+   * mutable snapshot access via an internal cast.
+   */
+  private static class WritableRepositoryHandle<S, T>
+    implements RepositoryHandle<S, T>, WritableHandle<T> {
+
+    private final TransactionalRepository<S, T> repo;
+
+    WritableRepositoryHandle(TransactionalRepository<S, T> repo) {
+      this.repo = repo;
+    }
+
+    @Override
+    public S readOnlySnapshot(Transaction transaction) {
+      return repo.snapshot(transaction);
+    }
+
+    @Override
+    public Supplier<T> mutableSnapshot() {
+      return ((InMemoryTransactionalRepository<S, T>) repo).mutableSnapshot();
+    }
   }
 }

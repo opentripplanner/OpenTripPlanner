@@ -9,18 +9,21 @@ import org.opentripplanner.framework.snapshot.event.DomainEvent;
 
 public class TripUpdateService {
 
-  private final Supplier<MutableTimetableSnapshot> timetableSnapshot;
-  private final Consumer<DomainEvent> publisher;
+  private final Supplier<MutableTimetableSnapshot> ctx;
+  private final Consumer<DomainEvent> domainEventConsumer;
 
-  public TripUpdateService(Supplier<MutableTimetableSnapshot> timetableSnapshot, Consumer<DomainEvent> publisher) {
-    this.timetableSnapshot = timetableSnapshot;
-    this.publisher = publisher;
+  public TripUpdateService(
+    Supplier<MutableTimetableSnapshot> timetable,
+    Consumer<DomainEvent> eventPublisher
+  ) {
+    this.ctx = timetable;
+    this.domainEventConsumer = eventPublisher;
   }
 
   public void doTripUpdate(TripUpdate update) {
-    timetableSnapshot.get().addTrip(update.tripId());
+    ctx.get().addTrip(update.tripId());
     if (update.newStopUsed()) {
-      publisher.accept(new NewStopUsedByTripPattern());
+      domainEventConsumer.accept(new NewStopUsedByTripPattern());
     }
   }
 }

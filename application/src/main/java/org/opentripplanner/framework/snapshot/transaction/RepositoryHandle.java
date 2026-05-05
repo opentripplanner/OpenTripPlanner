@@ -1,7 +1,5 @@
 package org.opentripplanner.framework.snapshot.transaction;
 
-import java.util.function.Supplier;
-
 /**
  * Application-scoped typed access point for a single {@link TransactionalRepository}.
  *
@@ -14,8 +12,10 @@ import java.util.function.Supplier;
  *       {@link RepositoryScope} from the framework and call
  *       {@link RepositoryScope#snapshot(RepositoryHandle)} on it, which guarantees that all
  *       repositories in one request are resolved against the same transaction.
- *   <li><em>Updaters</em> call {@link #mutableSnapshot()} directly to obtain a lazy supplier for
- *       the mutable snapshot. No transaction is involved on the write path.
+ *   <li><em>Updaters</em> obtain write access exclusively through a
+ *       {@link WriteContext} provided by the
+ *       {@link UpdateManager}. Handles are
+ *       read-only from the public API.
  * </ul>
  *
  * @param <S> the read-only snapshot type
@@ -29,12 +29,4 @@ public interface RepositoryHandle<S, T> {
    * the scope instead of calling this directly.
    */
   S readOnlySnapshot(Transaction transaction);
-
-  /**
-   * Return a lazy supplier for the mutable snapshot.
-   *
-   * <p>The supplier performs copy-on-write from the latest committed snapshot on first access.
-   * Intended for use by updaters.
-   */
-  Supplier<T> mutableSnapshot();
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.snapshot.transaction.Transaction;
 
-public class InMemoryRepositoryTransactionManager {
+class InMemoryRepositoryTransactionManager {
 
   private final AtomicReference<DefaultTransaction> currentTransaction = new AtomicReference<>(
     DefaultTransaction.next()

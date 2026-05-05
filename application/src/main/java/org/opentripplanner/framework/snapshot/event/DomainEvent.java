@@ -1,4 +1,3 @@
 package org.opentripplanner.framework.snapshot.event;
 
-public interface DomainEvent {
-}
+public interface DomainEvent {}

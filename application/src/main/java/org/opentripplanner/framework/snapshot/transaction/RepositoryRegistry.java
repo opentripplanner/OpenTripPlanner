@@ -3,7 +3,7 @@ package org.opentripplanner.framework.snapshot.transaction;
 /**
  * Application-scoped registry for transactional repositories.
  *
- * <p>This is the single entry point for wiring the transaction framework. Typical usage:
+ * <p>This is the entry point for wiring the transaction framework. Typical usage:
  *
  * <ol>
  *   <li>Create one {@code RepositoryRegistry} for the application lifetime.
@@ -12,8 +12,9 @@ package org.opentripplanner.framework.snapshot.transaction;
  *       injection into services and updaters.
  *   <li>At the start of each request, call {@link #scope()} to obtain a {@link RepositoryScope}
  *       that captures a consistent snapshot of all repositories at that point in time.
- *   <li>After an updater has finished writing, call {@link #commit()} to publish the changes and
- *       advance the transaction so subsequent scopes see the new state.
+ *   <li>To perform writes, use the
+ *       {@link UpdateManager}, which commits
+ *       changes automatically after each submitted task.
  * </ol>
  */
 public interface RepositoryRegistry {
@@ -42,12 +43,4 @@ public interface RepositoryRegistry {
    * method.
    */
   RepositoryScope scope();
-
-  /**
-   * Commit all pending mutable snapshots and advance the transaction.
-   *
-   * <p>After this call, any new {@link RepositoryScope} created via {@link #scope()} will see the
-   * updated state. Existing scopes retain their original consistent view until they are discarded.
-   */
-  void commit();
 }
