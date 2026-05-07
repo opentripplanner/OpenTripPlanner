@@ -28,6 +28,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
 
@@ -98,7 +99,11 @@ public class BicycleRoutingTest {
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var gpf = new GraphPathFinder();
-    var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
+    var paths = gpf
+      .graphPathFinderEntryPoint(request, linkingContext)
+      .stream()
+      .map(StreetPath::new)
+      .toList();
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       new NoopSiteResolver(),

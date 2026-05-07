@@ -20,7 +20,7 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
-import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.model.path.StreetPathSegment;
 import org.opentripplanner.test.support.ResourceLoader;
 
 class WalkRoutingTest {
@@ -80,7 +80,7 @@ class WalkRoutingTest {
     assertEquals(expected, backwardDiff);
   }
 
-  private static List<StreetPath> route(
+  private static List<StreetPathSegment> route(
     Graph graph,
     GenericLocation from,
     GenericLocation to,
