@@ -37,6 +37,10 @@ public class StreetModelFactory {
     return intersectionVertex(c.y, c.x);
   }
 
+  public static IntersectionVertex intersectionVertex(String label, WgsCoordinate c) {
+    return intersectionVertex(label, c.latitude(), c.longitude());
+  }
+
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
     return new LabelledIntersectionVertex(label, lon, lat, false, false);
