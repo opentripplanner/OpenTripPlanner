@@ -23,7 +23,7 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.GraphFactory;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -195,21 +195,23 @@ class StreetLinkerModuleTest {
     private final Graph graph;
 
     public TestModel() {
-      var from = StreetModelForTest.intersectionVertex(
-        KONGSBERG_PLATFORM_1.y - DELTA,
-        KONGSBERG_PLATFORM_1.x - DELTA
-      );
-      var to = StreetModelForTest.intersectionVertex(
-        KONGSBERG_PLATFORM_1.y + DELTA,
-        KONGSBERG_PLATFORM_1.x + DELTA
-      );
+      var g = new GraphFactory();
 
-      this.graph = new Graph();
-      graph.addVertex(from);
-      graph.addVertex(to);
+      var from = g.intersectionVertex(
+        new WgsCoordinate(
+          KONGSBERG_PLATFORM_1.y - DELTA,
+          KONGSBERG_PLATFORM_1.x - DELTA
+        )
+      );
+      var to = g.intersectionVertex(
+        new WgsCoordinate(
+          KONGSBERG_PLATFORM_1.y + DELTA,
+          KONGSBERG_PLATFORM_1.x + DELTA
+        )
+      );
+      g.street(from, to).withPermission(PEDESTRIAN).buildAndConnect();
+      g.street(from, to).withPermission(CAR).buildAndConnect();
 
-      StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
-      StreetModelForTest.streetEdge(from, to, CAR);
       var builder = SiteRepository.of();
       stop = builder
         .regularStop(id("platform-1"))
@@ -219,14 +221,9 @@ class StreetLinkerModuleTest {
 
       timetableRepository = new TimetableRepository(builder.build());
 
-      stopVertex = TransitStopVertex.of()
-        .withId(stop.getId())
-        .withPoint(stop.getGeometry())
-        .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
-        .build();
-      graph.addVertex(stopVertex);
-      graph.hasStreets = true;
+      stopVertex = g.stopVertex(stop.getId(), stop.getCoordinate());
 
+      graph = g.buildGraph();
       module = new StreetLinkerModule(
         graph,
         new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0, false),
