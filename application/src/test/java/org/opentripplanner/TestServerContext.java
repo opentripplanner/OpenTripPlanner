@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -47,6 +48,8 @@ import org.opentripplanner.street.service.DefaultStreetLimitationParametersServi
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
+import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -152,6 +155,15 @@ public class TestServerContext {
       null,
       null,
       null
+    );
+  }
+
+  public static OtpServerRequestContext of() {
+    return createServerContext(
+      new Graph(),
+      new TimetableRepository(),
+      new DefaultTransferRepository(new TransferIndex()),
+      new DefaultFareService()
     );
   }
 
