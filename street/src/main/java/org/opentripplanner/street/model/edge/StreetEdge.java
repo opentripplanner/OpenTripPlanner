@@ -773,7 +773,7 @@ public class StreetEdge
     );
 
     StreetElevationExtensionBuilder.of(seb)
-      .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
+      .withDistanceInMeters(toDistance - fromDistance)
       .withElevationProfile(partialElevationProfileFromParent)
       .build()
       .ifPresent(seb::withElevationExtension);

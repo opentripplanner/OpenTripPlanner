@@ -43,7 +43,11 @@ public class StreetElevationExtensionBuilder {
   }
 
   public Optional<StreetElevationExtension> build() {
-    if (elevationProfileHasAtLeastTwoPoints() && (!isSlopeOverride || computed)) {
+    if (
+      distanceInMeters > 0.01 &&
+      elevationProfileHasAtLeastTwoPoints() &&
+      (!isSlopeOverride || computed)
+    ) {
       return Optional.of(buildInternal());
     }
     return Optional.empty();
