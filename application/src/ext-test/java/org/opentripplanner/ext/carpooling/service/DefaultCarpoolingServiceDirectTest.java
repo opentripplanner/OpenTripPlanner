@@ -391,67 +391,18 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   }
 
   @Test
-  void itineraryReflectsDriverScheduleWhenTripDepartsBeforeRequestTime() {
-    // Trip starts 10 min before the passenger's requested time but within the 30-min
-    // TimeBasedFilter window, so the trip is accepted. The driver arrives at the pickup
-    // well before the requested time — the question is what the returned itinerary says.
+  void tripDepartingBeforeRequestTimeIsRejected() {
+    // TimeBasedFilter uses a one-sided window [T, T+searchWindow]: trips that departed before
+    // the passenger's requested time have already left and must be rejected, even if they
+    // fall within the old symmetric ±window.
     var departureTime = SEARCH_TIME.minusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
     repository.upsertCarpoolTrip(trip);
 
-    var router = new CarpoolTreeStreetRouter();
-    router.addVertex(vertexTripStart, CarpoolTreeStreetRouter.Direction.FROM, Duration.ofHours(2));
-    router.addVertex(vertexPickup, CarpoolTreeStreetRouter.Direction.FROM, Duration.ofHours(2));
-
-    var pathToPickup = router.route(vertexTripStart, vertexPickup);
-    assertNotNull(pathToPickup);
-    var drivingToPickup = Duration.between(
-      pathToPickup.states.getFirst().getTime(),
-      pathToPickup.states.getLast().getTime()
-    );
-
-    var pathPickupToDropoff = router.route(vertexPickup, vertexDropoff);
-    assertNotNull(pathPickupToDropoff);
-    var drivingPickupToDropoff = Duration.between(
-      pathPickupToDropoff.states.getFirst().getTime(),
-      pathPickupToDropoff.states.getLast().getTime()
-    );
-
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
-    var stopDuration = request.preferences().car().pickupTime();
-
-    // The driver's pickup arrival time is fixed by the trip's schedule. It does NOT shift
-    // forward just because the passenger requested a later departure — the driver cannot
-    // wait (committed schedule / other passengers).
-    var actualPickupArrivalTime = departureTime.plus(drivingToPickup);
-
-    // Guard the premise of this test: the requested time is after the real pickup arrival.
-    assertTrue(
-      request.dateTime().isAfter(actualPickupArrivalTime.toInstant()),
-      "Test premise: request time must be after the driver's real pickup arrival time"
-    );
-
-    // Itinerary start time is when the car arrives at the pickup; the boarding dwell is part
-    // of the leg's duration, so it shows up in the end time.
-    var expectedStartTime = actualPickupArrivalTime;
-    var expectedEndTime = expectedStartTime.plus(stopDuration).plus(drivingPickupToDropoff);
-
     var results = service.routeDirect(request, linkingContext);
 
-    assertFalse(results.isEmpty(), "Trip within search window should produce a result");
-
-    var itinerary = results.getFirst();
-    assertEquals(
-      expectedStartTime.toInstant(),
-      itinerary.startTime().toInstant(),
-      "Itinerary start time must match the driver's pickup arrival time, not the passenger's " +
-        "requested time — the driver cannot wait for the passenger"
-    );
-    assertEquals(
-      expectedEndTime.toInstant(),
-      itinerary.endTime().toInstant(),
-      "Itinerary end time must match the driver's real dropoff time"
-    );
+    assertTrue(results.isEmpty(), "Trip departing before request time must be rejected");
   }
 
   @Test

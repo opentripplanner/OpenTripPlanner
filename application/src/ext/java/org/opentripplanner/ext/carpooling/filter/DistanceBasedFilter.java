@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -12,13 +11,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Filters trips based on geographic proximity to the passenger journey.
  * <p>
- * Checks if the passenger's pickup and dropoff locations are both within
- * a reasonable distance from the driver's route. The filter considers all
- * segments of the driver's route (including intermediate stops), allowing
- * passengers to join trips where they share a segment of the driver's journey,
- * while rejecting passengers whose journey is far off any part of the driver's path.
+ * Checks if at least one of the passenger's pickup and dropoff locations is within a reasonable
+ * distance from the driver's route. The filter considers all segments of the driver's route
+ * (including intermediate stops), allowing passengers to join trips where they share a segment of
+ * the driver's journey, while rejecting passengers whose journey is far off any part of the
+ * driver's path.
  */
-public class DistanceBasedFilter implements TripFilter {
+public class DistanceBasedFilter implements CarpoolTripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(DistanceBasedFilter.class);
 
@@ -35,11 +34,19 @@ public class DistanceBasedFilter implements TripFilter {
   }
 
   @Override
-  public boolean accepts(
+  public boolean isCandidateTrip(
     CarpoolTrip trip,
-    WgsCoordinate passengerPickup,
-    WgsCoordinate passengerDropoff
+    CarpoolingRequest request,
+    Duration searchWindow
   ) {
+    return request.isAccessEgressRequest()
+      ? isProximateForAccessEgress(trip, request)
+      : isProximateForDirect(trip, request);
+  }
+
+  private boolean isProximateForDirect(CarpoolTrip trip, CarpoolingRequest request) {
+    var passengerPickup = request.getPassengerPickup();
+    var passengerDropoff = request.getPassengerDropoff();
     List<WgsCoordinate> routePoints = trip.routePoints();
 
     if (routePoints.size() < 2) {
@@ -47,7 +54,6 @@ public class DistanceBasedFilter implements TripFilter {
       return false;
     }
 
-    // Check each segment of the route
     for (int i = 0; i < routePoints.size() - 1; i++) {
       WgsCoordinate segmentStart = routePoints.get(i);
       WgsCoordinate segmentEnd = routePoints.get(i + 1);
@@ -63,48 +69,43 @@ public class DistanceBasedFilter implements TripFilter {
         segmentEnd.asJtsCoordinate()
       );
 
-      // Accept if either passenger location is within threshold of this segment
       if (
         pickupDistanceToSegment <= maxDistanceMeters ||
         dropoffDistanceToSegment <= maxDistanceMeters
       ) {
         LOG.debug(
-          "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). " +
-            "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
+          "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). Pickup distance: {}m, Dropoff distance: {}m (max: {}m)",
           trip.getId(),
           i,
           segmentStart,
           segmentEnd,
-          pickupDistanceToSegment,
-          dropoffDistanceToSegment,
-          maxDistanceMeters
+          Math.round(pickupDistanceToSegment),
+          Math.round(dropoffDistanceToSegment),
+          Math.round(maxDistanceMeters)
         );
         return true;
       }
     }
 
     LOG.debug(
-      "Trip {} rejected by distance filter: passenger journey too far from all route segments (max: {:.0f}m)",
+      "Trip {} rejected by distance filter: passenger journey too far from all route segments (max: {}m)",
       trip.getId(),
-      maxDistanceMeters
+      Math.round(maxDistanceMeters)
     );
     return false;
   }
 
   // length of the trip is longer than the length from the trip to the passenger
-  @Override
-  public boolean acceptsAccessEgress(
-    CarpoolTrip trip,
-    WgsCoordinate coordinateOfPassenger,
-    Instant passengerDepartureTime,
-    Duration searchWindow
-  ) {
+  private boolean isProximateForAccessEgress(CarpoolTrip trip, CarpoolingRequest request) {
     var tripStart = trip.routePoints().getFirst().asJtsCoordinate();
     var tripEnd = trip.routePoints().getLast().asJtsCoordinate();
+    var passengerCoordJts = request.isAccessRequest()
+      ? request.getPassengerPickup().asJtsCoordinate()
+      : request.getPassengerDropoff().asJtsCoordinate();
 
     var tripLength = SphericalDistanceLibrary.distance(tripStart, tripEnd);
     var lengthFromTripToPassenger = SphericalDistanceLibrary.fastDistance(
-      coordinateOfPassenger.asJtsCoordinate(),
+      passengerCoordJts,
       tripStart,
       tripEnd
     );
