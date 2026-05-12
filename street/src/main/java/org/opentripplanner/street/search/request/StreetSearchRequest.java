@@ -100,8 +100,8 @@ public class StreetSearchRequest implements AStarRequest {
     return new StreetSearchRequestBuilder(DEFAULT).withStartTime(Instant.now());
   }
 
-  public static StreetSearchRequestBuilder copyOf(StreetSearchRequest original) {
-    return new StreetSearchRequestBuilder(original);
+  public StreetSearchRequestBuilder copyOf() {
+    return new StreetSearchRequestBuilder(this);
   }
 
   public Instant startTime() {
@@ -175,7 +175,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
-    return copyOf(this).withStartTime(time).withArriveBy(!arriveBy);
+    return copyOf().withStartTime(time).withArriveBy(!arriveBy);
   }
 
   /**

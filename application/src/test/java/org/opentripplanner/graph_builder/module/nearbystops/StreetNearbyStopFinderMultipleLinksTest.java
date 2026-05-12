@@ -11,11 +11,10 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
 
@@ -63,9 +62,7 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
     var maxStopCount = 3;
     var finder = StreetNearbyStopFinder.of(durationLimit, maxStopCount).build();
 
-    var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetMode.WALK, false)
-    );
+    var sortedNearbyStops = sort(finder.findNearbyStops(stopA, StreetSearchRequest.DEFAULT));
 
     assertThat(sortedNearbyStops).hasSize(3);
     assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));

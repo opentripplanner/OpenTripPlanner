@@ -12,24 +12,21 @@ import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 
 public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final Duration durationLimit;
   private final int maxStopCount;
-  private final Collection<ExtensionRequestContext> extensionRequestContexts;
   private final Set<Vertex> ignoreVertices;
 
   /**
@@ -42,12 +39,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   private StreetNearbyStopFinder(
     Duration durationLimit,
     int maxStopCount,
-    Collection<ExtensionRequestContext> extensionRequestContexts,
     Set<Vertex> ignoreVertices
   ) {
     this.durationLimit = requireNonNull(durationLimit);
     this.maxStopCount = requireNonNull(maxStopCount);
-    this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
     this.ignoreVertices = requireNonNull(ignoreVertices);
   }
 
@@ -67,13 +62,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * is essential for associating the correct stop with each trip pattern in the vicinity.
    */
   @Override
-  public Collection<NearbyStop> findNearbyStops(
-    Vertex vertex,
-    RouteRequest routingRequest,
-    StreetMode streetMode,
-    boolean reverseDirection
-  ) {
-    return findNearbyStops(Set.of(vertex), routingRequest, streetMode, reverseDirection);
+  public Collection<NearbyStop> findNearbyStops(Vertex vertex, StreetSearchRequest request) {
+    return findNearbyStops(Set.of(vertex), request);
   }
 
   /**
@@ -81,48 +71,43 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * streets. If the origin vertex is a StopVertex, the result will include it.
    *
    * @param originVertices   the origin point of the street search.
-   * @param reverseDirection if true the paths returned instead originate at the nearby stops and
-   *                         have the originVertex as the destination.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
-    RouteRequest request,
-    StreetMode streetMode,
-    boolean reverseDirection
+    StreetSearchRequest request
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
+    var requestWithoutEnvelopes = request
+      .copyOf()
+      .withFromEnvelope(null)
+      .withToEnvelope(null)
+      .build();
     List<NearbyStop> stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
       Sets.difference(originVertices, ignoreVertices),
-      reverseDirection,
-      request,
-      streetMode
+      requestWithoutEnvelopes
     );
 
     // Return only the origin vertices if there are no valid street modes
     if (
-      streetMode == StreetMode.NOT_SET || (maxStopCount > 0 && stopsFound.size() >= maxStopCount)
+      request.mode() == StreetMode.NOT_SET ||
+      (maxStopCount > 0 && stopsFound.size() >= maxStopCount)
     ) {
       return stopsFound;
     }
     stopsFound = new ArrayList<>(stopsFound);
 
-    var visitor = new NearbyStopFinderVisitor(originVertices, ignoreVertices, reverseDirection);
+    var visitor = new NearbyStopFinderVisitor(originVertices, ignoreVertices, request.arriveBy());
 
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTraverseVisitor(visitor)
-      .withRequest(
-        StreetSearchRequestMapper.map(request)
-          .withMode(streetMode)
-          .withExtensionRequestContexts(extensionRequestContexts)
-          .build()
-      )
-      .withArriveBy(reverseDirection)
-      .withFrom(reverseDirection ? null : originVertices)
-      .withTo(reverseDirection ? originVertices : null);
+      .withRequest(request)
+      .withArriveBy(request.arriveBy())
+      .withFrom(request.arriveBy() ? null : originVertices)
+      .withTo(request.arriveBy() ? originVertices : null);
 
     if (maxStopCount > 0) {
       streetSearch.withTerminationStrategy(
@@ -176,25 +161,11 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     private final Duration durationLimit;
     private final int maxStopCount;
-    private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
     private Set<Vertex> ignoreVertices = Set.of();
 
     public Builder(Duration durationLimit, int maxStopCount) {
       this.durationLimit = durationLimit;
       this.maxStopCount = maxStopCount;
-    }
-
-    /**
-     * The search can adjusted using extensions. Each extention may provide its own request context.
-     * Set the context here.
-     * <p>
-     * @see org.opentripplanner.street.model.edge.StreetEdgeCostExtension
-     */
-    public Builder withExtensionRequestContexts(
-      Collection<ExtensionRequestContext> extensionRequestContexts
-    ) {
-      this.extensionRequestContexts = extensionRequestContexts;
-      return this;
     }
 
     /**
@@ -206,12 +177,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
 
     public StreetNearbyStopFinder build() {
-      return new StreetNearbyStopFinder(
-        durationLimit,
-        maxStopCount,
-        extensionRequestContexts,
-        ignoreVertices
-      );
+      return new StreetNearbyStopFinder(durationLimit, maxStopCount, ignoreVertices);
     }
   }
 }

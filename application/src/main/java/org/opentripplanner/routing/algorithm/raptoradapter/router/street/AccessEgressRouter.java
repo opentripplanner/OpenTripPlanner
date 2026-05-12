@@ -12,6 +12,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +42,12 @@ public class AccessEgressRouter {
     // Note: We calculate access/egresses in two parts. First we fetch the stops with zero distance.
     // Then we do street search. This is because some stations might use the centroid for street
     // routing, but should still give zero distance access/egresses to its child-stops.
+    var zeroDistanceRequest = StreetSearchRequestMapper.mapToTransferRequest(request)
+      .withArriveBy(accessOrEgress.isEgress())
+      .withMode(streetMode)
+      .build();
     var zeroDistanceAccessEgress = findAccessEgressWithZeroDistance(
-      request,
-      streetMode,
+      zeroDistanceRequest,
       accessOrEgress,
       linkingContext
     );
@@ -56,11 +61,15 @@ public class AccessEgressRouter {
     var originVertices = accessOrEgress.isAccess()
       ? linkingContext.findVertices(request.from())
       : linkingContext.findVertices(request.to());
+    var accessEgressRequest = StreetSearchRequestMapper.map(request)
+      .withArriveBy(accessOrEgress.isEgress())
+      .withMode(streetMode)
+      .withExtensionRequestContexts(extensionRequestContexts)
+      .build();
     var streetAccessEgress = StreetNearbyStopFinder.of(durationLimit, maxStopCount)
       .withIgnoreVertices(ignoreVertices)
-      .withExtensionRequestContexts(extensionRequestContexts)
       .build()
-      .findNearbyStops(originVertices, request, streetMode, accessOrEgress.isEgress());
+      .findNearbyStops(originVertices, accessEgressRequest);
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);
@@ -72,8 +81,7 @@ public class AccessEgressRouter {
    * return an empty list if the source/destination is not a stopId.
    */
   private static List<NearbyStop> findAccessEgressWithZeroDistance(
-    RouteRequest routeRequest,
-    StreetMode streetMode,
+    StreetSearchRequest streetSearchRequest,
     AccessEgressType accessOrEgress,
     LinkingContext linkingContext
   ) {
@@ -83,9 +91,7 @@ public class AccessEgressRouter {
 
     return NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
       transitStopVertices,
-      accessOrEgress.isEgress(),
-      routeRequest,
-      streetMode
+      streetSearchRequest
     );
   }
 }

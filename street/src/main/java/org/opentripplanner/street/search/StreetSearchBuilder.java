@@ -42,9 +42,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
 
   @Override
   protected Collection<State> createInitialStates(Set<Vertex> originVertices) {
-    StreetSearchRequest streetSearchRequest = StreetSearchRequest.copyOf(request)
-      .withArriveBy(arriveBy())
-      .build();
+    StreetSearchRequest streetSearchRequest = request.copyOf().withArriveBy(arriveBy()).build();
 
     return State.getInitialStates(originVertices, streetSearchRequest);
   }

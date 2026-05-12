@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -49,12 +48,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   }
 
   @Override
-  public List<NearbyStop> findNearbyStops(
-    Vertex vertex,
-    RouteRequest routingRequest,
-    StreetMode streetMode,
-    boolean reverseDirection
-  ) {
+  public List<NearbyStop> findNearbyStops(Vertex vertex, StreetSearchRequest request) {
     if (!(vertex instanceof TransitStopVertex stopVertex)) {
       throw new IllegalArgumentException(
         "Transfers can only be created between stops. Vertex: " + vertex
@@ -62,23 +56,18 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     }
 
     // Check if the from stop can be used in a transfer
-    if (!filter.includeFromStop(stopVertex.getId(), reverseDirection)) {
+    if (!filter.includeFromStop(stopVertex.getId(), request.arriveBy())) {
       return List.of();
     }
 
     // fetch nearby stops via the street network or using straight-line distance.
-    var nearbyStops = delegateNearbyStopFinder.findNearbyStops(
-      vertex,
-      routingRequest,
-      streetMode,
-      reverseDirection
-    );
+    var nearbyStops = delegateNearbyStopFinder.findNearbyStops(vertex, request);
 
     // Remove transfersNotAllowed stops BEFORE we filter in Pattern and Flex Trips
     nearbyStops = removeTransferNotAllowedStops(nearbyStops);
 
     // Run TripPattern and FlexTrip filters
-    var result = filter.filterToStops(nearbyStops, reverseDirection);
+    var result = filter.filterToStops(nearbyStops, request.arriveBy());
 
     return List.copyOf(result);
   }

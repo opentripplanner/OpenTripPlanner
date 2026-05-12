@@ -91,9 +91,7 @@ public class StreetEdgeTest {
   void testTraverseAsPedestrian() {
     StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(10.0f).buildAndConnect();
 
-    StreetSearchRequest options = StreetSearchRequest.copyOf(proto)
-      .withMode(StreetMode.WALK)
-      .build();
+    StreetSearchRequest options = proto.copyOf().withMode(StreetMode.WALK).build();
 
     State s0 = new State(v1, options);
     State s1 = e1.traverse(s0)[0];
@@ -109,7 +107,7 @@ public class StreetEdgeTest {
   void testTraverseAsCar() {
     StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(10.0f).buildAndConnect();
 
-    State s0 = new State(v1, StreetSearchRequest.copyOf(proto).withMode(StreetMode.CAR).build());
+    State s0 = new State(v1, proto.copyOf().withMode(StreetMode.CAR).build());
     State s1 = e1.traverse(s0)[0];
 
     // Should use the speed on the edge.
@@ -154,14 +152,14 @@ public class StreetEdgeTest {
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
 
-    StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder forward = proto.copyOf();
     forward.withBike(it -> it.withSpeed(3.0f));
 
     State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0)[0];
     State s2 = e1.traverse(s1)[0];
 
-    StreetSearchRequestBuilder reverse = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder reverse = proto.copyOf();
     reverse.withArriveBy(true);
     reverse.withBike(it -> it.withSpeed(3.0f));
 
@@ -191,13 +189,13 @@ public class StreetEdgeTest {
     );
     StreetEdge e1 = streetEdge(vWithTrafficLight, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
-    StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder forward = proto.copyOf();
 
     State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0)[0];
     State s2 = e1.traverse(s1)[0];
 
-    StreetSearchRequestBuilder reverse = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder reverse = proto.copyOf();
     reverse.withArriveBy(true);
 
     State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
@@ -217,7 +215,7 @@ public class StreetEdgeTest {
     StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(vWithTrafficLight, v2, 50.0, StreetTraversalPermission.PEDESTRIAN);
 
-    StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder forward = proto.copyOf();
     forward.withBike(it -> it.withSpeed(3.0f));
 
     State s0 = new State(v0, forward.withMode(StreetMode.WALK).build());
@@ -236,7 +234,7 @@ public class StreetEdgeTest {
     StreetEdge e1 = streetEdge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
     StreetEdge e2 = streetEdge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-    StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder noPenalty = proto.copyOf();
     noPenalty.withBike(it ->
       it.withWalking(w -> {
         w.withMountDismountTime(Duration.ofSeconds(0)).withMountDismountTime(Duration.ofSeconds(0));
@@ -248,7 +246,7 @@ public class StreetEdgeTest {
     State s2 = e1.traverse(s1)[0];
     State s3 = e2.traverse(s2)[0];
 
-    StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
+    StreetSearchRequestBuilder withPenalty = proto.copyOf();
     withPenalty.withBike(it ->
       it.withWalking(w ->
         w

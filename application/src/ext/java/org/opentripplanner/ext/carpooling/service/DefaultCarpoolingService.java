@@ -43,6 +43,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -375,14 +376,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
         0
       );
 
+      var streetSearchRequest = StreetSearchRequestMapper.map(request)
+        .withArriveBy(accessOrEgress.isEgress())
+        .withMode(StreetMode.CAR)
+        .build();
       var nearbyStops = streetNearbyStopFinder
         .build()
-        .findNearbyStops(
-          Set.of(passengerAccessEgressVertex),
-          request,
-          StreetMode.CAR,
-          accessOrEgress.isEgress()
-        )
+        .findNearbyStops(Set.of(passengerAccessEgressVertex), streetSearchRequest)
         .stream()
         .filter(stop -> !(transitServiceResolver.getStopLocation(stop.stopId) instanceof AreaStop))
         .toList();

@@ -669,7 +669,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   ) {
     var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
-      .withRequest(StreetSearchRequest.copyOf(req).withMode(streetMode).build())
+      .withRequest(req.copyOf().withMode(streetMode).build())
       .withFrom(fromVertex)
       .withTo(toVertex)
       .getShortestPathTree();
