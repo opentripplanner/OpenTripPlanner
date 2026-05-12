@@ -1,70 +1,99 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetMode.WALK;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class ViaDirectStreetRouterTest {
 
   private static final double FROM_LAT = 59.9000;
   private static final double FROM_LON = 10.7000;
-  private static final double VIA_LAT = 59.9005;
-  private static final double VIA_LON = 10.7005;
+  private static final double VIA_1_LAT = 59.9005;
+  private static final double VIA_1_LON = 10.7005;
+  private static final double VIA_2_LAT = 59.9008;
+  private static final double VIA_2_LON = 10.7008;
   private static final double TO_LAT = 59.9010;
   private static final double TO_LON = 10.7010;
 
   @Test
   void directWalkRouteWithViaReturnsItinerary() {
     var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);
-    var viaVertex = intersectionVertex("via", VIA_LAT, VIA_LON);
+    var firstViaVertex = intersectionVertex("via1", VIA_1_LAT, VIA_1_LON);
+    var secondViaVertex = intersectionVertex("via2", VIA_2_LAT, VIA_2_LON);
     var toVertex = intersectionVertex("to", TO_LAT, TO_LON);
 
-    streetEdge(fromVertex, viaVertex);
-    streetEdge(viaVertex, fromVertex);
-    streetEdge(viaVertex, toVertex);
-    streetEdge(toVertex, viaVertex);
+    streetEdge(fromVertex, firstViaVertex);
+    streetEdge(firstViaVertex, fromVertex);
+    streetEdge(firstViaVertex, secondViaVertex);
+    streetEdge(secondViaVertex, firstViaVertex);
+    streetEdge(secondViaVertex, toVertex);
+    streetEdge(toVertex, secondViaVertex);
 
     var fromLocation = GenericLocation.fromCoordinate(FROM_LAT, FROM_LON);
     var toLocation = GenericLocation.fromCoordinate(TO_LAT, TO_LON);
 
-    var viaPoint = new VisitViaLocation(
-      "via",
+    var firstViaPoint = new VisitViaLocation(
+      "via1",
       Duration.ZERO,
       List.of(),
-      new WgsCoordinate(VIA_LAT, VIA_LON)
+      new WgsCoordinate(VIA_1_LAT, VIA_1_LON)
     );
-    var viaLocation = viaPoint.coordinateLocation();
+    var firstViaLocation = firstViaPoint.coordinateLocation();
 
+    var secondViaWait = Duration.ofMinutes(30);
+    var secondViaPoint = new VisitViaLocation(
+      "via2",
+      secondViaWait,
+      List.of(),
+      new WgsCoordinate(VIA_2_LAT, VIA_2_LON)
+    );
+    var secondViaLocation = secondViaPoint.coordinateLocation();
+
+    var startTime = ZonedDateTime.of(
+      LocalDate.of(2026, Month.MAY, 12),
+      LocalTime.of(20, 30),
+      ZoneIds.GMT
+    );
     var request = RouteRequest.of()
       .withFrom(fromLocation)
       .withTo(toLocation)
-      .withViaLocations(List.of(viaPoint))
+      .withViaLocations(List.of(firstViaPoint, secondViaPoint))
       .withJourney(jb -> jb.withDirect(new StreetRequest(WALK)))
+      .withDateTime(startTime.toInstant())
       .buildRequest();
 
     var linkingContext = new LinkingContext(
-      Map.of(
-        fromLocation,
-        Set.of(fromVertex),
-        viaLocation,
-        Set.of(viaVertex),
-        toLocation,
-        Set.of(toVertex)
+      Map.ofEntries(
+        entry(fromLocation, Set.of(fromVertex)),
+        entry(firstViaLocation, Set.of(firstViaVertex)),
+        entry(secondViaLocation, Set.of(secondViaVertex)),
+        entry(toLocation, Set.of(toVertex))
       ),
       Set.of(),
       Set.of()
@@ -79,16 +108,116 @@ class ViaDirectStreetRouterTest {
     assertThat(itineraries).isNotEmpty();
 
     var legs = itineraries.getFirst().legs();
-    assertEquals(2, legs.size());
-    assertEquals("from_via (59.9, 10.7)", legs.get(0).from().toStringShort());
+    assertThat(legs).hasSize(3);
+    var firstLeg = legs.getFirst();
+    assertEquals(startTime, firstLeg.startTime());
+    var firstLegEnd = startTime.plusSeconds(47);
+    assertEquals(firstLegEnd, firstLeg.endTime());
+    var secondLeg = legs.get(1);
+    assertEquals(firstLegEnd, secondLeg.startTime());
+    var secondLegEnd = firstLegEnd.plusSeconds(28);
+    assertEquals(secondLegEnd, secondLeg.endTime());
+    var thirdLeg = legs.get(2);
+    var thirdLegStart = secondLegEnd.plus(secondViaWait);
+    assertEquals(thirdLegStart, thirdLeg.startTime());
+    var thirdLegEnd = thirdLegStart.plusSeconds(19);
+    assertEquals(thirdLegEnd, thirdLeg.endTime());
+
+    assertEquals("from_via1 (59.9, 10.7)", firstLeg.from().toStringShort());
     assertEquals(
-      "corner of via_from and via_to (59.9005, 10.7005)",
-      legs.get(0).to().toStringShort()
+      "corner of via1_via2 and via1_from (59.9005, 10.7005)",
+      secondLeg.from().toStringShort()
     );
     assertEquals(
-      "corner of via_from and via_to (59.9005, 10.7005)",
-      legs.get(1).from().toStringShort()
+      "corner of via2_via1 and via2_to (59.9008, 10.7008)",
+      secondLeg.to().toStringShort()
     );
-    assertEquals("to_via (59.901, 10.701)", legs.get(1).to().toStringShort());
+    assertEquals(
+      "corner of via2_via1 and via2_to (59.9008, 10.7008)",
+      thirdLeg.from().toStringShort()
+    );
+    assertEquals("to_via2 (59.901, 10.701)", thirdLeg.to().toStringShort());
+  }
+
+  @Test
+  void isRequestInvalidForRoutingWithPassThrough() {
+    var fromLocation = GenericLocation.fromCoordinate(FROM_LAT, FROM_LON);
+    var toLocation = GenericLocation.fromCoordinate(TO_LAT, TO_LON);
+
+    var firstViaPoint = new VisitViaLocation(
+      "via1",
+      Duration.ZERO,
+      List.of(),
+      new WgsCoordinate(VIA_1_LAT, VIA_1_LON)
+    );
+
+    var secondViaPoint = new PassThroughViaLocation(
+      "via2",
+      List.of(FeedScopedIdForTestFactory.id("A"))
+    );
+
+    var request = RouteRequest.of()
+      .withFrom(fromLocation)
+      .withTo(toLocation)
+      .withViaLocations(List.of(firstViaPoint, secondViaPoint))
+      .withJourney(jb -> jb.withDirect(new StreetRequest(WALK)))
+      .buildRequest();
+
+    var router = new ViaDirectStreetRouter();
+    assertTrue(router.isRequestInvalidForRouting(request));
+  }
+
+  @Test
+  void isStraightLineDistanceWithinLimit() {
+    var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);
+    var firstViaVertex = intersectionVertex("via1", VIA_1_LAT, VIA_1_LON);
+    var secondViaVertex = intersectionVertex("via2", VIA_2_LAT, VIA_2_LON);
+    var toVertex = intersectionVertex("to", TO_LAT, TO_LON);
+
+    var fromLocation = GenericLocation.fromCoordinate(FROM_LAT, FROM_LON);
+    var toLocation = GenericLocation.fromCoordinate(TO_LAT, TO_LON);
+
+    var firstViaPoint = new VisitViaLocation(
+      "via1",
+      Duration.ZERO,
+      List.of(),
+      new WgsCoordinate(VIA_1_LAT, VIA_1_LON)
+    );
+    var firstViaLocation = firstViaPoint.coordinateLocation();
+
+    var secondViaPoint = new VisitViaLocation(
+      "via2",
+      Duration.ZERO,
+      List.of(),
+      new WgsCoordinate(VIA_2_LAT, VIA_2_LON)
+    );
+    var secondViaLocation = secondViaPoint.coordinateLocation();
+
+    var request = RouteRequest.of()
+      .withFrom(fromLocation)
+      .withTo(toLocation)
+      .withViaLocations(List.of(firstViaPoint, secondViaPoint))
+      .withJourney(jb -> jb.withDirect(new StreetRequest(WALK)))
+      .buildRequest();
+
+    var linkingContext = new LinkingContext(
+      Map.ofEntries(
+        entry(fromLocation, Set.of(fromVertex)),
+        entry(firstViaLocation, Set.of(firstViaVertex)),
+        entry(secondViaLocation, Set.of(secondViaVertex)),
+        entry(toLocation, Set.of(toVertex))
+      ),
+      Set.of(),
+      Set.of()
+    );
+    var router = new ViaDirectStreetRouter();
+    assertTrue(router.isStraightLineDistanceWithinLimit(linkingContext, request, 500));
+    var withoutViaDistance = SphericalDistanceLibrary.distance(
+      fromLocation.getCoordinate(),
+      toLocation.getCoordinate()
+    );
+    assertFalse(
+      router.isStraightLineDistanceWithinLimit(linkingContext, request, withoutViaDistance)
+    );
   }
 }
