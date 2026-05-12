@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emission.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
@@ -16,8 +17,7 @@ public class EmissionGraphBuilderModule {
 
   @Provides
   @Singleton
-  @Nullable
-  static EmissionGraphBuilder provideEmissionGraphBuilder(
+  static Optional<EmissionGraphBuilder> provideEmissionGraphBuilder(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionRepository emissionRepository,
@@ -25,16 +25,18 @@ public class EmissionGraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     if (emissionRepository == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return new EmissionGraphBuilder(
-      dataSources.getGtfsConfiguredDataSource(),
-      dataSources.getEmissionConfiguredDataSource(),
-      config.emission,
-      emissionRepository,
-      timetableRepository,
-      issueStore
+    return Optional.of(
+      new EmissionGraphBuilder(
+        dataSources.getGtfsConfiguredDataSource(),
+        dataSources.getEmissionConfiguredDataSource(),
+        config.emission,
+        emissionRepository,
+        timetableRepository,
+        issueStore
+      )
     );
   }
 }

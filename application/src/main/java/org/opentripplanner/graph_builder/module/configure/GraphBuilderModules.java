@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.datastore.api.DataSource;
@@ -293,9 +294,8 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  @Nullable
-  static EdgeUpdaterModule provideDataOverlayFactory(BuildConfig config, Graph graph) {
-    return DataOverlayFactory.create(graph, config.dataOverlay);
+  static Optional<EdgeUpdaterModule> provideDataOverlayFactory(BuildConfig config, Graph graph) {
+    return Optional.ofNullable(DataOverlayFactory.create(graph, config.dataOverlay));
   }
 
   @Provides
@@ -335,30 +335,27 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  @Nullable
-  static StopConsolidationModule providesStopConsolidationModule(
+  static Optional<StopConsolidationModule> providesStopConsolidationModule(
     TimetableRepository timetableRepository,
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
       .stopConsolidation()
-      .map(ds -> StopConsolidationModule.of(timetableRepository, repo, ds))
-      .orElse(null);
+      .map(ds -> StopConsolidationModule.of(timetableRepository, repo, ds));
   }
 
   @Provides
   @Singleton
-  @Nullable
-  static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
+  static Optional<RouteToCentroidStationIdsValidator> routeToCentroidStationIdValidator(
     DataImportIssueStore issueStore,
     BuildConfig config,
     TimetableRepository timetableRepository
   ) {
     var ids = config.transitRouteToStationCentroid();
     return ids.isEmpty()
-      ? null
-      : new RouteToCentroidStationIdsValidator(issueStore, ids, timetableRepository);
+      ? Optional.empty()
+      : Optional.of(new RouteToCentroidStationIdsValidator(issueStore, ids, timetableRepository));
   }
 
   @Provides

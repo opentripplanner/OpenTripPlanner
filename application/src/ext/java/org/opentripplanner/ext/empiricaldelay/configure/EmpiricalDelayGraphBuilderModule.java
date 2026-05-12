@@ -3,6 +3,7 @@ package org.opentripplanner.ext.empiricaldelay.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
@@ -18,8 +19,7 @@ public class EmpiricalDelayGraphBuilderModule {
 
   @Provides
   @Singleton
-  @Nullable
-  static EmpiricalDelayGraphBuilder provideEmpiricalDelayGraphBuilder(
+  static Optional<EmpiricalDelayGraphBuilder> provideEmpiricalDelayGraphBuilder(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
@@ -28,16 +28,18 @@ public class EmpiricalDelayGraphBuilderModule {
     DeduplicatorService deduplicator
   ) {
     if (OTPFeature.EmpiricalDelay.isOff() || empiricalDelayRepository == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return new EmpiricalDelayGraphBuilder(
-      dataSources.getEmpiricalDelayConfiguredDataSource(),
-      deduplicator,
-      issueStore,
-      config.empiricalDelay,
-      empiricalDelayRepository,
-      timetableRepository
+    return Optional.of(
+      new EmpiricalDelayGraphBuilder(
+        dataSources.getEmpiricalDelayConfiguredDataSource(),
+        deduplicator,
+        issueStore,
+        config.empiricalDelay,
+        empiricalDelayRepository,
+        timetableRepository
+      )
     );
   }
 }

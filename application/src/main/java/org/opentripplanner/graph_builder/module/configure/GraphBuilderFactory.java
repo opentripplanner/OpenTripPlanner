@@ -5,6 +5,7 @@ import dagger.Component;
 import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
@@ -84,22 +85,17 @@ public interface GraphBuilderFactory {
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
 
-  @Nullable
-  EdgeUpdaterModule dataOverlayFactory();
+  Optional<EdgeUpdaterModule> dataOverlayFactory();
 
   TurnRestrictionModule turnRestrictionModule();
 
-  @Nullable
-  EmissionGraphBuilder emissionGraphBuilder();
+  Optional<EmissionGraphBuilder> emissionGraphBuilder();
 
-  @Nullable
-  EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
+  Optional<EmpiricalDelayGraphBuilder> empiricalDelayGraphBuilder();
 
-  @Nullable
-  RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
+  Optional<RouteToCentroidStationIdsValidator> routeToCentroidStationIdValidator();
 
-  @Nullable
-  StopConsolidationModule stopConsolidationModule();
+  Optional<StopConsolidationModule> stopConsolidationModule();
 
   FareServiceFactory fareServiceFactory();
 

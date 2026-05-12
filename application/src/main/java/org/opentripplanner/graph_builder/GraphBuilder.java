@@ -135,7 +135,7 @@ public class GraphBuilder implements Runnable {
 
     // Consolidate stops only if a stop consolidation repo has been provided
     if (hasTransitData) {
-      graphBuilder.addModuleOptional(factory.stopConsolidationModule());
+      graphBuilder.addModuleOptional(factory.stopConsolidationModule().orElse(null));
       graphBuilder.addModule(factory.tripPatternNamer());
       graphBuilder.addModuleOptional(
         factory.timeZoneAdjusterModule(),
@@ -179,10 +179,10 @@ public class GraphBuilder implements Runnable {
       // Analyze routing between stops to generate report
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);
 
-      graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
+      graphBuilder.addModuleOptional(factory.emissionGraphBuilder().orElse(null), OTPFeature.Emission);
 
       graphBuilder.addModuleOptional(
-        factory.empiricalDelayGraphBuilder(),
+        factory.empiricalDelayGraphBuilder().orElse(null),
         OTPFeature.EmpiricalDelay
       );
     }
@@ -193,11 +193,11 @@ public class GraphBuilder implements Runnable {
 
     graphBuilder.addModule(factory.stopConnectivityModule());
 
-    graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
+    graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator().orElse(null));
 
     graphBuilder.addModuleOptional(factory.dataImportIssueReporter(), config.dataImportReport);
 
-    graphBuilder.addModuleOptional(factory.dataOverlayFactory(), OTPFeature.DataOverlay);
+    graphBuilder.addModuleOptional(factory.dataOverlayFactory().orElse(null), OTPFeature.DataOverlay);
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
