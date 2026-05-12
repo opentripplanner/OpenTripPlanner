@@ -2,7 +2,7 @@ package org.opentripplanner.ext.sorlandsbanen.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.framework.application.OTPFeature;
 
@@ -10,8 +10,9 @@ import org.opentripplanner.framework.application.OTPFeature;
 public class SorlandsbanenNorwayModule {
 
   @Provides
-  @Nullable
-  SorlandsbanenNorwayService providesSorlandsbanenNorwayService() {
-    return OTPFeature.Sorlandsbanen.isOn() ? new SorlandsbanenNorwayService() : null;
+  Optional<SorlandsbanenNorwayService> providesSorlandsbanenNorwayService() {
+    return OTPFeature.Sorlandsbanen.isOn()
+      ? Optional.of(new SorlandsbanenNorwayService())
+      : Optional.empty();
   }
 }

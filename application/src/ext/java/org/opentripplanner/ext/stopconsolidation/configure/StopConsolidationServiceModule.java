@@ -3,6 +3,7 @@ package org.opentripplanner.ext.stopconsolidation.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -14,15 +15,12 @@ public class StopConsolidationServiceModule {
 
   @Provides
   @Singleton
-  @Nullable
-  StopConsolidationService service(
+  Optional<StopConsolidationService> service(
     @Nullable StopConsolidationRepository repo,
     TimetableRepository tm
   ) {
-    if (repo == null) {
-      return null;
-    } else {
-      return new DefaultStopConsolidationService(repo, tm);
-    }
+    return repo == null
+      ? Optional.empty()
+      : Optional.of(new DefaultStopConsolidationService(repo, tm));
   }
 }

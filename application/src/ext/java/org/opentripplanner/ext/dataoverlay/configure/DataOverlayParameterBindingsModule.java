@@ -3,7 +3,7 @@ package org.opentripplanner.ext.dataoverlay.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.standalone.config.BuildConfig;
 
@@ -16,8 +16,11 @@ public class DataOverlayParameterBindingsModule {
 
   @Provides
   @Singleton
-  @Nullable
-  static DataOverlayParameterBindings provideDataOverlayParameterBindings(BuildConfig config) {
-    return config.dataOverlay != null ? config.dataOverlay.getParameterBindings() : null;
+  static Optional<DataOverlayParameterBindings> provideDataOverlayParameterBindings(
+    BuildConfig config
+  ) {
+    return config.dataOverlay != null
+      ? Optional.of(config.dataOverlay.getParameterBindings())
+      : Optional.empty();
   }
 }
