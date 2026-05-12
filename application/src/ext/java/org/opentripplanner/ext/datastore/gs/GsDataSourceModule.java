@@ -3,7 +3,7 @@ package org.opentripplanner.ext.datastore.gs;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
@@ -18,13 +18,12 @@ public class GsDataSourceModule {
 
   @Provides
   @Singleton
-  @Nullable
   @GoogleStorageDSRepository
-  DataSourceRepository provideGoogleStorageDataSourceRepository(OtpDataStoreConfig config) {
+  Optional<DataSourceRepository> provideGoogleStorageDataSourceRepository(OtpDataStoreConfig config) {
     if (OTPFeature.GoogleCloudStorage.isOff()) {
-      return null;
+      return Optional.empty();
     }
     LOG.info("Google Cloud Store Repository enabled - GS resources detected.");
-    return new GsDataSourceRepository(config.gsParameters());
+    return Optional.of(new GsDataSourceRepository(config.gsParameters()));
   }
 }

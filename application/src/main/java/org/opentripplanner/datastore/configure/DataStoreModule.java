@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -51,13 +51,11 @@ public abstract class DataStoreModule {
   public static OtpDataStore provideDataStore(
     @OtpBaseDirectory File baseDirectory,
     OtpDataStoreConfig config,
-    @Nullable @GoogleStorageDSRepository DataSourceRepository gsRepository
+    @GoogleStorageDSRepository Optional<DataSourceRepository> gsRepository
   ) {
     List<DataSourceRepository> repositories = new ArrayList<>();
 
-    if (gsRepository != null) {
-      repositories.add(gsRepository);
-    }
+    gsRepository.ifPresent(repositories::add);
 
     repositories.add(new HttpsDataSourceRepository());
 
