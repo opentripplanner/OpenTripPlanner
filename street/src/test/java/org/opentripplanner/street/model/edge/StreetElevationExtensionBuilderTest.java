@@ -26,8 +26,14 @@ class StreetElevationExtensionBuilderTest {
     new Coordinate(0, 0),
     new Coordinate(1, 1),
   };
+  private static final Coordinate[] COORDINATES_ONE_POINT_TWICE = new Coordinate[] {
+    new Coordinate(0, 0),
+    new Coordinate(0, 0),
+  };
   private static final PackedCoordinateSequence ELEVATION_PROFILE_TWO_POINTS =
     new PackedCoordinateSequence.Double(COORDINATES_TWO_POINTS, 2);
+  private static final PackedCoordinateSequence ELEVATION_PROFILE_ONE_POINT_TWICE =
+    new PackedCoordinateSequence.Double(COORDINATES_ONE_POINT_TWICE, 2);
 
   private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
     new Coordinate[] {
@@ -63,6 +69,16 @@ class StreetElevationExtensionBuilderTest {
       .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS);
     Optional<StreetElevationExtension> streetElevationExtension = seeb.build();
     assertFalse(streetElevationExtension.isEmpty());
+  }
+
+  @Test
+  void testZeroLengthEdge() {
+    StreetElevationExtensionBuilder seeb = new StreetElevationExtensionBuilder()
+      .withPermission(StreetTraversalPermission.ALL)
+      .withDistanceInMeters(0)
+      .withElevationProfile(ELEVATION_PROFILE_ONE_POINT_TWICE);
+    Optional<StreetElevationExtension> streetElevationExtension = seeb.build();
+    assertTrue(streetElevationExtension.isEmpty());
   }
 
   @Test
