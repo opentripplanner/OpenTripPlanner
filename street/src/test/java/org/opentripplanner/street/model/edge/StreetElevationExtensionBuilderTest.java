@@ -77,7 +77,6 @@ class StreetElevationExtensionBuilderTest {
   @Test
   void testZeroLengthEdge() {
     StreetElevationExtensionBuilder seeb = new StreetElevationExtensionBuilder()
-      .withPermission(StreetTraversalPermission.ALL)
       .withDistanceInMeters(0)
       .withElevationProfile(ELEVATION_PROFILE_ONE_POINT_TWICE);
     Optional<StreetElevationExtension> streetElevationExtension = seeb.build();
