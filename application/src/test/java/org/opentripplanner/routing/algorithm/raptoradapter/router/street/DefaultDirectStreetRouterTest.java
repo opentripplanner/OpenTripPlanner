@@ -1,16 +1,17 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model.StreetMode.WALK;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.ItinerarySummarizer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
@@ -34,6 +35,7 @@ class DefaultDirectStreetRouterTest {
     var toLocation = GenericLocation.fromCoordinate(TO_LAT, TO_LON);
 
     var request = RouteRequest.of()
+      .withDateTime(OffsetDateTime.parse("2026-05-13T12:00Z").toInstant())
       .withFrom(fromLocation)
       .withTo(toLocation)
       .withJourney(jb -> jb.withDirect(new StreetRequest(WALK)))
@@ -53,8 +55,10 @@ class DefaultDirectStreetRouterTest {
 
     assertThat(itineraries).isNotEmpty();
 
-    var first = itineraries.getFirst().legs().getFirst();
-    assertEquals("from_to (59.9, 10.7)", first.from().toStringShort());
-    assertEquals("to_from (59.901, 10.701)", first.to().toStringShort());
+    var first = new ItinerarySummarizer(itineraries.getFirst());
+
+    assertThat(first.summarizeLegs()).containsExactly(
+      "[2026-05-13T12:00Z from_to (59.9, 10.7)] → [2026-05-13T12:01:33Z to_from (59.901, 10.701)]"
+    );
   }
 }

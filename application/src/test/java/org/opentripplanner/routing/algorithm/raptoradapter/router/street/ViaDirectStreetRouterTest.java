@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import static com.google.common.truth.Truth.assertThat;
 import static java.util.Map.entry;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.street.model.StreetMode.WALK;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
@@ -20,8 +20,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.ItinerarySummarizer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
@@ -107,36 +107,13 @@ class ViaDirectStreetRouterTest {
 
     assertThat(itineraries).isNotEmpty();
 
-    var legs = itineraries.getFirst().legs();
-    assertThat(legs).hasSize(3);
-    var firstLeg = legs.getFirst();
-    assertEquals(startTime, firstLeg.startTime());
-    var firstLegEnd = startTime.plusSeconds(47);
-    assertEquals(firstLegEnd, firstLeg.endTime());
-    var secondLeg = legs.get(1);
-    assertEquals(firstLegEnd, secondLeg.startTime());
-    var secondLegEnd = firstLegEnd.plusSeconds(28);
-    assertEquals(secondLegEnd, secondLeg.endTime());
-    var thirdLeg = legs.get(2);
-    var thirdLegStart = secondLegEnd.plus(secondViaWait);
-    assertEquals(thirdLegStart, thirdLeg.startTime());
-    var thirdLegEnd = thirdLegStart.plusSeconds(19);
-    assertEquals(thirdLegEnd, thirdLeg.endTime());
+    var itinerary = new ItinerarySummarizer(itineraries.getFirst());
 
-    assertEquals("from_via1 (59.9, 10.7)", firstLeg.from().toStringShort());
-    assertEquals(
-      "corner of via1_via2 and via1_from (59.9005, 10.7005)",
-      secondLeg.from().toStringShort()
+    assertThat(itinerary.summarizeLegs()).containsExactly(
+      "[2026-05-12T20:30Z from_via1 (59.9, 10.7)] → [2026-05-12T20:30:47Z corner of via1_via2 and via1_from (59.9005, 10.7005)]",
+      "[2026-05-12T20:30:47Z corner of via1_via2 and via1_from (59.9005, 10.7005)] → [2026-05-12T20:31:15Z corner of via2_via1 and via2_to (59.9008, 10.7008)]",
+      "[2026-05-12T21:01:15Z corner of via2_via1 and via2_to (59.9008, 10.7008)] → [2026-05-12T21:01:34Z to_via2 (59.901, 10.701)]"
     );
-    assertEquals(
-      "corner of via2_via1 and via2_to (59.9008, 10.7008)",
-      secondLeg.to().toStringShort()
-    );
-    assertEquals(
-      "corner of via2_via1 and via2_to (59.9008, 10.7008)",
-      thirdLeg.from().toStringShort()
-    );
-    assertEquals("to_via2 (59.901, 10.701)", thirdLeg.to().toStringShort());
   }
 
   @Test
@@ -151,10 +128,7 @@ class ViaDirectStreetRouterTest {
       new WgsCoordinate(VIA_1_LAT, VIA_1_LON)
     );
 
-    var secondViaPoint = new PassThroughViaLocation(
-      "via2",
-      List.of(FeedScopedIdForTestFactory.id("A"))
-    );
+    var secondViaPoint = new PassThroughViaLocation("via2", List.of(id("A")));
 
     var request = RouteRequest.of()
       .withFrom(fromLocation)
