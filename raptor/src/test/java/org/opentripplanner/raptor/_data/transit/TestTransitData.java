@@ -124,6 +124,11 @@ public class TestTransitData
   }
 
   @Override
+  public int numberOfTripPatterns() {
+    return routes.size();
+  }
+
+  @Override
   public RaptorCostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
     return new TestCostCalculator(
       boardCostSec,
@@ -261,14 +266,15 @@ public class TestTransitData
   }
 
   public TestTransitData withRoute(TestRoute route) {
-    int routeIndex = routes.size();
+    int tripPatternIndex = routes.size();
+    route.initTripPatternIndex(tripPatternIndex);
     this.routes.add(route);
     var pattern = route.pattern();
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       requestBuilder.debug().withStops(stopIndex);
       expandNumOfStops(stopIndex);
-      routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
+      routeIndexesByStopIndex.get(stopIndex).add(tripPatternIndex);
     }
     return this;
   }
@@ -383,7 +389,7 @@ public class TestTransitData
     } else {
       if (WARNING_COUNTER.getAndIncrement() % 20 == 0) {
         System.err.println(
-          "[INFO] The debug logging for raptor module teste is off by default! " +
+          "[INFO] The debug logging for raptor module tests is off by default! " +
             "Add \"-DdebugRaptor\" to the command line to enable."
         );
       }

@@ -5,7 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.service.TransitService;
 
 public class stopAtDistanceImpl implements GraphQLDataFetchers.GraphQLStopAtDistance {

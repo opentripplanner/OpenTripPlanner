@@ -175,6 +175,7 @@ class AddedTripBuilderTest {
     );
     TripOnServiceDate tripOnServiceDate = tripUpdate.addedTripOnServiceDate();
     assertNotNull(tripOnServiceDate, "The TripUpdate should contain a new TripOnServiceDate");
+    assertTrue(tripOnServiceDate.isExtraJourney(), "The trip should be marked as extra journey");
 
     // Assert stop pattern
     var stopPattern = tripUpdate.stopPattern();

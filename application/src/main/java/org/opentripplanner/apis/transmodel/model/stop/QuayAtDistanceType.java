@@ -9,8 +9,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import java.util.Optional;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.service.TransitService;
 
 public class QuayAtDistanceType {
@@ -61,6 +61,6 @@ public class QuayAtDistanceType {
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<TransmodelRequestContext>getContext().getTransitService();
   }
 }

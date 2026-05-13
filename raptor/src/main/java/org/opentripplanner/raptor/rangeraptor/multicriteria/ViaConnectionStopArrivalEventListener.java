@@ -16,9 +16,9 @@ import org.opentripplanner.raptor.api.request.via.RaptorTransferViaConnection;
 import org.opentripplanner.raptor.api.request.via.RaptorVisitStopViaConnection;
 import org.opentripplanner.raptor.api.request.via.ViaConnection;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
@@ -108,6 +108,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     transfersCache.clear();
   }
 
+  @SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
     var arrival = (McStopArrival<T>) newElement;
@@ -132,7 +133,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     }
   }
 
-  /// We need to continue pass-through connections, even if they are better arrivals in the
+  /// We need to continue pass-through connections, even if better arrivals exist in the
   /// stop arrivals at the given stop - so we ignore the fact that the alighting is rejected.
   @Override
   public void notifyElementRejected(ArrivalView<T> arrival, ArrivalView<T> rejectedByElement) {
@@ -143,26 +144,36 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     }
   }
 
-  private void continueOnSameTripInNextSegment(ArrivalView<T> arrival) {
-    if (!arrival.arrivedBy(TRANSIT)) {
-      next.addStopArrival((McStopArrival<T>) arrival);
+  /// @param alightArrival Must be a transit arrival, if not it is ignored.
+  @SuppressWarnings("DataFlowIssue")
+  private void continueOnSameTripInNextSegment(ArrivalView<T> alightArrival) {
+    if (!alightArrival.arrivedBy(TRANSIT)) {
       return;
     }
-    T trip = arrival.transitPath().trip();
+    var transitPath = alightArrival.transitPath();
+    T trip = transitPath.trip();
     var info = tripInfoProvider.apply(trip);
 
-    var boardingArrival = arrival.previous();
-    int passThroughStopPos = trip.findDepartureStopPosition(
-      boardingArrival.arrivalTime(),
-      arrival.stop()
+    var arrivalAtBoardStop = alightArrival.previous();
+    int boardingStopPos = trip.findDepartureStopPosition(
+      arrivalAtBoardStop.arrivalTime(),
+      transitPath.boardStop()
     );
-    var onBoardTripConstraint = new RaptorTripScheduleStopPosition(
+    int startRoutingAtStopPosition = trip.findArrivalStopPosition(
+      alightArrival.arrivalTime(),
+      alightArrival.stop()
+    );
+    var boardingConstraint = new RaptorTripScheduleStopPosition(
       info.routeIndex(),
       info.tripScheduleIndex(),
-      passThroughStopPos
+      boardingStopPos
     );
-
-    next.addOnBoardTripArrival(boardingArrival, arrival.stop(), onBoardTripConstraint);
+    next.addOnBoardTripArrival(
+      arrivalAtBoardStop,
+      alightArrival.stop(),
+      startRoutingAtStopPosition,
+      boardingConstraint
+    );
   }
 
   private void continueFromSameStopArrival(

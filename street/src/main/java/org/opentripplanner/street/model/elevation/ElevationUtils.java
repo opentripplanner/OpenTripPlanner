@@ -39,6 +39,13 @@ public class ElevationUtils {
     5.0000000000000000E+03,
     5.0000000000000000E+03,
   };
+
+  /// Maximum slope of 35% after which elevation data is considered unreliable. It is based
+  /// on the steepest drivable road,
+  /// [Baldwin Street in New Zealand](https://en.wikipedia.org/wiki/Baldwin_Street)
+  private static final double MAX_UPHILL_SLOPE = 0.35;
+  private static final double MAX_DOWNHILL_SLOPE = -MAX_UPHILL_SLOPE;
+
   private static final double[] TY = {
     -3.4999999999999998E-01,
     -3.4999999999999998E-01,
@@ -82,12 +89,19 @@ public class ElevationUtils {
     5.5464612133430242E-02,
   };
 
-  /**
-   * @param elev       The elevation profile, where each (x, y) is (distance along edge, elevation)
-   * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
-   *                   streets that take cars.
-   */
-  public static SlopeCosts getSlopeCosts(CoordinateSequence elev, boolean slopeLimit) {
+  /// Compute the slope costs for an elevation profile, taking into account that mixing raster elevation
+  /// with OSM data often leads to glitches that cause very high slopes and in turn to negative costs.
+  ///
+  /// We have [analysed](https://github.com/opentripplanner/OpenTripPlanner/pull/7579#pullrequestreview-4226004340)
+  /// if these glitches more commonly lead to edges that are too sloped when in reality they are
+  /// flat or the other way around: the result is that it's more common for slopes to be artificially
+  /// steep.
+  ///
+  /// For this reason we set the slope for an elevation segment to zero if it exceeds the limit
+  /// of {@link #MAX_UPHILL_SLOPE} uphill or {@link #MAX_DOWNHILL_SLOPE} downhill.
+  ///
+  /// @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
+  public static SlopeCosts getSlopeCosts(CoordinateSequence elev) {
     Coordinate[] coordinates = elev.toCoordinateArray();
     boolean flattened = false;
     double maxSlope = 0;
@@ -110,14 +124,10 @@ public class ElevationUtils {
         continue;
       }
       double slope = rise / run;
-      // Baldwin St in Dunedin, NZ, is the steepest street
-      // on earth, and has a grade of 35%.  So for streets
-      // which allow cars, we set the limit to 35%.  Footpaths
-      // are sometimes steeper, so we turn slopeLimit off for them.
-      // But we still need some sort of limit, because the energy
+      // We need _some_ sort of limit, because the energy
       // usage approximation breaks down at extreme slopes, and
       // gives negative weights
-      if ((slopeLimit && (slope > 0.35 || slope < -0.35)) || slope > 1.0 || slope < -1.0) {
+      if (slope > MAX_UPHILL_SLOPE || slope < MAX_DOWNHILL_SLOPE) {
         slope = 0;
         flattened = true;
       }

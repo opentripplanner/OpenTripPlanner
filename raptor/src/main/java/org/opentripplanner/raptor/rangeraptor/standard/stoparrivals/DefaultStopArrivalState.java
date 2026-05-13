@@ -22,7 +22,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
+sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
+  implements StopArrivalState<T>
+  permits EgressStopArrivalState {
 
   /**
    * Used to initialize all none time based attributes.

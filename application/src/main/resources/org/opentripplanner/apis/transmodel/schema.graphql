@@ -171,6 +171,8 @@ type Contact {
 type DatedServiceJourney {
   "Returns scheduled passingTimes for this dated service journey, updated with real-time-updates (if available). "
   estimatedCalls: [EstimatedCall!]! @timingData
+  "Whether this is an extra journey, either from planned data or added in realtime"
+  extraJourney: Boolean!
   id: ID!
   "JourneyPattern for the dated service journey."
   journeyPattern: JourneyPattern
@@ -191,7 +193,7 @@ type DatedServiceJourney {
   replacementForRelation: [ReplacementForRelation!]!
   "The service journey this Dated Service Journey is based on"
   serviceJourney: ServiceJourney!
-  "Alterations specified on the Trip in the planned data"
+  "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
 }
 

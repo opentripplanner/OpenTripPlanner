@@ -49,6 +49,12 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.api.PatternAtStop;
+import org.opentripplanner.place.api.PlaceAtDistance;
+import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -56,11 +62,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -343,7 +344,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<PlaceAtDistance> places;
       try {
         places = new ArrayList<>(
-          getGraphFinder(environment).findClosestPlaces(
+          getNearbyPlaceFinder(environment).findClosestPlaces(
             args.getGraphQLLat(),
             args.getGraphQLLon(),
             args.getGraphQLMaxDistance(),
@@ -762,7 +763,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       List<NearbyStop> stops;
       try {
-        stops = getGraphFinder(environment).findClosestStops(
+        stops = getNearbyStopFinder(environment).findNearbyStops(
           new Coordinate(args.getGraphQLLon(), args.getGraphQLLat()),
           args.getGraphQLRadius()
         );
@@ -967,8 +968,12 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     return environment.<GraphQLRequestContext>getContext().fareService();
   }
 
-  private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().graphFinder();
+  private NearbyPlaceFinder getNearbyPlaceFinder(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().nearbyPlaceFinder();
+  }
+
+  private NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().nearbyStopFinder();
   }
 
   private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {

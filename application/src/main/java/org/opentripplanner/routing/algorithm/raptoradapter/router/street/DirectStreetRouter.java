@@ -1,19 +1,21 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
+import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
  * Generates "direct" street routes, i.e. those that do not use transit and are on the street
@@ -46,20 +48,28 @@ public class DirectStreetRouter {
       var paths = gpFinder.graphPathFinderEntryPoint(request, linkingContext);
 
       // Convert the internal GraphPaths to itineraries
-      final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      final StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
         new TransitServiceResolver(serverContext.transitService()),
         serverContext.transitService().getTimeZone(),
         serverContext.graph().streetNotesService,
         serverContext.streetDetailsService(),
         serverContext.graph().ellipsoidToGeoidDifference
       );
-      List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths, request);
-      response = ItinerariesHelper.decorateItinerariesWithRequestData(
-        response,
+      List<Itinerary> itineraries = new ArrayList<>();
+      for (var path : paths) {
+        var legs = streetPathToLegsMapper.map(path, request);
+        var itinerary = LegsToItineraryMapper.map(
+          legs,
+          path.lastState().isRentingVehicleFromStation(),
+          path.calculateElevations()
+        );
+        itinerary.ifPresent(itineraries::add);
+      }
+      return ItinerariesHelper.decorateItinerariesWithRequestData(
+        itineraries,
         request.journey().wheelchair(),
         request.preferences().wheelchair()
       );
-      return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
     }

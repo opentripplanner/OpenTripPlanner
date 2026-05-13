@@ -14,7 +14,7 @@ import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
 import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
 import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -38,7 +38,7 @@ public class RaptorTransitData {
    * Index of outer list is from stop index, inner list index has no specific meaning. To stop index
    * is a field of the Transfer object.
    */
-  private final List<List<Transfer>> transfersByStopIndex;
+  private final List<List<PathTransfer>> transfersByStopIndex;
 
   /**
    * Trip to trip transfers like with properties like guaranteedTransfer, staySeated and priority.
@@ -76,7 +76,7 @@ public class RaptorTransitData {
 
   public RaptorTransitData(
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-    List<List<Transfer>> transfersByStopIndex,
+    List<List<PathTransfer>> transfersByStopIndex,
     ConstrainedTransferService transferService,
     SiteRepository siteRepository,
     RaptorRequestTransferCache transferCache,

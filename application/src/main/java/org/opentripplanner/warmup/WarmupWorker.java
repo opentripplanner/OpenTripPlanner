@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 class WarmupWorker implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(WarmupWorker.class);
-  private static final int MAX_QUERIES = 20;
+  private static final int MAX_QUERIES = 100;
 
   private final WarmupParameters parameters;
   private final WarmupQueryStrategy queryStrategy;

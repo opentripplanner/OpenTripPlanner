@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.siri.moduletests.extrajourney;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -87,7 +88,12 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     Trip trip = transitService.getTrip(tripId);
     assertNotNull(trip);
     assertNotNull(transitService.findPattern(trip));
-    assertNotNull(transitService.getTripOnServiceDate(tripId));
+    var tripOnServiceDate = transitService.getTripOnServiceDate(tripId);
+    assertNotNull(tripOnServiceDate);
+    assertTrue(
+      tripOnServiceDate.isExtraJourney(),
+      "An extra journey should have extraJourney=true"
+    );
     assertNotNull(
       transitService.getTripOnServiceDate(
         new TripIdAndServiceDate(tripId, env.defaultServiceDate())

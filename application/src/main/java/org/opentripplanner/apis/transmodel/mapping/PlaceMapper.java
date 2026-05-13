@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.TransmodelPlaceType;
-import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.place.api.PlaceType;
 
 /**
  * Map to/from {@link TransmodelPlaceType}

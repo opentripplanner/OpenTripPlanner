@@ -15,14 +15,14 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
-import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -240,10 +240,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       LOG.info(
         "Creating direct transfer edges between stops using straight line distance (not streets)..."
       );
-      finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
+      finder = new StraightLineNearbyStopFinder(
+        transitService::findRegularStopsByBoundingBox,
+        radiusAsDuration
+      );
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      finder = StreetNearbyStopFinder.of(radiusAsDuration, 0).build();
+      finder = StreetNearbyStopFinder.of(null, radiusAsDuration, 0).build();
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {

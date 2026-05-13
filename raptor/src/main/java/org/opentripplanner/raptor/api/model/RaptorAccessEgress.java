@@ -290,7 +290,11 @@ public interface RaptorAccessEgress {
   /** Call this from toString or {@link #defaultToString()} */
   default String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     StringBuilder buf = new StringBuilder();
-    if (isFree()) {
+
+    if (this instanceof RaptorStartOnBoardAccess sob) {
+      var boarding = sob.tripBoarding();
+      buf.append("StartOnBoard").append(boarding);
+    } else if (isFree()) {
       buf.append("Free");
     } else if (hasRides()) {
       buf.append(arrivedOnBoard() ? "Flex" : "Flex+Walk");
@@ -301,7 +305,9 @@ public interface RaptorAccessEgress {
       // which would be more precise.
       buf.append("Walk");
     }
-    buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    if (durationInSeconds() != 0) {
+      buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    }
     if (includeCost && c1() > 0) {
       buf.append(' ').append(C1.format(c1()));
     }

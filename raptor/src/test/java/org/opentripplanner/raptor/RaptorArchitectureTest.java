@@ -165,7 +165,7 @@ public class RaptorArchitectureTest {
       .dependsOn(RR_SHARED_PACKAGES)
       .verify();
     var mcArrivalsC1 = mcArrivals
-      .subPackage("c1")
+      .subPackage("stop")
       .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
       .verify();
     var mcRide = RR_MULTI_CRITERIA.subPackage("ride")

@@ -62,6 +62,7 @@ nav:
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
+    - Preparing DEM Data: 'Preparing-DEM.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
     - Frontends: 'Frontends.md'

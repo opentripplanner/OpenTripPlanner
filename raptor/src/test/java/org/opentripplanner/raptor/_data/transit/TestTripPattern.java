@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor._data.transit;
 
 import java.util.Objects;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -10,7 +11,7 @@ public class TestTripPattern implements RaptorTripPattern {
   private final int[] stopIndexes;
   private final BoardAlightRestrictions restrictions;
   private final int slackIndex;
-  private final int patternIndex;
+  private int patternIndex = RaptorConstants.NOT_SET;
   private final int priorityGroupId;
 
   private TestTripPattern(
@@ -18,14 +19,12 @@ public class TestTripPattern implements RaptorTripPattern {
     int[] stopIndexes,
     BoardAlightRestrictions restrictions,
     int slackIndex,
-    int patternIndex,
     int priorityGroupId
   ) {
     this.name = Objects.requireNonNull(name);
     this.stopIndexes = Objects.requireNonNull(stopIndexes);
     this.restrictions = Objects.requireNonNull(restrictions);
     this.slackIndex = slackIndex;
-    this.patternIndex = patternIndex;
     this.priorityGroupId = priorityGroupId;
   }
 
@@ -69,6 +68,9 @@ public class TestTripPattern implements RaptorTripPattern {
 
   @Override
   public int patternIndex() {
+    if (patternIndex == RaptorConstants.NOT_SET) {
+      throw new IllegalStateException();
+    }
     return patternIndex;
   }
 
@@ -91,13 +93,19 @@ public class TestTripPattern implements RaptorTripPattern {
       .toString();
   }
 
+  public void initIndex(int patternIndex) {
+    if (this.patternIndex != RaptorConstants.NOT_SET) {
+      throw new IllegalStateException("Init once!");
+    }
+    this.patternIndex = patternIndex;
+  }
+
   public static class Builder {
 
     private final String name;
     private int[] stopIndexes;
     private String restrictions;
     private int slackIndex = 0;
-    private int patternIndex = 0;
     private int priorityGroupId = 0;
 
     public Builder(String name, int... stopIndexes) {
@@ -136,7 +144,6 @@ public class TestTripPattern implements RaptorTripPattern {
           ? BoardAlightRestrictions.noRestriction(stopIndexes.length)
           : BoardAlightRestrictions.restrictions(restrictions),
         slackIndex,
-        patternIndex,
         priorityGroupId
       );
     }

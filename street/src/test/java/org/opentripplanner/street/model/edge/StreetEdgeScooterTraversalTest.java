@@ -184,7 +184,7 @@ public class StreetEdgeScooterTraversalTest {
       .build()
       .ifPresent(testStreet::setElevationExtension);
 
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev);
     double trueLength = costs.lengthMultiplier * length;
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);

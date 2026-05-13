@@ -118,13 +118,13 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.api.PlaceAtDistance;
+import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
@@ -783,8 +783,8 @@ public class TransmodelGraphQLSchemaFactory {
           .dataFetcher(environment -> {
             List<NearbyStop> stops;
             try {
-              stops = GqlUtil.getGraphFinder(environment)
-                .findClosestStops(
+              stops = GqlUtil.getNearbyStopFinder(environment)
+                .findNearbyStops(
                   new Coordinate(
                     environment.getArgument("longitude"),
                     environment.getArgument("latitude")
@@ -946,7 +946,7 @@ public class TransmodelGraphQLSchemaFactory {
             }
 
             List<PlaceAtDistance> places;
-            places = GqlUtil.getGraphFinder(environment).findClosestPlaces(
+            places = GqlUtil.getNearbyPlaceFinder(environment).findClosestPlaces(
               environment.getArgument("latitude"),
               environment.getArgument("longitude"),
               environment.getArgument("maximumDistance"),

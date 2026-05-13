@@ -19,6 +19,11 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -27,7 +32,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -121,12 +125,14 @@ public interface OtpServerRequestContext {
 
   MeterRegistry meterRegistry();
 
-  default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(
-      graph().hasStreets,
-      transitService()::findRegularStopsByBoundingBox,
-      linkingContextFactory()
-    );
+  default NearbyPlaceFinder nearbyPlaceFinder() {
+    return new StreetNearbyPlaceFinder(linkingContextFactory());
+  }
+
+  default NearbyStopFinder nearbyStopFinder() {
+    return graph().hasStreets
+      ? StreetNearbyStopFinder.of(linkingContextFactory()).build()
+      : new StraightLineNearbyStopFinder(transitService()::findRegularStopsByBoundingBox);
   }
 
   FlexParameters flexParameters();

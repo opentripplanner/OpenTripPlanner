@@ -352,11 +352,11 @@ public class SpeedTest {
    * to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
-    var currentTestCases = lastSampleResult.get(profile);
-    if (currentTestCases.isFiltered()) {
-      return;
-    }
     for (var p : opts.profiles()) {
+      var currentTestCases = lastSampleResult.get(p);
+      if (currentTestCases.isFiltered()) {
+        continue;
+      }
       tcIO.writeResultsToFile(p, currentTestCases);
     }
   }

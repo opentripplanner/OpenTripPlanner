@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_AND_C2;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
@@ -48,17 +47,14 @@ public class PathParetoSetComparatorsTest {
       // Arrival time
       Arguments.of(USE_ARRIVAL_TIME, NONE, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_ARRIVAL_TIME, USE_C1, NO_RELAX_FN, NO_COMP),
-      Arguments.of(USE_ARRIVAL_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
       Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
       // Departure time
       Arguments.of(USE_DEPARTURE_TIME, NONE, NO_RELAX_FN, NO_COMP),
-      Arguments.of(USE_DEPARTURE_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
       Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
       // Timetable
       Arguments.of(USE_TIMETABLE, NONE, NO_RELAX_FN, NO_COMP),
-      Arguments.of(USE_TIMETABLE, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
       Arguments.of(USE_TIMETABLE, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN)
     );
@@ -90,10 +86,6 @@ public class PathParetoSetComparatorsTest {
     switch (cost) {
       case USE_C1:
         verifyC1Comparator(comparator);
-        break;
-      case USE_C1_AND_C2:
-        verifyC1Comparator(comparator);
-        verifyC2Comparator(comparator);
         break;
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL:
         verifyRelaxedC1IfC2Optimal(comparator);
@@ -246,26 +238,6 @@ public class PathParetoSetComparatorsTest {
         new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL)
       ),
       "c1 and c2 is not optimal"
-    );
-  }
-
-  /**
-   * Verify that dominance function is used in a comparator. This method operates on an assumption
-   * that dominance function is l.c2 > r.c2
-   */
-  private void verifyC2Comparator(ParetoComparator<RaptorPath<RaptorTripSchedule>> comparator) {
-    // Verify that dominance function is used
-    assertTrue(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, ANY, SMALL),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, ANY, NORMAL)
-      )
-    );
-    assertFalse(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, ANY, LARGE),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, ANY, NORMAL)
-      )
     );
   }
 }

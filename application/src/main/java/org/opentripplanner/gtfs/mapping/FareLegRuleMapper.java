@@ -3,21 +3,17 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Area;
-import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.Timeframe;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class FareLegRuleMapper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(FareLegRuleMapper.class);
 
   private final IdFactory idFactory;
   private final FareProductMapper fareProductMapper;
@@ -88,25 +84,10 @@ class FareLegRuleMapper {
     }
     return switch (distanceType) {
       case 0 -> new FareDistance.Stops(
-        fareLegRule.getMinDistance().intValue(),
-        fareLegRule.getMaxDistance().intValue()
+        optionalInt(fareLegRule.getMinDistance()).orElse(0),
+        optionalInt(fareLegRule.getMaxDistance()).orElse(Integer.MAX_VALUE)
       );
-      case 1 -> new FareDistance.LinearDistance(
-        Distance.ofMetersBoxed(fareLegRule.getMinDistance(), error ->
-          LOG.warn(
-            "Fare leg rule min distance not valid: {} - {}",
-            fareLegRule.getMinDistance(),
-            error
-          )
-        ).orElse(null),
-        Distance.ofMetersBoxed(fareLegRule.getMaxDistance(), error ->
-          LOG.warn(
-            "Fare leg rule max distance not valid: {} - {}",
-            fareLegRule.getMaxDistance(),
-            error
-          )
-        ).orElse(null)
-      );
+      case 1 -> throw new IllegalArgumentException("Distance type 1 is not supported");
       default -> null;
     };
   }
@@ -117,5 +98,13 @@ class FareLegRuleMapper {
     }
     var groupId = idFactory.createId(id, "fare leg rule's timeframe group id");
     return timeframeMapper.findTimeframes(groupId);
+  }
+
+  private static OptionalInt optionalInt(Double value) {
+    if (value == null) {
+      return OptionalInt.empty();
+    } else {
+      return OptionalInt.of(value.intValue());
+    }
   }
 }

@@ -23,15 +23,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
-import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
-import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -42,8 +38,6 @@ import org.opentripplanner.utils.collection.Pair;
 class InsertionEvaluatorTest {
 
   private InsertionPositionFinder positionFinder;
-  private LinkingContext linkingContext;
-  private StreetVertexUtils streetVertexUtils;
   private Map<WgsCoordinate, Vertex> vertexMap;
 
   @BeforeEach
@@ -51,7 +45,6 @@ class InsertionEvaluatorTest {
     positionFinder = new InsertionPositionFinder(new BeelineEstimator());
 
     vertexMap = new HashMap<>();
-    Map<GenericLocation, Set<Vertex>> locationVertices = new HashMap<>();
 
     for (WgsCoordinate coord : List.of(
       OSLO_CENTER,
@@ -70,14 +63,7 @@ class InsertionEvaluatorTest {
         coord.longitude()
       );
       vertexMap.put(coord, vertex);
-      locationVertices.put(
-        GenericLocation.fromCoordinate(coord.latitude(), coord.longitude()),
-        Set.of(vertex)
-      );
     }
-
-    linkingContext = new LinkingContext(locationVertices, Set.of(), Set.of());
-    streetVertexUtils = new StreetVertexUtils(null, null);
   }
 
   private CarpoolTripWithVertices createTripWithVertices(CarpoolTrip trip) {
@@ -115,17 +101,11 @@ class InsertionEvaluatorTest {
       return null;
     }
 
-    var evaluator = new InsertionEvaluator(
-      linkingContext,
-      streetVertexUtils,
-      carpoolRouter,
-      Duration.ZERO
-    );
+    var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
       tripWithVertices,
       viablePositions,
-      passengerPickup,
-      passengerDropoff
+      new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
   }
 
@@ -315,17 +295,11 @@ class InsertionEvaluatorTest {
 
     var viablePositions = List.of(new InsertionPosition(1, 2), new InsertionPosition(2, 3));
 
-    var evaluator = new InsertionEvaluator(
-      linkingContext,
-      streetVertexUtils,
-      routingFunction,
-      Duration.ZERO
-    );
+    var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
       tripWithVertices,
       viablePositions,
-      OSLO_EAST,
-      OSLO_WEST
+      new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );
 
     assertNotNull(result);

@@ -1,7 +1,9 @@
 package org.opentripplanner.model.plan;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.NotImplementedException;
@@ -9,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -27,6 +30,7 @@ public class TestTransitLeg implements TransitLeg {
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final Trip trip;
+  private final List<StopLocation> intermediateStops;
 
   public TestTransitLeg(TestTransitLegBuilder builder) {
     this.from = builder.from;
@@ -34,6 +38,7 @@ public class TestTransitLeg implements TransitLeg {
     this.startTime = builder.startTime;
     this.endTime = builder.endTime;
     this.trip = builder.trip;
+    this.intermediateStops = builder.intermediateStops;
   }
 
   @Override
@@ -50,6 +55,22 @@ public class TestTransitLeg implements TransitLeg {
   @Override
   public Trip trip() {
     return trip;
+  }
+
+  @Override
+  public List<StopArrival> listIntermediateStops() {
+    // TODO: if required, allow manual setting of intermediate stop times
+    var stops = new ArrayList<StopArrival>(intermediateStops.size());
+    var totalDuration = Duration.between(startTime, endTime);
+    var n = intermediateStops.size() + 1;
+    for (int i = 0; i < intermediateStops.size(); i++) {
+      var fraction = Duration.ofMillis((totalDuration.toMillis() * (i + 1)) / n);
+      var time = LegCallTime.ofStatic(startTime.plus(fraction));
+      stops.add(
+        new StopArrival(Place.forStop(intermediateStops.get(i)), time, time, null, null, null)
+      );
+    }
+    return stops;
   }
 
   @Override

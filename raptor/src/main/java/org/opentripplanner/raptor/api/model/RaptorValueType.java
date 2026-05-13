@@ -24,6 +24,8 @@ public enum RaptorValueType {
   TRANSFER_PRIORITY("Tₚ"),
   /// Number of rides
   RIDES("Rₙ"),
+  /// Number of Raptor rounds or pareto-rounds
+  ROUNDS("Rₙ"),
   /// Number of via locations visited
   VIAS("Vₙ");
 

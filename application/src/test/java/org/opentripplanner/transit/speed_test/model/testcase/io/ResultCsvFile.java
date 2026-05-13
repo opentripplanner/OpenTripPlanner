@@ -2,6 +2,7 @@ package org.opentripplanner.transit.speed_test.model.testcase.io;
 
 import java.io.File;
 import java.io.IOException;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.speed_test.model.testcase.Result;
 
@@ -12,11 +13,11 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
 
   private static final String TC_ID = "tcId";
   private static final String N_TRANSFERS = "nTransfers";
-  private static final String DURATION = "duration";
-  private static final String COST = "cost";
-  private static final String WALK_DISTANCE = "walkDistance";
   private static final String START_TIME = "startTime";
   private static final String END_TIME = "endTime";
+  private static final String C1 = "c1";
+  private static final String C2 = "c2";
+  private static final String DURATION = "duration";
   private static final String AGENCIES = "agencies";
   private static final String MODES = "modes";
   private static final String ROUTES = "routes";
@@ -26,11 +27,11 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
   private static final String[] HEADERS = {
     TC_ID,
     N_TRANSFERS,
-    DURATION,
-    COST,
-    WALK_DISTANCE,
     START_TIME,
     END_TIME,
+    C1,
+    C2,
+    DURATION,
     AGENCIES,
     MODES,
     ROUTES,
@@ -47,11 +48,11 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
     return switch (colName) {
       case TC_ID -> row.testCaseId();
       case N_TRANSFERS -> Integer.toString(row.nTransfers());
-      case DURATION -> duration2Str(row.duration());
-      case COST -> Integer.toString(row.cost());
-      case WALK_DISTANCE -> Integer.toString(row.walkDistance());
       case START_TIME -> time2str(row.startTime());
       case END_TIME -> time2str(row.endTime());
+      case C1 -> Integer.toString(row.c1());
+      case C2 -> row.c2() == null ? "" : Integer.toString(row.c2());
+      case DURATION -> duration2Str(row.duration());
       case AGENCIES -> col2Str(row.agencies());
       case MODES -> col2Str(row.modes());
       case ROUTES -> col2Str(row.routes());
@@ -67,11 +68,11 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
     return new Result(
       parseString(TC_ID),
       parseInt(N_TRANSFERS),
-      parseDuration(DURATION),
-      parseInt(COST),
-      parseInt(WALK_DISTANCE),
       parseTime(START_TIME),
       parseTime(END_TIME),
+      parseInt(C1, RaptorConstants.ZERO),
+      parseInt(C2, RaptorConstants.ZERO),
+      parseDuration(DURATION),
       parseCollection(AGENCIES),
       parseCollection(MODES, TransitMode::valueOf),
       parseCollection(ROUTES),

@@ -16,7 +16,7 @@ public class ExcludedTripsTest extends GtfsTest {
 
   @Test
   public void test3e1() {
-    Itinerary itinerary = plan(+1388530860L, "3e1", "3e2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388530860L, "3e1", "3e2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 

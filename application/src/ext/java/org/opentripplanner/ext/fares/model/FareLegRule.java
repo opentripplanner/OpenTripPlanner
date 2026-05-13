@@ -22,6 +22,9 @@ public final class FareLegRule implements Serializable {
   private final Collection<FareProduct> fareProducts;
 
   @Nullable
+  private final FareDistance fareDistance;
+
+  @Nullable
   private final FeedScopedId legGroupId;
 
   @Nullable
@@ -53,6 +56,7 @@ public final class FareLegRule implements Serializable {
     this.networkId = builder.networkId;
     this.fromAreaId = builder.fromAreaId;
     this.toAreaId = builder.toAreaId;
+    this.fareDistance = builder.fareDistance;
     this.priority = builder.priority;
     // for serialization purposes, make sure that they are immutable lists
     this.fromTimeframes = List.copyOf(builder.fromTimeframes);
@@ -92,6 +96,11 @@ public final class FareLegRule implements Serializable {
   @Nullable
   public FeedScopedId toAreaId() {
     return toAreaId;
+  }
+
+  @Nullable
+  public FareDistance fareDistance() {
+    return fareDistance;
   }
 
   public OptionalInt priority() {
@@ -138,13 +147,22 @@ public final class FareLegRule implements Serializable {
       Objects.equals(this.networkId, that.networkId) &&
       Objects.equals(this.fromAreaId, that.fromAreaId) &&
       Objects.equals(this.toAreaId, that.toAreaId) &&
+      Objects.equals(this.fareDistance, that.fareDistance) &&
       Objects.equals(this.fareProducts, that.fareProducts)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, legGroupId, networkId, fromAreaId, toAreaId, fareProducts);
+    return Objects.hash(
+      id,
+      legGroupId,
+      networkId,
+      fromAreaId,
+      toAreaId,
+      fareDistance,
+      fareProducts
+    );
   }
 
   @Override

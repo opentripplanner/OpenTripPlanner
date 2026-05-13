@@ -1,4 +1,0 @@
-tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details
-1,0,01:55:21,13457,7759,12:00:00,13:55:21,,,,,Walk 1h55m21s
-1,1,01:01:39,6138,1688,12:02:21,13:04:00,TriMet,BUS,9|54,1:634|1:13171|1:365,Walk 3m50s ~ NE Broadway & 21st(634) ~ BUS 9 12:06:11 12:18:16 ~ W Burnside & SW 5th(13171) ~ BUS 54 12:28:31 12:46:44 ~ SW Beaverton-Hillsdale & 25th(365) ~ Walk 17m16s
-1,0,01:01:17,5623,1458,12:04:02,13:05:19,TriMet,BUS,8,1:6789|1:6548,Walk 7m18s ~ NE 15th & Halsey(6789) ~ BUS 8 12:11:20 12:49:19 ~ SW 11th & Gibbs(6548) ~ Walk   16m

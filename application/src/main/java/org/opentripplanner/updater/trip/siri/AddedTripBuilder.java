@@ -270,6 +270,7 @@ class AddedTripBuilder {
     var tripOnServiceDate = TripOnServiceDate.of(tripOnServiceDateId)
       .withTrip(trip)
       .withServiceDate(serviceDate)
+      .withRealtimeExtraJourney(true)
       .withReplacementFor(replacedTrips)
       .build();
 

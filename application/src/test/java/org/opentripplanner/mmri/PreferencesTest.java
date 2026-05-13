@@ -16,7 +16,7 @@ public class PreferencesTest extends GtfsTest {
 
   @Test
   public void test2c1() {
-    Itinerary itinerary = plan(+1388530860L, "2c1", "2c3", null, false, false, null, "", "", 2);
+    Itinerary itinerary = plan(+1388530860L, "2c1", "2c3", false, false, null, "", "", 2);
 
     Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 

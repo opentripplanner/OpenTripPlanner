@@ -288,7 +288,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>11.2.2</version>
+            <version>12.0.1</version>
         </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
@@ -357,7 +357,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.17</version>
+            <version>7.17.18</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

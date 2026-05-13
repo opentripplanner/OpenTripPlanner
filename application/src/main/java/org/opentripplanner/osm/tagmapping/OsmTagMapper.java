@@ -189,8 +189,20 @@ public class OsmTagMapper {
     );
 
     /* sidewalk and crosswalk */
-    props.setMixinProperties("footway=sidewalk", ofBicycleSafety(2.5));
-    props.setMixinProperties("footway=crossing", ofBicycleSafety(1.5));
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Not(new Equals("highway", "cycleway")),
+        new Equals("footway", "sidewalk")
+      ),
+      ofBicycleSafety(2.5)
+    );
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Not(new Equals("highway", "cycleway")),
+        new Equals("footway", "crossing")
+      ),
+      ofBicycleSafety(1.5)
+    );
 
     /* bicycle=designated, but no bike infrastructure is present */
     props.setMixinProperties(

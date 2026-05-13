@@ -21,7 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.trans
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
 import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -71,7 +71,7 @@ public class RaptorTransitDataMapper {
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
-    List<List<Transfer>> transfersByStopIndex;
+    List<List<PathTransfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
     LOG.info("Mapping raptorTransitData from TimetableRepository...");

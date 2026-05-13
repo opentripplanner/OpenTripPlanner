@@ -26,6 +26,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   int numberOfStops();
 
   /**
+   * This is the total number of trip patterns, it should be possible and all trip patterns must
+   * have a index ({@link RaptorTripPattern#patternIndex()}) < this value. Holes are acceptable.
+   */
+  int numberOfTripPatterns();
+
+  /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
    * around that stop.
    * <p/>

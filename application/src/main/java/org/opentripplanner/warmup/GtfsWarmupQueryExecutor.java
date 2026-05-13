@@ -35,17 +35,73 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
         dateTime: $dateTime
         modes: { transit: { access: [$accessMode], egress: [$egressMode] } }
       ) {
+        searchDateTime
+        pageInfo { startCursor endCursor hasNextPage hasPreviousPage }
+        routingErrors { code description inputField }
         edges {
           node {
             start
             end
+            duration generalizedCost waitingTime walkDistance
+            numberOfTransfers
             legs {
-              mode
-              duration
-              from { name lat lon }
-              to { name lat lon }
-              route { shortName }
-              legGeometry { points }
+              mode duration distance generalizedCost
+              start { scheduledTime estimated { time delay } }
+              end { scheduledTime estimated { time delay } }
+              realTime realtimeState
+              transitLeg walkingBike rentedBike
+              from {
+                name lat lon
+                stop {
+                  gtfsId code name platformCode
+                  parentStation { gtfsId name }
+                }
+              }
+              to {
+                name lat lon
+                stop { gtfsId code name }
+              }
+              intermediatePlaces {
+                name lat lon
+                stop { gtfsId name }
+                arrival { scheduledTime estimated { time delay } }
+                departure { scheduledTime estimated { time delay } }
+              }
+              stopCalls {
+                stopLocation { ... on Stop { gtfsId name } }
+                schedule { time { ... on ArrivalDepartureTime { arrival departure } } }
+                realTime {
+                  arrival { time delay }
+                  departure { time delay }
+                }
+              }
+              route {
+                gtfsId shortName longName mode
+                color textColor
+                agency { gtfsId name }
+              }
+              trip {
+                gtfsId tripHeadsign
+                route { gtfsId }
+              }
+              agency { gtfsId name }
+              alerts {
+                alertHeaderText alertDescriptionText
+                effectiveStartDate effectiveEndDate
+                alertSeverityLevel
+              }
+              pickupBookingInfo {
+                contactInfo { phoneNumber infoUrl bookingUrl }
+                message
+              }
+              dropOffBookingInfo {
+                contactInfo { phoneNumber infoUrl bookingUrl }
+                message
+              }
+              fareProducts {
+                product { name riderCategory { id name } }
+              }
+              legGeometry { points length }
             }
           }
         }

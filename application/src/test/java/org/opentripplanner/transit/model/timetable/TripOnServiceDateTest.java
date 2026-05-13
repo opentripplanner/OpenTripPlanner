@@ -50,6 +50,7 @@ class TripOnServiceDateTest {
       SUBJECT.sameAs(SUBJECT.copy().withServiceDate(LocalDate.now().plusDays(1)).build())
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTripAlteration(TripAlteration.PLANNED).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withRealtimeExtraJourney(true).build()));
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()
@@ -59,5 +60,19 @@ class TripOnServiceDateTest {
           .build()
       )
     );
+  }
+
+  @Test
+  void isExtraJourney() {
+    // True when set in planned data
+    assertTrue(
+      SUBJECT.copy().withTripAlteration(TripAlteration.EXTRA_JOURNEY).build().isExtraJourney()
+    );
+
+    // True when set by realtime update
+    assertTrue(SUBJECT.copy().withRealtimeExtraJourney(true).build().isExtraJourney());
+
+    // False by default
+    assertFalse(SUBJECT.isExtraJourney());
   }
 }

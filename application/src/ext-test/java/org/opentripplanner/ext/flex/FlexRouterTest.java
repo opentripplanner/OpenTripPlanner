@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -87,7 +86,7 @@ class FlexRouterTest {
     assertEquals(Set.of(expectedTripIds), actualTripIds);
   }
 
-  private @NonNull FlexRouter setupEnvironment(TripRequest tripRequest) {
+  private FlexRouter setupEnvironment(TripRequest tripRequest) {
     // Test FlexTrip running day -> service date aggregation using three trips:
     //     trip1 runs on it's service day
     //     trip2 runs on it's service day and the day after

@@ -16,7 +16,7 @@ public class SecondUnpreferredTransferTest extends GtfsTest {
 
   @Test
   public void test3g2() {
-    Itinerary itinerary = plan(+1388530860L, "3g21", "3g26", null, false, false, null, "", "", 2);
+    Itinerary itinerary = plan(+1388530860L, "3g21", "3g26", false, false, null, "", "", 2);
 
     Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 

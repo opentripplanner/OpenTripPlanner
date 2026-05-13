@@ -35,10 +35,18 @@ class ParetoDominanceTest {
   }
 
   @Test
+  void symbol() {
+    assertEquals('≺', LEFT.symbol());
+    assertEquals('≻', RIGHT.symbol());
+    assertEquals('≡', NONE.symbol());
+    assertEquals('∥', MUTUAL.symbol());
+  }
+
+  @Test
   void testToString() {
-    assertEquals("≺", LEFT.toString());
-    assertEquals("≻", RIGHT.toString());
-    assertEquals("≡", NONE.toString());
-    assertEquals("∥", MUTUAL.toString());
+    assertEquals("LEFT ≺", LEFT.toString());
+    assertEquals("RIGHT ≻", RIGHT.toString());
+    assertEquals("NONE ≡", NONE.toString());
+    assertEquals("MUTUAL ∥", MUTUAL.toString());
   }
 }

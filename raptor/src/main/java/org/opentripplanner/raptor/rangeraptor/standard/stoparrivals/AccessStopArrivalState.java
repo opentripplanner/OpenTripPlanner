@@ -14,7 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * well as the default state. There are relatively few access states, so the memory and performance
  * overhead is small.
  */
-public class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
+public final class AccessStopArrivalState<T extends RaptorTripSchedule>
+  implements StopArrivalState<T> {
 
   private final DefaultStopArrivalState<T> delegate;
   private RaptorAccessEgress accessArriveOnStreet;

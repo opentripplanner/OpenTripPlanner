@@ -57,7 +57,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -198,7 +198,7 @@ public class RaptorPathToItineraryMapperTest {
       RoutingBookingInfo.NOT_SET
     );
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress);
-    Transfer transfer = new Transfer(S2.getIndex(), 0, EnumSet.of(StreetMode.WALK));
+    var transfer = new PathTransfer(S1, S2, 0, List.of(), EnumSet.of(StreetMode.WALK));
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);
     RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);
     PathLeg<RaptorTripSchedule> egressLeg = new EgressPathLeg<>(egress, 0, 0, 0);

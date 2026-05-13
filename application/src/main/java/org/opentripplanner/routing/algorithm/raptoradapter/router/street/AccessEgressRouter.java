@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.NearbyStopFactory;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
@@ -56,7 +56,7 @@ public class AccessEgressRouter {
     var originVertices = accessOrEgress.isAccess()
       ? linkingContext.findVertices(request.from())
       : linkingContext.findVertices(request.to());
-    var streetAccessEgress = StreetNearbyStopFinder.of(durationLimit, maxStopCount)
+    var streetAccessEgress = StreetNearbyStopFinder.of(null, durationLimit, maxStopCount)
       .withIgnoreVertices(ignoreVertices)
       .withExtensionRequestContexts(extensionRequestContexts)
       .build()

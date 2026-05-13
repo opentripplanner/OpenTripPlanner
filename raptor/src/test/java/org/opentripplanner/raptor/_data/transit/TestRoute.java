@@ -108,6 +108,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
       .toString();
   }
 
+  public void initTripPatternIndex(int tripPatternIndex) {
+    pattern.initIndex(tripPatternIndex);
+  }
+
   /**
    * Add a transfer constraint to the route by iterating over all trips and matching the provided
    * {@code toTrip}(added to forward search) {@code fromTrip}(added to reverse search) with the rips

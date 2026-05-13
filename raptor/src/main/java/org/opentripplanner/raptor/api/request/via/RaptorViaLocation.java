@@ -98,7 +98,11 @@ public final class RaptorViaLocation {
           var dominance = comparator.compare(x, y);
           if (dominance != ParetoDominance.MUTUAL) {
             throw new IllegalArgumentException(
-              "All connection need to be pareto-optimal: %s %s %s".formatted(x, dominance, y)
+              "All connection need to be pareto-optimal: %s %s %s".formatted(
+                x,
+                dominance.symbol(),
+                y
+              )
             );
           }
         }

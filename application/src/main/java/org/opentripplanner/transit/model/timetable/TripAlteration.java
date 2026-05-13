@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
 /**
- * Alterations specified on a Trip in the planned data. This is in some ways equivalent with GTFS-RT
- * scheduled relationship.
+ * Alterations specified on a Trip in the planned data. This only includes alterations in the
+ * planned data, not realtime alterations from GTFS-RT or SIRI.
  */
 public enum TripAlteration {
   CANCELLATION,

@@ -43,7 +43,7 @@ public class TriasResource {
   public TriasResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
     var zoneId = context.triasApiParameters().timeZone().orElse(transitService.getTimeZone());
-    var service = new CallAtStopService(transitService, context.graphFinder());
+    var service = new CallAtStopService(transitService, context.nearbyStopFinder());
     var idMapper = idMapper(context.triasApiParameters());
     var serviceMapper = new OjpService(service, context.routingService(), idMapper, zoneId);
     this.handler = new RequestHandler(serviceMapper, TriasResource::ojpToTrias, "TRIAS");

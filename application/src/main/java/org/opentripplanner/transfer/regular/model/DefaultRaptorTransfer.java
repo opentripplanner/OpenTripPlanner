@@ -13,9 +13,9 @@ public final class DefaultRaptorTransfer implements RaptorTransfer {
   private final int stop;
   private final int durationInSeconds;
   private final int c1;
-  private final Transfer transfer;
+  private final PathTransfer transfer;
 
-  public DefaultRaptorTransfer(int stop, int durationInSeconds, int c1, Transfer transfer) {
+  public DefaultRaptorTransfer(int stop, int durationInSeconds, int c1, PathTransfer transfer) {
     this.stop = stop;
     this.durationInSeconds = durationInSeconds;
     this.c1 = c1;
@@ -34,7 +34,7 @@ public final class DefaultRaptorTransfer implements RaptorTransfer {
     return c1;
   }
 
-  public Transfer transfer() {
+  public PathTransfer transfer() {
     return transfer;
   }
 
@@ -62,9 +62,13 @@ public final class DefaultRaptorTransfer implements RaptorTransfer {
   @Override
   public String toString() {
     String duration = DurationUtils.durationToStr(durationInSeconds());
+    var modes = transfer.getModes();
+    var modesAsString = modes.size() == 1
+      ? modes.stream().findFirst().get().toString()
+      : modes.toString();
     return String.format(
       "%s %s %s ~ %d",
-      transfer.modesAsString(),
+      modesAsString,
       duration,
       OtpNumberFormat.formatCostCenti(c1),
       stop()

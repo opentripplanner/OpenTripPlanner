@@ -282,19 +282,6 @@ public class Itinerary implements ItinerarySortKey {
     return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
-  public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
-    Duration duration = Duration.between(legs().getFirst().startTime(), afterTime);
-    List<Leg> timeShiftedLegs = legs()
-      .stream()
-      .map(leg -> leg.withTimeShift(duration))
-      .collect(Collectors.toList());
-    return new ItineraryBuilder(timeShiftedLegs, searchWindowAware)
-      .withGeneralizedCost(generalizedCost)
-      .withAccessPenalty(accessPenalty)
-      .withEgressPenalty(egressPenalty)
-      .build();
-  }
-
   /** Total duration of the itinerary in seconds */
   public Duration totalDuration() {
     return totalDuration;

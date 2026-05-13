@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7368,
+          "generalizedCost" : 7369,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -252,7 +252,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1523,
+          "generalizedCost" : 1524,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -1195,7 +1195,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 93,
+          "generalizedCost" : 94,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -1715,7 +1715,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1523,
+          "generalizedCost" : 1524,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -2652,7 +2652,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6631,
+          "generalizedCost" : 6632,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -2869,7 +2869,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 137,
+          "generalizedCost" : 138,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -3437,7 +3437,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 137,
+          "generalizedCost" : 138,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -3743,7 +3743,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1381,
+          "generalizedCost" : 1382,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -3895,7 +3895,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 137,
+          "generalizedCost" : 138,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4058,7 +4058,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 680,
+          "generalizedCost" : 681,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4377,7 +4377,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 684,
+          "generalizedCost" : 685,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4477,7 +4477,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 137,
+          "generalizedCost" : 138,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4783,7 +4783,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1381,
+          "generalizedCost" : 1382,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4935,7 +4935,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 137,
+          "generalizedCost" : 138,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -5098,7 +5098,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 680,
+          "generalizedCost" : 681,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -5417,7 +5417,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 684,
+          "generalizedCost" : 685,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -5765,7 +5765,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6203,
+          "generalizedCost" : 6204,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",

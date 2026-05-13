@@ -1,39 +1,45 @@
 package org.opentripplanner.street.model.elevation;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.street.model.elevation.ElevationProfiles.STEEP_DOWNHILL_PROFILE;
+import static org.opentripplanner.street.model.elevation.ElevationProfiles.STEEP_ELEVATION_PROFILE;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 
-public class ElevationUtilsTest {
+class ElevationUtilsTest {
 
   @Test
-  public void testLengthMultiplier() {
+  void testLengthMultiplier() {
     PackedCoordinateSequenceFactory factory = PackedCoordinateSequenceFactory.DOUBLE_FACTORY;
     CoordinateSequence seq = factory.create(
       new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 1) }
     );
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(seq, false);
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(seq);
     assertEquals(1.0, costs.lengthMultiplier);
 
     seq = factory.create(new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 2) });
-    costs = ElevationUtils.getSlopeCosts(seq, false);
+    costs = ElevationUtils.getSlopeCosts(seq);
     assertEquals(1.00498756211208902702, costs.lengthMultiplier);
 
     seq = factory.create(
       new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 2), new Coordinate(15, 1) }
     );
-    costs = ElevationUtils.getSlopeCosts(seq, false);
+    costs = ElevationUtils.getSlopeCosts(seq);
     assertEquals(1.00992634231424500668, costs.lengthMultiplier);
   }
 
   @Test
-  public void testCalculateSlopeWalkEffectiveLengthFactor() {
+  void testCalculateSlopeWalkEffectiveLengthFactor() {
     // 35% should hit the MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR=3, hence 300m is expected
     assertEquals(300.0, ElevationUtils.calculateEffectiveWalkLength(100, 35), 0.1);
 
@@ -57,7 +63,7 @@ public class ElevationUtilsTest {
   }
 
   @Test
-  public void testPartialElevationProfile() {
+  void testPartialElevationProfile() {
     double[] two_point = new double[] { 0, 10, 10, 20 };
     double[] four_point = new double[] { 0, 100, 10, 110, 20, 120, 25, 125 };
     double[] small_run = new double[] { 0, 100, 10, 110, 20, 120, 20.5, 120.5 };
@@ -99,6 +105,17 @@ public class ElevationUtilsTest {
       20.25,
       new double[] { 0, 100.25, 9.75, 110, 19.75, 120, 20, 120.25 }
     );
+  }
+
+  private static List<PackedCoordinateSequence> slopeCases() {
+    return List.of(STEEP_ELEVATION_PROFILE, STEEP_DOWNHILL_PROFILE);
+  }
+
+  @ParameterizedTest
+  @MethodSource("slopeCases")
+  void nonNegativeSlopeSpeedFactorOnSteepProfiles(PackedCoordinateSequence seq) {
+    var slopeCosts = ElevationUtils.getSlopeCosts(seq);
+    assertThat(slopeCosts.slopeSpeedFactor).isGreaterThan(0);
   }
 
   private static void assertPartialElevation(

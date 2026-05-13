@@ -7,7 +7,9 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import gnu.trove.map.TIntObjectMap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
@@ -71,13 +73,10 @@ public class AccessPaths {
     RaptorProfile profile,
     SearchDirection searchDirection
   ) {
-    // On board access paths can not be filtered up-front to remove non-optimal accesses,
-    // and also cannot have time penalties, so we extract them from paths before removing.
-    var onBoardAccessPaths = paths
-      .stream()
-      .filter(RaptorStartOnBoardAccess.class::isInstance)
-      .map(RaptorStartOnBoardAccess.class::cast)
-      .toList();
+    var split = partitioningByStartOnBoard(paths);
+    var onBoardAccessPaths = mapToStartOnBoardAccess(split.get(true));
+
+    paths = split.get(false);
 
     if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
@@ -238,6 +237,25 @@ public class AccessPaths {
       }
     }
     return false;
+  }
+
+  private static List<RaptorStartOnBoardAccess> mapToStartOnBoardAccess(
+    List<RaptorAccessEgress> startOnBoardPaths
+  ) {
+    return startOnBoardPaths.stream().map(RaptorStartOnBoardAccess.class::cast).toList();
+  }
+
+  /// This method partition the input paths in two, the RaptorStartOnBoardAccess(key=true) in one
+  /// list and the rest in the other.
+  ///
+  /// Start on board access paths can not be filtered up-front to remove non-optimal accesses, and
+  /// also cannot have time penalties, so we extract them from paths before pressessing the rest.
+  private static Map<Boolean, List<RaptorAccessEgress>> partitioningByStartOnBoard(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    return paths
+      .stream()
+      .collect(Collectors.partitioningBy(RaptorStartOnBoardAccess.class::isInstance));
   }
 
   /**

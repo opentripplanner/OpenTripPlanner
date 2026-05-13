@@ -13,10 +13,10 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graphfinder.NoopSiteResolver;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 
 public class BicycleRoutingTest {
 
@@ -100,7 +101,7 @@ public class BicycleRoutingTest {
     var gpf = new GraphPathFinder();
     var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
-    GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+    StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
       new NoopSiteResolver(),
       ZoneIds.BERLIN,
       graph.streetNotesService,
@@ -108,7 +109,12 @@ public class BicycleRoutingTest {
       graph.ellipsoidToGeoidDifference
     );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
+    var itineraries = paths
+      .stream()
+      .map(path ->
+        LegsToItineraryMapper.map(streetPathToLegsMapper.map(path, request), false, null).get()
+      )
+      .toList();
     temporaryVerticesContainer.close();
 
     // make sure that we only get BICYCLE legs

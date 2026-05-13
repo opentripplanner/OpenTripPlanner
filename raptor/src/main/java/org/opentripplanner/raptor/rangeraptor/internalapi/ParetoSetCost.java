@@ -7,17 +7,13 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
  */
 public enum ParetoSetCost {
   /**
-   * Cost is not used.
+   * Cost is not used. This can not be used with McRaptor.
    */
   NONE,
   /**
    * One cost parameter is used. A small c1 value is better than a large value.
    */
   USE_C1,
-  /**
-   * Use both c1 and c2 in the pareto function. A small value is better than a large one.
-   */
-  USE_C1_AND_C2,
   /**
    * Use c1 in the pareto function, but relax c1 is c2 is optimal. This allows slightly worse
    * c1 values if a path is considered better based on the c2 value. Another way of looking at
@@ -27,7 +23,8 @@ public enum ParetoSetCost {
    */
   USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
 
-  public boolean includeC1() {
+  /// Return `true` if the c1 criteria is included in the pareto comparason.
+  public boolean useC1() {
     return this != NONE;
   }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 
 class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
 
@@ -15,7 +15,7 @@ class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
   private final List<DefaultRaptorTransfer>[] reversedTransfers;
 
   PreCachedRaptorTransferIndex(
-    List<List<Transfer>> transfersByStopIndex,
+    List<List<PathTransfer>> transfersByStopIndex,
     StreetSearchRequest request,
     boolean parallel
   ) {

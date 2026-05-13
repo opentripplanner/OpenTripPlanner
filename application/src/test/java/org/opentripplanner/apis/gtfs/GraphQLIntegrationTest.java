@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -68,6 +67,8 @@ import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -75,10 +76,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -125,7 +122,6 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
@@ -189,6 +185,14 @@ class GraphQLIntegrationTest {
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final VehicleParkingRepository PARKING_REPOSITORY =
     new DefaultVehicleParkingRepository();
+  private static final NearbyPlaceFinder PLACE_FINDER = (_, _, _, _, _, _, _, _, _, _, _, _) -> {
+    var stop = TimetableRepositoryForTest.of().stop("A").build();
+    return List.of(
+      new PlaceAtDistance(stop, 0),
+      new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
+      new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
+    );
+  };
 
   @BeforeAll
   static void setup() {
@@ -521,7 +525,8 @@ class GraphQLIntegrationTest {
       new DefaultVehicleParkingService(PARKING_REPOSITORY),
       realtimeVehicleService,
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      FINDER,
+      PLACE_FINDER,
+      null,
       routeRequest
     );
   }
@@ -661,34 +666,4 @@ class GraphQLIntegrationTest {
     fail("expected an outbound response but got %s".formatted(response.getClass().getSimpleName()));
     return null;
   }
-
-  private static final GraphFinder FINDER = new GraphFinder() {
-    @Override
-    public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
-      return null;
-    }
-
-    @Override
-    public List<PlaceAtDistance> findClosestPlaces(
-      double lat,
-      double lon,
-      double radiusMeters,
-      int maxResults,
-      List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes,
-      List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByStations,
-      List<FeedScopedId> filterByRoutes,
-      List<String> filterByBikeRentalStations,
-      List<String> filterByNetwork,
-      TransitService transitService
-    ) {
-      var stop = TimetableRepositoryForTest.of().stop("A").build();
-      return List.of(
-        new PlaceAtDistance(stop, 0),
-        new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
-        new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
-      );
-    }
-  };
 }
