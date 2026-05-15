@@ -554,6 +554,16 @@
                 <artifactId>geojson-jackson</artifactId>
                 <version>1.14</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${jaxb-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.5</version>
+            </dependency>
 
             <!-- Testing -->
 
