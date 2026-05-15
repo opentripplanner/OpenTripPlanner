@@ -124,6 +124,11 @@ public class TestTransitData
   }
 
   @Override
+  public int numberOfTripPatterns() {
+    return routes.size();
+  }
+
+  @Override
   public RaptorCostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
     return new TestCostCalculator(
       boardCostSec,
@@ -261,14 +266,15 @@ public class TestTransitData
   }
 
   public TestTransitData withRoute(TestRoute route) {
-    int routeIndex = routes.size();
+    int tripPatternIndex = routes.size();
+    route.initTripPatternIndex(tripPatternIndex);
     this.routes.add(route);
     var pattern = route.pattern();
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       requestBuilder.debug().withStops(stopIndex);
       expandNumOfStops(stopIndex);
-      routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
+      routeIndexesByStopIndex.get(stopIndex).add(tripPatternIndex);
     }
     return this;
   }

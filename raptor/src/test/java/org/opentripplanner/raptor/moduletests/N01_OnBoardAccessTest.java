@@ -8,6 +8,7 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor.spi.RaptorConstants.ZERO;
 
 import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 
 /**
  * FEATURE UNDER TEST
+ * <p>
  * Raptor should handle access from on-board a transit vehicle. When given such access as input,
  * resulting paths should include a boarding at the stop given in the access, but only for the
  * specific route and trip. Apart from boarding cost, the cost of the access leg should be
@@ -30,6 +32,13 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  */
 class N01_OnBoardAccessTest {
 
+  private static final int R1_INDEX = 0;
+  private static final int R2_INDEX = 1;
+  private static final int TRIP_0 = 0;
+  private static final int TRIP_1 = 1;
+  private static final int STOP_POS_0 = 0;
+  private static final int STOP_POS_1 = 1;
+  private static final int STOP_POS_2 = 2;
   private final TestTransitData data = new TestTransitData();
 
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
@@ -57,10 +66,11 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:05  0:10  0:20
-        -- R2
+        --
+        R2
         A     B           D
         0:00  0:06        0:15
         """
@@ -87,10 +97,11 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:05  0:10  0:20
-        -- R2
+        --
+        R2
         A     B     C     D
         0:00  0:06  0:12  0:15
         """
@@ -117,13 +128,15 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C
         0:00  0:05  0:10
-        -- R2
+        --
+        R2
                     C      D
                     0:12   0:20
-        -- R3
+        --
+        R3
         A     B     C     D
         0:00  0:06  0:09  0:15
         """
@@ -148,7 +161,7 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D     A     B     C     D
         0:00  0:05  0:10  0:20  0:30  0:35  0:40  0:50
         """
@@ -175,7 +188,7 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:02  0:05  0:10
         0:00  0:05  0:10  0:20
@@ -203,7 +216,7 @@ class N01_OnBoardAccessTest {
       .access(new TestRaptorStartOnBoardAccess(1, 1, 1, STOP_B, 0))
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:02  0:05  0:10
         0:00  0:05  0:10  0:20
@@ -226,7 +239,7 @@ class N01_OnBoardAccessTest {
       .access(new TestRaptorStartOnBoardAccess(0, 3, 1, STOP_B, 0))
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     D
         0:00  0:05  0:10
         0:00  0:10  0:20
@@ -247,26 +260,27 @@ class N01_OnBoardAccessTest {
   void multipleAccesses() {
     data
       .access(
+        // Pareto-optimal - best arrival-time
+        new TestRaptorStartOnBoardAccess(R2_INDEX, TRIP_0, STOP_POS_0, STOP_A, ZERO),
         // Dominated by trip 1 @ C
-        new TestRaptorStartOnBoardAccess(0, 1, 1, STOP_B, 0),
-        // Pareto-optimal
-        new TestRaptorStartOnBoardAccess(0, 1, 2, STOP_C, 0),
-        // Pareto-optimal
-        new TestRaptorStartOnBoardAccess(1, 0, 0, STOP_A, 0)
+        new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_1, STOP_B, ZERO),
+        // Pareto-optimal - best depature-time & c1
+        new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_2, STOP_C, ZERO)
       )
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:05  0:10  0:15
         0:05  0:10  0:15  0:20
-        -- R2
+        --
+        R2
         A     B
         0:02  0:04
         """
       )
-      .egress("D ~ Walk 30s");
+      .egress("D ~ Walk 1m");
 
     var requestBuilder = prepareRequest();
 
@@ -275,8 +289,8 @@ class N01_OnBoardAccessTest {
     // Only accesses that yield a non-dominated path are included in the result
     assertEquals(
       """
-      A ~ BUS R2 0:02 0:04 ~ B ~ BUS R1 0:05 0:15 ~ D ~ Walk 30s [0:02 0:15:30 13m30s Tₙ1 C₁2_040]
-      C ~ BUS R1 0:15 0:20 ~ D ~ Walk 30s [0:15 0:20:30 5m30s Tₙ0 C₁960]""",
+      A ~ BUS R2 0:02 0:04 ~ B ~ BUS R1 0:05 0:15 ~ D ~ Walk 1m [0:02 0:16 14m Tₙ1 C₁2_100]
+      C ~ BUS R1 0:15 0:20 ~ D ~ Walk 1m [0:15 0:21 6m Tₙ0 C₁1_020]""",
       pathsToString(raptorResponse)
     );
   }
@@ -294,10 +308,11 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B     C     D
         0:00  0:05  0:10  0:15
-        -- R2
+        --
+        R2
                     E     D
                     0:10  0:12
         """
@@ -328,7 +343,7 @@ class N01_OnBoardAccessTest {
       .withRoutes()
       .withTimetables(
         """
-        -- R1
+        R1
         A     B        C     D
         0:00  0:05:05  0:10  0:15
         0:05  0:10     0:15  0:20

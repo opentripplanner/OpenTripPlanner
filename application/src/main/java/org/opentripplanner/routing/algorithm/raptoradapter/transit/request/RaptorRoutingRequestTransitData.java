@@ -182,6 +182,11 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
+  public int numberOfTripPatterns() {
+    return patternIndex.size();
+  }
+
+  @Override
   public RaptorCostCalculator<TripSchedule> multiCriteriaCostCalculator() {
     return generalizedCostCalculator;
   }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class RaptorRequestTransferCache {
     return transferCache;
   }
 
-  public void put(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
+  public void put(List<List<PathTransfer>> transfersByStopIndex, RouteRequest request) {
     final RaptorRequestTransferCacheKey cacheKey = new RaptorRequestTransferCacheKey(
       transfersByStopIndex,
       request
@@ -39,7 +39,10 @@ public class RaptorRequestTransferCache {
     transferCache.put(cacheKey, raptorTransferIndex);
   }
 
-  public RaptorTransferIndex get(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
+  public RaptorTransferIndex get(
+    List<List<PathTransfer>> transfersByStopIndex,
+    RouteRequest request
+  ) {
     try {
       return transferCache.get(new RaptorRequestTransferCacheKey(transfersByStopIndex, request));
     } catch (ExecutionException e) {

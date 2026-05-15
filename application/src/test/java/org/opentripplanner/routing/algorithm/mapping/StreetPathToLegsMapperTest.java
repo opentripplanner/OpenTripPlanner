@@ -7,13 +7,13 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.NoopSiteResolver;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.service.NoopSiteResolver;
 
 class StreetPathToLegsMapperTest {
 

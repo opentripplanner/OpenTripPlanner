@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import java.util.Optional;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.street.model.elevation.SlopeCosts;
 
@@ -11,7 +10,6 @@ import org.opentripplanner.street.model.elevation.SlopeCosts;
  */
 public class StreetElevationExtensionBuilder {
 
-  private StreetTraversalPermission permission;
   private PackedCoordinateSequence elevationProfile;
 
   private float bicycleSafetyFactor;
@@ -28,8 +26,7 @@ public class StreetElevationExtensionBuilder {
       .withSlopeOverride(streetEdge.isSlopeOverride())
       .withStairs(streetEdge.isStairs())
       .withWalkSafetyFactor(streetEdge.getWalkSafetyFactor())
-      .withBicycleSafetyFactor(streetEdge.getBicycleSafetyFactor())
-      .withPermission(streetEdge.getPermission());
+      .withBicycleSafetyFactor(streetEdge.getBicycleSafetyFactor());
   }
 
   public static StreetElevationExtensionBuilder of(StreetEdgeBuilder<?> seb) {
@@ -38,8 +35,7 @@ public class StreetElevationExtensionBuilder {
       .withSlopeOverride(seb.slopeOverride())
       .withStairs(seb.stairs())
       .withWalkSafetyFactor(seb.walkSafetyFactor())
-      .withBicycleSafetyFactor(seb.bicycleSafetyFactor())
-      .withPermission(seb.permission());
+      .withBicycleSafetyFactor(seb.bicycleSafetyFactor());
   }
 
   public Optional<StreetElevationExtension> build() {
@@ -47,11 +43,6 @@ public class StreetElevationExtensionBuilder {
       return Optional.of(buildInternal());
     }
     return Optional.empty();
-  }
-
-  public StreetElevationExtensionBuilder withPermission(StreetTraversalPermission permission) {
-    this.permission = permission;
-    return this;
   }
 
   public StreetElevationExtensionBuilder withElevationProfile(
@@ -96,8 +87,7 @@ public class StreetElevationExtensionBuilder {
   }
 
   private StreetElevationExtension buildInternal() {
-    boolean slopeLimit = permission.allows(StreetTraversalPermission.CAR);
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elevationProfile, slopeLimit);
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elevationProfile);
 
     var effectiveBikeDistanceFactor = costs.slopeSpeedFactor;
     var effectiveBikeWorkFactor = costs.slopeWorkFactor;

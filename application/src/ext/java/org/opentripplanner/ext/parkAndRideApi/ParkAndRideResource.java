@@ -12,8 +12,8 @@ import jakarta.ws.rs.core.Response.Status;
 import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -26,7 +26,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 public class ParkAndRideResource {
 
   private final VehicleParkingService vehicleParkingService;
-  private final GraphFinder graphFinder;
+  private final NearbyStopFinder nearbyStopFinder;
 
   public ParkAndRideResource(
     @Context OtpServerRequestContext serverContext,
@@ -38,11 +38,10 @@ public class ParkAndRideResource {
   ) {
     this.vehicleParkingService = serverContext.vehicleParkingService();
 
-    // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
-    //           - serverContext.graphFinder(). This needs at least a comment!
+    // TODO OTP2 - Why are we using the StraightLineNearbyStopFinder here
     //           - This can be replaced with a search done with the SiteRepository
     //           - if we have a radius search there.
-    this.graphFinder = new DirectGraphFinder(
+    this.nearbyStopFinder = new StraightLineNearbyStopFinder(
       serverContext.transitService()::findRegularStopsByBoundingBox
     );
   }
@@ -89,7 +88,7 @@ public class ParkAndRideResource {
     if (maxTransitDistance == null) {
       return true;
     } else {
-      var stops = graphFinder.findClosestStops(
+      var stops = nearbyStopFinder.findNearbyStops(
         lot.getCoordinate().asJtsCoordinate(),
         maxTransitDistance
       );

@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 public class AccessEgressMapper {
 

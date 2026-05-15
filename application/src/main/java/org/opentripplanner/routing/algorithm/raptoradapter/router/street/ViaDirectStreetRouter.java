@@ -11,7 +11,6 @@ import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
-import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -19,6 +18,7 @@ import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.path.ElevationChange;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 
 public class ViaDirectStreetRouter extends DirectStreetRouter {
 

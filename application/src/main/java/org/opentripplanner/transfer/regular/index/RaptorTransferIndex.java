@@ -9,14 +9,14 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 
 public interface RaptorTransferIndex {
   /**
    * Create an index for a route request configured in router-config.json
    */
   static RaptorTransferIndex createInitialSetup(
-    List<List<Transfer>> transfersByStopIndex,
+    List<List<PathTransfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
     // We always want to parallelize the generation when OTP is starting up.
@@ -27,7 +27,7 @@ public interface RaptorTransferIndex {
    * Create an index for a route request originated from the client
    */
   static RaptorTransferIndex createRequestScope(
-    List<List<Transfer>> transfersByStopIndex,
+    List<List<PathTransfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
     return OTPFeature.OnDemandRaptorTransfer.isOn()
@@ -41,7 +41,7 @@ public interface RaptorTransferIndex {
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(
     StreetSearchRequest request,
-    List<Transfer> transfers
+    List<PathTransfer> transfers
   ) {
     var mode = request.mode();
     // The transfers are filtered so that there is only one possible directional transfer

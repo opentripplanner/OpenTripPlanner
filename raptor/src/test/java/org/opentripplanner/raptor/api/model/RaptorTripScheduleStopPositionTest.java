@@ -65,9 +65,6 @@ class RaptorTripScheduleStopPositionTest {
 
   @Test
   void testToString() {
-    assertEquals(
-      "RaptorTripScheduleStopPosition{route: 7, tripSchedule: 3, stopPosition: 5}",
-      subject.toString()
-    );
+    assertEquals("[route: 7, trip: 3, pos: 5]", subject.toString());
   }
 }

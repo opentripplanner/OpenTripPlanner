@@ -4,7 +4,7 @@ The GraphQL to Java type mappings are defined in _graphql-codegen.yml_.
 
 ## Requirements
 
-- NodeJS (version 20 or newer)
+- NodeJS (version 22 or newer)
 
 ## Running
 

@@ -31,7 +31,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStop
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
-import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
@@ -93,6 +92,11 @@ public class TestTransitData
   @Override
   public int numberOfStops() {
     return routeIndexesByStopIndex.size();
+  }
+
+  @Override
+  public int numberOfTripPatterns() {
+    return routes.size();
   }
 
   @Override
@@ -215,7 +219,7 @@ public class TestTransitData
     return this;
   }
 
-  public TestTransitData withTransfer(int fromStop, DefaultRaptorTransfer transfer) {
+  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
     transfersToStop.get(transfer.stop()).add(transfer.reverseOf(fromStop));

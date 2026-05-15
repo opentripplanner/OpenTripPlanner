@@ -9,17 +9,28 @@
 The code in this sandbox used to be part of OTP core but to allow more experimentation - in 
 particular regarding GTFS Fares V2 - it was moved into a sandbox.
 
-## Fares V2
+## Fares configuration
 
-In 2022 the GTFS spec was extended to contain a powerful new model, called Fares V2, to describe fares, prices and
-products for public transport tickets. A baseline effort was [merged into the main
-spec](https://github.com/google/transit/pull/286) in May.
+By default OTP will compute no fares.
+
+If you want to compute fares according to the GTFS Fares v1 or v2 specification, you need to set the
+`fares` config to `gtfs`.
+
+```JSON
+// build-config.json
+{
+  "fares": "gtfs"
+}
+```
+
+## Fares V2
 
 OTP experimentally supports the merged baseline plus a few extensions from the [larger, unmerged spec](http://bit.ly/gtfs-fares).
 
 To enable Fares V2 support, add the following to `otp-config.json`:
 
 ```json
+// otp-config.json
 {
   "otpFeatures" : {
     "FaresV2" : true
@@ -46,16 +57,8 @@ The classes and their maintainers are as follows:
 | HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
 | OrcaFareService                            | IBI Group ([Daniel Heppner](mailto:daniel.heppner@ibigroup.com))|
 
-
-
-## Fares configuration
-
-By default OTP will compute fares according to the GTFS specification if fare data is provided in
-your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex
-scenarios or to handle vehicle rental fares, it is necessary to manually configure fares using the
-`fares` section in `build-config.json`. You can combine different fares (for example transit and
-vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine
-(all fields starting with `fare` are considered to be sub-fares).
+For more complex scenarios, it is necessary to manually configure fares using the `fares` section 
+in `build-config.json`. 
 
 ```JSON
 // build-config.json

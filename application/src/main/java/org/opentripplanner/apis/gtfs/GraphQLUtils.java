@@ -11,9 +11,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoa
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 public class GraphQLUtils {

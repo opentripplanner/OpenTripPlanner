@@ -77,7 +77,6 @@ public abstract class GtfsTest {
     long dateTime,
     String fromVertex,
     String toVertex,
-    String onTripId,
     boolean wheelchairAccessible,
     boolean preferLeastTransfers,
     TransitMode preferredMode,
@@ -101,10 +100,6 @@ public abstract class GtfsTest {
     }
     if (toVertex != null && !toVertex.isEmpty()) {
       builder.withTo(GenericLocation.fromStopId(FeedScopedId.of(FEED_ID, toVertex)));
-    }
-    if (onTripId != null && !onTripId.isEmpty()) {
-      // TODO VIA - set different on-board request
-      //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
     }
     builder.withJourney(journeyBuilder -> {
       journeyBuilder.withWheelchair(wheelchairAccessible);

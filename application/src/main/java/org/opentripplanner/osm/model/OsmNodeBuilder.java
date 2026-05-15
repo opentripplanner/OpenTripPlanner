@@ -6,11 +6,12 @@ import org.opentripplanner.osm.OsmProvider;
 
 public class OsmNodeBuilder {
 
-  private static final Map<String, String> EMPTY_TAGS = Map.of();
+  private static final Map<String, String> EMPTY_TAGS = null;
   private long id;
   private double lat;
   private double lon;
-  // many nodes don't have any tags so we start with an empty immutable map
+  // the vast majority of nodes don't have any tags, so we start with null, because that has no
+  // allocations at all
   private Map<String, String> tags = EMPTY_TAGS;
   private OsmProvider osmProvider;
 

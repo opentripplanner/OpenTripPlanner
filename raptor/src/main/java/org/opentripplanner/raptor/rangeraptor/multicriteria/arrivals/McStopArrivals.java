@@ -14,6 +14,8 @@ import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.OnTripAccessArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.ArrivalParetoSetComparatorFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.BitSetIterator;
@@ -167,8 +169,17 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Return all arrivals at the given stop that were added after the last marker was set
-   * (i.e. arrivals in the current round).
+   * Return all arrivals at the given stop that were added after the last marker was set.
+   * <p>
+   * The semantics depend on when this is called in the round lifecycle:
+   * <ul>
+   *   <li>Called from the <b>boarding step</b>: returns transit and transfer arrivals from the
+   *       previous round (the marker was advanced past them at the end of that round's transit
+   *       scan, but the arrivals remain readable).</li>
+   *   <li>Called from the <b>transfer step</b>: returns only the transit alights from the current
+   *       round (the marker was just advanced past the previous round's arrivals and the new
+   *       transit alights were committed).</li>
+   * </ul>
    */
   public Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
     var it = arrivals[stop];
@@ -177,9 +188,19 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /**
-   * For each touched stop, advance the marker to the end of its Pareto set (so that subsequent
-   * calls to {@link #listArrivalsAfterMarker} return only new arrivals), then clear the
-   * touched-stop tracking for the next round.
+   * For each touched stop, advance the marker to the end of its Pareto set, then clear the
+   * touched-stop tracking.
+   * <p>
+   * Called at two points in the round lifecycle (see
+   * {@link McRangeRaptorWorkerState} for the full lifecycle description):
+   * <ul>
+   *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer
+   *       arrivals left over from the previous iteration's last round, so they are not
+   *       re-explored in the new iteration.</li>
+   *   <li><b>Transits for round complete</b>: advances the marker past the previous round's
+   *       arrivals before committing the current round's transit alights. This makes the new
+   *       transit alights visible to the transfer step while hiding the older arrivals.</li>
+   * </ul>
    */
   public void clearTouchedStopsAndSetStopMarkers() {
     IntIterator it = stopsTouchedIterator();
@@ -206,27 +227,33 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * Also ensures the Pareto set for {@code applyToStopIndex} is initialised and marks the stop
    * as touched so the routing loop will visit it.
    *
-   * @param boardingArrival       the arrival state from which boarding occurs.
-   * @param applyToStopIndex      the stop where the on-board boarding should be applied.
-   * @param onBoardTripConstraint  the trip and stop-position constraint for the on-board access.
+   * @param boardingArrival            the arrival state from which boarding occurs.
+   * @param startRoutingAtStopIndex    the stop index where the new ride is applied in the
+   *                                   algorithm. The next stop in pattern will be the first
+   *                                   possible stop to alight. The boarding might be at an earlier
+   *                                   stop.
+   * @param startRoutingAtStopPosition Same as above, but the stop position in the trip pattern.
+   * @param boardingConstraint         the trip and stop-position for where the boarding happens.
    */
   public void addOnBoardTripArrival(
     ArrivalView<T> boardingArrival,
-    int applyToStopIndex,
-    RaptorTripScheduleStopPosition onBoardTripConstraint
+    int startRoutingAtStopIndex,
+    int startRoutingAtStopPosition,
+    RaptorTripScheduleStopPosition boardingConstraint
   ) {
-    int routeIndex = onBoardTripConstraint.routeIndex();
+    int routeIndex = boardingConstraint.routeIndex();
     var arrivalsForRoute = onBoardTripArrivalsByRouteQueue.get(routeIndex);
+
     if (arrivalsForRoute == null) {
-      arrivalsForRoute = new OnTripAccessArrivals<T>();
+      arrivalsForRoute = new OnTripAccessArrivals<>();
       onBoardTripArrivalsByRouteQueue.put(routeIndex, arrivalsForRoute);
     }
-    arrivalsForRoute.add(boardingArrival, onBoardTripConstraint);
+    arrivalsForRoute.add(boardingArrival, startRoutingAtStopPosition, boardingConstraint);
 
     // Then update the state, both touchedStops and init the pareto-set for the given stop to
     // prevent NPE when the state is fetched later. The set is empty, which is ok.
-    findOrCreateSet(applyToStopIndex);
-    touchedStops.set(applyToStopIndex);
+    findOrCreateSet(startRoutingAtStopIndex);
+    touchedStops.set(startRoutingAtStopIndex);
   }
 
   /* private methods */

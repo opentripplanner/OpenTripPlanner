@@ -420,7 +420,8 @@ public class GraphBuilderModules {
       config.distanceBetweenElevationSamples,
       config.maxElevationPropagationMeters,
       config.includeEllipsoidToGeoidDifference,
-      config.multiThreadElevationCalculations
+      config.multiThreadElevationCalculations,
+      config.elevationTileCacheSizeMB
     );
   }
 

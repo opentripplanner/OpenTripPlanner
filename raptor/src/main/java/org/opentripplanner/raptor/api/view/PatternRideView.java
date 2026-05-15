@@ -1,10 +1,11 @@
 package org.opentripplanner.raptor.api.view;
 
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.AbstractPatternRide;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A pattern ride provide read-only access to a
- * {@link org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide}.
+ * {@link AbstractPatternRide}.
  * <p>
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

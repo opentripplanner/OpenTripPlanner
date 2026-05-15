@@ -9,6 +9,7 @@ import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.array.TDoubleArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -372,7 +373,7 @@ public class OsmModule implements GraphBuilderModule {
       IntersectionVertex fromVertex = null;
       IntersectionVertex toVertex = null;
 
-      ArrayList<Coordinate> segmentCoordinates = new ArrayList<>();
+      TDoubleArrayList segmentCoordinates = new TDoubleArrayList(100);
 
       /*
        * Traverse through all the nodes of this edge. For nodes which are not shared with any other edge, do not create endpoints -- just
@@ -412,7 +413,8 @@ public class OsmModule implements GraphBuilderModule {
          * the only processing we do on other nodes is to accumulate their geometry
          */
         if (segmentCoordinates.isEmpty()) {
-          segmentCoordinates.add(osmStartNode.getCoordinate());
+          segmentCoordinates.add(osmStartNode.lon);
+          segmentCoordinates.add(osmStartNode.lat);
         }
 
         if (
@@ -425,14 +427,14 @@ public class OsmModule implements GraphBuilderModule {
           osmEndNode.isEntrance() ||
           vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
         ) {
-          segmentCoordinates.add(osmEndNode.getCoordinate());
+          segmentCoordinates.add(osmEndNode.lon);
+          segmentCoordinates.add(osmEndNode.lat);
 
-          geometry = GeometryUtils.getGeometryFactory().createLineString(
-            segmentCoordinates.toArray(new Coordinate[0])
-          );
+          geometry = GeometryUtils.makeLineString(segmentCoordinates.toArray());
           segmentCoordinates.clear();
         } else {
-          segmentCoordinates.add(osmEndNode.getCoordinate());
+          segmentCoordinates.add(osmEndNode.lon);
+          segmentCoordinates.add(osmEndNode.lat);
           continue;
         }
 
@@ -554,28 +556,23 @@ public class OsmModule implements GraphBuilderModule {
 
   private Optional<Platform> getPlatform(OsmDatabase osmdb, OsmWay way) {
     var references = way.getMultiTagValues(params.boardingAreaRefTags());
-    if (way.isBoardingLocation() && !references.isEmpty()) {
-      var nodeRefs = way.getNodeRefs();
-      var size = nodeRefs.size();
-      var nodes = new Coordinate[size];
-      for (int i = 0; i < size; i++) {
-        nodes[i] = osmdb.getNode(nodeRefs.get(i)).getCoordinate();
-      }
-
-      var geometryFactory = GeometryUtils.getGeometryFactory();
-
-      var geometry = geometryFactory.createLineString(nodes);
-
-      return Optional.of(
-        new Platform(
-          params.edgeNamer().getName(way, "platform " + way.getId()),
-          geometry,
-          references
-        )
-      );
-    } else {
+    if (!way.isBoardingLocation() || references.isEmpty()) {
       return Optional.empty();
     }
+    var nodeRefs = way.getNodeRefs();
+    var size = nodeRefs.size();
+    var nodes = new Coordinate[size];
+    for (int i = 0; i < size; i++) {
+      nodes[i] = osmdb.getNode(nodeRefs.get(i)).getCoordinate();
+    }
+
+    var geometryFactory = GeometryUtils.getGeometryFactory();
+
+    var geometry = geometryFactory.createLineString(nodes);
+
+    return Optional.of(
+      new Platform(params.edgeNamer().getName(way, "platform " + way.getId()), geometry, references)
+    );
   }
 
   private void validateBarriers() {

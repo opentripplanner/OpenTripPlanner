@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ abstract class AbstractCsvFile<T> {
           }
           rows.add(parseRow());
         } catch (RuntimeException e) {
-          LOG.error("Parse error! Row: " + currentReader.getRawRecord());
+          LOG.error("Parse error! Row: {}", currentReader.getRawRecord());
           throw e;
         }
       }
@@ -93,9 +94,9 @@ abstract class AbstractCsvFile<T> {
         out.print(LF);
       }
       out.flush();
-      LOG.info("INFO - New CSV file with is saved to '" + file.getAbsolutePath() + "'.");
+      LOG.info("INFO - New CSV file with is saved to '{}'.", file.getAbsolutePath());
     } catch (Exception e) {
-      LOG.error("Failed to store results: " + e.getMessage(), e);
+      LOG.error("Failed to store results: {}", e.getMessage(), e);
     }
   }
 
@@ -111,6 +112,11 @@ abstract class AbstractCsvFile<T> {
 
   protected int parseInt(String colName) throws IOException {
     return Integer.parseInt(parseString(colName));
+  }
+
+  protected int parseInt(String colName, int defaultValue) throws IOException {
+    var value = parseString(colName);
+    return StringUtils.hasValue(value) ? Integer.parseInt(value) : defaultValue;
   }
 
   protected double parseDouble(String colName) throws IOException {

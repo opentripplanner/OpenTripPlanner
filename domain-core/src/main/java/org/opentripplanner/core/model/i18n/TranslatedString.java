@@ -114,8 +114,9 @@ public class TranslatedString implements I18NString, Serializable {
     if (translations.isEmpty()) {
       throw new IllegalArgumentException("At least one translation must be provided");
     }
-    if (TRANSLATION_CACHE.containsKey(translations)) {
-      return TRANSLATION_CACHE.get(translations);
+    var t = TRANSLATION_CACHE.get(translations);
+    if (t != null) {
+      return t;
     } else {
       I18NString ret;
       // Check if we only have one name, even under multiple languages

@@ -43,7 +43,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *     (generating randomized schedules)
  * </ul>
  * <p>
- * This class originated as a rewrite of Conveyals RAPTOR code: https://github.com/conveyal/r5.
+ * This class originated as a rewrite of <a href="https://github.com/conveyal/r5">Conveyals RAPTOR
+ * code</a>.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -229,12 +230,18 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
           transitWorker.alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
         }
       }
-      // attempt to board using on-board trip access
+
+      // attempt to board using on-board trip access/pass-though. This happens after
+      // the alight at the given stop position.
       if (onBoardArrivals != null && onBoardArrivals.arrivalExistForStopPosition(stopPos)) {
         for (var arrival : onBoardArrivals.listArrivals(stopPos)) {
           var boarding = arrival.boardingConstraint();
           var trip = route.timetable().getTripSchedule(boarding.tripScheduleIndex());
-          transitWorker.boardWithStartOnBoardAccess(arrival.accessStopArrival(), trip, stopPos);
+          transitWorker.boardWithStartOnBoardAccess(
+            arrival.accessStopArrival(),
+            trip,
+            boarding.stopPositionInPattern()
+          );
         }
       }
 

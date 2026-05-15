@@ -244,6 +244,7 @@ class FareLookupService implements Serializable {
       // covers this area
       areaMatcher.matchesFromArea(leg.from().stop, rule.fromAreaId()) &&
       areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId()) &&
+      DistanceMatcher.matchesDistance(leg, rule) &&
       timeframeMatcher.matchesTimeframes(leg, rule)
     );
   }

@@ -12,11 +12,11 @@ public class TransfersMapper {
    * Copy pre-calculated transfers from the original graph
    * @return a list where each element is a list of transfers for the corresponding stop index
    */
-  public static List<List<Transfer>> mapTransfers(
+  public static List<List<PathTransfer>> mapTransfers(
     SiteRepository siteRepository,
     TransferRepository transferRepository
   ) {
-    List<List<Transfer>> transfersByStopIndex = new ArrayList<>();
+    List<List<PathTransfer>> transfersByStopIndex = new ArrayList<>();
 
     for (int i = 0; i < siteRepository.stopIndexSize(); ++i) {
       var stop = siteRepository.stopByIndex(i);
@@ -25,27 +25,11 @@ public class TransfersMapper {
         continue;
       }
 
-      ArrayList<Transfer> list = new ArrayList<>();
+      var list = new ArrayList<PathTransfer>();
 
       for (PathTransfer pathTransfer : transferRepository.findTransfersByStop(stop)) {
         if (pathTransfer.to instanceof RegularStop) {
-          int toStopIndex = pathTransfer.to.getIndex();
-          Transfer newTransfer;
-          if (pathTransfer.getEdges() != null) {
-            newTransfer = new Transfer(
-              toStopIndex,
-              pathTransfer.getEdges(),
-              pathTransfer.getModes()
-            );
-          } else {
-            newTransfer = new Transfer(
-              toStopIndex,
-              (int) Math.ceil(pathTransfer.getDistanceMeters()),
-              pathTransfer.getModes()
-            );
-          }
-
-          list.add(newTransfer);
+          list.add(pathTransfer);
         }
       }
 

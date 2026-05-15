@@ -71,7 +71,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     this.maxSpanDays = Duration.ofSeconds(latestArrivalTime).toDays();
 
     DurationUtils.requireNonNegative(timePenalty.constant());
-    DoubleUtils.requireInRange(timePenalty.coefficient(), 0.05d, Double.MAX_VALUE);
+    DoubleUtils.requireNonNegative(timePenalty.coefficient());
+    if (timePenalty.isZero()) {
+      throw new IllegalArgumentException(
+        "Time penalty coefficient and constant cannot both be zero."
+      );
+    }
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {

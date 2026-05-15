@@ -133,7 +133,7 @@ public sealed interface Condition {
   record Equals(String key, String value) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
-      return way.hasTag(exKey) && way.isTag(exKey, value);
+      return way.isTag(exKey, value);
     }
 
     @Override

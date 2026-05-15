@@ -57,9 +57,9 @@ public class PathConfig<T extends RaptorTripSchedule> {
     return new DestinationArrivalPaths<>(
       comparator,
       ctx.calculator(),
-      costConfig.includeC1() ? ctx.costCalculator() : null,
+      costConfig.useC1() ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(costConfig.includeC1()),
+      createPathMapper(costConfig.useC1()),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()

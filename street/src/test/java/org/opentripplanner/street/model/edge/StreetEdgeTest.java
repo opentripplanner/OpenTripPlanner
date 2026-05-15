@@ -354,7 +354,7 @@ public class StreetEdgeTest {
       .build()
       .ifPresent(testStreet::setElevationExtension);
 
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev);
     double trueLength = costs.lengthMultiplier * length;
     double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();

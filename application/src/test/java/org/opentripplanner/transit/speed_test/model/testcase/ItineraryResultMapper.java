@@ -18,7 +18,6 @@ import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
@@ -137,16 +136,11 @@ class ItineraryResultMapper {
     return new Result(
       testCaseId,
       itinerary.numberOfTransfers(),
-      itinerary.totalDuration(),
-      itinerary.generalizedCost(),
-      itinerary
-        .legs()
-        .stream()
-        .filter(Leg::isWalkingLeg)
-        .mapToInt(l -> IntUtils.round(l.distanceMeters()))
-        .sum(),
       itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
       itinerary.endTime().get(ChronoField.SECOND_OF_DAY),
+      itinerary.generalizedCost(),
+      itinerary.generalizedCost2().orElse(null),
+      itinerary.totalDuration(),
       agencies,
       List.copyOf(modes),
       routes,

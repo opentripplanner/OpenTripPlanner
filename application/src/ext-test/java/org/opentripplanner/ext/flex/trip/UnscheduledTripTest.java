@@ -2,6 +2,8 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
@@ -9,6 +11,7 @@ import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.FlexStopTimesFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -197,6 +201,39 @@ class UnscheduledTripTest {
 
     assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_A));
     assertEquals(PickDrop.SCHEDULED, trip.getAlightRule(STOP_B));
+  }
+
+  public static List<TimePenalty> validPenaltyCases() {
+    return List.of(TimePenalty.of(Duration.ofMinutes(10), 0), TimePenalty.of(Duration.ZERO, 0.10));
+  }
+
+  @ParameterizedTest
+  @MethodSource("validPenaltyCases")
+  void testPenalty(TimePenalty penalty) {
+    var trip = UnscheduledTrip.of(id(1))
+      .withTimePenalty(penalty)
+      .withStopTimes(
+        List.of(
+          FlexStopTimesFactory.area("10:00", "14:00"),
+          FlexStopTimesFactory.area("10:00", "14:00")
+        )
+      )
+      .build();
+    assertNotNull(trip);
+  }
+
+  @Test
+  void testInvalidPenalty() {
+    var trip = UnscheduledTrip.of(id(1))
+      .withTimePenalty(TimePenalty.of(Duration.ZERO, 0))
+      .withStopTimes(
+        List.of(
+          FlexStopTimesFactory.area("10:00", "14:00"),
+          FlexStopTimesFactory.area("10:00", "14:00")
+        )
+      );
+
+    assertThrows(IllegalArgumentException.class, trip::build);
   }
 
   static Stream<TestCase> testRegularStopToAreaEarliestDepartureTimeTestCases() {

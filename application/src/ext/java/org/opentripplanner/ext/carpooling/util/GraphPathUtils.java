@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -9,6 +10,22 @@ import org.opentripplanner.street.search.state.State;
 public final class GraphPathUtils {
 
   private GraphPathUtils() {}
+
+  /**
+   * Returns the duration of the given path, or {@link Duration#ZERO} if the path is {@code null}.
+   */
+  public static Duration durationOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
+    return path == null ? Duration.ZERO : Duration.ofSeconds(path.getDuration());
+  }
+
+  /**
+   * Returns the A* weight of the given path, or {@code 0} if the path is {@code null}. The weight
+   * already accounts for the user's walk preferences (reluctance, safety factor, slope cost,
+   * etc.) since it comes from the search that produced the path.
+   */
+  public static double weightOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
+    return path == null ? 0 : path.getWeight();
+  }
 
   /**
    * Calculates cumulative durations from pre-routed segments, including stop duration
@@ -23,7 +40,7 @@ public final class GraphPathUtils {
   ) {
     Duration[] segmentDurations = new Duration[segments.length];
     for (int i = 0; i < segments.length; i++) {
-      segmentDurations[i] = calculateDuration(segments[i]);
+      segmentDurations[i] = Duration.ofSeconds(segments[i].getDuration());
     }
     return calculateCumulativeDurations(segmentDurations, stopDuration);
   }
@@ -62,15 +79,5 @@ public final class GraphPathUtils {
     }
 
     return cumulativeDurations;
-  }
-
-  /**
-   * Calculates duration for a segment
-   */
-  public static Duration calculateDuration(GraphPath<State, Edge, Vertex> segment) {
-    return Duration.between(
-      segment.states.getFirst().getTime(),
-      segment.states.getLast().getTime()
-    );
   }
 }

@@ -772,8 +772,6 @@ public class OsmDatabase {
           innerWays.add(way);
         } else if (member.hasRoleOuter()) {
           outerWays.add(way);
-        } else {
-          LOG.warn("Unexpected role '{}' in multipolygon", member.getRole());
         }
       }
       processedAreas.add(relation);

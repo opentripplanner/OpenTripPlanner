@@ -44,12 +44,12 @@ class GtfsFaresServiceTest implements FareTestConstants {
     var leg1 = TestTransitLeg.of()
       .withStartTime("10:00")
       .withEndTime("10:30")
-      .withNetwork(NETWORK_A.getId())
+      .withNetwork(NETWORK_A)
       .build();
     var leg2 = TestTransitLeg.of()
       .withStartTime("10:40")
       .withEndTime("11:00")
-      .withNetwork(NETWORK_A.getId())
+      .withNetwork(NETWORK_A)
       .build();
 
     var service = new GtfsFaresService(new DefaultFareService(), V2_SERVICE);
@@ -72,7 +72,7 @@ class GtfsFaresServiceTest implements FareTestConstants {
     var leg1 = TestTransitLeg.of()
       .withStartTime("10:00")
       .withEndTime("10:30")
-      .withNetwork(NETWORK_A.getId())
+      .withNetwork(NETWORK_A)
       .build();
     var service = new GtfsFaresService(new DefaultFareService(), V2_SERVICE);
 

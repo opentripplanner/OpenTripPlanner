@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
-import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
@@ -36,20 +35,20 @@ public class CarpoolTripWithVertices {
   }
 
   /**
-   * Resolves vertices for the trip's route points using the given utilities.
+   * Resolves vertices for the trip's route points using the given utilities. Driver route
+   * points are always linked in CAR mode since the driver traverses the entire trip.
    *
    * @return the trip with vertices, or null if any route point could not be linked to the graph
    */
   @Nullable
   public static CarpoolTripWithVertices create(
     CarpoolTrip trip,
-    StreetVertexUtils streetVertexUtils,
-    LinkingContext linkingContext
+    StreetVertexUtils streetVertexUtils
   ) {
     var vertices = trip
       .routePoints()
       .stream()
-      .map(coordinate -> streetVertexUtils.getOrCreateVertex(coordinate, linkingContext))
+      .map(streetVertexUtils::createDriverWaypointVertex)
       .toList();
     if (vertices.stream().anyMatch(Objects::isNull)) {
       return null;

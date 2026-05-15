@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.api.model;
 
 import java.util.Objects;
-import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class contains information to identify a given stop in a stop pattern for a given trip
  * schedule in a route. This can for example be used to identify where a bording or alighting
  * happens.
  */
+@SuppressWarnings("ClassCanBeRecord")
 public final class RaptorTripScheduleStopPosition {
 
   private final int routeIndex;
@@ -62,10 +62,14 @@ public final class RaptorTripScheduleStopPosition {
   @Override
   public String toString() {
     // The field labels are shortened to improve reading - should be easy to get in the context
-    return ToStringBuilder.of(RaptorTripScheduleStopPosition.class)
-      .addNum("route", routeIndex)
-      .addNum("tripSchedule", tripScheduleIndex)
-      .addNum("stopPosition", stopPositionInPattern)
-      .toString();
+    return (
+      "[route: " +
+      routeIndex +
+      ", trip: " +
+      tripScheduleIndex +
+      ", pos: " +
+      stopPositionInPattern +
+      "]"
+    );
   }
 }

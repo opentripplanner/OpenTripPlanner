@@ -41,22 +41,22 @@ class TransferCountWithTimeLimitTest implements PlanTestConstants, FareTestConst
   private static final TransitLeg LEG_1 = TestTransitLeg.of()
     .withStartTime("10:00")
     .withEndTime("10:10")
-    .withNetwork(NETWORK_A.getId())
+    .withNetwork(NETWORK_A)
     .build();
   private static final TransitLeg LEG_2 = TestTransitLeg.of()
     .withStartTime("10:20")
     .withEndTime("10:30")
-    .withNetwork(NETWORK_A.getId())
+    .withNetwork(NETWORK_A)
     .build();
   private static final TransitLeg LEG_3 = TestTransitLeg.of()
     .withStartTime("10:40")
     .withEndTime("10:50")
-    .withNetwork(NETWORK_A.getId())
+    .withNetwork(NETWORK_A)
     .build();
   private static final TransitLeg LEG_4 = TestTransitLeg.of()
     .withStartTime("10:50")
     .withEndTime("10:55")
-    .withNetwork(NETWORK_A.getId())
+    .withNetwork(NETWORK_A)
     .build();
 
   @Test

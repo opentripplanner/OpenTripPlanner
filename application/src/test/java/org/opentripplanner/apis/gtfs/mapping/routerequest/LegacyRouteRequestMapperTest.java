@@ -32,11 +32,12 @@ import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -88,11 +89,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      GraphFinder.getInstance(
-        graph.hasStreets,
-        transitService::findRegularStopsByBoundingBox,
-        linkingContextFactory
-      ),
+      new StreetNearbyPlaceFinder(linkingContextFactory),
+      StreetNearbyStopFinder.of(linkingContextFactory).build(),
       routeRequest
     );
   }

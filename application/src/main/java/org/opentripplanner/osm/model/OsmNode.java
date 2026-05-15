@@ -38,11 +38,11 @@ public class OsmNode extends OsmEntity {
   }
 
   public boolean hasHighwayTrafficLight() {
-    return hasTag("highway") && "traffic_signals".equals(getTag("highway"));
+    return "traffic_signals".equals(getTag("highway"));
   }
 
   public boolean hasCrossingTrafficLight() {
-    return hasTag("crossing") && "traffic_signals".equals(getTag("crossing"));
+    return "traffic_signals".equals(getTag("crossing"));
   }
 
   /**
@@ -51,6 +51,10 @@ public class OsmNode extends OsmEntity {
    * @return true if it does
    */
   public boolean isBarrier() {
+    // the majority of nodes have no tags at all, so this yields a good speed-up
+    if (this.isTagless()) {
+      return false;
+    }
     return overridePermissions(ALL) != ALL;
   }
 
@@ -69,6 +73,10 @@ public class OsmNode extends OsmEntity {
    * @return True if this entity provides an entrance to a platform or similar entity
    */
   public boolean isEntrance() {
+    // the majority of nodes have no tags at all, so this yields a good speed-up
+    if (this.isTagless()) {
+      return false;
+    }
     return (
       (isStationEntrance() || isTag("entrance", "yes") || isTag("entrance", "main")) &&
       !isTag("access", "private") &&

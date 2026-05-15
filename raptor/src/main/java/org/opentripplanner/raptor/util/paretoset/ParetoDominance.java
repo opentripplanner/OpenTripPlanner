@@ -15,7 +15,7 @@ public enum ParetoDominance {
   /// `x`, AND `x` and `y` are equal in all objective values: `[1, 7, 3]` ≡ `[1, 7, 3]`.
   NONE('≡');
 
-  private char symbol;
+  private final char symbol;
 
   ParetoDominance(char symbol) {
     this.symbol = symbol;
@@ -50,11 +50,15 @@ public enum ParetoDominance {
     return valueOf(value.toUpperCase());
   }
 
+  public char symbol() {
+    return symbol;
+  }
+
   /**
    * Return the symbolic representation of this dominance value.
    */
   @Override
   public String toString() {
-    return Character.toString(symbol);
+    return name() + " " + symbol;
   }
 }

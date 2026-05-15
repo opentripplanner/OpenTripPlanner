@@ -16,7 +16,7 @@ public class BeneficialChangesTest extends GtfsTest {
 
   @Test
   public void test3c1() {
-    Itinerary itinerary = plan(+1388531040L, "3c2", "3c3", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388531040L, "3c2", "3c3", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 

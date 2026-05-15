@@ -16,7 +16,7 @@ public class TimeTest extends GtfsTest {
 
   @Test
   public void test1g1() {
-    Itinerary itinerary = plan(+1388530920L, "1g1", "1g2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388530920L, "1g1", "1g2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
@@ -27,7 +27,7 @@ public class TimeTest extends GtfsTest {
 
   @Test
   public void test1g2() {
-    Itinerary itinerary = plan(-1388530980L, "1g1", "1g2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(-1388530980L, "1g1", "1g2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
@@ -38,7 +38,7 @@ public class TimeTest extends GtfsTest {
 
   @Test
   public void test1g5() {
-    Itinerary itinerary = plan(+1388703780L, "1g1", "1g2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388703780L, "1g1", "1g2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
@@ -49,7 +49,7 @@ public class TimeTest extends GtfsTest {
 
   @Test
   public void test1g6() {
-    Itinerary itinerary = plan(-1388703840L, "1g1", "1g2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(-1388703840L, "1g1", "1g2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 

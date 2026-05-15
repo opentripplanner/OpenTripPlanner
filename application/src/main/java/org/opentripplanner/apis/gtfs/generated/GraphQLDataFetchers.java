@@ -50,11 +50,11 @@ import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.api.PatternAtStop;
+import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.streetdetails.model.Level;
@@ -383,9 +383,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<String> feedId();
-
-    public DataFetcher<String> version();
     public DataFetcher<FeedPublisher> publisher();
+    public DataFetcher<String> version();
   }
 
   /** Feed publisher information */

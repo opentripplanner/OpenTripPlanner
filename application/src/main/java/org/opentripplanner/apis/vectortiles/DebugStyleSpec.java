@@ -223,7 +223,8 @@ public class DebugStyleSpec {
         .fillOpacity(0.5f)
         .fillOutlineColor(BLACK)
         .minZoom(6)
-        .maxZoom(MAX_ZOOM),
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
       StyleBuilder.ofId("group-stop")
         .group(STOPS_GROUP)
         .typeFill()
@@ -232,7 +233,8 @@ public class DebugStyleSpec {
         .fillOpacity(0.5f)
         .fillOutlineColor(BLACK)
         .minZoom(6)
-        .maxZoom(MAX_ZOOM),
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
       StyleBuilder.ofId("regular-stop")
         .group(STOPS_GROUP)
         .typeCircle()

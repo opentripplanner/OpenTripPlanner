@@ -147,6 +147,10 @@ OTP to draw an elevation profile for the on-street portion of itineraries, and h
 routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs are usually supplied
 as rasters (regular grids of numbers) stored in image formats such as GeoTIFF.
 
+For guidance on preparing the DEM file itself — choosing a resolution, projection handling, tile
+layout, NoData flag, and compression — see [Preparing DEM Data](Preparing-DEM.md). This section
+covers only the `build-config.json` options.
+
 
 ### Geoid Difference
 

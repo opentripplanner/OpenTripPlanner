@@ -20,7 +20,6 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.ElevatorUs
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.EscalatorUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
-import org.opentripplanner.routing.graphfinder.EntranceResolver;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -38,6 +37,7 @@ import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.EntranceResolver;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**

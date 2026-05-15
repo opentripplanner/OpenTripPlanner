@@ -23,15 +23,6 @@ class OsmWayTest {
   }
 
   @Test
-  void testIsBicycleDismountForced() {
-    OsmWay way = OsmWay.of().build();
-    assertFalse(way.isBicycleDismountForced());
-
-    way = OsmWay.of().withTag("bicycle", "dismount").build();
-    assertTrue(way.isBicycleDismountForced());
-  }
-
-  @Test
   void testAreaMustContain3Nodes() {
     OsmWay way = OsmWay.of().withTag("area", "yes").build();
     assertFalse(way.isRoutableArea());

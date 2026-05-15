@@ -9,33 +9,48 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
-import org.opentripplanner.transfer.regular.model.Transfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 class RaptorTransferIndexTest {
 
-  private static final Transfer T1 = new Transfer(2, 100, EnumSet.of(StreetMode.WALK));
-  private static final Transfer T2 = new Transfer(
+  private static final PathTransfer T1 = transfer(0, 2, 100, EnumSet.of(StreetMode.WALK));
+  private static final PathTransfer T2 = transfer(
+    0,
     3,
     200,
     EnumSet.of(StreetMode.WALK, StreetMode.BIKE)
   );
-  private static final Transfer T3 = new Transfer(0, 500, EnumSet.of(StreetMode.WALK));
-  private static final Transfer T4 = new Transfer(0, 1000, EnumSet.of(StreetMode.BIKE));
-  private static final Transfer T5 = new Transfer(
+  private static final PathTransfer T3 = transfer(1, 0, 500, EnumSet.of(StreetMode.WALK));
+  private static final PathTransfer T4 = transfer(3, 0, 1000, EnumSet.of(StreetMode.BIKE));
+  private static final PathTransfer T5 = transfer(
+    0,
     2,
     200,
     EnumSet.of(StreetMode.WALK, StreetMode.BIKE)
   );
 
-  private static final List<List<Transfer>> DATA = List.of(
+  private static final List<List<PathTransfer>> DATA = List.of(
     List.of(T1, T2, T5),
     List.of(T3),
     List.of(),
     List.of(T4)
   );
+
+  private static PathTransfer transfer(
+    int fromStop,
+    int toStop,
+    int meters,
+    EnumSet<StreetMode> streetModes
+  ) {
+    var from = RegularStop.of(FeedScopedId.of("F", "S"), () -> fromStop).build();
+    var to = RegularStop.of(FeedScopedId.of("F", "S"), () -> toStop).build();
+    return new PathTransfer(from, to, meters, List.of(), streetModes);
+  }
 
   @Test
   void testForwardWalk() {
@@ -106,8 +121,8 @@ class RaptorTransferIndexTest {
     Consumer<RaptorTransferIndex> verifier
   ) {
     for (var index : List.of(
-      RaptorTransferIndex.createInitialSetup(DATA, streetSearchRequest),
-      RaptorTransferIndex.createRequestScope(DATA, streetSearchRequest)
+      new PreCachedRaptorTransferIndex(DATA, streetSearchRequest, false),
+      new OnDemandRaptorTransferIndex(DATA, streetSearchRequest)
     )) {
       verifier.accept(index);
     }
@@ -115,7 +130,7 @@ class RaptorTransferIndexTest {
 
   private Iterable<DefaultRaptorTransfer> getForwardRaptorTransfers(
     StreetSearchRequest streetSearchRequest,
-    Transfer... transfers
+    PathTransfer... transfers
   ) {
     return Arrays.stream(transfers)
       .flatMap(t -> t.asRaptorTransfer(streetSearchRequest).stream())
@@ -125,7 +140,7 @@ class RaptorTransferIndexTest {
   private Iterable<DefaultRaptorTransfer> getReversedRaptorTransfers(
     StreetSearchRequest streetSearchRequest,
     int fromStopIndex,
-    Transfer... transfers
+    PathTransfer... transfers
   ) {
     return Arrays.stream(transfers)
       .flatMap(t ->

@@ -9,7 +9,7 @@ import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -24,13 +24,13 @@ import org.opentripplanner.transit.service.TransitService;
 public class CallAtStopService {
 
   private final TransitService transitService;
-  private final GraphFinder finder;
+  private final NearbyStopFinder finder;
   /**
    * In order to avoid a DDOS attack we limit the number.
    */
   private final int MAX_DEPARTURES = 100;
 
-  public CallAtStopService(TransitService transitService, GraphFinder finder) {
+  public CallAtStopService(TransitService transitService, NearbyStopFinder finder) {
     this.transitService = transitService;
     this.finder = finder;
   }
@@ -61,7 +61,7 @@ public class CallAtStopService {
    */
   public List<CallAtStop> findCallsAtStop(WgsCoordinate coordinate, StopEventRequestParams params) {
     var calls = finder
-      .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
+      .findNearbyStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
       .flatMap(nearbyStop -> {
         List<StopLocation> stopLocations = List.of(
