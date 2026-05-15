@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.glassfish.hk2.api.Factory;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
-import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
@@ -150,11 +150,21 @@ public class OTPWebApplication extends Application {
    * More on custom injection in Jersey 2:
    * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
+  private AbstractBinder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bindFactory(contextProvider).to(OtpServerRequestContext.class);
+        bindFactory(
+          new Factory<OtpServerRequestContext>() {
+            @Override
+            public OtpServerRequestContext provide() {
+              return contextProvider.get();
+            }
+
+            @Override
+            public void dispose(OtpServerRequestContext otpServerRequestContext) {}
+          }
+        ).to(OtpServerRequestContext.class);
       }
     };
   }
@@ -173,7 +183,7 @@ public class OTPWebApplication extends Application {
    *
    * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
    */
-  private Binder getBoundPrometheusRegistry() {
+  private AbstractBinder getBoundPrometheusRegistry() {
     PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
       PrometheusConfig.DEFAULT
     );
