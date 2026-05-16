@@ -1,10 +1,10 @@
 package org.opentripplanner.apis.vectortiles.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.json.ObjectMappers;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A style parameter that allows you to specify a number that changes dependent on the zoom level.

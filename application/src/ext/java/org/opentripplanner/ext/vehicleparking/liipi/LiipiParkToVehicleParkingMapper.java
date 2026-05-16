@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
 import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -26,6 +24,8 @@ import org.opentripplanner.street.model.openinghours.OHCalendar;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Maps a Liipi Park facility into a {@link VehicleParking}.
@@ -55,7 +55,7 @@ public class LiipiParkToVehicleParkingMapper {
   }
 
   public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName, String feedId) {
-    String id = jsonNode.path(idName).asText();
+    String id = jsonNode.path(idName).asString();
     return new FeedScopedId(feedId, id);
   }
 
@@ -80,10 +80,11 @@ public class LiipiParkToVehicleParkingMapper {
       );
       Map<String, String> translations = new HashMap<>();
       JsonNode nameNode = jsonNode.path("name");
-      nameNode.fieldNames().forEachRemaining(lang -> {
-        String name = nameNode.path(lang).asText();
+      nameNode.propertyNames()
+        .iterator().forEachRemaining(lang -> {
+        String name = nameNode.path(lang).asString();
         if (!name.isEmpty()) {
-          translations.put(lang, nameNode.path(lang).asText());
+          translations.put(lang, nameNode.path(lang).asString());
         }
       });
       I18NString name = translations.isEmpty()
@@ -91,7 +92,7 @@ public class LiipiParkToVehicleParkingMapper {
         : TranslatedString.getI18NString(translations, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
 
-      var stateText = jsonNode.path("status").asText();
+      var stateText = jsonNode.path("status").asString();
       var state = stateMapper(stateText);
 
       var tags = parseTags(jsonNode);
@@ -188,17 +189,17 @@ public class LiipiParkToVehicleParkingMapper {
     ArrayNode servicesArray = (ArrayNode) node.get("services");
     if (servicesArray != null && servicesArray.isArray()) {
       for (JsonNode jsonNode : servicesArray) {
-        tagList.add(feedId + ":SERVICE_" + jsonNode.asText());
+        tagList.add(feedId + ":SERVICE_" + jsonNode.asString());
       }
     }
     ArrayNode authenticationMethods = (ArrayNode) node.get("authenticationMethods");
     if (authenticationMethods != null && authenticationMethods.isArray()) {
       for (JsonNode jsonNode : authenticationMethods) {
-        tagList.add(feedId + ":AUTHENTICATION_METHOD_" + jsonNode.asText());
+        tagList.add(feedId + ":AUTHENTICATION_METHOD_" + jsonNode.asString());
       }
     }
     if (node.has("pricingMethod")) {
-      tagList.add(feedId + ":PRICING_METHOD_" + node.path("pricingMethod").asText());
+      tagList.add(feedId + ":PRICING_METHOD_" + node.path("pricingMethod").asString());
     }
     return tagList;
   }
@@ -230,10 +231,10 @@ public class LiipiParkToVehicleParkingMapper {
       String key = dayTypeAndDays.typeKey();
       if (openingHoursByDayType.has(key) && openingHoursByDayType.path(key).has("from")) {
         LocalTime fromTime = convertTimeStringLocalTime(
-          openingHoursByDayType.path(key).path("from").asText()
+          openingHoursByDayType.path(key).path("from").asString()
         );
         LocalTime toTime = convertTimeStringLocalTime(
-          openingHoursByDayType.path(key).path("until").asText()
+          openingHoursByDayType.path(key).path("until").asString()
         );
         var openingHoursBuilder = calendarBuilder.openingHours(
           dayTypeAndDays.name(),

@@ -28,6 +28,9 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.updater.spi.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Vehicle parking updater class for the Norwegian bike box provider Bikely:
@@ -101,13 +104,13 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
         }
       }
 
-      var vehicleParkId = new FeedScopedId(parameters.feedId(), jsonNode.get("id").asText());
+      var vehicleParkId = new FeedScopedId(parameters.feedId(), jsonNode.get("id").asString());
 
       var lat = jsonNode.get("latitude").asDouble();
       var lng = jsonNode.get("longitude").asDouble();
       var coord = new WgsCoordinate(lat, lng);
 
-      var name = new NonLocalizedString(jsonNode.path("name").asText());
+      var name = new NonLocalizedString(jsonNode.path("name").asString());
 
       var isUnderMaintenance = jsonNode.get("isInMaintenance").asBoolean();
 

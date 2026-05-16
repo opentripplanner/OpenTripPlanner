@@ -2,16 +2,16 @@ package org.opentripplanner.apis.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
+import tools.jackson.core.JacksonException;
 
 class GeoJsonScalarTest {
 
   @Test
-  void geoJson() throws JsonProcessingException {
+  void geoJson() throws JacksonException {
     var gm = new GeometryFactory();
     var polygon = gm.createPolygon(new Coordinate[] {
       new Coordinate(0, 0),

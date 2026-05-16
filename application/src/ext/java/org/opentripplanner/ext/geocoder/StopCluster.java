@@ -1,15 +1,14 @@
 package org.opentripplanner.ext.geocoder;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A result of a fuzzy stop cluster geocoding search. A cluster is defined as a group of stops that
@@ -64,11 +63,10 @@ record StopCluster(Location primary, Collection<Location> secondaries) {
     }
   }
 
-  private static class FeedScopedIdSerializer extends JsonSerializer<FeedScopedId> {
+  private static class FeedScopedIdSerializer extends ValueSerializer<FeedScopedId> {
 
     @Override
-    public void serialize(FeedScopedId value, JsonGenerator gen, SerializerProvider provider)
-      throws IOException {
+    public void serialize(FeedScopedId value, JsonGenerator gen, SerializationContext provider) {
       gen.writeString(value.toString());
     }
   }

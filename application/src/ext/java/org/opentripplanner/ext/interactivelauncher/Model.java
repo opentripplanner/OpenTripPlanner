@@ -1,14 +1,14 @@
 package org.opentripplanner.ext.interactivelauncher;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
 import org.opentripplanner.ext.interactivelauncher.debug.raptor.RaptorDebugModel;
 import org.opentripplanner.ext.interactivelauncher.startup.StartupModel;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class Model implements Serializable {
 
@@ -42,12 +42,9 @@ public class Model implements Serializable {
 
   private static Model readFromFile() {
     try {
-      var mapper = new ObjectMapper().configure(
-        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-        false
-      );
+      var mapper = new JsonMapper();
       return mapper.readValue(MODEL_FILE, Model.class).initSubModels();
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       System.err.println(
         "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
           "is expected, and it will work next time. Cause: " +
@@ -59,9 +56,12 @@ public class Model implements Serializable {
 
   void save() {
     try {
-      var mapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
-      mapper.writeValue(MODEL_FILE, this);
-    } catch (IOException e) {
+      var mapper = JsonMapper.builder()
+        .configure(SerializationFeature.INDENT_OUTPUT, true)
+        // TODO writeValue was removed from JsonMapper in Jackson 3.
+        .writeValue(MODEL_FILE, this)
+        .build();
+    } catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

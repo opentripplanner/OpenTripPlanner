@@ -7,15 +7,6 @@ import au.com.origin.snapshots.serializers.SerializerType;
 import au.com.origin.snapshots.serializers.SnapshotSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.core.util.Separators;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -56,6 +47,14 @@ import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.DurationUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.core.util.Separators;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * A base class for creating snapshots test of itinerary generation using the Portland graph.
@@ -126,8 +125,6 @@ public abstract class SnapshotTestBase {
       .withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)))
       .withNumItineraries(6)
       .withSearchWindow(Duration.ofHours(5));
-
-    return builder;
   }
 
   protected void printItineraries(
@@ -349,17 +346,16 @@ public abstract class SnapshotTestBase {
     private final DefaultPrettyPrinter pp;
 
     private SnapshotItinerarySerializer() {
-      objectMapper = new ObjectMapper();
-      objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-      objectMapper.enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
-      objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-      objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-      objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-      objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-      objectMapper.registerModule(new JavaTimeModule());
-      objectMapper.registerModule(new Jdk8Module());
-
-      objectMapper.addMixIn(ApiLeg.class, ApiLegMixin.class);
+      objectMapper = JsonMapper.builder()
+        .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+        .enable(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID)
+        .changeDefaultPropertyInclusion(incl ->
+          incl
+            .withContentInclusion(JsonInclude.Include.NON_NULL)
+            .withValueInclusion(JsonInclude.Include.NON_NULL)
+        )
+        .addMixIn(ApiLeg.class, ApiLegMixin.class)
+        .build();
 
       pp = new DefaultPrettyPrinter("") {
         @Override
@@ -385,7 +381,7 @@ public abstract class SnapshotTestBase {
     public String apply(Object[] objects) {
       try {
         return objectMapper.writer(pp).writeValueAsString(objects);
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new RuntimeException("Failed to process snapshot JSON", e);
       }
     }

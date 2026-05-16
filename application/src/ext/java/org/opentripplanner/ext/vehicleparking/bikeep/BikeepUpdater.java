@@ -1,8 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.bikeep;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectReader;
-import java.io.IOException;
 import java.util.List;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -13,6 +10,9 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectReader;
 
 /**
  * Vehicle parking updater for Bikeep's API.
@@ -36,8 +36,8 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
       var coordinate = new WgsCoordinate(coords.get(1).asDouble(), coords.get(0).asDouble());
 
       var props = jsonNode.path("properties");
-      var vehicleParkId = new FeedScopedId(params.feedId(), props.path("code").asText());
-      var name = new NonLocalizedString(props.path("label").asText());
+      var vehicleParkId = new FeedScopedId(params.feedId(), props.path("code").asString());
+      var name = new NonLocalizedString(props.path("label").asString());
       var parking = props.path("parking");
 
       List<String> tags = STRING_LIST_READER.readValue(props.path("tags"));
@@ -65,7 +65,7 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
         .capacity(capacity)
         .entrance(entrance)
         .build();
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

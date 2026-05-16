@@ -2,14 +2,15 @@ package org.opentripplanner.test.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class JsonAssertions {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new JsonMapper();
 
   /**
    * Take two JSON documents and reformat them before comparing {@code actual} with {@code expected}.
@@ -17,7 +18,7 @@ public class JsonAssertions {
   public static void assertEqualJson(String expected, String actual) {
     try {
       assertEqualJson(expected, MAPPER.readTree(actual));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -35,7 +36,7 @@ public class JsonAssertions {
           JsonSupport.prettyPrint(actualNode)
         )
       );
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -48,7 +49,7 @@ public class JsonAssertions {
       var actualNode = MAPPER.readTree(actual.toString());
       var exp = MAPPER.readTree(expected);
       return exp.equals(actualNode);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

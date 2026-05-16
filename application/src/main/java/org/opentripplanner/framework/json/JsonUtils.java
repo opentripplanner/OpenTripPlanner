@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.json;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
+import tools.jackson.databind.JsonNode;
 
 public class JsonUtils {
 
@@ -10,7 +10,7 @@ public class JsonUtils {
     if (valueNode == null) {
       return Optional.empty();
     }
-    String value = valueNode.asText();
+    String value = valueNode.asString();
     return value.isEmpty() ? Optional.empty() : Optional.of(value);
   }
 }

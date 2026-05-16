@@ -11,8 +11,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -60,6 +58,8 @@ import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * This class is an object representation of the 'build-config.json'.

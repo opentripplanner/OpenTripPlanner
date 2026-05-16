@@ -8,7 +8,6 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSec
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,8 @@ import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @GeneratesDocumentation
 public class SiriMqttConfigurationDocTest implements DocsTestConstants {
@@ -29,7 +30,7 @@ public class SiriMqttConfigurationDocTest implements DocsTestConstants {
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-mqtt");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  public static final ObjectMapper MAPPER = new ObjectMapper();
+  public static final ObjectMapper MAPPER = new JsonMapper();
 
   /**
    * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest

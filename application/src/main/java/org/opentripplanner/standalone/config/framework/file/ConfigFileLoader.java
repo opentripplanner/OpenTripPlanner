@@ -3,10 +3,6 @@ package org.opentripplanner.standalone.config.framework.file;
 import static org.opentripplanner.standalone.config.framework.file.IncludeFileDirective.includeFileDirective;
 import static org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,6 +12,12 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * Generic config file loader. This is used to load all configuration files.
@@ -27,7 +29,10 @@ public class ConfigFileLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigFileLoader.class);
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = JsonMapper.builder()
+    // Configure mapper
+    .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+    .build();
 
   @Nullable
   private File configDir = null;
@@ -36,8 +41,6 @@ public class ConfigFileLoader {
   private String jsonFallback = null;
 
   private ConfigFileLoader() {
-    // Configure mapper
-    mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
   }
 
@@ -125,7 +128,7 @@ public class ConfigFileLoader {
       jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
       return mapper.readTree(jsonAsString);
-    } catch (IOException ie) {
+    } catch (JacksonException ie) {
       LOG.error("Error while parsing config '{}'.", source, ie);
       throw new OtpAppException("Failed to load config: " + source);
     }

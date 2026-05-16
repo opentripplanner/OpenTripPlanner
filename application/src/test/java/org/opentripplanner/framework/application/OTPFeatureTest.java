@@ -5,10 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class OTPFeatureTest {
 
@@ -45,9 +46,10 @@ public class OTPFeatureTest {
   @Test
   public void allowOTPFeaturesToBeConfigurableFromJSON() {
     // Use a mapper to create a JSON configuration
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
-    mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+    ObjectMapper mapper = JsonMapper.builder()
+      .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+      .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+      .build();
 
     // Given the following config
     String json = """

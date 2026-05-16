@@ -1,28 +1,30 @@
 package org.opentripplanner.standalone.config.framework.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 public class JsonSupport {
 
-  private static final ObjectMapper LENIENT_MAPPER = new ObjectMapper();
+  private static final ObjectMapper LENIENT_MAPPER = JsonMapper.builder()
+    .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+    .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+    .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+    .build();
   private static final ObjectWriter PRETTY_PRINTER;
 
   static {
-    LENIENT_MAPPER.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-    LENIENT_MAPPER.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-    LENIENT_MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     // -Dline.seperator cannot be reliably overridden
     // 2 spaces + LF
     var lfOnlyIndenter = new DefaultIndenter("  ", "\n");
@@ -39,16 +41,17 @@ public class JsonSupport {
    */
   public static JsonNode jsonNodeForTest(String jsonText) {
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-      mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-      mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      ObjectMapper mapper = JsonMapper.builder()
+        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+        .build();
 
       // Replace ' with "
       jsonText = jsonText.replace("'", "\"");
 
       return mapper.readTree(jsonText);
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -76,7 +79,7 @@ public class JsonSupport {
   public static String prettyPrint(JsonNode body) {
     try {
       return PRETTY_PRINTER.writeValueAsString(body);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -89,7 +92,7 @@ public class JsonSupport {
     try {
       var json = LENIENT_MAPPER.readTree(input);
       return PRETTY_PRINTER.writeValueAsString(json);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }
@@ -102,7 +105,7 @@ public class JsonSupport {
       var json = Files.readString(path);
 
       return LENIENT_MAPPER.readTree(json);
-    } catch (IOException e) {
+    } catch (JacksonException | IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -113,7 +116,7 @@ public class JsonSupport {
   public static JsonNode jsonNodeFromString(String input) {
     try {
       return LENIENT_MAPPER.readTree(input);
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

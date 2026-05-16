@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 import static org.opentripplanner.street.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ public class Station
 
   private GeometryCollection geometry;
 
+  @JsonCreator
   Station(StationBuilder builder) {
     super(builder.getId());
     // Required fields
