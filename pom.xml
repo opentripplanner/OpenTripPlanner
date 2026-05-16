@@ -473,6 +473,11 @@
                         <artifactId>rewrite-static-analysis</artifactId>
                         <version>2.41.1</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-jackson</artifactId>
+                        <version>1.22.2</version>
+                    </dependency>
                 </dependencies>
             </plugin>
             <plugin>
