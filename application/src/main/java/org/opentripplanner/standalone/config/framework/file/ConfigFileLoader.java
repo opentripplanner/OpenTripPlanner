@@ -13,7 +13,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonParser;
+import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -31,7 +31,8 @@ public class ConfigFileLoader {
 
   private final ObjectMapper mapper = JsonMapper.builder()
     // Configure mapper
-    .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+    .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+    .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
     .build();
 
   @Nullable
@@ -40,9 +41,7 @@ public class ConfigFileLoader {
   @Nullable
   private String jsonFallback = null;
 
-  private ConfigFileLoader() {
-    mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-  }
+  private ConfigFileLoader() {}
 
   public static ConfigFileLoader of() {
     return new ConfigFileLoader();

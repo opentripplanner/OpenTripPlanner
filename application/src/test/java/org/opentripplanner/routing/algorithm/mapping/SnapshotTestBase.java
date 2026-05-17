@@ -50,7 +50,6 @@ import org.opentripplanner.utils.time.DurationUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
-import tools.jackson.core.util.Separators;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
@@ -357,30 +356,16 @@ public abstract class SnapshotTestBase {
         .addMixIn(ApiLeg.class, ApiLegMixin.class)
         .build();
 
-      pp = new DefaultPrettyPrinter("") {
-        @Override
-        public DefaultPrettyPrinter withSeparators(Separators separators) {
-          this._separators = separators;
-          this._objectFieldValueSeparatorWithSpaces =
-            separators.getObjectFieldValueSeparator() + " ";
-          return this;
-        }
-
-        @Override
-        public DefaultPrettyPrinter createInstance() {
-          return this;
-        }
-      };
-
       DefaultPrettyPrinter.Indenter lfOnlyIndenter = new DefaultIndenter("  ", "\n");
-      pp.indentArraysWith(lfOnlyIndenter);
-      pp.indentObjectsWith(lfOnlyIndenter);
+      pp = new DefaultPrettyPrinter()
+        .withObjectIndenter(lfOnlyIndenter)
+        .withArrayIndenter(lfOnlyIndenter);
     }
 
     @Override
     public String apply(Object[] objects) {
       try {
-        return objectMapper.writer(pp).writeValueAsString(objects);
+        return objectMapper.writer().with(pp).writeValueAsString(objects);
       } catch (JacksonException e) {
         throw new RuntimeException("Failed to process snapshot JSON", e);
       }

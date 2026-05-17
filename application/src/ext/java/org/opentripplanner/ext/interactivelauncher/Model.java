@@ -6,7 +6,6 @@ import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
 import org.opentripplanner.ext.interactivelauncher.debug.raptor.RaptorDebugModel;
 import org.opentripplanner.ext.interactivelauncher.startup.StartupModel;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -56,11 +55,10 @@ public class Model implements Serializable {
 
   void save() {
     try {
-      var mapper = JsonMapper.builder()
+      JsonMapper.builder()
         .configure(SerializationFeature.INDENT_OUTPUT, true)
-        // TODO writeValue was removed from JsonMapper in Jackson 3.
-        .writeValue(MODEL_FILE, this)
-        .build();
+        .build()
+        .writeValue(MODEL_FILE, this);
     } catch (JacksonException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

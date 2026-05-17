@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonParser;
+import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.databind.JsonNode;
@@ -18,9 +18,9 @@ import tools.jackson.databind.json.JsonMapper;
 public class JsonSupport {
 
   private static final ObjectMapper LENIENT_MAPPER = JsonMapper.builder()
-    .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
-    .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-    .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+    .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+    .enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
+    .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
     .build();
   private static final ObjectWriter PRETTY_PRINTER;
 
@@ -31,7 +31,7 @@ public class JsonSupport {
     var pp = new DefaultPrettyPrinter()
       .withObjectIndenter(lfOnlyIndenter)
       .withArrayIndenter(lfOnlyIndenter);
-    PRETTY_PRINTER = LENIENT_MAPPER.writer(pp);
+    PRETTY_PRINTER = LENIENT_MAPPER.writer().with(pp);
   }
 
   /**
@@ -42,9 +42,9 @@ public class JsonSupport {
   public static JsonNode jsonNodeForTest(String jsonText) {
     try {
       ObjectMapper mapper = JsonMapper.builder()
-        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
-        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+        .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+        .enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
+        .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
         .build();
 
       // Replace ' with "
