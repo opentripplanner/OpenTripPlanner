@@ -6,7 +6,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -27,7 +26,7 @@ public class DefaultDirectStreetRouter extends DirectStreetRouter {
     LinkingContext linkingContext,
     RouteRequest request
   ) {
-    var paths = graphPathFinder.graphPathFinderEntryPoint(request, linkingContext);
+    var paths = graphPathFinder.find(request, linkingContext);
     return mapToItineraries(serverContext, request, paths);
   }
 

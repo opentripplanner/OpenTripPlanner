@@ -11,7 +11,6 @@ import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -175,7 +174,7 @@ public class ViaDirectStreetRouter extends DirectStreetRouter {
     RouteRequest request
   ) {
     // We don't really support multiple results from A*
-    return graphPathFinder.graphPathFinderEntryPoint(request, linkingContext).getFirst();
+    return graphPathFinder.find(request, linkingContext).getFirst();
   }
 
   /**

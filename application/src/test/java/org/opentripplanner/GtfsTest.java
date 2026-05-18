@@ -38,6 +38,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;

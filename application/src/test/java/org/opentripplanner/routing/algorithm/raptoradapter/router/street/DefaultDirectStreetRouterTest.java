@@ -9,12 +9,12 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.ItinerarySummarizer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.standalone.api.TestServerContext;
 
 class DefaultDirectStreetRouterTest {
 

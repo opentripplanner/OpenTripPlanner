@@ -9,7 +9,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.StreetMode;

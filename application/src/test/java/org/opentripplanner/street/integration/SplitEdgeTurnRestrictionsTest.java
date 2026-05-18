@@ -14,23 +14,19 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
-import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultDirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.service.NoopSiteResolver;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial
@@ -179,23 +175,10 @@ public class SplitEdgeTurnRestrictionsTest {
       var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-      var gpf = new GraphPathFinder();
-      var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
+      var ctx = TestServerContext.ofGraph(graph);
 
-      StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
-        new NoopSiteResolver(),
-        ZoneIds.BERLIN,
-        graph.streetNotesService,
-        new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
-        graph.ellipsoidToGeoidDifference
-      );
-
-      var itineraries = paths
-        .stream()
-        .map(path ->
-          LegsToItineraryMapper.map(streetPathToLegsMapper.map(path, request), false, null).get()
-        )
-        .toList();
+      var router = new DefaultDirectStreetRouter();
+      var itineraries = router.route(ctx, request, linkingContext);
 
       // make sure that we only get CAR legs
       itineraries.forEach(i ->
