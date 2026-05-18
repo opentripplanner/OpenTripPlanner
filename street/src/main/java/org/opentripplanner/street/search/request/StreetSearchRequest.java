@@ -7,9 +7,11 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -48,6 +50,13 @@ public class StreetSearchRequest implements AStarRequest {
   private final List<ExtensionRequestContext> extensionRequestContexts;
   private final Duration timeout;
 
+  /**
+   * Geofencing zones containing the destination, precomputed for arriveBy searches. Used to
+   * initialize zone state on initial renting states so restrictions are enforced during the
+   * backward ride.
+   */
+  private final Set<GeofencingZone> arriveByDestinationZones;
+
   @Nullable
   private final RentalPeriod rentalPeriod;
 
@@ -73,6 +82,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.intersectionTraversalCalculator = IntersectionTraversalCalculator.DEFAULT;
     this.extensionRequestContexts = List.of();
     this.timeout = Duration.ofSeconds(5);
+    this.arriveByDestinationZones = Set.of();
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
@@ -94,6 +104,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.intersectionTraversalCalculator = requireNonNull(builder.intersectionTraversalCalculator);
     this.extensionRequestContexts = List.copyOf(requireNonNull(builder.extensionRequestContexts));
     this.timeout = requireNonNull(builder.timeout);
+    this.arriveByDestinationZones = Set.copyOf(builder.arriveByDestinationZones);
   }
 
   public static StreetSearchRequestBuilder of() {
@@ -220,6 +231,10 @@ public class StreetSearchRequest implements AStarRequest {
 
   public Duration timeout() {
     return timeout;
+  }
+
+  public Set<GeofencingZone> arriveByDestinationZones() {
+    return arriveByDestinationZones;
   }
 
   public RentalRequest rental(TraverseMode traverseMode) {

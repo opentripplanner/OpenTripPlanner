@@ -43,7 +43,8 @@ public class DirectStreetRouter {
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.listExtensionRequestContexts(request),
-        maxCarSpeed
+        maxCarSpeed,
+        serverContext.graph().getAllGeofencingZoneIndexes()
       );
       var paths = gpFinder.graphPathFinderEntryPoint(request, linkingContext);
 

@@ -14,8 +14,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
@@ -37,7 +38,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
-  private RentalRestrictionExtension rentalRestrictions = RentalRestrictionExtension.NO_RESTRICTION;
+
+  private List<GeofencingBoundaryExtension> geofencingBoundaries = List.of();
 
   /* CONSTRUCTORS */
 
@@ -55,9 +57,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     if (this.getCoordinate() != null) {
       sb.append(" lat,lng=").append(this.getCoordinate().y);
       sb.append(",").append(this.getCoordinate().x);
-    }
-    if (!rentalRestrictions.toList().isEmpty()) {
-      sb.append(", traversalExtension=").append(rentalRestrictions);
     }
     sb.append("}");
     return sb.toString();
@@ -263,24 +262,23 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     );
   }
 
-  public boolean rentalTraversalBanned(State currentState) {
-    return rentalRestrictions.traversalBanned(currentState);
+  public void addGeofencingBoundary(GeofencingBoundaryExtension ext) {
+    if (geofencingBoundaries.contains(ext)) {
+      return;
+    }
+    var newList = new ArrayList<>(geofencingBoundaries);
+    newList.add(ext);
+    geofencingBoundaries = List.copyOf(newList);
   }
 
-  public void addRentalRestriction(RentalRestrictionExtension ext) {
-    rentalRestrictions = rentalRestrictions.add(ext);
+  public List<GeofencingBoundaryExtension> getGeofencingBoundaries() {
+    return geofencingBoundaries;
   }
 
-  public RentalRestrictionExtension rentalRestrictions() {
-    return rentalRestrictions;
-  }
-
-  public boolean rentalDropOffBanned(State currentState) {
-    return rentalRestrictions.dropOffBanned(currentState);
-  }
-
-  public void removeRentalRestriction(RentalRestrictionExtension ext) {
-    rentalRestrictions = rentalRestrictions.remove(ext);
+  public void removeGeofencingBoundariesForZones(Set<GeofencingZone> zones) {
+    var newList = new ArrayList<>(geofencingBoundaries);
+    newList.removeIf(ext -> zones.contains(ext.zone()));
+    geofencingBoundaries = List.copyOf(newList);
   }
 
   /**

@@ -25,6 +25,7 @@ Furthermore, support is limited to the following form factors:
 | type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                                                                                                       | *Required* |               |  1.5  |
 | [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                                | *Optional* | `false`       |  2.1  |
 | frequency                                                                             |    `duration`   | How often the data should be updated.                                                                                                                          | *Optional* | `"PT1M"`      |  1.5  |
+| [geofencingBusinessAreaBorders](#u_1_geofencingBusinessAreaBorders)                   |    `boolean`    | Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary.                                                          | *Optional* | `true`        |  2.7  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                                                                | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                                                                                                           | *Optional* |               |  2.1  |
 | [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.                                                                                      | *Optional* |               |  1.5  |
@@ -53,6 +54,20 @@ For this to be possible three things need to be configured:
  - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
  - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
  - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+
+
+<h4 id="u_1_geofencingBusinessAreaBorders">geofencingBusinessAreaBorders</h4>
+
+**Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /updaters/[1] 
+
+Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary.
+
+When enabled, GBFS geofencing zones that have no restrictions (no traversal or drop-off bans)
+are treated as business areas. The router will force a vehicle drop-off when exiting such an
+area, preventing routes that leave the operator's service area with a rented vehicle.
+
+Requires `geofencingZones` to also be enabled.
 
 
 <h4 id="u_1_geofencingZones">geofencingZones</h4>

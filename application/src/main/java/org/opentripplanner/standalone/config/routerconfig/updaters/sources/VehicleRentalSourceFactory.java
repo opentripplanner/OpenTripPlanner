@@ -46,6 +46,7 @@ public class VehicleRentalSourceFactory {
         headers(),
         network(),
         geofencingZones(),
+        geofencingBusinessAreaBorders(),
         overloadingAllowed(),
         rentalPickupTypes()
       );
@@ -118,6 +119,25 @@ public class VehicleRentalSourceFactory {
         """
       )
       .asBoolean(false);
+  }
+
+  private boolean geofencingBusinessAreaBorders() {
+    return c
+      .of("geofencingBusinessAreaBorders")
+      .since(V2_7)
+      .summary(
+        "Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary."
+      )
+      .description(
+        """
+        When enabled, GBFS geofencing zones that have no restrictions (no traversal or drop-off bans)
+        are treated as business areas. The router will force a vehicle drop-off when exiting such an
+        area, preventing routes that leave the operator's service area with a rented vehicle.
+
+        Requires `geofencingZones` to also be enabled.
+        """
+      )
+      .asBoolean(true);
   }
 
   private Set<RentalPickupType> rentalPickupTypes() {

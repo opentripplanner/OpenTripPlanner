@@ -59,46 +59,6 @@ public class StateEditorTest {
   }
 
   @Nested
-  class GeofencingZones {
-
-    StreetVertex v1 = StreetModelFactory.intersectionVertex(0, 0);
-    StreetVertex v2 = StreetModelFactory.intersectionVertex(1, 1);
-    StreetEdge edge1 = StreetModelFactory.streetEdge(v1, v2);
-
-    @Test
-    void forwardEnterZone() {
-      var editor = new StateEditor(
-        v1,
-        StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build()
-      );
-      editor.enterNoRentalDropOffArea();
-      var state = editor.makeState();
-      assertTrue(state.isInsideNoRentalDropOffArea());
-
-      var secondEditor = state.edit(edge1);
-      secondEditor.enterNoRentalDropOffArea();
-      var secondState = secondEditor.makeState();
-      assertTrue(secondState.isInsideNoRentalDropOffArea());
-    }
-
-    @Test
-    void leaveZone() {
-      var editor = new StateEditor(
-        v1,
-        StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build()
-      );
-      editor.enterNoRentalDropOffArea();
-      var state = editor.makeState();
-      assertTrue(state.isInsideNoRentalDropOffArea());
-
-      var secondEditor = state.edit(edge1);
-      secondEditor.leaveNoRentalDropOffArea();
-      var secondState = secondEditor.makeState();
-      assertFalse(secondState.isInsideNoRentalDropOffArea());
-    }
-  }
-
-  @Nested
   class ParkAndRide {
 
     StreetVertex v1 = StreetModelFactory.intersectionVertex(0, 0);

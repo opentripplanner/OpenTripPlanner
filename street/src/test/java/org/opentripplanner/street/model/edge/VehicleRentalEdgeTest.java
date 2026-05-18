@@ -13,22 +13,22 @@ import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import static org.opentripplanner.street.model.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.SCOOTER_RENTAL;
+import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
+import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Set;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
+import org.opentripplanner.service.vehiclerental.model.TestGeofencingZoneBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelFactory;
@@ -36,7 +36,6 @@ import org.opentripplanner.street.search.request.RentalPeriod;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.VehicleRentalState;
 
 class VehicleRentalEdgeTest {
 
@@ -280,64 +279,75 @@ class VehicleRentalEdgeTest {
     assertFalse(State.isEmpty(s1));
   }
 
-  @Nested
-  class StartedReverseSearchInNoGeofencingZone {
+  /**
+   * When a generic RENTING_FLOATING state (network=null) has a network in committedNetworks,
+   * VehicleRentalEdge should block picking up a vehicle of that network.
+   */
+  @Test
+  void committedNetworkBlocksGenericPickup() {
+    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
 
-    private static final String NETWORK = "tier";
-    private static final StreetSearchRequest SEARCH_REQUEST = StreetSearchRequest.of()
-      .withMode(SCOOTER_RENTAL)
-      .withArriveBy(true)
+    var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
+    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
+    editor.addCommittedNetwork(vertex.getStation().network());
+    var genericState = editor.makeState();
+
+    assertTrue(genericState.getCommittedNetworks().contains(vertex.getStation().network()));
+
+    var result = vehicleRentalEdge.traverse(genericState);
+    assertTrue(State.isEmpty(result));
+  }
+
+  /**
+   * When a generic RENTING_FLOATING state does NOT have the network committed,
+   * VehicleRentalEdge should allow picking up the vehicle.
+   */
+  @Test
+  void uncommittedNetworkAllowsGenericPickup() {
+    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
+
+    var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
+    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
+    editor.addCommittedNetwork("some-other-network");
+    var genericState = editor.makeState();
+
+    assertFalse(genericState.getCommittedNetworks().contains(vertex.getStation().network()));
+
+    var result = vehicleRentalEdge.traverse(genericState);
+    assertFalse(State.isEmpty(result));
+  }
+
+  /**
+   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce
+   * both RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
+   */
+  @Test
+  void pickupAtNoTraversalBoundaryVertexShouldFork() {
+    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
+
+    var noTraversalZone = TestGeofencingZoneBuilder.of(
+      TestFreeFloatingRentalVehicleBuilder.NETWORK_1,
+      "no-traverse"
+    )
+      .noTraversal()
       .build();
+    vertex.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
 
-    private static final VehicleRentalVehicle RENTAL_PLACE = VehicleRentalVehicle.of()
-      .withLatitude(1)
-      .withLongitude(1)
-      .withId(new FeedScopedId(NETWORK, "123"))
-      .withVehicleType(
-        RentalVehicleType.of()
-          .withId(new FeedScopedId(NETWORK, "scooter"))
-          .withName(I18NString.of("scooter"))
-          .withFormFactor(RentalFormFactor.SCOOTER)
-          .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
-          .withMaxRangeMeters(100000d)
-          .build()
-      )
-      .build();
+    var result = rent();
 
-    @Test
-    void startedInNoDropOffZone() {
-      var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
-      var rentalEdge = VehicleRentalEdge.createVehicleRentalEdge(rentalVertex, SCOOTER);
+    assertEquals(2, result.length);
 
-      rentalVertex.addRentalRestriction(noDropOffZone());
+    var renting = Arrays.stream(result)
+      .filter(s -> s.getVehicleRentalState() == RENTING_FLOATING)
+      .findFirst();
+    assertTrue(renting.isPresent(), "should have a RENTING_FLOATING branch");
 
-      var state = new State(rentalVertex, SEARCH_REQUEST);
-
-      assertEquals(Set.of(NETWORK), state.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
-
-      assertTrue(State.isEmpty(rentalEdge.traverse(state)));
-    }
-
-    @Test
-    void startedOutsideNoDropOffZone() {
-      var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
-      var rentalEdge = VehicleRentalEdge.createVehicleRentalEdge(rentalVertex, SCOOTER);
-      var state = new State(rentalVertex, SEARCH_REQUEST);
-
-      assertEquals(Set.of(), state.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
-      var result = rentalEdge.traverse(state);
-
-      assertEquals(1, result.length);
-
-      var afterTraversal = result[0];
-      assertEquals(VehicleRentalState.BEFORE_RENTING, afterTraversal.getVehicleRentalState());
-    }
-
-    private GeofencingZoneExtension noDropOffZone() {
-      return new GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, null, true, false)
-      );
-    }
+    var dropped = Arrays.stream(result)
+      .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
+      .findFirst();
+    assertTrue(dropped.isPresent(), "should have a HAVE_RENTED branch for walking into zone");
   }
 
   private void initBicycleEdgeAndRequest(int vehicles, int spaces) {

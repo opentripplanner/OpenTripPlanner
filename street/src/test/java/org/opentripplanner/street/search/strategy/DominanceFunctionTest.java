@@ -6,8 +6,6 @@ import static org.opentripplanner.street.model.StreetModelFactory.intersectionVe
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.spi.DominanceFunction;
-import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -35,28 +33,4 @@ class DominanceFunctionTest {
   // TODO: Make unit tests for rest of dominance functionality
   // TODO: Make functional tests for concepts covered by dominance with current algorithm
   // (Specific transfers, bike rental, park and ride, turn restrictions)
-
-  @Test
-  public void noDropOffZone() {
-    var dominanceF = new DominanceFunctions.MinimumWeight();
-
-    var fromVertex = intersectionVertex(1, 1);
-    var toVertex = intersectionVertex(2, 2);
-
-    var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
-
-    StateData stateData = StateData.getBaseCaseStateData(req);
-
-    State outsideZone = new State(req, 0, fromVertex, null, null, stateData, 0, 0);
-    assertFalse(outsideZone.isInsideNoRentalDropOffArea());
-
-    var edge = StreetModelFactory.streetEdge(fromVertex, toVertex);
-
-    var editor = outsideZone.edit(edge);
-    editor.enterNoRentalDropOffArea();
-    var insideZone = editor.makeState();
-
-    assertFalse(dominanceF.betterOrEqualAndComparable(insideZone, outsideZone));
-    assertFalse(dominanceF.betterOrEqualAndComparable(outsideZone, insideZone));
-  }
 }

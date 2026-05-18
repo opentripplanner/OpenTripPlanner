@@ -40,6 +40,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );
@@ -148,6 +149,7 @@ class GbfsFeedMapperTest {
         HttpHeaders.empty(),
         null,
         true,
+        true,
         false,
         RentalPickupType.ALL
       ),
@@ -172,6 +174,11 @@ class GbfsFeedMapperTest {
 
     assertTrue(hubBergnet.dropOffBanned());
     assertFalse(hubBergnet.traversalBanned());
+    // v3 ride_start_allowed and ride_end_allowed are independent
+    assertFalse(hubBergnet.rideStartBanned());
+    assertFalse(hubBergnet.isBusinessArea());
+    assertEquals(List.of("check_moped_almere_60"), hubBergnet.vehicleTypeIds());
+    assertNull(hubBergnet.maximumSpeedKph());
 
     var almereHaven = zones
       .stream()
@@ -205,6 +212,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );
@@ -230,6 +238,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );

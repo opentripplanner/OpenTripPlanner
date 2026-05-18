@@ -1,6 +1,8 @@
 package org.opentripplanner.service.vehiclerental.street;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -8,6 +10,8 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.Propuls
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
+import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
@@ -34,6 +38,20 @@ public class VehicleRentalEdge extends Edge {
     RentalFormFactor formFactor
   ) {
     return connectToGraph(new VehicleRentalEdge(vertex, formFactor));
+  }
+
+  public static void createRentalEdgesForStation(
+    VehicleRentalPlaceVertex vertex,
+    VehicleRentalPlace station,
+    DisposableEdgeCollection edges
+  ) {
+    var formFactors = Stream.concat(
+      station.availablePickupFormFactors(false).stream(),
+      station.availableDropoffFormFactors(false).stream()
+    ).collect(Collectors.toSet());
+    for (var formFactor : formFactors) {
+      edges.addEdge(createVehicleRentalEdge(vertex, formFactor));
+    }
   }
 
   @Override
@@ -72,14 +90,10 @@ public class VehicleRentalEdge extends Edge {
           pickedUp = false;
         }
         case RENTING_FLOATING -> {
-          // a very special case: an arriveBy search has started in a no-drop-off zone.
-          // in such a case we mark this case in the state that speculatively picks up a vehicle
-          // when leaving the no-drop-off zone (has no network) and check it here so that we cannot
-          // begin the rental.
-          // reminder: in an arriveBy search we traverse backwards so beginFloatingVehicle means
-          // traversing from renting to walking.
+          // Block pickup if this network has already been committed by the generic state's
+          // boundary fork — the committed branch already handles this network.
           if (
-            s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
+            s0.getCommittedNetworks().contains(network) ||
             !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
@@ -168,6 +182,10 @@ public class VehicleRentalEdge extends Edge {
       }
     }
 
+    if (pickedUp) {
+      s1.initializeGeofencingZones(stationVertex.getInitialGeofencingZones());
+    }
+
     s1.incrementWeight(
       pickedUp ? request.pickupCost().toSeconds() : request.dropOffCost().toSeconds()
     );
@@ -175,6 +193,40 @@ public class VehicleRentalEdge extends Edge {
       pickedUp ? request.pickupTime().toMillis() : request.dropOffTime().toMillis()
     );
     s1.setBackMode(null);
+
+    // When picking up a floating vehicle at a no-traversal zone boundary, also produce a
+    // HAVE_RENTED state for walking into the zone. Without this, the A* wastes exploration
+    // on the RENTING_FLOATING state which immediately hits dead ends at zone-adjacent edges.
+    if (pickedUp && station.isFloatingVehicle() && !s0.getRequest().arriveBy()) {
+      State rentingState = s1.makeState();
+      if (
+        rentingState != null &&
+        GeofencingBoundaryExtension.hasNoTraversalEntry(
+          stationVertex.getGeofencingBoundaries(),
+          rentingState.getVehicleRentalNetwork()
+        )
+      ) {
+        StateEditor dropEditor = s0.edit(this);
+        dropEditor.beginFloatingVehicleRenting(
+          formFactor,
+          getPropulsionType(station),
+          network,
+          false
+        );
+        dropEditor.initializeGeofencingZones(stationVertex.getInitialGeofencingZones());
+        dropEditor.dropFloatingVehicle(formFactor, getPropulsionType(station), network, false);
+        dropEditor.incrementWeight(
+          request.pickupCost().toSeconds() + request.dropOffCost().toSeconds()
+        );
+        dropEditor.incrementTimeInMilliseconds(
+          request.pickupTime().toMillis() + request.dropOffTime().toMillis()
+        );
+        dropEditor.setBackMode(null);
+        State droppedState = dropEditor.makeState();
+        return State.ofNullable(rentingState, droppedState);
+      }
+    }
+
     return s1.makeStateArray();
   }
 

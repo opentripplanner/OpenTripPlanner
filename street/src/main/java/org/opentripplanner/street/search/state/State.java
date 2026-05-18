@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -69,11 +71,6 @@ public final class State implements AStarState<State, Edge, Vertex> {
     this.backState = null;
     this.backEdge = null;
     this.stateData = stateData;
-    if (request.arriveBy() && !vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
-      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch = vertex
-        .rentalRestrictions()
-        .noDropOffNetworks();
-    }
     this.traversalDistance_m = 0;
     this.time_ms = startTime.toEpochMilli();
   }
@@ -108,8 +105,20 @@ public final class State implements AStarState<State, Edge, Vertex> {
     StreetSearchRequest streetSearchRequest
   ) {
     Collection<State> states = new ArrayList<>();
+    var destinationZones = streetSearchRequest.arriveByDestinationZones();
+    var restrictedNetworks = destinationZones.isEmpty()
+      ? Set.<String>of()
+      : destinationZones
+          .stream()
+          .filter(GeofencingZone::hasRestriction)
+          .map(z -> z.id().getFeedId())
+          .collect(Collectors.toSet());
+
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
+        if (!stateData.applyGeofencingDestinationZones(destinationZones, restrictedNetworks)) {
+          continue;
+        }
         states.add(
           new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
         );
@@ -231,13 +240,14 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   private boolean vehicleRentalIsFinished() {
+    boolean dropOffBanned = isDropOffBannedByCurrentZones();
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
-      (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
-        !stateData.insideNoRentalDropOffArea) ||
+      (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING && !dropOffBanned) ||
       (getRequest().allowsArrivingInRentalAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
-        stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION)
+        stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION &&
+        !dropOffBanned)
     );
   }
 
@@ -460,8 +470,36 @@ public final class State implements AStarState<State, Edge, Vertex> {
     return Optional.empty();
   }
 
-  public boolean isInsideNoRentalDropOffArea() {
-    return stateData.insideNoRentalDropOffArea;
+  public Set<GeofencingZone> getCurrentGeofencingZones() {
+    return stateData.currentGeofencingZones;
+  }
+
+  public Set<String> getCommittedNetworks() {
+    return stateData.committedNetworks;
+  }
+
+  /**
+   * Whether drop-off is banned by the current geofencing zones, resolved via per-field
+   * priority-based precedence for this state's network.
+   */
+  public boolean isDropOffBannedByCurrentZones() {
+    return GeofencingZone.resolveField(
+      stateData.currentGeofencingZones,
+      stateData.vehicleRentalNetwork,
+      GeofencingZone::dropOffBanned
+    );
+  }
+
+  /**
+   * Whether traversal is banned by the current geofencing zones, resolved via per-field
+   * priority-based precedence for this state's network.
+   */
+  public boolean isTraversalBannedByCurrentZones() {
+    return GeofencingZone.resolveField(
+      stateData.currentGeofencingZones,
+      stateData.vehicleRentalNetwork,
+      GeofencingZone::traversalBanned
+    );
   }
 
   /**

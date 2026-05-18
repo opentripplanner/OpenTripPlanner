@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,13 +9,13 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
 import org.opentripplanner.street.geometry.CompactLineStringUtils;
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.SplitLineString;
 import org.opentripplanner.street.linking.LinkingDirection;
-import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
@@ -29,7 +28,6 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.street.search.state.VehicleRentalState;
 import org.opentripplanner.utils.lang.BitSetUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.slf4j.Logger;
@@ -310,45 +308,16 @@ public class StreetEdge
   public State[] traverse(State s0) {
     final StateEditor editor;
 
-    final boolean arriveByRental =
-      s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
-    if (arriveByRental && tov.rentalTraversalBanned(s0)) {
-      return State.empty();
-    } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
-      return splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0);
-    }
-    // if the traversal is banned for the current state because of a GBFS geofencing zone
-    // we drop the vehicle and continue walking
-    else if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
-      editor = doTraverse(s0, TraverseMode.WALK, false);
-      if (editor != null) {
-        editor.dropFloatingVehicle(
-          s0.vehicleRentalFormFactor(),
-          s0.rentalVehiclePropulsionType(),
-          s0.getVehicleRentalNetwork(),
-          s0.getRequest().arriveBy()
-        );
-      }
-      // when we start the reverse search of a rental request there are three cases when we need
-      // to stop walking and pick up a vehicle:
-      //  - crossing the border of a business zone
-      //  - leaving a no-drop-off zone
-      //  - leaving a no-traversal zone
-      // remember that this is a reverse search so calling dropFloatingVehicle actually transitions
-      // from walking to using the vehicle.
-    } else if (arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
-      editor = doTraverse(s0, TraverseMode.WALK, false);
-      if (editor != null) {
-        editor.dropFloatingVehicle(
-          s0.vehicleRentalFormFactor(),
-          s0.rentalVehiclePropulsionType(),
-          s0.getVehicleRentalNetwork(),
-          s0.getRequest().arriveBy()
-        );
+    // Geofencing enforcement for rental modes
+    if (s0.getRequest().mode().includesRenting()) {
+      var geofencingResult = traverseWithGeofencing(s0);
+      if (geofencingResult != null) {
+        return geofencingResult;
       }
     }
+
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (s0.currentMode() == TraverseMode.BICYCLE) {
+    if (s0.currentMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -363,34 +332,6 @@ public class StreetEdge
     }
 
     State state = editor != null ? editor.makeState() : null;
-
-    // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
-    // off the vehicle and walking
-    if (state != null && !fromv.rentalDropOffBanned(s0) && tov.rentalDropOffBanned(s0)) {
-      StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
-      if (afterTraversal != null) {
-        afterTraversal.dropFloatingVehicle(
-          state.vehicleRentalFormFactor(),
-          state.rentalVehiclePropulsionType(),
-          state.getVehicleRentalNetwork(),
-          state.getRequest().arriveBy()
-        );
-        afterTraversal.leaveNoRentalDropOffArea();
-        var forkState = afterTraversal.makeState();
-        return State.ofNullable(forkState, state);
-      }
-    }
-
-    // when we leave a geofencing zone in reverse search we want to speculatively pick up a rental
-    // vehicle, however, we _also_ want to keep on walking in case the renting state doesn't lead
-    // anywhere due to these cases:
-    //  - no rental vehicle available
-    //  - not being able to continue renting due to traversal restrictions or geofencing zones
-    if (state != null && arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
-      StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
-      var forkState = walking.makeState();
-      return State.ofNullable(forkState, state);
-    }
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
@@ -465,14 +406,6 @@ public class StreetEdge
     return hasElevationExtension()
       ? elevationExtension.getEffectiveWalkDistance()
       : getDistanceMeters();
-  }
-
-  /**
-   * This method is not thread-safe.
-   */
-  public void removeRentalExtension(RentalRestrictionExtension ext) {
-    fromv.removeRentalRestriction(ext);
-    tov.removeRentalRestriction(ext);
   }
 
   @Override
@@ -589,13 +522,6 @@ public class StreetEdge
   }
 
   /**
-   * This method is not thread-safe!
-   */
-  public void addRentalRestriction(RentalRestrictionExtension ext) {
-    fromv.addRentalRestriction(ext);
-  }
-
-  /**
    * Split this street edge and return the resulting street edges. After splitting, the original
    * edge will be removed from the graph.
    */
@@ -667,9 +593,6 @@ public class StreetEdge
     StreetEdge se1 = seb1.buildAndConnect();
     StreetEdge se2 = seb2.buildAndConnect();
 
-    copyRentalRestrictionsToSplitEdge(se1);
-    copyRentalRestrictionsToSplitEdge(se2);
-
     return new SplitStreetEdge(se1, se2);
   }
 
@@ -690,7 +613,6 @@ public class StreetEdge
         .withBack(isBack());
       copyPropertiesToSplitEdge(seb1, 0, defaultMillimeterLength(geoms.beginning()) / 1000.0);
       e1 = seb1.buildAndConnect();
-      copyRentalRestrictionsToSplitEdge(e1);
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
@@ -706,7 +628,6 @@ public class StreetEdge
         getDistanceMeters()
       );
       e2 = seb2.buildAndConnect();
-      copyRentalRestrictionsToSplitEdge(e2);
     }
 
     return new SplitStreetEdge(e1, e2);
@@ -746,7 +667,6 @@ public class StreetEdge
         .withMeterLength(length);
       copyPropertiesToSplitEdge(tpseb, start, start + length);
       TemporaryPartialStreetEdge se = tpseb.buildAndConnect();
-      copyRentalRestrictionsToSplitEdge(se);
       return Optional.of(se);
     } else {
       return Optional.empty();
@@ -777,13 +697,6 @@ public class StreetEdge
       .withElevationProfile(partialElevationProfileFromParent)
       .build()
       .ifPresent(seb::withElevationExtension);
-  }
-
-  /**
-   * Copy inherited rental restrictions from a parent edge to a split edge
-   */
-  protected void copyRentalRestrictionsToSplitEdge(StreetEdge splitEdge) {
-    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
   }
 
   short getFlags() {
@@ -817,118 +730,12 @@ public class StreetEdge
     return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
   }
 
-  /**
-   * Helper method for {@link #splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching}.
-   * Create a single new state, exiting a no-drop-off zone, in reverse, and continuing
-   * on a rental vehicle in the known network, or an unknown network if network is null,
-   * unless the known network is not accepted by the provided {@link StreetSearchRequest}.
-   * @param s0 The parent state (i.e. the following state, as we are in reverse)
-   * @param network Network id, or null if unknown
-   * @param request Active {@link StreetSearchRequest}
-   * @return Newly generated {@link State}, or null if the state would have been forbidden.
-   */
-  private State createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
-    State s0,
-    String network,
-    StreetSearchRequest request
-  ) {
-    var edit = doTraverse(s0, TraverseMode.WALK, false);
-    if (edit != null) {
-      edit.dropFloatingVehicle(
-        s0.vehicleRentalFormFactor(),
-        s0.rentalVehiclePropulsionType(),
-        network,
-        s0.getRequest().arriveBy()
-      );
-      if (network != null) {
-        edit.resetStartedInNoDropOffZone();
-      }
-      State state = edit.makeState();
-      if (state != null && network != null) {
-        var allowedNetworks = request.rental(state.currentMode()).allowedNetworks();
-        var bannedNetworks = request.rental(state.currentMode()).bannedNetworks();
-        if (allowedNetworks.isEmpty()) {
-          if (bannedNetworks.contains(network)) {
-            return null;
-          }
-        } else {
-          if (!allowedNetworks.contains(network)) {
-            return null;
-          }
-        }
-      }
-      return state;
-    }
-    return null;
-  }
-
-  /**
-   * A very special case: an arriveBy rental search has started in a no-drop-off zone
-   * we don't know yet which rental network we will end up using.
-   * <p>
-   * So we speculatively assume that we can rent any by setting the network in the state data
-   * to null.
-   * <p>
-   * When we then leave the no drop off zone on foot we generate a state for each network that the
-   * zone applies to where we pick up a vehicle with a specific network.
-   */
-  private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
-    var request = s0.getRequest();
-    var states = new ArrayList<State>();
-
-    // Also include a state which continues walking, because the vehicle rental states are
-    // speculation. It is possible that the rental states don't end up at the target at all
-    // due to mode limitations or not finding a place to pick up the rental vehicle, or that
-    // the rental possibility is simply more expensive than walking.
-    StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
-    if (walking != null) {
-      states.add(walking.makeState());
-    }
-
-    boolean hasNetworkStates = false;
-    for (var network : tov.rentalRestrictions().noDropOffNetworks()) {
-      var state = createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
-        s0,
-        network,
-        request
-      );
-      if (state != null) {
-        states.add(state);
-        hasNetworkStates = true;
-      }
-    }
-    if (hasNetworkStates) {
-      // null is a special rental network that speculatively assumes that you can take any vehicle
-      // you have to check in the rental edge if this has search has been started in a no-drop off zone
-      states.add(createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, request));
-    }
-    return states.toArray(State[]::new);
-  }
-
-  /**
-   * This is the state that starts a backwards search inside a restricted zone
-   * (no drop off, no traversal or outside business area) and is walking towards finding a rental
-   * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
-   * speculatively pick up a vehicle a ride towards an edge where there is one parked.
-   */
-  private boolean leavesZoneWithRentalRestrictionsWhenHavingRented(State s0) {
-    return (
-      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
-      !fromv.rentalRestrictions().hasRestrictions() &&
-      tov.rentalRestrictions().hasRestrictions()
-    );
-  }
-
-  /**
-   * If the reverse search has started in a no-drop off rental zone and you are exiting
-   * it .
-   */
-  private boolean hasStartedWalkingInNoDropOffZoneAndIsExitingIt(State s0) {
-    return (
-      s0.currentMode() == TraverseMode.WALK &&
-      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty() &&
-      fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
-      !tov.rentalRestrictions().noDropOffNetworks().isEmpty()
+  private State[] traverseWithGeofencing(State s0) {
+    return GeofencingInterceptor.apply(
+      s0,
+      fromv.getGeofencingBoundaries(),
+      tov.getGeofencingBoundaries(),
+      (state, mode) -> doTraverse(state, mode, false)
     );
   }
 
@@ -975,12 +782,8 @@ public class StreetEdge
       return null;
     }
 
-    if (s0.getRequest().mode().includesRenting()) {
-      if (tov.rentalDropOffBanned(s0)) {
-        s1.enterNoRentalDropOffArea();
-      } else if (s0.isInsideNoRentalDropOffArea() && !tov.rentalDropOffBanned(s0)) {
-        s1.leaveNoRentalDropOffArea();
-      }
+    if (s0.getRequest().mode().includesRenting() && !fromv.getGeofencingBoundaries().isEmpty()) {
+      s1.updateGeofencingZones(fromv, tov, s0.getRequest().arriveBy());
     }
 
     var request = s0.getRequest();

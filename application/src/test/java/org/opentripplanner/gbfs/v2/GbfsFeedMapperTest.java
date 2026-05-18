@@ -3,6 +3,7 @@ package org.opentripplanner.gbfs.v2;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,6 +38,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );
@@ -133,6 +135,7 @@ class GbfsFeedMapperTest {
         HttpHeaders.empty(),
         null,
         true,
+        true,
         false,
         RentalPickupType.ALL
       ),
@@ -151,6 +154,7 @@ class GbfsFeedMapperTest {
         false,
         HttpHeaders.empty(),
         null,
+        true,
         true,
         false,
         RentalPickupType.ALL
@@ -176,13 +180,63 @@ class GbfsFeedMapperTest {
 
     assertTrue(frognerPark.dropOffBanned());
     assertFalse(frognerPark.traversalBanned());
+    // v2 ride_allowed covers both start and end
+    assertTrue(frognerPark.rideStartBanned());
+    assertFalse(frognerPark.isBusinessArea());
+    assertEquals(
+      List.of("YTI:VehicleType:escooter_oslo", "YTI:VehicleType:ebicycle_oslo"),
+      frognerPark.vehicleTypeIds()
+    );
+    assertNull(frognerPark.maximumSpeedKph());
 
     var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
 
     assertEquals(1, businessAreas.size());
 
-    assertEquals("OSLO Summer 2021", businessAreas.get(0).name().toString());
-    assertEquals("tieroslo:4640262c", businessAreas.get(0).id().toString());
+    var osloZone = businessAreas.get(0);
+    assertEquals("OSLO Summer 2021", osloZone.name().toString());
+    assertEquals("tieroslo:4640262c", osloZone.id().toString());
+    assertFalse(osloZone.dropOffBanned());
+  }
+
+  @Test
+  void geofencingZonePriority() {
+    var dataSource = new GbfsVehicleRentalDataSource(
+      new GbfsVehicleRentalDataSourceParameters(
+        "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+        "en",
+        false,
+        HttpHeaders.empty(),
+        null,
+        true,
+        true,
+        true,
+        RentalPickupType.ALL
+      ),
+      new OtpHttpClientFactory()
+    );
+
+    dataSource.setup();
+    assertTrue(dataSource.update());
+    dataSource.getUpdates();
+
+    var zones = dataSource.getGeofencingZones();
+
+    // First zone ("OSLO Summer 2021") should have priority 0
+    var osloZone = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("OSLO Summer 2021"))
+      .findFirst()
+      .get();
+    assertEquals(0, osloZone.priority());
+
+    // Second zone ("NP Frogner og vigelandsparken") should have priority 1
+    var frognerPark = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
+      .findFirst()
+      .get();
+    assertEquals(1, frognerPark.priority());
   }
 
   @Test
@@ -195,6 +249,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       network,
       false,
+      true,
       true,
       RentalPickupType.ALL
     );
@@ -257,6 +312,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );
@@ -287,6 +343,7 @@ class GbfsFeedMapperTest {
       HttpHeaders.empty(),
       null,
       false,
+      true,
       false,
       RentalPickupType.ALL
     );

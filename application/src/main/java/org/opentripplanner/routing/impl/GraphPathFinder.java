@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -10,6 +12,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -51,16 +55,20 @@ public class GraphPathFinder {
 
   private final float maxCarSpeed;
 
+  private final Map<String, GeofencingZoneIndex> geofencingZoneIndexes;
+
   public GraphPathFinder() {
-    this(List.of(), StreetConstants.DEFAULT_MAX_CAR_SPEED);
+    this(List.of(), StreetConstants.DEFAULT_MAX_CAR_SPEED, Map.of());
   }
 
   public GraphPathFinder(
     Collection<ExtensionRequestContext> extensionRequestContexts,
-    float maxCarSpeed
+    float maxCarSpeed,
+    Map<String, GeofencingZoneIndex> geofencingZoneIndexes
   ) {
     this.extensionRequestContexts = Objects.requireNonNull(extensionRequestContexts);
     this.maxCarSpeed = maxCarSpeed;
+    this.geofencingZoneIndexes = Objects.requireNonNull(geofencingZoneIndexes);
   }
 
   /**
@@ -69,6 +77,23 @@ public class GraphPathFinder {
    */
   public List<StreetPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
     StreetPreferences preferences = request.preferences().street();
+
+    var requestBuilder = StreetSearchRequestMapper.map(request)
+      .withExtensionRequestContexts(extensionRequestContexts)
+      .withMode(request.journey().direct().mode());
+
+    // For arriveBy rental searches, precompute geofencing zones at the destination
+    // so initial renting states have correct zone membership for boundary-based tracking.
+    if (
+      request.arriveBy() &&
+      request.journey().direct().mode().includesRenting() &&
+      !geofencingZoneIndexes.isEmpty()
+    ) {
+      var destinationZones = computeZonesAtVertices(to);
+      if (!destinationZones.isEmpty()) {
+        requestBuilder.withArriveByDestinationZones(destinationZones);
+      }
+    }
 
     StreetSearchBuilder streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
@@ -80,12 +105,7 @@ public class GraphPathFinder {
       )
       // FORCING the dominance function to weight only
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .withRequest(
-        StreetSearchRequestMapper.map(request)
-          .withExtensionRequestContexts(extensionRequestContexts)
-          .withMode(request.journey().direct().mode())
-          .build()
-      )
+      .withRequest(requestBuilder.build())
       .withFrom(from)
       .withTo(to);
 
@@ -158,5 +178,16 @@ public class GraphPathFinder {
     }
 
     return paths;
+  }
+
+  private Set<GeofencingZone> computeZonesAtVertices(Set<Vertex> vertices) {
+    var zones = new HashSet<GeofencingZone>();
+    for (var vertex : vertices) {
+      var coord = vertex.getCoordinate();
+      for (var index : geofencingZoneIndexes.values()) {
+        zones.addAll(index.getZonesContaining(coord));
+      }
+    }
+    return zones;
   }
 }
