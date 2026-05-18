@@ -30,9 +30,9 @@
   "devDependencies": {
     "@eslint/compat": "2.0.3",
     "@eslint/js": "9.39.4",
-    "@graphql-codegen/cli": "6.2.1",
-    "@graphql-codegen/client-preset": "5.2.4",
-    "@graphql-codegen/introspection": "5.0.1",
+    "@graphql-codegen/cli": "7.0.0",
+    "@graphql-codegen/client-preset": "6.0.0",
+    "@graphql-codegen/introspection": "6.0.0",
     "@parcel/watcher": "2.5.6",
     "@testing-library/react": "16.3.2",
     "@types/react": "19.2.14",
