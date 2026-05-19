@@ -71,6 +71,10 @@ public class GraphDataFetcher {
       .toList();
   }
 
+  public Collection<String> summarizeEdges() {
+    return listEdges().stream().map(StreetSummarizer::summarizeEdge).toList();
+  }
+
   /**
    * A list of textual representations of the links (edges of type {@link TemporaryPartialStreetEdge})
    * in the graph.
