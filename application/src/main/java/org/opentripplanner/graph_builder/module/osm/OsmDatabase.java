@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -128,7 +129,7 @@ public class OsmDatabase {
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
    * with existing ones.
    */
-  private long virtualNodeId = -100000;
+  private final AtomicLong virtualNodeId = new AtomicLong(-100000);
 
   public OsmDatabase(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
@@ -674,11 +675,10 @@ public class OsmDatabase {
    */
   private OsmNode createVirtualNode(OsmProvider osmProvider, Coordinate c) {
     OsmNode node = OsmNode.of()
-      .withId(virtualNodeId)
+      .withId(virtualNodeId.getAndDecrement())
       .withLatLon(c.y, c.x)
       .withOsmProvider(osmProvider)
       .build();
-    virtualNodeId--;
     waysNodeIds.add(node.getId());
     nodesById.put(node.getId(), node);
     return node;

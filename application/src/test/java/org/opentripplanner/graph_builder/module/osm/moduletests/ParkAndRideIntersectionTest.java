@@ -74,10 +74,10 @@ class ParkAndRideIntersectionTest {
         "(0.000667,0.001) → (0.000333,0) ALL ♿✅",
         "(0.001,0.002) → (0.000667,0.001) ALL ♿✅",
         "(0.000667,0.001) → (0.001,0.002) ALL ♿✅",
-        "Parking (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100000] → (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100000]",
-        "Parking (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100000] → (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100001]",
-        "Parking (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100001] → (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100000]",
-        "Parking (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100001] → (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100001]"
+        "Parking (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100000] → (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100000]",
+        "Parking (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100000] → (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100001]",
+        "Parking (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100001] → (0.000667,0.001)[Vehicle parking OSM:OsmWay/1/osm:node:-100000]",
+        "Parking (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100001] → (0.000333,0)[Vehicle parking OSM:OsmWay/1/osm:node:-100001]"
       );
   }
 }
