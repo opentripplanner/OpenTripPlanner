@@ -2,9 +2,10 @@ package org.opentripplanner.framework.snapshot.domain.transfer;
 
 import org.opentripplanner.framework.snapshot.domain.NewStopUsedByTripPattern;
 import org.opentripplanner.framework.snapshot.domain.transfer.repository.MutableTransferSnapshot;
-import org.opentripplanner.framework.snapshot.event.EventHandlerTransfer;
+import org.opentripplanner.framework.snapshot.event.EventHandler;
 
-public class NewStopHandler implements EventHandlerTransfer<NewStopUsedByTripPattern> {
+public class NewStopHandler
+  implements EventHandler<NewStopUsedByTripPattern, MutableTransferSnapshot> {
 
   @Override
   public Class<NewStopUsedByTripPattern> eventType() {

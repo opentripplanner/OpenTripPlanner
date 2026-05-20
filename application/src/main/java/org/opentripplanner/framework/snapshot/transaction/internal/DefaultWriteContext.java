@@ -18,10 +18,10 @@ import org.opentripplanner.framework.snapshot.transaction.WriteContext;
  */
 class DefaultWriteContext implements WriteContext {
 
-  private final Map<Class<?>, List<HandlerEntry<?, ?>>> handlers;
+  private final Map<Class<?>, List<HandlerEntry<?, ?>>> eventHandlers;
 
-  DefaultWriteContext(Map<Class<?>, List<HandlerEntry<?, ?>>> handlers) {
-    this.handlers = handlers;
+  DefaultWriteContext(Map<Class<?>, List<HandlerEntry<?, ?>>> eventHandlers) {
+    this.eventHandlers = eventHandlers;
   }
 
   @Override
@@ -31,7 +31,7 @@ class DefaultWriteContext implements WriteContext {
 
   @Override
   public void publish(DomainEvent event) {
-    List<HandlerEntry<?, ?>> entries = handlers.getOrDefault(
+    List<HandlerEntry<?, ?>> entries = eventHandlers.getOrDefault(
       event.getClass(),
       Collections.emptyList()
     );
