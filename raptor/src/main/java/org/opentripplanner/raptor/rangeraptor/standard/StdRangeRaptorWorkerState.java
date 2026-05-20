@@ -32,7 +32,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   implements StdWorkerState<T> {
 
-  private static final boolean EARLY_PRUNING_ENABLED = true;
+  private static final boolean EARLY_PRUNING_ENABLED = false;
 
   /**
    * The best times to reach each stop, whether via a transfer or via transit directly. This is the
