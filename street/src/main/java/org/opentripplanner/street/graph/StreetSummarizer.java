@@ -10,7 +10,9 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 class StreetSummarizer {
@@ -39,6 +41,11 @@ class StreetSummarizer {
         summarizeVertex(link.getFromVertex()),
         summarizeVertex(link.getToVertex())
       );
+      case VehicleParkingEdge p -> String.format(
+        "Parking %s → %s",
+        summarizeVertex(p.getFromVertex()),
+        summarizeVertex(p.getToVertex())
+      );
       default -> throw new NotImplementedException(
         "No summary for edge " + e.getClass().getSimpleName()
       );
@@ -54,6 +61,9 @@ class StreetSummarizer {
     buf.append(coord);
     if (v instanceof TransitStopVertex tsv) {
       buf.append("[%s]".formatted(tsv.getId()));
+    }
+    if (v instanceof VehicleParkingEntranceVertex pev) {
+      buf.append("[%s]".formatted(pev.getLabel()));
     }
 
     if (!v.areaStops().isEmpty()) {

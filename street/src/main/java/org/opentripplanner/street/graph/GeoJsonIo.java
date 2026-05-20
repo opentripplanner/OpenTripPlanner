@@ -27,7 +27,7 @@ public class GeoJsonIo {
     try {
       var geoJson = MAPPER.writeValueAsString(geometry);
       var encoded = URLEncoder.encode(geoJson, StandardCharsets.UTF_8);
-      return "http://geojson.io/#data=data:application/json,%s".formatted(encoded);
+      return "http://geojson.io/next/#data=data:application/json,%s".formatted(encoded);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

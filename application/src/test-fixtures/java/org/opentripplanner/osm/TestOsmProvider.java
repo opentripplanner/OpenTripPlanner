@@ -27,19 +27,18 @@ public class TestOsmProvider implements OsmProvider {
 
   public TestOsmProvider(List<OsmRelation> relations, List<OsmWay> ways, List<OsmNode> nodes) {
     // this was originally peek() but Joel insisted that it's "for debugging"
-    this.relations = List.copyOf(
-      relations
-        .stream()
-        .map(relation -> relation.copy().withOsmProvider(this).build())
-        .toList()
-    );
-    this.ways = List.copyOf(
-      ways
-        .stream()
-        .map(way -> way.copy().withOsmProvider(this).build())
-        .toList()
-    );
-    this.nodes = List.copyOf(nodes);
+    this.relations = relations
+      .stream()
+      .map(relation -> relation.copy().withOsmProvider(this).build())
+      .toList();
+    this.ways = ways
+      .stream()
+      .map(way -> way.copy().withOsmProvider(this).build())
+      .toList();
+    this.nodes = nodes
+      .stream()
+      .map(n -> n.copy().withOsmProvider(this).build())
+      .toList();
   }
 
   public static Builder of() {
