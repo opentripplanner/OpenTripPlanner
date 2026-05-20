@@ -4,6 +4,7 @@ import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
@@ -30,6 +31,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   implements StdWorkerState<T> {
+
+  private static final boolean EARLY_PRUNING_ENABLED = true;
 
   /**
    * The best times to reach each stop, whether via a transfer or via transit directly. This is the
@@ -59,6 +62,33 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final RaptorTransitCalculator<T> calculator;
 
   /**
+   * Early Pruning: egress stop indices and their minimum egress durations. For each egress stop,
+   * we track the minimum duration of all egress paths from that stop. The best destination arrival
+   * time = min(arrivalTimeAtEgressStop + minEgressDuration).
+   * See: Rohovyi et al., "Early Pruning for Public Transport Routing", 2026.
+   */
+  private final int[] egressStopIndices;
+  private final int[] egressMinDurations;
+
+  /**
+   * Early Pruning: best known destination arrival time per round (across all iterations).
+   * Each round only prunes against its own best, so a fast multi-transfer path from a previous
+   * iteration does not block a slower few-transfer path in the current iteration.
+   * This ensures correctness for Range Raptor's [departureTime, arrivalTime, numTransfers] Pareto.
+   */
+  private final int[] bestDestArrivalByRound;
+
+  /**
+   * Early Pruning: best known destination arrival time within the current RAPTOR iteration.
+   * Within a single iteration (fixed departure time), rounds proceed sequentially, so this
+   * value only reflects earlier rounds. It is reset at the start of each iteration.
+   */
+  private int bestDestCurrentIteration;
+
+  /** Current round, updated via lifecycle. */
+  private int currentRound;
+
+  /**
    * create a BestTimes Range Raptor State for given context.
    */
   public StdRangeRaptorWorkerState(
@@ -66,13 +96,27 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     BestTimes bestTimes,
     StopArrivalsState<T> stopArrivalsState,
     BestNumberOfTransfers bestNumberOfTransfers,
-    ArrivedAtDestinationCheck arrivedAtDestinationCheck
+    ArrivedAtDestinationCheck arrivedAtDestinationCheck,
+    int[] egressStopIndices,
+    int[] egressMinDurations,
+    int nRounds,
+    WorkerLifeCycle lifeCycle
   ) {
     this.calculator = calculator;
     this.bestTimes = bestTimes;
     this.stopArrivalsState = stopArrivalsState;
     this.bestNumberOfTransfers = bestNumberOfTransfers;
     this.arrivedAtDestinationCheck = arrivedAtDestinationCheck;
+    this.egressStopIndices = egressStopIndices;
+    this.egressMinDurations = egressMinDurations;
+    this.bestDestArrivalByRound = new int[nRounds + 1];
+    java.util.Arrays.fill(this.bestDestArrivalByRound, calculator.unreachedTime());
+    this.bestDestCurrentIteration = calculator.unreachedTime();
+    this.currentRound = 0;
+    lifeCycle.onPrepareForNextRound(round -> this.currentRound = round);
+    lifeCycle.onSetupIteration(ignore ->
+      this.bestDestCurrentIteration = calculator.unreachedTime()
+    );
   }
 
   @Override
@@ -121,12 +165,23 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   /**
    * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
+   * Transfers are expected to be sorted by duration (non-decreasing). This enables Early Pruning:
+   * once a transfer exceeds the time limit, all subsequent (longer) transfers will too, so the
+   * loop can terminate early. See: Rohovyi et al., "Early Pruning for Public Transport Routing".
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
     int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
-    while (transfers.hasNext()) {
-      transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+    if (EARLY_PRUNING_ENABLED) {
+      while (transfers.hasNext()) {
+        if (transferToStopWithEarlyPruning(arrivalTimeTransit, fromStop, transfers.next())) {
+          break;
+        }
+      }
+    } else {
+      while (transfers.hasNext()) {
+        transferToStopWithEarlyPruning(arrivalTimeTransit, fromStop, transfers.next());
+      }
     }
   }
 
@@ -187,7 +242,15 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return stopArrivalsState.previousTransit(boardStopIndex);
   }
 
-  private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
+  /**
+   * @return true if the time limit was exceeded, signaling that Early Pruning should terminate
+   *     the transfer loop (all subsequent sorted transfers will also exceed the limit).
+   */
+  private boolean transferToStopWithEarlyPruning(
+    int arrivalTimeTransit,
+    int fromStop,
+    RaptorTransfer transfer
+  ) {
     // Use the calculator to make sure the calculation is done correct for a normal
     // forward search and a reverse search.
     final int arrivalTime = calculator.plusDuration(
@@ -196,7 +259,26 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     );
 
     if (exceedsTimeLimit(arrivalTime)) {
-      return;
+      return true;
+    }
+
+    // Early Pruning: use the tighter of two valid bounds:
+    // 1. bestDestArrivalByRound[currentRound] — per-round best across all Range Raptor iterations
+    // 2. bestDestCurrentIteration — best within current iteration (from earlier rounds)
+    // Both are valid: (1) ensures cross-iteration correctness for Pareto [dept, arr, transfers],
+    // (2) provides within-iteration pruning as in single-departure RAPTOR (paper's EP).
+    // See: Rohovyi et al., "Early Pruning for Public Transport Routing", 2026.
+    if (EARLY_PRUNING_ENABLED) {
+      int epBound = bestDestCurrentIteration;
+      if (
+        currentRound < bestDestArrivalByRound.length &&
+        calculator.isBefore(bestDestArrivalByRound[currentRound], epBound)
+      ) {
+        epBound = bestDestArrivalByRound[currentRound];
+      }
+      if (!calculator.isBefore(arrivalTime, epBound)) {
+        return true;
+      }
     }
 
     final int toStop = transfer.stop();
@@ -206,6 +288,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     } else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
+    return false;
   }
 
   @Override
@@ -220,7 +303,28 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   /* private methods */
 
   private boolean newOverallBestTime(int stop, int alightTime) {
-    return bestTimes.updateNewBestTime(stop, alightTime);
+    boolean updated = bestTimes.updateNewBestTime(stop, alightTime);
+    if (updated) {
+      // Early Pruning: update destination arrival times if this is an egress stop.
+      for (int i = 0; i < egressStopIndices.length; i++) {
+        if (egressStopIndices[i] == stop) {
+          int destArrival = calculator.plusDuration(alightTime, egressMinDurations[i]);
+          // Update per-round bound (for cross-iteration correctness)
+          if (
+            currentRound < bestDestArrivalByRound.length &&
+            calculator.isBefore(destArrival, bestDestArrivalByRound[currentRound])
+          ) {
+            bestDestArrivalByRound[currentRound] = destArrival;
+          }
+          // Update within-iteration bound (for within-iteration pruning)
+          if (calculator.isBefore(destArrival, bestDestCurrentIteration)) {
+            bestDestCurrentIteration = destArrival;
+          }
+          break;
+        }
+      }
+    }
+    return updated;
   }
 
   private boolean newBestTransitArrivalTime(int stop, int alightTime) {

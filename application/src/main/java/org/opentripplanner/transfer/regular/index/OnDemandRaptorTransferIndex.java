@@ -2,7 +2,9 @@ package org.opentripplanner.transfer.regular.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -53,10 +55,11 @@ class OnDemandRaptorTransferIndex implements RaptorTransferIndex {
     // We don't think that the overhead of locking is worthwhile for the occasional chance of two
     // threads generating the transfers at the same time.
     if (forwardRaptorTransfers[stopIndex] == null) {
-      forwardRaptorTransfers[stopIndex] = RaptorTransferIndex.getRaptorTransfers(
-        request,
-        transfersByFromStopIndex.get(stopIndex)
+      var transfers = new ArrayList<>(
+        RaptorTransferIndex.getRaptorTransfers(request, transfersByFromStopIndex.get(stopIndex))
       );
+      transfers.sort(Comparator.comparingInt(RaptorTransfer::durationInSeconds));
+      forwardRaptorTransfers[stopIndex] = transfers;
     }
 
     return forwardRaptorTransfers[stopIndex];
@@ -67,13 +70,14 @@ class OnDemandRaptorTransferIndex implements RaptorTransferIndex {
     initializeTransfersByToStop();
 
     if (reversedRaptorTransfers[stopIndex] == null) {
-      reversedRaptorTransfers[stopIndex] = RaptorTransferIndex.getRaptorTransfers(
-        request,
-        transfersByToStopIndex.get(stopIndex)
-      )
-        .stream()
-        .map(t -> t.reverseOf(t.transfer().from.getIndex()))
-        .toList();
+      var transfers = new ArrayList<>(
+        RaptorTransferIndex.getRaptorTransfers(request, transfersByToStopIndex.get(stopIndex))
+          .stream()
+          .map(t -> t.reverseOf(t.transfer().from.getIndex()))
+          .toList()
+      );
+      transfers.sort(Comparator.comparingInt(RaptorTransfer::durationInSeconds));
+      reversedRaptorTransfers[stopIndex] = transfers;
     }
 
     return reversedRaptorTransfers[stopIndex];
