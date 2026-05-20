@@ -33,7 +33,11 @@ public class GraphDataFetcher {
   }
 
   public List<StreetEdge> listStreetEdges() {
-    return graph.getEdgesOfType(StreetEdge.class);
+    return listEdges()
+      .stream()
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .toList();
   }
 
   public List<TransitStopVertex> listStopVertices() {

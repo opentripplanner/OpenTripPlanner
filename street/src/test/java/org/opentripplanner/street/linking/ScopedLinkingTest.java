@@ -22,7 +22,7 @@ class ScopedLinkingTest {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
     var temp = env.linkVertexForRequest(0.05, 0.05);
-    assertThat(env.graph().listStreetEdges()).hasSize(2);
+    assertThat(env.graph().listStreetEdges()).hasSize(3);
     temp.disposeEdges();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
   }
@@ -32,11 +32,7 @@ class ScopedLinkingTest {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
-    env
-      .linker()
-      .linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (vertex, streetVertex) ->
-        List.of()
-      );
+    env.linker().linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (_, _) -> List.of());
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     env.disposeEdges();
     // edges should stay after disposing
@@ -50,8 +46,8 @@ class ScopedLinkingTest {
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
     var temp = env
       .linker()
-      .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (v1, v2) -> List.of());
-    assertThat(env.graph().listStreetEdges()).hasSize(2);
+      .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (_, _) -> List.of());
+    assertThat(env.graph().listStreetEdges()).hasSize(3);
     temp.disposeEdges();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
   }
