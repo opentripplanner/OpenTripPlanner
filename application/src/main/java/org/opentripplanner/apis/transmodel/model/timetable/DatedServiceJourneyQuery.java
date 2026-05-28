@@ -1,14 +1,20 @@
 package org.opentripplanner.apis.transmodel.model.timetable;
 
 import graphql.Scalars;
+import graphql.relay.Relay;
+import graphql.relay.SimpleListConnection;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.transmodel.mapping.FilterMapper;
+import org.opentripplanner.apis.transmodel.mapping.TripOnServiceDateSelectMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -139,6 +145,54 @@ public class DatedServiceJourneyQuery {
         return GqlUtil.getTransitService(environment).findTripsOnServiceDate(
           tripOnServiceDateRequestBuilder.build()
         );
+      })
+      .build();
+  }
+
+  public GraphQLFieldDefinition createCancelledQuery(
+    GraphQLOutputType datedServiceJourneyType,
+    Relay relay
+  ) {
+    return GraphQLFieldDefinition.newFieldDefinition()
+      .name("cancelledDatedServiceJourneys")
+      .type(
+        relay.connectionType(
+          "cancelledDatedServiceJourney",
+          relay.edgeType(
+            "cancelledDatedServiceJourney",
+            datedServiceJourneyType,
+            null,
+            new ArrayList<>()
+          ),
+          new ArrayList<>()
+        )
+      )
+      .description("Get all cancelled dated service journeys, optionally filtered")
+      .argument(
+        GraphQLArgument.newArgument()
+          .name("filters")
+          .description(
+            "A list of filters for which dated service journeys should be included. " +
+              "A journey will be included if it matches at least one filter. " +
+              "An empty list is not allowed. " +
+              "Omit the argument to return all cancelled journeys."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(DatedServiceJourneyFilterInputType.INPUT_TYPE)))
+      )
+      .arguments(relay.getConnectionFieldArguments())
+      .dataFetcher(environment -> {
+        List<Map<String, ?>> filtersInput = environment.getArgument("filters");
+        var requestBuilder = TripOnServiceDateRequest.of();
+        if (filtersInput != null) {
+          var mapper = new TripOnServiceDateSelectMapper(idMapper);
+          requestBuilder.withFilters(
+            FilterMapper.mapFilters(filtersInput, mapper::mapSelectRequest)
+          );
+        }
+        var trips = GqlUtil.getTransitService(environment).findCanceledTrips(
+          requestBuilder.build()
+        );
+        return new SimpleListConnection<>(trips).get(environment);
       })
       .build();
   }

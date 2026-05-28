@@ -11,7 +11,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
+import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
@@ -26,7 +27,7 @@ public class TripTimeOnDateRequest {
   private final FilterValues<FeedScopedId> excludeRoutes;
   private final FilterValues<TransitMode> includeModes;
   private final FilterValues<TransitMode> excludeModes;
-  private final List<TripTimeOnDateFilterRequest> transitFilters;
+  private final List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
   private final int numberOfDepartures;
@@ -46,7 +47,7 @@ public class TripTimeOnDateRequest {
     FilterValues<FeedScopedId> excludeRoutes,
     FilterValues<TransitMode> includeModes,
     FilterValues<TransitMode> excludeModes,
-    List<TripTimeOnDateFilterRequest> transitFilters
+    List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
     this.time = Objects.requireNonNull(time);
@@ -120,7 +121,7 @@ public class TripTimeOnDateRequest {
     return sortOrder;
   }
 
-  public List<TripTimeOnDateFilterRequest> transitFilters() {
+  public List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters() {
     return transitFilters;
   }
 }

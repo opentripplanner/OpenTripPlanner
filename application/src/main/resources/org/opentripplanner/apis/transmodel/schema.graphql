@@ -687,6 +687,19 @@ type QueryType {
   bikeRentalStations(ids: [String]): [BikeRentalStation]! @timingData
   "Get all bike rental stations within the specified bounding box."
   bikeRentalStationsByBbox(maximumLatitude: Float, maximumLongitude: Float, minimumLatitude: Float, minimumLongitude: Float): [BikeRentalStation]! @timingData
+  "Get all cancelled dated service journeys, optionally filtered"
+  cancelledDatedServiceJourneys(
+    "fetching only nodes after this node (exclusive)"
+    after: String,
+    "fetching only nodes before this node (exclusive)"
+    before: String,
+    "A list of filters for which dated service journeys should be included. A journey will be included if it matches at least one filter. An empty list is not allowed. Omit the argument to return all cancelled journeys."
+    filters: [DatedServiceJourneyFilterInput!],
+    "fetching only the first certain number of nodes"
+    first: Int,
+    "fetching only the last certain number of nodes"
+    last: Int
+  ): cancelledDatedServiceJourneyConnection
   "Get a single dated service journey based on its id"
   datedServiceJourney(id: String): DatedServiceJourney
   "Get all dated service journeys, matching the filters"
@@ -1618,6 +1631,22 @@ type ViaTripPatternSegment {
   tripPatterns: [TripPattern!]!
 }
 
+"A connection to a list of items."
+type cancelledDatedServiceJourneyConnection {
+  "a list of edges"
+  edges: [cancelledDatedServiceJourneyEdge]
+  "details about this specific page"
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection"
+type cancelledDatedServiceJourneyEdge {
+  "cursor marks a unique position or index into the connection"
+  cursor: String!
+  "The item at the end of the edge"
+  node: DatedServiceJourney
+}
+
 type debugOutput {
   totalTime: Long
 }
@@ -2229,6 +2258,24 @@ input BikePreferencesInput {
   speed: Float = 5.0
   "When using optimisationMethod 'triangle', these values tell the routing engine how important each factor is compared to the others. All values should add up to 1."
   triangleFactors: TriangleFactors
+}
+
+"A collection of selectors for which dated service journeys should be included / excluded. At least one of `select` or `not` must be provided. The `select` is always applied first, then `not`. If only `not` is present, the exclusion is applied to all journeys."
+input DatedServiceJourneyFilterInput {
+  "A list of selectors for journeys that should be excluded. If a journey matches at least one selector it will be excluded."
+  not: [DatedServiceJourneySelectInput!]
+  "A list of selectors for which journeys should be included. A journey is included if it matches at least one selector. Omit the field to include all journeys. An empty list is not allowed."
+  select: [DatedServiceJourneySelectInput!]
+}
+
+"A selector for filter allow-list / exclude-list. At least one field must be provided. A dated service journey matches a selector if it matches all fields. Within each field, a journey matches if it matches any of the listed values."
+input DatedServiceJourneySelectInput {
+  "Set of ids for authorities that should be included in/excluded from search. A journey matches if its authority matches any of the given IDs. An empty list is not allowed. Omit the field to match all authorities."
+  authorities: [ID!]
+  "Set of ids for lines that should be included in/excluded from search. A journey matches if its line matches any of the given IDs. An empty list is not allowed. Omit the field to match all lines."
+  lines: [ID!]
+  "The allowed modes for the dated service journey. A journey matches if its mode matches any of the listed modes. An empty list is not allowed. Omit the field to match all modes. Omitting main mode (transportMode) is also not allowed."
+  transportModes: [TransportModes!]
 }
 
 "A collection of selectors for what estimated calls should be included / excluded. At least one of `select` or `not` must be provided. The `select` is always applied first, then `not`. If only `not` is present, the exclude is applied to the existing set of estimated calls."

@@ -30,7 +30,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.apis.transmodel.mapping.TripTimeOnDateFilterMapper;
+import org.opentripplanner.apis.transmodel.mapping.FilterMapper;
+import org.opentripplanner.apis.transmodel.mapping.TripTimeOnDateSelectMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
@@ -389,8 +390,10 @@ public class StopPlaceType {
               .withIncludeCancelledTrips(includeCancelledTrips);
 
             if (filtersInput != null) {
-              var mapper = new TripTimeOnDateFilterMapper(idMapper);
-              requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
+              var mapper = new TripTimeOnDateSelectMapper(idMapper);
+              requestBuilder.withTransitFilters(
+                FilterMapper.mapFilters(filtersInput, mapper::mapSelectRequest)
+              );
             }
             requestBuilder
               .withIncludeAgencies(

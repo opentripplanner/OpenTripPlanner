@@ -9,58 +9,24 @@ import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 
 /**
- * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link TripTimeOnDateFilterRequest}
- * objects by extracting the {@code select} and {@code not} criteria from the GraphQL input.
- * <p>
- * Each filter has {@code select} and {@code not} arrays of select criteria.
+ * Maps GraphQL {@code EstimatedCallsSelectInput} to {@link TripTimeOnDateSelectRequest}
+ * by extracting the criteria from the GraphQL input.
  * <p>
  * Empty lists are not allowed and will result in an {@link InvalidInputException}.
  */
-public class TripTimeOnDateFilterMapper {
+public class TripTimeOnDateSelectMapper {
 
   private final FeedScopedIdMapper idMapper;
 
-  public TripTimeOnDateFilterMapper(FeedScopedIdMapper idMapper) {
+  public TripTimeOnDateSelectMapper(FeedScopedIdMapper idMapper) {
     this.idMapper = idMapper;
   }
 
   @SuppressWarnings("unchecked")
-  public List<TripTimeOnDateFilterRequest> mapFilters(List<Map<String, ?>> filters) {
-    validateFieldNotEmpty("filters", filters);
-
-    var filterRequests = new ArrayList<TripTimeOnDateFilterRequest>();
-
-    for (var filterInput : filters) {
-      var filterRequestBuilder = TripTimeOnDateFilterRequest.of();
-
-      if (filterInput.containsKey("select")) {
-        var select = (List<Map<String, List<?>>>) filterInput.get("select");
-        validateFieldNotEmpty("select", select);
-        for (var it : select) {
-          filterRequestBuilder.addSelect(mapSelectRequest(it));
-        }
-      }
-      if (filterInput.containsKey("not")) {
-        var not = (List<Map<String, List<?>>>) filterInput.get("not");
-        validateFieldNotEmpty("not", not);
-        for (var it : not) {
-          filterRequestBuilder.addNot(mapSelectRequest(it));
-        }
-      }
-      if (!filterInput.containsKey("select") && !filterInput.containsKey("not")) {
-        throw new InvalidInputException("A filter must have at least one of 'select' or 'not'.");
-      }
-      filterRequests.add(filterRequestBuilder.build());
-    }
-    return filterRequests;
-  }
-
-  @SuppressWarnings("unchecked")
-  private TripTimeOnDateSelectRequest mapSelectRequest(Map<String, List<?>> input) {
+  public TripTimeOnDateSelectRequest mapSelectRequest(Map<String, List<?>> input) {
     validateNotEmpty(input);
 
     var builder = TripTimeOnDateSelectRequest.of();

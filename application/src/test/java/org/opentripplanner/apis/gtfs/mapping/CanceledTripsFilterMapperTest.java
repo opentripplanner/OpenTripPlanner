@@ -2,8 +2,8 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 class CanceledTripsFilterMapperTest {
@@ -22,8 +23,7 @@ class CanceledTripsFilterMapperTest {
     Map<String, Object> args = Map.of("filters", List.of());
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
-    assertTrue(request.includeModes().includeEverything());
-    assertTrue(request.excludeModes().includeEverything());
+    assertThat(request.filters()).isEmpty();
   }
 
   @Test
@@ -31,8 +31,35 @@ class CanceledTripsFilterMapperTest {
     Map<String, Object> args = new HashMap<>();
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
-    assertTrue(request.includeModes().includeEverything());
-    assertTrue(request.excludeModes().includeEverything());
+    assertThat(request.filters()).isEmpty();
+  }
+
+  @Test
+  void testNullExclude() {
+    // When no exclude is given, exclude will be null, which should not impact the filtering
+    var mode = TransitMode.BUS;
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("include", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
+    );
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertThat(request.filters()).hasSize(1);
+    assertNull(request.filters().getFirst().not());
+  }
+
+  @Test
+  void testNullInclude() {
+    // When no include is given, include will be null which should not impact the filtering
+    var mode = TransitMode.BUS;
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("exclude", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
+    );
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertThat(request.filters()).hasSize(1);
+    assertNull(request.filters().getFirst().select());
   }
 
   @Test
@@ -44,10 +71,10 @@ class CanceledTripsFilterMapperTest {
     );
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
-    var modes = request.includeModes().get();
-    assertThat(modes).hasSize(1);
-    assertEquals(mode, modes.iterator().next());
-    assertTrue(request.excludeModes().includeEverything());
+    assertThat(request.filters()).hasSize(1);
+    var selectModes = request.filters().getFirst().select().getFirst().transportModes().get();
+    assertThat(selectModes).containsExactly(new MainAndSubMode(mode));
+    assertNull(request.filters().getFirst().not());
   }
 
   @Test
@@ -59,10 +86,10 @@ class CanceledTripsFilterMapperTest {
     );
     var environment = getEnvironment(args);
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
-    var modes = request.excludeModes().get();
-    assertThat(modes).hasSize(1);
-    assertEquals(mode, modes.iterator().next());
-    assertTrue(request.includeModes().includeEverything());
+    assertThat(request.filters()).hasSize(1);
+    var notModes = request.filters().getFirst().not().getFirst().transportModes().get();
+    assertThat(notModes).containsExactly(new MainAndSubMode(mode));
+    assertNull(request.filters().getFirst().select());
   }
 
   @Test

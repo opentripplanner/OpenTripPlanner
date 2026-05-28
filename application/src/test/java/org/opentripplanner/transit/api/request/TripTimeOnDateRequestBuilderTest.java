@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
@@ -174,7 +174,7 @@ class TripTimeOnDateRequestBuilderTest {
 
   @Test
   void withTransitFilters() {
-    var filter = TripTimeOnDateFilterRequest.of()
+    var filter = FilterRequest.<TripTimeOnDateSelectRequest>of()
       .addSelect(
         TripTimeOnDateSelectRequest.of().withAgencies(List.of(new FeedScopedId("F", "A1"))).build()
       )

@@ -1547,6 +1547,7 @@ public class TransmodelGraphQLSchemaFactory {
       )
       .field(datedServiceJourneyQueryFactory.createGetById(datedServiceJourneyType))
       .field(datedServiceJourneyQueryFactory.createQuery(datedServiceJourneyType))
+      .field(datedServiceJourneyQueryFactory.createCancelledQuery(datedServiceJourneyType, relay))
       .build();
 
     return GraphQLSchema.newSchema()

@@ -22,7 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.apis.transmodel.mapping.TripTimeOnDateFilterMapper;
+import org.opentripplanner.apis.transmodel.mapping.FilterMapper;
+import org.opentripplanner.apis.transmodel.mapping.TripTimeOnDateSelectMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
@@ -326,8 +327,10 @@ public class QuayType {
               .withIncludeCancelledTrips(includeCancelledTrips);
 
             if (filtersInput != null) {
-              var mapper = new TripTimeOnDateFilterMapper(idMapper);
-              requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
+              var mapper = new TripTimeOnDateSelectMapper(idMapper);
+              requestBuilder.withTransitFilters(
+                FilterMapper.mapFilters(filtersInput, mapper::mapSelectRequest)
+              );
             }
             requestBuilder
               .withIncludeAgencies(
