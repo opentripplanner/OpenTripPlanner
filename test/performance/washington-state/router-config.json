@@ -3,5 +3,8 @@
   "flex": {
     "maxAccessWalkDuration": "10m",
     "maxEgressWalkDuration": "10m"
+  },
+  "transit": {
+    "earlyTransferPruning": false
   }
 }
