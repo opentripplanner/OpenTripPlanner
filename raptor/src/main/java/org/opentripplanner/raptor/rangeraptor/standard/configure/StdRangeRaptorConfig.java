@@ -281,6 +281,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
     return new StdTransferEarlyPruning<T>(
       egressPaths().listAll(),
+      ctx.nStops(),
       ctx.nRounds(),
       ctx.calculator(),
       ctx.lifeCycle()
