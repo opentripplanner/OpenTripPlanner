@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - flex-early-pruning
 
 jobs:
   perf-test:
@@ -52,12 +53,12 @@ jobs:
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
-            profile: extended
+            profile: core
 
           - location: helsinki
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v6
