@@ -10,9 +10,8 @@ public class ObjectMappers {
   /**
    * Returns a mapper that doesn't fail on unknown properties.
    */
-  public static ObjectMapper ignoringExtraFields() {
-    var mapper = new JsonMapper();
-    return mapper;
+  public static JsonMapper ignoringExtraFields() {
+    return new JsonMapper();
   }
 
   /**

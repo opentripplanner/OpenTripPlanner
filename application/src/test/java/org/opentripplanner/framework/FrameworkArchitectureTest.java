@@ -14,7 +14,7 @@ public class FrameworkArchitectureTest {
   private static final Package APACHE_HTTP = Package.of("org.apache.hc..");
 
   private static final Module XML_MODULES = Module.of(
-    Package.of("com.fasterxml.jackson.."),
+    Package.of("tools.jackson.."),
     Package.of("org.w3c.dom"),
     Package.of("org.xml.sax")
   );

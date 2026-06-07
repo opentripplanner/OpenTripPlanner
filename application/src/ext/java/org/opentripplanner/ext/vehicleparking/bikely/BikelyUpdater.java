@@ -2,10 +2,6 @@ package org.opentripplanner.ext.vehicleparking.bikely;
 
 import static org.opentripplanner.service.vehicleparking.model.VehicleParkingState.OPERATIONAL;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Currency;
@@ -29,7 +25,8 @@ import org.opentripplanner.updater.spi.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -43,7 +40,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   private static final String JSON_PARSE_PATH = "result";
   private static final Set<String> INCLUDED_TYPES = Set.of("Standard", "Rack");
   private static final Currency NOK = Currency.getInstance("NOK");
-  private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
+  private static final JsonMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private static final ObjectNode POST_PARAMS = OBJECT_MAPPER.createObjectNode()
     .put("groupPins", true)
     .put("lonMin", 0)
