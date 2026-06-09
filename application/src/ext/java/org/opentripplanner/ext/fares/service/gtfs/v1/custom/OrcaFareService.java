@@ -399,7 +399,7 @@ public class OrcaFareService extends DefaultFareService {
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT, KC_METRO -> optionalUSD(1.00f);
-      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL, EVERETT_TRANSIT -> optionalUSD(0.5f);
+      case EVERETT_TRANSIT -> defaultFare.map(_ -> usDollars(0.5f));
       case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
@@ -417,8 +417,8 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
-      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> defaultFare.map(Money::half);
-      default -> defaultFare;
+      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL, WHATCOM_LOCAL, SKAGIT_TRANSIT -> defaultFare.map(Money::half);
+      default -> Optional.empty();
     };
   }
 

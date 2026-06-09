@@ -314,7 +314,7 @@ public class OrcaFareServiceTest {
     calculateFare(
       rides,
       FareType.senior,
-      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE.times(2)).plus(usDollars(0.5f))
+      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE.times(2)).plus(DEFAULT_TEST_RIDE_PRICE.half())
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     // We don't get any fares for the skagit transit leg below here because they don't accept ORCA (electronic)
@@ -569,7 +569,7 @@ public class OrcaFareServiceTest {
     );
 
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
-    calculateFare(rides, FareType.senior, usDollars(0.50f).times(2));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.half().times(2));
     // TODO: Check that these are undefined, not zero
     calculateFare(rides, FareType.youth, ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, ZERO_USD);
