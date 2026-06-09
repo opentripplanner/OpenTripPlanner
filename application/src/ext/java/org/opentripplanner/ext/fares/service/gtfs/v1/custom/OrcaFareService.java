@@ -140,6 +140,7 @@ public class OrcaFareService extends DefaultFareService {
           WHATCOM_LOCAL,
           WHATCOM_CROSS_COUNTY,
           KITSAP_TRANSIT_FAST_FERRY,
+          MONORAIL,
           SKAGIT_CROSS_COUNTY -> false;
         default -> true;
       };
@@ -341,7 +342,7 @@ public class OrcaFareService extends DefaultFareService {
         SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
         ? Optional.empty()
         : defaultFare;
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(4.00f);
       default -> defaultFare;
     };
   }

@@ -579,39 +579,32 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * We explicitly do not calculate monorail fares
-   */
-  @Test
-  void calculateMonorailFares() {
-    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
-
-    calculateFare(rides, regular, usDollars(0.00f));
-    calculateFare(rides, FareType.senior, usDollars(0.00f));
-    calculateFare(rides, FareType.youth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-  }
-
-  /**
    * Test monorail fares with transfers to ensure transfer logic works correctly
-   * with monorail's unique fare structure. Update: we now exclude monorail from fare calcs
+   * with monorail's unique fare structure. Update: monorail doesn't accept transfers anymore
    */
   @Test
   void calculateMonorailFaresWithTransfers() {
     List<Leg> rides = List.of(
-      getLeg(MONORAIL_AGENCY_ID, 0),
-      getLeg(KC_METRO_AGENCY_ID, 30),
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
       getLeg(COMM_TRANS_AGENCY_ID, 60)
     );
 
-    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f)));
+    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f).plus(usDollars(4.00f))));
     calculateFare(rides, FareType.youth, ZERO_USD);
-    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f).plus(usDollars(4.00f)));
     calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
     calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
     calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+
+    var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
+
+    // KC Metro is charged its normal fare
+    assertLegFareEquals(300, rides.get(0), fares, false);
+    // Monorail doesn't accept or give transfers
+    assertLegFareEquals(400, rides.get(1), fares, false);
+    // CommTrans still gets a free transfer from KC Metro (monorail doesn't break the chain)
+    assertLegFareEquals(0, rides.get(2), fares, true);
   }
 
   static Stream<Arguments> allTypes() {
