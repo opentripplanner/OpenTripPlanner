@@ -417,7 +417,12 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
-      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL, WHATCOM_LOCAL, SKAGIT_TRANSIT -> defaultFare.map(Money::half);
+      case
+        WHATCOM_CROSS_COUNTY,
+        SKAGIT_CROSS_COUNTY,
+        SKAGIT_LOCAL,
+        WHATCOM_LOCAL,
+        SKAGIT_TRANSIT -> defaultFare.map(Money::half);
       default -> Optional.empty();
     };
   }
