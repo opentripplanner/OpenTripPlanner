@@ -22,7 +22,7 @@ class GeoJsonScalarTest {
     var geoJson = GraphQLScalars.GEOJSON_SCALAR.getCoercing().serialize(polygon);
 
     var expected = ObjectMappers.ignoringExtraFields().readTree(
-      "{\"type\":\"Polygon\",\"coordinates\":[[[0.0,0.0],[1.0,1.0],[2.0,2.0],[0.0,0.0]]]}"
+      "{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[1,1],[2,2],[0,0]]]}"
     );
     assertEquals(expected.toString(), geoJson.toString());
   }

@@ -9,8 +9,10 @@ public class JsonUtils {
     JsonNode valueNode = node.get(field);
     if (valueNode == null) {
       return Optional.empty();
+    } else if (valueNode.isString()) {
+      return Optional.of(valueNode.asString());
+    } else {
+      return Optional.empty();
     }
-    String value = valueNode.asString();
-    return value.isEmpty() ? Optional.empty() : Optional.of(value);
   }
 }
