@@ -196,9 +196,9 @@
         "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.core:{/,}**",
-        "com.fasterxml.jackson.datatype:{/,}**",
+        "tools.jackson:{/,}**",
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
         "com.azure:{/,}**"
       ],
       "automerge": true,
@@ -225,8 +225,8 @@
     {
       "groupName": "Jackson non-patch",
       "matchPackageNames": [
-        "com.fasterxml.jackson.core:{/,}**",
-        "com.fasterxml.jackson.datatype:{/,}**",
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
       ],
       "matchUpdateTypes": ["major", "minor"],
       "minimumReleaseAge": "1 week"
