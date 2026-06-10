@@ -1,32 +1,35 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.util.BitSetIterator;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardingSearch;
+import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
+import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -167,7 +170,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       }
     }
 
-    return new BitSetIterator(activeTripPatternsForGivenStops);
+    return IntIterators.of(activeTripPatternsForGivenStops);
   }
 
   @Override
@@ -178,6 +181,11 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   @Override
   public int numberOfStops() {
     return raptorTransitData.getStopCount();
+  }
+
+  @Override
+  public int numberOfTripPatterns() {
+    return patternIndex.size();
   }
 
   @Override
@@ -259,5 +267,15 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
+  }
+
+  @Override
+  public RaptorTripScheduleReference tripScheduleReference(TripSchedule trip) {
+    return new RaptorTripScheduleReference(trip.pattern().patternIndex(), trip.tripScheduleIndex());
+  }
+
+  public Collection<TripPatternForDates> activeTripPatternsPerStop(int stopIndex) {
+    var routeIndices = activeTripPatternsPerStop.get(stopIndex);
+    return Arrays.stream(routeIndices).mapToObj(patternIndex::get).toList();
   }
 }

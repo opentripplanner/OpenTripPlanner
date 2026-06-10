@@ -1,14 +1,9 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
-
-import java.util.EnumSet;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.street.model.StreetMode;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 
 /**
- * Simple factory to create {@link DefaultRaptorTransfer}s for unit-testing.
+ * Simple factory to create {@link TestTransfer}s for unit-testing.
  * <p>
  * <b>Note!</b> The created transfer does NOT have a AStar path (list of edges).
  */
@@ -19,16 +14,11 @@ public final class TestTransfers {
   /** This is a utility class, should not be instansiated */
   private TestTransfers() {}
 
-  public static DefaultRaptorTransfer transfer(int stop, int durationInSeconds, int cost) {
-    var tx = new Transfer(
-      stop,
-      (int) Math.round(durationInSeconds * 1.3),
-      EnumSet.of(StreetMode.WALK)
-    );
-    return new DefaultRaptorTransfer(stop, durationInSeconds, cost, tx);
+  public static TestTransfer transfer(int stop, int durationInSeconds, int cost) {
+    return new TestTransfer(stop, durationInSeconds, cost);
   }
 
-  public static DefaultRaptorTransfer transfer(int stop, int durationInSeconds) {
+  public static TestTransfer transfer(int stop, int durationInSeconds) {
     return transfer(stop, durationInSeconds, walkCost(durationInSeconds));
   }
 

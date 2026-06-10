@@ -85,6 +85,22 @@ public class SiriETMqttUpdaterConfig {
       )
       .asDuration(Duration.ofSeconds(1));
 
+    Duration connectionStartupTimeout = siriMqttRoot
+      .of("connectionStartupTimeout")
+      .since(OtpVersion.V2_10)
+      .summary("How long to wait for the MQTT broker to be available at startup.")
+      .description(
+        """
+        If the MQTT broker is unavailable when OTP starts, OTP will wait up to this duration for
+        the broker to become available before allowing routing requests. If the broker connects
+        within this time, normal priming occurs: retained messages are processed before routing is
+        enabled. If the broker does not connect within this time, OTP will start routing without
+        real-time data. The MQTT client will continue attempting to reconnect in the background, and
+        live messages will be processed once the broker is available.
+        """
+      )
+      .asDuration(Duration.ofSeconds(30));
+
     return new MqttSiriETUpdaterParameters(
       configRef,
       feedId,
@@ -96,7 +112,8 @@ public class SiriETMqttUpdaterConfig {
       qos,
       fuzzyTripMatching,
       numberOfPrimingWorkers,
-      maxPrimingIdleTime
+      maxPrimingIdleTime,
+      connectionStartupTimeout
     );
   }
 }

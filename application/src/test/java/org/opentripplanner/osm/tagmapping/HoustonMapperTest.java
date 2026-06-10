@@ -8,8 +8,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.model.OsmEntity;
-import org.opentripplanner.osm.model.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
@@ -20,13 +18,14 @@ class HoustonMapperTest {
   @Test
   public void lamarTunnel() {
     // https://www.openstreetmap.org/way/127288293
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "footway");
-    tunnel.addTag("indoor", "yes");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("lit", "yes");
-    tunnel.addTag("name", "Lamar Tunnel");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "footway")
+      .withTag("indoor", "yes")
+      .withTag("layer", "-1")
+      .withTag("lit", "yes")
+      .withTag("name", "Lamar Tunnel")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(NONE, WPS.getDataForEntity(tunnel).getPermission());
   }
@@ -34,11 +33,12 @@ class HoustonMapperTest {
   @Test
   public void harrisCountyTunnel() {
     // https://www.openstreetmap.org/way/127288288
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "footway");
-    tunnel.addTag("indoor", "yes");
-    tunnel.addTag("name", "Harris County Tunnel");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "footway")
+      .withTag("indoor", "yes")
+      .withTag("name", "Harris County Tunnel")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(PEDESTRIAN, WPS.getDataForEntity(tunnel).getPermission());
   }
@@ -46,10 +46,11 @@ class HoustonMapperTest {
   @Test
   public void pedestrianUnderpass() {
     // https://www.openstreetmap.org/way/783648925
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "footway");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "footway")
+      .withTag("layer", "-1")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(PEDESTRIAN, WPS.getDataForEntity(tunnel).getPermission());
   }
@@ -57,40 +58,43 @@ class HoustonMapperTest {
   @Test
   public void cyclingTunnel() {
     // https://www.openstreetmap.org/way/220484967
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("bicycle", "designated");
-    tunnel.addTag("foot", "designated");
-    tunnel.addTag("highway", "cycleway");
-    tunnel.addTag("segregated", "no");
-    tunnel.addTag("surface", "concrete");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("bicycle", "designated")
+      .withTag("foot", "designated")
+      .withTag("highway", "cycleway")
+      .withTag("segregated", "no")
+      .withTag("surface", "concrete")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(PEDESTRIAN_AND_BICYCLE, WPS.getDataForEntity(tunnel).getPermission());
 
     // https://www.openstreetmap.org/way/101884176
-    tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "cycleway");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("name", "Hogg Woods Trail");
-    tunnel.addTag("tunnel", "yes");
+    tunnel = OsmWay.of()
+      .withTag("highway", "cycleway")
+      .withTag("layer", "-1")
+      .withTag("name", "Hogg Woods Trail")
+      .withTag("tunnel", "yes")
+      .build();
     assertEquals(PEDESTRIAN_AND_BICYCLE, WPS.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
   public void carTunnel() {
     // https://www.openstreetmap.org/way/598694756
-    var tunnel = new OsmWay();
-    tunnel.addTag("highway", "primary");
-    tunnel.addTag("hov", "lane");
-    tunnel.addTag("lanes", "4");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("lit", "yes");
-    tunnel.addTag("maxspeed", "30 mph");
-    tunnel.addTag("nam", "San Jacinto Street");
-    tunnel.addTag("note:lanes", "right lane is hov");
-    tunnel.addTag("oneway", "yes");
-    tunnel.addTag("surface", "concrete");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "primary")
+      .withTag("hov", "lane")
+      .withTag("lanes", "4")
+      .withTag("layer", "-1")
+      .withTag("lit", "yes")
+      .withTag("maxspeed", "30 mph")
+      .withTag("nam", "San Jacinto Street")
+      .withTag("note:lanes", "right lane is hov")
+      .withTag("oneway", "yes")
+      .withTag("surface", "concrete")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(ALL, WPS.getDataForWay(tunnel).forward().getPermission());
   }
@@ -98,12 +102,13 @@ class HoustonMapperTest {
   @Test
   public void carUnderpass() {
     // https://www.openstreetmap.org/way/102925214
-    var tunnel = new OsmWay();
-    tunnel.addTag("highway", "motorway_link");
-    tunnel.addTag("lanes", "2");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("oneway", "yes");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "motorway_link")
+      .withTag("lanes", "2")
+      .withTag("layer", "-1")
+      .withTag("oneway", "yes")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(CAR, WPS.getDataForWay(tunnel).forward().getPermission());
   }
@@ -111,10 +116,11 @@ class HoustonMapperTest {
   @Test
   public void serviceTunnel() {
     // https://www.openstreetmap.org/way/15334550
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "service");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "service")
+      .withTag("layer", "-1")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(ALL, WPS.getDataForEntity(tunnel).getPermission());
   }
@@ -122,11 +128,12 @@ class HoustonMapperTest {
   @Test
   public void unclassified() {
     // https://www.openstreetmap.org/way/44896136
-    OsmEntity tunnel = new OsmEntityForTest();
-    tunnel.addTag("highway", "unclassified");
-    tunnel.addTag("name", "Ross Sterling Street");
-    tunnel.addTag("layer", "-1");
-    tunnel.addTag("tunnel", "yes");
+    var tunnel = OsmWay.of()
+      .withTag("highway", "unclassified")
+      .withTag("name", "Ross Sterling Street")
+      .withTag("layer", "-1")
+      .withTag("tunnel", "yes")
+      .build();
 
     assertEquals(ALL, WPS.getDataForEntity(tunnel).getPermission());
   }

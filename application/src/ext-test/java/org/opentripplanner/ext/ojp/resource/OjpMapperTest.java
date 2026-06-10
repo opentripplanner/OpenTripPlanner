@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.ojp.resource;
 
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;

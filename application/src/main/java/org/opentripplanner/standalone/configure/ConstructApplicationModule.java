@@ -9,7 +9,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
-import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
@@ -40,7 +39,6 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.visualizer.GraphVisualizer;
 
 @Module
 public class ConstructApplicationModule {
@@ -65,7 +63,6 @@ public class ConstructApplicationModule {
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
-    @Nullable TraverseVisitor<?, ?> traverseVisitor,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     StreetDetailsService streetDetailsService,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
@@ -121,7 +118,6 @@ public class ConstructApplicationModule {
       transmodelSchema,
       sorlandsbanenService,
       stopConsolidationService,
-      traverseVisitor,
       transmodelAPIParameters
     );
   }
@@ -130,11 +126,5 @@ public class ConstructApplicationModule {
   @Provides
   public FareService fareService(FareServiceFactory fareServiceFactory) {
     return fareServiceFactory.makeFareService();
-  }
-
-  @Provides
-  @Nullable
-  TraverseVisitor<?, ?> traverseVisitor(@Nullable GraphVisualizer graphVisualizer) {
-    return graphVisualizer == null ? null : graphVisualizer.traverseVisitor;
   }
 }

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
@@ -338,8 +338,8 @@ class RealTimeTripTimesTest {
   @Test
   public void testCancel() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-    builder.cancelTrip();
-    assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
+    builder.withCanceled();
+    assertTrue(builder.build().isCanceled());
   }
 
   @Test
@@ -356,7 +356,8 @@ class RealTimeTripTimesTest {
   public void testRealTimeUpdated() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     assertFalse(builder.build().isRealTimeUpdated(1));
-    builder.withRealTimeState(RealTimeState.UPDATED);
+    builder.withArrivalTime(1, 70);
+    builder.withDepartureTime(1, 70);
     assertTrue(builder.build().isRealTimeUpdated(1));
     builder.withNoData(1);
     var updatedTripTimesA = builder.build();

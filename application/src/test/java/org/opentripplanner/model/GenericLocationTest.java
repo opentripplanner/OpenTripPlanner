@@ -1,13 +1,13 @@
 package org.opentripplanner.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.GenericLocation.UNKNOWN;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class GenericLocationTest {
 
@@ -15,33 +15,55 @@ class GenericLocationTest {
   private static final FeedScopedId STOP_ID = new FeedScopedId("F", "Stop:1");
   private static final double LATITUDE = 20.0;
   private static final double LONGITUDE = 30.0;
-  private final GenericLocation subject = new GenericLocation(LABEL, STOP_ID, LATITUDE, LONGITUDE);
+  private final GenericLocation subject = GenericLocation.fromStopIdWithFallback(
+    STOP_ID,
+    LATITUDE,
+    LONGITUDE,
+    LABEL
+  );
+
+  private final GenericLocation other = GenericLocation.fromCoordinate(LATITUDE, LONGITUDE, LABEL);
+
+  @Test
+  void fromStopIdWithFallback() {
+    var location = GenericLocation.fromStopIdWithFallback(STOP_ID, LATITUDE, LONGITUDE, LABEL);
+    assertEquals(STOP_ID, location.stopId());
+    assertEquals(new WgsCoordinate(LATITUDE, LONGITUDE), location.wgsCoordinate());
+    assertEquals(LABEL, location.label());
+  }
 
   @Test
   void fromStopId() {
-    assertEquals(STOP_ID, subject.stopId);
+    var location = GenericLocation.fromStopId(STOP_ID, LABEL);
+    assertEquals(STOP_ID, location.stopId());
+    assertNull(location.wgsCoordinate());
+    assertEquals(LABEL, location.label());
   }
 
   @Test
-  void getCoordinate() {
-    assertEquals(STOP_ID, subject.stopId);
+  void fromCoordinate() {
+    var location = GenericLocation.fromCoordinate(LATITUDE, LONGITUDE, LABEL);
+    assertNull(location.stopId());
+    assertEquals(new WgsCoordinate(LATITUDE, LONGITUDE), location.wgsCoordinate());
+    assertEquals(LABEL, location.label());
   }
 
   @Test
-  void isSpecified() {
-    assertTrue(subject.isSpecified());
-    assertFalse(UNKNOWN.isSpecified());
+  void testInvalid() {
+    assertThrows(NullPointerException.class, () -> GenericLocation.fromStopId(null));
+    assertThrows(NullPointerException.class, () ->
+      GenericLocation.fromStopIdWithFallback(null, 0.0, 0.0, "label")
+    );
   }
 
   @Test
   void testEquals() {
-    var copy = new GenericLocation(LABEL, STOP_ID, LATITUDE, LONGITUDE);
-    AssertEqualsAndHashCode.verify(subject).sameAs(copy).differentFrom(UNKNOWN);
+    var copy = GenericLocation.fromStopIdWithFallback(STOP_ID, LATITUDE, LONGITUDE, LABEL);
+    AssertEqualsAndHashCode.verify(subject).sameAs(copy).differentFrom(other);
   }
 
   @Test
   void testToString() {
-    assertEquals("Unknown location", UNKNOWN.toString());
     assertEquals("A place F:Stop:1 (20.0, 30.0)", subject.toString());
   }
 }

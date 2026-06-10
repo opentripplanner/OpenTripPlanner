@@ -46,12 +46,12 @@ class TimeAndCostPenaltyForEnumTest {
   @Test
   void testToString() {
     assertEquals(
-      "TimeAndCostPenaltyForEnum{PERCH: (timePenalty: 11s + 1.20 t, costFactor: 1.50)}",
+      "TimeAndCostPenaltyForEnum{PERCH: (timePenalty: 11s + 1.2 t, costFactor: 1.5)}",
       subject.toString()
     );
     // Test toSting for builder
     assertEquals(
-      "Builder{PERCH: (timePenalty: 11s + 1.20 t, costFactor: 1.50)}",
+      "Builder{PERCH: (timePenalty: 11s + 1.2 t, costFactor: 1.5)}",
       subject.copyOf().toString()
     );
   }
@@ -78,7 +78,7 @@ class TimeAndCostPenaltyForEnumTest {
       .with(Fish.COD, TimeAndCostPenalty.of("1s + 3t", 0.2))
       .build();
     assertEquals(
-      "TimeAndCostPenaltyForEnum{COD: (timePenalty: 1s + 3.0 t, costFactor: 0.20)}",
+      "TimeAndCostPenaltyForEnum{COD: (timePenalty: 1s + 3.0 t, costFactor: 0.2)}",
       c.toString()
     );
   }
@@ -110,7 +110,7 @@ class TimeAndCostPenaltyForEnumTest {
       .build();
 
     assertEquals(
-      "TimeAndCostPenaltyForEnum{PERCH: (timePenalty: 3s + 5.0 t, costFactor: 0.10)}",
+      "TimeAndCostPenaltyForEnum{PERCH: (timePenalty: 3s + 5.0 t, costFactor: 0.1)}",
       c.toString()
     );
   }

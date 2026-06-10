@@ -6,8 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -275,18 +276,8 @@ public class SearchParams {
       .toString();
   }
 
-  public boolean isVisitViaSearch() {
-    return (
-      !viaLocations.isEmpty() &&
-      viaLocations.stream().noneMatch(RaptorViaLocation::isPassThroughSearch)
-    );
-  }
-
-  public boolean isPassThroughSearch() {
-    return (
-      !viaLocations.isEmpty() &&
-      viaLocations.stream().allMatch(RaptorViaLocation::isPassThroughSearch)
-    );
+  public boolean isViaSearch() {
+    return !viaLocations.isEmpty();
   }
 
   static SearchParams defaults() {
@@ -314,10 +305,6 @@ public class SearchParams {
       viaLocations.size() <= MAX_VIA_POINTS,
       "The 'viaLocations' exceeds the  maximum number of via-locations (" + MAX_VIA_POINTS + ")."
     );
-    assertProperty(
-      viaLocations.isEmpty() || isVisitViaSearch() || isPassThroughSearch(),
-      "Combining pass-through and regular via-vist it is not allowed: " + viaLocations + "."
-    );
 
     // Validate via-visit access and egress paths
     validateViaVisitAccessEgress();
@@ -328,14 +315,14 @@ public class SearchParams {
    * via-visit searches can have via-locations, not pass-through searches.
    */
   private void validateViaVisitAccessEgress() {
-    int numberOfViaVisits = isPassThroughSearch() ? 0 : this.viaLocations.size();
+    int numberOfVias = this.viaLocations.size();
 
     // Validate individual access and egress paths
     for (var access : accessPaths) {
-      access.validateAccessEgressVisitVia("Access", numberOfViaVisits);
+      access.validateAccessEgressVisitVia("Access", numberOfVias);
     }
     for (var egress : egressPaths) {
-      egress.validateAccessEgressVisitVia("Egress", numberOfViaVisits);
+      egress.validateAccessEgressVisitVia("Egress", numberOfVias);
     }
   }
 }

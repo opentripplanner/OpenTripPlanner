@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import java.io.Serializable;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
+import org.opentripplanner.street.model.elevation.ElevationProfileSlicer;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class StreetElevationExtension implements Serializable {
@@ -129,6 +130,15 @@ public class StreetElevationExtension implements Serializable {
 
   public boolean isFlattened() {
     return this.flattened;
+  }
+
+  /**
+   * Slice this elevation profile to {@code [start, end]} along the edge. Returns {@code null}
+   * when the resulting sub-profile would have fewer than two coordinates (e.g. a zero-length
+   * slice or a slice that falls entirely between two coordinate samples).
+   */
+  public PackedCoordinateSequence partial(double start, double end) {
+    return ElevationProfileSlicer.slice(getElevationProfile(), start, end);
   }
 
   public String toString() {

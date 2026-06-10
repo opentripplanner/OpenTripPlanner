@@ -22,7 +22,14 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 /**
- * A Euclidean remaining weight strategy.
+ * <p>A Euclidean remaining weight strategy.</p>
+ *
+ * <p>Generates an admissible heuristic by simply calculating the direct distance to the target,
+ * and calculating the minimum possible weight for that. Any path which diverts from the straight
+ * line or does not travel at the maximum possible "speed" for the given modes will have a larger
+ * weight. "Speed" is in scare quotes because we have to consider the effect of safety on the
+ * cost for non-car modes, so instead of maximum speed we actually use minimum cost per distance,
+ * where cost is calculated in a mode-appropriate way.</p>
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
@@ -46,11 +53,11 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
   //      not work correctly.
-  public void initialize(Set<Vertex> toVertices, boolean arriveBy, StreetSearchRequest req) {
+  public void initialize(Set<Vertex> toVertices, StreetSearchRequest req) {
     Vertex target = toVertices.iterator().next();
     minimumCostPerDistance = getMinimumCostPerDistance(req);
     walkingCostPerDistance = getWalkingCostPerDistance(req.walk());
-    this.arriveBy = arriveBy;
+    this.arriveBy = req.arriveBy();
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();
@@ -63,8 +70,30 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     lon = target.getLon();
   }
 
-  private static double scaleSafety(double safety, double safetyFactor) {
-    return 1 + (safety - 1) * safetyFactor;
+  /**
+   * On a non-transit trip, the remaining weight is simply distance / street speed.
+   */
+  @Override
+  public double estimateRemainingWeight(State s) {
+    Vertex sv = s.getVertex();
+    double euclideanDistance = SphericalDistanceLibrary.fastDistance(
+      sv.getLat(),
+      sv.getLon(),
+      lat,
+      lon
+    );
+
+    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
+    boolean useWalkSpeed;
+    if (arriveBy) {
+      useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
+    } else {
+      useWalkSpeed =
+        s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
+    }
+
+    final double costPerDistance = useWalkSpeed ? walkingCostPerDistance : minimumCostPerDistance;
+    return euclideanDistance * costPerDistance;
   }
 
   private double getEffectiveSafetyForOptimization(
@@ -88,7 +117,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   }
 
   /**
-   * @return the minimum of (pace × reluctance × safety) for the applicable modes
+   * @return the minimum of the lower limits of pace for the applicable modes
    */
   private double getMinimumCostPerDistance(StreetSearchRequest req) {
     var streetMode = req.mode();
@@ -121,7 +150,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     return getCostPerDistance(
       bikeRequest.speed(),
       bikeRequest.reluctance(),
-      getEffectiveSafetyForOptimization(
+      getEffectiveSafetyForOptimizeType(
         bikeRequest.optimizeType(),
         bikeRequest.optimizeTriangle(),
         streetLimitationParametersService.getBestBikeSafety()
@@ -133,12 +162,36 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     return getCostPerDistance(
       scooterRequest.speed(),
       scooterRequest.reluctance(),
-      getEffectiveSafetyForOptimization(
+      getEffectiveSafetyForOptimizeType(
         scooterRequest.optimizeType(),
         scooterRequest.optimizeTriangle(),
         streetLimitationParametersService.getBestBikeSafety()
       )
     );
+  }
+
+  private double getEffectiveSafetyForOptimizeType(
+    VehicleRoutingOptimizeType optimizeType,
+    TimeSlopeSafetyTriangle triangle,
+    double safety
+  ) {
+    return switch (optimizeType) {
+      case SHORTEST_DURATION -> 1.0;
+      case SAFE_STREETS -> safety;
+      case FLAT_STREETS -> 1.0;
+      case SAFEST_STREETS -> safety;
+      case TRIANGLE -> scaleSafety(
+        safety,
+        Objects.requireNonNull(
+          triangle,
+          "triangle must not be null if vehicleRoutingOptimizeType is TRIANGLE."
+        ).safety()
+      );
+    };
+  }
+
+  private static double scaleSafety(double safety, double safetyFactor) {
+    return 1 + (safety - 1) * safetyFactor;
   }
 
   private static double getCostPerDistance(
@@ -147,31 +200,5 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     double effectiveMinimumSafety
   ) {
     return (1.0 / speed) * reluctance * effectiveMinimumSafety;
-  }
-
-  /**
-   * On a non-transit trip, the remaining weight is simply distance / street speed.
-   */
-  @Override
-  public double estimateRemainingWeight(State s) {
-    Vertex sv = s.getVertex();
-    double euclideanDistance = SphericalDistanceLibrary.fastDistance(
-      sv.getLat(),
-      sv.getLon(),
-      lat,
-      lon
-    );
-
-    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
-    boolean useWalkSpeed;
-    if (arriveBy) {
-      useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
-    } else {
-      useWalkSpeed =
-        s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
-    }
-
-    final double costPerDistance = useWalkSpeed ? walkingCostPerDistance : minimumCostPerDistance;
-    return euclideanDistance * costPerDistance;
   }
 }

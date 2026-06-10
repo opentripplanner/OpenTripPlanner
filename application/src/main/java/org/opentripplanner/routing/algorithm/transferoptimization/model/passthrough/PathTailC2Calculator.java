@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import java.util.List;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 

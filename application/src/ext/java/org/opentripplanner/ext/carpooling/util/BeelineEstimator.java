@@ -85,25 +85,22 @@ public class BeelineEstimator {
   }
 
   /**
-   * Calculates cumulative travel times to each point in a route.
-   * Returns an array where index i contains the cumulative duration from the start to point i.
+   * Calculates cumulative travel times to each point in a route, including stop duration
+   * at each intermediate point.
    *
    * @param points Route points in order
+   * @param stopDuration Duration added at each intermediate stop (not at the first point)
    * @return Array of cumulative durations (first element is always Duration.ZERO)
    */
-  public Duration[] calculateCumulativeTimes(List<WgsCoordinate> points) {
+  public Duration[] calculateCumulativeTimes(List<WgsCoordinate> points, Duration stopDuration) {
     if (points.isEmpty()) {
       return new Duration[0];
     }
 
-    Duration[] cumulativeTimes = new Duration[points.size()];
-    cumulativeTimes[0] = Duration.ZERO;
-
-    for (int i = 0; i < points.size() - 1; i++) {
-      Duration segmentDuration = estimateDuration(points.get(i), points.get(i + 1));
-      cumulativeTimes[i + 1] = cumulativeTimes[i].plus(segmentDuration);
+    Duration[] segmentDurations = new Duration[points.size() - 1];
+    for (int i = 0; i < segmentDurations.length; i++) {
+      segmentDurations[i] = estimateDuration(points.get(i), points.get(i + 1));
     }
-
-    return cumulativeTimes;
+    return GraphPathUtils.calculateCumulativeDurations(segmentDurations, stopDuration);
   }
 }

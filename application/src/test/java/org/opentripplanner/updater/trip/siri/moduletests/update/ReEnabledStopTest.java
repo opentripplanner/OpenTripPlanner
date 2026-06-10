@@ -22,7 +22,7 @@ class ReEnabledStopTest implements RealtimeTestConstants {
 
   /**
    * A SIRI update with DepartureBoardingActivity=BOARDING should re-enable a stop
-   * that was scheduled with PickDrop.NONE (no boarding). This must produce a MODIFIED
+   * that was scheduled with PickDrop.NONE (no boarding). This must produce a PATTERN_MODIFIED
    * trip (new pattern) because the stop's pickup type changed from NONE to SCHEDULED.
    */
   @Test
@@ -59,9 +59,9 @@ class ReEnabledStopTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
 
-    // The trip should be MODIFIED (new pattern) because stop B's pickup changed NONE -> SCHEDULED
+    // The trip should be PATTERN_MODIFIED (new pattern) because stop B's pickup changed NONE -> SCHEDULED
     assertEquals(
-      "MODIFIED | A 0:00:11 0:00:11 | B 0:00:20 0:00:21 | C 0:00:30 0:00:30",
+      "P U | A 0:00:11 0:00:11 | B 0:00:20 0:00:21 | C 0:00:30 0:00:30",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 

@@ -23,7 +23,7 @@ total cost of traversal, this results in choosing a path with lower safety value
 only paths available are of high safety values, it acts as a further reluctance for walking and
 cycling compared to taking transit when safety is enabled.
 
-How the safety values work was changed between versions 2.8 and 2.9. Before the change, a safety
+How the safety values work was changed between versions 2.9 and 2.10. Before the change, a safety
 normalizer would multiply the values set by the mapper such that the most desirable way had a safety
 factor of 1.0, so that the use of safety would only further increase, but not decrease. the reluctance. 
 This was found to be problematic because of two reasons:
@@ -35,7 +35,7 @@ For more details, see [#6775](https://github.com/opentripplanner/OpenTripPlanner
 way which could be anywhere in the map. Increasing or decreasing the map coverage could change the
 effect on the same way.
 
-The normalizer has been removed in version 2.9, so the safety values are applied directly without
+The normalizer has been removed in version 2.10, so the safety values are applied directly without
 change. As a result, some of the values in the tag mappers have also changed to compensate for the 
 effect that they will not be multiplied further.
 
@@ -117,8 +117,8 @@ Multiple mixins can apply to the same way and their effects compound.
 | `cycleway=opposite_track; not(highway=cycleway)`                                                                                                                             | backward: BICYCLE |                        | no direction: 1.0 <br> forward: 1.0 <br> back: 0.75 |             |
 | `cycleway=shared_lane; not(highway=cycleway)`                                                                                                                                | BICYCLE           |                        | 0.77                                                |             |
 | `cycleway=opposite; not(highway=cycleway)`                                                                                                                                   | backward: BICYCLE |                        | no direction: 1.0 <br> forward: 1.0 <br> back: 1.4  |             |
-| `footway=sidewalk`                                                                                                                                                           |                   |                        | 2.5                                                 |             |
-| `footway=crossing`                                                                                                                                                           |                   |                        | 1.5                                                 |             |
+| `not(highway=cycleway); footway=sidewalk`                                                                                                                                    |                   |                        | 2.5                                                 |             |
+| `not(highway=cycleway); footway=crossing`                                                                                                                                    |                   |                        | 1.5                                                 |             |
 | `bicycle=designated; cycleway not one of [no, none] or absent; not(highway=cycleway); not(lcn=yes); not(rcn=yes); not(ncn=yes); not(bicycle_road=yes); not(cyclestreet=yes)` |                   |                        | 0.8                                                 |             |
 | `lcn=yes¦rcn=yes¦ncn=yes¦bicycle_road=yes¦cyclestreet=yes`                                                                                                                   |                   |                        | 0.7                                                 |             |
 | `highway=trunk; sidewalk=yes¦highway=trunk; sidewalk=left¦highway=trunk; sidewalk=right¦highway=trunk; sidewalk=both`                                                        |                   |                        |                                                     | 0.25        |

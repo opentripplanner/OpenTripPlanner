@@ -1,15 +1,11 @@
 package org.opentripplanner.raptor.spi;
 
-import java.util.function.Consumer;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 
 record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime) implements
   RaptorBoardOrAlightEvent<T> {
   @Override
-  public int tripIndex() {
+  public int tripScheduleIndex() {
     return RaptorConstants.NOT_FOUND;
   }
 
@@ -36,14 +32,6 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
   @Override
   public boolean empty() {
     return true;
-  }
-
-  @Override
-  public void boardWithFallback(
-    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
-  ) {
-    alternativeBoardingFallback.accept(this);
   }
 
   @Override

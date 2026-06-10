@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 class OperatorTest {
 
@@ -16,7 +16,7 @@ class OperatorTest {
   private static final String URL = "http://info.aaa.com";
   private static final String PHONE = "+47 95566333";
 
-  private static final Operator SUBJECT = Operator.of(TimetableRepositoryForTest.id(ID))
+  private static final Operator SUBJECT = Operator.of(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withPhone(PHONE)
@@ -45,7 +45,7 @@ class OperatorTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPhone("X").build()));

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import com.google.common.collect.ImmutableMultimap;
 import java.util.List;
@@ -13,7 +13,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.model.plan.TestTransitLeg;
-import org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory;
 
 class TimeframeMatcherTest implements FareTestConstants {
 
@@ -22,7 +21,7 @@ class TimeframeMatcherTest implements FareTestConstants {
     .withFromTimeframes(List.of(TIMEFRAME_TWELVE_TO_TWO))
     .withToTimeframes(List.of(TIMEFRAME_THREE_TO_FIVE))
     .build();
-  public static final FeedScopedId ID2 = FeedScopedIdForTestFactory.id("2");
+  public static final FeedScopedId ID2 = id("2");
 
   private static List<Arguments> outsideTimeframeCases() {
     return List.of(

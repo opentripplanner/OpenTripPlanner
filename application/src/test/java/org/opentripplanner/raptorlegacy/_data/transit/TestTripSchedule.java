@@ -1,11 +1,12 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
 import static org.opentripplanner.core.model.accessibility.Accessibility.NO_INFORMATION;
+import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.createDeprecatedUnsupportedFeatureException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -15,7 +16,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
  *             module. Use the OTP model entities instead.
@@ -31,6 +31,7 @@ public class TestTripSchedule implements TripSchedule {
   private final int transitReluctanceIndex;
   private final Accessibility wheelchairBoarding;
   private final TripPattern originalPattern;
+  private final TripTimes tripTimes;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
@@ -38,7 +39,8 @@ public class TestTripSchedule implements TripSchedule {
     int[] departureTimes,
     int transitReluctanceIndex,
     Accessibility wheelchairBoarding,
-    TripPattern originalPattern
+    TripPattern originalPattern,
+    TripTimes tripTimes
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -46,6 +48,7 @@ public class TestTripSchedule implements TripSchedule {
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
     this.originalPattern = originalPattern;
+    this.tripTimes = tripTimes;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -83,6 +86,11 @@ public class TestTripSchedule implements TripSchedule {
     return departureTimes[stopPosInPattern];
   }
 
+  @Override
+  public int relativeTravelDuration(int boardTime) {
+    return arrivalTimes[arrivalTimes.length - 1] - boardTime;
+  }
+
   public TestTripPattern pattern() {
     return pattern;
   }
@@ -117,12 +125,17 @@ public class TestTripSchedule implements TripSchedule {
 
   @Override
   public TripTimes getOriginalTripTimes() {
-    return null;
+    return tripTimes;
   }
 
   @Override
   public TripPattern getOriginalTripPattern() {
     return this.originalPattern;
+  }
+
+  @Override
+  public int tripScheduleIndex() {
+    throw createDeprecatedUnsupportedFeatureException();
   }
 
   @SuppressWarnings("UnusedReturnValue")
@@ -135,6 +148,7 @@ public class TestTripSchedule implements TripSchedule {
     private int transitReluctanceIndex = 0;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
     private TripPattern originalPattern;
+    private TripTimes tripTimes;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -143,6 +157,11 @@ public class TestTripSchedule implements TripSchedule {
 
     public TestTripSchedule.Builder originalPattern(TripPattern pattern) {
       this.originalPattern = pattern;
+      return this;
+    }
+
+    public TestTripSchedule.Builder withTripTimes(TripTimes tripTimes) {
+      this.tripTimes = tripTimes;
       return this;
     }
 
@@ -244,7 +263,8 @@ public class TestTripSchedule implements TripSchedule {
         departureTimes,
         transitReluctanceIndex,
         wheelchairBoarding,
-        originalPattern
+        originalPattern,
+        tripTimes
       );
     }
 

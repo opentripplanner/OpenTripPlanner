@@ -45,10 +45,10 @@ public class LegacyRouteRequestMapper {
     CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
     callWith.argument("fromPlace", (String from) ->
-      request.withFrom(LocationStringParser.fromOldStyleString(from))
+      LocationStringParser.fromOldStyleString(from).ifPresent(request::withFrom)
     );
     callWith.argument("toPlace", (String to) ->
-      request.withTo(LocationStringParser.fromOldStyleString(to))
+      LocationStringParser.fromOldStyleString(to).ifPresent(request::withTo)
     );
 
     callWith.argument("from", (Map<String, Object> v) -> request.withFrom(toGenericLocation(v)));
@@ -262,7 +262,7 @@ public class LegacyRouteRequestMapper {
     String address = (String) m.get("address");
 
     if (address != null) {
-      return new GenericLocation(address, null, lat, lng);
+      return GenericLocation.fromCoordinate(lat, lng, address);
     }
 
     return GenericLocation.fromCoordinate(lat, lng);

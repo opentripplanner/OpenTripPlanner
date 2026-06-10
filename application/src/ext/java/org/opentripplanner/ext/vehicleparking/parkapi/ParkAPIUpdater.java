@@ -98,7 +98,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
       .orElse(false);
 
-    return VehicleParking.builder()
+    return VehicleParking.of()
       .id(vehicleParkId)
       .name(new NonLocalizedString(jsonNode.path("name").asText()))
       .state(state)
@@ -143,7 +143,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     Integer wheelchairAccessibleCarSpaces,
     Integer bicycleSpaces
   ) {
-    return VehicleParkingSpaces.builder()
+    return VehicleParkingSpaces.of()
       .bicycleSpaces(bicycleSpaces)
       .carSpaces(carSpaces)
       .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarSpaces)

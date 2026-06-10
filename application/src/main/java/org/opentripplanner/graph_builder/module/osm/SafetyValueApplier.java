@@ -12,13 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Collects the minimum bike & walk safety values while applying them to the graph.
- * <p>
- * The heuristic function needs to know the minimum values so it never overestimates
- * the remaining cost of the path and won't prune out optimal paths.
- * <p>
- * Further reading: <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/4442">Issue 4442</a>
- * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/6775">Issue 6775</a>
+ * Applies bike and walk safety factors from OSM to street edges, and tracks
+ * the minimum values found across the graph. These minimums are needed to
+ * provide a {@link org.opentripplanner.astar.spi.RemainingWeightHeuristic}
+ * that incorporates walk and bike safety in its lower bound.
  */
 class SafetyValueApplier {
 
@@ -45,7 +42,7 @@ class SafetyValueApplier {
    * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
    * safety value.
    */
-  public float getBestBikeSafety() {
+  float getBestBikeSafety() {
     return bestBikeSafety;
   }
 
@@ -55,7 +52,7 @@ class SafetyValueApplier {
    * @return The walk safety of the safest way in the graph, i.e. the way with the lowest walk
    * safety value.
    */
-  public float getBestWalkSafety() {
+  float getBestWalkSafety() {
     return bestWalkSafety;
   }
 

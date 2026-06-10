@@ -1,9 +1,12 @@
 package org.opentripplanner.ext.flex;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.model.FlexStopTimesFactory.area;
+import static org.opentripplanner.model.FlexStopTimesFactory.groupStop;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -13,17 +16,21 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class FlexIndexTest {
+
+  public static final Route ROUTE_2 = TimetableRepositoryForTest.route("r2").build();
 
   @Test
   void testFlexTripSpanningMidnight() {
     TimetableRepository repo = new TimetableRepository();
 
     FeedScopedId serviceId = id("S1");
-    Trip trip = TimetableRepositoryForTest.trip("T1").withServiceId(serviceId).build();
+    Trip trip = trip("T1").withServiceId(serviceId).build();
 
     UnscheduledTrip flexTrip = UnscheduledTrip.of(id("FT1"))
       .withTrip(trip)
@@ -65,7 +72,7 @@ class FlexIndexTest {
   void testFlexTripStartingAfterMidnight() {
     TimetableRepository repo = new TimetableRepository();
     FeedScopedId serviceId = id("S2");
-    Trip trip = TimetableRepositoryForTest.trip("T2").withServiceId(serviceId).build();
+    Trip trip = trip("T2").withServiceId(serviceId).build();
 
     UnscheduledTrip flexTrip = UnscheduledTrip.of(id("FT2"))
       .withTrip(trip)
@@ -89,5 +96,51 @@ class FlexIndexTest {
     Collection<FlexTripForDate> tripsOnNextDay = index.getFlexTripsForRunningDate(nextDay);
     assertEquals(1, tripsOnNextDay.size(), "Should have 1 trip on next day");
     assertEquals(serviceDate, tripsOnNextDay.iterator().next().serviceDate());
+  }
+
+  @Test
+  void routesAtArea() {
+    var repo = new TimetableRepository();
+
+    var st1 = area("10:00", "12:00");
+    var st2 = area("14:00", "16:00");
+
+    var flexTrip = UnscheduledTrip.of(id("T2"))
+      .withTrip(trip("T2").withRoute(ROUTE_2).build())
+      .withStopTimes(List.of(st1, st2))
+      .build();
+
+    repo.addFlexTrip(flexTrip.getId(), flexTrip);
+
+    var index = new FlexIndex(repo);
+
+    assertThat(index.findRoutes(st1.getStop())).containsExactly(ROUTE_2);
+    assertThat(index.findRoutes(st2.getStop())).containsExactly(ROUTE_2);
+  }
+
+  @Test
+  void routesAtGroup() {
+    var repo = new TimetableRepository();
+
+    var st1 = groupStop("10:00", "12:00");
+    var st2 = groupStop("14:00", "16:00");
+
+    var flexTrip = UnscheduledTrip.of(id("T2"))
+      .withTrip(trip("T2").withRoute(ROUTE_2).build())
+      .withStopTimes(List.of(st1, st2))
+      .build();
+
+    repo.addFlexTrip(flexTrip.getId(), flexTrip);
+
+    var index = new FlexIndex(repo);
+
+    var groupStop = (GroupStop) st1.getStop();
+    assertThat(groupStop.getChildLocations()).isNotEmpty();
+    groupStop
+      .getChildLocations()
+      .forEach(child -> {
+        assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
+        assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
+      });
   }
 }

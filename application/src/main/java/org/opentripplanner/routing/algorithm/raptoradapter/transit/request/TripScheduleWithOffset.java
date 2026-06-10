@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -51,6 +51,14 @@ public final class TripScheduleWithOffset implements TripSchedule {
   }
 
   @Override
+  public int relativeTravelDuration(int boardTime) {
+    // sortIndex is the arrival time at stop 0. This allow us to use it to compute the relative
+    // travel duration. It satisfies both invariants of relativeTravelDuration (see JavaDoc on this
+    // method).
+    return sortIndex - boardTime;
+  }
+
+  @Override
   public RaptorTripPattern pattern() {
     return pattern;
   }
@@ -79,6 +87,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
   @Override
   public TripPattern getOriginalTripPattern() {
     return pattern.getTripPattern().getPattern();
+  }
+
+  @Override
+  public int tripScheduleIndex() {
+    return tripIndexForDates;
   }
 
   @Override

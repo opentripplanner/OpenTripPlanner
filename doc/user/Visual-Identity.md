@@ -1,6 +1,6 @@
 # OpenTripPlanner Visual Identity
 
-This is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
+This is the original OpenTripPlanner logo in scalable vector format, with knockout transparency:
 
 ![OTP Logo](images/otp-logo.svg)
 
@@ -22,6 +22,8 @@ XML source code:
 	l21.712,14.775L92.222,85.667z"/>
 </svg>
 ```
+
+The version of this logo with a white background is used exclusively in the documentation for a consistent appearance across both dark and light modes. It is also available as a [downloadable file](images/otp-logo-white-bg.svg)
 
 This concept behind this logo design was "infinite roads". Besides the clear references to movement
 and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T

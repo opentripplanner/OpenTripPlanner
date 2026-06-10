@@ -20,6 +20,9 @@ public class PlannerErrorMapper {
       case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW:
         api = new PlannerError(Message.PATH_NOT_FOUND);
         break;
+      case NO_DIRECT_MODE_CONNECTION:
+        api = new PlannerError(Message.NO_DIRECT_MODE_CONNECTION);
+        break;
       case OUTSIDE_BOUNDS:
         api = new PlannerError(Message.OUTSIDE_BOUNDS);
         api.setMissing(List.of(domain.inputField.name()));

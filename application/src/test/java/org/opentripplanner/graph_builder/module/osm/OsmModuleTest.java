@@ -13,14 +13,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -33,7 +30,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmModuleTest {
@@ -154,21 +150,12 @@ public class OsmModuleTest {
   }
 
   @Test
-  public void testBuildAreaWithoutVisibility() {
-    testBuildingAreas(true);
-  }
-
-  @Test
-  public void testBuildAreaWithVisibility() {
-    testBuildingAreas(false);
-  }
-
-  @Test
   public void testCreativeNaming() {
-    OsmEntity way = new OsmWay();
-    way.addTag("highway", "footway");
-    way.addTag("cycleway", "lane");
-    way.addTag("access", "no");
+    OsmEntity way = OsmWay.of()
+      .withTag("highway", "footway")
+      .withTag("cycleway", "lane")
+      .withTag("access", "no")
+      .build();
 
     CreativeNamer namer = new CreativeNamer(
       "Highway with cycleway {cycleway} and access {access} and morx {morx}"
@@ -248,50 +235,6 @@ public class OsmModuleTest {
   }
 
   private record BuildResult(Graph graph, VehicleParkingRepository repository) {}
-
-  /**
-   * This reads test file with area and tests if it can be routed if visibility is used and if it
-   * isn't
-   * <p>
-   * Routing needs to be successful in both options since without visibility calculation area rings
-   * are used.
-   *
-   * @param skipVisibility if true visibility calculations are skipped
-   */
-  private void testBuildingAreas(boolean skipVisibility) {
-    var graph = new Graph();
-
-    File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
-    var provider = new DefaultOsmProvider(file, false);
-
-    var osmModule = OsmModuleTestFactory.of(provider)
-      .withGraph(graph)
-      .builder()
-      .withAreaVisibility(!skipVisibility)
-      .build();
-
-    osmModule.buildGraph();
-
-    RouteRequest request = RouteRequest.defaultValue();
-
-    //This are vertices that can be connected only over edges on area (with correct permissions)
-    //It tests if it is possible to route over area without visibility calculations
-    Vertex bottomV = graph.getVertex(VertexLabel.osm(580290955));
-    Vertex topV = graph.getVertex(VertexLabel.osm(559271124));
-
-    GraphPathFinder graphPathFinder = new GraphPathFinder(null);
-    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
-      request,
-      Set.of(bottomV),
-      Set.of(topV)
-    );
-
-    assertNotNull(pathList);
-    assertFalse(pathList.isEmpty());
-    for (GraphPath<State, Edge, Vertex> path : pathList) {
-      assertFalse(path.states.isEmpty());
-    }
-  }
 
   private record VertexPair(Vertex v0, Vertex v1) {}
 }

@@ -11,13 +11,13 @@ import java.util.List;
  * at 04:05+1d, while the first bus on Sundays may leave at 03:00. Be aware, these two trips may
  * not have the same service calendar, normally they are different. For example "Sundays" might be
  * all Sundays and public holidays.
- * </p>
+ * <p>
  * The trip index is a sorted list of trips based on the first stop departure time. The index
  * contains two pointers, the first is the day and the second is the trip index on that day:
  * ```
  *   tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate)
  * ```
- * </p>
+ * <p>
  * This class might at first look a bit complicated. A much easier approach would be to just sort
  * on departure times using a Java built in sort, but sorting is expensive. This code will merge
  * the  timetables instead - which is faster. In 99% of the cases we will just do one extra

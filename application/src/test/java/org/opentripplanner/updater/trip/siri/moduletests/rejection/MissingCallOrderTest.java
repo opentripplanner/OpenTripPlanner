@@ -132,7 +132,7 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:20 0:00:25 | C 0:00:45 0:00:45",
+      "U | A 0:00:15 0:00:15 | B 0:00:20 0:00:25 | C 0:00:45 0:00:45",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

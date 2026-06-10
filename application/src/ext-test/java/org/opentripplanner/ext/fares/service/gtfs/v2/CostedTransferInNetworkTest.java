@@ -2,8 +2,8 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import java.util.List;
 import java.util.Set;
@@ -55,7 +55,6 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     var first = i1.legs().getFirst();
     var last = i1.legs().getLast();
     assertThat(result.offersForLeg(first)).containsExactly(
@@ -88,7 +87,6 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var second = i1.legs().get(1);
     var last = i1.legs().getLast();
 
-    assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.offersForLeg(first)).containsExactly(
       FareOffer.of(first.startTime(), FARE_PRODUCT_A),
       FareOffer.of(first.startTime(), FARE_PRODUCT_B)
@@ -115,7 +113,6 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     var result = SERVICE.calculateFares(i1);
 
-    assertEquals(Set.of(), result.itineraryProducts());
     var first = i1.legs().getFirst();
     assertThat(result.offersForLeg(first)).containsExactly(
       FareOffer.of(first.startTime(), FARE_PRODUCT_A),

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.BitSet;
 import java.util.List;
@@ -125,8 +125,8 @@ class ScheduledTripTimesTest {
   }
 
   @Test
-  void isScheduled() {
-    assertTrue(subject.isScheduled());
+  void hasAnyUpdates() {
+    assertFalse(subject.hasAnyUpdates());
   }
 
   @Test
@@ -142,11 +142,6 @@ class ScheduledTripTimesTest {
   @Test
   void isDeleted() {
     assertFalse(subject.isDeleted());
-  }
-
-  @Test
-  void getRealTimeState() {
-    assertEquals(RealTimeState.SCHEDULED, subject.getRealTimeState());
   }
 
   @Test

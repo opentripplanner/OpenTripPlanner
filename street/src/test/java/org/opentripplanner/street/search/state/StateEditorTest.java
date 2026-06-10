@@ -3,7 +3,7 @@ package org.opentripplanner.street.search.state;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Nested;
@@ -16,22 +16,22 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-public class StateEditorTest {
+class StateEditorTest {
 
   static Vertex vertex = StreetModelFactory.intersectionVertex(1, 1);
 
   @Test
-  public final void testIncrementTimeInMilliseconds() {
+  void testIncrementTimeInMilliseconds() {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementTimeInMilliseconds(999999999);
 
-    assertEquals(999999999, stateEditor.child.getTimeMilliseconds());
+    assertEquals(999999999, stateEditor.makeState().getTimeMilliseconds());
   }
 
   @Test
-  public final void testWeightIncrement() {
+  void testWeightIncrement() {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
@@ -41,23 +41,29 @@ public class StateEditorTest {
   }
 
   @Test
-  public final void testNanWeightIncrement() {
+  void testNanWeightIncrement() {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
-    stateEditor.incrementWeight(Double.NaN);
-
-    assertNull(stateEditor.makeState());
+    assertThrows(IllegalArgumentException.class, () -> stateEditor.incrementWeight(Double.NaN));
   }
 
   @Test
-  public final void testInfinityWeightIncrement() {
+  void testInfinityWeightIncrement() {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
-    stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);
+    assertThrows(IllegalArgumentException.class, () ->
+      stateEditor.incrementWeight(Double.NEGATIVE_INFINITY)
+    );
+  }
 
-    assertNull(stateEditor.makeState(), "Infinity weight increment");
+  @Test
+  void negativeMillis() {
+    var stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
+
+    stateEditor.setTimeSeconds(0);
+    assertThrows(IllegalArgumentException.class, () -> stateEditor.incrementTimeInMilliseconds(-1));
   }
 
   @Nested

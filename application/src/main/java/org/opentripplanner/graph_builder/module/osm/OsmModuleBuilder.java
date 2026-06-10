@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
@@ -34,8 +35,10 @@ public class OsmModuleBuilder {
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
   private boolean includeInclinedEdgeLevelInfo = false;
-  private boolean includeOsmSubwayEntrances = false;
+  private boolean includeOsmStationEntrances = false;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
+
+  private GraphBuildCacheManager cacheManager = GraphBuildCacheManager.NOOP;
 
   public OsmModuleBuilder(
     Collection<OsmProvider> providers,
@@ -73,6 +76,11 @@ public class OsmModuleBuilder {
     return this;
   }
 
+  public OsmModuleBuilder withCacheManager(GraphBuildCacheManager cacheManager) {
+    this.cacheManager = cacheManager;
+    return this;
+  }
+
   public OsmModuleBuilder withPlatformEntriesLinking(boolean platformEntriesLinking) {
     this.platformEntriesLinking = platformEntriesLinking;
     return this;
@@ -98,8 +106,8 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withIncludeOsmSubwayEntrances(boolean includeOsmSubwayEntrances) {
-    this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
+  public OsmModuleBuilder withIncludeOsmStationEntrances(boolean includeOsmStationEntrances) {
+    this.includeOsmStationEntrances = includeOsmStationEntrances;
     return this;
   }
 
@@ -121,8 +129,9 @@ public class OsmModuleBuilder {
         staticParkAndRide,
         staticBikeParkAndRide,
         includeInclinedEdgeLevelInfo,
-        includeOsmSubwayEntrances
-      )
+        includeOsmStationEntrances
+      ),
+      cacheManager
     );
   }
 }

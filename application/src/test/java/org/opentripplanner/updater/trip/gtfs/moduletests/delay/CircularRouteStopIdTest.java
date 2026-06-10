@@ -38,7 +38,7 @@ class CircularRouteStopIdTest implements RealtimeTestConstants {
     assertSuccess(rt.applyTripUpdate(update));
 
     assertEquals(
-      "UPDATED | A 10:01 10:01 | B 10:21 10:21 | A 10:31 10:31",
+      "U | A 10:01 10:01 | B 10:21 10:21 | A 10:31 10:31",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -56,7 +56,7 @@ class CircularRouteStopIdTest implements RealtimeTestConstants {
     assertSuccess(rt.applyTripUpdate(update));
 
     assertEquals(
-      "UPDATED | A [ND] 10:00 10:00 | B 10:21 10:21 | A 10:31 10:31",
+      "U | A [ND] 10:00 10:00 | B 10:21 10:21 | A 10:31 10:31",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -74,7 +74,7 @@ class CircularRouteStopIdTest implements RealtimeTestConstants {
     assertSuccess(rt.applyTripUpdate(update));
 
     assertEquals(
-      "UPDATED | A 10:11 10:11 | B 10:21 10:21 | A 10:31 10:31",
+      "U | A 10:11 10:11 | B 10:21 10:21 | A 10:31 10:31",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

@@ -191,7 +191,7 @@ public class HeuristicsAdapter implements Heuristics {
 
           for (RaptorAccessEgress it : list) {
             // Prevent transfer(walking) and the egress which start with walking
-            if (!(it.stopReachedOnBoard() || stopReachedByTransit)) {
+            if (!(it.arrivedOnBoard() || stopReachedByTransit)) {
               continue;
             }
 

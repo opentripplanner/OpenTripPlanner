@@ -2,10 +2,10 @@ package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Join two results together.

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 class AgencyTest {
 
@@ -19,7 +19,7 @@ class AgencyTest {
   private static final String FARE_URL = "http://fare.aaa.com";
   private static final String LANG = "image";
 
-  private static final Agency SUBJECT = Agency.of(TimetableRepositoryForTest.id(ID))
+  private static final Agency SUBJECT = Agency.of(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withTimezone(TIMEZONE)
@@ -56,7 +56,7 @@ class AgencyTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTimezone("CET").build()));

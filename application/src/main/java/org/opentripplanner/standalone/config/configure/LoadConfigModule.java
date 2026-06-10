@@ -21,7 +21,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
  * types. The {@link ConfigModule} is a separate module to be able to use it without this module;
  * If the {@link ConfigModel} is already instantiated.
  * <p>
- * The binding to {@link OtpDataStoreConfig} and {@link @TransitServicePeriod} is done
+ * The binding to {@link OtpDataStoreConfig} and {@link TransitServicePeriod} is done
  * here, not in the {@link ConfigModel}, because they are only needed at load time - if this change,
  * then move the binding to the {@link ConfigModule}.
  */

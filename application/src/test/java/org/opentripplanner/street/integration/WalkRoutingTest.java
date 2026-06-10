@@ -1,29 +1,23 @@
 package org.opentripplanner.street.integration;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 
 class WalkRoutingTest {
@@ -53,37 +47,10 @@ class WalkRoutingTest {
   void shouldRouteAroundRoundabout() {
     var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
     var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
-    assertDoesNotThrow(() -> route(roundabout, start, end, DATE_TIME, false));
+    assertFalse(route(roundabout, start, end, DATE_TIME, false).isEmpty());
   }
 
-  @ParameterizedTest
-  @ValueSource(ints = { 0, 200, 400, 499, 500, 501, 600, 700, 800, 900, 999 })
-  void pathReversalWorks(int offset) {
-    var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
-    var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
-    var base = DATE_TIME.truncatedTo(ChronoUnit.SECONDS);
-    var time = base.plusMillis(offset);
-    var forwardResults = route(roundabout, start, end, time, false);
-    assertEquals(1, forwardResults.size());
-    var forwardStates = forwardResults.getFirst().states;
-    var forwardDiff = ChronoUnit.MILLIS.between(
-      forwardStates.getFirst().getTimeAccurate(),
-      forwardStates.getLast().getTimeAccurate()
-    );
-    var backwardResults = route(roundabout, start, end, time, true);
-    assertEquals(1, backwardResults.size());
-    var backwardStates = forwardResults.getFirst().states;
-    var backwardDiff = ChronoUnit.MILLIS.between(
-      backwardStates.getFirst().getTimeAccurate(),
-      backwardStates.getLast().getTimeAccurate()
-    );
-    // should be same for every parametrized offset, otherwise irrelevant
-    int expected = 10430;
-    assertEquals(expected, forwardDiff);
-    assertEquals(expected, backwardDiff);
-  }
-
-  private static List<GraphPath<State, Edge, Vertex>> route(
+  private static List<Itinerary> route(
     Graph graph,
     GenericLocation from,
     GenericLocation to,
@@ -102,8 +69,8 @@ class WalkRoutingTest {
       var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-      var gpf = new GraphPathFinder(null);
-      return gpf.graphPathFinderEntryPoint(request, linkingContext);
+      var ctx = TestServerContext.ofGraph(graph);
+      return DirectStreetRouter.route(ctx, request, linkingContext);
     }
   }
 }

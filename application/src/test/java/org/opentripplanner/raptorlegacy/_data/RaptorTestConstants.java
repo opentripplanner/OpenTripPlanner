@@ -87,4 +87,10 @@ public interface RaptorTestConstants {
   default String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);
   }
+
+  static RuntimeException createDeprecatedUnsupportedFeatureException() {
+    return new UnsupportedOperationException(
+      "This class is deprecated, we are not adding more features."
+    );
+  }
 }

@@ -1,6 +1,7 @@
 package org.opentripplanner.datastore.file;
 
 import static org.opentripplanner.datastore.OtpDataStore.BUILD_REPORT_DIR;
+import static org.opentripplanner.datastore.api.FileType.CACHE;
 import static org.opentripplanner.datastore.api.FileType.CONFIG;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
@@ -35,6 +36,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   private static final Logger LOG = LoggerFactory.getLogger(FileDataSourceRepository.class);
 
   private final Pattern GRAPH_PATTERN = Pattern.compile("(?i)(street)?graph.*\\.obj");
+  private final Pattern CACHE_PATTERN = Pattern.compile("(?i).*-cache-\\d+\\.obj");
   private final Pattern EMISSION_PATTERN = Pattern.compile("(?i)(emission).*\\.(txt|csv)");
   private final Pattern EMPIRICAL_DELAY_PATTERN = Pattern.compile("(?i)(empirical[_-]?delay).*");
 
@@ -199,6 +201,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     }
     if (GRAPH_PATTERN.matcher(name).find()) {
       return GRAPH;
+    }
+    if (CACHE_PATTERN.matcher(name).find()) {
+      return CACHE;
     }
     if (name.equals(BUILD_REPORT_DIR)) {
       return REPORT;

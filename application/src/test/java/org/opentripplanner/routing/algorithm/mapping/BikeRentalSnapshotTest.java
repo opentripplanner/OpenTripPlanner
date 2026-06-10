@@ -23,25 +23,22 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
 
   private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
-  static GenericLocation p1 = new GenericLocation(
-    "SW Johnson St. & NW 24th Ave. (P1)",
-    null,
+  static GenericLocation p1 = GenericLocation.fromCoordinate(
     45.52832,
-    -122.70059
+    -122.70059,
+    "SW Johnson St. & NW 24th Ave. (P1)"
   );
 
-  static GenericLocation p2 = new GenericLocation(
-    "NW Hoyt St. & NW 20th Ave. (P2)",
-    null,
+  static GenericLocation p2 = GenericLocation.fromCoordinate(
     45.52704,
-    -122.69240
+    -122.69240,
+    "NW Hoyt St. & NW 20th Ave. (P2)"
   );
 
-  static GenericLocation p3 = new GenericLocation(
-    "NW Everett St. & NW 5th Ave. (P3)",
-    null,
+  static GenericLocation p3 = GenericLocation.fromCoordinate(
     45.52523,
-    -122.67525
+    -122.67525,
+    "NW Everett St. & NW 5th Ave. (P3)"
   );
 
   @BeforeAll

@@ -2,9 +2,8 @@
 
 ## Contact Info
 
-- Kyyti Group Oy, Finland
+- Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 - Entur, Norway
-- Hannes Junnila
 
 ## Documentation
 

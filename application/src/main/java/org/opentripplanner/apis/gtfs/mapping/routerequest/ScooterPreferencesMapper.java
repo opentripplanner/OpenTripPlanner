@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 
@@ -38,7 +39,7 @@ public class ScooterPreferencesMapper {
     var allowedNetworks = args.getGraphQLAllowedNetworks();
     if (allowedNetworks != null) {
       if (allowedNetworks.isEmpty()) {
-        throw new IllegalArgumentException("Allowed scooter rental networks must not be empty.");
+        throw new InvalidInputException("Allowed scooter rental networks must not be empty.");
       }
       preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
     }

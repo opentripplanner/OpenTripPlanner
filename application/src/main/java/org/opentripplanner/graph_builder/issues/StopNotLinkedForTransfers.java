@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 
 public record StopNotLinkedForTransfers(TransitStopVertex stop) implements DataImportIssue {
   private static final String FMT = "Stop %s not near any other stops; no transfers are possible.";
@@ -26,11 +25,6 @@ public record StopNotLinkedForTransfers(TransitStopVertex stop) implements DataI
       stop.getDefaultName(),
       stop.getId()
     );
-  }
-
-  @Override
-  public Vertex getReferencedVertex() {
-    return this.stop;
   }
 
   @Override

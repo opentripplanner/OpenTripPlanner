@@ -66,21 +66,24 @@ public class ReplacementHelper {
     return tripOnServiceDate.getReplacementFor().stream().map(ReplacementForRelation::new).toList();
   }
 
-  private boolean submodeIsReplacement(SubMode submode) {
+  private static boolean isReplacementGtfsType(@Nullable Integer gtfsType) {
+    return gtfsType != null && REPLACEMENT_EXTENDED_TYPES.contains(gtfsType);
+  }
+
+  private static boolean isReplacementSubmode(SubMode submode) {
     return submode.toString().toLowerCase().contains("replacement");
   }
 
-  private boolean isReplacementGtfsType(Route route) {
-    var type = route.getGtfsType();
-    return type != null && REPLACEMENT_EXTENDED_TYPES.contains(type);
+  public static boolean isReplacement(SubMode submode, @Nullable Integer gtfsType) {
+    return isReplacementSubmode(submode) || isReplacementGtfsType(gtfsType);
   }
 
-  public boolean isReplacementRoute(Route route) {
-    return isReplacementGtfsType(route) || submodeIsReplacement(route.getNetexSubmode());
+  public static boolean isReplacementRoute(Route route) {
+    return isReplacement(route.getNetexSubmode(), route.getGtfsType());
   }
 
-  public boolean isReplacementTrip(Trip trip) {
-    return isReplacementGtfsType(trip.getRoute()) || submodeIsReplacement(trip.getNetexSubMode());
+  public static boolean isReplacementTrip(Trip trip) {
+    return isReplacement(trip.getNetexSubMode(), trip.getRoute().getGtfsType());
   }
 
   public boolean isReplacementTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {

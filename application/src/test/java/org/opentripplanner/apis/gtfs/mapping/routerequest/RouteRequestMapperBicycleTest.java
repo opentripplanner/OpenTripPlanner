@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
@@ -55,7 +56,7 @@ class RouteRequestMapperBicycleTest {
     var walkSpeed = 7d;
     var mountDismountTime = Duration.ofSeconds(23);
     var mountDismountCost = Cost.costOfSeconds(35);
-    var walkReluctance = 6.3;
+    var walkReluctance = 6.5;
     bicycleArgs.put(
       "preferences",
       Map.ofEntries(
@@ -227,7 +228,7 @@ class RouteRequestMapperBicycleTest {
       )
     );
     var allowedEnv = testCtx.executionContext(bikeArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 

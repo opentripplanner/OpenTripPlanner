@@ -31,51 +31,62 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                                          |          Type         | Summary                                                                                                                                                                                                              |  Req./Opt. | Default Value | Since |
-|-------------------------------------------------------------------------------------------|:---------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |               |  2.1  |
-| [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |               |  2.1  |
-| gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |               |  2.8  |
-|    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |               |   na  |
-| [ojpApi](sandbox/OjpApi.md)                                                               |        `object`       | Configuration for the OJP API.                                                                                                                                                                                       | *Optional* |               |  2.9  |
-| [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |               |  2.3  |
-| [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |               |  2.0  |
-| [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |               |  2.4  |
-|    [apiDocumentationProfile](#server_apiDocumentationProfile)                             |         `enum`        | List of available custom documentation profiles. A profile is used to inject custom documentation like type and field description or a deprecated reason.  Currently, ONLY the Transmodel API supports this feature. | *Optional* | `"default"`   |  2.7  |
-|    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                                                                                                                                           | *Optional* | `"PT-1S"`     |  2.4  |
-|    [httpResponseTimeMetrics](#server_httpResponseTimeMetrics)                             |        `object`       | Configuration for HTTP response time metrics.                                                                                                                                                                        | *Optional* |               |  2.9  |
-|    [traceParameters](#server_traceParameters)                                             |       `object[]`      | Trace OTP request using HTTP request/response parameter(s) combined with logging.                                                                                                                                    | *Optional* |               |  2.4  |
-|          generateIdIfMissing                                                              |       `boolean`       | If `true` a unique value is generated if no http request header is provided, or the value is missing.                                                                                                                | *Optional* | `false`       |  2.4  |
-|          httpRequestHeader                                                                |        `string`       | The header-key to use when fetching the trace parameter value                                                                                                                                                        | *Optional* |               |  2.4  |
-|          httpResponseHeader                                                               |        `string`       | The header-key to use when saving the value back into the http response                                                                                                                                              | *Optional* |               |  2.4  |
-|          [logKey](#server_traceParameters_0_logKey)                                       |        `string`       | The log event key used.                                                                                                                                                                                              | *Optional* |               |  2.4  |
-| timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                                                                                                                                         | *Optional* |               |  2.2  |
-|    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                                                                                                                                                | *Optional* | `"PT1S"`      |  2.2  |
-|    purgeExpiredData                                                                       |       `boolean`       | Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates.                                                                                                                           | *Optional* | `true`        |  2.2  |
-| [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                                                                                                                                      | *Optional* |               |   na  |
-|    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                                                                                                                                        | *Optional* | `60`          |   na  |
-|    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                                                                                                                                   | *Optional* | `12`          |   na  |
-|    [maxSearchWindow](#transit_maxSearchWindow)                                            |       `duration`      | Upper limit of the request parameter searchWindow.                                                                                                                                                                   | *Optional* | `"PT24H"`     |  2.4  |
-|    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                                                                                                                                   | *Optional* | `50`          |   na  |
-|    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.                                                                                                                               | *Optional* | `0`           |   na  |
-|    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.                                                                                                                           | *Optional* | `25`          |   na  |
-|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                                                                                                                                        | *Optional* |               |  2.1  |
-|       [maxWindow](#transit_dynamicSearchWindow_maxWindow)                                 |       `duration`      | Upper limit for the search-window calculation.                                                                                                                                                                       | *Optional* | `"PT3H"`      |  2.2  |
-|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                                                                                                                                   | *Optional* | `0.5`         |  2.1  |
-|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                                                                                                                                      | *Optional* | `0.5`         |  2.1  |
-|       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                                                                                                                                            | *Optional* | `"PT40M"`     |  2.2  |
-|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                                                                                                                                               | *Optional* | `10`          |  2.1  |
-|    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page.                                                                                                                    | *Optional* |               |   na  |
-|    [stopBoardAlightDuringTransferCost](#transit_stopBoardAlightDuringTransferCost)        | `enum map of integer` | Costs for boarding and alighting during transfers at stops with a given transfer priority.                                                                                                                           | *Optional* |               |  2.0  |
-|    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                                                                                                                                             | *Optional* |               |  2.3  |
-| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                                                                                                                                        | *Optional* |               |  2.1  |
-|    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                                                                                                                                              | *Optional* | `false`       |   na  |
-|    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                                                                                                                                     | *Optional* | `1000000`     |  2.6  |
-|    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                                                                                                                                          | *Optional* |               |   na  |
-| [triasApi](sandbox/TriasApi.md)                                                           |        `object`       | Configuration for the TRIAS API.                                                                                                                                                                                     | *Optional* |               |  2.8  |
-| [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
-| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |               |   na  |
-| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory using GBFS v3 manifest.                                                                                                                                       | *Optional* |               |  2.0  |
+| Config Parameter                                                                          |          Type         | Summary                                                                                                                                                                                                              |  Req./Opt. | Default Value  | Since |
+|-------------------------------------------------------------------------------------------|:---------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|----------------|:-----:|
+| [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |                |  2.1  |
+| [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |                |  2.1  |
+| gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |                |  2.8  |
+|    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |                |   na  |
+| [ojpApi](sandbox/OjpApi.md)                                                               |        `object`       | Configuration for the OJP API.                                                                                                                                                                                       | *Optional* |                |  2.9  |
+| [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |                |  2.3  |
+| [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |                |  2.0  |
+| [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |                |  2.4  |
+|    [apiDocumentationProfile](#server_apiDocumentationProfile)                             |         `enum`        | List of available custom documentation profiles. A profile is used to inject custom documentation like type and field description or a deprecated reason.  Currently, ONLY the Transmodel API supports this feature. | *Optional* | `"default"`    |  2.7  |
+|    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                                                                                                                                           | *Optional* | `"PT-1S"`      |  2.4  |
+|    [httpResponseTimeMetrics](#server_httpResponseTimeMetrics)                             |        `object`       | Configuration for HTTP response time metrics.                                                                                                                                                                        | *Optional* |                |  2.9  |
+|    [traceParameters](#server_traceParameters)                                             |       `object[]`      | Trace OTP request using HTTP request/response parameter(s) combined with logging.                                                                                                                                    | *Optional* |                |  2.4  |
+|          generateIdIfMissing                                                              |       `boolean`       | If `true` a unique value is generated if no http request header is provided, or the value is missing.                                                                                                                | *Optional* | `false`        |  2.4  |
+|          httpRequestHeader                                                                |        `string`       | The header-key to use when fetching the trace parameter value                                                                                                                                                        | *Optional* |                |  2.4  |
+|          httpResponseHeader                                                               |        `string`       | The header-key to use when saving the value back into the http response                                                                                                                                              | *Optional* |                |  2.4  |
+|          [logKey](#server_traceParameters_0_logKey)                                       |        `string`       | The log event key used.                                                                                                                                                                                              | *Optional* |                |  2.4  |
+| timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                                                                                                                                         | *Optional* |                |  2.2  |
+|    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                                                                                                                                                | *Optional* | `"PT1S"`       |  2.2  |
+|    purgeExpiredData                                                                       |       `boolean`       | Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates.                                                                                                                           | *Optional* | `true`         |  2.2  |
+| [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                                                                                                                                      | *Optional* |                |   na  |
+|    [earlyTransferPruning](#transit_earlyTransferPruning)                                  |       `boolean`       | Enable the Transfer Early Pruning optimization for standard RAPTOR.                                                                                                                                                  | *Optional* | `true`         |  2.10 |
+|    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                                                                                                                                        | *Optional* | `60`           |   na  |
+|    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                                                                                                                                   | *Optional* | `12`           |   na  |
+|    [maxSearchWindow](#transit_maxSearchWindow)                                            |       `duration`      | Upper limit of the request parameter searchWindow.                                                                                                                                                                   | *Optional* | `"PT24H"`      |  2.4  |
+|    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                                                                                                                                   | *Optional* | `50`           |   na  |
+|    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.                                                                                                                               | *Optional* | `0`            |   na  |
+|    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.                                                                                                                           | *Optional* | `25`           |   na  |
+|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                                                                                                                                        | *Optional* |                |  2.1  |
+|       [maxWindow](#transit_dynamicSearchWindow_maxWindow)                                 |       `duration`      | Upper limit for the search-window calculation.                                                                                                                                                                       | *Optional* | `"PT3H"`       |  2.2  |
+|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                                                                                                                                   | *Optional* | `0.5`          |  2.1  |
+|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                                                                                                                                      | *Optional* | `0.5`          |  2.1  |
+|       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                                                                                                                                            | *Optional* | `"PT40M"`      |  2.2  |
+|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                                                                                                                                               | *Optional* | `10`           |  2.1  |
+|    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page.                                                                                                                    | *Optional* |                |   na  |
+|    [stopBoardAlightDuringTransferCost](#transit_stopBoardAlightDuringTransferCost)        | `enum map of integer` | Costs for boarding and alighting during transfers at stops with a given transfer priority.                                                                                                                           | *Optional* |                |  2.0  |
+|    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                                                                                                                                             | *Optional* |                |  2.3  |
+| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                                                                                                                                        | *Optional* |                |  2.1  |
+|    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                                                                                                                                              | *Optional* | `false`        |   na  |
+|    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                                                                                                                                     | *Optional* | `1000000`      |  2.6  |
+|    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                                                                                                                                          | *Optional* |                |   na  |
+| [triasApi](sandbox/TriasApi.md)                                                           |        `object`       | Configuration for the TRIAS API.                                                                                                                                                                                     | *Optional* |                |  2.8  |
+| [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |                |  1.5  |
+| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |                |   na  |
+| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory using GBFS v3 manifest.                                                                                                                                       | *Optional* |                |  2.0  |
+| [warmup](#warmup)                                                                         |        `object`       | Configure application warmup by running transit searches during startup.                                                                                                                                             | *Optional* |                |  2.10 |
+|    [api](#warmup_api)                                                                     |         `enum`        | Which GraphQL API to use for warmup queries.                                                                                                                                                                         | *Optional* | `"transmodel"` |  2.10 |
+|    [accessModes](#warmup_accessModes)                                                     |       `string[]`      | Access modes to cycle through in warmup queries.                                                                                                                                                                     | *Optional* |                |  2.10 |
+|    [egressModes](#warmup_egressModes)                                                     |       `string[]`      | Egress modes to cycle through in warmup queries.                                                                                                                                                                     | *Optional* |                |  2.10 |
+|    from                                                                                   |        `object`       | Origin location for warmup searches.                                                                                                                                                                                 | *Optional* |                |  2.10 |
+|       lat                                                                                 |        `double`       | Latitude of the origin.                                                                                                                                                                                              | *Required* |                |  2.10 |
+|       lon                                                                                 |        `double`       | Longitude of the origin.                                                                                                                                                                                             | *Required* |                |  2.10 |
+|    to                                                                                     |        `object`       | Destination location for warmup searches.                                                                                                                                                                            | *Optional* |                |  2.10 |
+|       lat                                                                                 |        `double`       | Latitude of the destination.                                                                                                                                                                                         | *Required* |                |  2.10 |
+|       lon                                                                                 |        `double`       | Longitude of the destination.                                                                                                                                                                                        | *Required* |                |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -215,6 +226,22 @@ Configuration for transit searches with RAPTOR.
 Some of these parameters for tuning transit routing are only available through configuration and
 cannot be set in the routing request. These parameters work together with the default routing
 request and the actual routing request.
+
+
+<h3 id="transit_earlyTransferPruning">earlyTransferPruning</h3>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /transit 
+
+Enable the Transfer Early Pruning optimization for standard RAPTOR.
+
+When enabled, the transfer relaxation loop breaks early once the current arrival time
+exceeds the best known destination arrival time. Transfers must be sorted by duration for
+this to be correct (which OTP ensures). This optimization only applies to Standard RAPTOR
+(not Multi-Criteria searches).
+
+See _Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026_
+in the [Bibliography](Bibliography.md).
 
 
 <h3 id="transit_iterationDepartureStepInSeconds">iterationDepartureStepInSeconds</h3>
@@ -481,6 +508,131 @@ Enforce rate limiting based on query complexity; Queries that return too much da
 **Path:** /transmodelApi 
 
 Used to group requests when monitoring OTP.
+
+<h3 id="warmup">warmup</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configure application warmup by running transit searches during startup.
+
+When configured, OTP runs transit routing queries between the given locations
+during startup. This warms up the application (JIT compilation, GraphQL schema
+caches, routing data structures, etc.) before production traffic arrives.
+Queries start after the Raptor transit data is created and stop when all updaters
+are primed (the health endpoint would return "UP").
+If no updaters are configured, no warmup queries are run.
+
+
+<h3 id="warmup_api">api</h3>
+
+**Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"transmodel"`   
+**Path:** /warmup   
+**Enum values:** `transmodel` | `gtfs`
+
+Which GraphQL API to use for warmup queries.
+
+ - `transmodel` Use the TransModel GraphQL API for warmup queries.
+ - `gtfs` Use the GTFS GraphQL API for warmup queries.
+
+
+<h3 id="warmup_accessModes">accessModes</h3>
+
+**Since version:** `2.10` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /warmup 
+
+Access modes to cycle through in warmup queries.
+
+Ordered list of `StreetMode` values used as access modes. Each entry is paired with the egress mode at the same index.  - `not-set` 
+ - `walk` Walking some or all of the way of the route.
+ - `bike` Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+   
+   Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
+   is called `bikesAllowed`.
+ - `bike-to-park` Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+   This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
+   
+   _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
+ - `bike-rental` Taking a rented, shared-mobility bike for part or the entirety of the route.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `scooter-rental` Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
+   This can include scooter rental at fixed locations or free-floating services.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `car` Driving your own car the entirety of the route.
+   This can be combined with transit, where will return routes with a [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component.
+   This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
+ - `car-to-park` Driving a car to the park-and-ride facilities near a station and taking publictransport.
+   This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
+   _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
+ - `car-pickup` Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
+ - `car-rental` Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
+   This can include car rental at fixed locations or free-floating services.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `car-hailing` Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
+   
+   See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
+ - `carpool` Carpool or rideshare with other passengers going in the same direction.
+   
+   This is the request mode for enabling carpooling in street route searches.
+   
+   Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
+ - `flexible` Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.
+
+
+<h3 id="warmup_egressModes">egressModes</h3>
+
+**Since version:** `2.10` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /warmup 
+
+Egress modes to cycle through in warmup queries.
+
+Ordered list of `StreetMode` values used as egress modes. Each entry is paired with the access mode at the same index.  - `not-set` 
+ - `walk` Walking some or all of the way of the route.
+ - `bike` Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+   
+   Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
+   is called `bikesAllowed`.
+ - `bike-to-park` Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+   This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
+   
+   _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
+ - `bike-rental` Taking a rented, shared-mobility bike for part or the entirety of the route.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `scooter-rental` Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
+   This can include scooter rental at fixed locations or free-floating services.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `car` Driving your own car the entirety of the route.
+   This can be combined with transit, where will return routes with a [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component.
+   This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
+ - `car-to-park` Driving a car to the park-and-ride facilities near a station and taking publictransport.
+   This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
+   _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
+ - `car-pickup` Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
+ - `car-rental` Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
+   This can include car rental at fixed locations or free-floating services.
+   
+   _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+   See [Configuring GBFS](GBFS-Config.md) on how to add one.
+ - `car-hailing` Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
+   
+   See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
+ - `carpool` Carpool or rideshare with other passengers going in the same direction.
+   
+   This is the request mode for enabling carpooling in street route searches.
+   
+   Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
+ - `flexible` Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.
+
 
 
 <!-- PARAMETERS-DETAILS END -->
@@ -961,6 +1113,25 @@ Used to group requests when monitoring OTP.
       "maxPrimingIdleTime" : "1s"
     }
   ],
+  "warmup" : {
+    "api" : "transmodel",
+    "from" : {
+      "lat" : 59.9139,
+      "lon" : 10.7522
+    },
+    "to" : {
+      "lat" : 59.95,
+      "lon" : 10.76
+    },
+    "accessModes" : [
+      "WALK",
+      "CAR_TO_PARK"
+    ],
+    "egressModes" : [
+      "WALK",
+      "WALK"
+    ]
+  },
   "rideHailingServices" : [
     {
       "type" : "uber-car-hailing",

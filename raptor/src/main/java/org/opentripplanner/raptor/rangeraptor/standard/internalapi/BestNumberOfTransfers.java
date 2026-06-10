@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.internalapi;
 
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
  * This interface is part of calculating heuristics for transfers.

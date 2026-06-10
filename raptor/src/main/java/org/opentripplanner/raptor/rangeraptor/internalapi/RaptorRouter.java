@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Interface for Raptor Router. Allow instrumentation/wrapping the router. This is not

@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 class TestCaseBuilder {
 
@@ -18,7 +18,7 @@ class TestCaseBuilder {
   }
 
   TestCaseBuilder points(int... stops) {
-    points.add(RaptorViaLocation.passThrough("PT").addPassThroughStops(stops).build());
+    points.add(RaptorViaLocation.passThrough("PT").addStop(stops).build());
     return this;
   }
 

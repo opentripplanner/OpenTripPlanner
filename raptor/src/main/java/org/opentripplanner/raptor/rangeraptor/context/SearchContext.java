@@ -9,15 +9,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -41,7 +36,11 @@ import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * The search context is used to hold search scoped instances and to pass these to whom ever needs
@@ -67,9 +66,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final DebugHandlerFactory<T> debugFactory;
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
-  @Nullable
-  private final IntPredicate acceptC2AtDestination;
-
   private final List<SearchContextViaSegments<T>> segments;
 
   /** Lazy initialized */
@@ -81,8 +77,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorTransitDataProvider<T> transitData,
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
-    EgressPaths egressPaths,
-    @Nullable IntPredicate acceptC2AtDestination
+    EgressPaths egressPaths
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
@@ -95,21 +90,15 @@ public class SearchContext<T extends RaptorTripSchedule> {
       lifeCycle()
     );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
-    this.acceptC2AtDestination = acceptC2AtDestination;
     this.segments = initSegments(accessPaths, viaConnections, egressPaths);
   }
 
-  /**
-   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
-   *                             for accepting it at the destination, if not this is {@code null}.
-   */
   public static <T extends RaptorTripSchedule> SearchContextBuilder<T> of(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit,
-    @Nullable IntPredicate acceptC2AtDestination
+    RaptorTransitDataProvider<T> transit
   ) {
-    return new SearchContextBuilder<>(request, tuningParameters, transit, acceptC2AtDestination);
+    return new SearchContextBuilder<>(request, tuningParameters, transit);
   }
 
   public List<SearchContextViaSegments<T>> segments() {
@@ -179,11 +168,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.performanceTimers();
   }
 
-  @Nullable
-  public IntPredicate acceptC2AtDestination() {
-    return acceptC2AtDestination;
-  }
-
   /** Number of stops in transit graph. */
   public int nStops() {
     return transitData.numberOfStops();
@@ -218,6 +202,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   public boolean useConstrainedTransfers() {
     return request.useConstrainedTransfers();
+  }
+
+  public boolean earlyTransferPruning() {
+    return tuningParameters.earlyTransferPruning();
   }
 
   /* private methods */

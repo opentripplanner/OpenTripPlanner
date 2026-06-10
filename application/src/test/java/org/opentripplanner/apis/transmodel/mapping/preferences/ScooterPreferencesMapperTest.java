@@ -120,8 +120,8 @@ class ScooterPreferencesMapperTest {
     );
     mapScooterPreferences(preferences, callWith);
     var result = preferences.build();
-    // Due to rounding in Units.speed
-    assertEquals(11, result.speed());
+    // Due to rounding in Units.speed: 10.5 is a tie at step 1.0; HALF_EVEN -> 10 (even).
+    assertEquals(10, result.speed());
     assertEquals(4.0, result.reluctance());
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType());
     assertEquals(0.5, result.optimizeTriangle().time());

@@ -11,9 +11,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoa
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 public class GraphQLUtils {
@@ -35,12 +35,16 @@ public class GraphQLUtils {
     }
     return switch (code) {
       case LOCATION_NOT_FOUND -> GraphQLRoutingErrorCode.LOCATION_NOT_FOUND;
+      case NO_DIRECT_MODE_CONNECTION -> GraphQLRoutingErrorCode.NO_DIRECT_MODE_CONNECTION;
       case NO_STOPS_IN_RANGE -> GraphQLRoutingErrorCode.NO_STOPS_IN_RANGE;
       case NO_TRANSIT_CONNECTION -> GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION;
       case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
       case OUTSIDE_BOUNDS -> GraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
       case OUTSIDE_SERVICE_PERIOD -> GraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
       case WALKING_BETTER_THAN_TRANSIT -> GraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
+      case TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME -> throw new UnsupportedOperationException(
+        "Start-on-board access is not supported in the GTFS GraphQL API yet."
+      );
     };
   }
 

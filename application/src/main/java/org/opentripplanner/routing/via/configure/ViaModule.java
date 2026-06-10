@@ -20,7 +20,7 @@ public abstract class ViaModule {
     return new DefaultViaCoordinateTransferFactory(
       graph,
       transitService,
-      buildConfig.maxTransferDuration
+      buildConfig.regularTransferParameters().maxDuration()
     );
   }
 }

@@ -27,7 +27,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ExpectedList;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /*
@@ -60,8 +59,6 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
       .addEgressPaths(walk(STOP_B, D2_m).withTimePenalty(D1_m));
 
     requestBuilder.searchParams().timetable(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   private static List<RaptorModuleTestCase> firstTwoPathsArriveBeforeLAT() {

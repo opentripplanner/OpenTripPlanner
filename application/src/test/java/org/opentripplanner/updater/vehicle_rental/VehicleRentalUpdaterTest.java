@@ -30,6 +30,7 @@ class VehicleRentalUpdaterTest {
   public static final VehicleRentalUpdaterParameters PARAMS = new VehicleRentalUpdaterParameters(
     "A",
     Duration.ofMinutes(1),
+    Duration.ZERO,
     new FakeParams()
   );
   public static final DefaultVehicleRentalService SERVICE = new DefaultVehicleRentalService();

@@ -13,20 +13,19 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -113,9 +112,9 @@ public interface Leg {
   boolean hasSameMode(Leg other);
 
   /**
-   * Return {@code true} if to legs are the same. The mode must match and the time must overlap.
-   * For transit the trip ID must match and board/alight position must overlap. (Two trips with
-   * different service-date can overlap in time, so we use boarding-/alight-position to verify).
+   * Return {@code true} if two legs are the same. The mode must match and the time must overlap.
+   * For transit the service date, trip ID, and board/alight position must all match. (Two trips
+   * with different service-date can overlap in time, so we use boarding-/alight-position to verify)
    */
   default boolean isPartiallySameLeg(Leg other) {
     if (!hasSameMode(other)) {
@@ -133,20 +132,7 @@ public interface Leg {
     }
     // Transit leg
     else {
-      // If NOT the same trip, return false
-      if (!trip().getId().equals(other.trip().getId())) {
-        return false;
-      }
-
-      // Return true if legs overlap in space(have one common stop visit), this is necessary
-      // since the same trip id on two following service dates may overlap in time. For example,
-      // a trip may run in a loop for 48 hours, overlapping with the same trip id of the trip
-      // scheduled for the next service day. They both visit the same stops, with overlapping
-      // times, but the stop positions will be different.
-      return (
-        boardStopPosInPattern() < other.alightStopPosInPattern() &&
-        alightStopPosInPattern() > other.boardStopPosInPattern()
-      );
+      return isPartiallySameTransitLeg(other);
     }
   }
 
@@ -254,11 +240,6 @@ public interface Leg {
    */
   default boolean isRealTimeUpdated() {
     return false;
-  }
-
-  @Nullable
-  default RealTimeState realTimeState() {
-    return null;
   }
 
   /**

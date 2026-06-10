@@ -51,8 +51,6 @@ public interface RaptorTestConstants {
   int STOP_D = 4;
   int STOP_E = 5;
   int STOP_F = 6;
-  int STOP_G = 7;
-  int STOP_H = 8;
 
   int NUM_STOPS = 14;
 
@@ -73,7 +71,6 @@ public interface RaptorTestConstants {
 
   // FLEX
   int ONE_RIDE = 1;
-  int TWO_RIDES = 2;
 
   static String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);

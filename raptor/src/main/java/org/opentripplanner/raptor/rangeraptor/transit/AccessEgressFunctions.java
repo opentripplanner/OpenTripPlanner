@@ -55,7 +55,7 @@ public final class AccessEgressFunctions {
    * </ol>
    */
   private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
-    ((l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
+    ((l.arrivedOnBoard() && !r.arrivedOnBoard()) ||
       r.hasOpeningHours() ||
       l.numberOfRides() < r.numberOfRides() ||
       l.durationInSeconds() < r.durationInSeconds() ||

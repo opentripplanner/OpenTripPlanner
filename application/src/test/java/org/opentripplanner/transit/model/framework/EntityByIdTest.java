@@ -7,16 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 public class EntityByIdTest {
 
-  private static final FeedScopedId ID = TimetableRepositoryForTest.id("99");
+  private static final FeedScopedId ID = FeedScopedIdForTestFactory.id("99");
   private static final TestEntity E = TestEntity.of(ID).build();
   private static final String E_TO_STRING = E.toString();
   private static final String LIST_OF_E_TO_STRING = String.format("[%s]", E_TO_STRING);
   private static final String MAP_OF_E_TO_STRING = String.format("{%s=%s}", ID, E_TO_STRING);
-  private static final FeedScopedId FAKE_ID = TimetableRepositoryForTest.id("77");
+  private static final FeedScopedId FAKE_ID = FeedScopedIdForTestFactory.id("77");
   private final EntityById<TestEntity> subject = new DefaultEntityById<>();
 
   @Test

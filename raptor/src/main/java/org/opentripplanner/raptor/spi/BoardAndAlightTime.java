@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Objects;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -18,20 +17,6 @@ public class BoardAndAlightTime {
     this.trip = trip;
     this.boardStopPos = boardStopPos;
     this.alightStopPos = alightStopPos;
-  }
-
-  public static BoardAndAlightTime create(
-    RaptorTripSchedule trip,
-    int boardStop,
-    int boardTime,
-    int alightStop,
-    int alightTime
-  ) {
-    return new BoardAndAlightTime(
-      trip,
-      trip.findDepartureStopPosition(boardTime, boardStop),
-      trip.findArrivalStopPosition(alightTime, alightStop)
-    );
   }
 
   public int boardTime() {

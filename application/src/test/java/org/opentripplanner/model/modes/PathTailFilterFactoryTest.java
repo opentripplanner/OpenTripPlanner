@@ -33,7 +33,7 @@ class PathTailFilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var result = (AllowMainModeFilter) AllowTransitModeFilter.of(modes);
+    var result = (AllowMainModeFilter) AllowTransitModeFilter.ofMainAndSubMode(modes);
     assertEquals(TransitMode.BUS, result.mainMode());
   }
 
@@ -44,7 +44,7 @@ class PathTailFilterFactoryTest {
     // Add one extra sub-mode filter, this should be removed because it is a subset of all
     modes.add(new MainAndSubMode(TransitMode.BUS, NIGHT_BUS));
 
-    var result = AllowTransitModeFilter.of(modes);
+    var result = AllowTransitModeFilter.ofMainAndSubMode(modes);
     assertInstanceOf(AllowAllModesFilter.class, result);
   }
 
@@ -53,7 +53,7 @@ class PathTailFilterFactoryTest {
     // Add all MainModes except AIRPLANE as separate filters
     var modes = TransitMode.transitModesExceptAirplane().stream().map(MainAndSubMode::new).toList();
 
-    var result = (AllowMainModesFilter) AllowTransitModeFilter.of(modes);
+    var result = (AllowMainModesFilter) AllowTransitModeFilter.ofMainAndSubMode(modes);
 
     for (TransitMode mode : TransitMode.values()) {
       assertEquals(mode != TransitMode.AIRPLANE, result.match(mode, SubMode.UNKNOWN));
@@ -65,7 +65,7 @@ class PathTailFilterFactoryTest {
     // Add ALL MainModes as separate filters
     var modes = List.of(new MainAndSubMode(TransitMode.BUS, LOCAL_BUS));
 
-    var result = (AllowMainAndSubModeFilter) AllowTransitModeFilter.of(modes);
+    var result = (AllowMainAndSubModeFilter) AllowTransitModeFilter.ofMainAndSubMode(modes);
 
     assertEquals(TransitMode.BUS, result.mainMode());
     assertEquals(LOCAL_BUS, result.subMode());
@@ -78,7 +78,7 @@ class PathTailFilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var result = AllowTransitModeFilter.of(modes);
+    var result = AllowTransitModeFilter.ofMainAndSubMode(modes);
 
     assertTrue(result.match(TransitMode.BUS, LOCAL_BUS));
     assertTrue(result.match(TransitMode.BUS, NIGHT_BUS));
@@ -94,7 +94,7 @@ class PathTailFilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var result = (AllowMainAndSubModesFilter) AllowTransitModeFilter.of(modes);
+    var result = (AllowMainAndSubModesFilter) AllowTransitModeFilter.ofMainAndSubMode(modes);
 
     assertTrue(result.match(TransitMode.BUS, LOCAL_BUS));
     assertFalse(result.match(TransitMode.TRAM, LOCAL_BUS));

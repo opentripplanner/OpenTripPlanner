@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -43,6 +44,15 @@ class StopTimesMapper {
     stopTime.setStopSequence(stopSequence);
     stopTime.setTrip(trip);
     stopTime.setStop(stop);
+
+    // Set default boarding/alighting rules for first and last stops.
+    // Can't alight at first stop and can't board at last stop.
+    if (isFirstStop) {
+      stopTime.setDropOffType(PickDrop.NONE);
+    }
+    if (isLastStop) {
+      stopTime.setPickupType(PickDrop.NONE);
+    }
 
     // Fallback to other time, if one doesn't exist
     var aimedArrivalTime = call.getAimedArrivalTime() != null

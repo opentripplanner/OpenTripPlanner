@@ -103,9 +103,8 @@ class QuayMapper {
       .withWheelchairAccessibility(wheelchair)
       .withVehicleType(transitMode.mainMode())
       .withNetexVehicleSubmode(subMode)
-      .withSometimesUsedRealtime(sometimesUsedRealtime);
-
-    builder.fareZones().addAll(fareZones);
+      .withSometimesUsedRealtime(sometimesUsedRealtime)
+      .withFareZones(fareZones);
 
     return builder.build();
   }

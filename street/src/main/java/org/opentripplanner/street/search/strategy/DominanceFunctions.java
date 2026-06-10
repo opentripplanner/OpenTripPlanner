@@ -100,7 +100,7 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       a.backEdge != b.getBackEdge() &&
       (a.backEdge instanceof StreetEdge) &&
       a.getBackMode() != null &&
-      a.getBackMode().isInCar() &&
+      a.getBackMode().isDrivingIsh() &&
       a.getRequest().isCloseToStartOrEnd(a.getVertex())
     ) {
       return false;
@@ -143,17 +143,13 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
   }
 
   /**
-   * A dominance function that prefers the least walking. This should only be used with walk-only
-   * searches because it does not include any functions of time, and once transit is boarded walk
-   * distance is constant.
-   * <p>
-   * It is used when building stop tree caches for egress from transit stops.
+   * A dominance function that prefers the shortest distance.
    */
-  public static class LeastWalk extends DominanceFunctions {
+  public static class ShortestDistance extends DominanceFunctions {
 
     @Override
     protected boolean betterOrEqual(State a, State b) {
-      return a.getWalkDistance() <= b.getWalkDistance();
+      return a.getTraversalDistanceMeters() <= b.getTraversalDistanceMeters();
     }
   }
 

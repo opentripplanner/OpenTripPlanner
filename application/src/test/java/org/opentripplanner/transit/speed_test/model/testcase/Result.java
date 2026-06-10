@@ -25,12 +25,11 @@ import org.opentripplanner.utils.time.TimeUtils;
 public record Result(
   String testCaseId,
   Integer nTransfers,
-  Duration duration,
-  Integer cost,
-  Integer walkDistance,
   Integer startTime,
   Integer endTime,
-
+  Integer c1,
+  Integer c2,
+  Duration duration,
   List<String> agencies,
   List<TransitMode> modes,
   List<String> routes,
@@ -58,11 +57,10 @@ public record Result(
   @Override
   public String toString() {
     return String.format(
-      "%d %s %d %dm %s %s -- %s",
+      "%d %s %d %s %s -- %s",
       nTransfers,
       durationAsStr(),
-      cost,
-      walkDistance,
+      c1,
       TimeUtils.timeToStrCompact(startTime),
       TimeUtils.timeToStrCompact(endTime),
       details
@@ -89,13 +87,13 @@ public record Result(
       if (skipCost) {
         return 0;
       }
-      if (r1.cost == null || r1.cost.equals(0)) {
+      if (r1.c1 == null || r1.c1.equals(0)) {
         return 0;
       }
-      if (r2.cost == null || r2.cost.equals(0)) {
+      if (r2.c1 == null || r2.c1.equals(0)) {
         return 0;
       }
-      return -(r2.cost - r1.cost);
+      return -(r2.c1 - r1.c1);
     };
   }
 

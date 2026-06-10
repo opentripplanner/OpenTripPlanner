@@ -23,6 +23,12 @@ public interface TripSchedule extends DefaultTripSchedule {
   TripPattern getOriginalTripPattern();
 
   /**
+   * Return the index used to look up this trip in the
+   * {@link org.opentripplanner.raptor.spi.RaptorTimeTable#getTripSchedule(int)}.
+   */
+  int tripScheduleIndex();
+
+  /**
    * Return {@code true} if this trip is not based on a fixed schedule, but instead a frequency
    * based scheduled trip. The {@link #frequencyHeadwayInSeconds()} is only defined for such trips.
    */

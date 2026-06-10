@@ -1,0 +1,63 @@
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop;
+
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
+
+import org.opentripplanner.raptor.api.view.PathLegType;
+import org.opentripplanner.raptor.api.view.TransitArrival;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+
+/**
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
+ */
+final class TransferStopArrival<T extends RaptorTripSchedule> extends McStopArrival<T> {
+
+  private final RaptorTransfer transfer;
+
+  TransferStopArrival(
+    McStopArrival<T> previousState,
+    RaptorTransfer transferPath,
+    int arrivalTime
+  ) {
+    super(
+      previousState,
+      // Transfer happens in the same round as the previous transit
+      previousState.round(),
+      transferPath.stop(),
+      arrivalTime,
+      previousState.c1() + transferPath.c1()
+    );
+    this.transfer = transferPath;
+  }
+
+  @Override
+  public int c2() {
+    return RaptorConstants.NOT_SET;
+  }
+
+  @Override
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return previous().mostRecentTransitArrival();
+  }
+
+  @Override
+  public PathLegType arrivedBy() {
+    return TRANSFER;
+  }
+
+  @Override
+  public RaptorTransfer transfer() {
+    return transfer;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
+  }
+
+  @Override
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new TransferStopArrival<>(previous(), transfer, arrivalTime() + slack);
+  }
+}

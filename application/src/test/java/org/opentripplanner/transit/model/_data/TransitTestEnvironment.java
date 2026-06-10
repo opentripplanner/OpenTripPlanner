@@ -1,20 +1,26 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.LocalTimeParser;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * A helper class for setting up and interacting with transit data for tests.
@@ -25,7 +31,6 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
-  private final TransferRepository transferRepository;
   private final TimetableSnapshotManager snapshotManager;
   private final LocalDate defaultServiceDate;
 
@@ -65,7 +70,6 @@ public final class TransitTestEnvironment {
       () -> defaultServiceDate
     );
     this.defaultServiceDate = defaultServiceDate;
-    this.transferRepository = transferRepository;
   }
 
   /**
@@ -115,14 +119,14 @@ public final class TransitTestEnvironment {
   }
 
   /**
-   * Get a data fetcher for the given trip id on the default ServiceDate
+   * Get a data fetcher for the given trip id on the default service date
    */
   public TripOnDateDataFetcher tripData(String tripId) {
     return new TripOnDateDataFetcher(transitService(), id(tripId), defaultServiceDate);
   }
 
   /**
-   * Get a data fetcher for the given trip id on the default ServiceDate
+   * Get a data fetcher for the given trip id on the given service date
    */
   public TripOnDateDataFetcher tripData(String tripId, LocalDate serviceDate) {
     return new TripOnDateDataFetcher(transitService(), id(tripId), serviceDate);
@@ -140,5 +144,31 @@ public final class TransitTestEnvironment {
    */
   public RaptorTransitDataFetcher raptorData() {
     return raptorData(defaultServiceDate);
+  }
+
+  /**
+   * Returns {@link RaptorRoutingRequestTransitData} for the given service date.
+   */
+  public RaptorRoutingRequestTransitData raptorRoutingRequestTransitData(LocalDate serviceDate) {
+    var transitSearchTimeZero = ServiceDateUtils.asStartOfService(
+      serviceDate,
+      timetableRepository.getTimeZone()
+    );
+    return new RaptorRoutingRequestTransitData(
+      timetableRepository.getRaptorTransitData(),
+      TransitGroupPriorityService.empty(),
+      transitSearchTimeZero,
+      0,
+      0,
+      new DefaultTransitDataProviderFilterBuilder().build(),
+      RouteRequest.defaultValue()
+    );
+  }
+
+  /**
+   * Returns {@link RaptorRoutingRequestTransitData} for the default service date.
+   */
+  public RaptorRoutingRequestTransitData raptorRoutingRequestTransitData() {
+    return raptorRoutingRequestTransitData(defaultServiceDate);
   }
 }

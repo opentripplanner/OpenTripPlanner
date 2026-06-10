@@ -1,0 +1,65 @@
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop;
+
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
+
+import org.opentripplanner.raptor.api.view.PathLegType;
+import org.opentripplanner.raptor.api.view.TransitArrival;
+import org.opentripplanner.raptor.api.view.TransitPathView;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+
+/**
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
+ */
+final class TransitStopArrivalC2<T extends RaptorTripSchedule>
+  extends AbstractStopArrivalC2<T>
+  implements TransitPathView<T>, TransitArrival<T> {
+
+  private final T trip;
+
+  TransitStopArrivalC2(
+    McStopArrival<T> previous,
+    int stopIndex,
+    int arrivalTime,
+    int c1,
+    int c2,
+    T trip
+  ) {
+    super(previous, previous.round() + 1, stopIndex, arrivalTime, c1, c2);
+    this.trip = trip;
+  }
+
+  @Override
+  public int boardStop() {
+    return previousStop();
+  }
+
+  @Override
+  public T trip() {
+    return trip;
+  }
+
+  @Override
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return this;
+  }
+
+  @Override
+  public PathLegType arrivedBy() {
+    return TRANSIT;
+  }
+
+  @Override
+  public TransitPathView<T> transitPath() {
+    return this;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
+  }
+
+  @Override
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new TransitStopArrivalC2<>(previous(), stop(), arrivalTime() + slack, c1(), c2(), trip);
+  }
+}

@@ -1,5 +1,6 @@
 package org.opentripplanner.model.modes;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -17,7 +18,7 @@ class AllowMainModeFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean match(TransitMode transitMode, SubMode ignore) {
+  public boolean match(TransitMode transitMode, SubMode ignore, @Nullable Integer ignore2) {
     return mainMode == transitMode;
   }
 

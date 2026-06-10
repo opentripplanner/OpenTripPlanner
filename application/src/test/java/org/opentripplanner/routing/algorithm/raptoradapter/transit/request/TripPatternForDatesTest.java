@@ -7,9 +7,10 @@ import java.time.LocalDate;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -79,7 +80,7 @@ class TripPatternForDatesTest {
     stopTime2.setDepartureTime(300);
     stopTime2.setStopSequence(1);
     StopPattern stopPattern = new StopPattern(List.of(stopTime1, stopTime2));
-    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .build()

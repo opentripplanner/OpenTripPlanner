@@ -104,13 +104,13 @@ class StreetVehicleParkingLinkTest {
   }
 
   private static VehicleParkingEntranceVertex buildVertex(Set<String> parkingTags) {
-    var parking = VehicleParking.builder()
+    var parking = VehicleParking.of()
       .id(id("parking"))
       .coordinate(new WgsCoordinate(1, 1))
       .tags(parkingTags)
       .build();
 
-    var entrance = VehicleParkingEntrance.builder()
+    var entrance = VehicleParkingEntrance.of()
       .vehicleParking(parking)
       .entranceId(id("entrance"))
       .coordinate(new WgsCoordinate(1, 1))

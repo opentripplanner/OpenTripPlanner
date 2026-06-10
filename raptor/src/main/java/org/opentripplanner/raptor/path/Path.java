@@ -7,16 +7,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The result of a Raptor search is a path describing the one possible journey. The path is the
@@ -88,19 +88,9 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this(iterationDepartureTime, accessLeg, c1, RaptorConstants.NOT_SET);
   }
 
-  /** Copy constructor */
-  protected Path(RaptorPath<T> original) {
-    this(
-      original.rangeRaptorIterationDepartureTime(),
-      original.accessLeg(),
-      original.c1(),
-      original.c2()
-    );
-  }
-
   /**
    * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
-   * creating the hole path.
+   * creating the whole path.
    */
   public static <T extends RaptorTripSchedule> RaptorPath<T> dummyPath(
     int iteration,
@@ -227,10 +217,6 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     return buildString(false, null, null);
   }
 
-  protected String toString(boolean detailed, RaptorStopNameResolver stopNameResolver) {
-    return buildString(detailed, stopNameResolver, null);
-  }
-
   protected String buildString(
     boolean detailed,
     @Nullable RaptorStopNameResolver stopNameResolver,
@@ -300,7 +286,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
     return (EgressPathLeg<S>) leg
       .stream()
-      .reduce((a, b) -> b)
+      .reduce((_, b) -> b)
       .orElseThrow();
   }
 

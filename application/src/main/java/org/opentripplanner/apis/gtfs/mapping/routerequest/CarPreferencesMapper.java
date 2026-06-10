@@ -8,6 +8,7 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.p
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
@@ -69,7 +70,7 @@ public class CarPreferencesMapper {
     var allowedNetworks = args.getGraphQLAllowedNetworks();
     if (allowedNetworks != null) {
       if (allowedNetworks.isEmpty()) {
-        throw new IllegalArgumentException("Allowed car rental networks must not be empty.");
+        throw new InvalidInputException("Allowed car rental networks must not be empty.");
       }
       preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
     }

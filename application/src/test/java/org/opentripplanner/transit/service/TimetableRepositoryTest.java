@@ -2,8 +2,8 @@ package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.stopPattern;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -44,7 +44,7 @@ class TimetableRepositoryTest {
       graph,
       timetableRepository,
       ConstantsForTests.SIMPLE_GTFS,
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       FAKE_FEED_ID
     );
 
@@ -66,7 +66,7 @@ class TimetableRepositoryTest {
           graph,
           timetableRepository,
           RESOURCE_LOADER.file("kcm_gtfs.zip"),
-          new DefaultFareServiceFactory(),
+          new GtfsFareServiceFactory(),
           null
         ),
       ("The graph contains agencies with different time zones. " +
@@ -89,7 +89,7 @@ class TimetableRepositoryTest {
       graph,
       timetableRepository,
       ConstantsForTests.SIMPLE_GTFS,
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       FAKE_FEED_ID
     );
 
@@ -98,7 +98,7 @@ class TimetableRepositoryTest {
       graph,
       timetableRepository,
       RESOURCE_LOADER.file("kcm_gtfs.zip"),
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       null
     );
 

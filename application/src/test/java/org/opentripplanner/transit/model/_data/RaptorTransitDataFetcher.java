@@ -42,7 +42,7 @@ public class RaptorTransitDataFetcher {
     var states = t
       .tripTimes()
       .stream()
-      .map(tt -> tt.getRealTimeState().toString())
+      .map(TripTimesStateDecoder::summarizeFromTripTimes)
       .collect(Collectors.joining(","));
 
     var id = t.getTripPattern().getPattern().getId();

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking;
 
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.geometry.GeometryUtils;

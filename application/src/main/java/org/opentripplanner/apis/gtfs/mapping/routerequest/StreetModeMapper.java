@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.street.model.StreetMode;
 
@@ -28,7 +29,7 @@ public class StreetModeMapper {
    */
   public static StreetMode getStreetModeForRouting(List<StreetMode> modes) {
     if (modes.size() > 2) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "Only one or two modes can be specified for a leg, got: " + modes + "."
       );
     }
@@ -38,24 +39,24 @@ public class StreetModeMapper {
       // which don't contain the only specified mode as opposed to also returning legs which contain
       // only walking.
       if (!isAlwaysPresentInLeg(mode)) {
-        throw new IllegalArgumentException(
+        throw new InvalidInputException(
           "For the time being, " + mode + " needs to be combined with WALK mode for the same leg."
         );
       }
       return mode;
     }
     if (modes.contains(StreetMode.BIKE)) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "Bicycle can't be combined with other modes for the same leg: " + modes + "."
       );
     }
     if (modes.contains(StreetMode.CAR)) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "Car can't be combined with other modes for the same leg: " + modes + "."
       );
     }
     if (!modes.contains(StreetMode.WALK)) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "For the time being, WALK needs to be added as a mode for a leg when using " +
           modes +
           " and these two can't be used in the same leg."
@@ -91,12 +92,12 @@ public class StreetModeMapper {
     modes.add(journey.egress().mode());
     modes.add(journey.transfer().mode());
     if (modes.contains(StreetMode.BIKE) && modes.size() != 1) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "If BICYCLE is used for access, egress or transfer, then it should be used for all."
       );
     }
     if (modes.contains(StreetMode.CAR) && modes.size() != 1) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "If CAR is used for access, egress or transfer, then it should be used for all."
       );
     }

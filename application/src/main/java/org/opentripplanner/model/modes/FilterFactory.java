@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
+import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
@@ -22,11 +24,14 @@ class FilterFactory {
   /** Utility class, prevent instantiation */
   private FilterFactory() {}
 
-  static AllowTransitModeFilter of(MainAndSubMode mode) {
-    if (mode.subMode() == null) {
-      return new AllowMainModeFilter(mode.mainMode());
+  static AllowTransitModeFilter of(NarrowedTransitMode mode) {
+    if (mode.getReplacement() != ReplacementRequirement.IGNORED) {
+      return new AllowNarrowedTransitModeFilter(mode);
+    }
+    if (mode.getSubMode() == null) {
+      return new AllowMainModeFilter(mode.getMode());
     } else {
-      return new AllowMainAndSubModeFilter(mode);
+      return new AllowMainAndSubModeFilter(new MainAndSubMode(mode.getMode(), mode.getSubMode()));
     }
   }
 
@@ -37,7 +42,7 @@ class FilterFactory {
    *   <li>{@link AllowMainAndSubModeFilter}
    * </ul>
    */
-  static AllowTransitModeFilter create(Collection<MainAndSubMode> allowedModes) {
+  static AllowTransitModeFilter create(Collection<NarrowedTransitMode> allowedModes) {
     var filters = allowedModes.stream().distinct().map(FilterFactory::of).toList();
 
     if (filters.isEmpty()) {
@@ -92,6 +97,24 @@ class FilterFactory {
         result.add(new AllowMainAndSubModesFilter(subModeFilters));
       }
       // esle ignore empty
+    }
+
+    var narrowedModeFiltersByMainMode = stream(map, AllowNarrowedTransitModeFilter.class).collect(
+      Collectors.groupingBy(AllowNarrowedTransitModeFilter::mainMode)
+    );
+
+    for (TransitMode mainMode : narrowedModeFiltersByMainMode.keySet()) {
+      if (mainModes.contains(mainMode)) {
+        continue;
+      }
+
+      var narrowedModeFilters = narrowedModeFiltersByMainMode.get(mainMode);
+
+      if (narrowedModeFilters.size() == 1) {
+        result.addAll(narrowedModeFilters);
+      } else if (narrowedModeFilters.size() > 1) {
+        result.add(new AllowNarrowedTransitModesFilter(narrowedModeFilters));
+      }
     }
 
     if (result.size() == 1) {

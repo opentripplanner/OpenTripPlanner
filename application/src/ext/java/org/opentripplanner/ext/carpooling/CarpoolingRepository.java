@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling;
 
 import java.util.Collection;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 
 /**
@@ -39,4 +40,9 @@ public interface CarpoolingRepository {
    * @throws IllegalArgumentException if trip is null
    */
   void upsertCarpoolTrip(CarpoolTrip trip);
+
+  /**
+   * Removes the carpool trip with the given id. No-op if no trip with this id exists.
+   */
+  void removeCarpoolTrip(FeedScopedId id);
 }

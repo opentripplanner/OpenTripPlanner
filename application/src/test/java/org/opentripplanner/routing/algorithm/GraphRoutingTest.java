@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -438,7 +438,7 @@ public abstract class GraphRoutingTest {
       List<VehicleParkingEntranceCreator> entrances,
       String... tags
     ) {
-      var vehicleParking = VehicleParking.builder()
+      var vehicleParking = VehicleParking.of()
         .id(id(id))
         .coordinate(new WgsCoordinate(y, x))
         .bicyclePlaces(bicyclePlaces)

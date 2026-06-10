@@ -95,9 +95,9 @@
   <logger name="com.azure" level="warn" />
 
   <!--Log errors in GraphQL data fetchers. This is disabled by default.
-     Set it to "warn" to log these errors.
+     Set it to "info" to log client bad requests and server errors or "warn" to log only server errors.
   -->
-  <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
+  <logger name="org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler" level="off" />
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
   <logger name="org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter" level="info" />

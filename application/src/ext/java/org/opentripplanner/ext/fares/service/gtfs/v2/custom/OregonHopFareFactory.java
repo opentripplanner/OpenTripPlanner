@@ -11,7 +11,7 @@ import org.opentripplanner.ext.fares.model.FareTransferRuleBuilder;
 import org.opentripplanner.ext.fares.model.TimeLimitType;
 import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v2.GtfsFaresV2Service;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class OregonHopFareFactory extends DefaultFareServiceFactory {
+public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
   static final FeedScopedId TRIMET_ADULT_SINGLE_RIDE = trimetId("TRIMET_ADULT_SINGLE_RIDE");
   static final FeedScopedId TRIMET_HC_SINGLE_RIDE = trimetId("TRIMET_HC_SINGLE_RIDE");
@@ -43,7 +43,7 @@ public class OregonHopFareFactory extends DefaultFareServiceFactory {
   static final FeedScopedId LG_CTRAN_REGIONAL = ctranId("REGIONAL");
   static final FeedScopedId LG_CTRAN_EXPRESS = ctranId("EXPRESS");
   static final FeedScopedId LG_CTRAN_LOCAL = ctranId("LOCAL");
-  static final FeedScopedId LG_CTRAN_FLEX_LOCAL = FeedScopedId.parse("CTRAN_FLEX:LOCAL");
+  static final FeedScopedId LG_CTRAN_FLEX_LOCAL = FeedScopedId.of("CTRAN_FLEX", "LOCAL");
 
   // rider categories
   static final RiderCategory CATEGORY_YOUTH = RiderCategory.of(ctranId("YOUTH"))
@@ -446,6 +446,7 @@ public class OregonHopFareFactory extends DefaultFareServiceFactory {
       .withTransferRules(this.fareTransferRules)
       .withStopAreas(this.stopAreas)
       .withServiceIds(this.serviceDates)
+      .withFreeTransferMatchPredicate(TransferRules.transferEligibility())
       .build();
 
     return new GtfsFaresService(fareService, faresV2Service);

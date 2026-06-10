@@ -2,24 +2,40 @@ package org.opentripplanner.osm.model;
 
 public class RelationBuilder {
 
-  private final OsmRelation relation = new OsmRelation();
+  private final OsmRelationBuilder builder = OsmRelation.of();
 
   public static RelationBuilder ofMultiPolygon() {
     var builder = new RelationBuilder();
-    builder.relation.addTag("type", "multipolygon");
-    builder.relation.addTag("highway", "pedestrian");
+    builder.withTag("type", "multipolygon");
+    builder.withTag("highway", "pedestrian");
     return builder;
   }
 
   public static RelationBuilder ofTurnRestriction(String restrictionType) {
+    return ofType("restriction").withTag("restriction", restrictionType);
+  }
+
+  public static RelationBuilder ofStopArea() {
+    return ofType("public_transport").withTag("public_transport", "stop_area");
+  }
+
+  public static RelationBuilder ofType(String type) {
     var builder = new RelationBuilder();
-    builder.relation.addTag("type", "restriction");
-    builder.relation.addTag("restriction", restrictionType);
+    builder.builder.addTag("type", type);
     return builder;
+  }
+
+  public RelationBuilder withTag(String key, String value) {
+    builder.addTag(key, value);
+    return this;
   }
 
   public RelationBuilder withWayMember(long id, String role) {
     return withMember(id, role, OsmMemberType.WAY);
+  }
+
+  public RelationBuilder withNodeMember(long id) {
+    return withMember(id, "", OsmMemberType.NODE);
   }
 
   public RelationBuilder withNodeMember(long id, String role) {
@@ -27,7 +43,7 @@ public class RelationBuilder {
   }
 
   public OsmRelation build() {
-    return relation;
+    return builder.build();
   }
 
   private RelationBuilder withMember(long id, String role, OsmMemberType osmMemberType) {
@@ -35,7 +51,7 @@ public class RelationBuilder {
     member.setRole(role);
     member.setType(osmMemberType);
     member.setRef(id);
-    relation.addMember(member);
+    builder.addMember(member);
     return this;
   }
 }

@@ -14,7 +14,7 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
-import static org.opentripplanner.raptor.api.request.RaptorViaLocation.via;
+import static org.opentripplanner.raptor.api.request.via.RaptorViaLocation.viaVisit;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -27,7 +27,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 
 /**
@@ -104,7 +104,7 @@ class J02_ViaStopSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder.searchParams().addViaLocation(via("C").addViaStop(STOP_C).build());
+    requestBuilder.searchParams().addViaLocation(viaVisit("C").addStop(STOP_C).build());
 
     var result = raptorService.route(requestBuilder.build(), data);
 
@@ -140,7 +140,7 @@ class J02_ViaStopSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder.searchParams().addViaLocation(via("C").addViaStop(STOP_C).build());
+    requestBuilder.searchParams().addViaLocation(viaVisit("C").addStop(STOP_C).build());
 
     var result = raptorService.route(requestBuilder.build(), data);
 
@@ -357,7 +357,9 @@ class J02_ViaStopSearchTest {
     requestBuilder
       .searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
-      .addViaLocations(List.of(RaptorViaLocation.via("B", minWaitTime).addViaStop(STOP_B).build()))
+      .addViaLocations(
+        List.of(RaptorViaLocation.viaVisit("B", minWaitTime).addStop(STOP_B).build())
+      )
       .addEgressPaths(walk(STOP_C, D30_s));
 
     // We expect to bard the second trip at 0:05:45, since the minWaitTime is 45s and the
@@ -370,8 +372,8 @@ class J02_ViaStopSearchTest {
   }
 
   private static RaptorViaLocation viaLocation(String label, int... stops) {
-    var builder = RaptorViaLocation.via(label);
-    Arrays.stream(stops).forEach(builder::addViaStop);
+    var builder = RaptorViaLocation.viaVisit(label);
+    Arrays.stream(stops).forEach(builder::addStop);
     return builder.build();
   }
 }

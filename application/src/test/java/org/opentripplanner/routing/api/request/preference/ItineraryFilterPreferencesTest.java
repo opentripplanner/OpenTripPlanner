@@ -149,7 +149,7 @@ class ItineraryFilterPreferencesTest {
         "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
         "parkAndRideDurationRatio: 0.44, " +
         "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
-        "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
+        "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.3 t, " +
         "filterDirectFlexBySearchWindow" +
         "}",
       subject.toString()

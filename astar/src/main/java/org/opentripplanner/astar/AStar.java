@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.BinHeap;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -17,6 +18,7 @@ import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.spi.StatisticsCallback;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.utils.time.DateUtils;
 import org.slf4j.Logger;
@@ -34,16 +36,27 @@ public class AStar<
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-  private static final boolean VERBOSE = LOG.isDebugEnabled();
-
   private final boolean arriveBy;
-  private final Set<Vertex> fromVertices;
-  private final Set<Vertex> toVertices;
+  private final Set<Vertex> initialVertices;
+
+  @Nullable
+  private final Set<Vertex> goalVertices;
+
+  @Nullable
   private final RemainingWeightHeuristic<State> heuristic;
+
   private final Runnable preSearchHook;
+
+  @Nullable
   private final SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
+
+  @Nullable
   private final SearchTerminationStrategy<State> terminationStrategy;
+
+  @Nullable
   private final TraverseVisitor<State, Edge> traverseVisitor;
+
+  private final StatisticsCallback<Vertex> statisticsCallback;
   private final Duration timeout;
 
   private final ShortestPathTree<State, Edge, Vertex> spt;
@@ -53,30 +66,44 @@ public class AStar<
   private State u;
   private int nVisited;
 
+  /// Create an AStar search
+  /// @param initialStates The initial states to start the search from.
+  /// @param arriveBy If set to true we will do a backwards search by traversing the incoming edges from each vertex.
+  /// @param dominanceFunction A dominance function that determines which states we should keep during the search.
+  /// @param goalVertices The search stops once the first goal vertex is reached.
+  /// @param heuristic An astar heuristic that estimates a lower bound of the weight to the destination. If set to null the search will be a basic Dijkstra search.
+  /// @param timeout A timeout that exits the search.
+  /// @param preSearchHook A runnable that is run before the search starts.
+  /// @param statisticsCallback A pluggable callback for logging metrics.
   AStar(
-    RemainingWeightHeuristic<State> heuristic,
-    Runnable preSearchHook,
-    SkipEdgeStrategy<State, Edge> skipEdgeStrategy,
-    TraverseVisitor<State, Edge> traverseVisitor,
+    Collection<State> initialStates,
     boolean arriveBy,
-    Set<Vertex> fromVertices,
-    Set<Vertex> toVertices,
-    SearchTerminationStrategy<State> terminationStrategy,
     DominanceFunction<State> dominanceFunction,
+    @Nullable Set<Vertex> goalVertices,
+    @Nullable RemainingWeightHeuristic<State> heuristic,
+    @Nullable TraverseVisitor<State, Edge> traverseVisitor,
+    @Nullable SkipEdgeStrategy<State, Edge> skipEdgeStrategy,
+    @Nullable SearchTerminationStrategy<State> terminationStrategy,
     Duration timeout,
-    Collection<State> initialStates
+    Runnable preSearchHook,
+    StatisticsCallback<Vertex> statisticsCallback
   ) {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
     this.traverseVisitor = traverseVisitor;
-    this.fromVertices = fromVertices;
-    this.toVertices = toVertices;
+    this.initialVertices = initialStates
+      .stream()
+      .map(AStarState::getVertex)
+      .collect(Collectors.toSet());
+    this.goalVertices = goalVertices;
     this.arriveBy = arriveBy;
     this.terminationStrategy = terminationStrategy;
     this.timeout = Objects.requireNonNull(timeout);
 
-    this.spt = new ShortestPathTree<>(dominanceFunction);
-    this.preSearchHook = preSearchHook;
+    this.spt = new ShortestPathTree<>(Objects.requireNonNull(dominanceFunction));
+
+    this.preSearchHook = Objects.requireNonNull(preSearchHook);
+    this.statisticsCallback = Objects.requireNonNull(statisticsCallback);
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);
@@ -89,13 +116,13 @@ public class AStar<
     }
   }
 
-  ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
+  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     runSearch();
 
     return spt;
   }
 
-  List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
+  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     runSearch();
 
     return targetAcceptedStates
@@ -106,12 +133,6 @@ public class AStar<
   }
 
   private boolean iterate() {
-    // print debug info
-    if (VERBOSE) {
-      double w = pq.peek_min_key();
-      LOG.debug("pq min key = {}", w);
-    }
-
     // get the lowest-weight state in the queue
     u = pq.extract_min();
 
@@ -131,10 +152,6 @@ public class AStar<
 
     Vertex u_vertex = u.getVertex();
 
-    if (VERBOSE) {
-      LOG.debug("   vertex {}", u_vertex);
-    }
-
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
     for (Edge edge : edges) {
       if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
@@ -151,24 +168,12 @@ public class AStar<
           traverseVisitor.visitEdge(edge);
         }
 
-        double remaining_w = heuristic.estimateRemainingWeight(v);
+        double remaining_w = heuristic != null ? heuristic.estimateRemainingWeight(v) : 0;
 
         if (remaining_w < 0 || Double.isInfinite(remaining_w)) {
           continue;
         }
         double estimate = v.getWeight() + remaining_w;
-
-        if (VERBOSE) {
-          LOG.debug("      edge {}", edge);
-          LOG.debug(
-            "      {} -> {}(w) + {}(heur) = {} vert = {}",
-            u.getWeight(),
-            v.getWeight(),
-            remaining_w,
-            estimate,
-            v.getVertex()
-          );
-        }
 
         // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
         if (spt.add(v)) {
@@ -188,6 +193,7 @@ public class AStar<
     // execute the hook before the search begins so that it can be checked if the request
     // has already timed out.
     preSearchHook.run();
+    statisticsCallback.searchStarted();
     long abortTime = DateUtils.absoluteTimeout(timeout);
 
     /* the core of the A* algorithm */
@@ -196,8 +202,8 @@ public class AStar<
        * Terminate based on timeout. We don't check the termination on every round, as it is
        * expensive to fetch the current time, compared to just running one more round.
        */
-      if (timeout != null && nVisited % 100 == 0 && System.currentTimeMillis() > abortTime) {
-        LOG.warn("Search timeout. origin={} target={}", fromVertices, toVertices);
+      if (nVisited % 128 == 0 && System.currentTimeMillis() > abortTime) {
+        LOG.warn("Search timeout. origin={} target={}", initialVertices, goalVertices);
         break;
       }
 
@@ -219,14 +225,15 @@ public class AStar<
           break;
         }
       }
-      if (toVertices != null && toVertices.contains(u.getVertex()) && u.isFinal()) {
+      if (goalVertices != null && goalVertices.contains(u.getVertex()) && u.isFinal()) {
         targetAcceptedStates.add(u);
 
         // Break out of the search if we've found the requested number of paths.
-        // Currently,  we can only find one path per search.
-        LOG.debug("total vertices visited {}", nVisited);
+        // Currently, we can only find one path per search.
         break;
       }
     }
+
+    statisticsCallback.searchFinished(initialVertices, goalVertices, nVisited);
   }
 }

@@ -9,18 +9,18 @@ import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 public class CalendarServiceBuilderTest {
 
   private static final LocalDate D1 = LocalDate.of(2020, 11, 1);
   private static final LocalDate D2 = LocalDate.of(2020, 11, 2);
 
-  private static final FeedScopedId EXP_SID_1 = TimetableRepositoryForTest.id("S000001");
-  private static final FeedScopedId EXP_SID_2 = TimetableRepositoryForTest.id("S000002");
-  private static final FeedScopedId EXP_SID_3 = TimetableRepositoryForTest.id("S000003");
+  private static final FeedScopedId EXP_SID_1 = FeedScopedIdForTestFactory.id("S000001");
+  private static final FeedScopedId EXP_SID_2 = FeedScopedIdForTestFactory.id("S000002");
+  private static final FeedScopedId EXP_SID_3 = FeedScopedIdForTestFactory.id("S000003");
 
   @Test
   public void addDatesForAGivenService() {
@@ -64,8 +64,8 @@ public class CalendarServiceBuilderTest {
   @Test
   public void createServiceId() {
     CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
-    assertEquals(TimetableRepositoryForTest.id("S000001"), subject.createServiceId());
-    assertEquals(TimetableRepositoryForTest.id("S000002"), subject.createServiceId());
+    assertEquals(FeedScopedIdForTestFactory.id("S000001"), subject.createServiceId());
+    assertEquals(FeedScopedIdForTestFactory.id("S000002"), subject.createServiceId());
   }
 
   private void assertServiceDateExistInList(

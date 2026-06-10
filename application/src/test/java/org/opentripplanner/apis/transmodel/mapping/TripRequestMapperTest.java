@@ -23,9 +23,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
@@ -39,6 +39,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
@@ -210,11 +211,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = arguments("maxAccessEgressDurationForMode", duration);
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode WALK. The value 45m1s is not greater than the default 45m.",
+      "Invalid duration for mode WALK. The value 45m1s is greater than the default 45m.",
       ex.getMessage()
     );
   }
@@ -225,11 +226,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxAccessEgressDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode FLEXIBLE. The value 20m1s is not greater than the default 20m.",
+      "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
       ex.getMessage()
     );
   }
@@ -243,11 +244,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = arguments("maxDirectDurationForMode", duration);
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode WALK. The value 4h1s is not greater than the default 4h.",
+      "Invalid duration for mode WALK. The value 4h1s is greater than the default 4h.",
       ex.getMessage()
     );
   }
@@ -258,11 +259,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxDirectDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode FLEXIBLE. The value 20m1s is not greater than the default 20m.",
+      "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
       ex.getMessage()
     );
   }
@@ -405,6 +406,31 @@ public class TripRequestMapperTest implements PlanTestConstants {
     Map<String, Object> arguments = arguments(name, 101);
     var req = MAPPER.createRequest(executionContext(arguments));
     assertEquals(Duration.ofSeconds(101), req.preferences().transfer().slack());
+  }
+
+  @Test
+  void testOnBoardLocation() {
+    var fromWithOnBoardLocation = Map.of(
+      "serviceJourneyLocation",
+      Map.of(
+        "datedServiceJourneyReference",
+        Map.of(
+          "serviceJourneyOnServiceDate",
+          Map.of("serviceJourneyId", "F:T1", "serviceDate", LocalDate.of(2024, 11, 1))
+        ),
+        "pointInJourneyPatternReference",
+        Map.of("stopLocationId", "F:stop1")
+      )
+    );
+
+    var arguments = new HashMap<String, Object>();
+    arguments.put("from", fromWithOnBoardLocation);
+    arguments.put("to", Map.of("place", "F:Quay:2"));
+
+    var request = MAPPER.createRequest(executionContext(arguments));
+    var from = request.from();
+    assertNotNull(from);
+    assertNotNull(from.tripLocation());
   }
 
   @Test

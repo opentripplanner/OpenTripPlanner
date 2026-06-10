@@ -89,7 +89,7 @@ class StopMapper {
     );
 
     if (gtfsStop.getZoneId() != null) {
-      builder.addFareZones(
+      builder.addFareZone(
         FareZone.of(new FeedScopedId(gtfsStop.getId().getAgencyId(), gtfsStop.getZoneId())).build()
       );
     }

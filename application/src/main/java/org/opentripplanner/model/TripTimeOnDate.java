@@ -13,7 +13,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -274,12 +273,12 @@ public class TripTimeOnDate {
   }
 
   public boolean isRealtime() {
-    return !tripTimes.isScheduled() && !isNoDataStop();
+    return tripTimes.hasAnyUpdates() && !isNoDataStop();
   }
 
   public boolean isCancelledStop() {
     return (
-      tripTimes.isCancelledStop(stopPosition) ||
+      tripTimes.isCanceledStop(stopPosition) ||
       tripPattern.isBoardAndAlightAt(stopPosition, PickDrop.CANCELLED)
     );
   }
@@ -313,12 +312,6 @@ public class TripTimeOnDate {
   /// True if there is realtime information indicating that the trip has departed from the stop.
   public boolean hasDeparted() {
     return tripTimes.hasDeparted(stopPosition);
-  }
-
-  public RealTimeState getRealTimeState() {
-    return tripTimes.isNoDataStop(stopPosition)
-      ? RealTimeState.SCHEDULED
-      : tripTimes.getRealTimeState();
   }
 
   public OccupancyStatus getOccupancyStatus() {
@@ -358,7 +351,7 @@ public class TripTimeOnDate {
       return tripPattern.getBoardType(stopPosition);
     }
 
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopPosition)
+    return tripTimes.isCanceled() || tripTimes.isCanceledStop(stopPosition)
       ? PickDrop.CANCELLED
       : tripPattern.getBoardType(stopPosition);
   }
@@ -375,7 +368,7 @@ public class TripTimeOnDate {
       return tripPattern.getAlightType(stopPosition);
     }
 
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopPosition)
+    return tripTimes.isCanceled() || tripTimes.isCanceledStop(stopPosition)
       ? PickDrop.CANCELLED
       : tripPattern.getAlightType(stopPosition);
   }

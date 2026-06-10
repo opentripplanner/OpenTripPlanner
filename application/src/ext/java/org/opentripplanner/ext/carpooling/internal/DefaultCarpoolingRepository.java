@@ -29,4 +29,14 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
       LOG.debug("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     }
   }
+
+  @Override
+  public void removeCarpoolTrip(FeedScopedId id) {
+    CarpoolTrip removed = trips.remove(id);
+    if (removed != null) {
+      LOG.debug("Removed carpool trip {}", id);
+    } else {
+      LOG.debug("Tried to remove unknown carpool trip {}", id);
+    }
+  }
 }

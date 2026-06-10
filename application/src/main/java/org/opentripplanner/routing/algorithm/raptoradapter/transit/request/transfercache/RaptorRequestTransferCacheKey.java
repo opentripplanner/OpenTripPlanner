@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request.tran
 
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.BikeRequest;
@@ -11,16 +10,17 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.WalkRequest;
 import org.opentripplanner.street.search.request.WheelchairRequest;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class RaptorRequestTransferCacheKey {
 
-  private final List<List<Transfer>> transfersByStopIndex;
+  private final List<List<PathTransfer>> transfersByStopIndex;
   private final StreetSearchRequest request;
   private final StreetRelevantOptions options;
 
   public RaptorRequestTransferCacheKey(
-    List<List<Transfer>> transfersByStopIndex,
+    List<List<PathTransfer>> transfersByStopIndex,
     RouteRequest request
   ) {
     this.transfersByStopIndex = transfersByStopIndex;
@@ -28,7 +28,7 @@ class RaptorRequestTransferCacheKey {
     this.options = new StreetRelevantOptions(this.request);
   }
 
-  public List<List<Transfer>> transfersByStopIndex() {
+  public List<List<PathTransfer>> transfersByStopIndex() {
     return transfersByStopIndex;
   }
 

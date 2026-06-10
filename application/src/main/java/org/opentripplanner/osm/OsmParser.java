@@ -9,15 +9,16 @@ import java.util.Objects;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.model.OsmMemberType;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmNodeBuilder;
 import org.opentripplanner.osm.model.OsmRelation;
+import org.opentripplanner.osm.model.OsmRelationBuilder;
 import org.opentripplanner.osm.model.OsmRelationMember;
-import org.opentripplanner.osm.model.OsmTag;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWayBuilder;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
  *
- * @since 0.4
  */
 class OsmParser extends BinaryParser {
 
@@ -63,17 +64,12 @@ class OsmParser extends BinaryParser {
     }
 
     for (Osmformat.Relation i : rels) {
-      OsmRelation tmp = new OsmRelation();
-      tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
+      OsmRelationBuilder builder = OsmRelation.of().withId(i.getId()).withOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
-        OsmTag tag = new OsmTag();
         String key = internalize(getStringById(i.getKeys(j)));
         String value = internalize(getStringById(i.getVals(j)));
-        tag.setK(key);
-        tag.setV(value);
-        tmp.addTag(tag);
+        builder.addTag(key, value);
       }
 
       long lastMid = 0;
@@ -97,10 +93,10 @@ class OsmParser extends BinaryParser {
           assert false;
         }
 
-        tmp.addMember(relMember);
+        builder.addMember(relMember);
       }
 
-      osmdb.addRelation(tmp);
+      osmdb.addRelation(builder.build());
     }
   }
 
@@ -116,9 +112,8 @@ class OsmParser extends BinaryParser {
       return;
     }
 
+    // because it's a hot loop we don't use the builder
     for (int i = 0; i < nodes.getIdCount(); i++) {
-      OsmNode tmp = new OsmNode();
-
       long lat = nodes.getLat(i) + lastLat;
       lastLat = lat;
       long lon = nodes.getLon(i) + lastLon;
@@ -128,29 +123,22 @@ class OsmParser extends BinaryParser {
       double latf = parseLat(lat);
       double lonf = parseLon(lon);
 
-      tmp.setId(id);
-      tmp.setOsmProvider(provider);
-      tmp.lat = latf;
-      tmp.lon = lonf;
-
+      var builder = OsmNode.of().withId(id).withOsmProvider(provider).withLatLon(latf, lonf);
       // If empty, assume that nothing here has keys or vals.
       if (nodes.getKeysValsCount() > 0) {
         while (nodes.getKeysVals(j) != 0) {
           int keyid = nodes.getKeysVals(j++);
           int valid = nodes.getKeysVals(j++);
 
-          OsmTag tag = new OsmTag();
           String key = internalize(getStringById(keyid));
           String value = internalize(getStringById(valid));
-          tag.setK(key);
-          tag.setV(value);
-          tmp.addTag(tag);
+          builder.withTag(key, value);
         }
         // Skip over the '0' delimiter.
         j++;
       }
 
-      osmdb.addNode(tmp);
+      osmdb.addNode(builder.build());
     }
   }
 
@@ -161,23 +149,18 @@ class OsmParser extends BinaryParser {
     }
 
     for (Osmformat.Node i : nodes) {
-      OsmNode tmp = new OsmNode();
-      tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
-      tmp.lat = parseLat(i.getLat());
-      tmp.lon = parseLon(i.getLon());
+      OsmNodeBuilder builder = OsmNode.of()
+        .withId(i.getId())
+        .withOsmProvider(provider)
+        .withLatLon(parseLat(i.getLat()), parseLon(i.getLon()));
 
       for (int j = 0; j < i.getKeysCount(); j++) {
         String key = internalize(getStringById(i.getKeys(j)));
-        // if handler.retain_tag(key) // TODO: filter tags
         String value = internalize(getStringById(i.getVals(j)));
-        OsmTag tag = new OsmTag();
-        tag.setK(key);
-        tag.setV(value);
-        tmp.addTag(tag);
+        builder.withTag(key, value);
       }
 
-      osmdb.addNode(tmp);
+      osmdb.addNode(builder.build());
     }
   }
 
@@ -188,26 +171,21 @@ class OsmParser extends BinaryParser {
     }
 
     for (Osmformat.Way i : ways) {
-      OsmWay tmp = new OsmWay();
-      tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
+      OsmWayBuilder builder = OsmWay.of().withId(i.getId()).withOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
-        OsmTag tag = new OsmTag();
         String key = internalize(getStringById(i.getKeys(j)));
         String value = internalize(getStringById(i.getVals(j)));
-        tag.setK(key);
-        tag.setV(value);
-        tmp.addTag(tag);
+        builder.withTag(key, value);
       }
 
       long lastId = 0;
       for (long j : i.getRefsList()) {
-        tmp.addNodeRef(j + lastId);
+        builder.addNodeRef(j + lastId);
         lastId = j + lastId;
       }
 
-      osmdb.addWay(tmp);
+      osmdb.addWay(builder.build());
     }
   }
 

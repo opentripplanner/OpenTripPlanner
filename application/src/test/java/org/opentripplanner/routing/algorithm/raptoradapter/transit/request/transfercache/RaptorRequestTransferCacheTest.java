@@ -6,16 +6,16 @@ import static org.junit.Assert.assertNotEquals;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 
 public class RaptorRequestTransferCacheTest {
 
   @Test
   public void testRaptorRequestTransferCacheKeyWithWheelchair() {
-    List<List<Transfer>> list = List.of();
+    List<List<PathTransfer>> list = List.of();
 
     RouteRequest base = builder()
       .withJourney(b -> b.withAllModes(StreetMode.WALK))
@@ -46,7 +46,7 @@ public class RaptorRequestTransferCacheTest {
 
   @Test
   public void testRaptorRequestTransferCacheKeyWithWalkMode() {
-    List<List<Transfer>> list = List.of();
+    List<List<PathTransfer>> list = List.of();
 
     // This is intentionally CAR in the beginning.
     RouteRequest base = builder()
@@ -76,7 +76,7 @@ public class RaptorRequestTransferCacheTest {
 
   @Test
   public void testRaptorRequestTransferCacheKeyWithBikeMode() {
-    List<List<Transfer>> list = List.of();
+    List<List<PathTransfer>> list = List.of();
 
     // This is intentionally CAR in the beginning.
     RouteRequest base = builder()
@@ -106,7 +106,7 @@ public class RaptorRequestTransferCacheTest {
 
   @Test
   public void testRaptorRequestTransferCacheKeyWithCarMode() {
-    List<List<Transfer>> list = List.of();
+    List<List<PathTransfer>> list = List.of();
 
     // This is intentionally WALK in the beginning.
     RouteRequest base = builder()
@@ -136,7 +136,7 @@ public class RaptorRequestTransferCacheTest {
 
   @Test
   public void testRaptorRequestTransferCacheKeyWithTurnReluctance() {
-    List<List<Transfer>> list = List.of();
+    List<List<PathTransfer>> list = List.of();
 
     RouteRequest base = builder()
       .withJourney(b -> b.withAllModes(StreetMode.WALK))

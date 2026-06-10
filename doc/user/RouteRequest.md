@@ -29,13 +29,13 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | nonpreferredTransferPenalty                                                                                  |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                                                 | *Optional* | `180`            |  2.0  |
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                             | *Optional* | `50`             |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                            | *Optional* | `300`            |  2.0  |
-| [relaxTransitGroupPriority](#rd_relaxTransitGroupPriority)                                                   |        `string`        | The relax function for transit-group-priority                                                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.5  |
+| [relaxTransitGroupPriority](#rd_relaxTransitGroupPriority)                                                   |        `string`        | The relax function for transit-group-priority                                                                                                            | *Optional* | `"0s + 1.0 t"`   |  2.5  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                                       | *Optional* |                  |  2.0  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                               | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                                | *Optional* | `0`              |  2.0  |
 | [transferSlack](#rd_transferSlack)                                                                           |       `duration`       | The extra time needed to make a safe transfer.                                                                                                           | *Optional* | `"PT2M"`         |  2.0  |
 | turnReluctance                                                                                               |        `double`        | Multiplicative factor on expected turning time.                                                                                                          | *Optional* | `1.0`            |  2.0  |
-| [unpreferredCost](#rd_unpreferredCost)                                                                       | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                                      | *Optional* | `"0s + 1.00 t"`  |  2.2  |
+| [unpreferredCost](#rd_unpreferredCost)                                                                       | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                                      | *Optional* | `"0s + 1.0 t"`   |  2.2  |
 | waitReluctance                                                                                               |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                                        | *Optional* | `1.0`            |  2.0  |
 | accessEgress                                                                                                 |        `object`        | Parameters for access and egress routing.                                                                                                                | *Optional* |                  |  2.4  |
 |    [maxDuration](#rd_accessEgress_maxDuration)                                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                                      | *Optional* | `"PT45M"`        |  2.1  |
@@ -45,7 +45,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [penalty](#rd_accessEgress_penalty)                                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                                | *Optional* |                  |  2.4  |
 |       FLEXIBLE                                                                                               |        `object`        | NA                                                                                                                                                       | *Optional* |                  |  2.4  |
 |          costFactor                                                                                          |        `double`        | A factor multiplied with the time-penalty to get the cost-penalty.                                                                                       | *Optional* | `0.0`            |  2.4  |
-|          timePenalty                                                                                         |     `time-penalty`     | Penalty added to the time of a path/leg.                                                                                                                 | *Optional* | `"0s + 0.00 t"`  |  2.4  |
+|          timePenalty                                                                                         |     `time-penalty`     | Penalty added to the time of a path/leg.                                                                                                                 | *Optional* | `"0s + 0.0 t"`   |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                                 | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                                        | *Optional* |                  |  2.0  |
 | bicycle                                                                                                      |        `object`        | Bicycle preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
 |    [boardCost](#rd_bicycle_boardCost)                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.                                                                          | *Optional* | `600`            |  2.0  |
@@ -78,7 +78,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [mountDismountCost](#rd_bicycle_walk_mountDismountCost)                                                |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                                 | *Optional* | `0`              |  2.0  |
 |       [mountDismountTime](#rd_bicycle_walk_mountDismountTime)                                                |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                                   | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                              | *Optional* | `5.0`            |  2.1  |
-|       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                                      | *Optional* | `1.33`           |  2.1  |
+|       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                                      | *Optional* | `1.35`           |  2.1  |
 |       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs, on top of the reluctance parameter.                                                        | *Optional* | `2.0`            |  2.3  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                                   | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                                         | *Optional* |                  |  2.0  |
 | car                                                                                                          |        `object`        | Car preferences.                                                                                                                                         | *Optional* |                  |  2.5  |
@@ -107,7 +107,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [allowedNetworks](#rd_car_rental_allowedNetworks)                                                      |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                                        | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_car_rental_bannedNetworks)                                                        |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                                     | *Optional* |                  |  2.1  |
 | [directTransitSearch](#rd_directTransitSearch)                                                               |        `object`        | Extend the search result with extra results using a direct transit search                                                                                | *Optional* |                  |  2.9  |
-|    [costRelaxFunction](#rd_directTransitSearch_costRelaxFunction)                                            | `cost-linear-function` | The generalized-cost window for which paths to include.                                                                                                  | *Optional* | `"15m + 1.50 t"` |  2.9  |
+|    [costRelaxFunction](#rd_directTransitSearch_costRelaxFunction)                                            | `cost-linear-function` | The generalized-cost window for which paths to include.                                                                                                  | *Optional* | `"15m + 1.5 t"`  |  2.9  |
 |    enabled                                                                                                   |        `boolean`       | Enable the direct transit search                                                                                                                         | *Optional* | `false`          |  2.9  |
 |    [extraAccessEgressReluctance](#rd_directTransitSearch_extraAccessEgressReluctance)                        |        `double`        | Add an extra cost factor to access/egress legs for these results                                                                                         | *Optional* | `1.0`            |  2.9  |
 |    [maxAccessEgressDuration](#rd_directTransitSearch_maxAccessEgressDuration)                                |       `duration`       | A limit on the duration of access/egress for the direct transit search                                                                                   | *Optional* |                  |  2.9  |
@@ -129,9 +129,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                                   | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                                        | *Optional* | `"1h + 2.0 t"`   |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                               |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                            | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)                 |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                                  | *Optional* | `false`          |  2.2  |
-|    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                                  | *Optional* | `"1m + 1.30 t"`  |  2.4  |
+|    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                                  | *Optional* | `"1m + 1.3 t"`   |  2.4  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                                       | *Optional* |                  |  2.1  |
-|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.50 t"` |  2.2  |
+|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.5 t"`  |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.2  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                         | `enum map of duration` | Limit direct route duration per street mode.                                                                                                             | *Optional* |                  |  2.2  |
 | scooter                                                                                                      |        `object`        | Scooter preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
@@ -167,7 +167,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    boardCost                                                                                                 |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.                       | *Optional* | `600`            |  2.0  |
 |    [reluctance](#rd_walk_reluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
 |    [safetyFactor](#rd_walk_safetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                            | *Optional* | `1.0`            |  2.2  |
-|    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                               | *Optional* | `1.33`           |  2.0  |
+|    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                               | *Optional* | `1.35`           |  2.0  |
 |    stairsReluctance                                                                                          |        `double`        | A multiplier to specify how bad walking on stairs is, on top of the reluctance parameter.                                                                | *Optional* | `2.0`            |  2.0  |
 |    [stairsTimeFactor](#rd_walk_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                                              | *Optional* | `3.0`            |  2.1  |
 |    escalator                                                                                                 |        `object`        | Escalator preferences.                                                                                                                                   | *Optional* |                  |  2.7  |
@@ -299,7 +299,7 @@ We return number of seconds that we are willing to wait for preferred route.
 
 <h3 id="rd_relaxTransitGroupPriority">relaxTransitGroupPriority</h3>
 
-**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.0 t"`   
 **Path:** /routingDefaults 
 
 The relax function for transit-group-priority
@@ -379,7 +379,7 @@ close to zero for everyday commuters and short distance searches in high-frequen
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>
 
-**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.0 t"`   
 **Path:** /routingDefaults 
 
 A cost function used to calculate penalty for an unpreferred route.
@@ -452,11 +452,11 @@ performance will be better.
 
 The default values are
 
-- `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
-- `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
-- `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
-- `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
-- `flexible` = (timePenalty: 10m + 1.30 t, costFactor: 1.30)
+- `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
+- `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
+- `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
+- `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.5)
+- `flexible` = (timePenalty: 10m + 1.3 t, costFactor: 1.3)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -513,11 +513,11 @@ If the optimization is set to `safe-streets` or `safest-streets`, or if `safety`
 in the triangle, the actual effect will further be affected by the safety of the cycle
 route.
 
-The effect of safety has changed between versions 2.8 and 2.9 by the removal of the
+The effect of safety has changed between versions 2.9 and 2.10 by the removal of the
 safety normalizer. Before the change, all the safety values were multiplied such that
 the safest way in the whole map would have an effective value of 1, and traversal on any
 ways which are not the safest in the whole map would further multiply the cost. Since
-version 2.9, this multiplication is not done and the values set in the
+version 2.10, this multiplication is not done and the values set in the
 [OSM Tag Mapper](osm/OsmTag.md) are used as-is, so it is now possible to decrease the
 effective reluctance if a safe route is present.
 
@@ -742,7 +742,7 @@ This feature is off by default!
 
 <h3 id="rd_directTransitSearch_costRelaxFunction">costRelaxFunction</h3>
 
-**Since version:** `2.9` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.50 t"`   
+**Since version:** `2.9` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.5 t"`   
 **Path:** /routingDefaults/directTransitSearch 
 
 The generalized-cost window for which paths to include.
@@ -949,7 +949,7 @@ Itineraries visiting the same set of stops and riding the exact same routes, dep
 
 <h3 id="rd_if_removeTransitWithHigherCostThanBestOnStreetOnly">removeTransitWithHigherCostThanBestOnStreetOnly</h3>
 
-**Since version:** `2.4` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"1m + 1.30 t"`   
+**Since version:** `2.4` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"1m + 1.3 t"`   
 **Path:** /routingDefaults/itineraryFilters 
 
 Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.
@@ -980,7 +980,7 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value (3000s)
 
 <h3 id="rd_if_transitGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
 
-**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.50 t"`   
+**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.5 t"`   
 **Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
 
 The base function used by the filter.

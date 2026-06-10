@@ -2,6 +2,7 @@ package org.opentripplanner.model.modes;
 
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -24,10 +25,14 @@ public class FilterCollection implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean match(TransitMode transitMode, SubMode netexSubMode) {
+  public boolean match(
+    TransitMode transitMode,
+    SubMode netexSubMode,
+    @Nullable Integer gtfsExtendedType
+  ) {
     // Performance is important here, do not use streams
     for (AllowTransitModeFilter it : filters) {
-      if (it.match(transitMode, netexSubMode)) {
+      if (it.match(transitMode, netexSubMode, gtfsExtendedType)) {
         return true;
       }
     }
@@ -37,5 +42,11 @@ public class FilterCollection implements AllowTransitModeFilter {
   @Override
   public boolean isModeSelective() {
     return filters.stream().anyMatch(AllowTransitModeFilter::isModeSelective);
+  }
+
+  public String toString() {
+    // must always give the same order so that it works in assertions, so sort
+    var filtersString = filters.stream().map(AllowTransitModeFilter::toString).sorted().toList();
+    return "FilterCollection" + filtersString;
   }
 }

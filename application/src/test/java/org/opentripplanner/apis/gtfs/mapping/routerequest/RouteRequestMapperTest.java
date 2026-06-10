@@ -32,10 +32,8 @@ class RouteRequestMapperTest {
     var defaultRequest = RouteRequest.defaultValue();
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
 
-    assertEquals(_RouteRequestTestContext.ORIGIN.x, routeRequest.from().lat);
-    assertEquals(_RouteRequestTestContext.ORIGIN.y, routeRequest.from().lng);
-    assertEquals(_RouteRequestTestContext.DESTINATION.x, routeRequest.to().lat);
-    assertEquals(_RouteRequestTestContext.DESTINATION.y, routeRequest.to().lng);
+    assertEquals(_RouteRequestTestContext.ORIGIN, routeRequest.from().getCoordinate());
+    assertEquals(_RouteRequestTestContext.DESTINATION, routeRequest.to().getCoordinate());
     assertEquals(testCtx.locale(), routeRequest.preferences().locale());
     assertEquals(defaultRequest.journey().wheelchair(), routeRequest.journey().wheelchair());
     assertEquals(defaultRequest.arriveBy(), routeRequest.arriveBy());
@@ -140,10 +138,10 @@ class RouteRequestMapperTest {
     );
     var env = testCtx.executionContext(stopLocationArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
-    assertEquals(FeedScopedId.parse(stopA), routeRequest.from().stopId);
-    assertEquals(originLabel, routeRequest.from().label);
-    assertEquals(FeedScopedId.parse(stopB), routeRequest.to().stopId);
-    assertEquals(destinationLabel, routeRequest.to().label);
+    assertEquals(FeedScopedId.parseStrict(stopA), routeRequest.from().stopId());
+    assertEquals(originLabel, routeRequest.from().label());
+    assertEquals(FeedScopedId.parseStrict(stopB), routeRequest.to().stopId());
+    assertEquals(destinationLabel, routeRequest.to().label());
   }
 
   @Test

@@ -91,9 +91,9 @@ class StopClusterMapper {
 
         return new LuceneStopCluster(
           primary.getId().toString(),
-          secondaryIds
+          secondaries
             .stream()
-            .map(id -> id.toString())
+            .map(id -> id.getId().toString())
             .toList(),
           names,
           codes,

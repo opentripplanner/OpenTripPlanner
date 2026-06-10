@@ -28,8 +28,4 @@ public interface ArchComponent {
   Module LOG_FRAMEWORK = Module.of(Package.of("org.slf4j"));
 
   Collection<Package> packages();
-
-  default Collection<String> packageIdentifiers() {
-    return packages().stream().map(Package::packageIdentifier).toList();
-  }
 }

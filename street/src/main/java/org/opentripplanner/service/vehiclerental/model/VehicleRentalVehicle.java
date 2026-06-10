@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
@@ -30,6 +31,8 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   private final boolean isReserved;
   private final boolean isDisabled;
   private final RentalVehicleFuel fuel;
+
+  @Nullable
   private final Instant availableUntil;
 
   public VehicleRentalVehicle() {
@@ -196,8 +199,8 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
-  public Instant availableUntil() {
-    return availableUntil;
+  public Optional<Instant> availableUntil() {
+    return Optional.ofNullable(availableUntil);
   }
 
   @Override

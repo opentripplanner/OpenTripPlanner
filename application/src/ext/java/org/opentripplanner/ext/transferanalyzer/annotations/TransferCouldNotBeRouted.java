@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
-import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -63,11 +62,6 @@ public class TransferCouldNotBeRouted implements DataImportIssue {
 
   @Override
   public Geometry getGeometry() {
-    return GeometryUtils.makeLineString(
-      List.of(
-        origin.getCoordinate().asJtsCoordinate(),
-        destination.getCoordinate().asJtsCoordinate()
-      )
-    );
+    return GeometryUtils.makeLineString(origin.getCoordinate(), destination.getCoordinate());
   }
 }

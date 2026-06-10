@@ -1,11 +1,13 @@
 package org.opentripplanner.model.plan;
 
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -37,6 +39,7 @@ public class TestTransitLegBuilder {
   Trip trip = Trip.of(id("t1")).withRoute(ROUTE).withServiceId(id("s1")).build();
   StopLocation from = new TestStopLocation(id("s1"));
   StopLocation to = new TestStopLocation(id("s2"));
+  List<StopLocation> intermediateStops = List.of();
 
   public TestTransitLegBuilder withStartTime(String startTime) {
     var time = LocalTime.parse(startTime);
@@ -75,6 +78,17 @@ public class TestTransitLegBuilder {
       .withGroupOfRoutes(List.of(GroupOfRoutes.of(id).build()))
       .build();
     return withRoute(route);
+  }
+
+  public TestTransitLegBuilder withNetwork(GroupOfRoutes network) {
+    return withNetwork(network.getId());
+  }
+
+  public TestTransitLegBuilder withIntermediateStops(FeedScopedId... stopIds) {
+    this.intermediateStops = Arrays.stream(stopIds)
+      .map(TestStopLocation::new)
+      .collect(Collectors.toUnmodifiableList());
+    return this;
   }
 
   public TestTransitLeg build() {

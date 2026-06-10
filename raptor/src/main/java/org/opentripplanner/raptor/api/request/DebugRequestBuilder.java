@@ -38,11 +38,6 @@ public class DebugRequestBuilder {
     this.logger = debug.logger();
   }
 
-  /** Read-only view to stops added sorted in ascending order. */
-  public List<Integer> stops() {
-    return stops.stream().sorted().collect(Collectors.toList());
-  }
-
   public DebugRequestBuilder withStops(Collection<Integer> stops) {
     this.stops.addAll(stops);
     return this;
@@ -50,13 +45,6 @@ public class DebugRequestBuilder {
 
   public DebugRequestBuilder withStops(int... stops) {
     return withStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
-  }
-
-  /**
-   * The list of stops for a given path to debug.
-   */
-  public List<Integer> path() {
-    return path;
   }
 
   public DebugRequestBuilder withPath(List<Integer> stopsInPath) {
@@ -69,10 +57,6 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public int debugPathFromStopIndex() {
-    return debugPathFromStopIndex;
-  }
-
   /**
    * Select the stop index where the debugging should start. It is the index of the stops in the
    * path list.
@@ -82,19 +66,11 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
-    return stopArrivalListener;
-  }
-
   public DebugRequestBuilder withStopArrivalListener(
     Consumer<DebugEvent<ArrivalView<?>>> listener
   ) {
     this.stopArrivalListener = listener;
     return this;
-  }
-
-  public Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener() {
-    return patternRideDebugListener;
   }
 
   public DebugRequestBuilder withPatternRideDebugListener(
@@ -104,19 +80,11 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener() {
-    return pathFilteringListener;
-  }
-
   public DebugRequestBuilder withPathFilteringListener(
     Consumer<DebugEvent<RaptorPath<?>>> listener
   ) {
     this.pathFilteringListener = listener;
     return this;
-  }
-
-  public DebugLogger logger() {
-    return logger;
   }
 
   public DebugRequestBuilder withLogger(DebugLogger logger) {

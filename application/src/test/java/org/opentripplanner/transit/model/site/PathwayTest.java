@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
@@ -16,13 +17,13 @@ class PathwayTest {
   private static final String ID = "1:pathway";
   private static final String NAME = "name";
   private static final PathwayMode MODE = PathwayMode.ESCALATOR;
-  private static final PathwayNode FROM = PathwayNode.of(TimetableRepositoryForTest.id("1:node"))
+  private static final PathwayNode FROM = PathwayNode.of(FeedScopedIdForTestFactory.id("1:node"))
     .withCoordinate(new WgsCoordinate(20, 30))
     .build();
   private static final RegularStop TO = TimetableRepositoryForTest.of().stop("1:stop").build();
   public static final int TRAVERSAL_TIME = 120;
 
-  private final Pathway subject = Pathway.of(TimetableRepositoryForTest.id(ID))
+  private final Pathway subject = Pathway.of(FeedScopedIdForTestFactory.id(ID))
     .withPathwayMode(MODE)
     .withSignpostedAs(NAME)
     .withFromStop(FROM)
@@ -64,7 +65,7 @@ class PathwayTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withSignpostedAs("X").build()));
     assertFalse(subject.sameAs(subject.copy().withReverseSignpostedAs("X").build()));
     assertFalse(subject.sameAs(subject.copy().withPathwayMode(PathwayMode.ELEVATOR).build()));

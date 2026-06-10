@@ -66,11 +66,6 @@ public record GraphIsland(
   }
 
   @Override
-  public Vertex getReferencedVertex() {
-    return island.getRepresentativeVertex();
-  }
-
-  @Override
   public Geometry getGeometry() {
     return island.getGeometry();
   }

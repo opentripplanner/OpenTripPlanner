@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class GroupOfStationsTest {
@@ -25,7 +26,7 @@ class GroupOfStationsTest {
     .build();
 
   private static final GroupOfStations SUBJECT = GroupOfStations.of(
-    TimetableRepositoryForTest.id(ID)
+    FeedScopedIdForTestFactory.id(ID)
   )
     .withName(NAME)
     .addChildStation(STATION)
@@ -55,7 +56,7 @@ class GroupOfStationsTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       SUBJECT.sameAs(

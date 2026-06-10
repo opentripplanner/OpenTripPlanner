@@ -3,9 +3,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapperTest.RequestFeature.TRANSIT_GROUP_PRIORITY;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapperTest.RequestFeature.VIA_PASS_THROUGH;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapperTest.RequestFeature.VIA_VISIT;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -13,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,7 +33,6 @@ import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.utils.collection.ListUtils;
 
 class RaptorRequestMapperTest {
 
@@ -115,9 +109,9 @@ class RaptorRequestMapperTest {
 
     var result = map(req.buildRequest());
 
-    assertTrue(result.searchParams().isVisitViaSearch());
+    assertTrue(result.searchParams().isViaSearch());
     assertEquals(
-      "[RaptorViaLocation{via Via A wait 13m : [(stop 0, 13m)]}]",
+      "[RaptorViaLocation{via-visit Via A : [(stop 0 [13m])]}]",
       result.searchParams().viaLocations().toString()
     );
   }
@@ -130,7 +124,6 @@ class RaptorRequestMapperTest {
 
     var result = map(req.buildRequest());
 
-    assertTrue(result.searchParams().isPassThroughSearch());
     assertEquals(
       "[RaptorViaLocation{pass-through Via A : [(stop " + STOP_A.getIndex() + ")]}]",
       result.searchParams().viaLocations().toString()
@@ -152,7 +145,7 @@ class RaptorRequestMapperTest {
 
     assertFalse(result.searchParams().viaLocations().isEmpty());
     assertEquals(
-      "[RaptorViaLocation{via Via coordinate wait 10m : [(stop 47 ~ 123, 10m10s)]}]",
+      "[RaptorViaLocation{via-visit Via coordinate : [(transfer 47 ~ 123 [10m10s C₁12])]}]",
       result.searchParams().viaLocations().toString()
     );
   }
@@ -169,79 +162,6 @@ class RaptorRequestMapperTest {
     var result = map(req.buildRequest());
 
     assertTrue(result.multiCriteria().transitPriorityCalculator().isPresent());
-  }
-
-  static List<Arguments> testViaAndTransitGroupPriorityCombinationsTestCases() {
-    return List.of(
-      // If ONE feature is requested, the same feature is expected
-      Arguments.of(
-        "VIA_PASS_THROUGH only",
-        List.of(VIA_PASS_THROUGH),
-        List.of(VIA_PASS_THROUGH),
-        null
-      ),
-      Arguments.of("VIA_VISIT only", List.of(VIA_VISIT), List.of(VIA_VISIT), null),
-      Arguments.of(
-        "TRANSIT_GROUP_PRIORITY only",
-        List.of(TRANSIT_GROUP_PRIORITY),
-        List.of(TRANSIT_GROUP_PRIORITY),
-        null
-      ),
-      Arguments.of(
-        "VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.",
-        List.of(VIA_VISIT, VIA_PASS_THROUGH),
-        List.of(),
-        "A mix of via-locations and pass-through is not allowed in this version."
-      ),
-      Arguments.of(
-        """
-        VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.
-        Other features are ignored.
-        """,
-        List.of(VIA_VISIT, VIA_PASS_THROUGH, TRANSIT_GROUP_PRIORITY),
-        List.of(),
-        "A mix of via-locations and pass-through is not allowed in this version."
-      ),
-      Arguments.of(
-        "VIA_PASS_THROUGH cannot be combined with other features, and other features are dropped",
-        List.of(VIA_PASS_THROUGH, TRANSIT_GROUP_PRIORITY),
-        List.of(VIA_PASS_THROUGH),
-        null
-      ),
-      Arguments.of(
-        "VIA_VISIT can be combined with TRANSIT_GROUP_PRIORITY",
-        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
-        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
-        null
-      )
-    );
-  }
-
-  @ParameterizedTest(name = "{0}.  {1}  =>  {2}")
-  @MethodSource("testViaAndTransitGroupPriorityCombinationsTestCases")
-  void testViaAndTransitGroupPriorityCombinations(
-    String ignore,
-    List<RequestFeature> requestedFeatures,
-    List<RequestFeature> expectedFeatures,
-    @Nullable String errorMessage
-  ) {
-    var builder = requestBuilder();
-
-    for (RequestFeature it : requestedFeatures) {
-      builder = setFeaturesOnRequest(builder, it);
-    }
-
-    if (errorMessage == null) {
-      var result = map(builder.buildRequest());
-
-      for (var feature : RequestFeature.values()) {
-        assertFeatureSet(feature, result, expectedFeatures.contains(feature));
-      }
-    } else {
-      var r = builder.buildRequest();
-      var ex = Assertions.assertThrows(IllegalArgumentException.class, () -> map(r));
-      assertEquals(errorMessage, ex.getMessage());
-    }
   }
 
   @Test
@@ -283,65 +203,8 @@ class RaptorRequestMapperTest {
     ).mapRaptorRequest();
   }
 
-  private static void assertFeatureSet(
-    RequestFeature feature,
-    RaptorRequest<?> result,
-    boolean expected
-  ) {
-    switch (feature) {
-      case VIA_VISIT:
-        if (expected) {
-          assertTrue(result.searchParams().isVisitViaSearch());
-          // One via location exist(no NPE), but it does not allow pass-through
-          assertEquals(
-            "RaptorViaLocation{via Via A : [(stop 0)]}",
-            result.searchParams().viaLocations().get(0).toString()
-          );
-        }
-        break;
-      case VIA_PASS_THROUGH:
-        if (expected) {
-          assertTrue(result.searchParams().isPassThroughSearch());
-          assertEquals(
-            "RaptorViaLocation{pass-through Via A : [(stop 0)]}",
-            result.searchParams().viaLocations().get(0).toString()
-          );
-        }
-        break;
-      case TRANSIT_GROUP_PRIORITY:
-        assertEquals(expected, result.multiCriteria().transitPriorityCalculator().isPresent());
-        if (expected) {
-          assertFalse(result.searchParams().isPassThroughSearch());
-        }
-        break;
-    }
-  }
-
   private static RouteRequestBuilder requestBuilder() {
     return RouteRequest.of().withFrom(FROM).withTo(TO);
-  }
-
-  private static RouteRequestBuilder setFeaturesOnRequest(
-    RouteRequestBuilder req,
-    RequestFeature feature
-  ) {
-    return switch (feature) {
-      case VIA_VISIT -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(VISIT_VIA_LOCATION))
-      );
-      case VIA_PASS_THROUGH -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
-      );
-      case TRANSIT_GROUP_PRIORITY -> req.withPreferences(p ->
-        p.withTransit(t -> t.withRelaxTransitGroupPriority(RELAX_TRANSIT_GROUP_PRIORITY))
-      );
-    };
-  }
-
-  enum RequestFeature {
-    VIA_VISIT,
-    VIA_PASS_THROUGH,
-    TRANSIT_GROUP_PRIORITY,
   }
 
   private static class DummyViaCoordinateTransferFactory implements ViaCoordinateTransferFactory {

@@ -36,6 +36,8 @@ public class TripInput {
   @Nullable
   private List<LocalDate> serviceDates = null;
 
+  private String shortName;
+
   @Nullable
   private I18NString headsign;
 
@@ -56,6 +58,7 @@ public class TripInput {
   private TripInput(String id, boolean isFlex) {
     this.id = id;
     this.isFlex = isFlex;
+    this.shortName = id;
   }
 
   public static TripInput of(String id) {
@@ -68,6 +71,10 @@ public class TripInput {
 
   public String id() {
     return id;
+  }
+
+  public String shortName() {
+    return shortName;
   }
 
   public List<StopTime> stopTimes(Trip trip) {

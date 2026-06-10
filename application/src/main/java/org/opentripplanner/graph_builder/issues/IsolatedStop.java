@@ -7,7 +7,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.OsmUrlGenerator;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.time.DurationUtils;
 
 public record IsolatedStop(TransitStopVertex vertex, Duration maxWalk) implements DataImportIssue {
@@ -26,11 +25,6 @@ public record IsolatedStop(TransitStopVertex vertex, Duration maxWalk) implement
   @Override
   public int getPriority() {
     return (int) maxWalk.toSeconds();
-  }
-
-  @Override
-  public Vertex getReferencedVertex() {
-    return vertex;
   }
 
   @Override

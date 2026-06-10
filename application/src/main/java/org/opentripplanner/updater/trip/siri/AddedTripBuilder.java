@@ -27,7 +27,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -261,15 +260,15 @@ class AddedTripBuilder {
     }
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      builder.cancelTrip();
-    } else {
-      builder.withRealTimeState(RealTimeState.ADDED);
+      builder.withCanceled();
     }
+    builder.withAdded();
 
     /* Validate */
     var tripOnServiceDate = TripOnServiceDate.of(tripOnServiceDateId)
       .withTrip(trip)
       .withServiceDate(serviceDate)
+      .withRealtimeExtraJourney(true)
       .withReplacementFor(replacedTrips)
       .build();
 
@@ -290,9 +289,9 @@ class AddedTripBuilder {
   }
 
   /**
-   * Method to create a Route. Commonly used to create a route if a real-time message
-   * refers to a route that is not in the transit model.
-   * If no name is given for the route, an empty string will be set as the name.
+   * Method to create a Route. Commonly used to create a route if a real-time message refers to a
+   * route that is not in the transit model. If no name is given for the route, an empty string will
+   * be set as the name.
    *
    * @return a new Route
    */
@@ -309,12 +308,10 @@ class AddedTripBuilder {
   }
 
   /**
-   * Attempt to find the agency to which this new trip belongs.
-   * The algorithm retrieves any route operated by the same operator as the one operating this new
-   * trip and resolves its agency.
-   * If no route with the same operator can be found, the algorithm falls back to retrieving the
-   * agency operating the replaced route.
-   * If none can be found the method returns null.
+   * Attempt to find the agency to which this new trip belongs. The algorithm retrieves any route
+   * operated by the same operator as the one operating this new trip and resolves its agency. If no
+   * route with the same operator can be found, the algorithm falls back to retrieving the agency
+   * operating the replaced route. If none can be found the method returns null.
    */
   @Nullable
   private Agency resolveAgency() {

@@ -149,7 +149,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   @Override
   public void teardown() {
-    client.disconnect();
+    if (client != null) {
+      client.disconnect();
+    }
   }
 
   @Override

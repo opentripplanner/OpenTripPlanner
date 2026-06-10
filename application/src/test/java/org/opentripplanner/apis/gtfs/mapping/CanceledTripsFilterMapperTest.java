@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -32,6 +34,34 @@ class CanceledTripsFilterMapperTest {
     var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
     assertTrue(request.includeModes().includeEverything());
     assertTrue(request.excludeModes().includeEverything());
+  }
+
+  @Test
+  void testNullExclude() {
+    // When no exclude is given, exclude will be null, which should not impact the filtering
+    var mode = TransitMode.BUS;
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("include", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
+    );
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertThat(request.filters()).hasSize(1);
+    assertNull(request.filters().getFirst().not());
+  }
+
+  @Test
+  void testNullInclude() {
+    // When no include is given, include will be null which should not impact the filtering
+    var mode = TransitMode.BUS;
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("exclude", List.of(Map.of("modes", List.of(TransitModeMapper.map(mode))))))
+    );
+    var environment = getEnvironment(args);
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+    assertThat(request.filters()).hasSize(1);
+    assertNull(request.filters().getFirst().select());
   }
 
   @Test
@@ -71,7 +101,7 @@ class CanceledTripsFilterMapperTest {
       List.of(Map.of("include", List.of()), Map.of("include", List.of()))
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals("Only one filter is allowed for now.", exception.getMessage());
@@ -104,7 +134,7 @@ class CanceledTripsFilterMapperTest {
       List.of(Map.of("include", List.of(Map.of("modes", List.of()))))
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals(

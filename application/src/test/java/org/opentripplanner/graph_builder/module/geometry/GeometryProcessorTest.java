@@ -2,11 +2,11 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.distance;
 import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.moveMeters;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -322,6 +322,27 @@ class GeometryProcessorTest {
     );
 
     assertLineStringWithinTolerance(expected, linestrings);
+  }
+
+  @Test
+  void tripWithoutShapeIdFallsBackToStraightLines() {
+    var builder = new TransitDataImportBuilder(REPO, NOOP);
+
+    // Trip with no shape_id at all
+    var trip = TimetableRepositoryForTest.trip("t").build();
+    var stops = List.of(STOP_A, STOP_B, STOP_C);
+    var stopTimes = IntStream.range(0, stops.size())
+      .mapToObj(index -> TEST_MODEL.stopTime(trip, index, stops.get(index)))
+      .toList();
+    builder.getStopTimesSortedByTrip().put(trip, stopTimes);
+
+    var processor = new GeometryProcessor(builder, 150, NOOP);
+    var linestrings = processor.createHopGeometries(trip);
+
+    assertLineStringWithinTolerance(
+      List.of(makeLineString(0, 0, 0, 0.1), makeLineString(0, 0.1, 0, 0.2)),
+      linestrings
+    );
   }
 
   @Test

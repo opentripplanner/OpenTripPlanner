@@ -24,6 +24,7 @@ Sections follow that describe particular settings in more depth.
 | [configVersion](#configVersion)                                                             |       `string`       | Deployment version of the *build-config.json*.                                                                                                                 | *Optional* |                                   |  2.1  |
 | [dataImportReport](#dataImportReport)                                                       |       `boolean`      | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)                         |       `double`       | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
+| [elevationTileCacheSizeMB](#elevationTileCacheSizeMB)                                       |       `integer`      | Memory budget in megabytes for the Imagen tile cache used during elevation processing.                                                                         | *Optional* | `100`                             |  2.10 |
 | embedRouterConfig                                                                           |       `boolean`      | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
 | [graph](#graph)                                                                             |         `uri`        | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                     |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
@@ -37,7 +38,6 @@ Sections follow that describe particular settings in more depth.
 | [osmCacheDataInMem](#osmCacheDataInMem)                                                     |       `boolean`      | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
 | [osmNaming](#osmNaming)                                                                     |        `enum`        | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
 | platformEntriesLinking                                                                      |       `boolean`      | Link unconnected entries to public transport platforms.                                                                                                        | *Optional* | `false`                           |  2.0  |
-| [readCachedElevations](#readCachedElevations)                                               |       `boolean`      | Whether to read cached elevation data.                                                                                                                         | *Optional* | `true`                            |  2.0  |
 | staticBikeParkAndRide                                                                       |       `boolean`      | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
 | staticParkAndRide                                                                           |       `boolean`      | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
 | stopConsolidationFile                                                                       |         `uri`        | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
@@ -46,8 +46,11 @@ Sections follow that describe particular settings in more depth.
 | [transitModelTimeZone](#transitModelTimeZone)                                               |      `time-zone`     | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                                     |      `duration`      | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                                                 |      `duration`      | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
-| [writeCachedElevations](#writeCachedElevations)                                             |       `boolean`      | Reusing elevation data from previous builds                                                                                                                    | *Optional* | `false`                           |  2.0  |
 | [boardingLocationTags](#boardingLocationTags)                                               |      `string[]`      | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
+| [cache](#cache)                                                                             |       `object`       | Configuration for the graph-build file cache.                                                                                                                  | *Optional* |                                   |  2.10 |
+|    [enabled](#cache_enabled)                                                                |       `boolean`      | Master switch for the graph-build cache.                                                                                                                       | *Optional* | `false`                           |  2.10 |
+|    [path](#cache_path)                                                                      |         `uri`        | Root directory for cache files.                                                                                                                                | *Optional* |                                   |  2.10 |
+|    [tasks](#cache_tasks)                                                                    |      `enum set`      | Which graph-build computations to cache between builds.                                                                                                        | *Optional* |                                   |  2.10 |
 | [dataOverlay](sandbox/DataOverlay.md)                                                       |       `object`       | Config for the DataOverlay Sandbox module                                                                                                                      | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                                                 |      `object[]`      | Specify parameters for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.2  |
 |       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)                             |       `double`       | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.                                         | *Optional* | `1.0`                             |  2.3  |
@@ -85,12 +88,12 @@ Sections follow that describe particular settings in more depth.
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                                     |       `regexp`       | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)                         |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
 | [osm](#osm)                                                                                 |      `object[]`      | Configure properties for a given OpenStreetMap feed.                                                                                                           | *Optional* |                                   |  2.2  |
-|       includeOsmSubwayEntrances                                                             |       `boolean`      | Whether to include subway entrances from the OSM data. Overrides the value specified in `osmDefaults`.                                                         | *Optional* | `false`                           |  2.7  |
+|       includeOsmStationEntrances                                                            |       `boolean`      | Whether to include station entrances from the OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* | `false`                           |  2.10 |
 |       [osmTagMapping](#osm_0_osmTagMapping)                                                 |        `enum`        | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.                                                  | *Optional* | `"default"`                       |  2.2  |
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       timeZone                                                                              |      `time-zone`     | The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* |                                   |  2.2  |
 | osmDefaults                                                                                 |       `object`       | Default properties for OpenStreetMap feeds.                                                                                                                    | *Optional* |                                   |  2.2  |
-|    includeOsmSubwayEntrances                                                                |       `boolean`      | Whether to include subway entrances from the OSM data.                                                                                                         | *Optional* | `false`                           |  2.7  |
+|    includeOsmStationEntrances                                                               |       `boolean`      | Whether to include station entrances from the OSM data.                                                                                                        | *Optional* | `false`                           |  2.10 |
 |    [osmTagMapping](#od_osmTagMapping)                                                       |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                                                 |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
 | [transferParametersForMode](#transferParametersForMode)                                     | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
@@ -260,6 +263,10 @@ OpenTripPlanner can "drape" the OSM street network over a digital elevation mode
 OTP to draw an elevation profile for the on-street portion of itineraries, and helps provide better
 routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs are usually supplied
 as rasters (regular grids of numbers) stored in image formats such as GeoTIFF.
+
+For guidance on preparing the DEM file itself — choosing a resolution, projection handling, tile
+layout, NoData flag, and compression — see [Preparing DEM Data](Preparing-DEM.md). This section
+covers only the `build-config.json` options.
 
 
 ### Geoid Difference
@@ -446,6 +453,19 @@ The distance between elevation samples in meters.
 
 The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
 
+<h3 id="elevationTileCacheSizeMB">elevationTileCacheSizeMB</h3>
+
+**Since version:** `2.10` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `100`   
+**Path:** / 
+
+Memory budget in megabytes for the Imagen tile cache used during elevation processing.
+
+Elevation sampling reads pixels from a tiled DEM through Imagen's tile cache. Sizing the
+cache to fit the DEM working set turns repeated tile decompressions into cache hits.
+Increase for large DEMs, lower for memory-constrained environments. The cache lives
+inside the JVM heap and must fit inside `-Xmx`.
+
+
 <h3 id="graph">graph</h3>
 
 **Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
@@ -529,18 +549,6 @@ data, and to `false` to read the stream from the source each time.
 
 A custom OSM namer to use.
 
-<h3 id="readCachedElevations">readCachedElevations</h3>
-
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
-**Path:** / 
-
-Whether to read cached elevation data.
-
-When set to true, the elevation module will attempt to read this file in
-order to reuse calculations of elevation data for various coordinate sequences instead of
-recalculating them all over again.
-
-
 <h3 id="streetGraph">streetGraph</h3>
 
 **Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
@@ -612,36 +620,6 @@ build(BUILD_DAY).
 To get an effectively unbounded value, use a very large period like `"-P100Y"`.
 
 
-<h3 id="writeCachedElevations">writeCachedElevations</h3>
-
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** / 
-
-Reusing elevation data from previous builds
-
-When set to true, the elevation module will create a file cache for calculated elevation data.
-Subsequent graph builds can reuse the data in this file.
-
-After building the graph, a file called `cached_elevations.obj` will be written to the cache
-directory. By default, this file is not written during graph builds. There is also a graph build
-parameter called `readCachedElevations` which is set to `true` by default.
-
-In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from
-the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden
-via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US
-states, the time it took with using this pre-downloaded and precalculated data became roughly 9
-minutes.
-
-The cached data is a lookup table where the coordinate sequences of respective street edges are
-used as keys for calculated data. It is assumed that all of the other input data except for the
-OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
-data is changed, or different configuration values for `elevationUnitMultiplier` or
-`includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data
-should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
-become stale and not include new OSM ways. Therefore, periodic update of this cached data is
-recommended.
-
-
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
 
 **Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -650,6 +628,71 @@ recommended.
 What OSM tags should be looked on for the source of matching stops to platforms and stops.
 
 [Detailed documentation](BoardingLocations.md)
+
+<h3 id="cache">cache</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configuration for the graph-build file cache.
+
+OTP can cache the results of expensive graph-build computations between builds. Both
+cached tasks can take a significant portion of total graph-build time; enabling the cache
+skips their computation on subsequent builds and can cut build time considerably when the
+same OSM and DEM files are reused.
+
+**When to enable:** any pipeline that rebuilds the graph repeatedly from the same OSM
+and elevation data (e.g. nightly GTFS-only updates).
+
+Cache files are named `<task>-cache-<version>.obj` (for example `elevation-cache-1.obj`).
+When OTP bumps the internal serialization version the old file is ignored automatically
+and a new one is written, so old versioned files can be deleted safely at any time.
+
+Caching is **disabled by default**. Set `enabled: true` to activate it.
+
+
+<h3 id="cache_enabled">enabled</h3>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /cache 
+
+Master switch for the graph-build cache.
+
+When `false` no cache files are read or written during graph builds.
+
+<h3 id="cache_path">path</h3>
+
+**Since version:** `2.10` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
+**Path:** /cache 
+
+Root directory for cache files.
+
+Path to the directory where cache files are stored. Defaults to the OTP base directory
+(the directory containing `build-config.json`) when not set.
+
+
+<h3 id="cache_tasks">tasks</h3>
+
+**Since version:** `2.10` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
+**Path:** /cache   
+**Enum values:** `elevation` | `visibility`
+
+Which graph-build computations to cache between builds.
+
+ - `elevation` Caches the elevation profile sampled for every street edge. The cache key is the encoded edge
+   geometry; OSM changes are handled automatically (new or modified edges cause a cache miss,
+   removed edges are omitted from the next save).
+   
+   **Delete the elevation cache when the DEM source file is replaced**, because edge geometries
+   are unchanged but the sampled height values would be stale.
+ - `visibility` Caches pre-computed visibility graphs for walkable OSM areas (parks, plazas, etc.). The cache
+   key is a hash of the OSM entity IDs and all polygon coordinates, so any geometry change
+   causes a cache miss automatically. Only entries accessed during a build are written back, so
+   deleted areas are pruned from the saved file automatically.
+   
+   **The visibility cache never needs to be deleted manually.**
+
+When not set, all tasks are enabled. Omit a task from the list to disable its cache.
 
 <h3 id="dem">dem</h3>
 
@@ -1345,6 +1388,9 @@ the centroid.
       "carsAllowedStopMaxTransferDuration" : "3h",
       "bikesAllowedStopMaxTransferDuration" : "1h"
     }
+  },
+  "cache" : {
+    "enabled" : true
   }
 }
 ```

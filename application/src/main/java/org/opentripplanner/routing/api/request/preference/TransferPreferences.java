@@ -115,7 +115,7 @@ public final class TransferPreferences implements Serializable {
 
   /**
    * Ideally maxTransfers should be set in the router config, not from the client. Instead, the
-   * client should use {@link #maxAdditionalTransfers)} instead to pass in the max number of
+   * client should use {@link #maxAdditionalTransfers} instead to pass in the max number of
    * additional/extra transfers relative to the best trip (with the fewest possible transfers)
    * within constraint of the other search parameters. This might be too complicated to explain to
    * the customer, so you might stick to the old limit, but that has side-effects where you might

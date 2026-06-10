@@ -3,6 +3,7 @@ package org.opentripplanner.api.parameter;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -163,5 +164,19 @@ public class QualifiedModeSet implements Serializable {
       sb.append(" ");
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    QualifiedModeSet that = (QualifiedModeSet) o;
+    return Objects.equals(qModes, that.qModes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(qModes);
   }
 }

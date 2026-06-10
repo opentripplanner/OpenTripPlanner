@@ -85,7 +85,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   public void getCandidateTripIndex() {
     setup(FORWARD);
     var r = subject.search(TRIP_TIME, STOP_POS_0);
-    assertEquals(0, r.tripIndex());
+    assertEquals(0, r.tripScheduleIndex());
   }
 
   @Test

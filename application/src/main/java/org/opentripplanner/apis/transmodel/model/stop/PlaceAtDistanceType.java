@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.transmodel.model.TransmodelPlaceType;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;

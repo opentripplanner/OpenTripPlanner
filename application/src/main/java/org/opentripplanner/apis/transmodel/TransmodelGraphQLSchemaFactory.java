@@ -46,6 +46,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.support.graphql.injectdoc.CustomDocumentation;
 import org.opentripplanner.apis.support.graphql.injectdoc.InjectCustomDocumentation;
@@ -57,6 +58,7 @@ import org.opentripplanner.apis.transmodel.model.framework.AuthorityType;
 import org.opentripplanner.apis.transmodel.model.framework.BrandingType;
 import org.opentripplanner.apis.transmodel.model.framework.EmissionType;
 import org.opentripplanner.apis.transmodel.model.framework.InfoLinkType;
+import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.MultilingualStringType;
 import org.opentripplanner.apis.transmodel.model.framework.NoticeType;
 import org.opentripplanner.apis.transmodel.model.framework.OperatorType;
@@ -80,6 +82,7 @@ import org.opentripplanner.apis.transmodel.model.plan.ElevationProfileStepType;
 import org.opentripplanner.apis.transmodel.model.plan.LegType;
 import org.opentripplanner.apis.transmodel.model.plan.PathGuidanceType;
 import org.opentripplanner.apis.transmodel.model.plan.PlanPlaceType;
+import org.opentripplanner.apis.transmodel.model.plan.RefetchTripPatternQuery;
 import org.opentripplanner.apis.transmodel.model.plan.RoutingErrorType;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternTimePenaltyType;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
@@ -117,13 +120,13 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.api.PlaceAtDistance;
+import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
@@ -133,7 +136,6 @@ import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,6 +168,7 @@ public class TransmodelGraphQLSchemaFactory {
   private final ServiceJourneyType serviceJourneyTypeFactory;
   private final DatedServiceJourneyType datedServiceJourneyTypeFactory;
   private final TripQuery tripQueryFactory;
+  private final RefetchTripPatternQuery refetchTripPatternQueryFactory;
   private final ViaTripQuery viaTripQueryFactory;
   private final GroupOfLinesType groupOfLinesTypeFactory;
   private final DatedServiceJourneyQuery datedServiceJourneyQueryFactory;
@@ -200,6 +203,7 @@ public class TransmodelGraphQLSchemaFactory {
     this.serviceJourneyTypeFactory = new ServiceJourneyType(idMapper);
     this.datedServiceJourneyTypeFactory = new DatedServiceJourneyType(idMapper);
     this.tripQueryFactory = new TripQuery(idMapper);
+    this.refetchTripPatternQueryFactory = new RefetchTripPatternQuery(idMapper);
     this.viaTripQueryFactory = new ViaTripQuery(idMapper);
     this.groupOfLinesTypeFactory = new GroupOfLinesType(idMapper);
     this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idMapper);
@@ -368,7 +372,7 @@ public class TransmodelGraphQLSchemaFactory {
       replacementForRelationType
     );
 
-    GraphQLOutputType timetabledPassingTime = TimetabledPassingTimeType.create(
+    var timetabledPassingTime = TimetabledPassingTimeType.create(
       bookingArrangementType,
       noticeType,
       quayType,
@@ -423,6 +427,7 @@ public class TransmodelGraphQLSchemaFactory {
 
     GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create();
     GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create();
+    GraphQLInputObjectType locationInputType = LocationInputType.create(dateTimeScalar);
 
     GraphQLFieldDefinition tripQuery = tripQueryFactory.create(
       routing,
@@ -430,7 +435,15 @@ public class TransmodelGraphQLSchemaFactory {
       tripType,
       durationPerStreetModeInput,
       penaltyForStreetMode,
-      dateTimeScalar
+      dateTimeScalar,
+      locationInputType
+    );
+
+    GraphQLFieldDefinition refetchTripPatternQuery = refetchTripPatternQueryFactory.create(
+      routing,
+      tripPatternType,
+      durationPerStreetModeInput,
+      locationInputType
     );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
@@ -442,7 +455,8 @@ public class TransmodelGraphQLSchemaFactory {
       viaTripType,
       viaLocationInputType,
       viaSegmentInputType,
-      dateTimeScalar
+      dateTimeScalar,
+      locationInputType
     );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType.newInputObject()
@@ -487,6 +501,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLObjectType queryType = GraphQLObjectType.newObject()
       .name("QueryType")
       .field(tripQuery)
+      .field(refetchTripPatternQuery)
       .field(viaTripQuery)
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -648,7 +663,7 @@ public class TransmodelGraphQLSchemaFactory {
               var ids = resolveIds(environment);
 
               if (environment.getArgument("name") != null) {
-                throw new IllegalArgumentException("Unable to combine other filters with ids");
+                throw new InvalidInputException("Unable to combine other filters with ids");
               }
 
               TransitService transitService = GqlUtil.getTransitService(environment);
@@ -783,8 +798,8 @@ public class TransmodelGraphQLSchemaFactory {
           .dataFetcher(environment -> {
             List<NearbyStop> stops;
             try {
-              stops = GqlUtil.getGraphFinder(environment)
-                .findClosestStops(
+              stops = GqlUtil.getNearbyStopFinder(environment)
+                .findNearbyStops(
                   new Coordinate(
                     environment.getArgument("longitude"),
                     environment.getArgument("latitude")
@@ -795,8 +810,7 @@ public class TransmodelGraphQLSchemaFactory {
                 .filter(
                   stopAtDistance ->
                     environment.getArgument("authority") == null ||
-                    stopAtDistance.stop
-                      .getId()
+                    stopAtDistance.stopId
                       .getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority"))
                 )
@@ -947,7 +961,7 @@ public class TransmodelGraphQLSchemaFactory {
             }
 
             List<PlaceAtDistance> places;
-            places = GqlUtil.getGraphFinder(environment).findClosestPlaces(
+            places = GqlUtil.getNearbyPlaceFinder(environment).findClosestPlaces(
               environment.getArgument("latitude"),
               environment.getArgument("longitude"),
               environment.getArgument("maximumDistance"),
@@ -1153,7 +1167,7 @@ public class TransmodelGraphQLSchemaFactory {
                 ).anyMatch(environment::containsArgument) ||
                 Boolean.TRUE.equals(environment.getArgument("flexibleOnly"))
               ) {
-                throw new IllegalArgumentException("Unable to combine other filters with ids");
+                throw new InvalidInputException("Unable to combine other filters with ids");
               }
 
               return GqlUtil.getTransitService(environment).getRoutes(ids);
@@ -1574,7 +1588,7 @@ public class TransmodelGraphQLSchemaFactory {
   private Stream<FeedScopedId> resolveIds(DataFetchingEnvironment env) {
     return Optional.ofNullable(env.<Collection<String>>getArgument("ids"))
       .stream()
-      .flatMap(ids -> ids.stream().filter(StringUtils::hasValue).map(idMapper::parse));
+      .flatMap(ids -> ids.stream().flatMap(id -> idMapper.parse(id).stream()));
   }
 
   private @Nullable List<FeedScopedId> toNullableIdList(@Nullable List<String> ids) {

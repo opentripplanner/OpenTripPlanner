@@ -221,7 +221,7 @@ class ResultPrinter {
         .orElse(0d);
 
       System.err.printf(
-        " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f  (σ=%.1f)%n",
+        " ==> %-" + labelMaxLen + "s : %s (μ=%4.1f, σ=%.1f)%n",
         label,
         values,
         avg,

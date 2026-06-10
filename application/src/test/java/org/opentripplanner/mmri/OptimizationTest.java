@@ -16,7 +16,7 @@ public class OptimizationTest extends GtfsTest {
 
   @Test
   public void test2a1() {
-    Itinerary itinerary = plan(+1388530860L, "2a1", "2a2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388530860L, "2a1", "2a2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
@@ -27,7 +27,7 @@ public class OptimizationTest extends GtfsTest {
 
   @Test
   public void test2a2() {
-    Itinerary itinerary = plan(+1388530980L, "2a1", "2a2", null, false, false, null, "", "", 1);
+    Itinerary itinerary = plan(+1388530980L, "2a1", "2a2", false, false, null, "", "", 1);
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 

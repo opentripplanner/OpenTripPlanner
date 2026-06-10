@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.Duration;
@@ -45,8 +45,6 @@ class DepartureToDepartureTimeLimitTest implements PlanTestConstants, FareTestCo
 
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
-
     var first = i1.legs().getFirst();
     var last = i1.legs().getLast();
     assertThat(result.offersForLeg(first)).containsExactly(
@@ -66,8 +64,6 @@ class DepartureToDepartureTimeLimitTest implements PlanTestConstants, FareTestCo
       .build();
 
     var result = SERVICE.calculateFares(i1);
-
-    assertThat(result.itineraryProducts()).isEmpty();
 
     var first = i1.legs().getFirst();
     var last = i1.legs().getLast();

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
@@ -13,46 +14,43 @@ import org.opentripplanner.street.model.StreetMode;
 public class TransitSnapshotTest extends SnapshotTestBase {
 
   static GenericLocation ptc = GenericLocation.fromStopId(
-    "Rose Quarter Transit Center",
-    "prt",
-    "79-tc"
+    new FeedScopedId("prt", "79-tc"),
+    "Rose Quarter Transit Center"
   );
 
-  static GenericLocation ps = GenericLocation.fromStopId("NE 12th & Couch", "prt", "6577");
+  static GenericLocation ps = GenericLocation.fromStopId(
+    new FeedScopedId("prt", "6577"),
+    "NE 12th & Couch"
+  );
 
-  static GenericLocation p0 = new GenericLocation(
-    "SE Stark    St. & SE 17th Ave. (P0)",
-    null,
+  static GenericLocation p0 = GenericLocation.fromCoordinate(
     45.519320,
-    -122.648567
+    -122.648567,
+    "SE Stark    St. & SE 17th Ave. (P0)"
   );
 
-  static GenericLocation p1 = new GenericLocation(
-    "SE Morrison St. & SE 17th Ave. (P1)",
-    null,
+  static GenericLocation p1 = GenericLocation.fromCoordinate(
     45.51726,
-    -122.64847
+    -122.64847,
+    "SE Morrison St. & SE 17th Ave. (P1)"
   );
 
-  static GenericLocation p2 = new GenericLocation(
-    "NW Northrup St. & NW 22nd Ave. (P2)",
-    null,
+  static GenericLocation p2 = GenericLocation.fromCoordinate(
     45.53122,
-    -122.69659
+    -122.69659,
+    "NW Northrup St. & NW 22nd Ave. (P2)"
   );
 
-  static GenericLocation p3 = new GenericLocation(
-    "NW Northrup St. & NW 24th Ave. (P3)",
-    null,
+  static GenericLocation p3 = GenericLocation.fromCoordinate(
     45.53100,
-    -122.70029
+    -122.70029,
+    "NW Northrup St. & NW 24th Ave. (P3)"
   );
 
-  static GenericLocation p4 = new GenericLocation(
-    "NE Thompson St. & NE 18th Ave. (P4)",
-    null,
+  static GenericLocation p4 = GenericLocation.fromCoordinate(
     45.53896,
-    -122.64699
+    -122.64699,
+    "NE Thompson St. & NE 18th Ave. (P4)"
   );
 
   @BeforeAll

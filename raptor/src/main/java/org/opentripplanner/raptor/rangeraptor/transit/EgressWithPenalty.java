@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import org.opentripplanner.raptor.api.model.AbstractAccessEgressDecorator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
  * This decorator will add the time penalty to the duration of the egress and adjust the

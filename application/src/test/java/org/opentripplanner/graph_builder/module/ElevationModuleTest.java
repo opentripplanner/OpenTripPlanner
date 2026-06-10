@@ -4,10 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
@@ -31,7 +35,7 @@ public class ElevationModuleTest {
    */
   @Test
   @Disabled
-  public void testSetElevationOnEdgesUsingS3BucketTiles() {
+  public void testSetElevationOnEdgesUsingS3BucketTiles() throws URISyntaxException {
     // create a graph with a StreetWithElevationEdge
     var graph = new Graph();
     OsmVertex from = new OsmVertex(-122.6932051, 45.5122964, 40513757);
@@ -90,9 +94,17 @@ public class ElevationModuleTest {
       .buildAndConnect();
 
     // create the elevation module
-    File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
+    var cacheDirectory = new DirectoryDataSource(
+      new File(ElevationModuleTest.class.getResource("ned").getFile()),
+      FileType.DEM
+    );
     DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
-    NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
+    var datumUrl = new URI("https://example.com");
+    NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(
+      cacheDirectory,
+      datumUrl,
+      awsTileSource
+    );
     ElevationModule elevationModule = new ElevationModule(gcf, graph);
 
     // build to graph to execute the elevation module

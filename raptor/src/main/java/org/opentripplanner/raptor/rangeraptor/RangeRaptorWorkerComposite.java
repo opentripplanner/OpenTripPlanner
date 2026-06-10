@@ -2,11 +2,11 @@ package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.support.RouterResultPathAggregator;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.composite.CompositeUtil;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
@@ -65,23 +65,23 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void applyStreetStopAccess() {
+  public void applyAccessArrivedOnStreet() {
     for (RangeRaptorWorker<T> child : children) {
-      child.applyStreetStopAccess();
+      child.applyAccessArrivedOnStreet();
     }
   }
 
   @Override
-  public void applyOnBoardStopAccess() {
+  public void applyAccessArrivedOnBoard() {
     for (RangeRaptorWorker<T> child : children) {
-      child.applyOnBoardStopAccess();
+      child.applyAccessArrivedOnBoard();
     }
   }
 
   @Override
-  public void applyOnBoardTripAccess(int iterationDepartureTime) {
+  public void applyAccessStartOnBoard() {
     for (RangeRaptorWorker<T> child : children) {
-      child.applyOnBoardTripAccess(iterationDepartureTime);
+      child.applyAccessStartOnBoard();
     }
   }
 
@@ -89,13 +89,6 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   public void routeTransit() {
     for (RangeRaptorWorker<T> child : children) {
       child.routeTransit();
-    }
-  }
-
-  @Override
-  public void routeTransitUsingOnBoardTripAccess() {
-    for (RangeRaptorWorker<T> child : children) {
-      child.routeTransitUsingOnBoardTripAccess();
     }
   }
 

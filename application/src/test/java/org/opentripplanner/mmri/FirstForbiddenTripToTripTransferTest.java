@@ -16,7 +16,7 @@ public class FirstForbiddenTripToTripTransferTest extends GtfsTest {
 
   @Test
   public void test2e3() {
-    Itinerary itinerary = plan(+1388530860L, "2e31", "2e36", null, false, false, null, "", "", 2);
+    Itinerary itinerary = plan(+1388530860L, "2e31", "2e36", false, false, null, "", "", 2);
 
     Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 

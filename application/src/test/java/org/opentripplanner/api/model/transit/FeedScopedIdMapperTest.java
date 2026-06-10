@@ -19,8 +19,8 @@ class FeedScopedIdMapperTest {
   private static class IdMapperTestImpl implements FeedScopedIdMapper {
 
     @Override
-    public FeedScopedId parse(String id) {
-      return new FeedScopedId("FIXED", id);
+    public Optional<FeedScopedId> parse(String id) {
+      return FeedScopedId.ofOptional("FIXED", id);
     }
 
     @Override

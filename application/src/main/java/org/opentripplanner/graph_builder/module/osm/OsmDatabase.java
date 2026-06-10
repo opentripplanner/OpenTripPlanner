@@ -29,13 +29,13 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
-import org.opentripplanner.osm.model.OsmTag;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.HashGridSpatialIndex;
@@ -119,6 +119,11 @@ public class OsmDatabase {
    */
   private final Multimap<OsmEntity, OsmNode> stopsInAreas = HashMultimap.create();
 
+  /**
+   * Set of all entrance nodes in stop areas, which will be treated as station entrances.
+   */
+  private final Set<OsmNode> entrancesInStopAreas = new HashSet<>();
+
   /*
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
    * with existing ones.
@@ -188,6 +193,10 @@ public class OsmDatabase {
 
   public Collection<OsmNode> getStopsInArea(OsmEntity areaParent) {
     return stopsInAreas.get(areaParent);
+  }
+
+  public boolean isEntranceInStopArea(OsmNode node) {
+    return entrancesInStopAreas.contains(node);
   }
 
   /**
@@ -530,7 +539,8 @@ public class OsmDatabase {
               continue;
             }
 
-            way.addNodeRef(ringSegment.nA.getId(), i + 1);
+            way = way.copy().insertNodeRef(ringSegment.nA.getId(), i + 1).build();
+            waysById.put(way.getId(), way);
 
             if (
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
@@ -549,7 +559,8 @@ public class OsmDatabase {
               continue;
             }
 
-            way.addNodeRef(ringSegment.nB.getId(), i + 1);
+            way = way.copy().insertNodeRef(ringSegment.nB.getId(), i + 1).build();
+            waysById.put(way.getId(), way);
 
             if (
               checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
@@ -561,7 +572,7 @@ public class OsmDatabase {
             break;
           } else {
             // create a node
-            splitNode = createVirtualNode(p.getCoordinate());
+            splitNode = createVirtualNode(way.getOsmProvider(), p.getCoordinate());
             nCreatedNodes++;
             LOG.debug(
               "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
@@ -574,7 +585,8 @@ public class OsmDatabase {
               ringSegment.nB,
               p
             );
-            way.addNodeRef(splitNode.getId(), i + 1);
+            way = way.copy().insertNodeRef(splitNode.getId(), i + 1).build();
+            waysById.put(way.getId(), way);
 
             /*
              * If we split the way, re-start the way segments loop as the newly created segments
@@ -660,11 +672,12 @@ public class OsmDatabase {
    * @param c The location of the node to create.
    * @return The created node.
    */
-  private OsmNode createVirtualNode(Coordinate c) {
-    OsmNode node = new OsmNode();
-    node.lon = c.x;
-    node.lat = c.y;
-    node.setId(virtualNodeId);
+  private OsmNode createVirtualNode(OsmProvider osmProvider, Coordinate c) {
+    OsmNode node = OsmNode.of()
+      .withId(virtualNodeId)
+      .withLatLon(c.y, c.x)
+      .withOsmProvider(osmProvider)
+      .build();
     virtualNodeId--;
     waysNodeIds.add(node.getId());
     nodesById.put(node.getId(), node);
@@ -759,8 +772,6 @@ public class OsmDatabase {
           innerWays.add(way);
         } else if (member.hasRoleOuter()) {
           outerWays.add(way);
-        } else {
-          LOG.warn("Unexpected role '{}' in multipolygon", member.getRole());
         }
       }
       processedAreas.add(relation);
@@ -806,19 +817,6 @@ public class OsmDatabase {
     }
   }
 
-  /**
-   * Handle route=bicycle relations. Copies their network type to all way members.
-   *
-   * @see "https://wiki.openstreetmap.org/wiki/Tag:route%3Dbicycle"
-   */
-  private void processBicycleRoute(OsmRelation relation) {
-    if (relation.isBicycleRoute()) {
-      // we treat networks without known network type like local networks
-      var network = relation.getTagOpt("network").orElse("lcn");
-      setNetworkForAllMembers(relation, network);
-    }
-  }
-
   private void setNetworkForAllMembers(OsmRelation relation, String key) {
     relation
       .getMembers()
@@ -828,7 +826,8 @@ public class OsmDatabase {
         // if it is an OSM way (rather than a node) and it doesn't already contain the tag
         // we add it
         if (way != null && isOsmWay && !way.hasTag(key)) {
-          way.addTag(key, "yes");
+          var updatedWay = way.copy().withTag(key, "yes").build();
+          waysById.put(updatedWay.getId(), updatedWay);
         }
       });
   }
@@ -936,38 +935,11 @@ public class OsmDatabase {
    * Handle route=road and route=bicycle relations.
    */
   private void processRoute(OsmRelation relation) {
-    for (OsmRelationMember member : relation.getMembers()) {
-      if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
-        continue;
-      }
-
-      OsmWay way = waysById.get(member.getRef());
-      if (way == null) {
-        continue;
-      }
-
-      if (relation.hasTag("name")) {
-        if (way.hasTag("otp:route_name")) {
-          way.addTag(
-            "otp:route_name",
-            addUniqueName(way.getTag("otp:route_name"), relation.getTag("name"))
-          );
-        } else {
-          way.addTag(new OsmTag("otp:route_name", relation.getTag("name")));
-        }
-      }
-      if (relation.hasTag("ref")) {
-        if (way.hasTag("otp:route_ref")) {
-          way.addTag(
-            "otp:route_ref",
-            addUniqueName(way.getTag("otp:route_ref"), relation.getTag("ref"))
-          );
-        } else {
-          way.addTag(new OsmTag("otp:route_ref", relation.getTag("ref")));
-        }
-      }
+    if (relation.isBicycleRoute()) {
+      // we treat networks without known network type like local networks
+      var network = relation.getTagOpt("network").orElse("lcn");
+      setNetworkForAllMembers(relation, network);
     }
-    processBicycleRoute(relation);
   }
 
   /**
@@ -988,8 +960,13 @@ public class OsmDatabase {
       switch (member.getType()) {
         case NODE -> {
           var node = nodesById.get(member.getRef());
-          if (node != null && (node.isEntrance() || node.isBoardingLocation())) {
-            platformNodes.add(node);
+          if (node != null) {
+            if (node.isPlatformAccess()) {
+              platformNodes.add(node);
+            }
+            if (node.isEntrance()) {
+              entrancesInStopAreas.add(node);
+            }
           }
         }
         case WAY -> {

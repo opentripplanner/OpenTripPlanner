@@ -9,13 +9,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.graph.Graph;
@@ -74,14 +75,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     List<TransferInfo> directTransfersTooLong = new ArrayList<>();
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
-    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
+    var straightLineNearbyStopFinder = new StraightLineNearbyStopFinder(
       timetableRepository.getSiteRepository()::findRegularStops
     );
     var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
-    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(
-      linkingContextFactory,
-      timetableRepository.getSiteRepository()::getRegularStop
-    );
+    var streetNearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     int stopsAnalyzed = 0;
 
@@ -92,20 +90,22 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
       /* Find nearby stops by euclidean distance */
       Coordinate c0 = originStopVertex.getCoordinate();
-      Map<RegularStop, NearbyStop> stopsEuclidean = nearbyStopFinderEuclidian
-        .findClosestStops(c0, radiusMeters)
+      Map<RegularStop, NearbyStop> stopsEuclidean = straightLineNearbyStopFinder
+        .findNearbyStops(c0, radiusMeters)
         .stream()
-        .filter(t -> t.stop instanceof RegularStop)
-        .collect(Collectors.toMap(t -> (RegularStop) t.stop, t -> t));
+        .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
+        .collect(Collectors.toMap(nearbyStop -> getRegularStop(nearbyStop.stopId), t -> t));
 
       Map<RegularStop, NearbyStop> stopsStreets = new HashMap<>();
       try {
         /* Find nearby stops by street distance */
-        nearbyStopFinderStreets
-          .findClosestStops(c0, radiusMeters * RADIUS_MULTIPLIER)
+        streetNearbyStopFinder
+          .findNearbyStops(c0, radiusMeters * RADIUS_MULTIPLIER)
           .stream()
-          .filter(t -> t.stop instanceof RegularStop)
-          .forEach(t -> stopsStreets.putIfAbsent((RegularStop) t.stop, t));
+          .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
+          .forEach(nearbyStop ->
+            stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId), nearbyStop)
+          );
       } catch (Exception ignored) {}
 
       RegularStop originStop = Objects.requireNonNull(
@@ -191,6 +191,10 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       directTransfersNotFound.size(),
       directTransfersTooLong.size()
     );
+  }
+
+  private RegularStop getRegularStop(FeedScopedId id) {
+    return timetableRepository.getSiteRepository().getRegularStop(id);
   }
 
   private static class TransferInfo {

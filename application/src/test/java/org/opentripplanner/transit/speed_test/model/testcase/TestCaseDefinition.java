@@ -30,9 +30,9 @@ public record TestCaseDefinition(
     return String.format(
       "#%s %s - via:%s - %s, %s - via:%s - %s, %s-%s(%s)",
       id,
-      fromPlace.label,
+      fromPlace.label(),
       viaLocation != null ? viaLocation.label() : null,
-      toPlace.label,
+      toPlace.label(),
       coordinateString(fromPlace),
       viaLocation != null ? coordinateString(viaLocation.coordinateLocation()) : null,
       coordinateString(toPlace),
@@ -59,6 +59,12 @@ public record TestCaseDefinition(
   }
 
   private String coordinateString(GenericLocation location) {
-    return ValueObjectToStringBuilder.of().addCoordinate(location.lat, location.lng).toString();
+    var coord = location.wgsCoordinate();
+    if (coord == null) {
+      return ValueObjectToStringBuilder.of().addCoordinate(null, null).toString();
+    }
+    return ValueObjectToStringBuilder.of()
+      .addCoordinate(coord.latitude(), coord.longitude())
+      .toString();
   }
 }

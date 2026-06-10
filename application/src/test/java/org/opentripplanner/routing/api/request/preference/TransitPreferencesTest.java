@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -21,7 +21,7 @@ class TransitPreferencesTest {
     TransitMode.AIRPLANE,
     2.1
   );
-  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("5m + 1.15 x");
+  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("5m + 1.2 x");
   private static final Duration D15_s = Duration.ofSeconds(15);
   private static final Duration D45_s = Duration.ofSeconds(45);
   private static final Duration D25_m = Duration.ofMinutes(25);
@@ -129,8 +129,8 @@ class TransitPreferencesTest {
         "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
         "reluctanceForMode: {AIRPLANE=2.1}, " +
         "otherThanPreferredRoutesPenalty: $350, " +
-        "unpreferredCost: 5m + 1.15 t, " +
-        "relaxTransitGroupPriority: 5m + 1.50 t, " +
+        "unpreferredCost: 5m + 1.2 t, " +
+        "relaxTransitGroupPriority: 5m + 1.5 t, " +
         "ignoreRealtimeUpdates, " +
         "includePlannedCancellations, " +
         "includeRealtimeCancellations, " +

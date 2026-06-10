@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
+import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
@@ -45,7 +45,7 @@ class GtfsGraphQLIndex {
 
     GraphQL graphQL = GraphQL.newGraphQL(requestContext.schema())
       .instrumentation(instrumentation)
-      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
+      .defaultDataFetcherExceptionHandler(new OtpDataFetcherExceptionHandler())
       .build();
 
     if (variables == null) {

@@ -42,7 +42,7 @@ class BackwardsEarlinessPropagationCancellationTest implements RealtimeTestConst
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
     assertEquals(
-      "UPDATED | A [ND] 10:00 10:00 | B [ND] 10:10 10:10 | C [C] 10:19 10:19 | D 10:19 10:19",
+      "U | A [ND] 10:00 10:00 | B [ND] 10:10 10:10 | C [C] 10:19 10:19 | D 10:19 10:19",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

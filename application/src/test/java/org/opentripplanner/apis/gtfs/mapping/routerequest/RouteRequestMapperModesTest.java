@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -67,7 +68,7 @@ class RouteRequestMapperModesTest {
     var bicycleRental = List.of("BICYCLE_RENTAL");
     modesArgs.put("modes", Map.ofEntries(entry("direct", bicycleRental)));
     var env = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
   }
@@ -106,7 +107,7 @@ class RouteRequestMapperModesTest {
       )
     );
     var rentalEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(rentalEnv, testCtx.context())
     );
 
@@ -119,7 +120,7 @@ class RouteRequestMapperModesTest {
       )
     );
     var bicycleWalkEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(bicycleWalkEnv, testCtx.context())
     );
   }
@@ -136,7 +137,7 @@ class RouteRequestMapperModesTest {
       )
     );
     var env = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
   }
@@ -182,21 +183,21 @@ class RouteRequestMapperModesTest {
     var empty = List.of();
     modesArgs.put("modes", Map.ofEntries(entry("direct", empty)));
     var directEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(directEnv, testCtx.context())
     );
 
     modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("access", empty)))));
     var accessEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(accessEnv, testCtx.context())
     );
 
     modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("egress", empty)))));
     var egressEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(egressEnv, testCtx.context())
     );
 
@@ -206,14 +207,14 @@ class RouteRequestMapperModesTest {
       Map.ofEntries(entry("transit", Map.ofEntries(entry("transfer", empty))))
     );
     var transferEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(transferEnv, testCtx.context())
     );
 
     modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("transit", empty)))));
     var transitEnv = testCtx.executionContext(modesArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(transitEnv, testCtx.context())
     );
   }

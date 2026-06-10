@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -179,6 +179,7 @@ public class TimetableRepositoryTestBuilder {
     var route = Optional.ofNullable(tripInput.route()).orElse(defaultRoute);
 
     var tripBuilder = Trip.of(id(tripInput.id()))
+      .withShortName(tripInput.shortName())
       .withRoute(route)
       .withHeadsign(tripInput.headsign())
       .withServiceId(serviceId)

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -49,11 +49,15 @@ public class SiteRepositoryTestBuilder {
   }
 
   public RegularStop stop(String id, Consumer<RegularStopBuilder> stopCustomizer) {
+    // Give each stop a unique coordinate
+    var coordinate = ANY_COORDINATE.moveEastMeters(
+      100 * siteRepositoryBuilder.regularStopsById().size()
+    );
     var builder = siteRepositoryBuilder
       .regularStop(id(id))
       .withName(new NonLocalizedString(id))
       .withCode(id)
-      .withCoordinate(ANY_COORDINATE);
+      .withCoordinate(coordinate);
     stopCustomizer.accept(builder);
     var stop = builder.build();
     siteRepositoryBuilder.withRegularStop(stop);

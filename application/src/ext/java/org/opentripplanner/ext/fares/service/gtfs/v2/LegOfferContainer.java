@@ -66,7 +66,7 @@ class LegOfferContainer {
    * one, this means that the currently existing one is worse than the proposed new one and
    * is removed.
    */
-  void addToLeg(TransitLeg leg, LegOffer legOffer) {
+  private void addToLeg(TransitLeg leg, LegOffer legOffer) {
     var legContainsItAlready = unlimitedTransferOffers
       .get(leg)
       .stream()

@@ -35,7 +35,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -381,11 +380,11 @@ public class TripTimesUpdaterTest {
 
     var updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
-    assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
+    assertTrue(updatedTripTimes.hasAnyUpdates());
     assertTrue(updatedTripTimes.isNoDataStop(0));
     assertFalse(updatedTripTimes.isNoDataStop(1));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertFalse(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.isNoDataStop(2));
     var updatedPickup = p.updatedPickup();
     var updatedDropoff = p.updatedDropoff();
@@ -476,10 +475,10 @@ public class TripTimesUpdaterTest {
 
     var updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
-    assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertTrue(updatedTripTimes.hasAnyUpdates());
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertFalse(updatedTripTimes.isCanceledStop(2));
     assertEquals(I18NString.of("new stop headsign"), updatedTripTimes.getHeadsign(0));
     assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(1));
     assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(2));
@@ -769,9 +768,9 @@ public class TripTimesUpdaterTest {
     assertEquals(0, updatedTripTimes.getDepartureDelay(0));
     assertEquals(-800, updatedTripTimes.getArrivalDelay(2));
     assertEquals(-800, updatedTripTimes.getDepartureDelay(2));
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertFalse(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
   }
@@ -810,9 +809,9 @@ public class TripTimesUpdaterTest {
     assertEquals(1000, updatedTripTimes.getDepartureDelay(0));
     assertEquals(0, updatedTripTimes.getArrivalDelay(2));
     assertEquals(0, updatedTripTimes.getDepartureDelay(2));
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertFalse(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
   }
@@ -880,9 +879,9 @@ public class TripTimesUpdaterTest {
     assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
     assertEquals(0, updatedTripTimes.getArrivalDelay(2));
     assertEquals(0, updatedTripTimes.getDepartureDelay(2));
-    assertTrue(updatedTripTimes.isCancelledStop(0));
-    assertFalse(updatedTripTimes.isCancelledStop(1));
-    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertTrue(updatedTripTimes.isCanceledStop(0));
+    assertFalse(updatedTripTimes.isCanceledStop(1));
+    assertFalse(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
   }
@@ -920,9 +919,9 @@ public class TripTimesUpdaterTest {
     assertEquals(0, updatedTripTimes.getDepartureDelay(0));
     assertEquals(700, updatedTripTimes.getArrivalDelay(1));
     assertEquals(700, updatedTripTimes.getDepartureDelay(1));
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertFalse(updatedTripTimes.isCancelledStop(1));
-    assertTrue(updatedTripTimes.isCancelledStop(2));
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertFalse(updatedTripTimes.isCanceledStop(1));
+    assertTrue(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
   }
@@ -968,14 +967,14 @@ public class TripTimesUpdaterTest {
     assertEquals(600, updatedTripTimes.getDepartureDelay(0));
     assertEquals(-1200, updatedTripTimes.getArrivalDelay(7));
     assertEquals(-1200, updatedTripTimes.getDepartureDelay(7));
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertTrue(updatedTripTimes.isCancelledStop(2));
-    assertTrue(updatedTripTimes.isCancelledStop(3));
-    assertTrue(updatedTripTimes.isCancelledStop(4));
-    assertTrue(updatedTripTimes.isCancelledStop(5));
-    assertTrue(updatedTripTimes.isCancelledStop(6));
-    assertFalse(updatedTripTimes.isCancelledStop(7));
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertTrue(updatedTripTimes.isCanceledStop(2));
+    assertTrue(updatedTripTimes.isCanceledStop(3));
+    assertTrue(updatedTripTimes.isCanceledStop(4));
+    assertTrue(updatedTripTimes.isCanceledStop(5));
+    assertTrue(updatedTripTimes.isCanceledStop(6));
+    assertFalse(updatedTripTimes.isCanceledStop(7));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
     assertTrue(updatedTripTimes.getDepartureTime(2) <= updatedTripTimes.getArrivalTime(3));
@@ -1031,14 +1030,14 @@ public class TripTimesUpdaterTest {
     assertEquals(500, updatedTripTimes.getDepartureDelay(4));
     assertEquals(-1200, updatedTripTimes.getArrivalDelay(7));
     assertEquals(-1200, updatedTripTimes.getDepartureDelay(7));
-    assertFalse(updatedTripTimes.isCancelledStop(0));
-    assertTrue(updatedTripTimes.isCancelledStop(1));
-    assertTrue(updatedTripTimes.isCancelledStop(2));
-    assertFalse(updatedTripTimes.isCancelledStop(3));
-    assertFalse(updatedTripTimes.isCancelledStop(4));
-    assertTrue(updatedTripTimes.isCancelledStop(5));
-    assertTrue(updatedTripTimes.isCancelledStop(6));
-    assertFalse(updatedTripTimes.isCancelledStop(7));
+    assertFalse(updatedTripTimes.isCanceledStop(0));
+    assertTrue(updatedTripTimes.isCanceledStop(1));
+    assertTrue(updatedTripTimes.isCanceledStop(2));
+    assertFalse(updatedTripTimes.isCanceledStop(3));
+    assertFalse(updatedTripTimes.isCanceledStop(4));
+    assertTrue(updatedTripTimes.isCanceledStop(5));
+    assertTrue(updatedTripTimes.isCanceledStop(6));
+    assertFalse(updatedTripTimes.isCanceledStop(7));
     assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
     assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
     assertTrue(updatedTripTimes.getDepartureTime(2) <= updatedTripTimes.getArrivalTime(3));

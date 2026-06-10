@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import com.google.common.collect.ImmutableMultimap;
 import java.util.List;

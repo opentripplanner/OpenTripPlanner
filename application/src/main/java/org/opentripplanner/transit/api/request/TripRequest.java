@@ -9,7 +9,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A request for {@link Trip}s.
- * </p>
+ * <p>
  * This request is used to retrieve {@link Trip}s that match the provided filter values.
  */
 public class TripRequest {

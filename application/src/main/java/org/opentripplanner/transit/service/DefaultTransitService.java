@@ -67,6 +67,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
+import org.opentripplanner.utils.collection.SetUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -254,7 +255,14 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Set<Route> findRoutes(StopLocation stop) {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepositoryIndex.getRoutesForStop(stop);
+    Collection<Route> flexRoutes = List.of();
+    var flexIndex = timetableRepositoryIndex.getFlexIndex();
+    if (flexIndex != null) {
+      flexRoutes = flexIndex.findRoutes(stop);
+    }
+    var fixedRoutes = timetableRepositoryIndex.getRoutesForStop(stop);
+
+    return SetUtils.combine(flexRoutes, fixedRoutes);
   }
 
   @Override

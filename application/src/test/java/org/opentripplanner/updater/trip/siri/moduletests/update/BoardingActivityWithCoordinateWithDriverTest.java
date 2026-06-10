@@ -69,9 +69,9 @@ class BoardingActivityWithCoordinateWithDriverTest implements RealtimeTestConsta
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
 
-    // Trip should stay UPDATED — BOARDING/ALIGHTING should not override COORDINATE_WITH_DRIVER
+    // Trip should stay U — BOARDING/ALIGHTING should not override COORDINATE_WITH_DRIVER
     assertEquals(
-      "UPDATED | A 0:00:11 0:00:11 | B 0:00:20 0:00:21 | C 0:00:30 0:00:30",
+      "U | A 0:00:11 0:00:11 | B 0:00:20 0:00:21 | C 0:00:30 0:00:30",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 

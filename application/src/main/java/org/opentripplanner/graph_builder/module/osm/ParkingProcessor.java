@@ -338,7 +338,7 @@ class ParkingProcessor {
       carCapacity.isPresent() ||
       wheelchairAccessibleCarCapacity.isPresent()
     ) {
-      vehicleParkingSpaces = VehicleParkingSpaces.builder()
+      vehicleParkingSpaces = VehicleParkingSpaces.of()
         .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
         .carSpaces(carCapacity.isPresent() ? carCapacity.getAsInt() : null)
         .wheelchairAccessibleCarSpaces(
@@ -379,7 +379,7 @@ class ParkingProcessor {
       tags.add("osm:surveillance");
     }
 
-    return VehicleParking.builder()
+    return VehicleParking.of()
       .id(id)
       .name(creativeName)
       .coordinate(new WgsCoordinate(coordinate))

@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.geocoder;
 
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.ext.geocoder.StopCluster.LocationType.STOP;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.Set;

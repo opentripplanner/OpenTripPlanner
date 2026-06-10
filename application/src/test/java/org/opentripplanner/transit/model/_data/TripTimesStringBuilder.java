@@ -1,0 +1,73 @@
+package org.opentripplanner.transit.model._data;
+
+import java.util.ArrayList;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.utils.time.TimeUtils;
+
+public class TripTimesStringBuilder {
+
+  /**
+   * This encodes the trip times and information about stops in a readable way in order to simplify
+   * testing/debugging. The format of the output string is:
+   *
+   * <pre>
+   * REALTIME_STATES... | stop1 [FLAGS] arrivalTime departureTime | stop2 ...
+   *
+   * Where flags are:
+   * C: Canceled
+   * R: Recorded (Arrived & Departed)
+   * A: Arrived but not departed
+   * PI: Prediction Inaccurate
+   * ND: No Data
+   * </pre>
+   *
+   * @throws IllegalStateException if TripTimes does not match the TripPattern
+   */
+  public static String encodeTripTimes(TripTimes tripTimes, TripPattern pattern) {
+    var stops = pattern.getStops();
+
+    if (tripTimes.getNumStops() != stops.size()) {
+      throw new IllegalArgumentException(
+        "TripTimes and TripPattern have different number of stops"
+      );
+    }
+
+    StringBuilder s = new StringBuilder(TripTimesStateDecoder.summarizeFromTripTimes(tripTimes));
+    for (int i = 0; i < tripTimes.getNumStops(); i++) {
+      var depart = tripTimes.getDepartureTime(i);
+      var arrive = tripTimes.getArrivalTime(i);
+      var flags = new ArrayList<String>();
+      if (tripTimes.isCanceledStop(i)) {
+        flags.add("C");
+      }
+      if (tripTimes.hasArrived(i)) {
+        if (tripTimes.hasDeparted(i)) {
+          flags.add("R");
+        } else {
+          flags.add("A");
+        }
+      }
+      if (tripTimes.isPredictionInaccurate(i)) {
+        flags.add("PI");
+      }
+      if (tripTimes.isNoDataStop(i)) {
+        flags.add("ND");
+      }
+      if (tripTimes.isExtraCall(i)) {
+        flags.add("EC");
+      }
+
+      s.append(" | ").append(stops.get(i).getName());
+      if (!flags.isEmpty()) {
+        s.append(" [").append(String.join(",", flags)).append("]");
+      }
+      s
+        .append(" ")
+        .append(TimeUtils.timeToStrCompact(arrive))
+        .append(" ")
+        .append(TimeUtils.timeToStrCompact(depart));
+    }
+    return s.toString();
+  }
+}

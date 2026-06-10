@@ -7,17 +7,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 class LegReferenceSerializerTest {
 
-  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("Trip");
+  private static final FeedScopedId TRIP_ID = FeedScopedIdForTestFactory.id("Trip");
   private static final LocalDate SERVICE_DATE = LocalDate.of(2022, 1, 31);
   private static final int FROM_STOP_POS = 1;
 
-  private static final FeedScopedId FROM_STOP_ID = TimetableRepositoryForTest.id("Boarding Stop");
+  private static final FeedScopedId FROM_STOP_ID = FeedScopedIdForTestFactory.id("Boarding Stop");
   private static final int TO_STOP_POS = 3;
-  private static final FeedScopedId TO_STOP_ID = TimetableRepositoryForTest.id("Alighting Stop");
+  private static final FeedScopedId TO_STOP_ID = FeedScopedIdForTestFactory.id("Alighting Stop");
 
   /**
    * Token based on the latest format, including stop ids and TripOnServiceDate id.

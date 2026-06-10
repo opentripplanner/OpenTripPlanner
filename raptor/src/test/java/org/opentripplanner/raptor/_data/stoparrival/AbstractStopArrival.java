@@ -33,16 +33,6 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
     }
   }
 
-  AbstractStopArrival(
-    int round,
-    int stop,
-    int arrivalTime,
-    int extraCost,
-    ArrivalView<TestTripSchedule> previous
-  ) {
-    this(round, stop, arrivalTime, extraCost, previous.c2(), previous);
-  }
-
   @Override
   public int stop() {
     return stop;

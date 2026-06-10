@@ -1,5 +1,6 @@
 package org.opentripplanner.datastore;
 
+import static org.opentripplanner.datastore.api.FileType.CACHE;
 import static org.opentripplanner.datastore.api.FileType.CONFIG;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
@@ -104,6 +105,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
     addAll(findMultipleCompositeSources(config.empiricalDelayFiles(), EMPIRICAL_DATA));
+    addAll(findMultipleSources(config.cacheFiles(), CACHE));
 
     streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
@@ -163,6 +165,27 @@ public class OtpDataStore {
 
   public Optional<DataSource> stopConsolidation() {
     return Optional.ofNullable(stopConsolidation);
+  }
+
+  /**
+   * Returns a {@link CompositeDataSource} for the graph-build cache directory. When {@code path}
+   * is {@code null}, defaults to the OTP base directory (the same directory that contains
+   * {@code build-config.json}).
+   * <p>
+   * Using the data-store abstraction means the cache works with any configured repository —
+   * local filesystem, GCS bucket, etc.
+   */
+  public CompositeDataSource getCacheDir(@Nullable URI path) {
+    assertDataStoreIsOpened();
+    if (path != null) {
+      return findSourceUsingAllRepos(it -> it.findCompositeSource(path, CACHE));
+    }
+    return localRepository.findCompositeSource(".", CACHE);
+  }
+
+  public DataSource getCacheFile(URI cacheFile) {
+    assertDataStoreIsOpened();
+    return findSourceUsingAllRepos(it -> it.findSource(cacheFile, CACHE));
   }
 
   /* private methods */

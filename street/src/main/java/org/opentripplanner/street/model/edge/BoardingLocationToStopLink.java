@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import java.util.List;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -40,6 +39,14 @@ public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitS
 
   @Override
   public LineString getGeometry() {
-    return GeometryUtils.makeLineString(List.of(fromv.getCoordinate(), tov.getCoordinate()));
+    return GeometryUtils.makeLineString(fromv.getX(), fromv.getY(), tov.getX(), tov.getY());
+  }
+
+  @Override
+  public boolean includeGeometryInPath() {
+    // when linking an OSM boarding location, like a platform centroid, we create a link edge
+    // so we can see it in the debug UI's traversal permission layer but we don't want to show the
+    // link to the user so we remove it here
+    return false;
   }
 }

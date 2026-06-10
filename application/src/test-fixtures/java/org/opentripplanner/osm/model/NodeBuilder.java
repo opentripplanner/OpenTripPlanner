@@ -4,9 +4,15 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class NodeBuilder {
 
+  public static OsmNodeBuilder of() {
+    return OsmNode.of();
+  }
+
+  public static OsmNodeBuilder of(long id, WgsCoordinate wgsCoordinate) {
+    return OsmNode.of().withId(id).withLatLon(wgsCoordinate.latitude(), wgsCoordinate.longitude());
+  }
+
   public static OsmNode node(long id, WgsCoordinate wgsCoordinate) {
-    var node = new OsmNode(wgsCoordinate.latitude(), wgsCoordinate.longitude());
-    node.setId(id);
-    return node;
+    return of(id, wgsCoordinate).build();
   }
 }

@@ -29,8 +29,5 @@ public record ViaLocationDeprecated(
     Objects.requireNonNull(minSlack);
     Objects.requireNonNull(maxSlack);
     Objects.requireNonNull(point);
-    if (!point.isSpecified()) {
-      throw new IllegalArgumentException("The Via location is not specified");
-    }
   }
 }

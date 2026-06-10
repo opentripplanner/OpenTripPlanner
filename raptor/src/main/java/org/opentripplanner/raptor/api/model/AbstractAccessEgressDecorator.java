@@ -110,13 +110,13 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean stopReachedOnBoard() {
-    return delegate.stopReachedOnBoard();
+  public boolean arrivedOnBoard() {
+    return delegate.arrivedOnBoard();
   }
 
   @Override
-  public boolean stopReachedByWalking() {
-    return delegate.stopReachedByWalking();
+  public boolean arrivedOnStreet() {
+    return delegate.arrivedOnStreet();
   }
 
   @Override

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.street.model.StreetMode;
 
 class StreetModeMapperTest {
@@ -40,7 +41,7 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithRentalOnly() {
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE_RENTAL))
     );
     assertEquals(
@@ -59,7 +60,7 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithTwoModesAndNoWalk() {
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       StreetModeMapper.getStreetModeForRouting(
         List.of(StreetMode.BIKE_RENTAL, StreetMode.SCOOTER_RENTAL)
       )
@@ -72,7 +73,7 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithCarAndWalk() {
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CAR, StreetMode.WALK))
     );
     assertEquals(
@@ -83,7 +84,7 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithBicycleAndWalk() {
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE, StreetMode.WALK))
     );
     assertEquals(
@@ -94,7 +95,7 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithMoreThanTwoModes() {
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       StreetModeMapper.getStreetModeForRouting(
         List.of(StreetMode.WALK, StreetMode.BIKE_TO_PARK, StreetMode.CAR_TO_PARK)
       )

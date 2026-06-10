@@ -3,8 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
@@ -13,16 +12,8 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   private final FlexAccessEgress flexAccessEgress;
 
-  public FlexAccessEgressAdapter(
-    FlexAccessEgress flexAccessEgress,
-    AccessEgressType accessOrEgress
-  ) {
-    super(
-      flexAccessEgress.stop().getIndex(),
-      accessOrEgress.isEgress()
-        ? flexAccessEgress.lastState().reverse()
-        : flexAccessEgress.lastState()
-    );
+  public FlexAccessEgressAdapter(FlexAccessEgress flexAccessEgress) {
+    super(flexAccessEgress.stop().getIndex(), flexAccessEgress.lastState());
     this.flexAccessEgress = flexAccessEgress;
   }
 
@@ -48,7 +39,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
   }
 
   @Override
-  public boolean stopReachedOnBoard() {
+  public boolean arrivedOnBoard() {
     return flexAccessEgress.stopReachedOnBoard();
   }
 

@@ -90,7 +90,7 @@ class RouteRequestConfigTest {
     var streetPreferences = subject.preferences().street();
 
     assertEquals(
-      "(timePenalty: 2m + 1.10 t, costFactor: 1.70)",
+      "(timePenalty: 2m + 1.1 t, costFactor: 1.7)",
       streetPreferences.accessEgress().penalty().valueOf(StreetMode.FLEXIBLE).toString()
     );
     assertEquals(

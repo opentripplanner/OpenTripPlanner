@@ -19,7 +19,10 @@ import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OperatorRefStructure;
+import uk.org.siri.siri21.PassengerCapacityStructure;
+import uk.org.siri.siri21.SimpleContactStructure;
 import uk.org.siri.siri21.StopAssignmentStructure;
+import uk.org.siri.siri21.VehicleOccupancyStructure;
 
 public class CarpoolEstimatedVehicleJourneyData {
 
@@ -130,6 +133,65 @@ public class CarpoolEstimatedVehicleJourneyData {
     return journey;
   }
 
+  public static EstimatedVehicleJourney journeyWithPublicContact(String phoneNumber, String url) {
+    var journey = minimalCompleteJourney();
+    var contact = new SimpleContactStructure();
+    contact.setPhoneNumber(phoneNumber);
+    contact.setUrl(url);
+    journey.setPublicContact(contact);
+    return journey;
+  }
+
+  /**
+   * A minimal complete journey flagged as cancelled at the trip level.
+   */
+  public static EstimatedVehicleJourney cancelledJourney() {
+    var journey = minimalCompleteJourney();
+    journey.setCancellation(true);
+    return journey;
+  }
+
+  /**
+   * A 3-stop journey where the intermediate call is flagged as cancelled — the driver still
+   * drives origin → destination but skips the middle waypoint.
+   */
+  public static EstimatedVehicleJourney journeyWithCancelledIntermediateCall() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var base = calls.getFirst().getAimedDepartureTime();
+
+    var intermediate = forPoint(OSLO_NORTH);
+    intermediate.setAimedArrivalTime(base.plusMinutes(20));
+    intermediate.setAimedDepartureTime(base.plusMinutes(20));
+    intermediate.setCancellation(true);
+    addStopName(intermediate, "Cancelled intermediate");
+
+    calls.add(1, intermediate);
+    return journey;
+  }
+
+  /**
+   * A 3-stop journey where two of three calls are cancelled, leaving fewer than 2 active calls.
+   */
+  public static EstimatedVehicleJourney journeyWithAllButOneCallCancelled() {
+    var journey = journeyWithCancelledIntermediateCall();
+    journey.getEstimatedCalls().getEstimatedCalls().getLast().setCancellation(true);
+    return journey;
+  }
+
+  /**
+   * Same trip id as {@link #minimalCompleteJourney()} but with the last call's aimed arrival
+   * time set before the first call's aimed departure time, causing the mapper to throw during
+   * call-order validation. Not flagged as cancelled.
+   */
+  public static EstimatedVehicleJourney malformedNonCancelledJourney() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var firstDeparture = calls.getFirst().getAimedDepartureTime();
+    calls.getLast().setAimedArrivalTime(firstDeparture.minusMinutes(45));
+    return journey;
+  }
+
   public static EstimatedVehicleJourney stopTimesAreOutOfOrder() {
     var journey = new EstimatedVehicleJourney();
     journey.setEstimatedCalls(new EstimatedVehicleJourney.EstimatedCalls());
@@ -172,6 +234,139 @@ public class CarpoolEstimatedVehicleJourneyData {
 
     call.getDepartureStopAssignments().add(stop);
     return call;
+  }
+
+  public static EstimatedVehicleJourney journeyWithTotalCapacity(int capacity) {
+    var journey = minimalCompleteJourney();
+    for (var call : journey.getEstimatedCalls().getEstimatedCalls()) {
+      addTotalCapacity(call, capacity);
+    }
+    return journey;
+  }
+
+  public static EstimatedVehicleJourney journeyWithDifferentCapacitiesPerCall(
+    int firstCapacity,
+    int lastCapacity
+  ) {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    addTotalCapacity(calls.getFirst(), firstCapacity);
+    addTotalCapacity(calls.getLast(), lastCapacity);
+    return journey;
+  }
+
+  public static EstimatedVehicleJourney journeyWithOnboardCounts(int... onboardCounts) {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    for (int i = 0; i < Math.min(onboardCounts.length, calls.size()); i++) {
+      addOnboardCount(calls.get(i), onboardCounts[i]);
+    }
+    return journey;
+  }
+
+  private static void addTotalCapacity(EstimatedCall call, int totalCapacity) {
+    var capacity = new PassengerCapacityStructure();
+    capacity.setTotalCapacity(BigInteger.valueOf(totalCapacity));
+    call.getExpectedDepartureCapacities().add(capacity);
+  }
+
+  public static EstimatedVehicleJourney journeyWithLatestExpectedArrivalTime(
+    int expectedArrivalMinutes,
+    int latestExpectedArrivalMinutes
+  ) {
+    var journey = minimalCompleteJourney();
+    var lastStop = journey.getEstimatedCalls().getEstimatedCalls().getLast();
+    var base = lastStop.getAimedArrivalTime();
+    lastStop.setExpectedArrivalTime(base.plusMinutes(expectedArrivalMinutes));
+    lastStop.setLatestExpectedArrivalTime(base.plusMinutes(latestExpectedArrivalMinutes));
+    return journey;
+  }
+
+  public static EstimatedVehicleJourney journeyWithLatestExpectedArrivalTimeAimedOnly(
+    int latestExpectedArrivalMinutes
+  ) {
+    var journey = minimalCompleteJourney();
+    var lastStop = journey.getEstimatedCalls().getEstimatedCalls().getLast();
+    var base = lastStop.getAimedArrivalTime();
+    lastStop.setExpectedArrivalTime(null);
+    lastStop.setLatestExpectedArrivalTime(base.plusMinutes(latestExpectedArrivalMinutes));
+    return journey;
+  }
+
+  /**
+   * Builds a 3-stop journey (origin, intermediate, destination) where the intermediate and
+   * destination stops each get their own {@code expectedArrivalTime} and
+   * {@code latestExpectedArrivalTime}, enabling assertions on per-stop deviation budgets.
+   * Arrival times are offset from {@code now} in minutes.
+   */
+  public static EstimatedVehicleJourney journeyWithPerStopLatestExpectedArrivalTimes(
+    int intermediateExpectedArrivalMinutes,
+    int intermediateLatestExpectedArrivalMinutes,
+    int lastExpectedArrivalMinutes,
+    int lastLatestExpectedArrivalMinutes
+  ) {
+    var base = ZonedDateTime.now();
+
+    var origin = forPoint(OSLO_EAST);
+    origin.setAimedDepartureTime(base);
+    addStopName(origin, "Origin");
+
+    var intermediate = createArrivalStop(
+      OSLO_NORTH,
+      "Intermediate",
+      base,
+      intermediateExpectedArrivalMinutes,
+      intermediateLatestExpectedArrivalMinutes
+    );
+    intermediate.setAimedDepartureTime(base.plusMinutes(intermediateExpectedArrivalMinutes));
+
+    var last = createArrivalStop(
+      OSLO_NORTH,
+      "Last",
+      base,
+      lastExpectedArrivalMinutes,
+      lastLatestExpectedArrivalMinutes
+    );
+
+    var journey = new EstimatedVehicleJourney();
+    var operator = new OperatorRefStructure();
+    operator.setValue("TESTOPERATOR");
+    journey.setEstimatedVehicleJourneyCode("unittest");
+    journey.setOperatorRef(operator);
+    journey.setEstimatedCalls(new EstimatedVehicleJourney.EstimatedCalls());
+    journey.getEstimatedCalls().getEstimatedCalls().add(origin);
+    journey.getEstimatedCalls().getEstimatedCalls().add(intermediate);
+    journey.getEstimatedCalls().getEstimatedCalls().add(last);
+
+    return journey;
+  }
+
+  private static EstimatedCall createArrivalStop(
+    WgsCoordinate coordinate,
+    String name,
+    ZonedDateTime base,
+    int expectedArrivalMinutes,
+    int latestExpectedArrivalMinutes
+  ) {
+    var arrivalTime = base.plusMinutes(expectedArrivalMinutes);
+    var call = forPoint(coordinate);
+    call.setAimedArrivalTime(arrivalTime);
+    call.setExpectedArrivalTime(arrivalTime);
+    call.setLatestExpectedArrivalTime(base.plusMinutes(latestExpectedArrivalMinutes));
+    addStopName(call, name);
+    return call;
+  }
+
+  private static void addStopName(EstimatedCall call, String name) {
+    var nameStruct = new NaturalLanguageStringStructure();
+    nameStruct.setValue(name);
+    call.getStopPointNames().add(nameStruct);
+  }
+
+  private static void addOnboardCount(EstimatedCall call, int onboardCount) {
+    var occupancy = new VehicleOccupancyStructure();
+    occupancy.setOnboardCount(BigInteger.valueOf(onboardCount));
+    call.getExpectedDepartureOccupancies().add(occupancy);
   }
 
   static AimedFlexibleArea poslistToAimedFlexibleArea(String coordinates) {

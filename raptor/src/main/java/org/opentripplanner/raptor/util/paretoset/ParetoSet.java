@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
- * This {@link java.util.Collection} store all pareto-optimal elements. The {@link #add(Object)}
+ * This {@link java.util.Collection} stores all pareto-optimal elements. The {@link #add(Object)}
  * method returns {@code true} if and only if the element was added successfully. When an element is
- * added other elements which are no longer pareto-optimal are dropped.
+ *  added, other elements which are no longer pareto-optimal are dropped.
  * <p/>
  * Like the {@link java.util.ArrayList} the elements are stored internally in an array for
  * performance reasons, and the order is guaranteed to be the same as the order the elements are
@@ -97,38 +97,29 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       return false;
     }
 
-    boolean mutualDominanceExist = false;
-    boolean equivalentVectorExist = false;
-
-    for (int i = 0; i < size; ++i) {
+    loop: for (int i = 0; i < size; ++i) {
       T it = elements[i];
 
-      boolean leftDominance = leftDominanceExist(newValue, it);
-      boolean rightDominance = rightDominanceExist(newValue, it);
-
-      if (leftDominance && rightDominance) {
-        mutualDominanceExist = true;
-      } else if (leftDominance) {
-        removeDominatedElementsFromRestOfSetAndAddNewElement(newValue, i);
-        return true;
-      } else if (rightDominance) {
-        goodElement = elements[i];
-        notifyElementRejected(newValue, it);
-        return false;
-      } else {
-        equivalentVectorExist = true;
+      switch (comparator.compare(newValue, it)) {
+        case MUTUAL:
+          continue loop;
+        case LEFT:
+          removeDominatedElementsFromRestOfSetAndAddNewElement(newValue, i);
+          return true;
+        case RIGHT:
+          goodElement = it;
+          notifyElementRejected(newValue, it);
+          return false;
+        case NONE:
+          // newValue is strictly equal to an existing value
+          notifyElementRejected(newValue, it);
+          return false;
       }
     }
 
-    if (mutualDominanceExist && !equivalentVectorExist) {
-      assertEnoughSpaceInSet();
-      acceptAndAppendValue(newValue);
-      return true;
-    }
-
-    // No dominance found, newValue is equivalent with all values in the set
-    notifyElementRejected(newValue, elements[0]);
-    return false;
+    assertEnoughSpaceInSet();
+    acceptAndAppendValue(newValue);
+    return true;
   }
 
   public final void clear() {
@@ -159,31 +150,22 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       return false;
     }
 
-    boolean mutualDominanceExist = false;
-    boolean equivalentVectorExist = false;
+    loop: for (int i = size - 1; i >= 0; --i) {
+      var it = elements[i];
 
-    for (int i = size - 1; i >= 0; --i) {
-      boolean leftDominance = leftDominanceExist(newValue, elements[i]);
-      boolean rightDominance = rightDominanceExist(newValue, elements[i]);
-
-      if (leftDominance && rightDominance) {
-        if (equivalentVectorExist) {
+      switch (comparator.compare(newValue, it)) {
+        case MUTUAL:
+          continue loop;
+        case LEFT:
+          return true;
+        case RIGHT:
+          goodElement = it;
           return false;
-        }
-        mutualDominanceExist = true;
-      } else if (leftDominance) {
-        return true;
-      } else if (rightDominance) {
-        goodElement = elements[i];
-        return false;
-      } else {
-        if (mutualDominanceExist) {
+        case NONE:
           return false;
-        }
-        equivalentVectorExist = true;
       }
     }
-    return mutualDominanceExist;
+    return true;
   }
 
   /**

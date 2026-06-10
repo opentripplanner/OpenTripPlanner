@@ -7,13 +7,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
@@ -28,9 +26,6 @@ import org.slf4j.LoggerFactory;
 public class ConfigFileLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigFileLoader.class);
-
-  /** When echoing config files to logs, values for these keys will be hidden. */
-  private static final Set<String> REDACT_KEYS = Set.of("secretKey", "accessKey", "gsCredentials");
 
   private final ObjectMapper mapper = new ObjectMapper();
 
@@ -89,31 +84,6 @@ public class ConfigFileLoader {
   }
 
   /**
-   * Convert the JsonNode to a pretty-printed string with secrets hidden, operating on a protective
-   * copy of the node to avoid losing information.
-   */
-  private static String toRedactedString(JsonNode node) {
-    JsonNode redactedNode = node.deepCopy();
-    redactSecretsRecursive(redactedNode);
-    return redactedNode.toPrettyString();
-  }
-
-  /** Note that this method destructively modifies the node and its children in place. */
-  private static void redactSecretsRecursive(JsonNode node) {
-    if (node.isObject()) {
-      node
-        .fields()
-        .forEachRemaining(entry -> {
-          if (entry.getValue().isObject()) {
-            redactSecretsRecursive(entry.getValue());
-          } else if (REDACT_KEYS.contains(entry.getKey())) {
-            entry.setValue(new TextNode("********"));
-          }
-        });
-    }
-  }
-
-  /**
    * Open and parse the JSON file at the given path into a Jackson JSON tree. Comments and unquoted
    * keys are allowed. Returns an empty node if the file does not exist. Throws an exception if the
    * file contains syntax errors or cannot be parsed for some other reason.
@@ -128,7 +98,7 @@ public class ConfigFileLoader {
       String configString = new String(is.readAllBytes(), StandardCharsets.UTF_8);
       JsonNode node = stringToJsonNode(configString, file.toString());
       LOG.info("Load JSON configuration file '{}'", file.getPath());
-      LOG.info("Summarizing '{}': {}", file.getName(), toRedactedString(node));
+      LOG.info("Summarizing '{}': {}", file.getName(), ConfigFileRedactor.toRedactedString(node));
       return node;
     } catch (FileNotFoundException ex) {
       LOG.info("File '{}' is not present. Using default configuration.", file);

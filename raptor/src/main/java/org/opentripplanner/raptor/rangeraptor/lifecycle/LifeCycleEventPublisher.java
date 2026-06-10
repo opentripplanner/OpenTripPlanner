@@ -12,7 +12,6 @@ public class LifeCycleEventPublisher {
   private final Consumer<Boolean>[] onRouteSearchListeners;
   private final IntConsumer[] setupIterationListeners;
   private final IntConsumer[] prepareForNextRoundListeners;
-  private final Runnable[] transitsForRoundCompleteListeners;
   private final Runnable[] transfersForRoundCompleteListeners;
   private final Consumer<Boolean>[] roundCompleteListeners;
   private final Runnable[] iterationCompleteListeners;
@@ -26,8 +25,6 @@ public class LifeCycleEventPublisher {
     this.prepareForNextRoundListeners = subscriptions.prepareForNextRoundListeners.toArray(
       IntConsumer[]::new
     );
-    this.transitsForRoundCompleteListeners =
-      subscriptions.transitsForRoundCompleteListeners.toArray(Runnable[]::new);
     this.transfersForRoundCompleteListeners =
       subscriptions.transfersForRoundCompleteListeners.toArray(Runnable[]::new);
     this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(Consumer[]::new);
@@ -54,12 +51,6 @@ public class LifeCycleEventPublisher {
   public final void prepareForNextRound(final int round) {
     for (IntConsumer it : prepareForNextRoundListeners) {
       it.accept(round);
-    }
-  }
-
-  public final void transitsForRoundComplete() {
-    for (Runnable it : transitsForRoundCompleteListeners) {
-      it.run();
     }
   }
 

@@ -19,7 +19,7 @@ public class DebugOutput {
    * Time taken in the transit router (including access/egress street router) in nanoseconds.
    * Detailed timing information within the transit router is sored in transitRouterTimes.
    *
-   * @see DebugOutput#transitRouterTimes;
+   * @see DebugOutput#transitRouterTimes
    */
   public final long transitRouterTime;
 

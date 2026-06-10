@@ -15,15 +15,14 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.TransferParameters;
-import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
-import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
-import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
-import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -53,7 +52,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Duration defaultMaxTransferDuration;
 
   private final List<RouteRequest> transferRequests;
-  private final Map<StreetMode, TransferParameters> transferParametersForMode;
+  private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final TransferRepository transferRepository;
@@ -84,16 +83,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TimetableRepository timetableRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
-    Duration defaultMaxTransferDuration,
-    List<RouteRequest> transferRequests,
-    Map<StreetMode, TransferParameters> transferParametersForMode
+    RegularTransferParameters parameters
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
-    this.defaultMaxTransferDuration = defaultMaxTransferDuration;
-    this.transferRequests = transferRequests;
-    this.transferParametersForMode = transferParametersForMode;
+    this.defaultMaxTransferDuration = parameters.maxDuration();
+    this.transferRequests = parameters.requests();
+    this.transferParametersForMode = parameters.parametersForMode();
     this.transferRepository = transferRepository;
   }
 
@@ -243,13 +240,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       LOG.info(
         "Creating direct transfer edges between stops using straight line distance (not streets)..."
       );
-      finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
+      finder = new StraightLineNearbyStopFinder(
+        transitService::findRegularStopsByBoundingBox,
+        radiusAsDuration
+      );
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      final StopResolver stopResolver = new SiteRepositoryResolver(
-        timetableRepository.getSiteRepository()
-      );
-      finder = StreetNearbyStopFinder.of(stopResolver, radiusAsDuration, 0).build();
+      finder = StreetNearbyStopFinder.of(null, radiusAsDuration, 0).build();
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
@@ -311,41 +308,42 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     for (RouteRequest transferProfile : transferRequests) {
       StreetMode mode = transferProfile.journey().transfer().mode();
-      TransferParameters transferParameters = transferParametersForMode.get(mode);
+      var transferParameters = transferParametersForMode.get(mode);
       if (transferParameters != null) {
         // WALK mode transfers can not be disabled. For example, flex transfers need them.
         if (transferParameters.disableDefaultTransfers() && mode == StreetMode.WALK) {
           throw new IllegalArgumentException("WALK mode transfers can not be disabled");
         }
-        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
+        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers
+        // is set in the build config.
         if (!transferParameters.disableDefaultTransfers()) {
           defaultTransferRequests.add(transferProfile);
-          // Set mode-specific maxTransferDuration, if it is set in the build config.
-          Duration maxTransferDuration = transferParameters.maxTransferDuration();
-          if (maxTransferDuration != null) {
-            defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxTransferDuration));
+          // Set mode-specific maxDuration, if it is set in the build config.
+          Duration maxDuration = transferParameters.maxDuration();
+          if (maxDuration != null) {
+            defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxDuration));
           } else {
             defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
           }
         }
-        // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
-        Duration carsAllowedStopMaxTransferDuration =
-          transferParameters.carsAllowedStopMaxTransferDuration();
-        if (carsAllowedStopMaxTransferDuration != null) {
+        // Create transfers between carsAllowedStops for the specific mode if
+        // carsAllowedStopMaxDuration is set in the build config.
+        Duration carsAllowedStopMaxDuration = transferParameters.carsAllowedStopMaxDuration();
+        if (carsAllowedStopMaxDuration != null) {
           carsAllowedStopTransferRequests.add(transferProfile);
           carsAllowedStopNearbyStopFinderForMode.put(
             mode,
-            createNearbyStopFinder(carsAllowedStopMaxTransferDuration)
+            createNearbyStopFinder(carsAllowedStopMaxDuration)
           );
         }
-        // Create transfers between bikesAllowedStops for the specific mode if bikesAllowedStopMaxTransferDuration is set in the build config.
-        Duration bikesAllowedStopMaxTransferDuration =
-          transferParameters.bikesAllowedStopMaxTransferDuration();
-        if (bikesAllowedStopMaxTransferDuration != null) {
+        // Create transfers between bikesAllowedStops for the specific mode if
+        // bikesAllowedStopMaxDuration is set in the build config.
+        Duration bikesAllowedStopMaxDuration = transferParameters.bikesAllowedStopMaxDuration();
+        if (bikesAllowedStopMaxDuration != null) {
           bikesAllowedStopTransferRequests.add(transferProfile);
           bikesAllowedStopNearbyStopFinderForMode.put(
             mode,
-            createNearbyStopFinder(bikesAllowedStopMaxTransferDuration)
+            createNearbyStopFinder(bikesAllowedStopMaxDuration)
           );
         }
       } else {
@@ -390,12 +388,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .defaultNearbyStopFinderForMode()
         .get(mode)
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+      var repository = timetableRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        if (sd.stop == stop) {
+        var nearbyStop = repository.getStopLocation(sd.stopId);
+        if (nearbyStop.equals(stop)) {
           continue;
         }
-        createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+        createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
       }
     }
   }
@@ -418,16 +418,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), true);
       // This code is for finding transfers from AreaStops to Stops, transfers
       // from Stops to AreaStops and between Stops are already covered above.
+      var repository = timetableRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        if (sd.stop == stop) {
+        var nearbyStop = repository.getStopLocation(sd.stopId);
+        if (nearbyStop.equals(stop)) {
           continue;
         }
-        if (sd.stop instanceof RegularStop) {
+        if (nearbyStop instanceof RegularStop) {
           continue;
         }
         // The TransferKey and PathTransfer are created differently for flex routing.
-        createPathTransfer(sd.stop, stop, sd, distinctTransfers, mode);
+        createPathTransfer(nearbyStop, stop, sd, distinctTransfers, mode);
       }
     }
   }
@@ -492,19 +494,21 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     var nearbyStops = nearbyStopFinder
       .get(mode)
       .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
+    var repository = timetableRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
+      var nearbyStop = repository.getStopLocation(sd.stopId);
       // Skip the origin stop, loop transfers are not needed.
-      if (sd.stop == stop) {
+      if (nearbyStop.equals(stop)) {
         continue;
       }
-      if (sd.stop.transfersNotAllowed()) {
+      if (nearbyStop.transfersNotAllowed()) {
         continue;
       }
       // Only calculate transfers between allowedStops.
-      if (!allowedStops.contains(sd.stop)) {
+      if (!allowedStops.contains(nearbyStop)) {
         continue;
       }
-      createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+      createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
     }
   }
 

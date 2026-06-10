@@ -6,7 +6,7 @@ import static org.opentripplanner.graph_builder.module.transfer.PathTransferToSt
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.module.TransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -25,8 +25,8 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   @Test
   public void testRequestWithCarsAllowedPatterns() {
     OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
-      var transferParameters = new TransferParameters.Builder()
-        .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60))
+      var transferParameters = new TransferParametersForMode.Builder()
+        .withCarsAllowedStopMaxDuration(Duration.ofMinutes(60))
         .withDisableDefaultTransfers(true)
         .build();
 
@@ -51,8 +51,8 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
 
   @Test
   public void testRequestWithCarsAllowedPatternsWithDurationLimit() {
-    var transferParameters = new TransferParameters.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofSeconds(10))
+    var transferParameters = new TransferParametersForMode.Builder()
+      .withCarsAllowedStopMaxDuration(Duration.ofSeconds(10))
       .withDisableDefaultTransfers(true)
       .build();
 
@@ -71,8 +71,8 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
 
   @Test
   public void testMultipleRequestsWithPatternsAndWithCarsAllowedPatterns() {
-    var transferParameters = new TransferParameters.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60))
+    var transferParameters = new TransferParametersForMode.Builder()
+      .withCarsAllowedStopMaxDuration(Duration.ofMinutes(60))
       .withDisableDefaultTransfers(true)
       .build();
 
@@ -109,8 +109,8 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatterns() {
-    var transferParameters = new TransferParameters.Builder()
-      .withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(120))
+    var transferParameters = new TransferParametersForMode.Builder()
+      .withCarsAllowedStopMaxDuration(Duration.ofMinutes(120))
       .build();
 
     var repository = testDataWithStreetFraphAndPatterns()
@@ -133,7 +133,7 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatternsWithoutCarInTransferRequests() {
     var repository = testDataWithStreetFraphAndPatterns()
       .withCarFerrys_FARAWAY_S0_S12_and_S22_S23()
-      .withMaxTransferDuration(Duration.ofSeconds(30))
+      .withMaxDuration(Duration.ofSeconds(30))
       .withTransferRequests(REQUEST_WITH_BIKE_TRANSFER)
       .build();
 
@@ -148,11 +148,11 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
 
   @Test
   public void testDisableDefaultTransfersForMode() {
-    var transferParametersBuilderBike = new TransferParameters.Builder()
+    var transferParametersBuilderBike = new TransferParametersForMode.Builder()
       .withDisableDefaultTransfers(true)
       .build();
 
-    var transferParametersBuilderCar = new TransferParameters.Builder()
+    var transferParametersBuilderCar = new TransferParametersForMode.Builder()
       .withDisableDefaultTransfers(true)
       .build();
 
@@ -183,11 +183,11 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
 
   @Test
   public void testMaxTransferDurationForMode() {
-    var transferParametersBuilderWalk = new TransferParameters.Builder()
-      .withMaxTransferDuration(Duration.ofSeconds(100))
+    var transferParametersBuilderWalk = new TransferParametersForMode.Builder()
+      .withMaxDuration(Duration.ofSeconds(100))
       .build();
-    var transferParametersBuilderBike = new TransferParameters.Builder()
-      .withMaxTransferDuration(Duration.ofSeconds(21))
+    var transferParametersBuilderBike = new TransferParametersForMode.Builder()
+      .withMaxDuration(Duration.ofSeconds(21))
       .build();
 
     var repository = DirectTransferGeneratorTestData.of()

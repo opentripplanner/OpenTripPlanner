@@ -173,7 +173,10 @@ public class PlaceTest {
 
   @Test
   void forGenericLocation() {
-    GenericLocation location = GenericLocation.fromStopId(PLACE_NAME, "id", "stopId");
+    GenericLocation location = GenericLocation.fromStopId(
+      new FeedScopedId("id", "stopId"),
+      PLACE_NAME
+    );
     Place place = Place.forGenericLocation(location, DEFAULT_PLACE_NAME);
     assertNotNull(place);
     assertEquals(PLACE_NAME, place.name.toString());

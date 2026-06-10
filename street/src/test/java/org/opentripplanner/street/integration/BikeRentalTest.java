@@ -668,7 +668,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     StreetMode streetMode
   ) {
     EuclideanRemainingWeightHeuristic heuristic = new EuclideanRemainingWeightHeuristic();
-    heuristic.initialize(Set.of(toVertex), arriveBy, req);
+    heuristic.initialize(Set.of(toVertex), req);
     var tree = StreetSearchBuilder.of()
       .withHeuristic(heuristic)
       .withRequest(StreetSearchRequest.copyOf(req).withMode(streetMode).build())

@@ -2,8 +2,8 @@ package org.opentripplanner.raptor._data.transit;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -53,12 +53,13 @@ public class TestTripSchedule implements RaptorTripSchedule {
   }
 
   @Override
-  public RaptorTripPattern pattern() {
-    return pattern;
+  public int relativeTravelDuration(int boardTime) {
+    return arrivalTimes[arrivalTimes.length - 1] - boardTime;
   }
 
-  public int size() {
-    return arrivalTimes.length;
+  @Override
+  public RaptorTripPattern pattern() {
+    return pattern;
   }
 
   @Override

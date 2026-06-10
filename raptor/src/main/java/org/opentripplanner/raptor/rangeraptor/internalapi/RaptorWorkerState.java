@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The contract the state must implement for the {@link RangeRaptor} to do its job. This
@@ -44,6 +44,17 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    * Update state with a new transfer.
    */
   void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
+
+  /**
+   * Called after all transit routes are processed for this worker's round. This is intentionally
+   * NOT a {@link WorkerLifeCycle} event: in a via search there are multiple workers sharing one
+   * lifecycle, so lifecycle events fire after all workers finish. This method must fire per worker
+   * so that each worker's touched-stop markers and cached arrivals are committed before the next
+   * worker begins its transit routing in the same round.
+   */
+  default void transitsForRoundComplete() {
+    /* empty */
+  }
 
   RaptorRouterResult<T> results();
 }

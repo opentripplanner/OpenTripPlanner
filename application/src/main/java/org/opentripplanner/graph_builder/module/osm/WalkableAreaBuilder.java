@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -23,6 +25,7 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.cache.KeyValueCache;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -50,8 +53,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class WalkableAreaBuilder {
 
@@ -71,10 +72,16 @@ class WalkableAreaBuilder {
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
 
+  /**
+   * Visibility cache loaded from disk before processing begins. Key: area group hash.
+   * Value: survived visibility-edge pairs as {@code {fromX, fromY, toX, toY}} per entry.
+   * {@code null} when visibility caching is disabled.
+   */
+  @Nullable
+  private final KeyValueCache<Long, double[][]> visibilityCache;
+
   // template for AreaEdge names
   private static final String LABEL_TEMPLATE = "way (area) %s from %s to %s";
-
-  private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
   public WalkableAreaBuilder(
     Graph graph,
@@ -88,6 +95,34 @@ class WalkableAreaBuilder {
     boolean platformEntriesLinking,
     Set<String> boardingLocationRefTags
   ) {
+    this(
+      graph,
+      osmdb,
+      osmInfoGraphBuildRepository,
+      vertexBuilder,
+      namer,
+      safetyValueApplier,
+      issueStore,
+      maxAreaNodes,
+      platformEntriesLinking,
+      boardingLocationRefTags,
+      null
+    );
+  }
+
+  public WalkableAreaBuilder(
+    Graph graph,
+    OsmDatabase osmdb,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    VertexGenerator vertexBuilder,
+    EdgeNamer namer,
+    SafetyValueApplier safetyValueApplier,
+    DataImportIssueStore issueStore,
+    int maxAreaNodes,
+    boolean platformEntriesLinking,
+    Set<String> boardingLocationRefTags,
+    @Nullable KeyValueCache<Long, double[][]> visibilityCache
+  ) {
     this.graph = graph;
     this.osmdb = osmdb;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
@@ -98,6 +133,7 @@ class WalkableAreaBuilder {
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
+    this.visibilityCache = visibilityCache;
     this.platformLinkingPoints = platformEntriesLinking
       ? graph
           .getVertices()
@@ -153,54 +189,106 @@ class WalkableAreaBuilder {
     }
   }
 
+  /**
+   * Build walkable area edges using visibility graph computation.
+   *
+   * <p>Three phases:
+   * <ol>
+   *   <li>Build ring edges and collect vertex candidates for each ring.
+   *   <li>Compute which vertex pairs have line-of-sight within the polygon (cache miss),
+   *       or replay previously computed pairs (cache hit).
+   *   <li>Add visibility edges, prune unused ones, and finalise area group vertex sets.
+   * </ol>
+   */
   public void buildWithVisibility(OsmAreaGroup group) {
-    // These sets contain the nodes/vertices which can be used to traverse from the rest of the
-    // street network onto the walkable area
-    Set<Vertex> startingVertices = new HashSet<>();
+    long cacheKey = group.cacheKey();
+    double[][] cachedPairs = visibilityCache != null ? visibilityCache.get(cacheKey) : null;
 
-    // List of edges belonging to the walkable area
-    Set<Edge> edges = new HashSet<>();
+    Set<Long> osmWayIds = collectOsmWayIds(group);
+    RingSetData ringSetData = buildAllRingEdges(group, osmWayIds);
 
-    // Edges which are part of the rings
+    if (ringSetData.allEdges().isEmpty()) {
+      return;
+    }
+
+    if (cachedPairs != null) {
+      replayVisibilityEdges(cachedPairs, ringSetData, group);
+    } else {
+      List<VisibilityPair> visiblePairs = computeVisiblePairs(ringSetData);
+      VisibilityEdgesResult visEdges = addVisibilityEdges(visiblePairs, group);
+
+      Set<Edge> allEdges = new HashSet<>(ringSetData.allEdges());
+      allEdges.addAll(visEdges.allEdges());
+
+      Set<Edge> edgesToKeep = new HashSet<>(ringSetData.ringEdges());
+      edgesToKeep.addAll(visEdges.platformLinkedEdges());
+
+      Set<Edge> surviving = pruneAreaEdges(ringSetData.startingVertices(), allEdges, edgesToKeep);
+
+      if (visibilityCache != null) {
+        double[][] pairs = surviving
+          .stream()
+          .map(e ->
+            new double[] {
+              e.getFromVertex().getX(),
+              e.getFromVertex().getY(),
+              e.getToVertex().getX(),
+              e.getToVertex().getY(),
+            }
+          )
+          .toArray(double[][]::new);
+        visibilityCache.put(cacheKey, pairs);
+      }
+    }
+
+    ringSetData
+      .visibilityVertexCandidates()
+      .forEach((areaGroup, vertices) -> {
+        if (vertices.size() > maxAreaNodes) {
+          areaGroup.addVisibilityVertices(
+            vertices
+              .stream()
+              .sorted((v1, v2) -> Long.compare(v2.getDegreeOut(), v1.getDegreeOut()))
+              .limit(maxAreaNodes)
+              .collect(Collectors.toSet())
+          );
+        } else {
+          areaGroup.addVisibilityVertices(vertices);
+        }
+      });
+  }
+
+  // ---- Phase 1: ring traversal -------------------------------------------------------
+
+  /**
+   * Traverse all rings in the group: create ring edges, collect visibility vertex candidates,
+   * and register area metadata. Returns combined data for subsequent phases.
+   */
+  private RingSetData buildAllRingEdges(OsmAreaGroup group, Set<Long> osmWayIds) {
+    Set<Edge> allEdges = new HashSet<>();
     Set<Edge> ringEdges = new HashSet<>();
+    Set<Vertex> startingVertices = new HashSet<>();
+    Map<AreaGroup, HashSet<IntersectionVertex>> visibilityVertexCandidates = new HashMap<>();
+    Map<IntersectionVertex, AreaGroup> vertexToAreaGroup = new HashMap<>();
+    List<PerRingData> perRingData = new ArrayList<>();
 
-    HashMap<AreaGroup, HashSet<IntersectionVertex>> visibilityVertexCandidates = new HashMap<>();
-
-    // OSM ways that this area group consists of
-    Set<Long> osmWayIds = group.areas
-      .stream()
-      .map(area -> area.parent)
-      .flatMap(osmEntity ->
-        osmEntity instanceof OsmRelation relation
-          ? relation.getMembers().stream().map(OsmRelationMember::getRef)
-          : Stream.of(osmEntity.getId())
-      )
-      .collect(Collectors.toSet());
-
-    // create polygon and accumulate nodes for area
+    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
-
       AreaGroup areaGroup = new AreaGroup(polygon);
-
-      // the points corresponding to concave or hole vertices or those linked to ways
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
-      GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
       for (OsmArea area : group.areas) {
         OsmEntity areaEntity = area.parent;
 
-        // test if area is inside the current ring
-        if (!group.isSimpleAreaGroup()) {
-          if (!polygon.contains(area.jtsMultiPolygon)) {
-            continue;
-          }
+        if (!group.isSimpleAreaGroup() && !polygon.contains(area.jtsMultiPolygon)) {
+          continue;
         }
-        // Add stops/entrances from public transit relations into the area
-        // they may provide the only entrance to a platform
-        // which otherwise would be pruned as unconnected island
+
+        // Add stops/entrances from public transit relations — they may be the only entrance to
+        // a platform, which otherwise would be pruned as an unconnected island.
         Collection<OsmNode> entrances = osmdb.getStopsInArea(area.parent);
         for (OsmNode node : entrances) {
           var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
@@ -210,9 +298,7 @@ class WalkableAreaBuilder {
         }
 
         for (Ring outerRing : area.outermostRings) {
-          // variable to indicate if some additional entrance points have been added to area
           boolean linkPointsAdded = !entrances.isEmpty();
-          // Add unconnected entries to area if platformEntriesLinking parameter is true
           if (platformEntriesLinking && area.parent.isPlatform()) {
             List<OsmVertex> verticesWithin = platformLinkingPoints
               .stream()
@@ -237,25 +323,23 @@ class WalkableAreaBuilder {
               i,
               alreadyAddedEdges
             );
-            edges.addAll(newEdges);
+            allEdges.addAll(newEdges);
             ringEdges.addAll(newEdges);
 
-            // A node can only be a visibility node only if it is an entrance to the
-            // area or a convex point, i.e. the angle is over 180 degrees.
-            // Also, if additional linking points have been defined, add some points from outer
-            // edge to ensure that platform geometry gets connected
-            if (
+            // Convex corners and mid-points when link points are present are visibility candidates.
+            boolean convex =
               outerRing.isNodeConvex(i) ||
-              (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
-            ) {
-              visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT));
-            }
-            if (isStartingNode(node, osmWayIds)) {
+              (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2));
+            boolean starting = isStartingNode(node, osmWayIds);
+            if (convex || starting) {
               var v = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
-              startingVertices.add(v);
               visibilityVertices.add(v);
+              if (starting) {
+                startingVertices.add(v);
+              }
             }
           }
+
           for (Ring innerRing : outerRing.getHoles()) {
             for (int j = 0; j < innerRing.nodes.size(); ++j) {
               OsmNode node = innerRing.nodes.get(j);
@@ -266,18 +350,17 @@ class WalkableAreaBuilder {
                 j,
                 alreadyAddedEdges
               );
-              edges.addAll(newEdges);
+              allEdges.addAll(newEdges);
               ringEdges.addAll(newEdges);
-              // A node can only be a visibility node only if it is an entrance to the
-              // area or a convex point, i.e. the angle is over 180 degrees.
-              // For holes, we must swap the convexity condition
-              if (!innerRing.isNodeConvex(j)) {
-                visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT));
-              }
-              if (isStartingNode(node, osmWayIds)) {
+              // For holes the convexity condition is inverted.
+              boolean concave = !innerRing.isNodeConvex(j);
+              boolean starting = isStartingNode(node, osmWayIds);
+              if (concave || starting) {
                 var v = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
-                startingVertices.add(v);
                 visibilityVertices.add(v);
+                if (starting) {
+                  startingVertices.add(v);
+                }
               }
             }
           }
@@ -286,39 +369,76 @@ class WalkableAreaBuilder {
 
       if (visibilityVertices.isEmpty()) {
         issueStore.add(new UnconnectedArea(group));
-        // Area is not connected to graph. Remove it immediately before it causes any trouble.
-        for (Edge edge : edges) {
+        for (Edge edge : allEdges) {
           graph.removeEdge(edge);
         }
+        allEdges.clear();
+        ringEdges.clear();
         continue;
       }
+
       if (visibilityVertices.size() > maxAreaNodes) {
         issueStore.add(new AreaTooComplicated(group, visibilityVertices.size(), maxAreaNodes));
       }
-      visibilityVertexCandidates.put(areaGroup, visibilityVertices);
-      createAreas(areaGroup, ring, group.areas);
 
-      // if area is too complex, consider only part of visibility nodes
-      // so that at least some edges passing through the area are added
-      // otherwise routing can use only area boundary edges
-      float skip_ratio = (float) maxAreaNodes / (float) visibilityVertices.size();
+      visibilityVertexCandidates.put(areaGroup, visibilityVertices);
+      for (IntersectionVertex v : visibilityVertices) {
+        vertexToAreaGroup.putIfAbsent(v, areaGroup);
+      }
+      createAreas(areaGroup, ring, group.areas);
+      perRingData.add(
+        new PerRingData(
+          areaGroup,
+          polygon,
+          visibilityVertices,
+          platformLinkingVertices,
+          alreadyAddedEdges
+        )
+      );
+    }
+
+    return new RingSetData(
+      allEdges,
+      ringEdges,
+      startingVertices,
+      visibilityVertexCandidates,
+      vertexToAreaGroup,
+      perRingData
+    );
+  }
+
+  // ---- Phase 2: visibility computation -----------------------------------------------
+
+  /**
+   * For each ring, test all candidate vertex pairs for line-of-sight within the ring polygon.
+   * This is a pure computation — no graph mutations.
+   *
+   * <p>When the area has more vertices than {@code maxAreaNodes}, the vertex set is sampled
+   * uniformly so that at least some cross-edges are added even for complex areas.
+   */
+  private List<VisibilityPair> computeVisiblePairs(RingSetData ringSetData) {
+    List<VisibilityPair> pairs = new ArrayList<>();
+    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+    for (PerRingData ringData : ringSetData.perRingData()) {
+      float skipRatio = (float) maxAreaNodes / (float) ringData.visibilityVertices().size();
       int i = 0;
-      float sum_i = 0;
-      for (IntersectionVertex vertex1 : visibilityVertices) {
-        sum_i += skip_ratio;
-        if (Math.floor(sum_i) < i + 1) {
+      float sumI = 0;
+      for (IntersectionVertex vertex1 : ringData.visibilityVertices()) {
+        sumI += skipRatio;
+        if (Math.floor(sumI) < i + 1) {
           continue;
         }
-        i = (int) Math.floor(sum_i);
+        i = (int) Math.floor(sumI);
         int j = 0;
-        float sum_j = 0;
-        for (IntersectionVertex vertex2 : visibilityVertices) {
-          sum_j += skip_ratio;
-          if (Math.floor(sum_j) < j + 1) {
+        float sumJ = 0;
+        for (IntersectionVertex vertex2 : ringData.visibilityVertices()) {
+          sumJ += skipRatio;
+          if (Math.floor(sumJ) < j + 1) {
             continue;
           }
-          j = (int) Math.floor(sum_j);
-          if (shouldSkipEdge(vertex1, vertex2, alreadyAddedEdges)) {
+          j = (int) Math.floor(sumJ);
+          if (shouldSkipEdge(vertex1, vertex2, ringData.alreadyAddedEdges())) {
             continue;
           }
           Coordinate[] coordinates = new Coordinate[] {
@@ -326,48 +446,88 @@ class WalkableAreaBuilder {
             vertex2.getCoordinate(),
           };
           LineString line = geometryFactory.createLineString(coordinates);
-          if (polygon.contains(line)) {
-            Set<AreaEdge> segments = createSegments(vertex1, vertex2, group.areas, areaGroup, true);
-            edges.addAll(segments);
-            if (platformLinkingVertices.contains(vertex1)) {
-              ringEdges.addAll(segments);
-            }
-            if (platformLinkingVertices.contains(vertex2)) {
-              ringEdges.addAll(segments);
-            }
+          if (ringData.polygon().contains(line)) {
+            boolean platformLinked =
+              ringData.platformLinkingVertices().contains(vertex1) ||
+              ringData.platformLinkingVertices().contains(vertex2);
+            pairs.add(new VisibilityPair(vertex1, vertex2, ringData.areaGroup(), platformLinked));
           }
         }
       }
     }
-    pruneAreaEdges(startingVertices, edges, ringEdges);
-
-    visibilityVertexCandidates.forEach((areaGroup, vertices) -> {
-      if (vertices.size() > maxAreaNodes) {
-        // keep nodes which have most connections
-        areaGroup.addVisibilityVertices(
-          vertices
-            .stream()
-            .sorted((v1, v2) -> Long.compare((v2.getDegreeOut()), v1.getDegreeOut()))
-            .limit(maxAreaNodes)
-            .collect(Collectors.toSet())
-        );
-      } else {
-        areaGroup.addVisibilityVertices(vertices);
-      }
-    });
+    return pairs;
   }
+
+  // ---- Phase 3a: add visibility edges (cache miss) -----------------------------------
+
+  /**
+   * Create graph edges for each visibility pair and return them split into all edges and the
+   * subset that must survive pruning because they connect platform-linking vertices.
+   */
+  private VisibilityEdgesResult addVisibilityEdges(List<VisibilityPair> pairs, OsmAreaGroup group) {
+    Set<AreaEdge> allEdges = new HashSet<>();
+    Set<AreaEdge> platformLinkedEdges = new HashSet<>();
+    for (VisibilityPair pair : pairs) {
+      Set<AreaEdge> segments = createSegments(
+        pair.from(),
+        pair.to(),
+        group.areas,
+        pair.areaGroup(),
+        true
+      );
+      allEdges.addAll(segments);
+      if (pair.platformLinked()) {
+        platformLinkedEdges.addAll(segments);
+      }
+    }
+    return new VisibilityEdgesResult(allEdges, platformLinkedEdges);
+  }
+
+  // ---- Phase 3b: replay visibility edges (cache hit) ---------------------------------
+
+  /**
+   * Reconstruct visibility edges from previously cached coordinate pairs. No pruning step is
+   * needed because the cached pairs are already the pruned survivors of a previous run.
+   */
+  private void replayVisibilityEdges(
+    double[][] cachedPairs,
+    RingSetData ringSetData,
+    OsmAreaGroup group
+  ) {
+    Map<CoordKey, IntersectionVertex> vertexByCoord = new HashMap<>();
+    for (IntersectionVertex v : ringSetData.vertexToAreaGroup().keySet()) {
+      vertexByCoord.put(new CoordKey(v.getX(), v.getY()), v);
+    }
+    for (double[] pair : cachedPairs) {
+      IntersectionVertex v1 = vertexByCoord.get(new CoordKey(pair[0], pair[1]));
+      IntersectionVertex v2 = vertexByCoord.get(new CoordKey(pair[2], pair[3]));
+      if (v1 == null || v2 == null) {
+        continue;
+      }
+      AreaGroup ag = ringSetData
+        .vertexToAreaGroup()
+        .getOrDefault(v1, ringSetData.vertexToAreaGroup().get(v2));
+      if (ag != null) {
+        createSegments(v1, v2, group.areas, ag, true);
+      }
+    }
+  }
+
+  // ---- Pruning -----------------------------------------------------------------------
 
   /**
    * Do an all-pairs shortest path search from a list of vertices over a specified set of edges,
-   *  and retain only those edges which are actually used in some shortest path.
+   * and retain only those edges which are actually used in some shortest path.
+   *
+   * @return the visibility edges (not in {@code edgesToKeep}) that survived pruning
    */
-  private void pruneAreaEdges(
+  private Set<Edge> pruneAreaEdges(
     Collection<Vertex> startingVertices,
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
     if (edges.isEmpty()) {
-      return;
+      return Set.of();
     }
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
@@ -398,11 +558,29 @@ class WalkableAreaBuilder {
         }
       }
     }
+    Set<Edge> survivingVisibilityEdges = new HashSet<>();
     for (Edge edge : edges) {
       if (!usedEdges.contains(edge) && !edgesToKeep.contains(edge)) {
         graph.removeEdge(edge);
+      } else if (!edgesToKeep.contains(edge)) {
+        survivingVisibilityEdges.add(edge);
       }
     }
+    return survivingVisibilityEdges;
+  }
+
+  // ---- Helpers -----------------------------------------------------------------------
+
+  private Set<Long> collectOsmWayIds(OsmAreaGroup group) {
+    return group.areas
+      .stream()
+      .map(area -> area.parent)
+      .flatMap(osmEntity ->
+        osmEntity instanceof OsmRelation relation
+          ? relation.getMembers().stream().map(OsmRelationMember::getRef)
+          : Stream.of(osmEntity.getId())
+      )
+      .collect(Collectors.toSet());
   }
 
   private boolean isStartingNode(OsmNode node, Set<Long> osmWayIds) {
@@ -418,13 +596,9 @@ class WalkableAreaBuilder {
   }
 
   private WayProperties findAreaProperties(OsmEntity entity) {
-    if (!wayPropertiesCache.containsKey(entity)) {
-      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForEntity(entity);
-      wayPropertiesCache.put(entity, wayData);
-      return wayData;
-    } else {
-      return wayPropertiesCache.get(entity);
-    }
+    return wayPropertiesCache.computeIfAbsent(entity, e ->
+      e.getOsmProvider().getWayPropertySet().getDataForEntity(e)
+    );
   }
 
   private Set<AreaEdge> createEdgesForRingSegment(
@@ -477,7 +651,10 @@ class WalkableAreaBuilder {
     // combine properties of intersected areas
     for (OsmArea area : areas) {
       MultiPolygon polygon = area.jtsMultiPolygon;
-      boolean crosses = testIntersection ? polygon.intersection(line).getLength() > 0.000001 : true;
+      // intersects() is a cheap spatial predicate; only compute the full intersection when needed
+      boolean crosses =
+        !testIntersection ||
+        (polygon.intersects(line) && polygon.intersection(line).getLength() > 0.000001);
       if (crosses) {
         parent = area.parent;
         wayData = findAreaProperties(parent);
@@ -597,13 +774,6 @@ class WalkableAreaBuilder {
     return false;
   }
 
-  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy<State, Edge> {
-    @Override
-    public boolean shouldSkipEdge(State current, Edge edge) {
-      return !edges.contains(edge);
-    }
-  }
-
   private boolean shouldSkipEdge(
     IntersectionVertex v1,
     IntersectionVertex v2,
@@ -620,5 +790,55 @@ class WalkableAreaBuilder {
     return false;
   }
 
+  // ---- Inner types -------------------------------------------------------------------
+
+  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy<State, Edge> {
+    @Override
+    public boolean shouldSkipEdge(State current, Edge edge) {
+      return !edges.contains(edge);
+    }
+  }
+
   private record NodeEdge(IntersectionVertex from, IntersectionVertex to) {}
+
+  /**
+   * Per-ring data collected during Phase 1, passed into Phase 2 for visibility computation.
+   * The {@code alreadyAddedEdges} set is mutable and extended during Phase 2 to prevent
+   * duplicate visibility edges across both phases.
+   */
+  private record PerRingData(
+    AreaGroup areaGroup,
+    Polygon polygon,
+    HashSet<IntersectionVertex> visibilityVertices,
+    Set<IntersectionVertex> platformLinkingVertices,
+    HashSet<NodeEdge> alreadyAddedEdges
+  ) {}
+
+  /** Combined output of Phase 1 covering all rings in an area group. */
+  private record RingSetData(
+    Set<Edge> allEdges,
+    Set<Edge> ringEdges,
+    Set<Vertex> startingVertices,
+    Map<AreaGroup, HashSet<IntersectionVertex>> visibilityVertexCandidates,
+    Map<IntersectionVertex, AreaGroup> vertexToAreaGroup,
+    List<PerRingData> perRingData
+  ) {}
+
+  /** A vertex pair confirmed to have line-of-sight within a ring polygon. */
+  private record VisibilityPair(
+    IntersectionVertex from,
+    IntersectionVertex to,
+    AreaGroup areaGroup,
+    boolean platformLinked
+  ) {}
+
+  /** Output of Phase 3a: visibility edges split by whether they must survive pruning. */
+  private record VisibilityEdgesResult(Set<AreaEdge> allEdges, Set<AreaEdge> platformLinkedEdges) {}
+
+  /** Allocation-free coordinate key for vertex lookup maps. */
+  private record CoordKey(long xBits, long yBits) {
+    CoordKey(double x, double y) {
+      this(Double.doubleToLongBits(x), Double.doubleToLongBits(y));
+    }
+  }
 }

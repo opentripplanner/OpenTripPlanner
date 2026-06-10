@@ -1,11 +1,12 @@
 package org.opentripplanner.apis.transmodel.support;
 
 import graphql.execution.AsyncExecutionStrategy;
+import graphql.execution.DataFetcherResult;
 import graphql.execution.ExecutionStrategyParameters;
 import graphql.schema.DataFetchingEnvironment;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
-import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
+import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
 import org.opentripplanner.apis.transmodel.ResponseTooLargeException;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -33,11 +34,11 @@ public class AbortOnUnprocessableRequestExecutionStrategy
   );
 
   public AbortOnUnprocessableRequestExecutionStrategy() {
-    super(new LoggingDataFetcherExceptionHandler());
+    super(new OtpDataFetcherExceptionHandler());
   }
 
   @Override
-  protected <T> CompletableFuture<T> handleFetchingException(
+  protected <T> CompletableFuture<DataFetcherResult<T>> handleFetchingException(
     DataFetchingEnvironment environment,
     ExecutionStrategyParameters params,
     Throwable e

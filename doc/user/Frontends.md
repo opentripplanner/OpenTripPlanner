@@ -22,12 +22,6 @@ OpenTripPlanner comes with an integrated debug web frontend. The frontend source
 The current debug client is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
 Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).
 
-There is another of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
-located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
-While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric 
-UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the 
-street network, providing some insight into the internals of the routing algorithms that are not otherwise visible.
-
 ## Working with the Debug Frontend
 
 While the debug frontend is enabled by default as of this writing, it may not be in the future, and you may wish to disable it if you've chosen to use a different frontend. 

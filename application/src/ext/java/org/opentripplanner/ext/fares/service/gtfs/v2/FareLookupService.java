@@ -19,29 +19,38 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.utils.collection.SetUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The main part of the fare engine: it applies the leg and transfer rules to the transit legs.
  */
 class FareLookupService implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
+  /// The GTFS spec is underspecified about which fare products free transfers should apply to.
+  /// The interpretation of this implementation is that transfers apply to only those fare
+  /// products that share the same category and fare medium.
+  /// - [Github issue](https://github.com/google/transit/pull/423)
+  static final FreeTransferEligibility DEFAULT_FREE_TRANSFER_MATCH_PREDICATE =
+    TransferMatch::matchesEligibility;
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
   private final AreaMatcher areaMatcher;
   private final NetworkMatcher networkMatcher;
   private final TimeframeMatcher timeframeMatcher;
+  private final FreeTransferEligibility freeTransferEligibility;
 
+  /// @param freeTransferEligibility A bi-predicate that determines if a free transfer applies
+  /// to a given transfer match and fare product. This needs to be configurable because of custom
+  /// fare services.
   FareLookupService(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
     Multimap<FeedScopedId, FeedScopedId> stopAreas,
-    Multimap<FeedScopedId, LocalDate> serviceDates
+    Multimap<FeedScopedId, LocalDate> serviceDates,
+    FreeTransferEligibility freeTransferEligibility
   ) {
     this.legRules = List.copyOf(legRules);
-    this.transferRules = stripWildcards(fareTransferRules);
+    this.transferRules = List.copyOf(fareTransferRules);
+    this.freeTransferEligibility = freeTransferEligibility;
 
     var rulePriorityMatcher = new RulePriorityMatcher(legRules);
     this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
@@ -156,6 +165,9 @@ class FareLookupService implements Serializable {
           .fromLegRule()
           .fareProducts()
           .stream()
+          // the GTFS spec is underspecified about whether transfers apply only to specific
+          // fare products or all of them: https://github.com/google/transit/pull/423
+          .filter(p -> freeTransferEligibility.test(t, p))
           .map(product ->
             LegOffer.of(
               FareOffer.of(head.startTime(), product, dependencies.get(product)),
@@ -257,22 +269,6 @@ class FareLookupService implements Serializable {
       .stream()
       .filter(r -> r.legGroupId().equals(id))
       .toList();
-  }
-
-  private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {
-    return rules.stream().filter(FareLookupService::checkForWildcards).toList();
-  }
-
-  private static boolean checkForWildcards(FareTransferRule t) {
-    if (t.containsWildCard()) {
-      LOG.warn(
-        "Transfer rule {} contains a wildcard leg group reference. These are not supported yet.",
-        t
-      );
-      return false;
-    } else {
-      return true;
-    }
   }
 
   /**

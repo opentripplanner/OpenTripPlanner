@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 public class SetUtils {
 
@@ -32,5 +33,12 @@ public class SetUtils {
         .skip(1)
         .collect(() -> new HashSet<>(list.getFirst()), Set::retainAll, Set::retainAll);
     }
+  }
+
+  public static <T> Set<T> nullSafeImmutableSet(@Nullable Collection<T> input) {
+    if (input == null) {
+      return Set.of();
+    }
+    return Set.copyOf(input);
   }
 }

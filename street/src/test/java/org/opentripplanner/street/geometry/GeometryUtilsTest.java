@@ -210,44 +210,6 @@ public class GeometryUtilsTest {
   }
 
   @Test
-  void concatenateLineStringsWithSameFromToTest() {
-    Coordinate[] coordinates = new Coordinate[4];
-
-    coordinates[0] = new Coordinate(0, 0);
-    coordinates[1] = new Coordinate(0, 1);
-    coordinates[2] = new Coordinate(0, 1);
-    coordinates[3] = new Coordinate(0, 2);
-
-    LineString line = GeometryUtils.concatenateLineStrings(
-      List.of(
-        GeometryUtils.makeLineString(new Coordinate[] { coordinates[0], coordinates[1] }),
-        GeometryUtils.makeLineString(new Coordinate[] { coordinates[2], coordinates[3] })
-      )
-    );
-
-    assertEquals(3, line.getCoordinates().length);
-  }
-
-  @Test
-  void concatenateLineStringsWithDifferentFromToTest() {
-    Coordinate[] coordinates = new Coordinate[4];
-
-    coordinates[0] = new Coordinate(0, 0);
-    coordinates[1] = new Coordinate(0, 1);
-    coordinates[2] = new Coordinate(1, 1);
-    coordinates[3] = new Coordinate(1, 2);
-
-    LineString line = GeometryUtils.concatenateLineStrings(
-      List.of(
-        GeometryUtils.makeLineString(new Coordinate[] { coordinates[0], coordinates[1] }),
-        GeometryUtils.makeLineString(new Coordinate[] { coordinates[2], coordinates[3] })
-      )
-    );
-
-    assertEquals(4, line.getCoordinates().length);
-  }
-
-  @Test
   void toEnvelopes() {
     Coordinate[] coordinates = List.of(
       new Coordinate(0, 0),
@@ -271,8 +233,7 @@ public class GeometryUtilsTest {
 
   @Test
   void sumDistances() {
-    var coordinates = List.of(BERLIN, HAMBURG);
-    var meters = GeometryUtils.sumDistances(coordinates);
+    var meters = GeometryUtils.sumDistances(new Coordinate[] { BERLIN, HAMBURG });
     assertEquals(255_384.0, meters, 0.5);
   }
 

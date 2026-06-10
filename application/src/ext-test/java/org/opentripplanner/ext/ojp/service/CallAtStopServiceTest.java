@@ -3,7 +3,7 @@ package org.opentripplanner.ext.ojp.service;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Duration;
 import java.util.List;
@@ -13,25 +13,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
-import org.opentripplanner.transit.service.TransitService;
 
 class CallAtStopServiceTest {
 
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
+  private static final NearbyStopFinder NEARBY_STOP_FINDER = new StraightLineNearbyStopFinder(e ->
+    List.of()
+  );
 
   private static final String STOP_A_ID = "A";
   private static final String STOP_B_ID = "B";
@@ -74,10 +76,7 @@ class CallAtStopServiceTest {
   @MethodSource("stopPointRefCases")
   void stopPointRef(FeedScopedId ref) {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new CallAtStopService(
-      env.transitService(),
-      new DirectGraphFinder(e -> List.of())
-    );
+    var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
     var result = service.findCallsAtStop(ref, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
@@ -87,10 +86,7 @@ class CallAtStopServiceTest {
   @Test
   void notFound() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new CallAtStopService(
-      env.transitService(),
-      new DirectGraphFinder(e -> List.of())
-    );
+    var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
     assertThrows(EntityNotFoundException.class, () ->
       service.findCallsAtStop(id("unknown"), params(env, 100))
     );
@@ -98,28 +94,25 @@ class CallAtStopServiceTest {
 
   @Test
   void coordinates() {
-    var finder = new GraphFinder() {
+    var finder = new NearbyStopFinder() {
       @Override
-      public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
+      public List<NearbyStop> findNearbyStops(Coordinate coordinate, double radiusMeters) {
         return List.of(
-          new NearbyStop(STOP_A, 100, List.of(), TestStateBuilder.ofWalking().streetEdge().build())
+          new NearbyStop(
+            STOP_A.getId(),
+            100,
+            List.of(),
+            TestStateBuilder.ofWalking().streetEdge().build()
+          )
         );
       }
 
       @Override
-      public List<PlaceAtDistance> findClosestPlaces(
-        double lat,
-        double lon,
-        double radiusMeters,
-        int maxResults,
-        List<TransitMode> filterByModes,
-        List<PlaceType> filterByPlaceTypes,
-        List<FeedScopedId> filterByStops,
-        List<FeedScopedId> filterByStations,
-        List<FeedScopedId> filterByRoutes,
-        List<String> filterByBikeRentalStations,
-        List<String> filterByNetwork,
-        TransitService transitService
+      public List<NearbyStop> findNearbyStops(
+        Vertex vertex,
+        RouteRequest routingRequest,
+        StreetMode streetMode,
+        boolean reverseDirection
       ) {
         return List.of();
       }
@@ -140,10 +133,7 @@ class CallAtStopServiceTest {
       .addStop(STOP_C, "12:15", "12:16");
 
     var env = envBuilder.addTrip(TRIP_INPUT).addTrip(trip2).build();
-    var service = new CallAtStopService(
-      env.transitService(),
-      new DirectGraphFinder(e -> List.of())
-    );
+    var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
 
     // Station OMEGA has two child stops (A, D), each with a departure.
     // Requesting 1 departure should return exactly 1, not 2.
@@ -158,10 +148,7 @@ class CallAtStopServiceTest {
   @Test
   void tooManyDepartures() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new CallAtStopService(
-      env.transitService(),
-      new DirectGraphFinder(e -> List.of())
-    );
+    var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
     assertThrows(IllegalArgumentException.class, () ->
       service.findCallsAtStop(STOP_A.getId(), params(env, 101))
     );

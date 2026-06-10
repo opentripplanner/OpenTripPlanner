@@ -45,7 +45,7 @@ class TimeAndCostPenaltyTest {
 
   @Test
   void testToString() {
-    assertEquals("(timePenalty: 55s + 1.60 t, costFactor: 2.5)", subject.toString());
+    assertEquals("(timePenalty: 55s + 1.6 t, costFactor: 2.5)", subject.toString());
   }
 
   @Test

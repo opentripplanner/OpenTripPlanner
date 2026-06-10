@@ -65,8 +65,8 @@ public final class ItineraryFilterPreferences {
     this.groupedOtherThanSameLegsMaxCostMultiplier = Units.reluctance(
       builder.groupedOtherThanSameLegsMaxCostMultiplier
     );
-    this.groupSimilarityKeepOne = Units.reluctance(builder.groupSimilarityKeepOne);
-    this.groupSimilarityKeepThree = Units.reluctance(builder.groupSimilarityKeepThree);
+    this.groupSimilarityKeepOne = Units.ratio(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Units.ratio(builder.groupSimilarityKeepThree);
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
     this.nonTransitGeneralizedCostLimit = Objects.requireNonNull(
       builder.nonTransitGeneralizedCostLimit

@@ -9,12 +9,10 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 
 public class ReverseTransitCalculatorTest implements RaptorTestConstants {
 
-  public static final int BOARD_SLACK = D20_s;
-  public static final int ALIGHT_SLACK = D10_s;
   public static final int TRANSFER_SLACK = D1_m;
 
   private static final int STOP = 8;

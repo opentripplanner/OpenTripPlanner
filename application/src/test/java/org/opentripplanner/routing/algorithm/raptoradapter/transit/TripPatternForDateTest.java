@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -48,7 +49,7 @@ class TripPatternForDateTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .build()

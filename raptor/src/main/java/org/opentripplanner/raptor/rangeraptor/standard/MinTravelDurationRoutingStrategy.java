@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
@@ -11,6 +10,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
+  public void addAccessStopArrival(RaptorAccessEgress accessPath, int departureTime) {
     state.setAccessToStop(accessPath, iterationDepartureTime);
   }
 
@@ -89,7 +89,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     int prevArrivalTime = prevArrivalTime(stopIndex);
-    var boarding = boardingSupport.searchRegularTransfer(
+    var boarding = boardingSupport.searchForRegularBoarding(
       prevArrivalTime,
       stopPos,
       boardSlack,
@@ -137,7 +137,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   private void board(int stopIndex, RaptorBoardOrAlightEvent<T> boarding) {
-    onTripIndex = boarding.tripIndex();
+    onTripIndex = boarding.tripScheduleIndex();
     onTrip = boarding.trip();
     onTripBoardTime = boarding.earliestBoardTime();
     onTripBoardStop = stopIndex;

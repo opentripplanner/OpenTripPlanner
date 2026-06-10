@@ -60,7 +60,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
     return environment ->
       getSource(environment).isCanceledEffectively()
         ? GraphQLTypes.GraphQLRealtimeState.CANCELED
-        : RealtimeStateMapper.map(getSource(environment).getRealTimeState());
+        : RealtimeStateMapper.map(getSource(environment).getTripTimes());
   }
 
   @Override

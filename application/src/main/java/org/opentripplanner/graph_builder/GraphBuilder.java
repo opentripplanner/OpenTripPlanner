@@ -7,9 +7,9 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -20,6 +20,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -45,12 +46,13 @@ public class GraphBuilder implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
-  private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
+  private final Queue<GraphBuilderModule> graphBuilderModules = new LinkedList<>();
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
   private final DeduplicatorService deduplicator;
+  private final GraphBuildCacheManager cacheManager;
 
   private boolean hasTransitData = false;
 
@@ -59,13 +61,15 @@ public class GraphBuilder implements Runnable {
     DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
-    Closeable closeDataSourcesHandle
+    Closeable closeDataSourcesHandle,
+    GraphBuildCacheManager cacheManager
   ) {
     this.graph = baseGraph;
     this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.closeDataSourcesHandle = closeDataSourcesHandle;
+    this.cacheManager = cacheManager;
   }
 
   /**
@@ -215,8 +219,11 @@ public class GraphBuilder implements Runnable {
         builder.checkInputs();
       }
 
-      for (GraphBuilderModule load : graphBuilderModules) {
-        load.buildGraph();
+      // because we want to garbage-collect the modules as soon as they are finished
+      // we remove them from the queue during the build process
+      while (!graphBuilderModules.isEmpty()) {
+        var builder = graphBuilderModules.poll();
+        builder.buildGraph();
       }
 
       new DataImportIssueSummary(issueStore.listIssues()).logSummary();
@@ -226,7 +233,11 @@ public class GraphBuilder implements Runnable {
 
       validate();
     } finally {
-      closeDataSources();
+      try {
+        cacheManager.close();
+      } finally {
+        closeDataSources();
+      }
     }
   }
 

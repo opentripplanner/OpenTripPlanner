@@ -8,12 +8,12 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.path.PathBuilder;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
@@ -63,11 +63,6 @@ public class TestPathBuilder implements RaptorTestConstants {
     return access(startTime, TestAccessEgress.walk(toStop, duration));
   }
 
-  /** Same as {@link #access(int, int, int)} , but with a free access - duration is 0s. */
-  public TestPathBuilder access(int startTime, int toStop) {
-    return access(startTime, TestAccessEgress.free(toStop));
-  }
-
   /**
    * Create access with the given {@code startTime}, but allow the access to be time-shifted
    * according to the opening hours of the given {@code transfer}.
@@ -76,10 +71,6 @@ public class TestPathBuilder implements RaptorTestConstants {
     reset(startTime);
     builder.access(transfer);
     return this;
-  }
-
-  public TestPathBuilder walk(int duration, int toStop) {
-    return walk(TestTransfer.transfer(toStop, duration));
   }
 
   public TestPathBuilder walk(int duration, int toStop, int cost) {
@@ -121,11 +112,6 @@ public class TestPathBuilder implements RaptorTestConstants {
         ? TestAccessEgress.free(currentStop())
         : TestAccessEgress.walk(currentStop(), duration)
     );
-  }
-
-  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
-    builder.access(access);
-    return builder;
   }
 
   public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {

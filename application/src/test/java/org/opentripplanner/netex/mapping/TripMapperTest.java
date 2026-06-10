@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -33,7 +34,7 @@ public class TripMapperTest {
   private static final String ROUTE_ID = "RUT:Route:1";
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
-  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("S001");
+  private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("S001");
   private static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(

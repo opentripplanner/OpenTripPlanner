@@ -142,7 +142,7 @@ public class VehicleParking implements Serializable {
     this.vehicleParkingGroup = vehicleParkingGroup;
   }
 
-  public static VehicleParkingBuilder builder() {
+  public static VehicleParkingBuilder of() {
     return new VehicleParkingBuilder();
   }
 
@@ -323,9 +323,7 @@ public class VehicleParking implements Serializable {
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
-    var entrance = creator
-      .updateValues(VehicleParkingEntrance.builder().vehicleParking(this))
-      .build();
+    var entrance = creator.updateValues(VehicleParkingEntrance.of().vehicleParking(this)).build();
 
     entrances.add(entrance);
   }

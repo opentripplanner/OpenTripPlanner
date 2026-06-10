@@ -1,9 +1,13 @@
 package org.opentripplanner.ext.geocoder;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
@@ -36,8 +40,7 @@ class StopClusterMapperTest {
     var repo = new DefaultStopConsolidationRepository();
     repo.addGroups(List.of(new ConsolidatedStopGroup(STOP_A.getId(), List.of(STOP_B.getId()))));
 
-    var service = new DefaultStopConsolidationService(repo, TIMETABLE_REPOSITORY);
-    var mapper = new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY), service);
+    var mapper = buildMapper(repo);
 
     var clusters = mapper.generateStopClusters(LOCATIONS, List.of());
 
@@ -49,5 +52,41 @@ class StopClusterMapperTest {
       new StopCluster.Coordinate(STOP_A.getLat(), STOP_A.getLon())
     );
     assertThat(clusters).contains(expected);
+  }
+
+  @Test
+  void noConsolidatedStops() {
+    var repo = new DefaultStopConsolidationRepository();
+
+    var mapper = buildMapper(repo);
+
+    var primaries = Iterables.transform(mapper.generateStopClusters(LOCATIONS, List.of()), c ->
+      FeedScopedId.parseStrict(c.primaryId())
+    );
+
+    assertThat(primaries).containsExactly(STOP_A.getId(), STOP_B.getId(), STOP_C.getId());
+  }
+
+  @Test
+  void unknownSecondaries() {
+    var repo = new DefaultStopConsolidationRepository();
+    repo.addGroups(List.of(new ConsolidatedStopGroup(STOP_A.getId(), List.of(id("unknown")))));
+
+    var mapper = buildMapper(repo);
+
+    var primaries = Iterables.transform(mapper.generateStopClusters(LOCATIONS, List.of()), c ->
+      FeedScopedId.parseStrict(c.primaryId())
+    );
+    assertThat(primaries).containsExactly(STOP_A.getId(), STOP_B.getId(), STOP_C.getId());
+
+    var secondaries = ImmutableList.copyOf(mapper.generateStopClusters(LOCATIONS, List.of()))
+      .stream()
+      .flatMap(c -> c.secondaryIds().stream());
+    assertThat(secondaries).isEmpty();
+  }
+
+  private static StopClusterMapper buildMapper(DefaultStopConsolidationRepository repo) {
+    var service = new DefaultStopConsolidationService(repo, TIMETABLE_REPOSITORY);
+    return new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY), service);
   }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.config.SwissProfile;
 import org.opentripplanner.netex.issues.InterchangeMaxWaitTimeNotGuaranteed;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
 import org.opentripplanner.netex.issues.InterchangeWithoutConstraint;
@@ -61,6 +62,13 @@ public class TransferMapper {
     var to = mapPoint(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
 
     if (from == null || to == null) {
+      issueStore.add(
+        "InvalidInterchange",
+        "Interchange %s contains invalid from/to refs. from=%s, to=%s",
+        it,
+        from,
+        to
+      );
       return null;
     }
 
@@ -81,6 +89,9 @@ public class TransferMapper {
     VehicleJourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
+    if (isInvalid(sjRef)) {
+      return null;
+    }
     var sjId = sjRef.getRef();
     var trip = findTrip(label, "Journey", interchangeId, sjId);
     int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
@@ -184,6 +195,11 @@ public class TransferMapper {
       return false;
     }
     return true;
+  }
+
+  @SwissProfile
+  private static boolean isInvalid(VehicleJourneyRefStructure sjRef) {
+    return sjRef == null || sjRef.getRef() == null;
   }
 
   private enum Label {

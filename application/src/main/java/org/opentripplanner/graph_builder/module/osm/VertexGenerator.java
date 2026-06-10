@@ -63,7 +63,7 @@ class VertexGenerator {
   private final Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers = new HashMap<>();
   private final OsmDatabase osmdb;
   private final Set<String> boardingAreaRefTags;
-  private final Boolean includeOsmSubwayEntrances;
+  private final Boolean includeOsmStationEntrances;
   private final VertexFactory vertexFactory;
   private final DataImportIssueStore issueStore;
 
@@ -71,13 +71,13 @@ class VertexGenerator {
     OsmDatabase osmdb,
     Graph graph,
     Set<String> boardingAreaRefTags,
-    boolean includeOsmSubwayEntrances,
+    boolean includeOsmStationEntrances,
     DataImportIssueStore issueStore
   ) {
     this.osmdb = osmdb;
     this.vertexFactory = new VertexFactory(graph);
     this.boardingAreaRefTags = boardingAreaRefTags;
-    this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
+    this.includeOsmStationEntrances = includeOsmStationEntrances;
     this.issueStore = issueStore;
   }
 
@@ -134,7 +134,9 @@ class VertexGenerator {
         }
       }
 
-      if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {
+      if (
+        includeOsmStationEntrances && (node.isStationEntrance() || osmdb.isEntranceInStopArea(node))
+      ) {
         String ref = node.getTag("ref");
         iv = vertexFactory.stationEntrance(
           nid,

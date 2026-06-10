@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
@@ -43,10 +44,10 @@ public class TransitDataImportBuilderLimitPeriodTest {
   private static final LocalDate D1 = LocalDate.of(2020, 1, 8);
   private static final LocalDate D2 = LocalDate.of(2020, 1, 15);
   private static final LocalDate D3 = LocalDate.of(2020, 1, 31);
-  private static final FeedScopedId SERVICE_C_IN = TimetableRepositoryForTest.id("CalSrvIn");
-  private static final FeedScopedId SERVICE_D_IN = TimetableRepositoryForTest.id("CalSrvDIn");
-  private static final FeedScopedId SERVICE_C_OUT = TimetableRepositoryForTest.id("CalSrvOut");
-  private static final FeedScopedId SERVICE_D_OUT = TimetableRepositoryForTest.id("CalSrvDOut");
+  private static final FeedScopedId SERVICE_C_IN = FeedScopedIdForTestFactory.id("CalSrvIn");
+  private static final FeedScopedId SERVICE_D_IN = FeedScopedIdForTestFactory.id("CalSrvDIn");
+  private static final FeedScopedId SERVICE_C_OUT = FeedScopedIdForTestFactory.id("CalSrvOut");
+  private static final FeedScopedId SERVICE_D_OUT = FeedScopedIdForTestFactory.id("CalSrvDOut");
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP_1 = TEST_MODEL.stop("Stop-1").build();
@@ -190,11 +191,11 @@ public class TransitDataImportBuilderLimitPeriodTest {
   }
 
   private static FeedScopedId newId() {
-    return TimetableRepositoryForTest.id(Integer.toString(++SEQ_NR));
+    return FeedScopedIdForTestFactory.id(Integer.toString(++SEQ_NR));
   }
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
-    FeedScopedId patternId = TimetableRepositoryForTest.id(
+    FeedScopedId patternId = FeedScopedIdForTestFactory.id(
       trips
         .stream()
         .map(t -> t.getId().getId())

@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -90,18 +90,6 @@ public interface PathLeg<T extends RaptorTripSchedule> {
    */
   default boolean isAccessLeg() {
     return false;
-  }
-
-  /**
-   * Utility method performing a cast to {@link AccessPathLeg}, use with care:
-   * <pre>
-   * if(it.isAccessLeg()} {
-   *     AccessPathLeg&lt;T&gt; transit = it.asAccessLeg();
-   *     ...
-   * </pre>
-   */
-  default AccessPathLeg<T> asAccessLeg() {
-    return (AccessPathLeg<T>) this;
   }
 
   /**

@@ -1,4 +1,4 @@
-![OTP Logo](images/otp-logo.svg)
+![OTP Logo](images/otp-logo-white-bg.svg)
 
 # OpenTripPlanner 2
 

@@ -39,6 +39,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     VehicleRentalServiceDirectoryFetcher.class
   );
   private static final Duration DEFAULT_FREQUENCY = Duration.ofSeconds(15);
+  private static final Duration DEFAULT_STARTUP_RETRY_PERIOD = Duration.ZERO;
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
     .registerModule(new JavaTimeModule())
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -170,6 +171,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
       "vehicle-rental-service-directory:" + parameters.network(),
       DEFAULT_FREQUENCY,
+      DEFAULT_STARTUP_RETRY_PERIOD,
       parameters
     );
 

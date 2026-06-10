@@ -16,7 +16,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
@@ -73,8 +72,6 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .timetable(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {

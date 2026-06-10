@@ -8,7 +8,6 @@
     "gtfs": "(?i)gtfs",
     "netex": "(?i)netex"
   },
-
   "osmDefaults": {
     "timeZone": "Europe/Rome",
     "osmTagMapping": "default"
@@ -91,5 +90,8 @@
       "carsAllowedStopMaxTransferDuration": "3h",
       "bikesAllowedStopMaxTransferDuration": "1h"
     }
+  },
+  "cache": {
+    "enabled": true
   }
 }

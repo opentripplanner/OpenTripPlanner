@@ -3,11 +3,9 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -61,20 +59,12 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath<State, Edge, Vertex> path = shortestPathTree.getPath(destinationVertex);
-    if (path == null) {
+    var state = shortestPathTree.getState(destinationVertex);
+    if (state == null) {
       return null;
     }
 
-    int distance = (int) path.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-    int duration = path.getDuration();
-
-    // computing the linestring from the graph path is a surprisingly expensive operation
-    // so we delay it until it's actually needed. since most flex paths are never shown to the user
-    // this improves performance quite a bit.
-    return new FlexPath(distance, duration, () ->
-      GeometryUtils.concatenateLineStrings(path.edges, Edge::getGeometry)
-    );
+    return StateToFlexPathMapper.map(state);
   }
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {

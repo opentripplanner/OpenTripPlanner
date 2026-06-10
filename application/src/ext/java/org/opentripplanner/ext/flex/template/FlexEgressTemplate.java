@@ -4,11 +4,12 @@ import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -70,7 +71,7 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
     );
   }
 
-  protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {
+  protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, FeedScopedId transferStopId) {
     var flexPath = calculator.calculateFlexPath(
       flexFromVertex,
       accessEgress.state.getVertex(),
@@ -85,8 +86,8 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
     return new FlexTripEdge(
       flexFromVertex,
       accessEgress.state.getVertex(),
-      transferStop,
-      accessEgress.stop,
+      transferStopId,
+      accessEgress.stopId,
       trip,
       boardStopPosition,
       alightStopPosition,

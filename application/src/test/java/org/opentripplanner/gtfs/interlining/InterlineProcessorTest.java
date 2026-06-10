@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -163,7 +164,7 @@ class InterlineProcessorTest implements PlanTestConstants {
     var stopPattern = new StopPattern(stopTimes);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    return TripPattern.of(TimetableRepositoryForTest.id(tripId))
+    return TripPattern.of(FeedScopedIdForTestFactory.id(tripId))
       .withRoute(trip.getRoute())
       .withStopPattern(stopPattern)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))

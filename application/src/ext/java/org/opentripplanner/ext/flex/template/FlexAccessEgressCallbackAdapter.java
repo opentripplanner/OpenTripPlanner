@@ -27,7 +27,7 @@ public interface FlexAccessEgressCallbackAdapter {
   Collection<PathTransfer> getTransfersToStop(StopLocation stop);
 
   /** Adapter, look at implementing service for documentation.  */
-  Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation);
+  Collection<FlexTrip<?, ?>> getFlexTripsByStopId(FeedScopedId stopLocation);
 
   /**
    * Return true if date is an active service date for the given trip, and can be used for

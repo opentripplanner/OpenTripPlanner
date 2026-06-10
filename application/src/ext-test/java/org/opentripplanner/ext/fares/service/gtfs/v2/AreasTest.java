@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import com.google.common.collect.Multimaps;
 import java.util.Map;

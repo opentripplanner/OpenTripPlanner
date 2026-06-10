@@ -33,7 +33,7 @@ public final class WalkPreferences implements Serializable {
   private final EscalatorPreferences escalator;
 
   private WalkPreferences() {
-    this.speed = 1.33;
+    this.speed = 1.35;
     this.reluctance = 2.0;
     this.boardCost = Cost.costOfMinutes(10);
     this.stairsReluctance = 2.0;
@@ -63,7 +63,7 @@ public final class WalkPreferences implements Serializable {
   /**
    * Human walk speed along streets, in meters per second.
    * <p>
-   * Default: 1.33 m/s ~ 3mph, <a href="http://en.wikipedia.org/wiki/Walking">avg. human walk
+   * Default: 1.35 m/s ~ 3mph, <a href="http://en.wikipedia.org/wiki/Walking">avg. human walk
    * speed</a>
    */
   public double speed() {

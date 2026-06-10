@@ -21,7 +21,7 @@ import org.opentripplanner.updater.trip.UrlUpdaterParameters;
  */
 public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
 
-  protected static final String METRICS_PREFIX = "streaming_trip_updates";
+  protected static final String METRICS_PREFIX = "streaming.trip.updates";
   private final boolean producerMetrics;
 
   public StreamingTripUpdateMetrics(UrlUpdaterParameters parameters) {

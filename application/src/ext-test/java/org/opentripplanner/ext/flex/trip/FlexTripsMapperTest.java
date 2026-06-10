@@ -2,8 +2,8 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
+import static org.opentripplanner.model.FlexStopTimesFactory.area;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

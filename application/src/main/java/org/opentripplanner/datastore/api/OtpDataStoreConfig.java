@@ -72,6 +72,12 @@ public interface OtpDataStoreConfig {
   URI streetGraph();
 
   /**
+   * The URIs to the locations for graph builder cache.
+   */
+  @Nullable
+  List<URI> cacheFiles();
+
+  /**
    * The URI to the stop consolidation data source.
    */
   @Nullable

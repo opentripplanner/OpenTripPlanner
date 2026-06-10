@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,6 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 
@@ -52,12 +52,12 @@ class MultiTripPatternTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
-    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_2_ID).realTimeState());
+    assertFalse(env.tripData(TRIP_2_ID).tripTimes().hasAnyUpdates());
     assertEquals(
-      "SCHEDULED | A 0:01:10 0:01:11 | B 0:01:20 0:01:21",
+      "S | A 0:01:10 0:01:11 | B 0:01:20 0:01:21",
       env.tripData(TRIP_2_ID).showTimetable()
     );
   }

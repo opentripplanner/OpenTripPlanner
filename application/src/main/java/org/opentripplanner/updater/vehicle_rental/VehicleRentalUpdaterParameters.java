@@ -8,15 +8,18 @@ public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParame
 
   private final String configRef;
   private final Duration frequency;
+  private final Duration startupRetryPeriod;
   private final VehicleRentalDataSourceParameters source;
 
   public VehicleRentalUpdaterParameters(
     String configRef,
     Duration frequency,
+    Duration startupRetryPeriod,
     VehicleRentalDataSourceParameters source
   ) {
     this.configRef = configRef;
     this.frequency = frequency;
+    this.startupRetryPeriod = startupRetryPeriod;
     this.source = source;
   }
 
@@ -31,6 +34,13 @@ public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParame
   @Override
   public String configRef() {
     return configRef;
+  }
+
+  /**
+   * How long to retry loading the vehicle rental data source on startup if it initially fails.
+   */
+  public Duration startupRetryPeriod() {
+    return startupRetryPeriod;
   }
 
   public VehicleRentalDataSourceParameters sourceParameters() {

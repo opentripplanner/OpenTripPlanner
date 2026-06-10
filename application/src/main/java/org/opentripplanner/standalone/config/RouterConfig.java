@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ojp.config.OjpApiConfig;
@@ -22,10 +23,12 @@ import org.opentripplanner.standalone.config.routerconfig.ServerConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.routerconfig.WarmupConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.GtfsApiConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.updater.UpdatersParameters;
+import org.opentripplanner.warmup.api.WarmupParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +61,7 @@ public class RouterConfig implements Serializable {
   private final VectorTileConfig vectorTileConfig;
   private final TriasApiParameters triasApiParameters;
   private final OjpApiParameters ojpApiParameters;
+  private final WarmupParameters warmupParameters;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -88,6 +92,7 @@ public class RouterConfig implements Serializable {
     this.triasApiParameters = TriasApiConfig.mapParameters("triasApi", root);
     this.ojpApiParameters = OjpApiConfig.mapParameters("ojpApi", root);
     this.flexConfig = new FlexConfig(root, "flex");
+    this.warmupParameters = WarmupConfig.mapWarmupConfig("warmup", root);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
@@ -156,6 +161,11 @@ public class RouterConfig implements Serializable {
 
   public GtfsApiParameters gtfsApiParameters() {
     return gtfsApi;
+  }
+
+  @Nullable
+  public WarmupParameters warmupParameters() {
+    return warmupParameters;
   }
 
   public NodeAdapter asNodeAdapter() {

@@ -1,20 +1,21 @@
 package org.opentripplanner.ext.carpooling.model;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
  * <p>
  * A carpool trip models a driver offering their vehicle journey for passengers to join. It includes
- * the driver's planned route as a sequence of stops, available seating capacity, and timing
+ * the driver's planned route as a sequence of stops, total vehicle capacity, and timing
  * constraints including a deviation budget that allows the driver to slightly adjust their route
  * to accommodate passengers.
  *
@@ -23,9 +24,7 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
  *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
  *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers
  *       can be picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
- *   <li><strong>Deviation Budget:</strong> Maximum additional time the driver is willing to spend
- *       to pick up/drop off passengers (e.g., 5 minutes). This represents the driver's flexibility.</li>
- *   <li><strong>Available Seats:</strong> Current passenger capacity remaining in the vehicle</li>
+ *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
  * </ul>
  *
  * <h2>Data Source</h2>
@@ -57,26 +56,28 @@ public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
   implements LogInfo {
 
+  /** Default total capacity (including driver) when no capacity information is provided. */
+  public static final int DEFAULT_TOTAL_CAPACITY = 5;
+
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final String provider;
-
-  // The amount of time the trip can deviate from the scheduled time in order to pick up or drop off
-  // a passenger.
-  private final Duration deviationBudget;
-  private final int availableSeats;
+  private final int totalCapacity;
 
   // Ordered list of stops along the carpool route where passengers can be picked up or dropped off
   private final List<CarpoolStop> stops;
+
+  @Nullable
+  private final ContactInfo publicContactInformation;
 
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
     this.startTime = builder.startTime();
     this.endTime = builder.endTime();
     this.provider = builder.provider();
-    this.availableSeats = builder.availableSeats();
-    this.deviationBudget = builder.deviationBudget();
+    this.totalCapacity = builder.totalCapacity();
     this.stops = Collections.unmodifiableList(builder.stops());
+    this.publicContactInformation = builder.publicContactInformation();
   }
 
   /**
@@ -113,30 +114,45 @@ public class CarpoolTrip
     return endTime;
   }
 
+  /**
+   * Returns the latest expected arrival time of the destination stop if available, otherwise
+   * falls back to {@link #endTime()}.
+   *
+   * @return the latest expected end time of the trip
+   */
+  public ZonedDateTime latestEndTime() {
+    var latest = getDestination().getLatestExpectedArrivalTime();
+    return latest != null ? latest : endTime;
+  }
+
   public String provider() {
     return provider;
   }
 
-  public Duration deviationBudget() {
-    return deviationBudget;
-  }
-
-  public int availableSeats() {
-    return availableSeats;
+  /**
+   * @return Total number of seats in the vehicle, including the driver seat
+   */
+  public int totalCapacity() {
+    return totalCapacity;
   }
 
   /**
    * Returns the ordered sequence of stops along the carpool route.
    * <p>
    * Stops include both the driver's originally planned stops and any dynamically added stops
-   * for passenger pickups and dropoffs. The list is ordered by sequence number, representing
-   * the order in which stops are visited along the route.
+   * for passenger pickups and dropoffs. The list is ordered by visit order along the route:
+   * the first element is the origin and the last is the destination.
    *
-   * @return an immutable list of stops along the carpool route, ordered by sequence number,
-   *         never null but may be empty for trips with no intermediate stops
+   * @return an immutable list of stops along the carpool route, in visit order; never null,
+   *         and always contains at least the origin and destination
    */
   public List<CarpoolStop> stops() {
     return stops;
+  }
+
+  @Nullable
+  public ContactInfo publicContactInformation() {
+    return publicContactInformation;
   }
 
   /**
@@ -152,65 +168,67 @@ public class CarpoolTrip
   }
 
   /**
-   * Calculates the number of passengers in the vehicle after visiting the specified position.
-   * <p>
-   * Position semantics:
-   * - Position 0: Before any stops → 0 passengers
-   * - Position N: After Nth stop → cumulative passenger delta up to stop N
+   * Returns the number of passengers onboard the vehicle when departing the given stop.
    *
-   * @param position The position index (0 = before any stops, 1 = after first stop, etc.)
-   * @return Number of passengers after this position
-   * @throws IllegalArgumentException if position is negative or greater than stops.size()
+   * @param stopIndex The 0-based index of the stop in the stop list
+   * @return Number of passengers onboard when departing from this stop
+   * @throws IllegalArgumentException if stopIndex is out of bounds
    */
-  public int getPassengerCountAtPosition(int position) {
-    if (position < 0) {
-      throw new IllegalArgumentException("Position must be non-negative, got: " + position);
-    }
-
-    if (position > stops.size()) {
+  public int getPassengerCountAtDepartureOfStop(int stopIndex) {
+    if (stopIndex < 0 || stopIndex >= stops.size()) {
       throw new IllegalArgumentException(
-        "Position " + position + " exceeds valid range (0 to " + stops.size() + ")"
+        "Stop index " + stopIndex + " is out of bounds (0 to " + (stops.size() - 1) + ")"
       );
     }
 
-    // Position 0 is before any stops
-    if (position == 0) {
-      return 0;
-    }
-
-    // Accumulate passenger deltas up to this position
-    int count = 0;
-    for (int i = 0; i < position; i++) {
-      count += stops.get(i).getPassengerDelta();
-    }
-
-    return count;
+    return stops.get(stopIndex).getOnboardCount();
   }
 
   /**
-   * Checks if there's capacity to add passengers throughout a range of positions.
+   * Checks if there's capacity to insert a passenger at the given pickup and dropoff positions
+   * in the modified route.
    * <p>
-   * This validates that adding passengers won't exceed vehicle capacity at any point
-   * between pickup and dropoff positions.
+   * The positions are 0-based indices of the passenger's pickup and dropoff stops in the
+   * modified route (the route after the passenger's stops have been inserted). For example,
+   * with original stops [Origin, A, B, Destination] and pickupPosition=1, dropoffPosition=3:
+   * the modified route is [Origin, Pickup, A, Dropoff, B, Destination].
+   * All stops between (inclusive) pickupPosition - 1 and dropoffPosition - 2 are checked for capacity.
+   * In the example this is between stops 0 and 1, meaning that stops Origin and A need to have sufficient
+   * capacity for {@code additionalPassengers} extra passengers.
+   * <p>
    *
-   * @param pickupPosition The pickup position (1-indexed, inclusive)
-   * @param dropoffPosition The dropoff position (1-indexed, exclusive)
+   * @param pickupPosition 0-based index of the passenger's pickup in the modified route.
+   *        Must be >= 1 (position 0 is the driver's origin).
+   * @param dropoffPosition 0-based index of the passenger's dropoff in the modified route.
+   *        Must be > pickupPosition.
    * @param additionalPassengers Number of passengers to add (typically 1)
    * @return true if capacity is available throughout the entire range, false otherwise
+   * @throws IllegalArgumentException if pickupPosition < 1 or dropoffPosition <= pickupPosition
    */
   public boolean hasCapacityForInsertion(
     int pickupPosition,
     int dropoffPosition,
     int additionalPassengers
   ) {
-    int pickupPassengers = getPassengerCountAtPosition(pickupPosition - 1);
-    if (pickupPassengers + additionalPassengers > availableSeats) {
-      return false;
+    if (pickupPosition < 1) {
+      throw new IllegalArgumentException(
+        "pickupPosition must be >= 1 (position 0 is the driver's origin), got: " + pickupPosition
+      );
+    }
+    if (dropoffPosition <= pickupPosition) {
+      throw new IllegalArgumentException(
+        "dropoffPosition must be > pickupPosition, got: pickupPosition=" +
+          pickupPosition +
+          ", dropoffPosition=" +
+          dropoffPosition
+      );
     }
 
-    for (int pos = pickupPosition; pos < dropoffPosition; pos++) {
-      int currentPassengers = getPassengerCountAtPosition(pos);
-      if (currentPassengers + additionalPassengers > availableSeats) {
+    int firstOriginalStop = pickupPosition - 1;
+    int lastOriginalStop = dropoffPosition - 2;
+
+    for (int i = firstOriginalStop; i <= lastOriginalStop; i++) {
+      if (getPassengerCountAtDepartureOfStop(i) + additionalPassengers > totalCapacity) {
         return false;
       }
     }
@@ -230,7 +248,8 @@ public class CarpoolTrip
       getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
-      stops.equals(other.stops)
+      stops.equals(other.stops) &&
+      Objects.equals(publicContactInformation, other.publicContactInformation)
     );
   }
 

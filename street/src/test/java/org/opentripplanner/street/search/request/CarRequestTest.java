@@ -11,7 +11,7 @@ import org.opentripplanner.core.model.basic.Cost;
 class CarRequestTest {
 
   private static final double RELUCTANCE = 5.111;
-  private static final double EXPECTED_RELUCTANCE = 5.1;
+  private static final double EXPECTED_RELUCTANCE = 5.0;
   private static final int PICKUP_TIME = 600;
   private static final Cost PICKUP_COST = Cost.costOfSeconds(500);
   private static final double ACCELERATION_SPEED = 3.1;
@@ -84,7 +84,7 @@ class CarRequestTest {
     assertEquals("CarRequest{}", CarRequest.DEFAULT.toString());
     assertEquals(
       "CarRequest{" +
-        "reluctance: 5.1, " +
+        "reluctance: 5.0, " +
         "parking: ParkingRequest{cost: $30}, " +
         "rental: RentalRequest{pickupTime: 30s}, " +
         "pickupTime: PT10M, " +

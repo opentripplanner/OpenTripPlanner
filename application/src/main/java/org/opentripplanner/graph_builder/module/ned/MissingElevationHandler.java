@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <li>
  *   If a vertex only had a single path, then the last known elevation is used
  * </li>
- * </li>
+ * <li>
  *   Once elevations for vertices are interpolated they are used to set the elevation profile
  *   for the incoming / outgoing StreetEdges
  * </li>

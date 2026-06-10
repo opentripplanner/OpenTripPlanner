@@ -2212,6 +2212,9 @@
         "fill-opacity" : 0.5,
         "fill-outline-color" : "#140d0e"
       },
+      "layout" : {
+        "visibility" : "none"
+      },
       "metadata" : {
         "group" : "Stops"
       }
@@ -2227,6 +2230,9 @@
         "fill-color" : "#22DD9E",
         "fill-opacity" : 0.5,
         "fill-outline-color" : "#140d0e"
+      },
+      "layout" : {
+        "visibility" : "none"
       },
       "metadata" : {
         "group" : "Stops"

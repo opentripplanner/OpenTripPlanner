@@ -68,25 +68,27 @@ public class GeometryProcessor {
   }
 
   /**
-   * Generate the geometry for the trip. Assumes that there are already vertices in the graph for
-   * the stops.
+   * Generate the per-hop geometry for the trip. The returned list is never null and always
+   * contains one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable
+   * shape data, the hops fall back to straight lines between consecutive stops, mirroring the
+   * NeTEx {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that
+   * there are already vertices in the graph for the stops.
    * <p>
    * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,
    * the graph, the TransitDataImport and others are not.
    */
   public List<LineString> createHopGeometries(Trip trip) {
+    List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
-      return null;
+      return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
 
-    return Arrays.asList(
-      createGeometry(trip.getShapeId(), builder.getStopTimesSortedByTrip().get(trip))
-    );
+    return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

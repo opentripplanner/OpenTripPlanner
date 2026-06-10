@@ -66,7 +66,7 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
 
   private Leg decorateLegWithRideEstimate(Itinerary i, Leg leg, RideHailingService service) {
     try {
-      if (leg instanceof StreetLeg sl && sl.getMode().isInCar()) {
+      if (leg instanceof StreetLeg sl && sl.getMode().isDrivingIsh()) {
         var estimates = service.rideEstimates(
           leg.from().coordinate,
           leg.to().coordinate,

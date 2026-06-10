@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.basic.Cost.costOfSeconds;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -25,7 +27,6 @@ import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class StreetSearchRequestMapperTest {
 
@@ -62,8 +63,8 @@ class StreetSearchRequestMapperTest {
   void mapFromToStopIds() {
     var builder = builder();
 
-    var from = GenericLocation.fromStopId("S1", "A", "STOP1");
-    var to = GenericLocation.fromStopId("S2", "A", "STOP2");
+    var from = GenericLocation.fromStopId(new FeedScopedId("A", "STOP1"), "S1");
+    var to = GenericLocation.fromStopId(new FeedScopedId("A", "STOP2"), "S2");
 
     var req = builder.withDateTime(INSTANT).withFrom(from).withTo(to).buildRequest();
 
@@ -79,7 +80,7 @@ class StreetSearchRequestMapperTest {
 
     Instant dateTime = INSTANT;
     builder.withDateTime(dateTime);
-    var from = new GenericLocation(null, id("STOP"), null, null);
+    var from = GenericLocation.fromStopId(id("STOP"));
     builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     builder.withTo(to);
@@ -101,7 +102,7 @@ class StreetSearchRequestMapperTest {
   @ParameterizedTest
   @ValueSource(booleans = { true, false })
   void mapTransferRequest(boolean arriveBy) {
-    var from = new GenericLocation(null, id("STOP"), null, null);
+    var from = GenericLocation.fromStopId(id("STOP"));
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     var builder = builder()
       .withArriveBy(arriveBy)
@@ -332,7 +333,7 @@ class StreetSearchRequestMapperTest {
     var dateTime = Instant.parse("2022-11-10T10:00:00Z");
     var rentalDuration = Duration.ofHours(2);
     builder.withDateTime(dateTime);
-    var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
+    var from = GenericLocation.fromStopId(FeedScopedIdForTestFactory.id("STOP"));
     builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     builder.withTo(to);

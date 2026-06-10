@@ -17,7 +17,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -32,6 +32,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -123,7 +124,7 @@ public class FlexIntegrationTest {
 
   @Test
   void shouldReturnARouteWithTwoTransfers() {
-    var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
+    var from = GenericLocation.fromStopId(new FeedScopedId("MARTA", "97266"), "ALEX DR@ALEX WAY");
     var to = GenericLocation.fromCoordinate(33.86701256815635, -84.61787939071655);
 
     var itin = getItinerary(from, to, 3);
@@ -170,8 +171,8 @@ public class FlexIntegrationTest {
 
     // walk, flex
     assertEquals(2, itin.legs().size());
-    assertEquals("2021-12-02T12:52:56-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3248, itin.generalizedCost());
+    assertEquals("2021-12-02T12:53:02-05:00[America/New_York]", itin.startTime().toString());
+    assertEquals(3236, itin.generalizedCost());
 
     var walkToFlex = itin.streetLeg(0);
     assertEquals(WALK, walkToFlex.getMode());

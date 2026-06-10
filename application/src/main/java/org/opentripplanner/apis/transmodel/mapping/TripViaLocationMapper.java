@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
@@ -59,7 +60,7 @@ class TripViaLocationMapper {
     return switch (fieldName) {
       case ViaLocationInputType.FIELD_VISIT -> mapVisitViaLocation(value);
       case ViaLocationInputType.FIELD_PASS_THROUGH -> mapPassThroughViaLocation(value);
-      default -> throw new IllegalArgumentException("Unknown field: " + fieldName);
+      default -> throw new InvalidInputException("Unknown field: " + fieldName);
     };
   }
 

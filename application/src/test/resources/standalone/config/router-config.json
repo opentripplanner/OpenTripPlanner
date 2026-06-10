@@ -473,6 +473,13 @@
       "maxPrimingIdleTime": "1s"
     }
   ],
+  "warmup": {
+    "api": "transmodel",
+    "from": { "lat": 59.9139, "lon": 10.7522 },
+    "to": { "lat": 59.95, "lon": 10.76 },
+    "accessModes": ["WALK", "CAR_TO_PARK"],
+    "egressModes": ["WALK", "WALK"]
+  },
   "rideHailingServices": [
     {
       "type": "uber-car-hailing",

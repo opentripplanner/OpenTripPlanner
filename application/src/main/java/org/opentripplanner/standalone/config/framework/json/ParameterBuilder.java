@@ -442,13 +442,15 @@ public class ParameterBuilder {
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parse(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
+    return exist() ? FeedScopedId.parseStrict(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parse(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it ->
+      FeedScopedId.parseStrict(it.asText())
+    );
   }
 
   public CostLinearFunction asCostLinearFunction(CostLinearFunction defaultValue) {

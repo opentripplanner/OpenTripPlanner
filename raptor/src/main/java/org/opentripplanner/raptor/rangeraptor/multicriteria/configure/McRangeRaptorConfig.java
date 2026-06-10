@@ -1,43 +1,38 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import gnu.trove.map.TIntObjectMap;
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
-import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ViaConnectionStopArrivalEventListener;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalsEventListenerMapper;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McArrivalsEventListenerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2.StopArrivalFactoryC2;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.StopsWithArriveByTransitCriteriaResolver;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.ArrivalParetoSetComparatorFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrivalFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.StopArrivalFactoryC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.passthrough.BitSetPassThroughPointsService;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.AbstractPatternRide;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PassThroughRideFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.TransitGroupPriorityRideFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.TransitGroupPriorityRideFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
@@ -51,37 +46,17 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContextViaSegments<T> contextSegment;
   private final PathConfig<T> pathConfig;
-  private final PassThroughPointsService passThroughPointsService;
   private DestinationArrivalPaths<T> paths;
   private ParetoComparator<RaptorPath<T>> comparator;
   private McRangeRaptorWorkerState<T> state;
   private Heuristics heuristics;
   private McStopArrivals<T> arrivals;
-  private McStopArrivals<T> nextSegmentArrivals = null;
+  private McRangeRaptorWorkerState<T> nextSegmentState = null;
   private McStopArrivalFactory<T> stopArrivalFactory = null;
 
-  public McRangeRaptorConfig(
-    SearchContextViaSegments<T> contextSegment,
-    PassThroughPointsService passThroughPointsService
-  ) {
+  public McRangeRaptorConfig(SearchContextViaSegments<T> contextSegment) {
     this.contextSegment = Objects.requireNonNull(contextSegment);
-    this.passThroughPointsService = Objects.requireNonNull(passThroughPointsService);
     this.pathConfig = new PathConfig<>(this.contextSegment.parent());
-  }
-
-  /**
-   * Static factory method to allow the {@link org.opentripplanner.raptor.configure.RaptorConfig}
-   * inject PassThroughPointsService.
-   * TODO VIA - This method is not needed when pass-through is ported to use the chained-worker
-   *            strategy, and not c2.
-   */
-  public static PassThroughPointsService createPassThroughPointsService(
-    boolean enableMcPassThrough,
-    List<RaptorViaLocation> viaLocations
-  ) {
-    return enableMcPassThrough
-      ? BitSetPassThroughPointsService.of(viaLocations)
-      : BitSetPassThroughPointsService.NOOP;
   }
 
   /**
@@ -97,10 +72,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * next segment. If this is the last segment, the next segment should be {@code null}. This is
    * optional.
    */
-  public McRangeRaptorConfig<T> connectWithNextSegmentArrivals(
-    @Nullable McStopArrivals<T> nextSegmentArrivals
+  public McRangeRaptorConfig<T> connectWithNextSegmentState(
+    @Nullable McRangeRaptorWorkerState<T> nextSegmentState
   ) {
-    this.nextSegmentArrivals = nextSegmentArrivals;
+    this.nextSegmentState = nextSegmentState;
     return this;
   }
 
@@ -111,7 +86,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return createTransitWorkerStrategy(createState(heuristics));
   }
 
-  public RaptorWorkerState<T> state() {
+  public McRangeRaptorWorkerState<T> state() {
     return createState(heuristics);
   }
 
@@ -120,17 +95,24 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   public McStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
+      var stopsWithArriveByTransitCriteria = StopsWithArriveByTransitCriteriaResolver.resolve(
+        contextSegment.accessPaths(),
+        contextSegment.egressPaths(),
+        contextSegment.viaConnections()
+      );
+
       // Glue arrivals to next-connection, egress/destination events, and debug-event on stops.
-      var listeners = ArrivalsEventListenerMapper.<T>map(
+      var listenersFactory = new McArrivalsEventListenerFactory<>(
         context().debugFactory(),
         createViaConnectionListeners(),
         contextSegment.egressPaths(),
         createDestinationArrivalPaths()
-      );
+      ).create();
 
       this.arrivals = new McStopArrivals<>(
         context().nStops(),
-        listeners,
+        stopsWithArriveByTransitCriteria,
+        listenersFactory.arrivalListeners(),
         createFactoryParetoComparator(),
         context().debugFactory()
       );
@@ -140,7 +122,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   public ParetoComparator<RaptorPath<T>> createPathParetoComparator() {
     if (comparator == null) {
-      var c2Comp = includeC2() ? dominanceFunctionC2() : null;
+      var c2Comp = isTransitPriority() ? dominanceFunctionC2() : null;
       comparator = pathConfig.createPathParetoComparator(resolveCostConfig(), c2Comp);
     }
     return comparator;
@@ -149,20 +131,22 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /* private factory methods */
 
   private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
-    return includeC2()
-      ? createTransitWorkerStrategy(
-          state,
-          createPatternRideC2Factory(),
-          PatternRideC2.paretoComparatorRelativeCost(dominanceFunctionC2())
-        )
-      : createTransitWorkerStrategy(
-          state,
-          PatternRideC1.factory(),
-          PatternRideC1.paretoComparatorRelativeCost()
-        );
+    return switch (resolveCostConfig()) {
+      case USE_C1 -> createTransitWorkerStrategy(
+        state,
+        PatternRideC1.factory(),
+        PatternRideC1.paretoComparatorRelativeCost()
+      );
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> createTransitWorkerStrategy(
+        state,
+        createPatternRideC2Factory(),
+        PatternRideC2.comparatorRelaxedC1IfC2IsOptimal(mcRequest().relaxC1(), dominanceFunctionC2())
+      );
+      default -> throw new IllegalArgumentException("Not supported here: " + resolveCostConfig());
+    };
   }
 
-  private <R extends PatternRide<T>> RoutingStrategy<T> createTransitWorkerStrategy(
+  private <R extends AbstractPatternRide<T>> RoutingStrategy<T> createTransitWorkerStrategy(
     McRangeRaptorWorkerState<T> state,
     PatternRideFactory<T, R> factory,
     ParetoComparator<R> patternRideComparator
@@ -171,7 +155,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       state,
       context().createTimeBasedBoardingSupport(),
       factory,
-      passThroughPointsService,
       context().costCalculator(),
       context().slackProvider(),
       createPatternRideParetoSet(patternRideComparator)
@@ -195,7 +178,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private McStopArrivalFactory<T> createStopArrivalFactory() {
     if (stopArrivalFactory == null) {
-      this.stopArrivalFactory = includeC2()
+      this.stopArrivalFactory = isTransitPriority()
         ? new StopArrivalFactoryC2<>()
         : new StopArrivalFactoryC1<>();
     }
@@ -220,7 +203,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
   }
 
-  private <R extends PatternRide<T>> ParetoSet<R> createPatternRideParetoSet(
+  private <R extends AbstractPatternRide<T>> ParetoSet<R> createPatternRideParetoSet(
     ParetoComparator<R> comparator
   ) {
     return ParetoSet.of(comparator, context().debugFactory().paretoSetPatternRideListener());
@@ -234,15 +217,23 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private ArrivalParetoSetComparatorFactory<McStopArrival<T>> createFactoryParetoComparator() {
-    return ArrivalParetoSetComparatorFactory.factory(mcRequest().relaxC1(), dominanceFunctionC2());
+    return switch (resolveCostConfig()) {
+      case USE_C1 -> ArrivalParetoSetComparatorFactory.ofCompareC1();
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> ArrivalParetoSetComparatorFactory.ofCompareC1RelaxedOnC2Dominance(
+        mcRequest().relaxC1(),
+        dominanceFunctionC2()
+      );
+      default -> throw new IllegalArgumentException();
+    };
   }
 
   private TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> createViaConnectionListeners() {
     return ViaConnectionStopArrivalEventListener.createEventListeners(
       contextSegment.viaConnections(),
       createStopArrivalFactory(),
-      nextSegmentArrivals,
-      context().lifeCycle()::onTransfersForRoundComplete
+      nextSegmentState,
+      context().lifeCycle()::onTransfersForRoundComplete,
+      context().transitData()::tripScheduleReference
     );
   }
 
@@ -250,32 +241,15 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return context().multiCriteria();
   }
 
-  /**
-   * Use c2 in the search, this is use-case specific. For example the pass-through or
-   * transit-group-priority features uses the c2 value.
-   */
-  private boolean includeC2() {
-    return (
-      context().searchParams().isPassThroughSearch() ||
-      mcRequest().transitPriorityCalculator().isPresent()
-    );
-  }
-
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
-    if (isPassThrough()) {
-      return new PassThroughRideFactory<>(passThroughPointsService);
-    }
     if (isTransitPriority()) {
       return new TransitGroupPriorityRideFactory<>(getTransitGroupPriorityCalculator());
     }
-    throw new IllegalStateException("Only pass-through and transit-priority uses c2.");
+    throw new IllegalStateException("Only transit-priority uses c2.");
   }
 
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
-    if (isPassThrough()) {
-      return passThroughPointsService.dominanceFunction();
-    }
     if (isTransitPriority()) {
       return getTransitGroupPriorityCalculator().dominanceFunction();
     }
@@ -286,10 +260,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return mcRequest().transitPriorityCalculator().orElseThrow();
   }
 
-  private boolean isPassThrough() {
-    return context().searchParams().isPassThroughSearch();
-  }
-
   private boolean isTransitPriority() {
     return mcRequest().transitPriorityCalculator().isPresent();
   }
@@ -297,9 +267,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private ParetoSetCost resolveCostConfig() {
     if (isTransitPriority()) {
       return ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
-    }
-    if (isPassThrough()) {
-      return ParetoSetCost.USE_C1_AND_C2;
     }
     return ParetoSetCost.USE_C1;
   }

@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This interface define the methods used be the {@link ArrivalTimeRoutingStrategy} to query and
@@ -22,7 +22,7 @@ public interface StdWorkerState<T extends RaptorTripSchedule> extends RaptorWork
   int bestTimePreviousRound(int stop);
 
   /**
-   * See {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#setAccessToStop(RaptorAccessEgress, int)}.
+   * See {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#addAccessStopArrival(RaptorAccessEgress, int)}.
    */
   void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
 

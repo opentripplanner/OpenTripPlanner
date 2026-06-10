@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner._support.time.ZoneIds.BERLIN;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.PlanTestConstants.D10_m;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
@@ -12,7 +13,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus.IN_TRANSIT_TO;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
@@ -42,12 +42,12 @@ import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.FeedInfoTestFactory;
@@ -67,6 +67,8 @@ import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -74,10 +76,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -124,7 +122,6 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
@@ -171,6 +168,7 @@ class GraphQLIntegrationTest {
       .withNetwork("Network-2")
       .withCurrentRangeMeters(null)
       .withCurrentFuelPercent(null)
+      .withAvailableUntil(null)
       .build();
 
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
@@ -187,12 +185,20 @@ class GraphQLIntegrationTest {
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final VehicleParkingRepository PARKING_REPOSITORY =
     new DefaultVehicleParkingRepository();
+  private static final NearbyPlaceFinder PLACE_FINDER = (_, _, _, _, _, _, _, _, _, _, _, _) -> {
+    var stop = TimetableRepositoryForTest.of().stop("A").build();
+    return List.of(
+      new PlaceAtDistance(stop, 0),
+      new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
+      new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
+    );
+  };
 
   @BeforeAll
   static void setup() {
     PARKING_REPOSITORY.updateVehicleParking(
       List.of(
-        VehicleParking.builder()
+        VehicleParking.of()
           .id(id("parking-1"))
           .coordinate(WgsCoordinate.GREENWICH)
           .name(NonLocalizedString.ofNullable("parking"))
@@ -207,7 +213,7 @@ class GraphQLIntegrationTest {
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository);
 
-    var cal_id = TimetableRepositoryForTest.id("CAL_1");
+    var cal_id = FeedScopedIdForTestFactory.id("CAL_1");
     var trip = TimetableRepositoryForTest.trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .withServiceId(cal_id)
@@ -273,7 +279,7 @@ class GraphQLIntegrationTest {
     timetableSnapshot.update(
       RealTimeTripUpdate.of(
         pattern,
-        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
+        tripTimes2.createRealTimeFromScheduledTimes().withCanceled().build(),
         secondDate
       ).build()
     );
@@ -519,7 +525,8 @@ class GraphQLIntegrationTest {
       new DefaultVehicleParkingService(PARKING_REPOSITORY),
       realtimeVehicleService,
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      FINDER,
+      PLACE_FINDER,
+      null,
       routeRequest
     );
   }
@@ -659,34 +666,4 @@ class GraphQLIntegrationTest {
     fail("expected an outbound response but got %s".formatted(response.getClass().getSimpleName()));
     return null;
   }
-
-  private static final GraphFinder FINDER = new GraphFinder() {
-    @Override
-    public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
-      return null;
-    }
-
-    @Override
-    public List<PlaceAtDistance> findClosestPlaces(
-      double lat,
-      double lon,
-      double radiusMeters,
-      int maxResults,
-      List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes,
-      List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByStations,
-      List<FeedScopedId> filterByRoutes,
-      List<String> filterByBikeRentalStations,
-      List<String> filterByNetwork,
-      TransitService transitService
-    ) {
-      var stop = TimetableRepositoryForTest.of().stop("A").build();
-      return List.of(
-        new PlaceAtDistance(stop, 0),
-        new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
-        new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
-      );
-    }
-  };
 }

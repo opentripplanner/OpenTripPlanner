@@ -10,8 +10,9 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +21,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -36,6 +36,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public abstract class OsmEntity {
 
+  private static final Pattern I18N_PATTERN = Pattern.compile("\\{(.*?)}");
   /**
    * highway=* values that we don't want to even consider when building the graph.
    */
@@ -132,6 +133,24 @@ public abstract class OsmEntity {
    */
   protected static final Set<String> CHECKED_MODES = Set.of("foot", "bicycle", "motorcar");
 
+  private static final Set<String> WALK_ONLY_HIGHWAY_VALUES = Set.of("footway", "step", "corridor");
+  private static final Set<String> NO_ACCESS_VALUES = Set.of("no", "license", "dismount");
+  private static final Set<String> HIGHWAY_BOARDING_LOCATION_VALUES = Set.of(
+    "platform",
+    "bus_stop"
+  );
+  private static final Set<String> RAILWAY_BOARDING_LOCATION_VALUES = Set.of(
+    "tram_stop",
+    "station",
+    "halt"
+  );
+  private static final Set<String> AMENITY_BOARDING_LOCATION_VALUES = Set.of(
+    "bus_station",
+    "amenity",
+    "ferry_terminal"
+  );
+  private static final Set<String> RAILWAY_PLATFORM_VALUES = Set.of("platform", "platform_edge");
+
   /**
    * Mapping for the fallback key for checking access restrictions for each access mode in OSM
    * However, access is not included because we are skeptical of access=yes tags.
@@ -144,8 +163,7 @@ public abstract class OsmEntity {
     "bicycle",
     "vehicle"
   );
-  public static final Set<String> NO_ACCESS_TAGS = Set.of("no", "license", "dismount");
-  public static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION =
+  private static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION =
     Map.of(
       StreetTraversalPermission.CAR,
       "motorcar",
@@ -155,14 +173,36 @@ public abstract class OsmEntity {
       "foot"
     );
 
-  /* To save memory this is only created when an entity actually has tags. */
-  private Map<String, String> tags;
+  /// This is nullable for performance reasons.
+  ///
+  /// You could use an empty map, but using null allows you to skip the lower-casing and hash lookup
+  /// per tag, which is the hottest path during OSM processing.
+  @Nullable
+  private final Map<String, String> tags;
 
-  protected long id;
+  protected final long id;
 
-  protected I18NString creativeName;
+  private final OsmProvider osmProvider;
 
-  private OsmProvider osmProvider;
+  /**
+   * Because it is expensive to compute the creative way, we do it only once and store the fact in
+   * this boolean.
+   */
+  private boolean creativeNameComputed = false;
+
+  @Nullable
+  private I18NString creativeName;
+
+  /**
+   * Constructor for immutable OsmEntity
+   */
+  protected OsmEntity(long id, @Nullable Map<String, String> tags, OsmProvider osmProvider) {
+    this.id = id;
+    // calling Map.copyOf here costs about 10% of parsing performance, so we use
+    // Collections.unmodifiableMap in the getter
+    this.tags = tags;
+    this.osmProvider = osmProvider;
+  }
 
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
@@ -180,63 +220,34 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Sets the id.
-   */
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  /**
-   * Adds a tag.
-   */
-  public void addTag(OsmTag tag) {
-    if (tags == null) {
-      tags = new HashMap<>();
-    }
-
-    tags.put(tag.getK().toLowerCase(), tag.getV());
-  }
-
-  /**
-   * Adds a tag.
-   */
-  public OsmEntity addTag(String key, String value) {
-    if (key == null || value == null) {
-      return this;
-    }
-
-    if (tags == null) {
-      tags = new HashMap<>();
-    }
-
-    tags.put(key.toLowerCase(), value);
-    return this;
-  }
-
-  /**
-   * The tags of an entity.
+   * The tags of an entity (immutable).
    */
   public Map<String, String> getTags() {
-    return Objects.requireNonNullElse(tags, Map.of());
+    if (this.isTagless()) {
+      return Map.of();
+    } else {
+      return Collections.unmodifiableMap(tags);
+    }
   }
 
   /**
    * Is the tag defined?
    */
-  public boolean hasTag(String tag) {
-    tag = tag.toLowerCase();
-    return tags != null && tags.containsKey(tag);
+  public final boolean hasTag(String tag) {
+    return !this.isTagless() && getTag(tag) != null;
+  }
+
+  /**
+   * Does the entity contain any tags at all?
+   */
+  final boolean isTagless() {
+    return this.tags == null;
   }
 
   /**
    * Determines if a tag contains a false value. 'no', 'false', and '0' are considered false.
    */
-  public boolean isTagFalse(String tag) {
-    tag = tag.toLowerCase();
-    if (tags == null) {
-      return false;
-    }
-
+  public final boolean isTagFalse(String tag) {
     return isFalse(getTag(tag));
   }
 
@@ -256,20 +267,8 @@ public abstract class OsmEntity {
   /**
    * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
    */
-  public boolean isTagTrue(String tag) {
-    tag = tag.toLowerCase();
-    if (tags == null) {
-      return false;
-    }
-
+  public final boolean isTagTrue(String tag) {
     return isTrue(getTag(tag));
-  }
-
-  /**
-   * Returns true if bicycle dismounts are forced.
-   */
-  public boolean isBicycleDismountForced() {
-    return isTag("bicycle", "dismount");
   }
 
   public boolean isSidewalk() {
@@ -296,6 +295,9 @@ public abstract class OsmEntity {
    * or a parent mode, either with a directional suffix or not, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
+    if (isTagless()) {
+      return Optional.empty();
+    }
     // check if the exact directional tag allows or denies access
     if (direction != DIRECTIONLESS) {
       if (isExplicitlyAllowed(mode + direction.tagSuffix())) {
@@ -318,13 +320,9 @@ public abstract class OsmEntity {
   }
 
   protected boolean isExplicitlyAllowed(String key) {
-    if (tags == null) {
-      return false;
-    }
     if (isTagTrue(key)) {
       return true;
     }
-    key = key.toLowerCase();
     String value = getTag(key);
     return (
       "designated".equals(value) ||
@@ -339,12 +337,12 @@ public abstract class OsmEntity {
    * Returns null if tag is not present.
    */
   @Nullable
-  public String getTag(String tag) {
-    tag = tag.toLowerCase();
-    if (tags != null && tags.containsKey(tag)) {
-      return tags.get(tag);
+  public final String getTag(String tag) {
+    if (this.isTagless()) {
+      return null;
     }
-    return null;
+    tag = tag.toLowerCase();
+    return tags.get(tag);
   }
 
   /**
@@ -503,20 +501,20 @@ public abstract class OsmEntity {
   /**
    * Checks if a tag contains the specified value.
    */
-  public boolean isTag(String tag, String value) {
-    tag = tag.toLowerCase();
-    if (tags != null && tags.containsKey(tag) && value != null) {
-      return value.equals(tags.get(tag));
-    }
-
-    return false;
+  public final boolean isTag(String tag, String value) {
+    return !isTagless() && value != null && value.equals(tags.get(tag.toLowerCase()));
   }
 
   /**
    * Takes a tag key and checks if the value is any of those in {@code oneOfTags}.
    */
   public boolean isOneOfTags(String key, Set<String> oneOfTags) {
-    return oneOfTags.stream().anyMatch(value -> isTag(key, value));
+    var value = getTag(key);
+    if (value == null) {
+      return false;
+    } else {
+      return oneOfTags.contains(value);
+    }
   }
 
   /**
@@ -525,26 +523,23 @@ public abstract class OsmEntity {
    */
   @Nullable
   public I18NString getAssumedName() {
-    if (tags == null) {
-      return null;
-    }
-    if (tags.containsKey("name")) {
+    if (hasTag("name")) {
       return TranslatedString.getDeduplicatedI18NString(
         this.generateI18NForPattern("{name}"),
         false
       );
     }
-    if (tags.containsKey("otp:route_name")) {
-      return new NonLocalizedString(tags.get("otp:route_name"));
+    // because it is expensive to compute the creative way, we do it only once.
+    if (!creativeNameComputed) {
+      this.creativeName = getOsmProvider().getWayPropertySet().getCreativeName(this);
+      this.creativeNameComputed = true;
     }
-    if (this.creativeName != null) {
+    if (creativeName != null) {
       return this.creativeName;
     }
-    if (tags.containsKey("otp:route_ref")) {
-      return new NonLocalizedString(tags.get("otp:route_ref"));
-    }
-    if (tags.containsKey("ref")) {
-      return new NonLocalizedString(tags.get("ref"));
+    var ref = getTag("ref");
+    if (ref != null) {
+      return new NonLocalizedString(ref);
     }
     return null;
   }
@@ -561,7 +556,7 @@ public abstract class OsmEntity {
   public Map<String, String> generateI18NForPattern(String pattern) {
     Map<String, StringBuffer> i18n = new HashMap<>();
     i18n.put(null, new StringBuffer());
-    Matcher matcher = Pattern.compile("\\{(.*?)}").matcher(pattern);
+    Matcher matcher = I18N_PATTERN.matcher(pattern);
 
     int lastEnd = 0;
     while (matcher.find()) {
@@ -658,7 +653,7 @@ public abstract class OsmEntity {
       return Optional.empty();
     }
 
-    if ("foot".equals(mode) && !isOneOfTags("highway", Set.of("footway", "step", "corridor"))) {
+    if ("foot".equals(mode) && !isOneOfTags("highway", WALK_ONLY_HIGHWAY_VALUES)) {
       return Optional.empty();
     }
 
@@ -742,14 +737,14 @@ public abstract class OsmEntity {
    * @return whether the node is a place used to board a public transport vehicle
    */
   public boolean isBoardingLocation() {
+    // the majority of nodes have no tags at all, so this yields a good speed-up
+    if (isTagless()) {
+      return false;
+    }
     return (
-      isTag("highway", "bus_stop") ||
-      isTag("railway", "tram_stop") ||
-      isTag("railway", "station") ||
-      isTag("railway", "halt") ||
-      isTag("amenity", "bus_station") ||
-      isTag("amenity", "ferry_terminal") ||
-      isTag("highway", "platform") ||
+      isOneOfTags("highway", HIGHWAY_BOARDING_LOCATION_VALUES) ||
+      isOneOfTags("railway", RAILWAY_BOARDING_LOCATION_VALUES) ||
+      isOneOfTags("amenity", AMENITY_BOARDING_LOCATION_VALUES) ||
       isPlatform()
     );
   }
@@ -763,24 +758,8 @@ public abstract class OsmEntity {
    **/
   public boolean isPlatform() {
     var isPlatform =
-      isTag("public_transport", "platform") ||
-      isTag("railway", "platform") ||
-      isTag("railway", "platform_edge");
+      isTag("public_transport", "platform") || isOneOfTags("railway", RAILWAY_PLATFORM_VALUES);
     return isPlatform && !isTag("usage", "tourism");
-  }
-
-  /**
-   * @return True if this entity provides an entrance to a platform or similar entity
-   */
-  public boolean isEntrance() {
-    return (
-      (isTag("railway", "subway_entrance") ||
-        isTag("highway", "elevator") ||
-        isTag("entrance", "yes") ||
-        isTag("entrance", "main")) &&
-      !isTag("access", "private") &&
-      !isTag("access", "no")
-    );
   }
 
   /**
@@ -790,10 +769,6 @@ public abstract class OsmEntity {
     return (
       isTag("amenity", "bicycle_parking") && !isTag("access", "private") && !isTag("access", "no")
     );
-  }
-
-  public void setCreativeName(I18NString creativeName) {
-    this.creativeName = creativeName;
   }
 
   /**
@@ -830,22 +805,25 @@ public abstract class OsmEntity {
    * Values are split by semicolons.
    */
   public Set<String> getMultiTagValues(Set<String> refTags) {
-    return refTags
-      .stream()
-      .map(this::getTag)
-      .filter(Objects::nonNull)
-      .flatMap(v -> Arrays.stream(v.split(";")))
-      .map(String::strip)
-      .filter(v -> !v.isBlank())
-      .collect(Collectors.toUnmodifiableSet());
+    // we try to keep the allocations low, so only allocate a small hash set by default
+    Set<String> result = HashSet.newHashSet(2);
+    for (var tag : refTags) {
+      var value = getTag(tag);
+      if (value == null) {
+        continue;
+      }
+      for (var part : value.split(";")) {
+        var stripped = part.strip();
+        if (!stripped.isBlank()) {
+          result.add(stripped);
+        }
+      }
+    }
+    return result;
   }
 
   public OsmProvider getOsmProvider() {
     return osmProvider;
-  }
-
-  public void setOsmProvider(OsmProvider provider) {
-    this.osmProvider = provider;
   }
 
   /**
@@ -901,10 +879,11 @@ public abstract class OsmEntity {
    *         of other information.
    */
   public boolean isWheelchairAccessible() {
-    if (isTagTrue("wheelchair")) {
+    var wheelchairValue = getTag("wheelchair");
+    if (isTrue(wheelchairValue)) {
       return true;
     }
-    if (isTagFalse("wheelchair")) {
+    if (isFalse(wheelchairValue)) {
       return false;
     }
     if (isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS)) {
@@ -940,7 +919,7 @@ public abstract class OsmEntity {
    * set on the entity in OSM.
    *
    * @see OsmEntity#isNamed()
-   * @see https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   * @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
    */
   public boolean isExplicitlyUnnamed() {
     return isTagTrue("noname");
@@ -950,7 +929,7 @@ public abstract class OsmEntity {
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isExplicitlyDenied(String key) {
-    return isOneOfTags(key, NO_ACCESS_TAGS);
+    return isOneOfTags(key, NO_ACCESS_VALUES);
   }
 
   public StreetTraversalPermission getPermission() {

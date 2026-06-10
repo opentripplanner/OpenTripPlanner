@@ -36,7 +36,7 @@ class BackwardsEarlinessPropagationTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
     assertEquals(
-      "UPDATED | A [ND] 10:00 10:00 | B [ND] 10:09 10:09 | C 10:09 10:09",
+      "U | A [ND] 10:00 10:00 | B [ND] 10:09 10:09 | C 10:09 10:09",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -55,7 +55,7 @@ class BackwardsEarlinessPropagationTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
     assertEquals(
-      "UPDATED | A [ND] 10:00 10:00 | B [ND] 10:10 10:10 | C [ND] 10:20 10:20",
+      "U | A [ND] 10:00 10:00 | B [ND] 10:10 10:10 | C [ND] 10:20 10:20",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

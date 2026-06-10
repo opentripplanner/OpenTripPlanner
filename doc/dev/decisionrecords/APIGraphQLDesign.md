@@ -7,8 +7,9 @@ of the OTP developers is the Production Ready GraphQL book by Marc-André Giroux
 
 ## Pagination
 
-We use the [pagination](https://graphql.org/learn/pagination/) (a.k. Relay) specification for paging over entities like stations, 
-stops, trips and routes. Very often OTP has a _finite_ list of entities in memory.
+We use the [pagination](https://graphql.org/learn/pagination/) (a.k.a. Relay) specification for paging over entities like stations, 
+stops, trips and routes. Very often OTP has a _finite_ list of entities in memory. The route request has an OTP custom pagination
+feature - it is not finite and very complex.
 
 
 ## Refetching
@@ -43,3 +44,13 @@ We allow breaking API changes in these cases:
 > Use feature xyz instead. 
 > Note! This feature is subject for removal in September 2027! If you want this to stay, please
 >       notify the OTP community.
+
+## Conventions
+
+### Small `input` value-objects should have required fields, no default field values
+
+An input representing a single concept or thing should carry all relevant fields even if
+some of the values are common or have a natural default. Examples of such input types are 
+`InputCoordinate(lat, long)` and `InputLinearFunction(constant, coefficient)`. Small input 
+value-object types could be scalars, but if they have multiple fields using an input type 
+is a better match. This simplifies validation and default value injection.

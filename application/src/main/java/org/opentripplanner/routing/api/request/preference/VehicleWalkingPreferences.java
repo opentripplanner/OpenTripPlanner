@@ -24,7 +24,7 @@ public class VehicleWalkingPreferences implements Serializable {
   private final double stairsReluctance;
 
   private VehicleWalkingPreferences() {
-    this.speed = 1.33;
+    this.speed = 1.35;
     this.reluctance = 5.0;
     this.mountDismountTime = Duration.ZERO;
     this.mountDismountCost = Cost.ZERO;
@@ -53,7 +53,7 @@ public class VehicleWalkingPreferences implements Serializable {
   }
 
   /**
-   * The walking speed when walking a vehicle. Default: 1.33 m/s ~ Same as walkSpeed.
+   * The walking speed when walking a vehicle. Default: 1.35 m/s ~ Same as walkSpeed.
    */
   public double speed() {
     return speed;

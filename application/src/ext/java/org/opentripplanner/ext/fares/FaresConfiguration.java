@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.service.NoopFareServiceFactory;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.AtlantaFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombineInterlinedLegsFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.HSLFareServiceFactory;
@@ -58,7 +58,7 @@ public class FaresConfiguration {
     }
 
     if (type == null) {
-      type = "default";
+      type = "off";
     }
 
     FareServiceFactory factory = createFactory(type);
@@ -68,8 +68,8 @@ public class FaresConfiguration {
 
   private static FareServiceFactory createFactory(String type) {
     return switch (type) {
-      case "default" -> new DefaultFareServiceFactory();
       case "off" -> new NoopFareServiceFactory();
+      case "gtfs" -> new GtfsFareServiceFactory();
       case
         "highest-fare-in-free-transfer-window",
         "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();

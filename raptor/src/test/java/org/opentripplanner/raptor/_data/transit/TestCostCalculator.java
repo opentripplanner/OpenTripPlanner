@@ -1,10 +1,9 @@
 package org.opentripplanner.raptor._data.transit;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
@@ -50,17 +49,17 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   public int boardingCost(
     boolean firstBoarding,
     int prevArrivalTime,
-    int boardStop,
+    int boardStopIndex,
     int boardTime,
     TestTripSchedule trip,
     RaptorTransferConstraint transferConstraints
   ) {
     if (transferConstraints.isRegularTransfer()) {
-      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
+      return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStopIndex, boardTime);
     } else {
       return boardingCostConstrainedTransfer(
         prevArrivalTime,
-        boardStop,
+        boardStopIndex,
         boardTime,
         firstBoarding,
         transferConstraints
@@ -69,28 +68,24 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   }
 
   @Override
-  public int onTripRelativeRidingCost(int boardTime, TestTripSchedule tripScheduledBoarded) {
-    // The relative-transit-time is time spent on transit. We do not know the alight-stop, so
-    // it is impossible to calculate the "correct" time. But the only thing that maters is that
-    // the relative difference between to boardings are correct, assuming riding the same trip.
-    // So, we can use the negative board time as relative-transit-time.
-    return -boardTime * TRANSIT_RELUCTANCE;
+  public int transitCost(int transitDuration, TestTripSchedule tripScheduledBoarded) {
+    return transitDuration * TRANSIT_RELUCTANCE;
   }
 
   @Override
   public int transitArrivalCost(
     int boardCost,
     int alightSlack,
-    int transitTime,
+    int transitDuration,
     TestTripSchedule trip,
-    int toStop
+    int toStopIndex
   ) {
-    int cost = boardCost + TRANSIT_RELUCTANCE * transitTime + waitFactor * alightSlack;
+    int cost = boardCost + transitCost(transitDuration, trip) + waitFactor * alightSlack;
 
     // Add transfer cost on all alighting events.
     // If it turns out to be the last one this cost will be removed during costEgress phase.
     if (stopBoardAlightTransferCosts != null) {
-      cost += stopBoardAlightTransferCosts[toStop];
+      cost += stopBoardAlightTransferCosts[toStopIndex];
     }
 
     return cost;
@@ -102,33 +97,37 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   }
 
   @Override
-  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
+  public int calculateRemainingMinCost(
+    int minTravelDuration,
+    int minNumTransfers,
+    int fromStopIndex
+  ) {
     if (minNumTransfers > -1) {
       return (
         boardCost +
         ((boardCost + transferCost) * minNumTransfers) +
-        (TRANSIT_RELUCTANCE * minTravelTime)
+        (TRANSIT_RELUCTANCE * minTravelDuration)
       );
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null
-        ? (TRANSIT_RELUCTANCE * minTravelTime)
-        : (TRANSIT_RELUCTANCE * minTravelTime) - stopBoardAlightTransferCosts[fromStop];
+        ? (TRANSIT_RELUCTANCE * minTravelDuration)
+        : (TRANSIT_RELUCTANCE * minTravelDuration) - stopBoardAlightTransferCosts[fromStopIndex];
     }
   }
 
   @Override
-  public int costEgress(RaptorAccessEgress egress) {
-    if (egress.hasRides()) {
-      return egress.c1() + transferCost;
+  public int costEgress(int stopIndex, boolean hasRides) {
+    if (hasRides) {
+      return transferCost;
     } else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
-      return egress.c1() - stopBoardAlightTransferCosts[egress.stop()];
+      return -stopBoardAlightTransferCosts[stopIndex];
     } else {
-      return egress.c1();
+      return 0;
     }
   }
 

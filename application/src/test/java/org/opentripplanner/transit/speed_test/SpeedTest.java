@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
@@ -28,6 +27,7 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -161,7 +161,6 @@ public class SpeedTest {
       null,
       null,
       null,
-      null,
       null
     );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
@@ -257,7 +256,9 @@ public class SpeedTest {
     // We assume we are debugging and not measuring performance if we only run 1 test-case
     // one time; Hence skip JIT compiler warm-up.
     if (testCases.runJitWarmUp() || opts.profiles().length > 1) {
-      performRouting(testCases.getJitWarmUpCase());
+      for (var tc : testCases.getJitWarmUpCases()) {
+        performRouting(tc);
+      }
     }
 
     ResultPrinter.logSingleTestHeader(profile);
@@ -351,11 +352,11 @@ public class SpeedTest {
    * to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
-    var currentTestCases = lastSampleResult.get(profile);
-    if (currentTestCases.isFiltered()) {
-      return;
-    }
     for (var p : opts.profiles()) {
+      var currentTestCases = lastSampleResult.get(p);
+      if (currentTestCases.isFiltered()) {
+        continue;
+      }
       tcIO.writeResultsToFile(p, currentTestCases);
     }
   }

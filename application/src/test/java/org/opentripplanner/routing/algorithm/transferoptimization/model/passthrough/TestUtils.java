@@ -4,7 +4,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;

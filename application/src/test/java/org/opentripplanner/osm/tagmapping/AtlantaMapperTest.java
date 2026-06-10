@@ -22,13 +22,14 @@ class AtlantaMapperTest {
   public void peachtreeRoad() {
     // Peachtree Rd in Atlanta has sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/144429544
-    OsmWay peachtreeRd = new OsmWay();
-    peachtreeRd.addTag("highway", "trunk");
-    peachtreeRd.addTag("lanes", "6");
-    peachtreeRd.addTag("name", "Peachtree Road");
-    peachtreeRd.addTag("ref", "US 19;GA 9");
-    peachtreeRd.addTag("surface", "asphalt");
-    peachtreeRd.addTag("tiger:county", "Fulton, GA");
+    OsmWay peachtreeRd = OsmWay.of()
+      .withTag("highway", "trunk")
+      .withTag("lanes", "6")
+      .withTag("name", "Peachtree Road")
+      .withTag("ref", "US 19;GA 9")
+      .withTag("surface", "asphalt")
+      .withTag("tiger:county", "Fulton, GA")
+      .build();
 
     assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(peachtreeRd).getPermission());
   }
@@ -37,13 +38,14 @@ class AtlantaMapperTest {
   public void deKalbAvenue() {
     // "Outer" ramps from DeKalb Ave onto Moreland Ave in Atlanta have sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/9164434
-    OsmWay morelandRamp = new OsmWay();
-    morelandRamp.addTag("highway", "trunk_link");
-    morelandRamp.addTag("lanes", "1");
-    morelandRamp.addTag("oneway", "yes");
-    morelandRamp.addTag("tiger:cfcc", "A63");
-    morelandRamp.addTag("tiger:county", "DeKalb, GA");
-    morelandRamp.addTag("tiger:reviewed", "no");
+    OsmWay morelandRamp = OsmWay.of()
+      .withTag("highway", "trunk_link")
+      .withTag("lanes", "1")
+      .withTag("oneway", "yes")
+      .withTag("tiger:cfcc", "A63")
+      .withTag("tiger:county", "DeKalb, GA")
+      .withTag("tiger:reviewed", "no")
+      .build();
 
     assertEquals(
       StreetTraversalPermission.ALL,
@@ -55,17 +57,18 @@ class AtlantaMapperTest {
   public void tenthStreetNE() {
     // For sanity check, secondary roads (e.g. 10th Street) should remain allowed for all modes.
     // https://www.openstreetmap.org/way/505912700
-    OsmWay tenthSt = new OsmWay();
-    tenthSt.addTag("highway", "secondary");
-    tenthSt.addTag("lanes", "4");
-    tenthSt.addTag("maxspeed", "30 mph");
-    tenthSt.addTag("name", "10th Street Northeast");
-    tenthSt.addTag("oneway", "no");
-    tenthSt.addTag("source:maxspeed", "sign");
-    tenthSt.addTag("surface", "asphalt");
-    tenthSt.addTag("tiger:cfcc", "A41");
-    tenthSt.addTag("tiger:county", "Fulton, GA");
-    tenthSt.addTag("tiger:reviewed", "no");
+    OsmWay tenthSt = OsmWay.of()
+      .withTag("highway", "secondary")
+      .withTag("lanes", "4")
+      .withTag("maxspeed", "30 mph")
+      .withTag("name", "10th Street Northeast")
+      .withTag("oneway", "no")
+      .withTag("source:maxspeed", "sign")
+      .withTag("surface", "asphalt")
+      .withTag("tiger:cfcc", "A41")
+      .withTag("tiger:county", "Fulton, GA")
+      .withTag("tiger:reviewed", "no")
+      .build();
     // Some other params omitted.
     assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(tenthSt).getPermission());
   }

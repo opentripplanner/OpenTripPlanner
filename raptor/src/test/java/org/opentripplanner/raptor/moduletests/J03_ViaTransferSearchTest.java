@@ -15,7 +15,7 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
-import static org.opentripplanner.raptor.api.request.RaptorViaLocation.via;
+import static org.opentripplanner.raptor.api.request.via.RaptorViaLocation.viaVisit;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 
 /**
@@ -90,9 +90,7 @@ class J03_ViaTransferSearchTest {
       .searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(
-        RaptorViaLocation.via("B")
-          .addViaTransfer(STOP_B, TestTransfer.transfer(STOP_B, D1_m))
-          .build()
+        viaVisit("B").addTransfer(STOP_B, TestTransfer.transfer(STOP_B, D1_m)).build()
       )
       .addEgressPaths(walk(STOP_D, D30_s));
 
@@ -127,9 +125,7 @@ class J03_ViaTransferSearchTest {
     requestBuilder
       .searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
-      .addViaLocation(
-        via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
-      )
+      .addViaLocation(viaVisit("BxC").addTransfer(STOP_B, transfer(STOP_C, D1_m)).build())
       .addEgressPaths(walk(STOP_E, D30_s));
 
     var result = raptorService.route(requestBuilder.build(), data);
@@ -171,7 +167,7 @@ class J03_ViaTransferSearchTest {
       .searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(
-        via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
+        viaVisit("BxC").addTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
       )
       .addEgressPaths(walk(STOP_F, D30_s));
 
@@ -211,8 +207,8 @@ class J03_ViaTransferSearchTest {
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(
         List.of(
-          RaptorViaLocation.via("B", minWaitTime)
-            .addViaTransfer(STOP_B, transfer(STOP_B, D20_s))
+          RaptorViaLocation.viaVisit("B", minWaitTime)
+            .addTransfer(STOP_B, transfer(STOP_B, D20_s))
             .build()
         )
       )

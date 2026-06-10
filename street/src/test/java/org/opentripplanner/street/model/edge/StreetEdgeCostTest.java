@@ -20,9 +20,9 @@ class StreetEdgeCostTest {
   static Stream<Arguments> walkReluctanceCases() {
     return Stream.of(
       Arguments.of(0.5, 37),
-      Arguments.of(1, 75),
-      Arguments.of(2, 150),
-      Arguments.of(3, 225)
+      Arguments.of(1, 74),
+      Arguments.of(2, 148),
+      Arguments.of(3, 222)
     );
   }
 
@@ -45,7 +45,7 @@ class StreetEdgeCostTest {
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
 
-    assertEquals(76, result.getElapsedTimeSeconds());
+    assertEquals(75, result.getElapsedTimeSeconds());
   }
 
   static Stream<Arguments> bikeReluctanceCases() {
@@ -145,7 +145,7 @@ class StreetEdgeCostTest {
   }
 
   static Stream<Arguments> stairsCases() {
-    return Stream.of(Arguments.of(1, 45), Arguments.of(1.5, 67), Arguments.of(3, 135));
+    return Stream.of(Arguments.of(1, 44), Arguments.of(1.5, 66), Arguments.of(3, 133));
   }
 
   @ParameterizedTest(name = "stairs reluctance of {0} should lead to traversal costs of {1}")
@@ -175,11 +175,11 @@ class StreetEdgeCostTest {
 
     StreetEdge noStairsEdge = stairsEdge.toBuilder().withStairs(false).buildAndConnect();
     var notStairsResult = traverse(noStairsEdge, req.build());
-    assertEquals(15, (long) notStairsResult.weight);
+    assertEquals(14, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> bikeStairsCases() {
-    return Stream.of(Arguments.of(1, 112), Arguments.of(1.5, 169), Arguments.of(3, 338));
+    return Stream.of(Arguments.of(1, 111), Arguments.of(1.5, 166), Arguments.of(3, 333));
   }
 
   @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
@@ -213,7 +213,7 @@ class StreetEdgeCostTest {
   }
 
   static Stream<Arguments> walkSafetyCases() {
-    return Stream.of(Arguments.of(0, 15), Arguments.of(0.5, 22), Arguments.of(1, 30));
+    return Stream.of(Arguments.of(0, 14), Arguments.of(0.5, 22), Arguments.of(1, 29));
   }
 
   @ParameterizedTest(name = "walk safety factor of {0} should lead to traversal costs of {1}")
@@ -240,7 +240,7 @@ class StreetEdgeCostTest {
 
     StreetEdge lessSafeEdge = safeEdge.toBuilder().withWalkSafetyFactor(1).buildAndConnect();
     var defaultSafetyResult = traverse(lessSafeEdge, req.build());
-    assertEquals(15, (long) defaultSafetyResult.weight);
+    assertEquals(14, (long) defaultSafetyResult.weight);
   }
 
   private State traverse(StreetEdge edge, StreetSearchRequest request) {

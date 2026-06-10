@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -40,6 +43,21 @@ public class TransitPreferencesMapper {
     var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
     if (transitArgs == null) {
       return;
+    }
+
+    var relax = transitArgs.getGraphQLRelaxTransitGroupPriority();
+    if (relax != null) {
+      Cost constant = Cost.ZERO;
+      Double coefficient = 1.0;
+      if (relax.getGraphQLConstant() != null) {
+        constant = relax.getGraphQLConstant();
+      }
+      if (relax.getGraphQLCoefficient() != null) {
+        coefficient = relax.getGraphQLCoefficient();
+      }
+      transitPreferences.withRelaxTransitGroupPriority(
+        CostLinearFunction.of(constant, coefficient)
+      );
     }
 
     var board = transitArgs.getGraphQLBoard();
@@ -79,14 +97,14 @@ public class TransitPreferencesMapper {
       var maxTransfers = transfer.getGraphQLMaximumTransfers();
       if (maxTransfers != null) {
         if (maxTransfers < 0) {
-          throw new IllegalArgumentException("Maximum transfers must be non-negative.");
+          throw new InvalidInputException("Maximum transfers must be non-negative.");
         }
         transferPreferences.withMaxTransfers(maxTransfers + 1);
       }
       var additionalTransfers = transfer.getGraphQLMaximumAdditionalTransfers();
       if (additionalTransfers != null) {
         if (additionalTransfers < 0) {
-          throw new IllegalArgumentException("Maximum additional transfers must be non-negative.");
+          throw new InvalidInputException("Maximum additional transfers must be non-negative.");
         }
         transferPreferences.withMaxAdditionalTransfers(additionalTransfers);
       }

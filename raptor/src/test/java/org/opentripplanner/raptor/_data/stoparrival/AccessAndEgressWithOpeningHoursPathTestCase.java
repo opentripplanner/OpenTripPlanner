@@ -3,8 +3,8 @@ package org.opentripplanner.raptor._data.stoparrival;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
-import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
+import static org.opentripplanner.raptor.spi.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -16,11 +16,11 @@ import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -47,8 +47,6 @@ import org.opentripplanner.utils.time.TimeUtils;
 public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestConstants {
 
   private static final int ZERO = 0;
-  // The transit reluctance is ignored, any value should work
-  private static final int TRANSIT_RELUCTANCE_INDEX = -1;
   public static final double WAIT_RELUCTANCE = 0.8;
   public static final int BOARD_C1_SEC = 60;
   public static final int TRANSFER_C1_SEC = 120;

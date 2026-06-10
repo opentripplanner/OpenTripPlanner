@@ -2,8 +2,8 @@ package org.opentripplanner.updater.vehicle_parking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.List;
@@ -48,7 +48,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateCarAvailability() {
-    var service = buildParkingRepository(VehicleParkingSpaces.builder().carSpaces(10).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.of().carSpaces(10).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDataSource(DEFAULT_UPDATE),
@@ -65,7 +65,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateBicycleAvailability() {
-    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.of().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDataSource(DEFAULT_UPDATE),
@@ -82,7 +82,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void notFound() {
-    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.of().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDataSource(new AvailabiltyUpdate(id("not-found"), 100)),
@@ -109,7 +109,7 @@ class VehicleParkingAvailabilityUpdaterTest {
   }
 
   private static VehicleParking.VehicleParkingBuilder parkingBuilder() {
-    return VehicleParking.builder()
+    return VehicleParking.of()
       .id(ID)
       .name(I18NString.of("parking"))
       .coordinate(WgsCoordinate.GREENWICH);

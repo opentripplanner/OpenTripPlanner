@@ -4,7 +4,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.AGENCY;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
@@ -17,15 +18,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
+import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -157,7 +162,7 @@ class DefaultTransitServiceTest {
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
     var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
       .createRealTimeFromScheduledTimes()
-      .cancelTrip()
+      .withCanceled()
       .build();
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
@@ -257,35 +262,66 @@ class DefaultTransitServiceTest {
     assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, REAL_TIME_PATTERN), patternsForStop);
   }
 
-  @Test
-  void listCanceledTrips() {
-    var canceledTrips = service.listCanceledTrips();
-    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
-  }
+  @Nested
+  class ListCanceledTrips {
 
-  @Test
-  void findAllCanceledTrips() {
-    // No filters, should return all canceled trips
-    var canceledTrips = service.findCanceledTrips(TripOnServiceDateRequest.of().build());
-    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
-  }
+    @Test
+    void listCanceledTrips() {
+      var canceledTrips = service.listCanceledTrips();
+      assertEquals(
+        "[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]",
+        canceledTrips.toString()
+      );
+    }
 
-  @Test
-  void findCanceledBusTrips() {
-    var busFilter = FilterValues.ofEmptyIsEverything("modesToInclude", List.of(BUS));
-    var busRequest = TripOnServiceDateRequest.of().withIncludeModes(busFilter).build();
-    var busTrips = service.findCanceledTrips(busRequest);
-    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", busTrips.toString());
-  }
+    @Test
+    void findAllCanceledTrips() {
+      // No filters, should return all canceled trips
+      var canceledTrips = service.findCanceledTrips(TripOnServiceDateRequest.of().build());
+      assertEquals(
+        "[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]",
+        canceledTrips.toString()
+      );
+    }
 
-  @Test
-  void findCanceledNonBusTrips() {
-    var busExcludeFilter = FilterValues.ofEmptyIsEverything("modesToExclude", List.of(BUS));
-    var busExcludeRequest = TripOnServiceDateRequest.of()
-      .withExcludeModes(busExcludeFilter)
-      .build();
-    var excludedBusTrips = service.findCanceledTrips(busExcludeRequest);
-    assertThat(excludedBusTrips).isEmpty();
+    @Test
+    void filtersByAgencyNot() {
+      // NOT AGENCY should exclude all canceled trips since they all belong to this same agency
+      var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
+        .addNot(TripOnServiceDateSelectRequest.of().withAgencies(List.of(AGENCY.getId())).build())
+        .build();
+      var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
+      var result = service.findCanceledTrips(request);
+      assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findCanceledBusTrips() {
+      var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
+        .addSelect(
+          TripOnServiceDateSelectRequest.of()
+            .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
+            .build()
+        )
+        .build();
+      var busRequest = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
+      var busTrips = service.findCanceledTrips(busRequest);
+      assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", busTrips.toString());
+    }
+
+    @Test
+    void findCanceledNonBusTrips() {
+      var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
+        .addNot(
+          TripOnServiceDateSelectRequest.of()
+            .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
+            .build()
+        )
+        .build();
+      var busExcludeRequest = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
+      var excludedBusTrips = service.findCanceledTrips(busExcludeRequest);
+      assertThat(excludedBusTrips).isEmpty();
+    }
   }
 
   @Test

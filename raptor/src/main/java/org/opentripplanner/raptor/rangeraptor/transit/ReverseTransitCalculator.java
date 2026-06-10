@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A calculator that will take you back in time not forward, this is the basic logic to implement a

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
+import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
 import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
 import org.opentripplanner.apis.transmodel.support.ExecutionResultMapper;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
@@ -131,7 +131,7 @@ class TransmodelGraph {
     return GraphQL.newGraphQL(indexSchema)
       .instrumentation(instrumentation)
       .queryExecutionStrategy(executionStrategy)
-      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
+      .defaultDataFetcherExceptionHandler(new OtpDataFetcherExceptionHandler())
       .build();
   }
 

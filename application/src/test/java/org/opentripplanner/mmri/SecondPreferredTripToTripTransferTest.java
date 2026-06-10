@@ -16,7 +16,7 @@ public class SecondPreferredTripToTripTransferTest extends GtfsTest {
 
   @Test
   public void test2e2() {
-    Itinerary itinerary = plan(+1388530860L, "2e21", "2e26", null, false, false, null, "", "", 2);
+    Itinerary itinerary = plan(+1388530860L, "2e21", "2e26", false, false, null, "", "", 2);
 
     Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 

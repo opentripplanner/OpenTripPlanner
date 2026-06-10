@@ -14,7 +14,7 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
  * @param staticParkAndRide      Whether we should create car P+R stations from OSM data.
  * @param staticBikeParkAndRide  Whether we should create bike P+R stations from OSM data.
  * @param includeInclinedEdgeLevelInfo Whether level info for inclined edges should be stored.
- * @param includeOsmSubwayEntrances Whether we should create subway entrances from OSM data.
+ * @param includeOsmStationEntrances Whether we should create station entrances from OSM data.
  */
 public record OsmProcessingParameters(
   Set<String> boardingAreaRefTags,
@@ -25,7 +25,7 @@ public record OsmProcessingParameters(
   boolean staticParkAndRide,
   boolean staticBikeParkAndRide,
   boolean includeInclinedEdgeLevelInfo,
-  boolean includeOsmSubwayEntrances
+  boolean includeOsmStationEntrances
 ) {
   public OsmProcessingParameters {
     boardingAreaRefTags = Set.copyOf(Objects.requireNonNull(boardingAreaRefTags));

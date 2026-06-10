@@ -14,6 +14,10 @@ public class TestVertex implements AStarVertex<TestState, TestEdge, TestVertex> 
     this.name = name;
   }
 
+  public TestVertex() {
+    this("test vertex");
+  }
+
   public String name() {
     return name;
   }

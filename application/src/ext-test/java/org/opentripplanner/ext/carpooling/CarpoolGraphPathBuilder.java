@@ -18,9 +18,6 @@ public class CarpoolGraphPathBuilder {
   // Walking speed in m/s (OTP default from WalkPreferences)
   private static final double WALKING_SPEED_MPS = 1.33;
 
-  // Default number of edges to distribute duration across
-  private static final int DEFAULT_NUM_EDGES = 3;
-
   /**
    * Creates a GraphPath with default 5-minute duration.
    */
@@ -30,6 +27,10 @@ public class CarpoolGraphPathBuilder {
 
   /**
    * Creates a GraphPath with specified duration using State chain.
+   * Uses a single edge with floor distance to avoid rounding errors: the edge traversal
+   * applies ceiling when converting to milliseconds, and State.getTime() applies ceiling
+   * when converting to seconds, so floor distance ensures the final second-precision
+   * duration matches the requested value.
    *
    * @param duration Total duration for the path
    * @return GraphPath with real State objects and accurate timing
@@ -37,17 +38,9 @@ public class CarpoolGraphPathBuilder {
   public static GraphPath<State, Edge, Vertex> createGraphPath(Duration duration) {
     var builder = TestStateBuilder.ofWalking();
 
-    // Calculate distance needed for target duration
-    double totalDistanceMeters = duration.toSeconds() * WALKING_SPEED_MPS;
+    int distanceMeters = (int) (duration.toSeconds() * WALKING_SPEED_MPS);
 
-    // Distribute across multiple edges for realistic path
-    int numEdges = DEFAULT_NUM_EDGES;
-    int distancePerEdge = (int) Math.ceil(totalDistanceMeters / numEdges);
-
-    // Build state chain with calculated distances
-    for (int i = 0; i < numEdges; i++) {
-      builder.streetEdge("segment-" + i, distancePerEdge);
-    }
+    builder.streetEdge("segment-0", distanceMeters);
 
     return new GraphPath<>(builder.build());
   }

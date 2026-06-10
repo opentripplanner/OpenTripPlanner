@@ -181,7 +181,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * <p>
    * This does not apply to zones as street vertices store which zones they are part of.
    *
-   * @see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
+   * @link https://github.com/opentripplanner/OpenTripPlanner/issues/5498
    */
   private void linkToDriveableEdge(TransitStopVertex tStop) {
     vertexLinker.linkVertexPermanently(

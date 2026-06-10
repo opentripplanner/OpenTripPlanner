@@ -153,7 +153,7 @@ public class RoutingPreferencesTest {
     var pref = RoutingPreferences.DEFAULT;
     var copy = pref
       .copyOf()
-      .withItineraryFilter(i -> i.withGroupSimilarityKeepOne(2))
+      .withItineraryFilter(i -> i.withGroupSimilarityKeepOne(0.9))
       .build();
 
     assertNotSame(pref, copy);

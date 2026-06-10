@@ -58,31 +58,41 @@ class EuclideanRemainingWeightHeuristicTest {
       Arguments.argumentSet(
         "slow walk",
         StreetModelDetails.DEFAULT,
-        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1)).build(),
+        StreetSearchRequest.of()
+          .withWalk(w -> w.withSpeed(1))
+          .build(),
         200
       ),
       Arguments.argumentSet(
         "slow preferred walk",
         StreetModelDetails.DEFAULT,
-        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        StreetSearchRequest.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         50
       ),
       Arguments.argumentSet(
         "slow preferred safe walk",
         safeStreets,
-        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        StreetSearchRequest.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         40
       ),
       Arguments.argumentSet(
         "partial walk safety",
         safeStreets,
-        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5).withSafetyFactor(0.2)).build(),
+        StreetSearchRequest.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5).withSafetyFactor(0.2))
+          .build(),
         48
       ),
       Arguments.argumentSet(
         "slow preferred unsafe walk",
         unsafeStreets,
-        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        StreetSearchRequest.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         100
       ),
       // safe bike
@@ -95,7 +105,8 @@ class EuclideanRemainingWeightHeuristicTest {
       Arguments.argumentSet(
         "bike triangle",
         safeStreets,
-          StreetSearchRequest.of().withMode(StreetMode.BIKE)
+        StreetSearchRequest.of()
+          .withMode(StreetMode.BIKE)
           .withBike(b ->
             b
               .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
@@ -108,19 +119,31 @@ class EuclideanRemainingWeightHeuristicTest {
       Arguments.argumentSet(
         "safest bike",
         safeStreets,
-        StreetSearchRequest.of().withMode(StreetMode.BIKE)
+        StreetSearchRequest.of()
+          .withMode(StreetMode.BIKE)
           .withBike(b -> b.withOptimizeType(VehicleRoutingOptimizeType.SAFEST_STREETS))
           .build(),
-        28.8
+        24
       ),
       // a slow car
-      Arguments.argumentSet("slow car", slowCar, StreetSearchRequest.of().withMode(StreetMode.CAR).build(), 100),
+      Arguments.argumentSet(
+        "slow car",
+        slowCar,
+        StreetSearchRequest.of().withMode(StreetMode.CAR).build(),
+        100
+      ),
       // slow car speed should not affect cycling
-      Arguments.argumentSet("slow car", slowCar, StreetSearchRequest.of().withMode(StreetMode.BIKE).build(), 40),
+      Arguments.argumentSet(
+        "slow car",
+        slowCar,
+        StreetSearchRequest.of().withMode(StreetMode.BIKE).build(),
+        40
+      ),
       // minimum safety 0.8 with safety factor 0.6 = effectively safety factor 0.88
       Arguments.argumentSet(
         "intermediate walk safety",
-        safeStreets, StreetSearchRequest.of()
+        safeStreets,
+        StreetSearchRequest.of()
           .withWalk(w -> w.withSpeed(1).withReluctance(1).withSafetyFactor(0.6))
           .build(),
         88
@@ -165,10 +188,10 @@ class EuclideanRemainingWeightHeuristicTest {
       toCoordinate.latitude(),
       toCoordinate.longitude()
     );
-    
+
     var state = new State(fromVertex, req);
 
-    subject.initialize(Set.of(toVertex), false, req);
+    subject.initialize(Set.of(toVertex), req);
     Assertions.assertEquals(expected, subject.estimateRemainingWeight(state), 0.5);
   }
 }

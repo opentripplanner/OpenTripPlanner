@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 
 import java.util.BitSet;
 import java.util.List;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 
 /**
  * Iterate over the pass-through points. Note! This implementation iterates backwards starting at the last

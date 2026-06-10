@@ -15,10 +15,8 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
@@ -32,9 +30,6 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 public class F01_AccessWithRidesTest implements RaptorTestConstants {
 
   private static final int TRANSFER_SLACK = 60;
-  private static final int C1_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
-  private static final int C1_TRANSFER_SLACK = RaptorCostConverter.toRaptorCost(TRANSFER_SLACK);
-  private static final int C1_ONE_SEC = RaptorCostConverter.toRaptorCost(1);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
@@ -64,8 +59,6 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new TestSlackProvider(TRANSFER_SLACK, 0, 0));
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {

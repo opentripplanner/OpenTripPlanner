@@ -1,6 +1,6 @@
 package org.opentripplanner;
 
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -17,7 +17,7 @@ public record TestOtpModel(
     TimetableRepository timetableRepository,
     TransferRepository transferRepository
   ) {
-    this(graph, timetableRepository, transferRepository, new DefaultFareServiceFactory());
+    this(graph, timetableRepository, transferRepository, new GtfsFareServiceFactory());
   }
 
   public TestOtpModel index() {

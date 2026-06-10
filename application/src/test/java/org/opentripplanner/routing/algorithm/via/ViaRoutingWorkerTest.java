@@ -119,7 +119,7 @@ public class ViaRoutingWorkerTest {
   private RoutingResponse createRoutingResponse(RouteRequest req) {
     // request from A or C?
     var c = fromA.coordinate;
-    var firstOrSecondSearch = req.from().lng == c.longitude() && req.from().lat == c.latitude();
+    var firstOrSecondSearch = req.from().wgsCoordinate().equals(c);
 
     var searchItineraries = firstOrSecondSearch ? firstSearch : secondSearch;
 

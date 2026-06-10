@@ -22,7 +22,6 @@ public class StartupModel {
   private boolean buildTransit = true;
   private boolean saveGraph = false;
   private boolean serveGraph = true;
-  private boolean visualizer = false;
 
   public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
     this.commandLineChange = commandLineChange;
@@ -108,15 +107,6 @@ public class StartupModel {
     notifyChangeListener();
   }
 
-  public boolean isVisualizer() {
-    return visualizer;
-  }
-
-  public void setVisualizer(boolean visualizer) {
-    this.visualizer = visualizer;
-    notifyChangeListener();
-  }
-
   @Override
   public String toString() {
     return String.join("", asOtpArgs());
@@ -159,10 +149,6 @@ public class StartupModel {
     if (serveGraph && !buildStreetOnly()) {
       args.add("--serve");
     }
-    if (serveGraph && !buildStreetOnly() && visualizer) {
-      args.add("--visualize");
-    }
-
     args.add(getDataSourceDirectory());
 
     return args.toArray(new String[0]);

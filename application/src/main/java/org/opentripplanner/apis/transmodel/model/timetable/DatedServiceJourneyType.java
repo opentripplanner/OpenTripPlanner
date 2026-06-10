@@ -72,9 +72,20 @@ public class DatedServiceJourneyType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tripAlteration")
-          .description("Alterations specified on the Trip in the planned data")
+          .description(
+            "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
+          )
           .type(EnumTypes.SERVICE_ALTERATION)
           .dataFetcher(environment -> tripOnServiceDate(environment).getTripAlteration())
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("extraJourney")
+          .description(
+            "Whether this is an extra journey, either from planned data or added in realtime"
+          )
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(environment -> tripOnServiceDate(environment).isExtraJourney())
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

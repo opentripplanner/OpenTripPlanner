@@ -1,110 +1,70 @@
 package org.opentripplanner.ext.carpooling.constraints;
 
 import java.time.Duration;
+import java.util.List;
+import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
-import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Validates that inserting a new passenger does not cause excessive delays
- * for existing passengers in a carpool trip.
+ * for existing stops in a carpool trip.
  * <p>
- * Ensures that no existing passenger experiences:
- * - More than {@code maxDelay} additional wait time at their pickup location
- * - More than {@code maxDelay} later arrival at their dropoff location
+ * Ensures that no existing stop experiences more delay than its own
+ * {@link CarpoolStop#getDeviationBudget() deviationBudget} allows.
  * <p>
  * This protects the rider experience by preventing situations where accepting
  * one more passenger significantly inconveniences existing bookings.
  */
-public class PassengerDelayConstraints {
+public final class PassengerDelayConstraints {
 
   private static final Logger LOG = LoggerFactory.getLogger(PassengerDelayConstraints.class);
 
-  /**
-   * Default maximum delay: 5 minutes.
-   * No existing passenger should wait more than 5 minutes longer or arrive
-   * more than 5 minutes later due to a new passenger insertion.
-   */
-  public static final Duration DEFAULT_MAX_DELAY = Duration.ofMinutes(5);
-
-  private final Duration maxDelay;
+  private PassengerDelayConstraints() {}
 
   /**
-   * Creates constraints with default 5-minute maximum delay.
-   */
-  public PassengerDelayConstraints() {
-    this(DEFAULT_MAX_DELAY);
-  }
-
-  /**
-   * Creates constraints with custom maximum delay.
-   *
-   * @param maxDelay Maximum acceptable delay for existing passengers
-   */
-  public PassengerDelayConstraints(Duration maxDelay) {
-    this.maxDelay = DurationUtils.requireNonNegative(maxDelay);
-  }
-
-  /**
-   * Checks if a passenger insertion satisfies delay constraints.
+   * Checks if a passenger insertion satisfies delay constraints for all existing stops.
+   * Each stop is checked against its own deviation budget.
    *
    * @param originalCumulativeDurations Cumulative duration to each point in original route
    * @param modifiedCumulativeDurations Cumulative duration to each point in modified route
-   * @param pickupPos Position where passenger pickup is inserted (1-indexed)
-   * @param dropoffPos Position where passenger dropoff is inserted (1-indexed)
-   * @return true if all existing passengers experience acceptable delays
+   * @param pickupPos 0-based index of the passenger's pickup in the modified route
+   * @param dropoffPos 0-based index of the passenger's dropoff in the modified route
+   * @param stops The ordered list of stops in the original trip
+   * @return true if all existing stops experience acceptable delays
    */
-  public boolean satisfiesConstraints(
+  public static boolean satisfiesConstraints(
     Duration[] originalCumulativeDurations,
     Duration[] modifiedCumulativeDurations,
     int pickupPos,
-    int dropoffPos
+    int dropoffPos,
+    List<CarpoolStop> stops
   ) {
-    // If no existing stops (only boarding and alighting), no constraint to check
-    if (originalCumulativeDurations.length <= 2) {
-      return true;
-    }
-
-    // Check delay at each existing stop (exclude boarding at 0 and alighting at end)
+    // Check delay at each existing stop (exclude origin at index 0)
     for (
       int originalIndex = 1;
-      originalIndex < originalCumulativeDurations.length - 1;
+      originalIndex < originalCumulativeDurations.length;
       originalIndex++
     ) {
       int modifiedIndex = InsertionPosition.mapOriginalIndex(originalIndex, pickupPos, dropoffPos);
 
-      Duration originalTime = originalCumulativeDurations[originalIndex];
-      Duration modifiedTime = modifiedCumulativeDurations[modifiedIndex];
-      Duration delay = modifiedTime.minus(originalTime);
+      Duration delay = modifiedCumulativeDurations[modifiedIndex].minus(
+        originalCumulativeDurations[originalIndex]
+      );
+      Duration stopBudget = stops.get(originalIndex).getDeviationBudget();
 
-      if (delay.compareTo(maxDelay) > 0) {
+      if (delay.compareTo(stopBudget) > 0) {
         LOG.debug(
-          "Insertion rejected: stop at position {} delayed by {}s (max: {}s)",
+          "Stop at position {} delayed by {}s exceeds budget of {}s",
           originalIndex,
           delay.getSeconds(),
-          maxDelay.getSeconds()
+          stopBudget.getSeconds()
         );
         return false;
       }
-
-      LOG.trace(
-        "Stop at position {} delay: {}s (acceptable, max: {}s)",
-        originalIndex,
-        delay.getSeconds(),
-        maxDelay.getSeconds()
-      );
     }
 
     return true;
-  }
-
-  /**
-   * Gets the configured maximum delay.
-   *
-   * @return Maximum delay duration
-   */
-  public Duration getMaxDelay() {
-    return maxDelay;
   }
 }

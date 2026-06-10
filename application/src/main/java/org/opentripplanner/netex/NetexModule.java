@@ -1,6 +1,8 @@
 package org.opentripplanner.netex;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
@@ -45,7 +47,11 @@ public class NetexModule implements GraphBuilderModule {
    */
   private final LocalDateInterval transitPeriodLimit;
 
-  private final List<NetexBundle> netexBundles;
+  /**
+   * This collection is a queue because the bundles contain state that remains after loading.
+   * They should be garbage collected after loading is finished.
+   */
+  private final Queue<NetexBundle> netexBundles;
 
   public NetexModule(
     Graph graph,
@@ -66,7 +72,7 @@ public class NetexModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
     this.transitPeriodLimit = transitPeriodLimit;
-    this.netexBundles = netexBundles;
+    this.netexBundles = new LinkedList<>(netexBundles);
   }
 
   @Override
@@ -74,7 +80,9 @@ public class NetexModule implements GraphBuilderModule {
     try {
       var calendarServiceData = new CalendarServiceData();
 
-      for (NetexBundle netexBundle : netexBundles) {
+      while (!netexBundles.isEmpty()) {
+        // removes the bundle from the collection and allows it to be garbage collected
+        var netexBundle = netexBundles.poll();
         netexBundle.checkInputs();
 
         TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);

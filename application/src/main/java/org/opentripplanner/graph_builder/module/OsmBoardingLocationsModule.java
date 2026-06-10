@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,7 +16,6 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -30,7 +30,6 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -38,6 +37,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.transit.StopResolver;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -64,7 +64,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private static final LocalizedString LOCALIZED_PLATFORM_NAME = new LocalizedString(
     "name.platform"
   );
-  private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
+  private static final double SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(250);
 
   private final Graph graph;
 
@@ -72,6 +72,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final OsmInfoGraphBuildService osmInfoGraphBuildService;
   private final VertexFactory vertexFactory;
   private final VertexLinker linker;
+
+  private final Map<Platform, OsmBoardingLocationVertex> existingBoardingLocationsAtAreas;
 
   /**
    * @param timetableRepository This module requires the timetable repository because at the time
@@ -90,6 +92,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.vertexFactory = new VertexFactory(graph);
     this.linker = linker;
+    this.existingBoardingLocationsAtAreas = new HashMap<>();
   }
 
   @Override
@@ -100,18 +103,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     int successes = 0;
 
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
-      // if the street is already linked there is no need to link it again,
-      // could happened if using the prune isolated island
-      boolean alreadyLinked = false;
-      for (Edge e : ts.getOutgoing()) {
-        if (e instanceof StreetTransitStopLink) {
-          alreadyLinked = true;
-          break;
-        }
-      }
-      if (alreadyLinked) {
-        continue;
-      }
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());
@@ -146,7 +137,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     Envelope envelope = new Envelope(ts.getCoordinate());
 
     double xscale = Math.cos((ts.getCoordinate().y * Math.PI) / 180);
-    envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
+    envelope.expandBy(SEARCH_RADIUS_DEGREES / xscale, SEARCH_RADIUS_DEGREES);
     return envelope;
   }
 
@@ -175,10 +166,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         if (platOpt.isPresent()) {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
-            var boardingLocation = makeBoardingLocation(
+            var boardingLocation = getOrMakeBoardingLocationForPlatform(
               stop,
-              platform.geometry().getCentroid(),
-              platform.references(),
+              platform,
               area.getName()
             );
             linker.addPermanentAreaVertex(boardingLocation, areaGroup);
@@ -206,37 +196,37 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         .findPlatform(edge)
         .ifPresent(platform -> {
           if (matchesReference(stop, platform.references())) {
-            if (!nearbyEdges.containsKey(platform)) {
-              var list = new ArrayList<Edge>();
-              list.add(edge);
-              nearbyEdges.put(platform, list);
-            } else {
-              nearbyEdges.get(platform).add(edge);
-            }
+            nearbyEdges.computeIfAbsent(platform, _ -> new ArrayList<>()).add(edge);
           }
         });
     }
 
-    for (var platformEdgeList : nearbyEdges.entrySet()) {
-      Platform platform = platformEdgeList.getKey();
-      var name = platform.name();
-      var boardingLocation = makeBoardingLocation(
-        stop,
-        platform.geometry().getCentroid(),
-        platform.references(),
-        name
-      );
-      for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
-        boardingLocation,
-        new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        platformEdgeList.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
-      )) {
-        linkBoardingLocationToStop(ts, stop.getCode(), vertex);
-      }
-      return true;
-    }
-    return false;
+    return nearbyEdges
+      .entrySet()
+      .stream()
+      .findFirst()
+      .map(platformEdgeList -> {
+        Platform platform = platformEdgeList.getKey();
+        var boardingLocation = getOrMakeBoardingLocationForPlatform(
+          stop,
+          platform,
+          platform.name()
+        );
+        for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
+          boardingLocation,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BIDIRECTIONAL,
+          platformEdgeList
+            .getValue()
+            .stream()
+            .map(StreetEdge.class::cast)
+            .collect(Collectors.toSet())
+        )) {
+          linkBoardingLocationToStop(ts, stop.getCode(), vertex);
+        }
+        return true;
+      })
+      .orElse(false);
   }
 
   /**
@@ -270,6 +260,20 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       }
     }
     return false;
+  }
+
+  /*
+   * when two or more stops reference the same OSM platform, only one
+   * OsmBoardingLocationVertex is created for that platform and both stops are linked to it.
+   */
+  private OsmBoardingLocationVertex getOrMakeBoardingLocationForPlatform(
+    RegularStop stop,
+    Platform platform,
+    I18NString name
+  ) {
+    return existingBoardingLocationsAtAreas.computeIfAbsent(platform, _ ->
+      makeBoardingLocation(stop, platform.geometry().getCentroid(), platform.references(), name)
+    );
   }
 
   private OsmBoardingLocationVertex makeBoardingLocation(

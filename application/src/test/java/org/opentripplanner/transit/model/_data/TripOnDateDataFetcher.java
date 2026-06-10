@@ -3,10 +3,8 @@ package org.opentripplanner.transit.model._data;
 import java.time.LocalDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -69,10 +67,6 @@ public class TripOnDateDataFetcher {
   public TripTimes scheduledTripTimes() {
     var timetable = scheduledTripPattern().getScheduledTimetable();
     return timetable.getTripTimes(trip());
-  }
-
-  public RealTimeState realTimeState() {
-    return tripTimes().getRealTimeState();
   }
 
   /**

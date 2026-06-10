@@ -9,7 +9,7 @@ import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -26,7 +26,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  * <p>
  * This calculator is maintained by IBI Group.
  */
-public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFareServiceFactory {
+public class HighestFareInFreeTransferWindowFareServiceFactory extends GtfsFareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 

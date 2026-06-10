@@ -3,9 +3,9 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -34,14 +34,6 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
     this.callback = transitCallback;
   }
 
-  public int round() {
-    return round;
-  }
-
-  public int stop() {
-    return stop;
-  }
-
   @Override
   public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
     super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
@@ -54,7 +46,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
     super.transferToStop(fromStop, arrivalTime, transferPath);
     for (RaptorAccessEgress egressPath : egressPaths) {
-      if (egressPath.stopReachedOnBoard()) {
+      if (egressPath.arrivedOnBoard()) {
         // Raptor does not support currently egress directly after flex access.
         // There has to be at least one transit in between.
         // Hence, stopReachedOnBoard=false

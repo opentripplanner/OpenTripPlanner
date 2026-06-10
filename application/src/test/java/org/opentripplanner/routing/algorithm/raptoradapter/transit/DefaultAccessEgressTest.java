@@ -9,19 +9,19 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 class DefaultAccessEgressTest {
 
   private static final int STOP = 5;
-  private static final State LAST_STATE = TestStateBuilder.ofWalking().streetEdge().build();
+  private static final State FINAL_STATE = TestStateBuilder.ofWalking().streetEdge().build();
   public static final Duration TIME_PENALTY = Duration.ofSeconds(1);
   public static final Cost COST_PENALTY = Cost.costOfSeconds(11);
   public static final TimeAndCost PENALTY = new TimeAndCost(TIME_PENALTY, COST_PENALTY);
 
-  private final DefaultAccessEgress subject = new DefaultAccessEgress(STOP, LAST_STATE);
+  private final DefaultAccessEgress subject = new DefaultAccessEgress(STOP, FINAL_STATE);
   private final RoutingAccessEgress subjectWithPenalty = subject.withPenalty(PENALTY);
 
   @Test
@@ -31,7 +31,7 @@ class DefaultAccessEgressTest {
 
   @Test
   void durationInSeconds() {
-    int expected = (int) LAST_STATE.getElapsedTimeSeconds();
+    int expected = (int) FINAL_STATE.getElapsedTimeSeconds();
     assertEquals(expected, subject.durationInSeconds());
     assertEquals(expected, subjectWithPenalty.durationInSeconds());
   }
@@ -62,8 +62,8 @@ class DefaultAccessEgressTest {
   }
 
   @Test
-  void getLastState() {
-    assertEquals(LAST_STATE, subject.getLastState());
+  void getFinalState() {
+    assertEquals(FINAL_STATE, subject.getFinalState());
   }
 
   @Test
@@ -100,5 +100,24 @@ class DefaultAccessEgressTest {
       "Walk 1d8h50m15s C₁236_440 Pₜ1 w/penalty(1s $11) ~ 5",
       subjectWithPenalty.toString()
     );
+  }
+
+  /**
+   * Verify that the scalar values extracted during DefaultAccessEgress construction
+   * (duration, generalized cost, walk-only mode) are identical for reversed and unreversed
+   * State chains. This invariant allows deferring State.reverse() from AccessEgressMapper
+   * to GraphPath construction, where it is only applied to winning paths rather than all
+   * candidates.
+   */
+  @Test
+  void scalarValuesAreIdenticalForReversedAndUnreversedState() {
+    var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().streetEdge().build();
+
+    var fromUnreversed = new DefaultAccessEgress(STOP, state);
+    var fromReversed = new DefaultAccessEgress(STOP, state.reverse());
+
+    assertEquals(fromUnreversed.durationInSeconds(), fromReversed.durationInSeconds());
+    assertEquals(fromUnreversed.c1(), fromReversed.c1());
+    assertEquals(fromUnreversed.isWalkOnly(), fromReversed.isWalkOnly());
   }
 }

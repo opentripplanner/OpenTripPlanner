@@ -52,7 +52,7 @@ class TripAssert {
   }
 
   TripAssert withIndex(int expectedTripIndex) {
-    assertEquals(expectedTripIndex, result.tripIndex(), "Trip index");
+    assertEquals(expectedTripIndex, result.tripScheduleIndex(), "Trip index");
     return this;
   }
 

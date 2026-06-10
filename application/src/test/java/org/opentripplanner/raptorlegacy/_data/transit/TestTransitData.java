@@ -1,5 +1,7 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
+import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.createDeprecatedUnsupportedFeatureException;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -7,21 +9,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.util.BitSetIterator;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
@@ -79,7 +81,7 @@ public class TestTransitData
         routes.set(i);
       }
     }
-    return new BitSetIterator(routes);
+    return IntIterators.of(routes);
   }
 
   @Override
@@ -90,6 +92,11 @@ public class TestTransitData
   @Override
   public int numberOfStops() {
     return routeIndexesByStopIndex.size();
+  }
+
+  @Override
+  public int numberOfTripPatterns() {
+    return routes.size();
   }
 
   @Override
@@ -134,7 +141,7 @@ public class TestTransitData
           return null;
         }
         if (list.size() == 1) {
-          return list.get(0);
+          return list.getFirst();
         }
         throw new IllegalStateException("More than on transfers found: " + list);
       }
@@ -183,6 +190,11 @@ public class TestTransitData
     return getRoute(routeIndex).transferConstraintsReverseSearch();
   }
 
+  @Override
+  public RaptorTripScheduleReference tripScheduleReference(TestTripSchedule trip) {
+    throw createDeprecatedUnsupportedFeatureException();
+  }
+
   public TestRoute getRoute(int index) {
     return routes.get(index);
   }
@@ -207,7 +219,7 @@ public class TestTransitData
     return this;
   }
 
-  public TestTransitData withTransfer(int fromStop, DefaultRaptorTransfer transfer) {
+  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
     transfersToStop.get(transfer.stop()).add(transfer.reverseOf(fromStop));

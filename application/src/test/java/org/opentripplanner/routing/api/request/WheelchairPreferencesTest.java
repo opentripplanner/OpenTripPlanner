@@ -14,8 +14,8 @@ class WheelchairPreferencesTest {
 
   static Stream<Arguments> roundingTestCases() {
     return Stream.of(
-      Arguments.of(0.33333333333, 0.33, 0.333),
-      Arguments.of(0.77777777777, 0.78, 0.778)
+      Arguments.of(0.33333333333, 0.3, 0.333),
+      Arguments.of(0.77777777777, 0.8, 0.778)
     );
   }
 

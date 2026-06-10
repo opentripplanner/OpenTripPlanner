@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.vertex;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.utils.lang.DoubleUtils;
 
 /**
  * Represents a location on a street, somewhere between the two corners. This is used when computing
@@ -43,9 +44,12 @@ public class StreetLocation extends StreetVertex {
   }
 
   public boolean equals(Object o) {
-    if (o instanceof StreetLocation) {
-      StreetLocation other = (StreetLocation) o;
-      return other.getCoordinate().equals(getCoordinate());
+    if (o instanceof StreetLocation other) {
+      // avoid allocations of Coordinate by comparing the doubles directly
+      return (
+        DoubleUtils.doubleEquals(other.getLat(), this.getLat()) &&
+        DoubleUtils.doubleEquals(other.getLon(), this.getLon())
+      );
     }
     return false;
   }

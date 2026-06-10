@@ -29,9 +29,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
@@ -39,18 +36,18 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
@@ -59,11 +56,16 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -198,11 +200,8 @@ public class RaptorPathToItineraryMapperTest {
       true,
       RoutingBookingInfo.NOT_SET
     );
-    RaptorAccessEgress access = new FlexAccessEgressAdapter(
-      flexAccessEgress,
-      AccessEgressType.ACCESS
-    );
-    Transfer transfer = new Transfer(S2.getIndex(), 0, EnumSet.of(StreetMode.WALK));
+    RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress);
+    var transfer = new PathTransfer(S1, S2, 0, List.of(), EnumSet.of(StreetMode.WALK));
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);
     RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);
     PathLeg<RaptorTripSchedule> egressLeg = new EgressPathLeg<>(egress, 0, 0, 0);
@@ -236,6 +235,7 @@ public class RaptorPathToItineraryMapperTest {
   private TestTripSchedule transferAtSameStopSchedule() {
     TestTransitData data = new TestTransitData();
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+    var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()
       .times(
@@ -246,7 +246,8 @@ public class RaptorPathToItineraryMapperTest {
         TimeUtils.time("10:20")
       )
       .pattern(pattern)
-      .originalPattern(getOriginalPattern(pattern))
+      .originalPattern(originalPattern)
+      .withTripTimes(buildTripTimes(originalPattern))
       .build();
 
     data.withRoutes(TestRoute.route("TransferAtSameStop", 1, 2, 3, 2, 1).withTimetable(timetable));
@@ -263,6 +264,21 @@ public class RaptorPathToItineraryMapperTest {
     );
     var itinerary = mapper.createItinerary(path);
     assertTrue(itinerary.isSearchWindowAware());
+  }
+
+  private TripTimes buildTripTimes(TripPattern originalPattern) {
+    var trip = TimetableRepositoryForTest.trip("test").build();
+    var stopTimes = new ArrayList<StopTime>();
+    for (int i = 0; i < originalPattern.numberOfStops(); i++) {
+      var st = new StopTime();
+      st.setTrip(trip);
+      st.setStop(originalPattern.getStop(i));
+      st.setStopSequence(i);
+      st.setArrivalTime(TRANSIT_START + i * 300);
+      st.setDepartureTime(TRANSIT_START + i * 300);
+      stopTimes.add(st);
+    }
+    return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
@@ -298,6 +314,7 @@ public class RaptorPathToItineraryMapperTest {
       .toInstant();
     TimetableRepository timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.CET);
+    timetableRepository.index();
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(timetableRepository),
@@ -328,6 +345,7 @@ public class RaptorPathToItineraryMapperTest {
   private TestTripSchedule getTestTripSchedule2() {
     TestTransitData data = new TestTransitData();
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+    var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()
       .times(
@@ -338,7 +356,8 @@ public class RaptorPathToItineraryMapperTest {
         TimeUtils.time("10:20")
       )
       .pattern(pattern)
-      .originalPattern(getOriginalPattern(pattern))
+      .originalPattern(originalPattern)
+      .withTripTimes(buildTripTimes(originalPattern))
       .build();
 
     data.withRoutes(TestRoute.route("TestRoute_1", 1, 2, 3, 2, 1).withTimetable(timetable));
@@ -349,11 +368,13 @@ public class RaptorPathToItineraryMapperTest {
   private TestTripSchedule getTestTripSchedule() {
     TestTransitData data = new TestTransitData();
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(ROUTE);
+    var originalPattern = getOriginalPattern(pattern);
 
     var timetable = new TestTripSchedule.Builder()
       .times(TRANSIT_START, TRANSIT_END)
       .pattern(pattern)
-      .originalPattern(getOriginalPattern(pattern))
+      .originalPattern(originalPattern)
+      .withTripTimes(buildTripTimes(originalPattern))
       .build();
 
     data.withRoutes(TestRoute.route("TestRoute_1", 1, 2).withTimetable(timetable));

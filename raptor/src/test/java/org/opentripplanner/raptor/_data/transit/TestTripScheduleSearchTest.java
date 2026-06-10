@@ -3,16 +3,16 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_FOUND;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
+import static org.opentripplanner.raptor.spi.RaptorConstants.NOT_FOUND;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -78,18 +78,18 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
     if (expStatus == Status.EMPTY) {
       assertTrue(result.empty());
       assertTime(searchTime, result.earliestBoardTime());
-      assertEquals(NOT_FOUND, result.tripIndex());
+      assertEquals(NOT_FOUND, result.tripScheduleIndex());
     } else if (expStatus == Status.OK) {
       assertFalse(result.empty());
       assertEquals(stopPos, result.stopPositionInPattern());
       assertTime(expTime, result.time());
       assertTime(searchTime, result.earliestBoardTime());
-      assertEquals(0, result.tripIndex());
+      assertEquals(0, result.tripScheduleIndex());
     }
 
     if (!result.empty()) {
       // A second search fails if the first search succeeded
-      int tripIndex = result.tripIndex();
+      int tripIndex = result.tripScheduleIndex();
       var e = search.search(direction.isForward() ? T09_59_59 : T10_20_01, stopPos, tripIndex);
       assertTrue(e.empty());
     }
@@ -139,27 +139,27 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
     if (expTripIndex == NOT_FOUND) {
       assertTrue(result.empty());
       assertTime(searchTime, result.earliestBoardTime());
-      assertEquals(NOT_FOUND, result.tripIndex());
+      assertEquals(NOT_FOUND, result.tripScheduleIndex());
     } else {
       assertFalse(result.empty());
       assertEquals(stopPos, result.stopPositionInPattern());
       assertTime(expTime, result.time());
       assertTime(searchTime, result.earliestBoardTime());
-      assertEquals(expTripIndex, result.tripIndex());
+      assertEquals(expTripIndex, result.tripScheduleIndex());
     }
 
     if (!result.empty()) {
       int secondTrip = direction.isForward() ? TRIP_TWO : TRIP_ONE;
       int firstTrip = direction.isForward() ? TRIP_ONE : TRIP_TWO;
-      int tripIndex = result.tripIndex();
+      int tripIndex = result.tripScheduleIndex();
       var e = search.search(direction.isForward() ? T09_59_59 : T10_20_01, stopPos, tripIndex);
 
       if (tripIndex == secondTrip) {
         assertFalse(e.empty());
-        assertEquals(firstTrip, result.tripIndex());
+        assertEquals(firstTrip, result.tripScheduleIndex());
       } else {
         assertTrue(e.empty());
-        assertEquals(NOT_FOUND, result.tripIndex());
+        assertEquals(NOT_FOUND, result.tripScheduleIndex());
       }
     }
   }

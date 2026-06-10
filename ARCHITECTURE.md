@@ -1,7 +1,7 @@
 # OTP Architecture
 
-OTP has been developed for more than 15 years, and most of the design documentation is in the code as
-comments and JavaDoc. Over the years the complexity have increased, and the natural developer
+OTP has been in development for more than 15 years, and most of the design documentation is in the code as
+comments and JavaDoc. Over the years the complexity has increased, and the natural developer
 turnover creates a demand for more architecture and design documentation. The new OTP2 documentation
 is put together with the source; hopefully making it easier to maintain. Instead of documenting
 modules in old style _package-info.java_ files we use _package.md_ files. This document should serve
@@ -24,13 +24,13 @@ examples. The Transit model is more complex than the VehiclePosition model.
 
 ![MainModelOverview](doc/dev/images/ServiceModelOverview.png)
 
- - `Use Case Service` A service which combine the functionality in many `Domain Services` to fulfill
+ - `Use Case Service` A service which combines the functionality in many `Domain Services` to fulfill
    a use-case or set of features. It may have an api with request/response classes. These are 
-   usually stateless; Hence the `Use Case Service` does normally not have a model. The implementing
+   usually stateless; Hence the `Use Case Service` does not normally have a model. The implementing
    class has the same name as the interface with prefix `Default`.
  - `Domain Model` A model which encapsulate a business area. In the drawing two examples are shown,
-   the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
-   implementation has a separate `Service` and `Repository`. Almost all http endpoints are, 
+   the `transit` and `vehicleposition` domain model. The transit model is more complex so the 
+   implementation has a separate `Service` and `Repository`. Almost all http endpoints are 
    read-only so the `Service` can focus on serving the http API endpoints, while the repository
    is used to maintain the model by the updaters. 
 
@@ -42,8 +42,8 @@ but this is a start and we would like to expand this list in the future.
 
 ### [OTP Configuration Design](application/src/main/java/org/opentripplanner/standalone/config/package.md)
 
-The Configuration module is responsible for loading and parsing OTP configuration files and map them
-into Plan Old Java Objects (POJOs). These POJOs are injected into the other components.
+The Configuration module is responsible for loading and parsing OTP configuration files and mapping them
+into Plain Old Java Objects (POJOs). These POJOs are injected into the other components.
 
 ### [GTFS Import Module](application/src/main/java/org/opentripplanner/gtfs/package.md)
 
@@ -65,20 +65,20 @@ The Raptor functionality is quite complex, so we want to isolate it from the rem
 Therefore, the raptor component is designed to have as few dependencies as possible. In fact there
 are _no_
 dependencies from Raptor to other parts of OTP code, only to utility classes not found in the JDK.
-Also, the code follows a stricter object-oriented design, than most other parts of OTP. The Raptor
+Also, the code follows a stricter object-oriented design than most other parts of OTP. The Raptor
 implementation is highly critical code, hence we set the bar higher with respect to code quality.
 
 OTP provides transit data to Raptor by implementing the _raptor/spi_. The 
 [RoutingService](application/src/main/java/org/opentripplanner/routing/service/DefaultRoutingService.java)
 is responsible for mapping from the OTP context to a
 [RaptorRequest](raptor/src/main/java/org/opentripplanner/raptor/api/request/RaptorRequest.java)
-and then map the
+and then mapping the
 result, [Raptor Path](raptor/src/main/java/org/opentripplanner/raptor/api/path/RaptorPath.java), back to
 the OTP internal domain. This might seem like a lot of unnecessary mapping, but mapping is simple -
 routing is not.
 
 The performance of Raptor is important, and we care about every millisecond. All changes to the
-existing Raptor coded should be tested with the
+existing Raptor code should be tested with the
 [SpeedTest](application/src/test/java/org/opentripplanner/transit/speed_test/package.md) and compared
 with an earlier version of the code to make sure the performance is NOT degraded.
 

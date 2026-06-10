@@ -15,7 +15,6 @@ class RaptorAccessEgressToStringParserTest {
   private static final int DURATION = 12;
   private static final int T10_30 = TimeUtils.time("10:30");
   private static final int T12_30 = TimeUtils.time("11:30");
-  private static final int N_VIAS = 3;
   private static final int N_RIDES = 3;
   private static final int TIME_PENALTY_VALUE = 600;
 
@@ -45,8 +44,7 @@ class RaptorAccessEgressToStringParserTest {
     .withTimePenalty(TIME_PENALTY_VALUE);
 
   static List<TestAccessEgress> parseAccessEgressTestCases() {
-    return List.of(OPENING_HOURS);
-    //return List.of(WALK, FLEX, FLEX_AND_WALK, FREE, OPENING_HOURS, VIA, TIME_PENALTY, EVERYTHING);
+    return List.of(WALK, FLEX, FLEX_AND_WALK, FREE, OPENING_HOURS, VIA, TIME_PENALTY, EVERYTHING);
   }
 
   @ParameterizedTest

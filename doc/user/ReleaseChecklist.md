@@ -41,7 +41,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       semantic versioning)
     * `mvn versions:set -DnewVersion=x.y.z`
     * `git add pom.xml`
-    * `git commit -m "prepare release x.y.z"`
+    * `git commit -m "Prepare release x.y.z"`
 * Run a test build of the release locally, without deploying it
     * `mvn clean install -Prelease`
     * The `install` goal will sign the Maven artifacts so you need the GPG signing certificate set
@@ -50,7 +50,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       don't have the GPG certificate installed.
     * All tests should pass
 * Finally, if everything looks good, tag and push this release to make it official
-    * `git tag -a vX.Y.Z -m "release X.Y.Z"`
+    * `git tag -a vX.Y.Z -m "Release X.Y.Z"`
     * `git push origin vX.Y.Z`
     * `git push origin master`
     * Note that **only one** commit may have a particular non-snapshot version in the POM (this is
@@ -71,7 +71,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
     * While still on the tag commit, run `mvn deploy -Prelease`.
 * Check that Maven artifact appears on Maven Central
-    * [Directory listing of OTP releases on Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/)
+    * [Directory listing of OTP releases on Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/)
     * It may take a while (half an hour) for releases to show up in the central repo after Travis
       uploads the artifacts
 * Merge master back into dev (to sync up the Maven artifact version from the POM)

@@ -189,8 +189,20 @@ public class OsmTagMapper {
     );
 
     /* sidewalk and crosswalk */
-    props.setMixinProperties("footway=sidewalk", ofBicycleSafety(2.5));
-    props.setMixinProperties("footway=crossing", ofBicycleSafety(1.5));
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Not(new Equals("highway", "cycleway")),
+        new Equals("footway", "sidewalk")
+      ),
+      ofBicycleSafety(2.5)
+    );
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Not(new Equals("highway", "cycleway")),
+        new Equals("footway", "crossing")
+      ),
+      ofBicycleSafety(1.5)
+    );
 
     /* bicycle=designated, but no bike infrastructure is present */
     props.setMixinProperties(
@@ -404,7 +416,6 @@ public class OsmTagMapper {
     props.createNames("indoor=area", "name.indoor_area");
 
     // Platforms
-    props.createNames("otp:route_ref=*", "name.otp_route_ref");
     props.createNames("highway=platform;ref=*", "name.platform_ref");
     props.createNames("railway=platform;ref=*", "name.platform_ref");
     props.createNames("railway=platform;highway=footway;footway=sidewalk", "name.platform");

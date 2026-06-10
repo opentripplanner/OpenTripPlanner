@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 
@@ -51,6 +50,6 @@ class CancelAllStopsTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertSuccess(result);
-    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).realTimeState());
+    assertTrue(env.tripData(TRIP_1_ID).tripTimes().isCanceled());
   }
 }

@@ -1,18 +1,12 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorRequest;
 
 /**
- * This interface defines the data needed by Raptor. It is the main/top-level interface and together
- * with the {@link RaptorRequest} if provide all
- * information needed by Raptor to perform the search. It makes it possible to write small adapter
- * between the "OTP Transit Layer" and the Raptor algorithm.
+ * This interface defines the data needed by Raptor. It is the main/top-level interface and
+ * together with the {@code RaptorRequest} if provide all information needed by Raptor to perform
+ * the search. It makes it possible to write small adapter between the "OTP Transit Layer" and the
+ * Raptor algorithm.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -30,6 +24,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * every stop from 0 to {@code numberOfStops()-1}.
    */
   int numberOfStops();
+
+  /**
+   * This is the total number of trip patterns. All trip patterns must have a index
+   * ({@link RaptorTripPattern#patternIndex()}) < this value. Holes are acceptable.
+   */
+  int numberOfTripPatterns();
 
   /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
@@ -149,4 +149,20 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * REVERSE search.
    */
   RaptorConstrainedBoardingSearch<T> transferConstraintsReverseSearch(int routeIndex);
+
+  /**
+   * Return a reference for a give trip schedule. It can be stored and later used to fetch
+   * {@link RaptorRoute}, {@link RaptorTripPattern} and {@link RaptorTripSchedule} later on.
+   * <p>
+   * <b>IMPLEMENTATION NOTES</b>
+   * <p>
+   * Raptor uses this to fetch information in places where the original Raptor routing context
+   * (iterating over the stop of a pattern) is no longer available. Raptor could pass this
+   * information down the call stack, but that would have an effect on the performance. An other
+   * alternative is to add methods for this to the {@link RaptorTripSchedule}, but that would
+   * couple the trip schedule to the route and trip-pattern.
+   * <p>
+   * This method is <em>NOT</em> performance critical, but it should not be slow.
+   */
+  RaptorTripScheduleReference tripScheduleReference(T trip);
 }

@@ -7,10 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -36,7 +39,7 @@ class RegularStopTest {
   private static final String PLATFORM_CODE = "platformCode";
 
   private static final RegularStop SUBJECT = SiteRepository.of()
-    .regularStop(TimetableRepositoryForTest.id(ID))
+    .regularStop(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)
@@ -85,7 +88,7 @@ class RegularStopTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       SUBJECT.sameAs(SUBJECT.copy().withDescription(new NonLocalizedString("X")).build())
@@ -102,5 +105,24 @@ class RegularStopTest {
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPlatformCode("X").build()));
+  }
+
+  @Test
+  void fareZonesAreSortedById() {
+    var zoneC = FareZone.of(new FeedScopedId("F", "C")).build();
+    var zoneA = FareZone.of(new FeedScopedId("F", "A")).build();
+    var zoneB = FareZone.of(new FeedScopedId("F", "B")).build();
+
+    var stop = SiteRepository.of()
+      .regularStop(FeedScopedIdForTestFactory.id("sortTest"))
+      .withName(NAME)
+      .withCoordinate(COORDINATE)
+      .addFareZone(zoneC)
+      .addFareZone(zoneA)
+      .addFareZone(zoneB)
+      .build();
+
+    assertEquals(List.of(zoneA, zoneB, zoneC), List.copyOf(stop.getFareZones()));
+    assertEquals("A", stop.getFirstZoneAsString());
   }
 }

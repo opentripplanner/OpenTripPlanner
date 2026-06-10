@@ -30,31 +30,16 @@ public class BarrierTest {
 
   @Test
   void testLinearCrossingNonIntersection() {
-    var way = new OsmWay();
-    way.addTag("highway", "path");
-    way.addNodeRef(1);
-    way.addNodeRef(2);
-    way.addNodeRef(3);
-    way.addNodeRef(4);
-    way.setId(1);
+    var way = OsmWay.of().withId(1).withTag("highway", "path").addNodeRef(1, 2, 3, 4).build();
 
-    var barrier = new OsmWay();
-    barrier.addTag("barrier", "fence");
-    barrier.addNodeRef(99);
-    barrier.addNodeRef(2);
-    barrier.addNodeRef(98);
-    barrier.setId(2);
+    var barrier = OsmWay.of().withId(2).withTag("barrier", "fence").addNodeRef(99, 2, 98).build();
 
     var osmProvider = new TestOsmProvider(
       List.of(),
       List.of(way, barrier),
       Set.of(1, 2, 3, 4, 98, 99)
         .stream()
-        .map(id -> {
-          var node = new OsmNode((double) id / 1000, 0);
-          node.setId(id);
-          return node;
-        })
+        .map(id -> OsmNode.of().withId(id).withLatLon((double) id / 1000, 0).build())
         .toList()
     );
 
@@ -80,42 +65,23 @@ public class BarrierTest {
 
   @Test
   void testHighwayReachingBarrierOnArea() {
-    var n1 = new OsmNode(0, 0);
-    n1.setId(1);
-    var n2 = new OsmNode(0.001, 0);
-    n2.setId(2);
-    var n3 = new OsmNode(0, -0.001);
-    n3.setId(3);
-    var n4 = new OsmNode(0, 0.001);
-    n4.setId(4);
-    var n5 = new OsmNode(-0.001, 0.001);
-    n5.setId(5);
-    var n6 = new OsmNode(-0.001, -0.001);
-    n6.setId(6);
+    var n1 = OsmNode.of().withId(1).withLatLon(0, 0).build();
+    var n2 = OsmNode.of().withId(2).withLatLon(0.001, 0).build();
+    var n3 = OsmNode.of().withId(3).withLatLon(0, -0.001).build();
+    var n4 = OsmNode.of().withId(4).withLatLon(0, 0.001).build();
+    var n5 = OsmNode.of().withId(5).withLatLon(-0.001, 0.001).build();
+    var n6 = OsmNode.of().withId(6).withLatLon(-0.001, -0.001).build();
 
-    var path = new OsmWay();
-    path.addTag("highway", "path");
-    path.addNodeRef(1);
-    path.addNodeRef(2);
-    path.setId(1);
+    var path = OsmWay.of().withId(1).withTag("highway", "path").addNodeRef(1, 2).build();
 
-    var chain = new OsmWay();
-    chain.addTag("barrier", "chain");
-    chain.addNodeRef(3);
-    chain.addNodeRef(1);
-    chain.addNodeRef(4);
-    chain.setId(2);
+    var chain = OsmWay.of().withId(2).withTag("barrier", "chain").addNodeRef(3, 1, 4).build();
 
-    var barrier = new OsmWay();
-    barrier.addTag("highway", "pedestrian");
-    barrier.addTag("bicycle", "yes");
-    barrier.addTag("area", "yes");
-    barrier.addNodeRef(1);
-    barrier.addNodeRef(4);
-    barrier.addNodeRef(5);
-    barrier.addNodeRef(6);
-    barrier.addNodeRef(3);
-    barrier.addNodeRef(1);
+    var barrier = OsmWay.of()
+      .withTag("highway", "pedestrian")
+      .withTag("bicycle", "yes")
+      .withTag("area", "yes")
+      .addNodeRef(1, 4, 5, 6, 3, 1)
+      .build();
 
     var osmProvider = new TestOsmProvider(
       List.of(),
@@ -176,58 +142,38 @@ public class BarrierTest {
 
   @Test
   void testDifferentLevelsConnectingBarrier() {
-    var n1 = new OsmNode(0, 0);
-    n1.setId(1);
-    var n2 = new OsmNode(0, 1);
-    n2.setId(2);
-    var n3 = new OsmNode(0, 2);
-    n3.setId(3);
-    var n4 = new OsmNode(0, 3);
-    n4.setId(4);
-    n4.addTag("barrier", "bollard");
-    var n5 = new OsmNode(1, 0);
-    n5.setId(5);
-    var n6 = new OsmNode(-1, 0);
-    n6.setId(6);
-    n6.addTag("barrier", "bollard");
+    var n1 = OsmNode.of().withId(1).withLatLon(0, 0).build();
+    var n2 = OsmNode.of().withId(2).withLatLon(0, 1).build();
+    var n3 = OsmNode.of().withId(3).withLatLon(0, 2).build();
+    var n4 = OsmNode.of().withId(4).withLatLon(0, 3).withTag("barrier", "bollard").build();
+    var n5 = OsmNode.of().withId(5).withLatLon(1, 0).build();
+    var n6 = OsmNode.of().withId(6).withLatLon(-1, 0).withTag("barrier", "bollard").build();
 
-    var chain = new OsmWay();
-    chain.addTag("barrier", "chain");
-    chain.setId(999);
-    chain.addNodeRef(1);
-    chain.addNodeRef(2);
-    chain.addNodeRef(3);
+    var chain = OsmWay.of().withId(999).withTag("barrier", "chain").addNodeRef(1, 2, 3).build();
 
-    var w1 = new OsmWay();
-    w1.setId(1);
-    w1.addTag("highway", "pedestrian");
-    w1.addTag("level", "0");
-    w1.addTag("area", "yes");
-    w1.addNodeRef(4);
-    w1.addNodeRef(5);
-    w1.addNodeRef(1);
-    w1.addNodeRef(4);
+    var w1 = OsmWay.of()
+      .withId(1)
+      .withTag("highway", "pedestrian")
+      .withTag("level", "0")
+      .withTag("area", "yes")
+      .addNodeRef(4, 5, 1, 4)
+      .build();
 
-    var w2 = new OsmWay();
-    w2.setId(2);
-    w2.addTag("highway", "pedestrian");
-    w2.addTag("level", "1");
-    w2.addTag("area", "yes");
-    w2.addNodeRef(1);
-    w2.addNodeRef(2);
-    w2.addNodeRef(3);
-    w2.addNodeRef(6);
-    w2.addNodeRef(1);
+    var w2 = OsmWay.of()
+      .withId(2)
+      .withTag("highway", "pedestrian")
+      .withTag("level", "1")
+      .withTag("area", "yes")
+      .addNodeRef(1, 2, 3, 6, 1)
+      .build();
 
-    var w3 = new OsmWay();
-    w3.setId(3);
-    w3.addTag("highway", "pedestrian");
-    w3.addTag("level", "1");
-    w3.addTag("area", "yes");
-    w3.addNodeRef(4);
-    w3.addNodeRef(6);
-    w3.addNodeRef(1);
-    w3.addNodeRef(4);
+    var w3 = OsmWay.of()
+      .withId(3)
+      .withTag("highway", "pedestrian")
+      .withTag("level", "1")
+      .withTag("area", "yes")
+      .addNodeRef(4, 6, 1, 4)
+      .build();
 
     var issueStore = new DefaultDataImportIssueStore();
     var osmProvider = new TestOsmProvider(

@@ -14,6 +14,7 @@
 *.swp
 *.DS_Store
 *.snap.debug
+*.obj
 dependency-reduced-pom.xml
 interactive_otp_main.json
 /otp

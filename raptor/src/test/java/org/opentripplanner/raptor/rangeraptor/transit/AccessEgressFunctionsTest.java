@@ -20,10 +20,6 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
 
-  public static final int BOARD_SLACK = D20_s;
-  public static final int ALIGHT_SLACK = D10_s;
-  public static final int TRANSFER_SLACK = D1_m;
-
   private static final int STOP = 8;
   private static final int C1 = 1000;
   private static final int C1_LOW = 999;
@@ -197,12 +193,12 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   @Test
   void groupByRoundTest() {
     // Map one element
-    var res = groupByRound(List.of(WALK_8_m), e -> true);
+    var res = groupByRound(List.of(WALK_8_m), _ -> true);
     assertArrayEquals(new int[] { 0 }, res.keys());
     assertElements(List.of(WALK_8_m), res.get(0));
 
     // Map 4 elements into 3 groups
-    res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m, FLEX_2x_8_m, FLEX_1x_10_m), e -> true);
+    res = groupByRound(List.of(WALK_8_m, FLEX_1x_8_m, FLEX_2x_8_m, FLEX_1x_10_m), _ -> true);
     int[] keys = res.keys();
     Arrays.sort(keys);
 

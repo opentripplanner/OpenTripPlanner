@@ -1,7 +1,9 @@
 package org.opentripplanner.updater.trip.siri;
 
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -72,7 +74,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (calls.getFirst().getAimedDepartureTime() == null) {
-      throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+      throw UpdateException.of(INVALID_DEPARTURE_TIME);
     }
 
     Set<Trip> trips = null;
@@ -89,7 +91,7 @@ public class SiriFuzzyTripMatcher {
       // quay ids also work
       RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
       if (stop == null) {
-        throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+        throw UpdateException.of(UNKNOWN_STOP);
       }
       ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
         ? lastCall.getAimedArrivalTime()
@@ -293,7 +295,6 @@ public class SiriFuzzyTripMatcher {
     if (possibleTrips.isEmpty()) {
       throw UpdateException.of(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
     } else if (possibleTrips.size() > 1) {
-      LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
       throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     } else {
       return possibleTrips.iterator().next();

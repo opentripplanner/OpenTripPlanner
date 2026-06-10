@@ -85,8 +85,6 @@ class LinkingContextRequestTest {
 
   @Test
   void testToString() {
-    var defaultRequest = LinkingContextRequest.of().withFrom(GenericLocation.UNKNOWN).build();
-    assertEquals("LinkingContextRequest{from: Unknown location}", defaultRequest.toString());
     assertEquals(
       "LinkingContextRequest{" +
         "from: (1.0, 2.0), " +

@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.graphbuilder;
 
 import java.util.List;
 import org.opentripplanner.core.model.time.LocalDateInterval;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -25,7 +25,7 @@ public class GtfsModuleTestFactory {
       new Deduplicator(),
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       150.0,
       120
     );

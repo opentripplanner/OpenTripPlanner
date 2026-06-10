@@ -4,12 +4,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
+import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
@@ -17,30 +20,34 @@ public class TripTimeOnDateRequest {
 
   private final Set<StopLocation> stopLocations;
   private final Instant time;
+  private final boolean includeCancelledTrips;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
   private final FilterValues<FeedScopedId> excludeRoutes;
   private final FilterValues<TransitMode> includeModes;
   private final FilterValues<TransitMode> excludeModes;
+  private final List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
   private final int numberOfDepartures;
   private final Comparator<TripTimeOnDate> sortOrder;
 
-  TripTimeOnDateRequest(
+  public TripTimeOnDateRequest(
     Collection<StopLocation> stopLocations,
     Instant time,
     Duration timeWindow,
     ArrivalDeparture arrivalDeparture,
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
+    boolean includeCancelledTrips,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
     FilterValues<FeedScopedId> excludeRoutes,
     FilterValues<TransitMode> includeModes,
-    FilterValues<TransitMode> excludeModes
+    FilterValues<TransitMode> excludeModes,
+    List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
     this.time = Objects.requireNonNull(time);
@@ -48,12 +55,14 @@ public class TripTimeOnDateRequest {
     this.arrivalDeparture = arrivalDeparture;
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
+    this.includeCancelledTrips = includeCancelledTrips;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
     this.excludeRoutes = excludeRoutes;
     this.includeModes = includeModes;
     this.excludeModes = excludeModes;
+    this.transitFilters = List.copyOf(transitFilters);
   }
 
   public static TripTimeOnDateRequestBuilder of(Collection<StopLocation> stopLocations) {
@@ -66,6 +75,10 @@ public class TripTimeOnDateRequest {
 
   public Instant time() {
     return time;
+  }
+
+  public boolean includeCancelledTrips() {
+    return includeCancelledTrips;
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {
@@ -106,5 +119,9 @@ public class TripTimeOnDateRequest {
 
   public Comparator<TripTimeOnDate> sortOrder() {
     return sortOrder;
+  }
+
+  public List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters() {
+    return transitFilters;
   }
 }

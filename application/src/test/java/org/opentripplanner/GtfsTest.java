@@ -21,13 +21,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
@@ -38,6 +38,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -77,7 +78,6 @@ public abstract class GtfsTest {
     long dateTime,
     String fromVertex,
     String toVertex,
-    String onTripId,
     boolean wheelchairAccessible,
     boolean preferLeastTransfers,
     TransitMode preferredMode,
@@ -97,14 +97,10 @@ public abstract class GtfsTest {
       .withDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
 
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      builder.withFrom(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex));
+      builder.withFrom(GenericLocation.fromStopId(FeedScopedId.of(FEED_ID, fromVertex)));
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      builder.withTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
-    }
-    if (onTripId != null && !onTripId.isEmpty()) {
-      // TODO VIA - set different on-board request
-      //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
+      builder.withTo(GenericLocation.fromStopId(FeedScopedId.of(FEED_ID, toVertex)));
     }
     builder.withJourney(journeyBuilder -> {
       journeyBuilder.withWheelchair(wheelchairAccessible);

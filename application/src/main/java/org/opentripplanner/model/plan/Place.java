@@ -82,6 +82,10 @@ public class Place {
     this.viaLocationType = viaLocationType;
   }
 
+  public static Place noCoords(I18NString name) {
+    return new Place(name, null, VertexType.NORMAL, null, null, null, null);
+  }
+
   public static Place normal(Double lat, Double lon, I18NString name) {
     return new Place(
       name,
@@ -92,6 +96,10 @@ public class Place {
       null,
       null
     );
+  }
+
+  public static Place normal(WgsCoordinate coord, I18NString name) {
+    return new Place(name, coord, VertexType.NORMAL, null, null, null, null);
   }
 
   public static Place normal(
@@ -174,14 +182,13 @@ public class Place {
     I18NString defaultName
   ) {
     if (location == null) {
-      return Place.normal(null, null, defaultName);
+      return Place.noCoords(defaultName);
     }
-
-    return Place.normal(
-      location.lat,
-      location.lng,
-      NonLocalizedString.ofNullableOrElse(location.label, defaultName)
-    );
+    var coord = location.wgsCoordinate();
+    if (coord == null) {
+      return Place.noCoords(NonLocalizedString.ofNullableOrElse(location.label(), defaultName));
+    }
+    return Place.normal(coord, NonLocalizedString.ofNullableOrElse(location.label(), defaultName));
   }
 
   public static Place forVehicleRentalPlace(VehicleRentalPlaceVertex vertex) {

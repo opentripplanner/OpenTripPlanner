@@ -7,30 +7,32 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
-import org.opentripplanner.raptor.util.BitSetIterator;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
   implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
+
+  private static final AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
 
   private static final Pattern ROUTE_NAME_PATTERN = Pattern.compile("[-\\w]+");
 
@@ -45,6 +47,8 @@ public class TestTransitData
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<TestConstrainedTransfer> constrainedTransfers = new ArrayList<>();
+  private final boolean enableDebugLogging = initEnableDebugLogging();
+
   private int boardCostSec = 600;
   private int transferCostSec = 0;
   private double waitReluctance = 1.0;
@@ -56,9 +60,8 @@ public class TestTransitData
 
   private RaptorSlackProvider slackProvider = SLACK_PROVIDER;
 
-  /// Create an new instance and call {@link #withTimetables(String)}
-  public static TestTransitData of(String routeTimetables) {
-    return new TestTransitData().withTimetables(routeTimetables);
+  public TestTransitData() {
+    setUpDebugToStdErr();
   }
 
   public TestTransitData access(String... accessList) {
@@ -68,6 +71,7 @@ public class TestTransitData
 
   public TestTransitData access(RaptorAccessEgress... accessList) {
     requestBuilder.searchParams().addAccessPaths(accessList);
+    addAccessEgressStopsToDebugger(accessList);
     return this;
   }
 
@@ -83,6 +87,7 @@ public class TestTransitData
 
   public TestTransitData egress(RaptorAccessEgress... egressList) {
     requestBuilder.searchParams().addEgressPaths(egressList);
+    addAccessEgressStopsToDebugger(egressList);
     return this;
   }
 
@@ -105,7 +110,7 @@ public class TestTransitData
         routes.set(i);
       }
     }
-    return new BitSetIterator(routes);
+    return IntIterators.of(routes);
   }
 
   @Override
@@ -116,6 +121,11 @@ public class TestTransitData
   @Override
   public int numberOfStops() {
     return routeIndexesByStopIndex.size();
+  }
+
+  @Override
+  public int numberOfTripPatterns() {
+    return routes.size();
   }
 
   @Override
@@ -140,29 +150,20 @@ public class TestTransitData
 
   @Override
   public RaptorPathConstrainedTransferSearch<TestTripSchedule> transferConstraintsSearch() {
-    return new RaptorPathConstrainedTransferSearch<>() {
-      @Nullable
-      @Override
-      public RaptorConstrainedTransfer findConstrainedTransfer(
-        TestTripSchedule fromTrip,
-        int fromStopPosition,
-        TestTripSchedule toTrip,
-        int toStopPosition
-      ) {
-        var list = routes
-          .stream()
-          .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
-          .filter(tx -> tx.match(fromTrip, fromStopPosition, toTrip, toStopPosition))
-          .toList();
+    return (fromTrip, fromStopPosition, toTrip, toStopPosition) -> {
+      var list = routes
+        .stream()
+        .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
+        .filter(tx -> tx.match(fromTrip, fromStopPosition, toTrip, toStopPosition))
+        .toList();
 
-        if (list.isEmpty()) {
-          return null;
-        }
-        if (list.size() == 1) {
-          return list.get(0);
-        }
-        throw new IllegalStateException("More than on transfers found: " + list);
+      if (list.isEmpty()) {
+        return null;
       }
+      if (list.size() == 1) {
+        return list.getFirst();
+      }
+      throw new IllegalStateException("More than on transfers found: " + list);
     };
   }
 
@@ -208,27 +209,25 @@ public class TestTransitData
     return getRoute(routeIndex).transferConstraintsReverseSearch();
   }
 
+  @Override
+  public RaptorTripScheduleReference tripScheduleReference(TestTripSchedule trip) {
+    for (int routeIndex = 0; routeIndex < routes.size(); ++routeIndex) {
+      var route = routes.get(routeIndex);
+      for (int tripIndex = 0; tripIndex < route.numberOfTripSchedules(); ++tripIndex) {
+        if (trip == route.getTripSchedule(tripIndex)) {
+          return new RaptorTripScheduleReference(routeIndex, tripIndex);
+        }
+      }
+    }
+    throw new IllegalArgumentException("Trip not found: " + trip);
+  }
+
   public RaptorRequestBuilder<TestTripSchedule> requestBuilder() {
     return requestBuilder;
   }
 
   public TestRoute getRoute(int index) {
     return routes.get(index);
-  }
-
-  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request, boolean dryRun) {
-    var debug = request.debug();
-
-    if (debug.stops().isEmpty()) {
-      debug.withStops(stopsVisited());
-    }
-    var logger = new SystemErrDebugLogger(true, dryRun);
-
-    debug
-      .withStopArrivalListener(logger::stopArrivalLister)
-      .withPatternRideDebugListener(logger::patternRideLister)
-      .withPathFilteringListener(logger::pathFilteringListener)
-      .withLogger(logger);
   }
 
   /// Build a test data with multiple routes. The route name is generated(R1, R2 ...) if not
@@ -267,13 +266,15 @@ public class TestTransitData
   }
 
   public TestTransitData withRoute(TestRoute route) {
+    int tripPatternIndex = routes.size();
+    route.initTripPatternIndex(tripPatternIndex);
     this.routes.add(route);
-    int routeIndex = this.routes.indexOf(route);
     var pattern = route.pattern();
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
+      requestBuilder.debug().withStops(stopIndex);
       expandNumOfStops(stopIndex);
-      routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
+      routeIndexesByStopIndex.get(stopIndex).add(tripPatternIndex);
     }
     return this;
   }
@@ -306,21 +307,9 @@ public class TestTransitData
     return withConstrainedTransfer(fromTrip, fromStop, toTrip, toStop, TX_GUARANTEED);
   }
 
-  public void clearConstrainedTransfers() {
-    constrainedTransfers.clear();
-    for (TestRoute route : routes) {
-      route.clearTransferConstraints();
-    }
-  }
-
   /**
    * Create constraint for a given transfer. If trip passes through the stop more than once
    * constraint will be placed on stop position for the first visit.
-   * @param fromTrip initial trip
-   * @param fromStop initial stop index
-   * @param toTrip destination trip
-   * @param toStop destination trip index
-   * @param constraint constraint to set
    */
   public TestTransitData withConstrainedTransfer(
     TestTripSchedule fromTrip,
@@ -354,29 +343,8 @@ public class TestTransitData
     return this;
   }
 
-  public TestConstrainedTransfer findConstrainedTransfer(
-    TestTripSchedule fromTrip,
-    int fromStop,
-    int fromStopPosition,
-    TestTripSchedule toTrip,
-    int toStop,
-    int toStopPosition
-  ) {
-    for (var tx : constrainedTransfers) {
-      if (tx.match(fromTrip, fromStopPosition, toTrip, toStopPosition)) {
-        return tx;
-      }
-    }
-    return null;
-  }
-
   public TestTransitData withBoardCost(int boardCostSec) {
     this.boardCostSec = boardCostSec;
-    return this;
-  }
-
-  public TestTransitData withWaitReluctance(double waitReluctance) {
-    this.waitReluctance = waitReluctance;
     return this;
   }
 
@@ -395,18 +363,43 @@ public class TestTransitData
     }
   }
 
-  private List<Integer> stopsVisited() {
-    final List<Integer> stops = new ArrayList<>();
-    for (int i = 0; i < routeIndexesByStopIndex.size(); i++) {
-      if (!routeIndexesByStopIndex.get(i).isEmpty()) {
-        stops.add(i);
-      }
-    }
-    return stops;
-  }
-
   private static String flipEgress(String egress) {
     int pos = egress.indexOf('~');
     return egress.substring(pos + 1).trim() + " ~ " + egress.substring(0, pos).trim();
+  }
+
+  private void addAccessEgressStopsToDebugger(RaptorAccessEgress[] accessList) {
+    if (enableDebugLogging) {
+      requestBuilder
+        .debug()
+        .withStops(Arrays.stream(accessList).map(RaptorAccessEgress::stop).toList());
+    }
+  }
+
+  private void setUpDebugToStdErr() {
+    if (enableDebugLogging) {
+      var debug = requestBuilder.debug();
+      var logger = new SystemErrDebugLogger(stopNameResolver(), enableDebugLogging);
+
+      debug
+        .withStopArrivalListener(logger::stopArrivalLister)
+        .withPatternRideDebugListener(logger::patternRideLister)
+        .withPathFilteringListener(logger::pathFilteringListener)
+        .withLogger(logger);
+    } else {
+      if (WARNING_COUNTER.getAndIncrement() % 20 == 0) {
+        System.err.println(
+          "[INFO] The debug logging for raptor module tests is off by default! " +
+            "Add \"-DdebugRaptor\" to the command line to enable."
+        );
+      }
+    }
+  }
+
+  /// Add `-DdebugRaptor=true` to Raptor event logging.
+  boolean initEnableDebugLogging() {
+    boolean sysDebug = System.getProperties().containsKey("debugRaptor");
+    boolean envDebug = System.getenv().containsKey("debugRaptor");
+    return sysDebug || envDebug;
   }
 }

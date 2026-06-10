@@ -18,7 +18,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
@@ -64,8 +63,6 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
       .latestArrivalTime(T00_10)
       // Only one iteration is needed - the access should be time-shifted
       .searchWindowInSeconds(D3_m);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {

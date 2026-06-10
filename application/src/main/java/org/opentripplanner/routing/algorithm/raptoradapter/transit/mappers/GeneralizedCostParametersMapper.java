@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;

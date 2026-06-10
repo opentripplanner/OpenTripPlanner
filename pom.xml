@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.9.0</version>
+    <version>2.10.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -58,25 +58,25 @@
 
 
     <properties>
-        <otp.serialization.version.id>249</otp.serialization.version.id>
+        <otp.serialization.version.id>261</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>34.2</geotools.version>
+        <geotools.version>34.4</geotools.version>
         <google.dagger.version>2.59.2</google.dagger.version>
-        <jackson.version>2.21.1</jackson.version>
-        <jaxb-runtime.version>4.0.7</jaxb-runtime.version>
+        <jackson.version>2.22.0</jackson.version>
+        <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>6.0.3</junit.version>
+        <junit.version>6.1.0</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.32</logback.version>
-        <lucene.version>10.3.2</lucene.version>
-        <micrometer.version>1.16.4</micrometer.version>
-        <netex-java-model.version>2.0.15.2</netex-java-model.version>
+        <logback.version>1.5.34</logback.version>
+        <lucene.version>10.4.0</lucene.version>
+        <micrometer.version>1.16.5</micrometer.version>
+        <netex-java-model.version>2.0.15.3</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.34.0</protobuf.version>
-        <siri-java-model.version>2.0.5</siri-java-model.version>
-        <slf4j.version>2.0.17</slf4j.version>
+        <protobuf.version>4.35.0</protobuf.version>
+        <siri-java-model.version>2.0.6</siri-java-model.version>
+        <slf4j.version>2.0.18</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -113,7 +113,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>com.hubspot.maven.plugins</groupId>
@@ -199,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <configuration>
                     <propertiesEncoding>UTF-8</propertiesEncoding>
                 </configuration>
@@ -299,6 +299,11 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.14</version>
+                <configuration>
+                    <excludes>
+                        <exclude>org/opentripplanner/apis/gtfs/generated/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -307,7 +312,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>9.0.2</version>
+                <version>10.0.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -332,7 +337,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.29.0</version>
+                <version>6.40.0</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -351,7 +356,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.27.0</version>
+                        <version>2.35.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -375,7 +380,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>13.2.0</version>
+                        <version>13.4.2</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -467,7 +472,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.77.0</version>
+                <version>26.81.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -490,7 +495,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.5.0-jre</version>
+                <version>33.6.0-jre</version>
             </dependency>
 
             <!-- Logging API -->
@@ -575,7 +580,7 @@
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
-                <version>1.4.1</version>
+                <version>1.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>

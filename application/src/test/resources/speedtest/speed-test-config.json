@@ -2,6 +2,6 @@
   // Run all test-cases on the given date
   "testDate": "2009-12-17",
   "feedId": "1",
-  "graph": "not-used-but-requiered.obj",
+  "graph": "not-used-but-required.obj",
   "ignoreStreetResults": true
 }

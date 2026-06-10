@@ -1,6 +1,6 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

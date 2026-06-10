@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +25,6 @@ class OverlappingTimeframeTest implements PlanTestConstants, FareTestConstants {
     var it = TestItinerary.of(leg).build();
     var result = buildService(leg.serviceDate()).calculateFares(it);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.offersForLeg(leg)).containsExactly(
       FareOffer.of(leg.startTime(), FARE_PRODUCT_A),
       FareOffer.of(leg.startTime(), FARE_PRODUCT_B)

@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
-import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
@@ -20,7 +19,6 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.ElevatorUs
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.EscalatorUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
-import org.opentripplanner.routing.graphfinder.EntranceResolver;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -33,11 +31,13 @@ import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
+import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.EntranceResolver;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**

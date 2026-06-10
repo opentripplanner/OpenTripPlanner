@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -33,7 +34,12 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean match(TransitMode transitMode, SubMode subMode) {
+  public boolean match(
+    TransitMode transitMode,
+    SubMode subMode,
+    @Nullable Integer gtfsExtendedType
+  ) {
+    // if netexSubmode is non-null, gtfsExtendedType is null, so no need to check that
     return mainMode == transitMode && includesSubMode(subMode);
   }
 

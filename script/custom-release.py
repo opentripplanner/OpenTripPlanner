@@ -502,7 +502,7 @@ def resolve_latest_ser_ver_id():
     p = git('tag', '--list', '--sort=-v:refname', error_msg='Fetch git tags failed!')
     all_tags = p.stdout.splitlines()
     prefix = f'{state.major_version}-{config.release_remote}-\\d+'
-    pattern = re.compile('v' + prefix.replace('.', r'\.') + r'\d+')
+    pattern = re.compile('v' + prefix.replace('.', r'\.'))
     tags = [item for item in all_tags if re.search(pattern, item)]
     tags = tags[:60]
     maxSId = ' '
@@ -910,7 +910,7 @@ def print_help():
       1. The configured release-branch is reset hard to the <base-revision> script argument.
       2. Then the labeled PRs are merged into the release-branch [if configured].
       3. The config-branches are merged into the release-branch [if configured].
-      4. The pom.xml file is updated with a new version and serialization version id [if requiered].
+      4. The pom.xml file is updated with a new version and serialization version id [if required].
       5. The release is tested, tagged and pushed to Git repo.
 
     See the RELEASE_README.md for more details.

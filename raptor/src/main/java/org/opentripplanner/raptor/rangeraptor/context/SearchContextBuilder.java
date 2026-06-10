@@ -1,16 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.context;
 
 import java.util.List;
-import java.util.function.IntPredicate;
-import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class SearchContextBuilder<T extends RaptorTripSchedule> {
 
@@ -18,19 +16,14 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   private final RaptorTuningParameters tuningParameters;
   private final RaptorTransitDataProvider<T> transit;
 
-  @Nullable
-  private final IntPredicate acceptC2AtDestination;
-
   public SearchContextBuilder(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit,
-    @Nullable IntPredicate acceptC2AtDestination
+    RaptorTransitDataProvider<T> transit
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
-    this.acceptC2AtDestination = acceptC2AtDestination;
   }
 
   public SearchContext<T> build() {
@@ -40,8 +33,7 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
       transit,
       accessPaths(),
       viaConnections(),
-      egressPaths(),
-      acceptC2AtDestination
+      egressPaths()
     );
   }
 
@@ -54,16 +46,13 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   }
 
   private List<ViaConnections> viaConnections() {
-    // TODO VIA - This need to be changed if we allow mixing visit-via and pass-through
-    return request.searchParams().isVisitViaSearch()
-      ? request
-          .searchParams()
-          .viaLocations()
-          .stream()
-          .map(RaptorViaLocation::connections)
-          .map(ViaConnections::new)
-          .toList()
-      : List.of();
+    return request
+      .searchParams()
+      .viaLocations()
+      .stream()
+      .map(RaptorViaLocation::connections)
+      .map(ViaConnections::new)
+      .toList();
   }
 
   private EgressPaths egressPaths() {

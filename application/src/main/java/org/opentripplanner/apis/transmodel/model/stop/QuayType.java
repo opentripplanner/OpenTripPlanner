@@ -16,10 +16,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.transmodel.mapping.TripTimeOnDateFilterMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
@@ -27,7 +30,7 @@ import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScala
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
@@ -258,11 +261,11 @@ public class QuayType {
           .argument(
             GraphQLArgument.newArgument()
               .name("whiteListed")
-              .description("Whitelisted")
               .description(
                 "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
               )
               .type(JourneyWhiteListed.INPUT_TYPE)
+              .deprecate("Use 'filters' instead.")
               .build()
           )
           .argument(
@@ -270,6 +273,18 @@ public class QuayType {
               .name("whiteListedModes")
               .description("Only show estimated calls for selected modes.")
               .type(GraphQLList.list(EnumTypes.TRANSPORT_MODE))
+              .deprecate("Use 'filters' instead.")
+              .build()
+          )
+          .argument(
+            GraphQLArgument.newArgument()
+              .name("filters")
+              .description(
+                "A list of filters for which estimated calls should be included. " +
+                  "An estimated call will be included if it matches with at least one filter. " +
+                  "An empty list is not allowed. Omit the parameter to include all estimated calls."
+              )
+              .type(GraphQLList.list(new GraphQLNonNull(EstimatedCallFilterInputType.INPUT_TYPE)))
               .build()
           )
           .argument(
@@ -284,38 +299,51 @@ public class QuayType {
             ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
             boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
             int numberOfDepartures = environment.getArgument("numberOfDepartures");
-            Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
-              "numberOfDeparturesPerLineAndDestinationDisplay"
-            );
             int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();
-
-            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
-            Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
             Long startTimeInput = environment.getArgument("startTime");
             Instant startTime = startTimeInput != null
               ? Instant.ofEpochMilli(startTimeInput)
               : Instant.now();
 
-            return StopPlaceType.getTripTimesForStop(
-              stop,
-              startTime,
-              timeRange,
-              arrivalDeparture,
-              includeCancelledTrips,
-              numberOfDepartures,
-              departuresPerLineAndDestinationDisplay,
-              whiteListed.authorityIds,
-              whiteListed.lineIds,
-              transitModes,
-              environment
-            )
-              .sorted(TripTimeOnDate.compareByDeparture())
-              .distinct()
-              .limit(numberOfDepartures)
-              .toList();
+            List<Map<String, ?>> filtersInput = environment.getArgument("filters");
+            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
+            Collection<TransitMode> transitModes = EstimatedCallHelper.getWhitelistedModes(
+              environment.getArgument("whiteListedModes")
+            );
+
+            Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
+              "numberOfDeparturesPerLineAndDestinationDisplay"
+            );
+
+            var requestBuilder = TripTimeOnDateRequest.of(List.of(stop))
+              .withTime(startTime)
+              .withTimeWindow(timeRange)
+              .withArrivalDeparture(arrivalDeparture)
+              .withNumberOfDepartures(numberOfDepartures)
+              .withIncludeCancelledTrips(includeCancelledTrips);
+
+            if (filtersInput != null) {
+              var mapper = new TripTimeOnDateFilterMapper(idMapper);
+              requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
+            }
+            requestBuilder
+              .withIncludeAgencies(
+                whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
+              )
+              .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
+              .withIncludeModes(transitModes);
+
+            var tripTimes = GqlUtil.getTransitService(environment).findTripTimesOnDate(
+              requestBuilder.build()
+            );
+
+            return EstimatedCallHelper.limitPerLineAndDestinationDisplay(
+              tripTimes,
+              departuresPerLineAndDestinationDisplay
+            );
           })
           .build()
       )

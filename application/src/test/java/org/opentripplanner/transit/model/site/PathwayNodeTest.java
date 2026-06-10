@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
@@ -25,7 +26,7 @@ class PathwayNodeTest {
   public static final WgsCoordinate COORDINATE = new WgsCoordinate(0, 0);
   private static final StopLevel LEVEL = new StopLevel("level", 0);
   private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
-  private static final PathwayNode SUBJECT = PathwayNode.of(TimetableRepositoryForTest.id(ID))
+  private static final PathwayNode SUBJECT = PathwayNode.of(FeedScopedIdForTestFactory.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)
@@ -65,7 +66,7 @@ class PathwayNodeTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       SUBJECT.sameAs(SUBJECT.copy().withDescription(new NonLocalizedString("X")).build())

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import graphql.language.FloatValue;
 import graphql.language.IntValue;
+import graphql.language.ObjectValue;
 import graphql.language.Value;
 import graphql.schema.AsyncDataFetcher;
 import graphql.schema.DataFetcher;
@@ -34,6 +35,8 @@ public class SchemaFactoryTest {
     double walkSpeed = 15;
     var maxTransfers = 2;
     var numItineraries = 63;
+    var relaxCoefficient = 1;
+    var relaxConstant = 0;
 
     var routeRequest = RouteRequest.of()
       .withPreferences(preferences -> {
@@ -59,6 +62,28 @@ public class SchemaFactoryTest {
       "maximumTransfers"
     );
     assertEquals(maxTransfers, defaultMaxTransfers.getValue().intValue());
+
+    var defaultRelax = (ObjectValue) getDefaultValueForField(
+      schema,
+      "TransitPreferencesInput",
+      "relaxTransitGroupPriority"
+    );
+    var defaultRelaxCoefficient = (FloatValue) defaultRelax
+      .getObjectFields()
+      .stream()
+      .filter(f -> f.getName().equals("coefficient"))
+      .findFirst()
+      .orElseThrow()
+      .getValue();
+    assertEquals(relaxCoefficient, defaultRelaxCoefficient.getValue().doubleValue());
+    var defaultRelaxConstant = (IntValue) defaultRelax
+      .getObjectFields()
+      .stream()
+      .filter(f -> f.getName().equals("constant"))
+      .findFirst()
+      .orElseThrow()
+      .getValue();
+    assertEquals(relaxConstant, defaultRelaxConstant.getValue().intValue());
 
     var defaultNumberOfItineraries = (IntValue) getDefaultValueForArgument(
       schema,

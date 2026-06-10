@@ -7,6 +7,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFare;
+import org.opentripplanner.street.model.path.ElevationChange;
 
 public class ItineraryBuilder {
 
@@ -121,18 +122,13 @@ public class ItineraryBuilder {
 
   /**
    * Add the elevation change in meters to the the itinerary summary. The builder will add the
-   * change to the {@code elevationGained} or the {@code elevationLost} depending on the sign of
-   * the given change value. Negative change is added to the {@code elevationLost} and positive
-   * values are added to the {@code elevationGained}.
+   * change to the {@code elevationGained} and the {@code elevationLost}.
    *
    * Note! This is in addition to the elevation added for each leg elevation profile. TODO Why?
    */
-  public void addElevationChange(double change_m) {
-    if (change_m > 0.0) {
-      this.elevationGained_m += change_m;
-    } else {
-      this.elevationLost_m -= change_m;
-    }
+  public void addElevationChange(ElevationChange elevationChange) {
+    this.elevationGained_m += elevationChange.elevationGainedMeters();
+    this.elevationLost_m += elevationChange.elevationLostMeters();
   }
 
   public ItineraryBuilder withMaxSlope(double wheelchairPreferencesMaxSlope, double maxSlope) {

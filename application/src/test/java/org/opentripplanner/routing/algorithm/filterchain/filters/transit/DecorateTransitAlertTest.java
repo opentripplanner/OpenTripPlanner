@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
@@ -56,6 +57,27 @@ class DecorateTransitAlertTest implements PlanTestConstants {
     // Then: expect correct alerts to be added
     assertEquals(1, i1.legs().getFirst().listTransitAlerts().size());
     assertEquals(ID, i1.legs().getFirst().listTransitAlerts().iterator().next().getId());
+  }
+
+  @Test
+  void testSkipsLegRebuildWhenNoAlertsMatch() {
+    // Alert service with no alerts at all — nothing can match.
+    var transitAlertService = new TransitAlertServiceImpl(new TimetableRepository());
+    var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
+
+    var i1 = newItinerary(A).bus(31, 0, 30, E).build();
+    var originalLegs = i1.legs();
+
+    var decorated = decorator.decorate(i1);
+
+    // Every leg must be the same reference — the short-circuit avoids the rebuild.
+    for (int i = 0; i < originalLegs.size(); i++) {
+      assertSame(
+        originalLegs.get(i),
+        decorated.legs().get(i),
+        "leg " + i + " should not be rebuilt when no alerts apply"
+      );
+    }
   }
 
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {

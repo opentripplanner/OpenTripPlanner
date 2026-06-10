@@ -1,16 +1,14 @@
 package org.opentripplanner.raptor.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 
 import java.util.Collection;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 
 class SearchParamsTest {
 
@@ -76,48 +74,17 @@ class SearchParamsTest {
   void viaAndPassThrough() {
     var noVia = searchParamBuilder().buildSearchParam();
     var via = searchParamBuilder()
-      .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+      .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(5).build())
       .buildSearchParam();
     var passThrough = searchParamBuilder()
-      .addViaLocation(RaptorViaLocation.passThrough("Via").addPassThroughStop(5).build())
+      .addViaLocation(RaptorViaLocation.passThrough("Via").addStop(5).build())
       .buildSearchParam();
 
-    assertFalse(noVia.isVisitViaSearch());
-    assertTrue(via.isVisitViaSearch());
-    assertFalse(passThrough.isVisitViaSearch());
-
-    assertFalse(noVia.isPassThroughSearch());
-    assertFalse(via.isPassThroughSearch());
-    assertTrue(passThrough.isPassThroughSearch());
-
     assertEquals("[]", toString(noVia.viaLocations()));
-    assertEquals("[RaptorViaLocation{via Via : [(stop E)]}]", toString(via.viaLocations()));
+    assertEquals("[RaptorViaLocation{via-visit Via : [(stop E)]}]", toString(via.viaLocations()));
     assertEquals(
       "[RaptorViaLocation{pass-through Via : [(stop E)]}]",
       toString(passThrough.viaLocations())
-    );
-  }
-
-  @Test
-  void addBothViaAndPassThroughIsNotSupported() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      searchParamBuilder()
-        .addAccessPaths(walk(1, 30))
-        .addEgressPaths(walk(7, 30))
-        .addViaLocations(
-          List.of(
-            RaptorViaLocation.via("Via").addViaStop(5).build(),
-            RaptorViaLocation.passThrough("PassThrough").addPassThroughStop(5).build()
-          )
-        )
-        .build()
-    );
-    assertEquals(
-      "Combining pass-through and regular via-vist it is not allowed: [" +
-        "RaptorViaLocation{via Via : [(stop 5)]}, " +
-        "RaptorViaLocation{pass-through PassThrough : [(stop 5)]}" +
-        "].",
-      ex.getMessage()
     );
   }
 
@@ -127,7 +94,7 @@ class SearchParamsTest {
       searchParamBuilder()
         .addAccessPaths(walk(1, 30).withViaLocationsVisited(-1))
         .addEgressPaths(walk(7, 30))
-        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(5).build())
         .build()
     );
     assertEquals("Access cannot have negative via visits: -1", ex.getMessage());
@@ -139,7 +106,7 @@ class SearchParamsTest {
       searchParamBuilder()
         .addAccessPaths(walk(1, 30).withViaLocationsVisited(2))
         .addEgressPaths(walk(7, 30))
-        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(5).build())
         .build()
     );
     assertEquals("Access visits 2 via locations, but only 1 are defined", ex.getMessage());
@@ -151,7 +118,7 @@ class SearchParamsTest {
       searchParamBuilder()
         .addAccessPaths(walk(1, 30))
         .addEgressPaths(walk(7, 30).withViaLocationsVisited(2))
-        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .addViaLocation(RaptorViaLocation.viaVisit("Via").addStop(5).build())
         .build()
     );
     assertEquals("Egress visits 2 via locations, but only 1 are defined", ex.getMessage());

@@ -45,6 +45,14 @@ public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
     return mainMode.name() + "::" + subMode;
   }
 
+  @Nullable
+  public static List<MainAndSubMode> ofTransitModes(@Nullable Collection<TransitMode> modes) {
+    if (modes == null) {
+      return null;
+    }
+    return modes.stream().map(MainAndSubMode::new).toList();
+  }
+
   /**
    * Make sure the String serialization is deterministic by sorting the elements in
    * alphabetic order.

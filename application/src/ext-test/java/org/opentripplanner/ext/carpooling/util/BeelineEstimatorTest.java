@@ -73,7 +73,7 @@ class BeelineEstimatorTest {
     // Route: Oslo Center → Oslo East → Oslo North
     List<WgsCoordinate> points = List.of(OSLO_CENTER, OSLO_EAST, OSLO_NORTH);
 
-    Duration[] times = estimator.calculateCumulativeTimes(points);
+    Duration[] times = estimator.calculateCumulativeTimes(points, Duration.ZERO);
 
     assertEquals(3, times.length);
     // Start at 0
@@ -94,7 +94,7 @@ class BeelineEstimatorTest {
   void calculateCumulativeTimes_singlePoint_returnsZero() {
     List<WgsCoordinate> points = List.of(OSLO_CENTER);
 
-    Duration[] times = estimator.calculateCumulativeTimes(points);
+    Duration[] times = estimator.calculateCumulativeTimes(points, Duration.ZERO);
 
     assertEquals(1, times.length);
     assertEquals(Duration.ZERO, times[0]);
@@ -104,7 +104,7 @@ class BeelineEstimatorTest {
   void calculateCumulativeTimes_emptyList_returnsEmptyArray() {
     List<WgsCoordinate> points = List.of();
 
-    Duration[] times = estimator.calculateCumulativeTimes(points);
+    Duration[] times = estimator.calculateCumulativeTimes(points, Duration.ZERO);
 
     assertEquals(0, times.length);
   }
@@ -120,7 +120,7 @@ class BeelineEstimatorTest {
       OSLO_NORTHWEST
     );
 
-    Duration[] times = estimator.calculateCumulativeTimes(points);
+    Duration[] times = estimator.calculateCumulativeTimes(points, Duration.ZERO);
 
     // Times should be strictly increasing
     for (int i = 1; i < times.length; i++) {
@@ -257,7 +257,7 @@ class BeelineEstimatorTest {
   void calculateCumulativeTimes_twoPoints_calculatesCorrectly() {
     List<WgsCoordinate> points = List.of(OSLO_CENTER, OSLO_NORTH);
 
-    Duration[] times = estimator.calculateCumulativeTimes(points);
+    Duration[] times = estimator.calculateCumulativeTimes(points, Duration.ZERO);
 
     assertEquals(2, times.length);
     assertEquals(Duration.ZERO, times[0]);

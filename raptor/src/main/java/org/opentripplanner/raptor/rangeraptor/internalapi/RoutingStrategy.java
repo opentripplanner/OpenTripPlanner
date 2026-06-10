@@ -1,15 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.util.Collections;
-import java.util.Iterator;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Provides alternative implementations of some logic within the {@link RangeRaptor}.
@@ -20,25 +19,25 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
    * Add access path to state. This should be called in the matching round and appropriate place in
    * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and {@link
-   * RaptorAccessEgress#stopReachedOnBoard()}.
+   * RaptorAccessEgress#arrivedOnBoard()}.
    *
    * @param departureTime The access departure time. The current iteration departure time or
    *                      the time-shifted departure time for access with opening hours.
    */
-  void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
+  void addAccessStopArrival(RaptorAccessEgress accessPath, int departureTime);
+
+  /**
+   * Add a start-on-board access arrival to state. Called when the traveller is already on board a
+   * vehicle at the start of the search.
+   */
+  default void addStartOnBoardAccessStopArrival(RaptorStartOnBoardAccess access, int boardTime) {
+    throw createStartOnBoardAccessNotSupportedException();
+  }
 
   /**
    * Prepare the {@link RoutingStrategy} to route using the {@link RaptorTimeTable}.
    */
   void prepareForTransitWith(RaptorRoute<T> route);
-
-  /**
-   * First the {@link #prepareForTransitWith(RaptorRoute)} is called, then this method is
-   * called before alight and board methods are called. This allows the strategy to update
-   * the state before alighting and boarding is processed. Especially if there is a change
-   * in the state as a result of passing through a stop this method might come in handy.
-   */
-  default void prepareForNextStop(int stopIndex, int stopPos) {}
 
   /**
    * Alight the current trip at the given stop.
@@ -76,31 +75,31 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     RaptorConstrainedBoardingSearch<T> txSearch
   );
 
-  default void registerOnBoardAccessStopArrival(RaptorOnBoardAccess access, int boardTime) {
-    throw new UnsupportedOperationException(
-      "On-board access is not yet supported for this routing strategy"
-    );
+  /**
+   * @return all on-board trip access arrivals for the given {@code routeIndex}. The arrivals are
+   * removed from state and can only be fetched once. The method returns {@code null} if no
+   * arrivals exist - this should be very efficient to check.
+   */
+  @Nullable
+  default OnTripAccessArrivals<T> consumeStartOnBoardStopArrivalsForRoute(int routeIndex) {
+    return null;
   }
 
   /**
-   * @return an iterator over all on-board stop-arrivals currently in the state.
-   * The iterator allows removal and this is the expected way to remove or a stop-arrival. When
-   * removed is when we consider a stop-arrival to be "consumed".
+   * Board the given {@code trip} at the given {@code stopPositionInPattern} using an
+   * start-on-board access arrival as the previous state.
    */
-  default Iterator<? extends ArrivalView<T>> consumeOnBoardStopArrivals() {
-    return Collections.emptyIterator();
-  }
-
-  /**
-   * @return true if boarding successful, false otherwise
-   */
-  default boolean boardAsOnBoardAccess(
+  default void boardWithStartOnBoardAccess(
     ArrivalView<T> prevArrival,
-    int stopPositionInPattern,
-    T trip
+    T trip,
+    int stopPositionInPattern
   ) {
-    throw new UnsupportedOperationException(
-      "On-board access is not yet supported for this routing strategy"
+    throw createStartOnBoardAccessNotSupportedException();
+  }
+
+  private static RuntimeException createStartOnBoardAccessNotSupportedException() {
+    return new UnsupportedOperationException(
+      "On-board trip access is not yet supported for this routing strategy"
     );
   }
 }

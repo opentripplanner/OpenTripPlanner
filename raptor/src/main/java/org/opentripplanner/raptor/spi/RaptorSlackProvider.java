@@ -37,7 +37,7 @@ public interface RaptorSlackProvider {
   int alightSlack(int slackIndex);
 
   /**
-   * Return the {@link #boardSlack(int) plus {@link #alightSlack(int)
+   * Return the {@link #boardSlack(int)} plus {@link #alightSlack(int)}
    * slack.
    * <p>
    * Unit: seconds.

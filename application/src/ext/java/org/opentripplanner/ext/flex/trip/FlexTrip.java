@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.trip;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -119,25 +120,25 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
 
   public abstract PickDrop getAlightRule(int i);
 
-  public abstract boolean isBoardingPossible(StopLocation stop);
+  public abstract boolean isBoardingPossible(FeedScopedId stopId);
 
-  public abstract boolean isAlightingPossible(StopLocation stop);
+  public abstract boolean isAlightingPossible(FeedScopedId stopId);
 
   /**
-   * Find the first stop-position matching the given {@code fromStop} where
+   * Find the first stop-position matching the given {@code fromStopId} where
    * boarding is allowed.
    *
    * @return stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
-  public abstract int findBoardIndex(StopLocation fromStop);
+  public abstract int findBoardIndex(FeedScopedId fromStopId);
 
   /**
-   * Find the first stop-position matching the given {@code toStop} where
+   * Find the first stop-position matching the given {@code toStopId} where
    * alighting is allowed.
    *
    * @return the stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
-  public abstract int findAlightIndex(StopLocation toStop);
+  public abstract int findAlightIndex(FeedScopedId fromStopId);
 
   /**
    * Allow each FlexTrip type to decorate or replace the router defaultCalculator.

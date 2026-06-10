@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 class StopTimeKeyTest {
 
@@ -13,7 +13,7 @@ class StopTimeKeyTest {
   private static final int STOP_SEQUENCE_NUMBER = 1;
 
   private static final StopTimeKey SUBJECT = StopTimeKey.of(
-    TimetableRepositoryForTest.id(ID),
+    FeedScopedIdForTestFactory.id(ID),
     STOP_SEQUENCE_NUMBER
   ).build();
 
@@ -30,6 +30,6 @@ class StopTimeKeyTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
   }
 }

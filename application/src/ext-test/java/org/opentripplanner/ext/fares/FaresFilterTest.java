@@ -1,11 +1,16 @@
 package org.opentripplanner.ext.fares;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
@@ -20,15 +25,17 @@ public class FaresFilterTest implements PlanTestConstants {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
+  private Itinerary buildItinerary() {
+    return newItinerary(A, 0)
+      .walk(20, Place.forStop(testModel.stop("1:stop", 1d, 1d).build()))
+      .bus(1, 0, 50, B)
+      .bus(1, 52, 100, C)
+      .build();
+  }
+
   @Test
   void shouldAddFare() {
-    final int ID = 1;
-
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(testModel.stop("1:stop", 1d, 1d).build()))
-      .bus(ID, 0, 50, B)
-      .bus(ID, 52, 100, C)
-      .build();
+    Itinerary i1 = buildItinerary();
 
     assertEquals(ItineraryFare.empty(), i1.fare());
 
@@ -47,5 +54,22 @@ public class FaresFilterTest implements PlanTestConstants {
     var busLeg = i1.transitLeg(1);
 
     assertEquals(List.of(FareOffer.of(busLeg.startTime(), fp)), busLeg.fareOffers());
+  }
+
+  static Stream<Arguments> emptyOrNullFareCases() {
+    return Stream.of(
+      Arguments.of("empty", (FareService) itinerary -> ItineraryFare.empty()),
+      Arguments.of("null", (FareService) itinerary -> null)
+    );
+  }
+
+  @ParameterizedTest(name = "{0} fare must not trigger an itinerary rebuild")
+  @MethodSource("emptyOrNullFareCases")
+  void shouldSkipDecorationWhenFareProducesNoProducts(String label, FareService fareService) {
+    Itinerary i1 = buildItinerary();
+
+    var decorated = new DecorateWithFare(fareService).decorate(i1);
+
+    assertSame(i1, decorated);
   }
 }

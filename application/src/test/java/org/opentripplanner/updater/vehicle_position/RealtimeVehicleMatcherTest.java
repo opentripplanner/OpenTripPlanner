@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
@@ -53,7 +54,7 @@ public class RealtimeVehicleMatcherTest {
   );
   ZoneId zoneId = ZoneIds.BERLIN;
   String tripId = "trip1";
-  FeedScopedId scopedTripId = TimetableRepositoryForTest.id(tripId);
+  FeedScopedId scopedTripId = FeedScopedIdForTestFactory.id(tripId);
 
   @Test
   public void matchRealtimeVehiclesToTrip() {
@@ -126,7 +127,7 @@ public class RealtimeVehicleMatcherTest {
     var service = new DefaultRealtimeVehicleService(null);
 
     var tripId = "trip1";
-    var scopedTripId = TimetableRepositoryForTest.id(tripId);
+    var scopedTripId = FeedScopedIdForTestFactory.id(tripId);
     var trip1 = TimetableRepositoryForTest.trip(tripId).build();
 
     var stopTimes = List.of(
@@ -275,8 +276,8 @@ public class RealtimeVehicleMatcherTest {
 
     var tripId1 = "trip1";
     var tripId2 = "trip2";
-    var scopedTripId1 = TimetableRepositoryForTest.id(tripId1);
-    var scopedTripId2 = TimetableRepositoryForTest.id(tripId2);
+    var scopedTripId1 = FeedScopedIdForTestFactory.id(tripId1);
+    var scopedTripId2 = FeedScopedIdForTestFactory.id(tripId2);
 
     var trip1 = TimetableRepositoryForTest.trip(tripId1).build();
     var trip2 = TimetableRepositoryForTest.trip(tripId2).build();

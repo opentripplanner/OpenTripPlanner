@@ -86,7 +86,7 @@ The following OTP-based services are presented as production-quality deployments
 by an official transportation authority or government. OTP is also known to be used on the back end
 of several popular multi-city mobile trip planning applications.
 
-* [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android)
-  by CUTR-USF and Vreixo González can find itineraries on many different OTP servers via a service
-  discovery mechanism.
 * [**ViviBus Bologna**](http://www.vivibus.it/) Bologna, Italy.
+* [Aubin](https://aubin.app/) is a country-wide journey planner in Great Britain, with a mobile
+  application which focuses on personalized, need-based travel planning using the capability offered
+  by OpenTripPlanner.

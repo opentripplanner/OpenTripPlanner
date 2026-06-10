@@ -6,14 +6,14 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRule;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.network.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HSLFareServiceFactory extends DefaultFareServiceFactory {
+public class HSLFareServiceFactory extends GtfsFareServiceFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareService.class);
 

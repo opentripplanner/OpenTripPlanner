@@ -33,12 +33,24 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
       "schedule": ["after 6pm on the 17th day of the month"],
+      "minimumReleaseAge": "4 days",
       "reviewers": ["testower"],
       "postUpdateOptions": ["npmInstallTwice"]
     },
     {
       "matchFiles": ["client/package.json"],
+      "matchPackageNames": [
+        // incompatible with the current code, needs further investigation
+        "@graphql-codegen/cli",
+        "@graphql-codegen/client-preset",
+        "@graphql-codegen/introspection"
+      ],
+      enabled: false
+    },
+    {
+      "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["major"],
+      "minimumReleaseAge": "4 days",
       "reviewers": ["testower"],
       "postUpdateOptions": ["npmInstallTwice"]
     },
@@ -116,6 +128,7 @@
     {
       "groupName": "GTFS API code generation",
       "matchFiles": ["application/src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
+      "minimumReleaseAge": "4 days",
       "reviewers": ["optionsome", "leonardehrenfried"],
       "schedule": "on the 11th through 12th day of the month"
     },
@@ -164,6 +177,7 @@
         "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
+        "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
         "com.azure:{/,}**"
@@ -204,6 +218,13 @@
       ],
       "minimumReleaseAge": "1 week",
       "labels": ["+Skip Changelog", "+Bump Serialization Id"]
+    },
+    {
+      "description": "Some projects need some time to publish a release",
+      "matchPackageNames": [
+        "org.glassfish.jaxb:jaxb-runtime"
+      ],
+      "minimumReleaseAge": "1 week"
     },
     {
       "groupName": "Azure dependencies",

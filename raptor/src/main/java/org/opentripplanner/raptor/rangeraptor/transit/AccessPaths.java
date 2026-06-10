@@ -5,17 +5,19 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.util.IntIterators;
+import org.opentripplanner.raptor.spi.IntIterators;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * This class is responsible for performing Raptor-specific functionality on access-paths. It
@@ -29,27 +31,30 @@ import org.opentripplanner.raptor.util.IntIterators;
 public class AccessPaths {
 
   private final int iterationStep;
+  private final int maxNumberOfRides;
   private final int maxTimePenalty;
   private final IntUnaryOperator iterationOp;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
-  private final List<RaptorOnBoardAccess> onBoardAccessPaths;
+  private final List<RaptorStartOnBoardAccess> startOnBoardAccessPaths;
   private int iterationTimePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
   private AccessPaths(
     int iterationStep,
+    int maxNumberOfRides,
+    int maxTimePenalty,
     IntUnaryOperator iterationOp,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides,
-    List<RaptorOnBoardAccess> onBoardAccessPaths,
-    int maxTimePenalty
+    List<RaptorStartOnBoardAccess> startOnBoardAccessPaths
   ) {
     this.iterationStep = iterationStep;
+    this.maxNumberOfRides = maxNumberOfRides;
+    this.maxTimePenalty = maxTimePenalty;
     this.iterationOp = iterationOp;
     this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
     this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;
-    this.onBoardAccessPaths = onBoardAccessPaths;
-    this.maxTimePenalty = maxTimePenalty;
+    this.startOnBoardAccessPaths = startOnBoardAccessPaths;
   }
 
   /**
@@ -68,13 +73,10 @@ public class AccessPaths {
     RaptorProfile profile,
     SearchDirection searchDirection
   ) {
-    // On board access paths can not be filtered up-front to remove non-optimal accesses,
-    // and also cannot have time penalties, so we extract them from paths before removing.
-    var onBoardAccessPaths = paths
-      .stream()
-      .filter(RaptorOnBoardAccess.class::isInstance)
-      .map(RaptorOnBoardAccess.class::cast)
-      .toList();
+    var split = partitioningByStartOnBoard(paths);
+    var onBoardAccessPaths = mapToStartOnBoardAccess(split.get(true));
+
+    paths = split.get(false);
 
     if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
@@ -83,19 +85,25 @@ public class AccessPaths {
     }
 
     paths = decorateWithTimePenaltyLogic(paths);
-    var arrivedOnStreetByNumOfRides = groupByRound(paths, RaptorAccessEgress::stopReachedByWalking);
-    var arrivedOnBoardByNumOfRides = groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard);
+    var arrivedOnStreetByNumOfRides = groupByRound(paths, RaptorAccessEgress::arrivedOnStreet);
+    var arrivedOnBoardByNumOfRides = groupByRound(paths, RaptorAccessEgress::arrivedOnBoard);
+    int maxNumberOfRides = Math.max(
+      maxNumberOfRounds(arrivedOnStreetByNumOfRides),
+      maxNumberOfRounds(arrivedOnBoardByNumOfRides)
+    );
+    int maxTimePenalty = Math.max(
+      maxTimePenalty(arrivedOnStreetByNumOfRides),
+      maxTimePenalty(arrivedOnBoardByNumOfRides)
+    );
 
     return new AccessPaths(
       iterationStep,
+      maxNumberOfRides,
+      maxTimePenalty,
       iterationOp(searchDirection),
       arrivedOnStreetByNumOfRides,
       arrivedOnBoardByNumOfRides,
-      onBoardAccessPaths,
-      Math.max(
-        maxTimePenalty(arrivedOnStreetByNumOfRides),
-        maxTimePenalty(arrivedOnBoardByNumOfRides)
-      )
+      onBoardAccessPaths
     );
   }
 
@@ -119,18 +127,23 @@ public class AccessPaths {
     return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
+  public List<RaptorAccessEgress> arrivedOnBoard() {
+    return arrivedOnBoardByNumOfRides
+      .valueCollection()
+      .stream()
+      .flatMap(Collection::stream)
+      .toList();
+  }
+
   /**
    * Return the on-board accesses
    */
-  public List<RaptorOnBoardAccess> onBoardAccessPaths() {
-    return onBoardAccessPaths;
+  public List<RaptorStartOnBoardAccess> listStartOnBoardAccesses() {
+    return startOnBoardAccessPaths;
   }
 
-  public int calculateMaxNumberOfRides() {
-    return Math.max(
-      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
-      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
-    );
+  public int maxNumberOfRides() {
+    return maxNumberOfRides;
   }
 
   /**
@@ -175,11 +188,12 @@ public class AccessPaths {
   public AccessPaths filterOnSegment(int segment) {
     return new AccessPaths(
       iterationStep,
+      maxNumberOfRides,
+      maxTimePenalty,
       iterationOp,
       AccessEgressFunctions.filterOnSegment(arrivedOnStreetByNumOfRides, segment),
       AccessEgressFunctions.filterOnSegment(arrivedOnBoardByNumOfRides, segment),
-      AccessEgressFunctions.filterOnSegment(onBoardAccessPaths, segment),
-      maxTimePenalty
+      AccessEgressFunctions.filterOnSegment(startOnBoardAccessPaths, segment)
     );
   }
 
@@ -192,6 +206,10 @@ public class AccessPaths {
       .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
       .max()
       .orElse(RaptorConstants.TIME_NOT_SET);
+  }
+
+  private static int maxNumberOfRounds(TIntObjectMap<List<RaptorAccessEgress>> col) {
+    return IntStream.of(col.keys()).max().orElse(0);
   }
 
   /**
@@ -219,6 +237,25 @@ public class AccessPaths {
       }
     }
     return false;
+  }
+
+  private static List<RaptorStartOnBoardAccess> mapToStartOnBoardAccess(
+    List<RaptorAccessEgress> startOnBoardPaths
+  ) {
+    return startOnBoardPaths.stream().map(RaptorStartOnBoardAccess.class::cast).toList();
+  }
+
+  /// This method partition the input paths in two, the RaptorStartOnBoardAccess(key=true) in one
+  /// list and the rest in the other.
+  ///
+  /// Start on board access paths can not be filtered up-front to remove non-optimal accesses, and
+  /// also cannot have time penalties, so we extract them from paths before pressessing the rest.
+  private static Map<Boolean, List<RaptorAccessEgress>> partitioningByStartOnBoard(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    return paths
+      .stream()
+      .collect(Collectors.partitioningBy(RaptorStartOnBoardAccess.class::isInstance));
   }
 
   /**

@@ -1,14 +1,15 @@
 package org.opentripplanner.raptor.api.model;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.RIDES;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.TIME_PENALTY;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.VIAS;
+import static org.opentripplanner.raptor.spi.RaptorConstants.TIME_NOT_SET;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -256,7 +257,7 @@ public interface RaptorAccessEgress {
    * This information is used to generate transfers from that stop to other stops only when this
    * method returns true.
    */
-  default boolean stopReachedOnBoard() {
+  default boolean arrivedOnBoard() {
     return false;
   }
 
@@ -264,10 +265,10 @@ public interface RaptorAccessEgress {
    * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
    * <b>walking</b>(or other street mode)? This should be {@code true} if the access/egress
    * is NOT reached on-board.
-   * @see #stopReachedOnBoard()
+   * @see #arrivedOnBoard()
    */
-  default boolean stopReachedByWalking() {
-    return !stopReachedOnBoard();
+  default boolean arrivedOnStreet() {
+    return !arrivedOnBoard();
   }
 
   /**
@@ -289,10 +290,14 @@ public interface RaptorAccessEgress {
   /** Call this from toString or {@link #defaultToString()} */
   default String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     StringBuilder buf = new StringBuilder();
-    if (isFree()) {
+
+    if (this instanceof RaptorStartOnBoardAccess sob) {
+      var boarding = sob.tripBoarding();
+      buf.append("StartOnBoard").append(boarding);
+    } else if (isFree()) {
       buf.append("Free");
     } else if (hasRides()) {
-      buf.append(stopReachedOnBoard() ? "Flex" : "Flex+Walk");
+      buf.append(arrivedOnBoard() ? "Flex" : "Flex+Walk");
     } else {
       // This is not always walking, but inside Raptor we do not care if this is
       // biking, walking or car - any on street is treated the same. So, for
@@ -300,7 +305,9 @@ public interface RaptorAccessEgress {
       // which would be more precise.
       buf.append("Walk");
     }
-    buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    if (durationInSeconds() != 0) {
+      buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    }
     if (includeCost && c1() > 0) {
       buf.append(' ').append(C1.format(c1()));
     }

@@ -20,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
@@ -63,8 +62,6 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .earliestDepartureTime(T00_10)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10_m);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   /* Flex ~ B ~ Walk ~ C ~ Flex */

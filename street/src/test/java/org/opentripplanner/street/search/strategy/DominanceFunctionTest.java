@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.street.model.StreetMode;
@@ -14,7 +13,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
 
-public class DominanceFunctionTest {
+class DominanceFunctionTest {
 
   @Test
   public void testGeneralDominanceFunction() {
@@ -26,10 +25,8 @@ public class DominanceFunctionTest {
 
     StreetSearchRequest streetSearchRequest = StreetSearchRequest.of().build();
     StateData stateData = StateData.getBaseCaseStateData(streetSearchRequest);
-    State stateA = new State(fromVertex, Instant.EPOCH, stateData, streetSearchRequest);
-    State stateB = new State(toVertex, Instant.EPOCH, stateData, streetSearchRequest);
-    stateA.weight = 1;
-    stateB.weight = 2;
+    State stateA = new State(streetSearchRequest, 1, fromVertex, null, null, stateData, 0, 0);
+    State stateB = new State(streetSearchRequest, 2, toVertex, null, null, stateData, 0, 0);
 
     assertTrue(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateA, stateB));
     assertFalse(minimumWeightDominanceFunction.betterOrEqualAndComparable(stateB, stateA));
@@ -50,7 +47,7 @@ public class DominanceFunctionTest {
 
     StateData stateData = StateData.getBaseCaseStateData(req);
 
-    State outsideZone = new State(fromVertex, Instant.EPOCH, stateData, req);
+    State outsideZone = new State(req, 0, fromVertex, null, null, stateData, 0, 0);
     assertFalse(outsideZone.isInsideNoRentalDropOffArea());
 
     var edge = StreetModelFactory.streetEdge(fromVertex, toVertex);
@@ -58,7 +55,6 @@ public class DominanceFunctionTest {
     var editor = outsideZone.edit(edge);
     editor.enterNoRentalDropOffArea();
     var insideZone = editor.makeState();
-    insideZone.weight = 1;
 
     assertFalse(dominanceF.betterOrEqualAndComparable(insideZone, outsideZone));
     assertFalse(dominanceF.betterOrEqualAndComparable(outsideZone, insideZone));

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.street.graph.Graph;
@@ -178,7 +179,7 @@ class ScheduledTransitLegReferenceTest {
       SERVICE_DATE,
       0,
       1,
-      TimetableRepositoryForTest.id("invalid stop id"),
+      FeedScopedIdForTestFactory.id("invalid stop id"),
       STOP_2_ID,
       null
     );
@@ -345,7 +346,7 @@ class ScheduledTransitLegReferenceTest {
         NUMBER_OF_STOPS,
         STOP_1_ID,
         STOP_2_ID,
-        TimetableRepositoryForTest.id("trip on date id")
+        FeedScopedIdForTestFactory.id("trip on date id")
       )
     );
   }
@@ -388,7 +389,7 @@ class ScheduledTransitLegReferenceTest {
       NUMBER_OF_STOPS,
       STOP_1_ID,
       STOP_2_ID,
-      TimetableRepositoryForTest.id("unknown trip on date id")
+      FeedScopedIdForTestFactory.id("unknown trip on date id")
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }

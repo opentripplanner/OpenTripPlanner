@@ -1,8 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.site;
 
+import static org.opentripplanner.utils.collection.SetUtils.nullSafeImmutableSet;
+
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntSupplier;
@@ -37,7 +40,7 @@ public final class RegularStop
 
   private final Set<BoardingArea> boardingAreas;
 
-  private final Set<FareZone> fareZones;
+  private final List<FareZone> fareZones;
 
   RegularStop(RegularStopBuilder builder) {
     super(builder);
@@ -48,8 +51,8 @@ public final class RegularStop
     this.vehicleType = builder.vehicleType();
     this.netexVehicleSubmode = SubMode.getOrBuildAndCacheForever(builder.netexVehicleSubmode());
     this.sometimesUsedRealtime = builder.isSometimesUsedRealtime();
-    this.boardingAreas = setOfNullSafe(builder.boardingAreas());
-    this.fareZones = setOfNullSafe(builder.fareZones());
+    this.boardingAreas = nullSafeImmutableSet(builder.boardingAreas());
+    this.fareZones = builder.fareZones();
     if (isPartOfStation()) {
       getParentStation().addChildStop(this);
     }

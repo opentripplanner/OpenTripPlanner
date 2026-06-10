@@ -45,7 +45,7 @@ public class OjpResource {
 
   public OjpResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
-    var callAtStopService = new CallAtStopService(transitService, context.graphFinder());
+    var callAtStopService = new CallAtStopService(transitService, context.nearbyStopFinder());
     var idMapper = idMapper(context.ojpApiParameters());
     var ojpService = new OjpService(
       callAtStopService,

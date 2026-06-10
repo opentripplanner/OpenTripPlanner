@@ -101,7 +101,7 @@ class StreetEdgeWheelchairCostTest {
   }
 
   static Stream<Arguments> wheelchairStairsCases() {
-    return Stream.of(Arguments.of(1, 22), Arguments.of(10, 225), Arguments.of(100, 2255));
+    return Stream.of(Arguments.of(1, 22), Arguments.of(10, 222), Arguments.of(100, 2222));
   }
 
   @ParameterizedTest(
@@ -189,8 +189,8 @@ class StreetEdgeWheelchairCostTest {
     return Stream.of(
       Arguments.of(0.5, 3),
       Arguments.of(1, 7),
-      Arguments.of(10, 75),
-      Arguments.of(100, 751)
+      Arguments.of(10, 74),
+      Arguments.of(100, 740)
     );
   }
 

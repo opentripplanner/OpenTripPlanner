@@ -65,7 +65,6 @@ public class PathMapperTest implements RaptorTestConstants {
       C1_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
       null,
-      lifeCycle(),
       false
     );
 
@@ -158,7 +157,6 @@ public class PathMapperTest implements RaptorTestConstants {
       FLEX_COST_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
       null,
-      lifeCycle(),
       false
     );
     // When:

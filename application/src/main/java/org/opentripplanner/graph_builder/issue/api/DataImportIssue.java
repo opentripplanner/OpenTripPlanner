@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.issue.api;
 
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Represents noteworthy data import issues that occur during the graph building process. These
@@ -45,24 +43,6 @@ public interface DataImportIssue {
    * This method is used by the HTML report builder. It adds all issues with a geometry to a GeoJSON
    */
   default Geometry getGeometry() {
-    return null;
-  }
-
-  /**
-   * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only, which
-   * status is unclear. Is anyone still using it?
-   */
-  @Deprecated
-  default Edge getReferencedEdge() {
-    return null;
-  }
-
-  /**
-   * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only, which
-   * status is unclear. Is anyone still using it?
-   */
-  @Deprecated
-  default Vertex getReferencedVertex() {
     return null;
   }
 }

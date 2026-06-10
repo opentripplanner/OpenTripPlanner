@@ -4,6 +4,7 @@ import static org.opentripplanner.utils.collection.CollectionUtils.requireNullOr
 
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterSelectInput;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -21,7 +22,7 @@ class SelectRequestMapper {
 
     if (CollectionUtils.isEmpty(routes) && CollectionUtils.isEmpty(agencies)) {
       var type = GraphQLUtils.typeName(input);
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "%s must contain at least one element in either 'routes or 'agencies'.".formatted(type)
       );
     }

@@ -3,11 +3,11 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.areaWithContinuousStopping;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStop;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStopWithContinuousStopping;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.model.FlexStopTimesFactory.area;
+import static org.opentripplanner.model.FlexStopTimesFactory.areaWithContinuousStopping;
+import static org.opentripplanner.model.FlexStopTimesFactory.regularStop;
+import static org.opentripplanner.model.FlexStopTimesFactory.regularStopWithContinuousStopping;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

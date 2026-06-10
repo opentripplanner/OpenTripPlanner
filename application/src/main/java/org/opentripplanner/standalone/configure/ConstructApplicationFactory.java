@@ -66,7 +66,8 @@ import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.visualizer.GraphVisualizer;
+import org.opentripplanner.warmup.WarmupLauncher;
+import org.opentripplanner.warmup.configure.WarmupModule;
 
 /**
  * A Factory used by the Dagger dependency injection system to create the components of OTP, which
@@ -100,6 +101,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     VehicleRentalServiceModule.class,
     ViaModule.class,
+    WarmupModule.class,
     WorldEnvelopeServiceModule.class,
   }
 )
@@ -136,9 +138,6 @@ public interface ConstructApplicationFactory {
   @Nullable
   EmpiricalDelayRepository empiricalDelayRepository();
 
-  @Nullable
-  GraphVisualizer graphVisualizer();
-
   TransitService transitService();
 
   OtpServerRequestContext createServerContext();
@@ -170,6 +169,8 @@ public interface ConstructApplicationFactory {
 
   DeduplicatorService deduplicatorService();
 
+  WarmupLauncher warmupLauncher();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -183,9 +184,6 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
-
-    @BindsInstance
-    Builder graphVisualizer(@Nullable GraphVisualizer graphVisualizer);
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

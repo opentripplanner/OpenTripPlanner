@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterInput;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.apis.support.InvalidInputException;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 
 class FilterMapperTest {
 
@@ -24,14 +25,16 @@ class FilterMapperTest {
         List.of(Map.of("agencies", List.of("feed:A")))
       )
     );
-    var result = FilterMapper.mapFilters(MainAndSubMode.all(), List.of(filter)).stream().toList();
+    var result = FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(filter))
+      .stream()
+      .toList();
     assertEquals(
       "[(select: [(transportModes: ALL, agencies: [feed:A])], not: [(transportModes: EMPTY, routes: [feed:A])])]",
       result.toString()
     );
   }
 
-  private static List<Map<String, Object>> emptyListCases() {
+  private static List<Map<String, Object>> invalidArgumentCases() {
     var emptyAgencies = List.of(Map.of("routes", List.of("feed:A"), "agencies", List.of()));
     List<String> listWithNull = new ArrayList<>();
     listWithNull.add(null);
@@ -54,20 +57,34 @@ class FilterMapperTest {
       Map.of("include", emptyAgencies),
       Map.of("include", List.of()),
       Map.of("exclude", List.of()),
+      Map.of("exclude", List.of(Map.of("routes", listWithNull))),
+      Map.of("exclude", List.of(Map.of("agencies", listWithNull)))
+    );
+  }
+
+  private static List<Map<String, Object>> invalidInputCases() {
+    return List.of(
       Map.of("include", List.of(Map.of())),
       Map.of("exclude", List.of(Map.of())),
-      Map.of("exclude", List.of(Map.of("routes", listWithNull))),
-      Map.of("exclude", List.of(Map.of("agencies", listWithNull))),
       Map.of()
     );
   }
 
   @ParameterizedTest
-  @MethodSource("emptyListCases")
-  void emptyList(Map<String, Object> args) {
+  @MethodSource("invalidArgumentCases")
+  void invalidArgument(Map<String, Object> args) {
     var input = new GraphQLTransitFilterInput(args);
     assertThrows(IllegalArgumentException.class, () ->
-      FilterMapper.mapFilters(MainAndSubMode.all(), List.of(input))
+      FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidInputCases")
+  void invalidInput(Map<String, Object> args) {
+    var input = new GraphQLTransitFilterInput(args);
+    assertThrows(InvalidInputException.class, () ->
+      FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
     );
   }
 }

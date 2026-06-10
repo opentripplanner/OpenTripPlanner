@@ -16,7 +16,7 @@ class TimeAndCostPenaltyMapperTest {
       """
     );
     assertEquals(
-      "(timePenalty: 2m + 3.0 t, costFactor: 3.4)",
+      "(timePenalty: 2m + 3.0 t, costFactor: 3.5)",
       TimeAndCostPenaltyMapper.map(node).toString()
     );
   }

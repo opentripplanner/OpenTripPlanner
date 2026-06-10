@@ -1,0 +1,10 @@
+package org.opentripplanner.transfer.constrained.raptoradaptor;
+
+import org.opentripplanner.transit.model.timetable.Trip;
+
+/**
+ * This class is used to match a given trip and stop index.
+ */
+interface TransferPointMatcher {
+  boolean match(int stopIndex, Trip trip);
+}

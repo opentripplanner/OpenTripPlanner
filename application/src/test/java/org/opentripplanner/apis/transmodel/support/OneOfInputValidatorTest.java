@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 
 class OneOfInputValidatorTest {
 
@@ -19,7 +20,7 @@ class OneOfInputValidatorTest {
 
   @Test
   void testValidateOneOfWithEmptySetOfArguments() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       OneOfInputValidator.validateOneOf(Map.of(), "parent", "one", "two")
     );
     assertEquals(
@@ -30,7 +31,7 @@ class OneOfInputValidatorTest {
 
   @Test
   void testValidateOneOfWithTooManyArguments() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       OneOfInputValidator.validateOneOf(Map.of("one", "X", "two", "Y"), "parent", "one", "two")
     );
     assertEquals(
@@ -41,7 +42,7 @@ class OneOfInputValidatorTest {
 
   @Test
   void testValidateOneOfWithEmptyCollection() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       OneOfInputValidator.validateOneOf(Map.of("one", List.of()), "parent", "one", "two")
     );
     assertEquals("'one' can not be empty in 'parent @oneOf'.", ex.getMessage());

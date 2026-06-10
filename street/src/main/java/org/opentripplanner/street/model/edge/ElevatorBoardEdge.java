@@ -1,7 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import java.util.List;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -26,9 +24,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
 
   private ElevatorBoardEdge(Vertex from, ElevatorHopVertex to) {
     super(from, to);
-    geometry = GeometryUtils.makeLineString(
-      List.of(new Coordinate(from.getX(), from.getY()), new Coordinate(to.getX(), to.getY()))
-    );
+    geometry = GeometryUtils.makeLineString(from.getX(), from.getY(), to.getX(), to.getY());
   }
 
   public static ElevatorBoardEdge createElevatorBoardEdge(Vertex from, ElevatorHopVertex to) {

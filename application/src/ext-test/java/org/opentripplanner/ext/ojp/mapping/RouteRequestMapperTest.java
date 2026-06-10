@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeAndModeOfOperationFilterStructure;
@@ -45,10 +45,10 @@ class RouteRequestMapperTest {
 
     var routeRequest = mapper.map(tripRequest);
 
-    assertEquals(47.3769, routeRequest.from().lat);
-    assertEquals(8.5417, routeRequest.from().lng);
-    assertEquals(46.9480, routeRequest.to().lat);
-    assertEquals(7.4474, routeRequest.to().lng);
+    assertEquals(47.3769, routeRequest.from().wgsCoordinate().latitude());
+    assertEquals(8.5417, routeRequest.from().wgsCoordinate().longitude());
+    assertEquals(46.9480, routeRequest.to().wgsCoordinate().latitude());
+    assertEquals(7.4474, routeRequest.to().wgsCoordinate().longitude());
     assertTransitFilters("[ALLOW_ALL]", routeRequest);
 
     assertEquals(StreetMode.WALK, routeRequest.journey().access().mode());
@@ -62,8 +62,8 @@ class RouteRequestMapperTest {
 
     var routeRequest = mapper.map(tripRequest);
 
-    assertEquals(id("stop1"), routeRequest.from().stopId);
-    assertEquals(id("stop2"), routeRequest.to().stopId);
+    assertEquals(id("stop1"), routeRequest.from().stopId());
+    assertEquals(id("stop2"), routeRequest.to().stopId());
   }
 
   @Test
@@ -75,8 +75,8 @@ class RouteRequestMapperTest {
     var routeRequest = mapper.map(tripRequest);
 
     assertNotNull(routeRequest.to());
-    assertEquals(id("stopPoint1"), routeRequest.from().stopId);
-    assertEquals(id("stopPoint2"), routeRequest.to().stopId);
+    assertEquals(id("stopPoint1"), routeRequest.from().stopId());
+    assertEquals(id("stopPoint2"), routeRequest.to().stopId());
   }
 
   @Test
@@ -87,9 +87,9 @@ class RouteRequestMapperTest {
 
     var routeRequest = mapper.map(tripRequest);
 
-    assertEquals(47.3769, routeRequest.from().lat);
-    assertEquals(8.5417, routeRequest.from().lng);
-    assertEquals(id("stop1"), routeRequest.to().stopId);
+    assertEquals(47.3769, routeRequest.from().wgsCoordinate().latitude());
+    assertEquals(8.5417, routeRequest.from().wgsCoordinate().longitude());
+    assertEquals(id("stop1"), routeRequest.to().stopId());
   }
 
   @Test

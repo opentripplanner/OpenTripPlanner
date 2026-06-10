@@ -68,10 +68,10 @@ class VehicleParkingPreferredTagsTest {
   ) {
     var parking = StreetModelFactory.vehicleParking()
       .tags(parkingTags)
-      .availability(VehicleParkingSpaces.builder().bicycleSpaces(100).build())
+      .availability(VehicleParkingSpaces.of().bicycleSpaces(100).build())
       .bicyclePlaces(true)
       .build();
-    var entrance = VehicleParkingEntrance.builder()
+    var entrance = VehicleParkingEntrance.of()
       .name(new NonLocalizedString("bike parking"))
       .vehicleParking(parking)
       .walkAccessible(true)

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.PlanTestConstants.A;
 import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import static org.opentripplanner.model.plan.PlanTestConstants.C;
@@ -12,7 +13,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_30;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.ZonedDateTime;
 import java.util.List;

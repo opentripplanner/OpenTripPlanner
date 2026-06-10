@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test;
 class WalkRequestTest {
 
   private static final double SPEED = 1.7111;
-  private static final double EXPECTED_SPEED = 1.71;
+  private static final double EXPECTED_SPEED = 1.70;
   private static final double RELUCTANCE = 2.51;
   private static final double EXPECTED_RELUCTANCE = 2.5;
   private static final double STAIRS_RELUCTANCE = 3.011;
   private static final double EXPECTED_STAIRS_RELUCTANCE = 3.0;
   private static final double STAIRS_TIME_FACTOR = 1.3111;
-  private static final double EXPECTED_STAIRS_TIME_FACTOR = 1.31;
+  private static final double EXPECTED_STAIRS_TIME_FACTOR = 1.3;
   private static final double SAFETY_FACTOR = 0.5111;
-  private static final double EXPECTED_SAFETY_FACTOR = 0.51;
+  private static final double EXPECTED_SAFETY_FACTOR = 0.5;
 
   private final WalkRequest subject = WalkRequest.of()
     .withSpeed(SPEED)
@@ -148,7 +148,7 @@ class WalkRequestTest {
   void testToString() {
     assertEquals("WalkRequest{}", WalkRequest.DEFAULT.toString());
     assertEquals(
-      "WalkRequest{speed: 1.71, reluctance: 2.5, stairsReluctance: 3.0, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
+      "WalkRequest{speed: 1.7, reluctance: 2.5, stairsReluctance: 3.0, stairsTimeFactor: 1.3, safetyFactor: 0.5}",
       subject.toString()
     );
   }

@@ -20,7 +20,7 @@ package org.opentripplanner.raptor.util.paretoset;
  */
 public interface ParetoSetEventListener<T> {
   /**
-   * This is the callback called when an element is dropped.
+   * This is the callback called when an element is accepted.
    */
   default void notifyElementAccepted(T newElement) {}
 

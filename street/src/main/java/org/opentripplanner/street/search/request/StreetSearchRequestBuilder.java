@@ -1,15 +1,11 @@
 package org.opentripplanner.street.search.request;
 
-import static org.opentripplanner.street.search.request.StreetSearchRequest.MAX_CLOSENESS_METERS;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -84,13 +80,13 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
-  public StreetSearchRequestBuilder withFrom(@Nullable Coordinate from) {
-    this.fromEnvelope = createEnvelope(from);
+  public StreetSearchRequestBuilder withFromEnvelope(@Nullable Envelope fromEnvelope) {
+    this.fromEnvelope = fromEnvelope;
     return this;
   }
 
-  public StreetSearchRequestBuilder withTo(@Nullable Coordinate to) {
-    this.toEnvelope = createEnvelope(to);
+  public StreetSearchRequestBuilder withToEnvelope(@Nullable Envelope toEnvelope) {
+    this.toEnvelope = toEnvelope;
     return this;
   }
 
@@ -166,20 +162,5 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequest build() {
     return new StreetSearchRequest(this);
-  }
-
-  @Nullable
-  private static Envelope createEnvelope(@Nullable Coordinate coordinate) {
-    if (coordinate == null) {
-      return null;
-    }
-
-    double lat = SphericalDistanceLibrary.metersToDegrees(MAX_CLOSENESS_METERS);
-    double lon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CLOSENESS_METERS, coordinate.y);
-
-    Envelope env = new Envelope(coordinate);
-    env.expandBy(lon, lat);
-
-    return env;
   }
 }

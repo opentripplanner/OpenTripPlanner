@@ -19,7 +19,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateInterval;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -118,7 +118,7 @@ public class GtfsModule implements GraphBuilderModule {
       new Deduplicator(),
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       150.0,
       120
     );

@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
-import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -21,10 +19,6 @@ public class VehicleRentalDataSourceFactory {
       // and become the point of contact for the community.
       case GBFS -> new GbfsVehicleRentalDataSource(
         (GbfsVehicleRentalDataSourceParameters) source,
-        otpHttpClientFactory
-      );
-      case SMOOVE -> new SmooveBikeRentalDataSource(
-        (SmooveBikeRentalDataSourceParameters) source,
         otpHttpClientFactory
       );
     };

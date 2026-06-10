@@ -6,7 +6,7 @@ public final class ParetoSetWithListener<T> extends ParetoSet<T> {
 
   private final ParetoSetEventListener<? super T> eventListener;
 
-  public ParetoSetWithListener(
+  ParetoSetWithListener(
     ParetoComparator<T> comparator,
     ParetoSetEventListener<? super T> eventListener
   ) {
@@ -15,17 +15,17 @@ public final class ParetoSetWithListener<T> extends ParetoSet<T> {
   }
 
   @Override
-  protected final void notifyElementAccepted(T newElement) {
+  protected void notifyElementAccepted(T newElement) {
     eventListener.notifyElementAccepted(newElement);
   }
 
   @Override
-  protected final void notifyElementDropped(T element, T droppedByElement) {
+  protected void notifyElementDropped(T element, T droppedByElement) {
     eventListener.notifyElementDropped(element, droppedByElement);
   }
 
   @Override
-  protected final void notifyElementRejected(T element, T rejectByElement) {
+  protected void notifyElementRejected(T element, T rejectByElement) {
     eventListener.notifyElementRejected(element, rejectByElement);
   }
 }

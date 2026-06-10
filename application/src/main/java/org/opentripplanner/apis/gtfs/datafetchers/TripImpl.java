@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
@@ -52,6 +51,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         .getCalendarService()
         .getServiceDatesForServiceId(getSource(environment).getServiceId())
         .stream()
+        .sorted()
         .map(ServiceDateUtils::asCompactString)
         .collect(Collectors.toList());
   }
@@ -419,31 +419,12 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return getTransitService(environment).findPattern(environment.getSource());
   }
 
-  private TripPattern getTripPattern(
-    DataFetchingEnvironment environment,
-    @Nullable LocalDate date
-  ) {
-    return date == null
-      ? getTripPattern(environment)
-      : getTransitService(environment).findPattern(environment.getSource(), date);
-  }
-
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
-  }
-
-  private static Optional<LocalDate> getOptionalServiceDateArgument(
-    DataFetchingEnvironment environment
-  ) throws ParseException {
-    var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
-    if (args.getGraphQLServiceDate() != null) {
-      return Optional.of(ServiceDateUtils.parseString(args.getGraphQLServiceDate()));
-    }
-    return Optional.empty();
   }
 
   private Trip getSource(DataFetchingEnvironment environment) {

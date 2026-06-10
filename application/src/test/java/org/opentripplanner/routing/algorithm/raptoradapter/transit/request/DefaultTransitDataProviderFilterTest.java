@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -56,7 +57,7 @@ class DefaultTransitDataProviderFilterTest {
 
   private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
 
-  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("T1");
+  private static final FeedScopedId TRIP_ID = FeedScopedIdForTestFactory.id("T1");
 
   private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
@@ -99,7 +100,7 @@ class DefaultTransitDataProviderFilterTest {
     stopTimeEnd.setStop(lastStop);
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
-    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
@@ -148,7 +149,7 @@ class DefaultTransitDataProviderFilterTest {
     var stopTime3 = getStopTime("TEST:3", PickDrop.NONE);
     var stopTime4 = getStopTime("TEST:4", PickDrop.SCHEDULED);
     var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3, stopTime4));
-    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
@@ -681,7 +682,7 @@ class DefaultTransitDataProviderFilterTest {
     var cancelled = patternTimes
       .tripTimes()
       .createRealTimeFromScheduledTimes()
-      .cancelTrip()
+      .withCanceled()
       .build();
 
     var patternTimesWithCancellation = patternTimes.withTimes(cancelled);
@@ -720,7 +721,7 @@ class DefaultTransitDataProviderFilterTest {
   @Test
   void testBikesAllowed() {
     RouteBuilder routeBuilder = TimetableRepositoryForTest.route("1");
-    TripBuilder trip = Trip.of(TimetableRepositoryForTest.id("T1")).withRoute(routeBuilder.build());
+    TripBuilder trip = Trip.of(FeedScopedIdForTestFactory.id("T1")).withRoute(routeBuilder.build());
 
     assertEquals(
       BikeAccess.UNKNOWN,
@@ -896,7 +897,7 @@ class DefaultTransitDataProviderFilterTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build()
@@ -1005,7 +1006,7 @@ class DefaultTransitDataProviderFilterTest {
     stopTime.setStop(STOP_FOR_TEST);
 
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withMode(mode)
@@ -1042,7 +1043,7 @@ class DefaultTransitDataProviderFilterTest {
     TransitMode tripMode,
     boolean containsMultipleModes
   ) {
-    Trip trip = Trip.of(TimetableRepositoryForTest.id(tripIdSuffix))
+    Trip trip = Trip.of(FeedScopedIdForTestFactory.id(tripIdSuffix))
       .withRoute(ROUTE)
       .withMode(tripMode)
       .withBikesAllowed(BikeAccess.NOT_ALLOWED)
@@ -1058,7 +1059,7 @@ class DefaultTransitDataProviderFilterTest {
 
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
 
-    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .withMode(patternMode)

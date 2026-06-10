@@ -2,13 +2,16 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +20,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.ext.flex.FlexStopTimesForTest;
+import org.opentripplanner.model.FlexStopTimesFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -46,18 +50,18 @@ class UnscheduledTripTest {
   @Nested
   class IsUnscheduledTrip {
 
-    private static final StopTime SCHEDULED_STOP = FlexStopTimesForTest.regularStop("10:00");
-    private static final StopTime UNSCHEDULED_STOP = FlexStopTimesForTest.area("10:10", "10:20");
+    private static final StopTime SCHEDULED_STOP = FlexStopTimesFactory.regularStop("10:00");
+    private static final StopTime UNSCHEDULED_STOP = FlexStopTimesFactory.area("10:10", "10:20");
     private static final StopTime CONTINUOUS_PICKUP_STOP =
-      FlexStopTimesForTest.regularStopWithContinuousPickup("10:30");
+      FlexStopTimesFactory.regularStopWithContinuousPickup("10:30");
     private static final StopTime CONTINUOUS_DROP_OFF_STOP =
-      FlexStopTimesForTest.regularStopWithContinuousDropOff("10:40");
+      FlexStopTimesFactory.regularStopWithContinuousDropOff("10:40");
 
     // disallowed by the GTFS spec
     private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP =
-      FlexStopTimesForTest.areaWithContinuousPickup("10:50");
+      FlexStopTimesFactory.areaWithContinuousPickup("10:50");
     private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP =
-      FlexStopTimesForTest.areaWithContinuousDropOff("11:00");
+      FlexStopTimesFactory.areaWithContinuousDropOff("11:00");
 
     static List<List<StopTime>> notUnscheduled() {
       return List.of(
@@ -103,8 +107,8 @@ class UnscheduledTripTest {
   @Test
   void testMaxSpanDays() {
     var stopTimes = List.of(
-      FlexStopTimesForTest.area("10:10", "14:10"),
-      FlexStopTimesForTest.area("11:10", "15:10")
+      FlexStopTimesFactory.area("10:10", "14:10"),
+      FlexStopTimesFactory.area("11:10", "15:10")
     );
     var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
 
@@ -114,8 +118,8 @@ class UnscheduledTripTest {
   @Test
   void testMaxSpanDaysOvernight() {
     var stopTimes = List.of(
-      FlexStopTimesForTest.area("10:10", "14:10"),
-      FlexStopTimesForTest.area("21:10", "26:10")
+      FlexStopTimesFactory.area("10:10", "14:10"),
+      FlexStopTimesFactory.area("21:10", "26:10")
     );
     var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
     assertEquals(1, trip.maxSpanDays());
@@ -124,8 +128,8 @@ class UnscheduledTripTest {
   @Test
   void testMaxSpanDaysNextDay() {
     var stopTimes = List.of(
-      FlexStopTimesForTest.area("24:00", "26:00"),
-      FlexStopTimesForTest.area("24:00", "26:00")
+      FlexStopTimesFactory.area("24:00", "26:00"),
+      FlexStopTimesFactory.area("24:00", "26:00")
     );
     var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
     assertEquals(1, trip.maxSpanDays());
@@ -197,6 +201,39 @@ class UnscheduledTripTest {
 
     assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_A));
     assertEquals(PickDrop.SCHEDULED, trip.getAlightRule(STOP_B));
+  }
+
+  public static List<TimePenalty> validPenaltyCases() {
+    return List.of(TimePenalty.of(Duration.ofMinutes(10), 0), TimePenalty.of(Duration.ZERO, 0.10));
+  }
+
+  @ParameterizedTest
+  @MethodSource("validPenaltyCases")
+  void testPenalty(TimePenalty penalty) {
+    var trip = UnscheduledTrip.of(id(1))
+      .withTimePenalty(penalty)
+      .withStopTimes(
+        List.of(
+          FlexStopTimesFactory.area("10:00", "14:00"),
+          FlexStopTimesFactory.area("10:00", "14:00")
+        )
+      )
+      .build();
+    assertNotNull(trip);
+  }
+
+  @Test
+  void testInvalidPenalty() {
+    var trip = UnscheduledTrip.of(id(1))
+      .withTimePenalty(TimePenalty.of(Duration.ZERO, 0))
+      .withStopTimes(
+        List.of(
+          FlexStopTimesFactory.area("10:00", "14:00"),
+          FlexStopTimesFactory.area("10:00", "14:00")
+        )
+      );
+
+    assertThrows(IllegalArgumentException.class, trip::build);
   }
 
   static Stream<TestCase> testRegularStopToAreaEarliestDepartureTimeTestCases() {
@@ -566,11 +603,11 @@ class UnscheduledTripTest {
       .build()
       .trip();
 
-    assertTrue(trip.isBoardingPossible(AREA_STOP1));
-    assertFalse(trip.isAlightingPossible(AREA_STOP1));
+    assertTrue(trip.isBoardingPossible(AREA_STOP1.getId()));
+    assertFalse(trip.isAlightingPossible(AREA_STOP1.getId()));
 
-    assertFalse(trip.isBoardingPossible(AREA_STOP2));
-    assertTrue(trip.isAlightingPossible(AREA_STOP2));
+    assertFalse(trip.isBoardingPossible(AREA_STOP2.getId()));
+    assertTrue(trip.isAlightingPossible(AREA_STOP2.getId()));
   }
 
   private static String timeToString(int time) {

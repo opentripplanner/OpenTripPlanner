@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.street.search.state.State;
@@ -42,7 +43,7 @@ class FlexAccessEgressBookingTest {
     int alightPos,
     int requestedBookingTime
   ) {
-    var trip = UnscheduledTrip.of(TimetableRepositoryForTest.id("flex"))
+    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("flex"))
       .withTrip(TimetableRepositoryForTest.trip("t1").build())
       .withStopTimes(stopTimes)
       .build();

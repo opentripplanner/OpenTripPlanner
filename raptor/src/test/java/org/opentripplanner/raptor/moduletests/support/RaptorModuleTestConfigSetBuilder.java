@@ -28,10 +28,6 @@ public class RaptorModuleTestConfigSetBuilder {
     return remove(RaptorModuleTestConfig::isForward);
   }
 
-  public RaptorModuleTestConfigSetBuilder oneIteration() {
-    return remove(RaptorModuleTestConfig::withManyIterations);
-  }
-
   public RaptorModuleTestConfigSetBuilder manyIterations() {
     return remove(RaptorModuleTestConfig::withOneIteration);
   }

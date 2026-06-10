@@ -15,13 +15,13 @@ public record OsmExtractParameters(
   URI source,
   OsmTagMapperSource osmTagMapper,
   ZoneId timeZone,
-  boolean includeOsmSubwayEntrances
+  boolean includeOsmStationEntrances
 ) implements DataSourceConfig {
   public static final OsmTagMapperSource DEFAULT_OSM_TAG_MAPPER = OsmTagMapperSource.DEFAULT;
 
   public static final ZoneId DEFAULT_TIME_ZONE = null;
 
-  public static final boolean DEFAULT_INCLUDE_OSM_SUBWAY_ENTRANCES = false;
+  public static final boolean DEFAULT_INCLUDE_OSM_STATION_ENTRANCES = false;
 
   public static final OsmExtractParameters DEFAULT = new OsmExtractParametersBuilder().build();
 
@@ -30,7 +30,7 @@ public record OsmExtractParameters(
       builder.getSource(),
       builder.getOsmTagMapper(),
       builder.getTimeZone(),
-      builder.includeOsmSubwayEntrances()
+      builder.includeOsmStationEntrances()
     );
   }
 
@@ -48,8 +48,8 @@ public record OsmExtractParameters(
     return timeZone;
   }
 
-  public boolean includeOsmSubwayEntrances() {
-    return includeOsmSubwayEntrances;
+  public boolean includeOsmStationEntrances() {
+    return includeOsmStationEntrances;
   }
 
   public OsmExtractParametersBuilder copyOf() {

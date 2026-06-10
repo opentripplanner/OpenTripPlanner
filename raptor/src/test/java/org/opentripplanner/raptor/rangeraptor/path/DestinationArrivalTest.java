@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class DestinationArrivalTest {
 
@@ -83,9 +83,6 @@ public class DestinationArrivalTest {
 
   @Test
   public void testToString() {
-    assertEquals(
-      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 C₁1_484 C₂5], path: Walk 50s C₁100 ~ 101 }",
-      subject.toString()
-    );
+    assertEquals("Egress [8:14:50 Rₙ1 C₁1_484 C₂5] (Walk 50s C₁100 ~ 101)", subject.toString());
   }
 }

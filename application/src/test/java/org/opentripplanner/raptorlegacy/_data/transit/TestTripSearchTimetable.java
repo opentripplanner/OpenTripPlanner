@@ -1,7 +1,7 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripSearchTimetable;
 

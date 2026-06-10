@@ -13,9 +13,11 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -48,8 +50,16 @@ public class GqlUtil {
     ).getServerContext().vehicleParkingService();
   }
 
-  public static GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getServerContext().graphFinder();
+  public static NearbyPlaceFinder getNearbyPlaceFinder(DataFetchingEnvironment environment) {
+    return (
+      (TransmodelRequestContext) environment.getContext()
+    ).getServerContext().nearbyPlaceFinder();
+  }
+
+  public static NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
+    return (
+      (TransmodelRequestContext) environment.getContext()
+    ).getServerContext().nearbyStopFinder();
   }
 
   public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {
@@ -90,7 +100,7 @@ public class GqlUtil {
   ) {
     Integer argumentValue = environment.getArgument(argumentName);
     if (argumentValue == null || argumentValue < 0) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "The argument '" + argumentName + "' should be a non-null positive value: " + argumentValue
       );
     }

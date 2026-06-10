@@ -9,6 +9,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 
@@ -92,7 +93,7 @@ public class SJEstimatedCallsType {
 
   private static void checkStrictlyPositive(int count) {
     if (count <= 0) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "The argument 'count' should be a strictly positive value: " + count
       );
     }

@@ -183,7 +183,7 @@ public final class TimetableSnapshotManager {
       var scheduledTripTimes = scheduledPattern.getScheduledTimetable().getTripTimes(trip);
       if (scheduledTripTimes != null) {
         var builder = scheduledTripTimes.createRealTimeFromScheduledTimes();
-        builder.deleteTrip();
+        builder.withDeleted();
         buffer.update(
           RealTimeTripUpdate.of(scheduledPattern, builder.build(), serviceDate).build()
         );

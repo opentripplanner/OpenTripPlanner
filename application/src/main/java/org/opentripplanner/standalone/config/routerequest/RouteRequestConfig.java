@@ -368,11 +368,11 @@ public class RouteRequestConfig {
             in the triangle, the actual effect will further be affected by the safety of the cycle
             route.
 
-            The effect of safety has changed between versions 2.8 and 2.9 by the removal of the
+            The effect of safety has changed between versions 2.9 and 2.10 by the removal of the
             safety normalizer. Before the change, all the safety values were multiplied such that
             the safest way in the whole map would have an effective value of 1, and traversal on any
             ways which are not the safest in the whole map would further multiply the cost. Since
-            version 2.9, this multiplication is not done and the values set in the
+            version 2.10, this multiplication is not done and the values set in the
             [OSM Tag Mapper](osm/OsmTag.md) are used as-is, so it is now possible to decrease the
             effective reluctance if a safe route is present.
 

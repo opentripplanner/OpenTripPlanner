@@ -46,7 +46,7 @@ class VehicleParkingEdgeTest {
       StreetMode.CAR_TO_PARK,
       false,
       true,
-      VehicleParkingSpaces.builder().carSpaces(1).build()
+      VehicleParkingSpaces.of().carSpaces(1).build()
     );
 
     var s1 = traverse();
@@ -87,7 +87,7 @@ class VehicleParkingEdgeTest {
       StreetMode.BIKE_TO_PARK,
       true,
       false,
-      VehicleParkingSpaces.builder().bicycleSpaces(1).build()
+      VehicleParkingSpaces.of().bicycleSpaces(1).build()
     );
 
     var s1 = traverse();

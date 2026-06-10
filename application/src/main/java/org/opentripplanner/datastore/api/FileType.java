@@ -18,6 +18,7 @@ public enum FileType {
   EMPIRICAL_DATA("📊", "Empirical data"),
   GRAPH("🌐", "OTP Graph file"),
   REPORT("📈", "Issue report"),
+  CACHE("📎", "OTP Cache"),
   UNKNOWN("❓", "Unknown file");
 
   private final String icon;
@@ -40,18 +41,7 @@ public enum FileType {
   }
 
   /**
-   * Return {@code true} if the the file is an INPUT data file. This is GTFS, Netex, OpenStreetMap,
-   * and elevation data files. Config files is not data sources and graphs are not considered input
-   * data files.
-   * <p>
-   * At least one input data file must be present to build a graph.
-   */
-  public boolean isInputDataSource() {
-    return EnumSet.of(GTFS, NETEX, OSM, DEM).contains(this);
-  }
-
-  /**
-   * Return {@code true} if the the file is an OUTPUT data file/directory. This is the graph files
+   * Return {@code true} if the file is an OUTPUT data file/directory. This is the graph files
    * and the build-report file.
    */
   public boolean isOutputDataSource() {

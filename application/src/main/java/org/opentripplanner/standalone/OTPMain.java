@@ -2,6 +2,8 @@ package org.opentripplanner.standalone;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -9,8 +11,10 @@ import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.ConstructApplication;
@@ -108,6 +112,7 @@ public class OTPMain {
       "Searching for configuration and input files in {}",
       cli.getBaseDirectory().getAbsolutePath()
     );
+    setupDebugLogging(cli);
 
     // Init loading phase (Separate DI scope)
     var loadApp = new LoadApplication(cli);
@@ -193,11 +198,6 @@ public class OTPMain {
     // publishing the config version info make it available to the APIs
     setOtpConfigVersionsOnServerInfo(app);
 
-    /* Start visualizer if requested. */
-    if (params.visualize) {
-      app.graphVisualizer().run();
-    }
-
     /* Start web server if requested. */
     // We could start the server first so it can report build/load progress to a load balancer.
     // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
@@ -249,5 +249,13 @@ public class OTPMain {
     projectInfo().otpConfigVersion = app.otpConfig().configVersion;
     projectInfo().buildConfigVersion = app.buildConfig().configVersion;
     projectInfo().routerConfigVersion = app.routerConfig().getConfigVersion();
+  }
+
+  private static void setupDebugLogging(CommandLineParameters params) {
+    if (params.debugRequests) {
+      var ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+      ctx.getLogger(DefaultRoutingService.class).setLevel(Level.DEBUG);
+      ctx.getLogger(RaptorService.class).setLevel(Level.DEBUG);
+    }
   }
 }

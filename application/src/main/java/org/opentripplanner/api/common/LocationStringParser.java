@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -37,7 +38,7 @@ public class LocationStringParser {
    * Creates the GenericLocation by parsing a "name::place" string, where "place" is a geographic
    * coordinate string (latitude,longitude) or a feed scoped ID (feedId:stopId).
    */
-  public static GenericLocation fromOldStyleString(String input) {
+  public static Optional<GenericLocation> fromOldStyleString(String input) {
     String name = null;
     String place = input;
     if (input.contains("::")) {
@@ -53,22 +54,18 @@ public class LocationStringParser {
    * for the location that can pass through to the routing response unchanged. The place contains
    * latitude and longitude or a stop ID.
    */
-  public static GenericLocation getGenericLocation(String label, String place) {
+  public static Optional<GenericLocation> getGenericLocation(String label, String place) {
     if (place == null) {
-      return null;
+      return Optional.empty();
     }
-
-    Double lat = null;
-    Double lon = null;
-    FeedScopedId placeId = null;
 
     Matcher matcher = LAT_LON_PATTERN.matcher(place);
     if (matcher.find()) {
-      lat = Double.parseDouble(matcher.group(1));
-      lon = Double.parseDouble(matcher.group(4));
-    } else if (FeedScopedId.isValidString(place)) {
-      placeId = FeedScopedId.parse(place);
+      var lat = Double.parseDouble(matcher.group(1));
+      var lon = Double.parseDouble(matcher.group(4));
+      return Optional.of(GenericLocation.fromCoordinate(lat, lon, label));
+    } else {
+      return FeedScopedId.parseOptional(place).map(id -> GenericLocation.fromStopId(id, label));
     }
-    return new GenericLocation(label, placeId, lat, lon);
   }
 }

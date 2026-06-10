@@ -21,7 +21,6 @@ import org.opentripplanner.street.geometry.SplitLineString;
 import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -161,11 +160,11 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+    if (fromv instanceof BarrierVertex bv) {
+      permission = permission.intersection(bv.getBarrierPermissions());
     }
-    if (tov instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+    if (tov instanceof BarrierVertex bv) {
+      permission = permission.intersection(bv.getBarrierPermissions());
     }
 
     return permission.allows(mode);
@@ -767,11 +766,9 @@ public class StreetEdge
     seb.withWalkSafetyFactor(walkSafetyFactor);
     seb.withCarSpeed(carSpeed);
 
-    var partialElevationProfileFromParent = ElevationUtils.getPartialElevationProfile(
-      getElevationProfile(),
-      fromDistance,
-      toDistance
-    );
+    var partialElevationProfileFromParent = elevationExtension != null
+      ? elevationExtension.partial(fromDistance, toDistance)
+      : null;
 
     StreetElevationExtensionBuilder.of(seb)
       .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
@@ -1069,9 +1066,7 @@ public class StreetEdge
       weight += modeReluctance * request.turnReluctance() * turnDuration;
     }
 
-    if (!traverseMode.isInCar()) {
-      s1.incrementWalkDistance(getDistanceWithElevation());
-    }
+    s1.incrementTraversalDistanceMeters(getDistanceWithElevation());
 
     if (costExtension != null) {
       weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);

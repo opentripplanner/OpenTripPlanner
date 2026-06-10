@@ -12,6 +12,9 @@ import java.util.Set;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.Condition.Equals;
+import org.opentripplanner.osm.wayproperty.specifier.Condition.Not;
+import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
@@ -182,7 +185,13 @@ class FinlandMapper extends OsmTagMapper {
 
     // Typically if this tag is used on a way, there is also a better option for walking.
     // We don't need to set bicycle safety as cycling is not currently allowed on these ways.
-    props.setMixinProperties("bicycle=use_sidepath", ofWalkSafety(5));
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Not(new Equals("foot", "use_sidepath")),
+        new Equals("bicycle", "use_sidepath")
+      ),
+      ofWalkSafety(5)
+    );
 
     // Automobile speeds in Finland.
     // General speed limit is 80kph unless signs says otherwise.

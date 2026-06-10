@@ -8,7 +8,7 @@ If your input data is mostly GTFS then this is probably the best choice as it us
 
 The [Transmodel GraphQL API](TransmodelApi.md) is used at
 Entur in production since 2020. Like the GTFS GraphQL API it is also a general purpose API.
-If your input data is mostly NeTeX then you might want to investigate
+If your input data is mostly NeTEx then you might want to investigate
 this API as it uses the [Transmodel vocabulary](https://en.wikipedia.org/wiki/Transmodel) to describe 
 its entities.
 

@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -163,6 +164,32 @@ public class SiriRealTimeTripUpdateAdapter {
     }
   }
 
+  /**
+   * Determines the type of SIRI-ET update carried by {@code vehicleJourney}.
+   *
+   * <h2>Why ExtraJourney and Cancellation are never both true in the same message</h2>
+   *
+   * In the SIRI 2.0/2.1 XSD (and in the Nordic SIRI profile), the {@code ExtraJourney} and
+   * {@code Cancellation} elements of {@code EstimatedVehicleJourney} are enclosed in an
+   * {@code <xsd:choice>} group:
+   *
+   * <pre>{@code
+   * <xsd:choice>
+   *   <xsd:element name="ExtraJourney"  type="xsd:boolean" minOccurs="0"/>
+   *   <xsd:element name="Cancellation" type="xsd:boolean" minOccurs="0"/>
+   * </xsd:choice>
+   * }</pre>
+   *
+   * This means a single {@code EstimatedVehicleJourney} is schema-invalid if it contains both
+   * elements. Cancelling a previously-added extra journey therefore always arrives as a second,
+   * separate {@code ServiceDelivery} that carries only {@code Cancellation=true} (and no
+   * {@code ExtraJourney} element). That second message is routed here as {@code TRIP_UPDATE}
+   * (because {@code isExtraJourney()} is {@code null}/false), and {@code ModifiedTripBuilder}
+   * handles the cancellation.
+   *
+   * <p>This is why the {@link RealTimeTripTimesBuilder} never needs to hold both
+   * {@code added=true} and {@code canceled=true} at the same time for a SIRI source.
+   */
   private SiriUpdateType updateType(
     EstimatedVehicleJourney vehicleJourney,
     List<CallWrapper> callWrappers,

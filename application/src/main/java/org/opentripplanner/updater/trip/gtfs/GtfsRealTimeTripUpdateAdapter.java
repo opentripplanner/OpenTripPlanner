@@ -27,7 +27,6 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -159,6 +158,12 @@ public class GtfsRealTimeTripUpdateAdapter {
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     ForwardsDelayPropagationType forwardsDelayPropagationType
   ) throws UpdateException {
+    // The GTFS-RT TripDescriptor.schedule_relationship field is a protobuf optional enum,
+    // so a single TripUpdate message carries exactly one value — it is structurally impossible
+    // for a message to express two states (e.g. ADDED and CANCELED) at the same time.
+    // Cancelling a previously-added trip therefore always arrives as a second, separate feed
+    // entity carrying only CANCELED or DELETED. This is why the RealTimeTripTimesBuilder never
+    // needs to hold both added=true and canceled=true simultaneously for a GTFS-RT source.
     return switch (tripUpdate.scheduleRelationship()) {
       case SCHEDULED -> handleScheduledTrip(
         tripUpdate,
@@ -282,12 +287,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     Trip trip = tripBuilder.build();
 
-    return handleNewOrReplacementTrip(
-      trip,
-      tripUpdate,
-      RealTimeState.ADDED,
-      result.newRouteCreated()
-    );
+    return handleNewOrReplacementTrip(trip, tripUpdate, true, false, result.newRouteCreated());
   }
 
   /**
@@ -318,7 +318,8 @@ public class GtfsRealTimeTripUpdateAdapter {
   private UpdateSuccess handleNewOrReplacementTrip(
     Trip trip,
     TripUpdate tripUpdate,
-    RealTimeState realTimeState,
+    boolean added,
+    boolean modified,
     boolean hasANewRouteBeenCreated
   ) throws UpdateException {
     FeedScopedId tripId = trip.getId();
@@ -339,14 +340,16 @@ public class GtfsRealTimeTripUpdateAdapter {
       trip,
       tripUpdate,
       stopAndStopTimeUpdates,
-      realTimeState,
+      added,
+      modified,
       transitEditorService.getServiceCode(trip.getServiceId())
     );
 
     return addNewOrReplacementTripToSnapshot(
       value,
       tripUpdate.serviceDate(),
-      realTimeState,
+      added,
+      modified,
       hasANewRouteBeenCreated
     ).addWarnings(warnings);
   }
@@ -355,13 +358,13 @@ public class GtfsRealTimeTripUpdateAdapter {
    * Add a new or replacement trip to the snapshot
    *
    * @param serviceDate       service date of trip
-   * @param realTimeState     real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
   private UpdateSuccess addNewOrReplacementTripToSnapshot(
     final TripTimesWithStopPattern tripTimesWithStopPattern,
     final LocalDate serviceDate,
-    final RealTimeState realTimeState,
+    final boolean added,
+    final boolean modified,
     final boolean hasANewRouteBeenCreated
   ) throws UpdateException {
     RealTimeTripTimes tripTimes = tripTimesWithStopPattern.tripTimes();
@@ -375,7 +378,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     // Look up the scheduled pattern for MODIFIED trips so the manager can mark it as deleted
     TripPattern hideTripInScheduledPattern = null;
-    if (realTimeState == RealTimeState.MODIFIED) {
+    if (modified) {
       hideTripInScheduledPattern = getPatternForTripId(trip.getId());
     }
 
@@ -384,7 +387,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       .withRouteCreation(hasANewRouteBeenCreated)
       .withRevertPreviousRealTimeUpdates(true)
       .withHideTripInScheduledPattern(hideTripInScheduledPattern);
-    if (realTimeState == RealTimeState.ADDED) {
+    if (added) {
       builder
         .withAddedTripOnServiceDate(
           TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
@@ -418,7 +421,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
 
-    return handleNewOrReplacementTrip(trip, tripUpdate, RealTimeState.MODIFIED, false);
+    return handleNewOrReplacementTrip(trip, tripUpdate, false, true, false);
   }
 
   private UpdateSuccess handleCanceledTrip(
@@ -436,11 +439,11 @@ public class GtfsRealTimeTripUpdateAdapter {
         var timetable = snapshotManager.resolve(addedPattern, tripUpdate.serviceDate());
         if (timetable != null) {
           var tripTimes = timetable.getTripTimes(tripUpdate.tripId());
-          if (tripTimes != null && tripTimes.getRealTimeState() == RealTimeState.ADDED) {
+          if (tripTimes != null && tripTimes.isAdded()) {
             var builder = tripTimes.createRealTimeFromScheduledTimes();
             switch (cancelationType) {
-              case CANCEL -> builder.cancelTrip();
-              case DELETE -> builder.deleteTrip();
+              case CANCEL -> builder.withCanceled();
+              case DELETE -> builder.withDeleted();
             }
             return snapshotManager.updateBuffer(
               RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.serviceDate()).build()
@@ -463,8 +466,8 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     var builder = tripTimes.createRealTimeFromScheduledTimes();
     switch (cancelationType) {
-      case CANCEL -> builder.cancelTrip();
-      case DELETE -> builder.deleteTrip();
+      case CANCEL -> builder.withCanceled();
+      case DELETE -> builder.withDeleted();
     }
     return snapshotManager.updateBuffer(
       RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.serviceDate())

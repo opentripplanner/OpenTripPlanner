@@ -248,7 +248,7 @@ public class TimetableHelperTest {
       "Occupancy:" +
       tripTimes.getOccupancyStatus(index) +
       " Cancelled:" +
-      tripTimes.isCancelledStop(index) +
+      tripTimes.isCanceledStop(index) +
       " Extra:" +
       tripTimes.isExtraCall(index) +
       " Arrived:" +

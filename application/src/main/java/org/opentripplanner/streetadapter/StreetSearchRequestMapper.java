@@ -3,7 +3,7 @@ package org.opentripplanner.streetadapter;
 import java.time.Instant;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
@@ -19,6 +19,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingSelect;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.request.AccessibilityRequest;
 import org.opentripplanner.street.search.request.BikeRequest;
@@ -41,6 +42,9 @@ import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect
 
 public class StreetSearchRequestMapper {
 
+  /// How close to do you have to be to the start or end to be considered "close".
+  private static final int MAX_CLOSENESS_METERS = 500;
+
   /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] transferring all parameters
   /// relevant for street routing.
   public static StreetSearchRequestBuilder map(RouteRequest request) {
@@ -50,8 +54,8 @@ public class StreetSearchRequestMapper {
     var streetSearchRequestBuilder = StreetSearchRequest.of()
       .withStartTime(time)
       .withArriveBy(request.arriveBy())
-      .withFrom(mapGenericLocation(request.from()))
-      .withTo(mapGenericLocation(request.to()))
+      .withFromEnvelope(createEnvelope(request.from()))
+      .withToEnvelope(createEnvelope(request.to()))
       .withWheelchairEnabled(request.journey().wheelchair())
       .withGeoidElevation(preferences.system().geoidElevation())
       .withTurnReluctance(street.turnReluctance())
@@ -88,8 +92,8 @@ public class StreetSearchRequestMapper {
   ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
     return map(request)
-      .withFrom(null)
-      .withTo(null)
+      .withFromEnvelope(null)
+      .withToEnvelope(null)
       // transfer requests are always depart-at
       .withArriveBy(false)
       .withStartTime(Instant.ofEpochSecond(0))
@@ -97,15 +101,6 @@ public class StreetSearchRequestMapper {
   }
 
   // private methods
-
-  @Nullable
-  private static Coordinate mapGenericLocation(@Nullable GenericLocation location) {
-    if (location != null) {
-      return location.getCoordinate();
-    } else {
-      return null;
-    }
-  }
 
   private static void mapWheelchair(WheelchairRequest.Builder b, WheelchairPreferences wheelchair) {
     b
@@ -241,5 +236,24 @@ public class StreetSearchRequestMapper {
       .withHopTime(elevator.hopTime())
       .withReluctance(elevator.reluctance())
       .build();
+  }
+
+  @Nullable
+  private static Envelope createEnvelope(@Nullable GenericLocation location) {
+    if (location == null) {
+      return null;
+    }
+    var coordinate = location.getCoordinate();
+    if (coordinate == null) {
+      return null;
+    }
+
+    double lat = SphericalDistanceLibrary.metersToDegrees(MAX_CLOSENESS_METERS);
+    double lon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CLOSENESS_METERS, coordinate.y);
+
+    Envelope env = new Envelope(coordinate);
+    env.expandBy(lon, lat);
+
+    return env;
   }
 }

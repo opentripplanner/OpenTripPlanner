@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
@@ -85,12 +86,12 @@ abstract class AbstractFlexTemplate {
     this.maxTransferDuration = maxTransferDuration;
   }
 
-  StopLocation getTransferStop() {
-    return transferStop;
+  FeedScopedId getTransferStopId() {
+    return transferStop.getId();
   }
 
-  StopLocation getAccessEgressStop() {
-    return accessEgress.stop;
+  FeedScopedId getAccessEgressStopId() {
+    return accessEgress.stopId;
   }
 
   /**
@@ -174,7 +175,7 @@ abstract class AbstractFlexTemplate {
    * Get the FlexTripEdge for the flex ride.
    */
   @Nullable
-  protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
+  protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, FeedScopedId transferStopId);
 
   @Nullable
   private FlexAccessEgress createFlexAccessEgress(
@@ -182,7 +183,7 @@ abstract class AbstractFlexTemplate {
     Vertex flexVertex,
     RegularStop stop
   ) {
-    var flexEdge = getFlexEdge(flexVertex, transferStop);
+    var flexEdge = getFlexEdge(flexVertex, transferStop.getId());
 
     // Drop non-routable and very short(<10s) trips
     if (flexEdge == null || flexEdge.getTimeInSeconds() < MIN_FLEX_TRIP_DURATION_SECONDS) {

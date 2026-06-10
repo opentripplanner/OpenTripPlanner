@@ -33,15 +33,15 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
       parseTime("departure"),
       parseTime("arrival"),
       parseDuration("window"),
-      new GenericLocation(
+      genericLocation(
         parseString("origin"),
-        FeedScopedId.ofNullable(feedId, parseString("fromPlace")),
+        parseString("fromPlace"),
         parseDouble("fromLat"),
         parseDouble("fromLon")
       ),
-      new GenericLocation(
+      genericLocation(
         parseString("destination"),
-        FeedScopedId.ofNullable(feedId, parseString("toPlace")),
+        parseString("toPlace"),
         parseDouble("toLat"),
         parseDouble("toLon")
       ),
@@ -49,6 +49,14 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
       parseString("category"),
       new QualifiedModeSet(parseCollection("modes").toArray(new String[0]))
     );
+  }
+
+  private GenericLocation genericLocation(String label, String id, double lat, double lon) {
+    var feedScopedId = FeedScopedId.ofNullable(feedId, id);
+    if (feedScopedId == null) {
+      return GenericLocation.fromCoordinate(lat, lon, label);
+    }
+    return GenericLocation.fromStopIdWithFallback(feedScopedId, lat, lon, label);
   }
 
   @Nullable

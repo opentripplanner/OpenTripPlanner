@@ -8,7 +8,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.util.Set;
-import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
@@ -48,13 +47,6 @@ public class VehicleRentalSourceFactory {
         network(),
         geofencingZones(),
         overloadingAllowed(),
-        rentalPickupTypes()
-      );
-      case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
-        url(),
-        network(),
-        overloadingAllowed(),
-        headers(),
         rentalPickupTypes()
       );
     };

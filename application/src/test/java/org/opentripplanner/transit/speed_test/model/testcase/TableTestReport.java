@@ -35,14 +35,28 @@ public class TableTestReport {
 
   private static TableBuilder newTable() {
     return Table.of()
-      .withAlights(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left)
+      .withAlights(
+        Center,
+        Right,
+        Right,
+        Right,
+        Right,
+        Right,
+        Right,
+        Center,
+        Center,
+        Left,
+        Left,
+        Left
+      )
       .withHeaders(
         "STATUS",
         "TX",
-        "Duration",
-        "Cost",
         "Start",
         "End",
+        "C1",
+        "C2",
+        "Duration",
         "Modes",
         "Agencies",
         "Routes",
@@ -56,22 +70,17 @@ public class TableTestReport {
     table.addRow(
       e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),
       result.nTransfers(),
-      result.durationAsStr(),
-      result.cost(),
       TimeUtils.timeToStrLong(result.startTime()),
       TimeUtils.timeToStrLong(result.endTime()),
+      result.c1(),
+      result.c2() == null ? "-" : result.c2(),
+      result.durationAsStr(),
       toStr(result.modes()),
       toStr(result.agencies()),
       toStr(result.routes()),
       toStr(result.stops()),
       result.details()
     );
-  }
-
-  private static String intsToStr(Collection<Integer> list) {
-    return list.isEmpty()
-      ? "-"
-      : list.stream().map(Object::toString).collect(Collectors.joining(" "));
   }
 
   private static String toStr(Collection<?> list) {

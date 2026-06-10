@@ -14,7 +14,7 @@ import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
@@ -147,7 +147,7 @@ public class ConstantsForTests {
     try {
       var graph = new Graph();
       var timetableRepository = new TimetableRepository(new SiteRepository());
-      var fareFactory = new DefaultFareServiceFactory();
+      var fareFactory = new GtfsFareServiceFactory();
       // Add street data from OSM
       {
         var osmModule = OsmModuleTestFactory.of(new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false))
@@ -239,7 +239,7 @@ public class ConstantsForTests {
       otpModel.graph(),
       otpModel.timetableRepository(),
       gtfsPath,
-      new DefaultFareServiceFactory(),
+      new GtfsFareServiceFactory(),
       null
     );
 
@@ -250,7 +250,7 @@ public class ConstantsForTests {
   }
 
   public static TestOtpModel buildGtfsGraph(File gtfsPath) {
-    return buildGtfsGraph(gtfsPath, new DefaultFareServiceFactory());
+    return buildGtfsGraph(gtfsPath, new GtfsFareServiceFactory());
   }
 
   public static TestOtpModel buildGtfsGraph(File gtfsFile, FareServiceFactory fareServiceFactory) {

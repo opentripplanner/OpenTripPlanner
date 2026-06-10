@@ -26,6 +26,14 @@ public interface PlanTestConstants {
   int D5_m = DurationUtils.durationInSeconds("5m");
   int D10_m = DurationUtils.durationInSeconds("10m");
   int D12_m = DurationUtils.durationInSeconds("12m");
+  int D1_h = DurationUtils.durationInSeconds("1h");
+  int D2_h = DurationUtils.durationInSeconds("2h");
+  int D3_h = DurationUtils.durationInSeconds("3h");
+  int D4_h = DurationUtils.durationInSeconds("4h");
+  int D5_h = DurationUtils.durationInSeconds("5h");
+  int D10_h = DurationUtils.durationInSeconds("10h");
+  int D12_h = DurationUtils.durationInSeconds("12h");
+  int D24_h = DurationUtils.durationInSeconds("24h");
 
   // Time constants, all values are in seconds
   int T11_00 = time("11:00");

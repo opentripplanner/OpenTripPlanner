@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -47,6 +48,12 @@ import uk.org.siri.siri21.Siri;
  * (ready for routing requests), when all retained messages in the connected MQTT are processed.
  * If there are no retained messages, the updater is primed immediately. Live messages (messages
  * without a retained flag) are always processed, even if the updater is not yet primed.
+ * <p>
+ * If the MQTT broker is unavailable at startup, the updater waits up to
+ * {@code connectionStartupTimeout} for a connection. If no connection is established within that
+ * time, the updater marks itself as primed immediately so OTP can start routing without real-time
+ * data. The MQTT client continues retrying in the background; once the broker becomes available
+ * live messages will be processed normally.
  */
 public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
 
@@ -64,6 +71,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   private final ExecutorService liveExecutor;
 
   private volatile boolean primed = false;
+  private final CompletableFuture<Void> connectionFuture = new CompletableFuture<>();
 
   private Instant connectedAt;
   private final AtomicLong liveMessageCounter = new AtomicLong();
@@ -96,9 +104,28 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   public void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
     this.serviceDeliveryConsumer = serviceDeliveryConsumer;
 
-    client = connectAndSubscribeToClient();
-    connectedAt = Instant.now();
+    client = buildAndConnectClient();
 
+    // Wait up to connectionStartupTimeout for the broker to connect.
+    waitToConnectWithTimeout();
+
+    if (!connectionFuture.isDone()) {
+      // Broker was not reachable within the startup timeout. Allow OTP to route without
+      // real-time data. The HiveMQ client continues reconnecting in the background; live
+      // messages will flow once the broker becomes available (via onConnect -> subscribe).
+      LOG.warn(
+        "MQTT broker at {} was not reachable within {}. " +
+          "OTP will start routing without real-time data. " +
+          "The MQTT client will keep retrying in the background.",
+        parameters.url(),
+        parameters.connectionStartupTimeout()
+      );
+      liveExecutor.submit(new LiveRunner());
+      primed = true;
+      return;
+    }
+
+    // Normal priming path: broker was available, retained messages may have arrived.
     List<CompletableFuture<Void>> primingFutures = new ArrayList<>();
 
     for (int i = 0; i < parameters.numberOfPrimingWorkers(); i++) {
@@ -128,6 +155,18 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     liveExecutor.submit(new LiveRunner());
   }
 
+  private void waitToConnectWithTimeout() {
+    try {
+      connectionFuture.get(parameters.connectionStartupTimeout().toMillis(), TimeUnit.MILLISECONDS);
+    } catch (TimeoutException e) {
+      // Broker was not reachable within the startup timeout
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      LOG.warn("Unexpected error while waiting for MQTT connection", e);
+    }
+  }
+
   private void waitForGraphUpdates() {
     for (Future<?> f : graphUpdates) {
       try {
@@ -143,34 +182,39 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   private void registerMetrics() {
-    FunctionCounter.builder("mqtt_siri_message_size", liveMessageSize, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.message.size", liveMessageSize, AtomicLong::get)
       .tags("type", "live", "stage", "received")
       .register(Metrics.globalRegistry);
-    FunctionCounter.builder("mqtt_siri_message_size", primingMessageSize, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.message.size", primingMessageSize, AtomicLong::get)
       .tags("type", "priming", "stage", "received")
       .register(Metrics.globalRegistry);
-    FunctionCounter.builder("mqtt_siri_messages", liveMessageCounter, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.messages", liveMessageCounter, AtomicLong::get)
       .tags("type", "live", "stage", "received")
       .register(Metrics.globalRegistry);
-    FunctionCounter.builder("mqtt_siri_messages", primingMessageCounter, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.messages", primingMessageCounter, AtomicLong::get)
       .tags("type", "priming", "stage", "received")
       .register(Metrics.globalRegistry);
-    FunctionCounter.builder("mqtt_siri_messages", processedLiveMessageCounter, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.messages", processedLiveMessageCounter, AtomicLong::get)
       .tags("type", "live", "stage", "processed")
       .register(Metrics.globalRegistry);
-    FunctionCounter.builder("mqtt_siri_messages", processedPrimingMessageCounter, AtomicLong::get)
+    FunctionCounter.builder("mqtt.siri.messages", processedPrimingMessageCounter, AtomicLong::get)
       .tags("type", "priming", "stage", "processed")
       .register(Metrics.globalRegistry);
 
-    Gauge.builder("mqtt_siri_queue_size", primingMessageQueue, Collection::size)
+    Gauge.builder("mqtt.siri.queue.size", primingMessageQueue, Collection::size)
       .tags("type", "priming")
       .register(Metrics.globalRegistry);
-    Gauge.builder("mqtt_siri_queue_size", liveMessageQueue, Collection::size)
+    Gauge.builder("mqtt.siri.queue.size", liveMessageQueue, Collection::size)
       .tags("type", "live")
       .register(Metrics.globalRegistry);
   }
 
-  private Mqtt5AsyncClient connectAndSubscribeToClient() {
+  /**
+   * Build the HiveMQ client and initiate a non-blocking connect. The client will automatically
+   * retry the connection (with exponential backoff) if the broker is unavailable. When a
+   * connection is established, {@link #onConnect()} is called which sets up the subscription.
+   */
+  private Mqtt5AsyncClient buildAndConnectClient() {
     Mqtt5SimpleAuth auth;
     if (hasNoValue(parameters.user()) || hasNoValue(parameters.password())) {
       auth = null;
@@ -180,7 +224,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         .password(parameters.password().getBytes(StandardCharsets.UTF_8))
         .build();
     }
-    Mqtt5AsyncClient client = Mqtt5Client.builder()
+    Mqtt5AsyncClient mqttClient = Mqtt5Client.builder()
       .identifier("OpenTripPlanner-" + UUID.randomUUID())
       .serverHost(parameters.host())
       .serverPort(parameters.port())
@@ -190,17 +234,10 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       .addDisconnectedListener(this::onDisconnect)
       .buildAsync();
 
-    client.connectWith().keepAlive(30).cleanStart(false).send().join();
+    // Non-blocking connect: HiveMQ will retry automatically if the broker is unavailable.
+    mqttClient.connectWith().keepAlive(30).cleanStart(false).send();
 
-    client
-      .subscribeWith()
-      .topicFilter(parameters.topic())
-      .qos(Optional.ofNullable(MqttQos.fromCode(parameters.qos())).orElse(MqttQos.AT_MOST_ONCE))
-      .callback(this::onMessage)
-      .send()
-      .join();
-
-    return client;
+    return mqttClient;
   }
 
   private void onDisconnect(MqttClientDisconnectedContext ctx) {
@@ -208,11 +245,22 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   private void onConnect() {
+    connectedAt = Instant.now();
+    connectionFuture.complete(null);
     LOG.info(
       "Connected client to MQTT broker: {} with qos: {}",
       parameters.url(),
       parameters.qos()
     );
+    // Subscribe on every connect (including reconnects). With cleanStart=false the broker
+    // remembers the subscription across reconnects, but re-subscribing is idempotent in MQTT5
+    // and ensures the callback is always registered correctly.
+    client
+      .subscribeWith()
+      .topicFilter(parameters.topic())
+      .qos(Optional.ofNullable(MqttQos.fromCode(parameters.qos())).orElse(MqttQos.AT_MOST_ONCE))
+      .callback(this::onMessage)
+      .send();
   }
 
   @Override
@@ -224,7 +272,9 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   public void teardown() {
     liveExecutor.shutdownNow();
     primingExecutor.shutdownNow();
-    client.disconnect();
+    if (client != null) {
+      client.disconnect();
+    }
   }
 
   private Optional<ServiceDelivery> serviceDelivery(byte[] payload) {

@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -23,7 +25,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -69,7 +70,7 @@ class ModifiedTripBuilderTest {
     .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
     .build();
 
-  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("CAL_1");
+  private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("CAL_1");
 
   private static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP")
     .withRoute(ROUTE)
@@ -159,7 +160,8 @@ class ModifiedTripBuilderTest {
       false,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     );
 
     assertFailure(UpdateErrorType.TOO_FEW_STOPS, result::build);
@@ -195,12 +197,13 @@ class ModifiedTripBuilderTest {
       true,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
     TripTimes updatedTimes = tripUpdate.tripTimes();
-    assertEquals(RealTimeState.CANCELED, updatedTimes.getRealTimeState());
+    assertTrue(updatedTimes.isCanceled());
   }
 
   @Test
@@ -233,7 +236,8 @@ class ModifiedTripBuilderTest {
       false,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
@@ -244,7 +248,7 @@ class ModifiedTripBuilderTest {
     assertEquals(secondsInDay(10, 13), updatedTimes.getDepartureTime(1));
     assertEquals(secondsInDay(10, 22), updatedTimes.getArrivalTime(2));
     assertEquals(secondsInDay(10, 22), updatedTimes.getDepartureTime(2));
-    assertEquals(RealTimeState.UPDATED, updatedTimes.getRealTimeState());
+    assertTrue(updatedTimes.hasAnyUpdates());
   }
 
   @Test
@@ -277,7 +281,8 @@ class ModifiedTripBuilderTest {
       false,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     );
 
     var updateError = assertFailure(UpdateErrorType.NEGATIVE_DWELL_TIME, tripUpdate::build);
@@ -318,7 +323,8 @@ class ModifiedTripBuilderTest {
       false,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
@@ -329,7 +335,7 @@ class ModifiedTripBuilderTest {
     assertEquals(secondsInDay(10, 13), updatedTimes.getDepartureTime(1));
     assertEquals(secondsInDay(10, 22), updatedTimes.getArrivalTime(2));
     assertEquals(secondsInDay(10, 22), updatedTimes.getDepartureTime(2));
-    assertEquals(RealTimeState.UPDATED, updatedTimes.getRealTimeState());
+    assertTrue(updatedTimes.hasAnyUpdates());
   }
 
   @Test
@@ -362,7 +368,8 @@ class ModifiedTripBuilderTest {
       false,
       null,
       false,
-      "DATASOURCE"
+      "DATASOURCE",
+      false
     ).build();
 
     StopPattern stopPattern = tripUpdate.stopPattern();
@@ -378,7 +385,7 @@ class ModifiedTripBuilderTest {
     assertEquals(secondsInDay(10, 13), updatedTimes.getDepartureTime(1));
     assertEquals(secondsInDay(10, 22), updatedTimes.getArrivalTime(2));
     assertEquals(secondsInDay(10, 22), updatedTimes.getDepartureTime(2));
-    assertEquals(RealTimeState.MODIFIED, updatedTimes.getRealTimeState());
+    assertTrue(updatedTimes.isTripPatternModified());
   }
 
   @Test

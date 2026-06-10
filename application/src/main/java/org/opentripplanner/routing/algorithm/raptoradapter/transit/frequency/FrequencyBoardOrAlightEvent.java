@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
@@ -64,7 +64,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   /* RaptorTripScheduleBoardOrAlightEvent implementation */
 
   @Override
-  public int tripIndex() {
+  public int tripScheduleIndex() {
     return tripTimes.getDepartureTime(0) + offset;
   }
 
@@ -110,6 +110,11 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
 
   @Override
   public abstract int departure(int stopPosInPattern);
+
+  @Override
+  public int relativeTravelDuration(int boardTime) {
+    return offset - boardTime;
+  }
 
   @Override
   public RaptorTripPattern pattern() {

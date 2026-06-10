@@ -31,6 +31,13 @@ producing true Pareto-optimal sets of results.
   non-optimal before they reach the destination.
   <BR>https://epubs.siam.org/doi/pdf/10.1137/1.9781611975499.5
 
+- Rohovyi, Abuaisha, and Walsh. Early Pruning for Public Transport Routing (2026).
+  <BR>Introduces the Early Pruning optimization for the RAPTOR transfer relaxation step. By sorting
+  transfers by duration and tracking the best known destination arrival time, the inner transfer
+  loop can terminate early once remaining transfers cannot improve the current best. Implemented in
+  OTP as `earlyTransferPruning` (Standard RAPTOR only).
+  <BR>https://arxiv.org/abs/2603.12592
+
 ## Techniques used in or influencing OTP1 and OTP2
 
 ### General Background

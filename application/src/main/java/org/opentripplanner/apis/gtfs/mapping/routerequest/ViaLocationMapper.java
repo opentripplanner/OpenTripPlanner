@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
@@ -42,7 +43,7 @@ class ViaLocationMapper {
         mapCoordinate(visit.getGraphQLCoordinate()).orElse(null)
       );
     } else {
-      throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");
+      throw new InvalidInputException("ViaLocation must define either pass-through or visit.");
     }
   }
 
@@ -50,6 +51,6 @@ class ViaLocationMapper {
     if (ids == null) {
       return List.of();
     }
-    return ids.stream().map(FeedScopedId::parse).toList();
+    return ids.stream().map(FeedScopedId::parseStrict).toList();
   }
 }

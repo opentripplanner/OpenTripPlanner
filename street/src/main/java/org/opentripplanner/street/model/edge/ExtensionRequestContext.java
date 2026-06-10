@@ -12,6 +12,6 @@ package org.opentripplanner.street.model.edge;
  * implementation must check it has the right context.
  * <p>
  * There are no methods on this interface, the type should be enough for any extention to
- * determin if the right context is fetched.
+ * determine if the right context is fetched.
  */
 public interface ExtensionRequestContext {}

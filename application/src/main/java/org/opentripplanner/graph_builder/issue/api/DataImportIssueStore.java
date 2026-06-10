@@ -4,13 +4,13 @@ import java.util.List;
 import org.opentripplanner.framework.error.OtpError;
 
 /**
- * This service is used to store issued during data import. When the import is complete
- * all issues are written to a report. For test there is a NO-OP implementation, see the constant
- * {@link #NOOP}.
+ * Thread-safe service for storing issues encountered during data import. When the import is
+ * complete all issues are written to a report. For tests there is a NO-OP implementation, see
+ * the constant {@link #NOOP}.
  *
- * When creating issues try to avoid creating the sting message, this will take a lot of memory
+ * When creating issues try to avoid creating the string message; this will take a lot of memory
  * during graph build. Instead, keep references to values you want to include in the message and
- * construct the string when generating the report(when {@link DataImportIssue#getMessage()} or
+ * construct the string when generating the report (when {@link DataImportIssue#getMessage()} or
  * {@link DataImportIssue#getHTMLMessage()} is called).
  */
 public interface DataImportIssueStore {
@@ -37,17 +37,6 @@ public interface DataImportIssueStore {
   default void addAll(Iterable<OtpError> issues) {
     issues.forEach(it -> add(it));
   }
-
-  /**
-   * Starts processing a {@code source}. This will add the source to all created issues until the
-   * processing is stopped or a new source is processed.
-   */
-  void startProcessingSource(String source);
-
-  /**
-   * Stops the processing of the current source.
-   */
-  void stopProcessingSource();
 
   /** List all issues added */
   List<DataImportIssue> listIssues();

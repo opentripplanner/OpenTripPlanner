@@ -50,11 +50,11 @@ import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.api.PatternAtStop;
+import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.streetdetails.model.Level;
@@ -384,6 +384,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<String> feedId();
     public DataFetcher<FeedPublisher> publisher();
+    public DataFetcher<String> version();
   }
 
   /** Feed publisher information */
@@ -988,8 +989,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
     public DataFetcher<TripTimeOnDate> arrivalStoptime();
     public DataFetcher<GraphQLBikesAllowed> bikesAllowed();
-    public DataFetcher<GraphQLCarsAllowed> carsAllowed();
     public DataFetcher<String> blockId();
+    public DataFetcher<GraphQLCarsAllowed> carsAllowed();
     public DataFetcher<TripTimeOnDate> departureStoptime();
     public DataFetcher<String> directionId();
     public DataFetcher<Iterable<Iterable<Double>>> geometry();
@@ -1208,7 +1209,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> bogusName();
     public DataFetcher<Double> distance();
     public DataFetcher<
-      Iterable<org.opentripplanner.model.plan.leg.ElevationProfile.Step>
+      Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>
     > elevationProfile();
     public DataFetcher<String> exit();
     public DataFetcher<Object> feature();

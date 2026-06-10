@@ -65,6 +65,24 @@ public class DoubleUtils {
   }
 
   /**
+   * Round {@code value} to the nearest multiple of {@code step}, with ties broken
+   * towards the even neighbour ({@link RoundingMode#HALF_EVEN}, a.k.a. banker's rounding).
+   * This is the IEEE 754 default and avoids systematic bias when many rounded values
+   * are summed or averaged. BigDecimal is used so that the input is treated as an exact
+   * decimal and ties are detected reliably (e.g. {@code 1.85 / 0.1} is exactly 18.5
+   * rather than drifting through IEEE-754 representation of 0.1).
+   */
+  public static double roundToStep(double value, double step) {
+    if (Double.isNaN(value) || Double.isInfinite(value)) {
+      return value;
+    }
+    return BigDecimal.valueOf(value)
+      .divide(BigDecimal.valueOf(step), 0, RoundingMode.HALF_EVEN)
+      .multiply(BigDecimal.valueOf(step))
+      .doubleValue();
+  }
+
+  /**
    * Compare two doubles for equality - this is equivalent of
    * <pre>
    * Double.compare(a, b) == 0
@@ -72,6 +90,16 @@ public class DoubleUtils {
    */
   public static boolean doubleEquals(double a, double b) {
     return Double.compare(a, b) == 0;
+  }
+
+  /**
+   * Throws an exception if the value is less than zero.
+   */
+  public static double requireNonNegative(double value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Value is required to be non-negative, but was: " + value);
+    }
+    return value;
   }
 
   public static double requireInRange(double value, double min, double max) {

@@ -188,14 +188,21 @@ context. Please avoid including trivial Javadoc or the empty Javadoc stubs added
         - Are null values allowed as inputs?
         - Will null values occur as outputs (and what do they mean)?
     - Invariants that hold if the preconditions are met
-    - Concurrency
-        - Is the method thread-safe?
-        - Usage constraints for multi-threaded use
+    - Concurrency — document when it matters (see class-level guidance below)
 - On classes:
     - Initialization and teardown process
     - Can an instance be reused for multiple operations, or should it be discarded?
     - Is it immutable, or should anything be treated as immutable?
     - Is it a utility class of static methods that should not be instantiated?
+    - Concurrency — only document thread safety when it is relevant to callers:
+        - Document that a class **is thread-safe** if it can safely be shared across threads
+          (e.g. immutable, or uses proper internal synchronization).
+        - Document that a class **is not thread-safe** if it could reasonably be used in a
+          concurrent context but requires external synchronization.
+        - Do **not** add `@NotThreadSafe` or a "not thread-safe" note to classes that live
+          exclusively in a single-threaded context (e.g. Raptor worker state), where concurrent
+          use is neither expected nor possible. Documenting the absence of something that was
+          never a concern adds noise and can mislead readers.
 
 ### Annotations
 

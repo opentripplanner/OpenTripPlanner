@@ -72,7 +72,6 @@ The carpooling service matches passengers with compatible carpool trips based on
 - **Availability**: Checks if seats are available in the vehicle
 - **Time Compatibility**: Ensures the trip timing works for the passenger
 - **Route Alignment**: Validates that pickup and dropoff locations are reasonably close to the driver's route
-- **Direction**: Verifies the passenger's travel direction aligns with the trip route
 
 The system automatically calculates the optimal pickup and dropoff points along the driver's route that minimize additional travel time while respecting all constraints.
 
@@ -81,7 +80,6 @@ The system automatically calculates the optimal pickup and dropoff points along 
 To ensure a good experience for all users, the system enforces several constraints:
 
 - **Vehicle Capacity**: Never exceeds the maximum number of seats
-- **Route Logic**: Prevents backtracking or illogical detours
 - **Existing Passenger Protection**: Limits additional delay to existing passengers (maximum 5 minutes)
 - **Driver Deviation Budget**: Respects the driver's maximum acceptable detour time (currently 15 minutes)
 

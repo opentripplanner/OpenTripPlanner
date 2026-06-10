@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.updater;
 
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
@@ -96,17 +97,22 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Processes a single estimated vehicle journey, mapping it to a carpool trip and upserting it
-   * to the repository.
-   *
-   * @param estimatedVehicleJourney the estimated vehicle journey to process
+   * Maps a single estimated vehicle journey to a carpool trip and upserts it, or removes the
+   * trip when the journey is cancelled or has fewer than 2 non-cancelled calls.
    */
-  private void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
+  void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
-      var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
-      if (carpoolTrip != null) {
-        repository.upsertCarpoolTrip(carpoolTrip);
+      FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
+      if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
+        repository.removeCarpoolTrip(tripId);
+        return;
       }
+      var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
+      if (carpoolTrip == null) {
+        repository.removeCarpoolTrip(tripId);
+        return;
+      }
+      repository.upsertCarpoolTrip(carpoolTrip);
     } catch (Exception e) {
       LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
     }

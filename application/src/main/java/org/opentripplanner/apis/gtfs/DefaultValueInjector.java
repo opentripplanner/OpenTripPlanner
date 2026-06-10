@@ -315,6 +315,23 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       .boolReq(
         "TimetablePreferencesInput.includeRealTimeCancellations",
         transit.includeRealtimeCancellations()
+      )
+      .objectReq(
+        "TransitPreferencesInput.relaxTransitGroupPriority",
+        ObjectValue.newObjectValue()
+          .objectField(
+            ObjectField.newObjectField()
+              .name("constant")
+              .value(IntValue.of(transit.relaxTransitGroupPriority().constant().toSeconds()))
+              .build()
+          )
+          .objectField(
+            ObjectField.newObjectField()
+              .name("coefficient")
+              .value(FloatValue.of(transit.relaxTransitGroupPriority().coefficient()))
+              .build()
+          )
+          .build()
       );
   }
 

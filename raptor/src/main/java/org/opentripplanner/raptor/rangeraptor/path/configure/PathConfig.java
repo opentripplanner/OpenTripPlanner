@@ -3,9 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.path.configure;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
@@ -19,6 +16,9 @@ import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -57,10 +57,9 @@ public class PathConfig<T extends RaptorTripSchedule> {
     return new DestinationArrivalPaths<>(
       comparator,
       ctx.calculator(),
-      costConfig.includeC1() ? ctx.costCalculator() : null,
-      ctx.acceptC2AtDestination(),
+      costConfig.useC1() ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(costConfig.includeC1()),
+      createPathMapper(costConfig.useC1()),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
@@ -122,7 +121,6 @@ public class PathConfig<T extends RaptorTripSchedule> {
           costCalculator,
           stopNameResolver,
           txConstraintsSearch,
-          lifeCycle,
           profile.useApproximateTripSearch()
         );
   }

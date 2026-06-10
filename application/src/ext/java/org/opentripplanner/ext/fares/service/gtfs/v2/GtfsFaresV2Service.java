@@ -24,13 +24,15 @@ public final class GtfsFaresV2Service implements Serializable {
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
     Multimap<FeedScopedId, FeedScopedId> stopAreas,
-    Multimap<FeedScopedId, LocalDate> serviceDatesForServiceId
+    Multimap<FeedScopedId, LocalDate> serviceDatesForServiceId,
+    FreeTransferEligibility freeTransferMatchPredicate
   ) {
     this.lookup = new FareLookupService(
       legRules,
       fareTransferRules,
       stopAreas,
-      serviceDatesForServiceId
+      serviceDatesForServiceId,
+      freeTransferMatchPredicate
     );
   }
 
@@ -81,11 +83,7 @@ public final class GtfsFaresV2Service implements Serializable {
       );
     }
 
-    var itinProducts = lookup.findTransfersMatchingAllLegs(
-      transitLegs,
-      FareTransferRule::unlimitedTransfers
-    );
-    return new FareResult(itinProducts, offerContainer.toMultimap());
+    return new FareResult(offerContainer.toMultimap());
   }
 
   /**

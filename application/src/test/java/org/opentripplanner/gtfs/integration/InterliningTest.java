@@ -22,7 +22,7 @@ public class InterliningTest extends GtfsTest {
   public void interlineOnSameRoute() {
     // We should arrive at the destination using two legs, both of which are on
     // the same route and with zero transfers.
-    Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
+    Itinerary itinerary = plan(time, "stop0", "stop3", false, false, null, null, null, 2);
 
     assertEquals(itinerary.legs().get(0).route().getId().getId(), "route1");
 
@@ -34,7 +34,7 @@ public class InterliningTest extends GtfsTest {
 
   @Test
   public void interlineOnDifferentRoute() {
-    var itinerary = plan(time, "stop0", "stop6", null, false, false, null, null, null, 2);
+    var itinerary = plan(time, "stop0", "stop6", false, false, null, null, null, 2);
 
     assertEquals(itinerary.legs().get(0).route().getId().getId(), "route0");
 
@@ -46,7 +46,7 @@ public class InterliningTest extends GtfsTest {
 
   @Test
   public void staySeatedNotAllowed() {
-    var itinerary = plan(time, "stop0", "stop5", null, false, false, null, null, null, 2);
+    var itinerary = plan(time, "stop0", "stop5", false, false, null, null, null, 2);
 
     assertEquals(itinerary.legs().get(0).route().getId().getId(), "route2");
 

@@ -95,6 +95,11 @@ public final class FareProduct implements Serializable {
     return price.isZero();
   }
 
+  /// Does this FareProduct have the same category and medium as another FareProduct?
+  public boolean equalEligibility(FareProduct p) {
+    return Objects.equals(p.category, this.category) && Objects.equals(p.medium, this.medium);
+  }
+
   @Nullable
   public RiderCategory category() {
     return category;

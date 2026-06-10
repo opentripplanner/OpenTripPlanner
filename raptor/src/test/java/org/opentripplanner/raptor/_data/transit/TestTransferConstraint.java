@@ -2,7 +2,7 @@ package org.opentripplanner.raptor._data.transit;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * This class holds transfer constraint information.
@@ -37,10 +37,6 @@ public class TestTransferConstraint implements Serializable, RaptorTransferConst
 
   public static TestTransferConstraint guaranteed() {
     return new TestTransferConstraint(Type.GUARANTEED);
-  }
-
-  public static RaptorTransferConstraint regular() {
-    return RaptorTransferConstraint.REGULAR_TRANSFER;
   }
 
   public boolean isGuaranteed() {

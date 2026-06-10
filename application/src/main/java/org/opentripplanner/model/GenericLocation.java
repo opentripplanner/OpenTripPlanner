@@ -4,6 +4,8 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.api.request.TripLocation;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
@@ -14,50 +16,62 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  */
 public class GenericLocation {
 
-  public static final GenericLocation UNKNOWN = new GenericLocation(null, null, null, null);
-
-  /**
-   * A label for the place, if provided. This is pass-through information and does not affect
-   * routing in any way.
-   */
   @Nullable
-  public final String label;
-
-  /**
-   * Refers to a specific element in the OTP model. This can currently be a regular stop, area stop,
-   * group stop, station, multi-modal station or group of stations.
-   */
-  @Nullable
-  public final FeedScopedId stopId;
-
-  /**
-   * Coordinates of the location. These can be used by themselves or as a fallback if placeId is not
-   * found.
-   */
-  @Nullable
-  public final Double lat;
+  private final String label;
 
   @Nullable
-  public final Double lng;
+  private final FeedScopedId stopId;
 
-  public GenericLocation(
+  @Nullable
+  private final WgsCoordinate coordinate;
+
+  @Nullable
+  private final TripLocation tripLocation;
+
+  private GenericLocation(
     @Nullable String label,
     @Nullable FeedScopedId stopId,
-    @Nullable Double lat,
-    @Nullable Double lng
+    @Nullable WgsCoordinate coordinate,
+    @Nullable TripLocation tripLocation
   ) {
+    if (stopId == null && coordinate == null && tripLocation == null) {
+      throw new IllegalArgumentException(
+        "GenericLocation requires either a stop id, a coordinate or a trip location"
+      );
+    }
     this.label = label;
     this.stopId = stopId;
-    this.lat = lat;
-    this.lng = lng;
+    this.coordinate = coordinate;
+    this.tripLocation = tripLocation;
   }
 
   public static GenericLocation fromStopId(FeedScopedId id) {
+    Objects.requireNonNull(id);
     return new GenericLocation(null, id, null, null);
   }
 
-  public static GenericLocation fromStopId(String name, String feedId, String stopId) {
-    return new GenericLocation(name, new FeedScopedId(feedId, stopId), null, null);
+  public static GenericLocation fromStopId(FeedScopedId id, @Nullable String label) {
+    Objects.requireNonNull(id);
+    return new GenericLocation(label, id, null, null);
+  }
+
+  /// Create a GenericLocation of a stop id with fallback coordinates if the id is not found.
+  public static GenericLocation fromStopIdWithFallback(
+    FeedScopedId id,
+    double lat,
+    double lng,
+    @Nullable String label
+  ) {
+    Objects.requireNonNull(id);
+    return new GenericLocation(label, id, new WgsCoordinate(lat, lng), null);
+  }
+
+  public static GenericLocation fromCoordinate(WgsCoordinate coordinate) {
+    return new GenericLocation(null, null, coordinate, null);
+  }
+
+  public static GenericLocation fromCoordinate(WgsCoordinate coordinate, @Nullable String label) {
+    return new GenericLocation(label, null, coordinate, null);
   }
 
   /**
@@ -65,22 +79,81 @@ public class GenericLocation {
    * inserting {@code null} values.
    */
   public static GenericLocation fromCoordinate(double lat, double lng) {
-    return new GenericLocation(null, null, lat, lng);
+    return new GenericLocation(null, null, new WgsCoordinate(lat, lng), null);
+  }
+
+  public static GenericLocation fromCoordinate(double lat, double lng, @Nullable String label) {
+    return new GenericLocation(label, null, new WgsCoordinate(lat, lng), null);
   }
 
   /**
-   * Returns this as a Coordinate object.
+   * Create a new location based on a trip location. See {@link #tripLocation}.
+   */
+  public static GenericLocation fromTripLocation(TripLocation tripLocation) {
+    return new GenericLocation(null, null, null, tripLocation);
+  }
+
+  public static GenericLocation fromTripLocation(
+    TripLocation tripLocation,
+    @Nullable String label
+  ) {
+    return new GenericLocation(label, null, null, tripLocation);
+  }
+
+  /**
+   * Coordinates of the location. These can be used by themselves or as a fallback if placeId is not
+   * found.
    */
   @Nullable
   public Coordinate getCoordinate() {
-    if (this.lat == null || this.lng == null) {
+    if (this.coordinate == null) {
       return null;
     }
-    return new Coordinate(this.lng, this.lat);
+    return coordinate.asJtsCoordinate();
   }
 
-  public boolean isSpecified() {
-    return stopId != null || (lat != null && lng != null);
+  /**
+   * Returns true if this location represents a position on-board a transit vehicle
+   * rather than a geographic location. On-board locations have no coordinates and
+   * are not linked to the street network.
+   */
+  public boolean isOnBoard() {
+    return tripLocation != null;
+  }
+
+  /**
+   * Coordinates of the location. These can be used by themselves or as a fallback if placeId is not
+   * found.
+   */
+  @Nullable
+  public WgsCoordinate wgsCoordinate() {
+    return coordinate;
+  }
+
+  /**
+   * Refers to a specific element in the OTP model. This can currently be a regular stop, area stop,
+   * group stop, station, multi-modal station or group of stations.
+   */
+  @Nullable
+  public FeedScopedId stopId() {
+    return stopId;
+  }
+
+  /**
+   * When set, the location is on-board a specific trip.
+   */
+  @Nullable
+  public TripLocation tripLocation() {
+    return tripLocation;
+  }
+
+  /**
+   * A label for the place, if provided. This is pass-through information and does not affect
+   * routing in any way.
+   */
+  @Nullable
+  public String label() {
+    return label;
   }
 
   @Override
@@ -92,28 +165,27 @@ public class GenericLocation {
     return (
       Objects.equals(label, that.label) &&
       Objects.equals(stopId, that.stopId) &&
-      Objects.equals(lat, that.lat) &&
-      Objects.equals(lng, that.lng)
+      Objects.equals(coordinate, that.coordinate) &&
+      Objects.equals(tripLocation, that.tripLocation)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, stopId, lat, lng);
+    return Objects.hash(label, stopId, coordinate, tripLocation);
   }
 
   @Override
   public String toString() {
-    if (UNKNOWN.equals(this)) {
-      return "Unknown location";
-    }
-
     ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();
     if (StringUtils.hasValue(label)) {
       buf.addText(label).addText(" ");
     }
     buf.addObj(stopId);
-    buf.addCoordinate(lat, lng);
+    if (coordinate != null) {
+      buf.addCoordinate(coordinate.latitude(), coordinate.longitude());
+    }
+    buf.addObj(tripLocation);
     return buf.toString();
   }
 }

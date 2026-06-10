@@ -1,59 +1,44 @@
 package org.opentripplanner.ext.carpooling.constraints;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
 
 import java.time.Duration;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder;
+import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 
 class PassengerDelayConstraintsTest {
 
-  private PassengerDelayConstraints constraints;
+  private static final AtomicInteger STOP_COUNTER = new AtomicInteger(0);
+  private static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
 
-  @BeforeEach
-  void setup() {
-    constraints = new PassengerDelayConstraints();
+  private static CarpoolStop stopWithBudget(Duration budget) {
+    return CarpoolStop.of(FeedScopedId.ofNullable("TEST", "stop-" + STOP_COUNTER.incrementAndGet()))
+      .withCoordinate(new org.opentripplanner.street.geometry.WgsCoordinate(59.9, 10.7))
+      .withDeviationBudget(budget)
+      .build();
   }
 
   @Test
-  void satisfiesConstraints_noExistingStops_alwaysAccepts() {
-    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10) };
-
-    // Modified route with passenger inserted
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-    };
-
-    // Should accept - no existing passengers to protect
-    assertTrue(
-      constraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        1,
-        2
-      )
-    );
-  }
-
-  @Test
-  void satisfiesConstraints_delayWellUnderThreshold_accepts() {
-    // Original timings: 0min -> 5min -> 15min
+  void satisfiesConstraints_delayWellUnderBudget_accepts() {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(5), Duration.ofMinutes(15) };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Modified route: boarding -> pickup -> stop1 -> dropoff -> alighting
-    // Timings: 0min -> 3min -> 7min -> 12min -> 17min
-    // Stop1 delay: 7min - 5min = 2min (well under 5min threshold)
+    // Stop1 delay: 7min - 5min = 2min (within 5min budget)
+    // Destination delay: 17min - 15min = 2min (within 5min budget)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
@@ -62,23 +47,26 @@ class PassengerDelayConstraintsTest {
     };
 
     assertTrue(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
     );
   }
 
   @Test
-  void satisfiesConstraints_delayExactlyAtThreshold_accepts() {
-    // Original route with one stop
+  void satisfiesConstraints_delayExactlyAtBudget_accepts() {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Modified route where stop1 is delayed by exactly 5 minutes
-    // Timings: 0min -> 5min -> 15min -> 20min -> 25min
-    // Stop1 delay: 15min - 10min = 5min (exactly at threshold)
+    // Stop1 delay: 15min - 10min = 5min (exactly at 5min budget)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
@@ -87,23 +75,26 @@ class PassengerDelayConstraintsTest {
     };
 
     assertTrue(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
     );
   }
 
   @Test
-  void satisfiesConstraints_delayOverThreshold_rejects() {
-    // Original route with one stop
+  void satisfiesConstraints_delayOverBudget_rejects() {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Modified route where stop1 is delayed by 6 minutes (over 5min threshold)
-    // Timings: 0min -> 5min -> 16min -> 21min -> 26min
-    // Stop1 delay: 16min - 10min = 6min (exceeds threshold)
+    // Stop1 delay: 16min - 10min = 6min (exceeds 5min budget)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
@@ -112,29 +103,62 @@ class PassengerDelayConstraintsTest {
     };
 
     assertFalse(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
     );
   }
 
   @Test
-  void satisfiesConstraints_multipleStops_oneOverThreshold_rejects() {
-    // Original route: boarding -> stop1 -> stop2 -> alighting
+  void satisfiesConstraints_destinationOverBudget_rejects() {
+    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(Duration.ofMinutes(20)),
+      stopWithBudget(FIVE_MINUTES)
+    );
+
+    // Stop1 delay: 12min - 10min = 2min (within 20min budget)
+    // Destination delay: 27min - 20min = 7min (exceeds 5min budget)
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+    };
+
+    assertFalse(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        1,
+        3,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_multipleStops_oneOverBudget_rejects() {
     Duration[] originalTimes = {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
       Duration.ofMinutes(30),
     };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Modified route where stop1 is ok (3min delay) but stop2 exceeds (7min delay)
-    // Timings: 0min -> 5min -> 13min -> 18min -> 27min -> 32min
-    // Stop1 delay: 13min - 10min = 3min ✓
-    // Stop2 delay: 27min - 20min = 7min ✗
+    // Stop1 delay: 13min - 10min = 3min ok
+    // Stop2 delay: 27min - 20min = 7min exceeds
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
@@ -144,181 +168,61 @@ class PassengerDelayConstraintsTest {
     };
 
     assertFalse(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
-      )
-    );
-  }
-
-  @Test
-  void satisfiesConstraints_multipleStops_allUnderThreshold_accepts() {
-    // Original route: boarding -> stop1 -> stop2 -> alighting
-    Duration[] originalTimes = {
-      Duration.ZERO,
-      Duration.ofMinutes(10),
-      Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
-
-    // Modified route where both stops have acceptable delays
-    // Timings: 0min -> 5min -> 12min -> 17min -> 24min -> 34min
-    // Stop1 delay: 12min - 10min = 2min ✓
-    // Stop2 delay: 24min - 20min = 4min ✓
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
-
-    assertTrue(
-      constraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        1,
-        3
-      )
-    );
-  }
-
-  @Test
-  void satisfiesConstraints_passengerBeforeAllStops_checksAllStops() {
-    // Original route: boarding -> stop1 -> stop2 -> alighting
-    Duration[] originalTimes = {
-      Duration.ZERO,
-      Duration.ofMinutes(10),
-      Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
-
-    // Passenger inserted at very beginning (pickup at 1, dropoff at 2)
-    // Modified: boarding -> pickup -> dropoff -> stop1 -> stop2 -> alighting
-    // Mapping: stop1 (orig 1) -> mod 3, stop2 (orig 2) -> mod 4
-    // Timings: 0min -> 3min -> 5min -> 13min -> 24min -> 34min
-    // Stop1 delay: 13min - 10min = 3min ✓
-    // Stop2 delay: 24min - 20min = 4min ✓
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
-
-    assertTrue(
-      constraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        1,
-        2
-      )
-    );
-  }
-
-  @Test
-  void satisfiesConstraints_passengerAfterAllStops_checksAllStops() {
-    // Original route: boarding -> stop1 -> stop2 -> alighting
-    Duration[] originalTimes = {
-      Duration.ZERO,
-      Duration.ofMinutes(10),
-      Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
-
-    // Passenger inserted at very end (pickup at 3, dropoff at 4)
-    // Modified: boarding -> stop1 -> stop2 -> pickup -> dropoff -> alighting
-    // Mapping: stop1 (orig 1) -> mod 1, stop2 (orig 2) -> mod 2
-    // Even though passenger comes after, routing to pickup might cause delays
-    // Timings: 0min -> 11min -> 22min -> 27min -> 30min -> 40min
-    // Stop1 delay: 11min - 10min = 1min ✓
-    // Stop2 delay: 22min - 20min = 2min ✓
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
-
-    assertTrue(
-      constraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
         3,
-        4
+        stops
       )
     );
   }
 
   @Test
-  void satisfiesConstraints_passengerBetweenStops_checksAllStops() {
-    // Original route: boarding -> stop1 -> stop2 -> alighting
+  void satisfiesConstraints_multipleStops_allUnderBudget_accepts() {
     Duration[] originalTimes = {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
       Duration.ofMinutes(30),
     };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Passenger inserted between stops (pickup at 2, dropoff at 3)
-    // Modified: boarding -> stop1 -> pickup -> dropoff -> stop2 -> alighting
-    // Mapping: stop1 (orig 1) -> mod 1, stop2 (orig 2) -> mod 4
-    // Timings: 0min -> 11min -> 14min -> 17min -> 24min -> 34min
-    // Stop1 delay: 11min - 10min = 1min ✓
-    // Stop2 delay: 24min - 20min = 4min ✓
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        2,
-        3
-      )
-    );
-  }
-
-  @Test
-  void customMaxDelay_acceptsWithinCustomThreshold() {
-    var customConstraints = new PassengerDelayConstraints(Duration.ofMinutes(10));
-
-    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
-
-    // Stop1 delayed by 8 minutes (within 10min custom threshold)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(13)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
-
-    assertTrue(
-      customConstraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
     );
   }
 
   @Test
-  void customMaxDelay_rejectsOverCustomThreshold() {
-    var customConstraints = new PassengerDelayConstraints(Duration.ofMinutes(2));
-
+  void satisfiesConstraints_differentBudgetsPerStop() {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    // Stop 1 has 2min budget, destination has 10min budget
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(Duration.ofMinutes(2)),
+      stopWithBudget(Duration.ofMinutes(10))
+    );
 
-    // Stop1 delayed by 3 minutes (over 2min custom threshold)
+    // Stop1 delay: 13min - 10min = 3min (exceeds 2min budget)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
@@ -327,90 +231,25 @@ class PassengerDelayConstraintsTest {
     };
 
     assertFalse(
-      customConstraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
-    );
-  }
-
-  @Test
-  void customMaxDelay_zeroTolerance_rejectsAnyDelay() {
-    var strictConstraints = new PassengerDelayConstraints(Duration.ZERO);
-
-    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
-
-    // Stop1 delayed by even 1 second
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
-
-    assertFalse(
-      strictConstraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        1,
-        3
-      )
-    );
-  }
-
-  @Test
-  void customMaxDelay_veryPermissive_acceptsLargeDelays() {
-    var permissiveConstraints = new PassengerDelayConstraints(Duration.ofHours(1));
-
-    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
-
-    // Stop1 delayed by 30 minutes (well within 1 hour threshold)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
-
-    assertTrue(
-      permissiveConstraints.satisfiesConstraints(
-        originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
-        1,
-        3
-      )
-    );
-  }
-
-  @Test
-  void getMaxDelay_returnsConfiguredValue() {
-    assertEquals(Duration.ofMinutes(5), constraints.getMaxDelay());
-
-    var customConstraints = new PassengerDelayConstraints(Duration.ofMinutes(10));
-    assertEquals(Duration.ofMinutes(10), customConstraints.getMaxDelay());
-  }
-
-  @Test
-  void defaultMaxDelay_isFiveMinutes() {
-    assertEquals(Duration.ofMinutes(5), PassengerDelayConstraints.DEFAULT_MAX_DELAY);
-  }
-
-  @Test
-  void constructor_negativeDelay_throwsException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new PassengerDelayConstraints(Duration.ofMinutes(-1))
     );
   }
 
   @Test
   void satisfiesConstraints_noDelay_accepts() {
-    // Route where insertion doesn't add any delay
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Modified route where stop1 arrives at exactly the same time
-    // (perfect routing somehow)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
@@ -419,51 +258,269 @@ class PassengerDelayConstraintsTest {
     };
 
     assertTrue(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
         1,
-        3
+        3,
+        stops
       )
     );
   }
 
   @Test
-  void satisfiesConstraints_tripWithManyStops_checksAll() {
-    // Original route with 5 stops
+  void satisfiesConstraints_zeroBudget_rejectsAnyDelay() {
+    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ZERO)
+    );
+
+    // Stop1 delay: 10min + 1s - 10min = 1s (exceeds zero budget)
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    };
+
+    assertFalse(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        1,
+        3,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_zeroBudget_noDelay_accepts() {
+    var stops = List.of(
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ZERO)
+    );
+
+    // Use the same GraphPaths to derive both original and modified times
+    // so there is truly zero delay (avoids rounding from GraphPath construction)
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    };
+    Duration[] cumulativeDurations = calculateCumulativeDurations(modifiedSegments, Duration.ZERO);
+
+    // originalTimes = modified times at the original stop positions
+    // With pickup=1, dropoff=3: original indices [0,1,2] map to modified [0,2,4]
+    Duration[] originalTimes = {
+      cumulativeDurations[0],
+      cumulativeDurations[2],
+      cumulativeDurations[4],
+    };
+
+    assertTrue(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        cumulativeDurations,
+        1,
+        3,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_largeBudget_acceptsLargeDelay() {
+    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    var stops = List.of(
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ofHours(1)),
+      stopWithBudget(Duration.ofHours(1))
+    );
+
+    // Stop1 delay: 40min - 10min = 30min (within 60min budget)
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    };
+
+    assertTrue(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        1,
+        3,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_tightAndPermissiveStops_respectsEachBudget() {
+    Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
+    // Stop 1 is strict (3min), destination is permissive (30min)
+    var stops = List.of(
+      stopWithBudget(Duration.ZERO),
+      stopWithBudget(Duration.ofMinutes(3)),
+      stopWithBudget(Duration.ofMinutes(30))
+    );
+
+    // Stop1 delay: 12min - 10min = 2min (within 3min budget, ok)
+    // Destination delay: 47min - 20min = 27min (within 30min budget, ok)
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(30)),
+    };
+
+    assertTrue(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        1,
+        3,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_passengerBeforeAllStops_checksAllStops() {
     Duration[] originalTimes = {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
       Duration.ofMinutes(30),
-      Duration.ofMinutes(40),
-      Duration.ofMinutes(50),
-      Duration.ofMinutes(60),
     };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
 
-    // Insert passenger between stop2 and stop3 (positions 3, 4)
-    // All stops should have delays <= 5 minutes
-    // Modified indices: 0,1,2,pickup@3,dropoff@4,3,4,5,6
-    // Note: With real State objects, durations will be slightly longer due to rounding
-    // (typically 1-3 seconds per path). We use slightly shorter durations to ensure
-    // the cumulative delays stay within the 5-minute threshold.
+    // Passenger inserted at very beginning (pickup at 1, dropoff at 2)
+    // Stop1 delay: 13min - 10min = 3min ok
+    // Stop2 delay: 24min - 20min = 4min ok
+    // Destination delay: 36min - 30min = 6min exceeds 5min budget
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
+    };
+
+    assertFalse(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        1,
+        2,
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_nonZeroStopDuration_countsDwellAtIntermediateStops() {
+    // Uses a non-zero stopDuration to verify dwell at intermediate stops is included in the
+    // budget check. The modified route has 2 extra dwells vs. the baseline (4 segments vs. 2),
+    // which alone accounts for 2 of the 6-minute destination delay that pushes it over budget.
+    Duration stopDuration = Duration.ofMinutes(1);
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
+
+    // Baseline: 2 segments of 10min. With 1-min dwell: cumulative = [0, 10, 21]
+    GraphPath<State, Edge, Vertex>[] baselineSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
+    Duration[] originalTimes = calculateCumulativeDurations(baselineSegments, stopDuration);
+
+    // Modified (pickup=1, dropoff=3): 4 segments of 6min. With 1-min dwell: cumulative = [0, 6, 13, 20, 27]
+    // Destination delay: 27 - 21 = 6min, exceeds 5min budget.
+    GraphPath<State, Edge, Vertex>[] overBudgetSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+    };
+
+    assertFalse(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(overBudgetSegments, stopDuration),
+        1,
+        3,
+        stops
+      )
+    );
+
+    // Shortening one segment to 5min: cumulative = [0, 6, 12, 19, 26]
+    // Destination delay: 26 - 21 = 5min, exactly at budget → accepts.
+    GraphPath<State, Edge, Vertex>[] atBudgetSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+    };
 
     assertTrue(
-      constraints.satisfiesConstraints(
+      PassengerDelayConstraints.satisfiesConstraints(
         originalTimes,
-        calculateCumulativeDurations(modifiedSegments),
+        calculateCumulativeDurations(atBudgetSegments, stopDuration),
+        1,
         3,
-        4
+        stops
+      )
+    );
+  }
+
+  @Test
+  void satisfiesConstraints_passengerBetweenStops_checksAllStops() {
+    Duration[] originalTimes = {
+      Duration.ZERO,
+      Duration.ofMinutes(10),
+      Duration.ofMinutes(20),
+      Duration.ofMinutes(30),
+    };
+    var stops = List.of(
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES),
+      stopWithBudget(FIVE_MINUTES)
+    );
+
+    // Passenger inserted between stops (pickup at 2, dropoff at 3)
+    // Stop1 delay: 11min - 10min = 1min ok
+    // Stop2 delay: 24min - 20min = 4min ok
+    // Destination delay: 36min - 30min = 6min exceeds 5min budget
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
+    };
+
+    assertFalse(
+      PassengerDelayConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments, Duration.ZERO),
+        2,
+        3,
+        stops
       )
     );
   }

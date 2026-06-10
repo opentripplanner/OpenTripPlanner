@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -24,12 +23,13 @@ import org.opentripplanner.ext.flex.template.FlexServiceDate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -39,6 +39,7 @@ import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class FlexRouter {
@@ -53,7 +54,7 @@ public class FlexRouter {
   private final FlexIndex flexIndex;
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
-  private final GraphPathToItineraryMapper graphPathToItineraryMapper;
+  private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final FlexAccessEgressCallbackAdapter callbackService;
 
   /* Request data */
@@ -89,7 +90,7 @@ public class FlexRouter {
       transitService.getCalendarService()::getServiceDatesForServiceId
     );
     this.callbackService = new CallbackAdapter();
-    this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+    this.streetPathToLegsMapper = new StreetPathToLegsMapper(
       new TransitServiceResolver(transitService),
       transitService.getTimeZone(),
       graph.streetNotesService,
@@ -143,13 +144,10 @@ public class FlexRouter {
 
     for (DirectFlexPath it : directFlexPaths) {
       var startTime = startOfTime.plusSeconds(it.startTime());
-      var itinerary = graphPathToItineraryMapper
-        .generateItinerary(new GraphPath<>(it.state()), request)
-        .withTimeShiftToStartAt(startTime);
-
-      if (itinerary != null) {
-        itineraries.add(itinerary);
-      }
+      var path = new StreetPath(it.state());
+      var legs = streetPathToLegsMapper.map(path, request, startTime);
+      var itinerary = LegsToItineraryMapper.map(legs, false, path.calculateElevations());
+      itinerary.ifPresent(itineraries::add);
     }
     return itineraries;
   }
@@ -242,8 +240,8 @@ public class FlexRouter {
     }
 
     @Override
-    public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
-      return flexIndex.getFlexTripsByStop(stopLocation);
+    public Collection<FlexTrip<?, ?>> getFlexTripsByStopId(FeedScopedId stopLocationId) {
+      return flexIndex.getFlexTripsByStopId(stopLocationId);
     }
 
     @Override

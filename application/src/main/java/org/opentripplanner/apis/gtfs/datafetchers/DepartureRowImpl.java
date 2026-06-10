@@ -9,7 +9,7 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.place.api.PatternAtStop;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;

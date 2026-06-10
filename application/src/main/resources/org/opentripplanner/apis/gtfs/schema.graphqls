@@ -635,6 +635,42 @@ type FareProductUse {
           id: "single-ticket"  // product id
           name: "Single Ticket"
   ```
+    
+  ### Example: Combination of single tickets and day passes
+    
+  If you have two legs and it's possible to either buy singles or use a day pass, you will
+  have a combination of identical and different `FareProductUse.id`s.
+    
+  **Illustration**
+  ```yaml
+  itinerary:
+    leg1:
+      fareProducts:
+        # fare product use for day pass
+        id: "AAA" // id of a FareProductUse instance, not product id
+          product:
+            id: "single-ticket" // product id
+            name: "Single Ticket"
+    
+        # fare product use for single ticket
+        id: "CCC" // identical to leg2. the passenger needs to buy ONE day pass, not two.
+          product:
+            id: "day-pass"  // product id
+            name: "Day Pass"
+    leg2:
+      fareProducts:
+        id: "BBB" // different to leg1. the passenger needs to buy two single tickets.
+          product:
+            id: "single-ticket"  // product id
+            name: "Single Ticket"
+    
+        id: "CCC" // identical to leg1. the passenger needs to buy ONE day pass, not two.
+          product:
+            id: "day-pass"  // product id
+            name: "Day Pass"
+  ```
+  **It is the responsibility of the API consumers to display the day pass as a product for the
+  entire itinerary rather than two day passes!**
   """
   id: String!
   "The purchasable fare product"
@@ -654,6 +690,8 @@ type Feed {
   feedId: String!
   "The publisher of the input transit data."
   publisher: FeedPublisher
+  "The version of the dataset."
+  version: String
 }
 
 "Feed publisher information"
@@ -1062,7 +1100,11 @@ type Pattern implements Node {
   same, even if their ids have changed.
   """
   semanticHash: String
-  "List of stops served by this pattern"
+  """
+  List of stops in order in which they are visited by this pattern.
+    
+  If a stop is visited more than once, it will appear several times.
+  """
   stops: [Stop!]
   "Trips which run on this pattern"
   trips: [Trip!]
@@ -1750,7 +1792,7 @@ type QueryType {
     If the value is set to be 0, safety is ignored. Default is 1.0.
     """
     walkSafetyFactor: Float,
-    "Max walk speed along streets, in meters per second. Default value: 1.33"
+    "Max walk speed along streets, in meters per second. Default value: 1.35"
     walkSpeed: Float,
     "Whether the itinerary must be wheelchair accessible. Default value: false"
     wheelchair: Boolean
@@ -3830,6 +3872,16 @@ enum RelativeDirection {
   UTURN_RIGHT
 }
 
+"How does a trip's replacement feature affect whether a it is considered for use in routing?"
+enum ReplacementRequirement {
+  "Consider all trips ignoring their replacement feature."
+  FEATURE_IGNORED
+  "Only consider trips which don't have the replacement feature."
+  FORBIDDEN
+  "Only consider trips which have the replacement feature."
+  REQUIRED
+}
+
 "Entities that are relevant for routes that can contain alerts"
 enum RouteAlertType {
   "Alerts affecting the route's agency."
@@ -3857,6 +3909,12 @@ enum RoutingErrorCode {
   question.
   """
   LOCATION_NOT_FOUND
+  """
+  No usable itineraries were found for the requested direct mode (e.g. walking, cycling, car, flex)
+  and no transit modes were included in the search. This is returned both when no route exists and
+  when routes were found but didn't pass quality filters.
+  """
+  NO_DIRECT_MODE_CONNECTION
   """
   No stops are reachable from the start or end locations specified.
     
@@ -4505,6 +4563,18 @@ input InputUnpreferred {
   useUnpreferredRoutesPenalty: Int @deprecated(reason : "Use unpreferredCost instead")
 }
 
+"""
+A generalized linear cost function that can be applied to a cost value.
+The coefficient is used to scale the input Cost linearly and the constant is used
+to add a fixed offset. If we assume a cost c, then f(c) = coefficient * c + constant.
+"""
+input LinearCostFunctionInput {
+  "The coefficient that scales the Cost input linearly."
+  coefficient: Float!
+  "The 0th degree constant of the function as a Cost, must be a non-negative integer"
+  constant: Cost!
+}
+
 "Filters an entity by a date range."
 input LocalDateRangeInput {
   """
@@ -4737,6 +4807,19 @@ input PlanTransitModePreferenceInput {
   cost: TransitModePreferenceCostInput
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
+  """
+  If present and not null, further limits the transit mode selection.  A transit trip matches
+  a PlanTransitModePreferenceInput if the mandatory TransitMode field mode matches. If replacement
+  is REQUIRED, the trip must also be a replacement. If replacement is FORBIDDEN,
+  the trip must not be a replacement. If replacement is FEATURE_IGNORED or missing, it
+  does not matter if the trip is a replacement or not. Whether a leg is a replacement is recognized
+  both by the NeTEx submode and the GTFS extended type, depending on the data source.
+  Note that a bus replacing a train has mode: BUS, replacement: true, so it matches a query with
+  mode: BUS, replacement: REQUIRED and mode: BUS, replacement: FEATURE_IGNORED, but it does not
+  match mode: TRAIN with any replacement options. So to get both trains and buses replacing them,
+  but no other buses, query [(mode: TRAIN), (mode: BUS, replacement: REQUIRED)].
+  """
+  replacement: ReplacementFilterInput
 }
 
 """
@@ -4763,7 +4846,9 @@ input PlanTransitModesInput {
   """
   Transit modes and reluctances associated with them. Each defined mode can be used in
   an itinerary but doesn't have to be. If direct search is not disabled, there can be an
-  itinerary without any transit legs. By default, all transit modes are usable.
+  itinerary without any transit legs. By default, all transit modes are usable. For a transit trip
+  to match PlanTransitModesInput, it must match one of the PlanTransitModePreferenceInputs given
+  in the field.
   """
   transit: [PlanTransitModePreferenceInput!]
 }
@@ -4804,6 +4889,12 @@ input PlanVisitViaLocationInput {
   It is enough to visit ONE of the locations listed.
   """
   stopLocationIds: [String!]
+}
+
+"Contains details on how to filter trips based on the replacement feature when considering them for routing."
+input ReplacementFilterInput {
+  "One of three choices: must be replacement, cannot be a replacement, can either be or not be a replacement"
+  requirement: ReplacementRequirement
 }
 
 "What criteria should be used when optimizing a scooter route."
@@ -5008,6 +5099,23 @@ input TransitPreferencesInput {
   an AND-condition.
   """
   filters: [TransitFilterInput!]
+  """
+  Relax generalized-cost when comparing itineraries with a different set of
+  transit-group-priorities. The groups are set server side for routes and
+  can not be configured in the API.
+    
+  This relaxes the comparison inside the routing engine for each stop-arrival. If two
+  paths have a different set of transit-group-priorities, then the generalized-cost
+  comparison is relaxed. The final set of paths are filtered through the normal
+  itinerary-filters.
+    
+  A relax-cost is used to increase the limit when comparing one cost to another cost
+  using a linear function applied to the generalized cost.
+  This is used to include more results into the result. A `coefficient=2.0` means a path (itinerary)
+  with twice as high cost as another one, is accepted. A `constant=300` means a "fixed"
+  constant is added to the limit.
+  """
+  relaxTransitGroupPriority: LinearCostFunctionInput
   "Preferences related to cancellations and real-time."
   timetable: TimetablePreferencesInput
   "Preferences related to transfers between transit vehicles (typically between stops)."

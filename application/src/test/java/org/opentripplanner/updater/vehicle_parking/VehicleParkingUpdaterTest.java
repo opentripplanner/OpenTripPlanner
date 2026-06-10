@@ -98,7 +98,7 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void updateVehicleParkingTest() {
-    var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
+    var vehiclePlaces = VehicleParkingSpaces.of().bicycleSpaces(1).build();
 
     var vehicleParkings = List.of(
       VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
@@ -117,7 +117,7 @@ class VehicleParkingUpdaterTest {
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
-    vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
+    vehiclePlaces = VehicleParkingSpaces.of().bicycleSpaces(2).build();
     vehicleParkings = List.of(
       VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
     );
@@ -171,7 +171,7 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void updateNotOperatingVehicleParkingTest() {
-    var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
+    var vehiclePlaces = VehicleParkingSpaces.of().bicycleSpaces(1).build();
 
     var vehicleParking = StreetModelForTest.vehicleParking()
       .availability(vehiclePlaces)
@@ -188,7 +188,7 @@ class VehicleParkingUpdaterTest {
     );
     assertVehicleParkingNotLinked();
 
-    vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
+    vehiclePlaces = VehicleParkingSpaces.of().bicycleSpaces(2).build();
 
     vehicleParking = StreetModelForTest.vehicleParking()
       .availability(vehiclePlaces)

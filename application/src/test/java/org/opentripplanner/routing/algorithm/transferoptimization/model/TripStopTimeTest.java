@@ -66,10 +66,7 @@ public class TripStopTimeTest {
 
   @Test
   public void createArrival() {
-    assertEquals(
-      "[2 10:00 BUS L31]",
-      TripStopTime.arrival(trip, stopTime(STOP_1, time("10:00"))).toString()
-    );
+    // Arrival at the first stop is not valid (cannot alight where the trip originates)
     assertEquals(
       "[5 10:05 BUS L31]",
       TripStopTime.arrival(trip, stopTime(STOP_2, time("10:05"))).toString()
@@ -90,10 +87,7 @@ public class TripStopTimeTest {
       "[5 10:06 BUS L31]",
       TripStopTime.departure(trip, stopTime(STOP_2, time("10:06"))).toString()
     );
-    assertEquals(
-      "[7 10:21 BUS L31]",
-      TripStopTime.departure(trip, stopTime(STOP_3, time("10:21"))).toString()
-    );
+    // Departure at the last stop is not valid (cannot board where the trip terminates)
   }
 
   @Test

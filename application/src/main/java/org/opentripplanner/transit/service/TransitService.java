@@ -122,6 +122,8 @@ public interface TransitService {
 
   /**
    * Return the routes using the given stop, not including real-time updates.
+   * This includes area stops and resolution of members of group stops - if a trip visits a group
+   * stop, all member stops are considered visited, too.
    */
   Set<Route> findRoutes(StopLocation stop);
 
@@ -238,12 +240,12 @@ public interface TransitService {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                  Stop object to perform the search for
-   * @param startTime             Start time for the search.
-   * @param timeRange             Searches forward for timeRange from startTime
-   * @param numberOfDeparturesPerPattern    Number of departures to fetch per pattern
-   * @param arrivalDeparture      Filter by arrivals, departures, or both
-   * @param includeCancelledTrips If true, cancelled trips will also be included in result.
+   * @param stop                         Stop object to perform the search for
+   * @param startTime                    Start time for the search.
+   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
+   * @param arrivalDeparture             Filter by arrivals, departures, or both
+   * @param includeCancelledTrips        If true, cancelled trips will also be included in result.
    */
   List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
@@ -276,15 +278,16 @@ public interface TransitService {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop                 Stop object to perform the search for
-   * @param pattern              Pattern object to perform the search for
-   * @param startTime            Start time for the search.
-   * @param timeRange            Searches forward for timeRange from startTime
-   * @param numberOfDeparturesPerPattern   Number of departures to fetch per pattern
-   * @param arrivalDeparture     Filter by arrivals, departures, or both
-   * @param includeCancellations If the result should include those trip times where either the entire
-   *                             trip or the stop at the given stop location has been cancelled.
-   *                             Deleted trips are never returned no matter the value of this parameter.
+   * @param stop                         Stop object to perform the search for
+   * @param pattern                      Pattern object to perform the search for
+   * @param startTime                    Start time for the search.
+   * @param timeRange                    Searches forward for timeRange from startTime
+   * @param numberOfDeparturesPerPattern Number of departures to fetch per pattern
+   * @param arrivalDeparture             Filter by arrivals, departures, or both
+   * @param includeCancellations         If the result should include those trip times where either
+   *                                     the entire trip or the stop at the given stop location has
+   *                                     been cancelled. Deleted trips are never returned no matter
+   *                                     the value of this parameter.
    */
   List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,

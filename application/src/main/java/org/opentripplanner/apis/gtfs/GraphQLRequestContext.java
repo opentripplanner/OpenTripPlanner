@@ -1,10 +1,11 @@
 package org.opentripplanner.apis.gtfs;
 
 import graphql.schema.GraphQLSchema;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -21,7 +22,8 @@ public record GraphQLRequestContext(
   VehicleParkingService vehicleParkingService,
   RealtimeVehicleService realTimeVehicleService,
   GraphQLSchema schema,
-  GraphFinder graphFinder,
+  NearbyPlaceFinder nearbyPlaceFinder,
+  NearbyStopFinder nearbyStopFinder,
   RouteRequest defaultRouteRequest
 ) {
   public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
@@ -34,7 +36,8 @@ public record GraphQLRequestContext(
       context.vehicleParkingService(),
       context.realtimeVehicleService(),
       context.gtfsSchema(),
-      context.graphFinder(),
+      context.nearbyPlaceFinder(),
+      context.nearbyStopFinder(),
       context.defaultRouteRequest()
     );
   }

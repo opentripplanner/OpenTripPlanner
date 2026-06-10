@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -51,7 +51,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int tripIndex() {
+  public int tripScheduleIndex() {
     return candidateTripIndex;
   }
 

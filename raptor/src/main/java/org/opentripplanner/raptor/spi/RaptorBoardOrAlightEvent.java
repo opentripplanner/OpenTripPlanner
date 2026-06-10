@@ -1,10 +1,5 @@
 package org.opentripplanner.raptor.spi;
 
-import java.util.function.Consumer;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-
 /**
  * The purpose of the TripScheduleBoardAlight is to represent the board/alight for a given trip at a
  * specific stop. This is used as a result for the trip search, but may also be used in other
@@ -25,7 +20,7 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * <p>
    * If not found {@link RaptorConstants#NOT_FOUND} is returned.
    */
-  int tripIndex();
+  int tripScheduleIndex();
 
   /**
    * This i a reference to the trip found.
@@ -71,28 +66,6 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * to search using another way of boarding. The result is NOT empty if it is forbidden.
    */
   boolean empty();
-
-  /**
-   * This is a helper method for the Raptor implementation to be able to board or execute
-   * a alternativeBoardingFallback method depending on the event. This logic should ideally
-   * be put inside raptor, but due to performance(creating lambda instances, which for some
-   * reason is not inlined) this need to be here.
-   * <p>
-   * @param boardCallback perform boarding if the event in none empty (or some other special
-   *                      condition depending on the event, like boarding not allowed).
-   * @param alternativeBoardingFallback This is executed if it is allowed to board according to
-   *                                    this event and if the boarding event is empty.
-   */
-  default void boardWithFallback(
-    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
-  ) {
-    if (empty()) {
-      alternativeBoardingFallback.accept(this);
-    } else {
-      boardCallback.accept(this);
-    }
-  }
 
   /**
    * Create an empty event with the given {@code earliestBoardTime}.

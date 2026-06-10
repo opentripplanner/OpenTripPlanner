@@ -2,8 +2,6 @@ package org.opentripplanner.raptor.util.paretoset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -78,13 +76,5 @@ public class ParetoSetEventListenerTest {
     assertEquals(expRejected, listener.rejectedAsString());
     assertEquals(expDropped, listener.droppedAsString());
     listener.clear();
-  }
-
-  private String toString(List<TestVector> list) {
-    return list.stream().map(TestVector::toString).collect(Collectors.joining(" "));
-  }
-
-  private TestParetoSetEventListener<TestVector> eventListener() {
-    return new TestParetoSetEventListener<>();
   }
 }

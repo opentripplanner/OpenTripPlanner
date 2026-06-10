@@ -30,10 +30,6 @@ public class ExpectedList {
     return range(items.length - n, items.length);
   }
 
-  public String get(int index) {
-    return items[index];
-  }
-
   public String[] get(int... indexes) {
     return Arrays.stream(indexes)
       .mapToObj(i -> items[i])

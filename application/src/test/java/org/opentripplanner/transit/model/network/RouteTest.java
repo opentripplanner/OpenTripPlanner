@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -27,11 +28,11 @@ class RouteTest {
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
-  private static final Operator OPERATOR = Operator.of(FeedScopedId.parse("x:operatorId"))
+  private static final Operator OPERATOR = Operator.of(FeedScopedId.of("x", "operatorId"))
     .withName("operator name")
     .build();
 
-  private static final Branding BRANDING = Branding.of(FeedScopedId.parse("x:brandingId")).build();
+  private static final Branding BRANDING = Branding.of(FeedScopedId.of("x", "brandingId")).build();
   private static final String COLOR = "color";
   private static final String TEXT_COLOR = "text color";
   private static final int GTFS_TYPE = 0;
@@ -39,7 +40,7 @@ class RouteTest {
   private static final Integer GTFS_SORT_ORDER = 0;
   private static final String URL = "url";
   public static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
-  private static final Route SUBJECT = Route.of(TimetableRepositoryForTest.id(ID))
+  private static final Route SUBJECT = Route.of(FeedScopedIdForTestFactory.id(ID))
     .withShortName(SHORT_NAME)
     .withLongName(LONG_NAME)
     .withDescription(DESCRIPTION)
@@ -94,7 +95,7 @@ class RouteTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withShortName("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withLongName(new NonLocalizedString("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withDescription("X").build()));
@@ -105,7 +106,7 @@ class RouteTest {
       SUBJECT.sameAs(
         SUBJECT.copy()
           .withOperator(
-            Operator.of(FeedScopedId.parse("x:otherOperatorId"))
+            Operator.of(FeedScopedId.of("x", "otherOperatorId"))
               .withName("other operator name")
               .build()
           )
@@ -118,7 +119,7 @@ class RouteTest {
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()
-          .withBranding(Branding.of(FeedScopedId.parse("x:otherBrandingId")).build())
+          .withBranding(Branding.of(FeedScopedId.of("x", "otherBrandingId")).build())
           .build()
       )
     );

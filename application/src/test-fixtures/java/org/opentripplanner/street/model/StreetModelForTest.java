@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model;
 
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -142,7 +142,7 @@ public class StreetModelForTest {
   }
 
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
-    return VehicleParking.builder().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
+    return VehicleParking.of().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
   }
 
   static class GraphBuilder {

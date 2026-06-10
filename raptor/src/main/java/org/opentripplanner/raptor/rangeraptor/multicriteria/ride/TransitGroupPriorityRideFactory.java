@@ -1,0 +1,58 @@
+package org.opentripplanner.raptor.rangeraptor.multicriteria.ride;
+
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+
+/**
+ * This factory creates new {@link AbstractPatternRide}s and merge in transit-group-priority ids
+ * into c2.
+ */
+public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
+  implements PatternRideFactory<T, PatternRideC2<T>> {
+
+  private int currentPatternGroupPriority;
+  private final RaptorTransitGroupPriorityCalculator transitGroupPriorityCalculator;
+
+  public TransitGroupPriorityRideFactory(
+    RaptorTransitGroupPriorityCalculator transitGroupPriorityCalculator
+  ) {
+    this.transitGroupPriorityCalculator = transitGroupPriorityCalculator;
+  }
+
+  @Override
+  public PatternRideC2<T> createPatternRide(
+    McStopArrival<T> prevArrival,
+    int boardStopIndex,
+    int boardPos,
+    int boardTime,
+    int boardCost1,
+    int relativeC1,
+    T trip
+  ) {
+    return new PatternRideC2<>(
+      prevArrival,
+      boardStopIndex,
+      boardPos,
+      boardTime,
+      boardCost1,
+      relativeC1,
+      calculateC2(prevArrival.c2()),
+      trip.tripSortIndex(),
+      trip
+    );
+  }
+
+  @Override
+  public void prepareForTransitWith(RaptorTripPattern pattern) {
+    this.currentPatternGroupPriority = pattern.priorityGroupId();
+  }
+
+  /**
+   * Currently transit-group-priority is the only usage of c2
+   */
+  private int calculateC2(int c2) {
+    return transitGroupPriorityCalculator.mergeInGroupId(c2, currentPatternGroupPriority);
+  }
+}

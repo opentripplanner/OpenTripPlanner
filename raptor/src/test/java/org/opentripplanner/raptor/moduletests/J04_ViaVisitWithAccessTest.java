@@ -7,7 +7,6 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor.api.request.RaptorViaLocation.via;
 
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +17,8 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 
 /**
  * FEATURE UNDER TEST
@@ -54,8 +52,6 @@ class J04_ViaVisitWithAccessTest {
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
       .timetable(true);
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   @Test
@@ -173,9 +169,9 @@ class J04_ViaVisitWithAccessTest {
   }
 
   private static RaptorViaLocation viaStop(String label, int... stops) {
-    var builder = via(label);
+    var builder = RaptorViaLocation.viaVisit(label);
     for (int stop : stops) {
-      builder.addViaStop(stop);
+      builder.addStop(stop);
     }
     return builder.build();
   }

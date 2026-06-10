@@ -16,7 +16,7 @@ public class StopToStopTransfersTest extends GtfsTest {
 
   @Test
   public void test2d1() {
-    Itinerary itinerary = plan(+1388530860L, "2d1", "2d4", null, false, false, null, "", "", 2);
+    Itinerary itinerary = plan(+1388530860L, "2d1", "2d4", false, false, null, "", "", 2);
 
     Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 

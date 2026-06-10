@@ -115,6 +115,9 @@ public class AlertToLegMapper {
       !alert.displayDuring(leg.startTime().toEpochSecond(), leg.endTime().toEpochSecond())
     );
 
+    if (totalAlerts.isEmpty()) {
+      return leg;
+    }
     return leg.decorateWithAlerts(Set.copyOf(totalAlerts));
   }
 

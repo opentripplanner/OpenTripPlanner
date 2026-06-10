@@ -135,21 +135,6 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  void testReturningToClosedStation() {
-    initBicycleEdgeAndRequest(3, 3, true, true, true, false);
-
-    var s1 = rent();
-
-    assertFalse(State.isEmpty(s1));
-
-    initBicycleEdgeAndRequest(3, 3, true, false, true, false);
-
-    var s2 = dropOff(s1[0]);
-
-    assertTrue(State.isEmpty(s2));
-  }
-
-  @Test
   void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
     initBicycleEdgeAndRequest(3, 3, false, true, false, false);
 
@@ -446,10 +431,6 @@ class VehicleRentalEdgeTest {
 
   private State[] rentAndDropOff() {
     var s0 = singleState(vehicleRentalEdge.traverse(new State(vertex, request)));
-    return vehicleRentalEdge.traverse(s0);
-  }
-
-  private State[] dropOff(State s0) {
     return vehicleRentalEdge.traverse(s0);
   }
 

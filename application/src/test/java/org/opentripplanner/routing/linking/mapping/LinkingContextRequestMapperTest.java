@@ -15,8 +15,8 @@ import org.opentripplanner.street.model.StreetMode;
 
 class LinkingContextRequestMapperTest {
 
-  private static final GenericLocation FROM = new GenericLocation("from", null, 1.0, 0.0);
-  private static final GenericLocation TO = new GenericLocation("to", null, 0.0, 1.0);
+  private static final GenericLocation FROM = GenericLocation.fromCoordinate(1.0, 0.0, "from");
+  private static final GenericLocation TO = GenericLocation.fromCoordinate(0.0, 1.0, "to");
   private static final List<ViaLocation> VIA = List.of(
     new VisitViaLocation("via", null, List.of(), WgsCoordinate.GREENWICH)
   );

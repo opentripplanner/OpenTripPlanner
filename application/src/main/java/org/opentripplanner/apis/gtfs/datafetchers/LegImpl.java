@@ -206,8 +206,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
     return environment -> {
-      var state = getSource(environment).realTimeState();
-      return RealtimeStateMapper.map(state);
+      var leg = getSource(environment);
+      if (leg instanceof ScheduledTransitLeg stl) {
+        return RealtimeStateMapper.map(stl.tripTimes());
+      }
+      return null;
     };
   }
 

@@ -1,7 +1,8 @@
 package org.opentripplanner.graph_builder.services.ned;
 
-import java.io.File;
 import java.util.List;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.street.graph.Graph;
 
 /**
@@ -16,10 +17,10 @@ public interface NEDTileSource {
    * that this be somewhere permanent with plenty of disk space.  Don't use /tmp -- the downloading
    * process takes a long time and you don't want to repeat it if at all possible.
    */
-  void fetchData(Graph graph, File cacheDirectory);
+  void fetchData(Graph graph, CompositeDataSource cacheDir);
 
   /**
-   * Download all the NED tiles into the cache.
+   * Return all the NED tiles in the cache.
    */
-  List<File> getNEDTiles();
+  List<DataSource> getNEDTiles();
 }

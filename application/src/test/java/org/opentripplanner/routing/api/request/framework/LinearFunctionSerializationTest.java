@@ -27,13 +27,13 @@ class LinearFunctionSerializationTest {
       #        INPUT    ||       EXPECTED
       #                 ||  CONSTANT | COEFFICIENT
                  0+0t   ||       0s  |   0.0
-           1+0.0111 t   ||       1s  |   0.01
-        120 + 0.111 t   ||       2m  |   0.11
-        120 + 0.111 t   ||       2m  |   0.11
+           1+0.0111 t   ||       1s  |   0.0
+        120 + 0.111 t   ||       2m  |   0.1
+        120 + 0.111 t   ||       2m  |   0.1
            12.0 + 0 t   ||      12s  |   0.0
-       2h3m + 1.111 t   ||     2h3m  |   1.11
+       2h3m + 1.111 t   ||     2h3m  |   1.1
        2h3m + 2.111 t   ||     2h3m  |   2.1
-         3h + 5.111 t   ||       3h  |   5.1
+         3h + 5.111 t   ||       3h  |   5.0
           7m + 10.1 x   ||       7m  |  10.0
         PT7s + 10.1 x   ||       7s  |  10.0
         0.1 + 10.1 x   ||       0s  |  10.0
@@ -63,10 +63,10 @@ class LinearFunctionSerializationTest {
 
   @Test
   void serialize() {
-    assertEquals("0s + 0.00 t", LinearFunctionSerialization.serialize(Duration.ZERO, 0));
-    assertEquals("2m9s + 0.01 t", LinearFunctionSerialization.serialize(D2_h_9_s, 0.0111));
-    assertEquals("1h + 0.11 t", LinearFunctionSerialization.serialize(D1_h, 0.111));
-    assertEquals("1h + 1.11 t", LinearFunctionSerialization.serialize(D1_h, 1.111));
+    assertEquals("0s + 0.0 t", LinearFunctionSerialization.serialize(Duration.ZERO, 0));
+    assertEquals("2m9s + 0.0 t", LinearFunctionSerialization.serialize(D2_h_9_s, 0.0111));
+    assertEquals("1h + 0.1 t", LinearFunctionSerialization.serialize(D1_h, 0.111));
+    assertEquals("1h + 1.1 t", LinearFunctionSerialization.serialize(D1_h, 1.111));
     assertEquals("1h + 2.1 t", LinearFunctionSerialization.serialize(D1_h, 2.111));
   }
 

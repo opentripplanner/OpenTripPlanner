@@ -58,7 +58,7 @@ public class VisitViaLocation extends AbstractViaLocation {
     if (coordinate == null) {
       return null;
     }
-    return new GenericLocation(label(), null, coordinate.latitude(), coordinate.longitude());
+    return GenericLocation.fromCoordinate(coordinate.latitude(), coordinate.longitude(), label());
   }
 
   /**

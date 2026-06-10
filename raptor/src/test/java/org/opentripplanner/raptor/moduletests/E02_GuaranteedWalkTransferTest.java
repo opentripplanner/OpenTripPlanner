@@ -16,7 +16,6 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
-import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
@@ -78,8 +77,6 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer and a 30s walk leg, so any slack will do.
     data.withSlackProvider(new TestSlackProvider(D30_s, D20_s, D10_s));
-
-    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {

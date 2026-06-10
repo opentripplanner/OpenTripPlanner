@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.basic.Cost;
 
 class RouteRequestMapperCarTest {
@@ -122,7 +123,7 @@ class RouteRequestMapperCarTest {
       )
     );
     var allowedEnv = testCtx.executionContext(carArgs);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 

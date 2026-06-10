@@ -1,55 +1,42 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.IntSupplier;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
+/**
+ * Builder for {@link CarpoolStop} instances.
+ */
 public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, CarpoolStopBuilder> {
 
-  private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-  private final IntSupplier indexCounter;
-  private I18NString name;
-  private I18NString description;
-  private I18NString url;
   private WgsCoordinate coordinate;
-  private Geometry geometry;
 
-  private CarpoolStopType carpoolStopType;
   private ZonedDateTime expectedArrivalTime;
   private ZonedDateTime aimedArrivalTime;
+  private ZonedDateTime latestExpectedArrivalTime;
   private ZonedDateTime expectedDepartureTime;
   private ZonedDateTime aimedDepartureTime;
-  private int sequenceNumber;
-  private int passengerDelta;
+  private int onboardCount = CarpoolStop.DEFAULT_ONBOARD_COUNT;
 
-  CarpoolStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
+  private Duration deviationBudget = CarpoolStop.DEFAULT_DEVIATION_BUDGET;
+
+  CarpoolStopBuilder(FeedScopedId id) {
     super(id);
-    this.indexCounter = Objects.requireNonNull(indexCounter);
   }
 
   CarpoolStopBuilder(CarpoolStop original) {
     super(original);
-    this.indexCounter = original::getIndex;
-    // Optional fields
-    this.name = original.getName();
-    this.description = original.getDescription();
-    this.url = original.getUrl();
     this.coordinate = original.getCoordinate();
-    this.geometry = original.getGeometry();
-    this.sequenceNumber = original.getSequenceNumber();
-
-    this.carpoolStopType = original.getCarpoolStopType();
     this.expectedArrivalTime = original.getExpectedArrivalTime();
     this.aimedArrivalTime = original.getAimedArrivalTime();
+    this.latestExpectedArrivalTime = original.getLatestExpectedArrivalTime();
     this.expectedDepartureTime = original.getExpectedDepartureTime();
     this.aimedDepartureTime = original.getAimedDepartureTime();
-    this.passengerDelta = original.getPassengerDelta();
+    this.onboardCount = original.getOnboardCount();
+    this.deviationBudget = original.getDeviationBudget();
   }
 
   @Override
@@ -57,29 +44,8 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return new CarpoolStop(this);
   }
 
-  public CarpoolStopBuilder withName(I18NString name) {
-    this.name = name;
-    return this;
-  }
-
-  public CarpoolStopBuilder withDescription(I18NString description) {
-    this.description = description;
-    return this;
-  }
-
-  public CarpoolStopBuilder withUrl(I18NString url) {
-    this.url = url;
-    return this;
-  }
-
   public CarpoolStopBuilder withCoordinate(WgsCoordinate coordinate) {
     this.coordinate = coordinate;
-    this.geometry = toGeometry(coordinate);
-    return this;
-  }
-
-  public CarpoolStopBuilder withCarpoolStopType(CarpoolStopType carpoolStopType) {
-    this.carpoolStopType = carpoolStopType;
     return this;
   }
 
@@ -93,6 +59,11 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return this;
   }
 
+  public CarpoolStopBuilder withLatestExpectedArrivalTime(ZonedDateTime latestExpectedArrivalTime) {
+    this.latestExpectedArrivalTime = latestExpectedArrivalTime;
+    return this;
+  }
+
   public CarpoolStopBuilder withExpectedDepartureTime(ZonedDateTime expectedDepartureTime) {
     this.expectedDepartureTime = expectedDepartureTime;
     return this;
@@ -103,42 +74,27 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return this;
   }
 
-  public CarpoolStopBuilder withSequenceNumber(int sequenceNumber) {
-    this.sequenceNumber = sequenceNumber;
+  public CarpoolStopBuilder withOnboardCount(int onboardCount) {
+    this.onboardCount = onboardCount;
     return this;
   }
 
-  public CarpoolStopBuilder withPassengerDelta(int passengerDelta) {
-    this.passengerDelta = passengerDelta;
+  /**
+   * Sets the per-stop deviation budget. See {@link CarpoolStop#getDeviationBudget()} for the
+   * semantics of the value.
+   *
+   * @param deviationBudget remaining slack at this stop; must be non-null. Use
+   *                        {@link Duration#ZERO} for stops where no further deviation is
+   *                        acceptable (always for the trip origin).
+   * @throws NullPointerException if {@code deviationBudget} is null
+   */
+  public CarpoolStopBuilder withDeviationBudget(Duration deviationBudget) {
+    this.deviationBudget = Objects.requireNonNull(deviationBudget);
     return this;
-  }
-
-  int createIndex() {
-    return indexCounter.getAsInt();
-  }
-
-  public I18NString name() {
-    return name;
-  }
-
-  public I18NString description() {
-    return description;
-  }
-
-  public I18NString url() {
-    return url;
   }
 
   public WgsCoordinate coordinate() {
     return coordinate;
-  }
-
-  public Geometry geometry() {
-    return geometry;
-  }
-
-  public CarpoolStopType carpoolStopType() {
-    return carpoolStopType;
   }
 
   public ZonedDateTime expectedArrivalTime() {
@@ -149,6 +105,10 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return aimedArrivalTime;
   }
 
+  public ZonedDateTime latestExpectedArrivalTime() {
+    return latestExpectedArrivalTime;
+  }
+
   public ZonedDateTime expectedDepartureTime() {
     return expectedDepartureTime;
   }
@@ -157,15 +117,11 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
     return aimedDepartureTime;
   }
 
-  public int sequenceNumber() {
-    return sequenceNumber;
+  public int onboardCount() {
+    return onboardCount;
   }
 
-  public int passengerDelta() {
-    return passengerDelta;
-  }
-
-  private Geometry toGeometry(WgsCoordinate coordinate) {
-    return GEOMETRY_FACTORY.createPoint(coordinate.asJtsCoordinate());
+  public Duration deviationBudget() {
+    return deviationBudget;
   }
 }

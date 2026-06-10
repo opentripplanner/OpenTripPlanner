@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
 
 /**
  * This {@link FactorStrategy} keep a single value and use it every time the factor is needed. The
@@ -12,7 +12,7 @@ final class SingleValueFactorStrategy implements FactorStrategy {
 
   private final int factor;
 
-  SingleValueFactorStrategy(int factor) {
+  private SingleValueFactorStrategy(int factor) {
     this.factor = factor;
   }
 

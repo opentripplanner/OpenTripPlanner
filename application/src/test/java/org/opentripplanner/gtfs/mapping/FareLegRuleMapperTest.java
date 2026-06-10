@@ -15,9 +15,7 @@ import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.Timeframe;
-import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
-import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.Stops;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -37,15 +35,8 @@ class FareLegRuleMapperTest {
   private static List<TestCase> testCases() {
     return List.of(
       new TestCase(0, 1d, 10d, new Stops(1, 10)),
-      new TestCase(
-        1,
-        5000d,
-        10000d,
-        new LinearDistance(
-          Distance.ofKilometersBoxed(5d, ignore -> {}).orElse(null),
-          Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
-        )
-      ),
+      new TestCase(0, null, 8d, new Stops(0, 8)),
+      new TestCase(0, 2d, null, new Stops(2, Integer.MAX_VALUE)),
       new TestCase(null, null, null, null)
     );
   }
@@ -68,13 +59,13 @@ class FareLegRuleMapperTest {
     fp.setFareProductId(productId);
     var internalProduct = productMapper.map(fp);
 
-    final var obaRule = baseRule();
-    obaRule.setFareProductId(fp.getFareProductId());
-    obaRule.setDistanceType(tc.distanceType);
-    obaRule.setMinDistance(tc.minDistance);
-    obaRule.setMaxDistance(tc.maxDistance);
+    var rule = baseRule();
+    rule.setFareProductId(fp.getFareProductId());
+    rule.setDistanceType(tc.distanceType);
+    rule.setMinDistance(tc.minDistance);
+    rule.setMaxDistance(tc.maxDistance);
 
-    var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
+    var mappedRules = List.copyOf(ruleMapper.map(List.of(rule)));
     assertEquals(1, mappedRules.size());
 
     var otpRule = mappedRules.get(0);

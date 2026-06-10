@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 
 public record PrunedStopIsland(
@@ -55,11 +54,6 @@ public record PrunedStopIsland(
   @Override
   public int getPriority() {
     return island.streetSize() + island.stopSize();
-  }
-
-  @Override
-  public Vertex getReferencedVertex() {
-    return island.getRepresentativeVertex();
   }
 
   @Override

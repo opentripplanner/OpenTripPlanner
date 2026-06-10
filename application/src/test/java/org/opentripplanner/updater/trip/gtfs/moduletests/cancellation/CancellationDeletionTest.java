@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
@@ -18,7 +18,6 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
@@ -34,14 +33,14 @@ class CancellationDeletionTest implements RealtimeTestConstants {
 
   static List<Arguments> cases() {
     return List.of(
-      Arguments.of(ScheduleRelationship.CANCELED, RealTimeState.CANCELED),
-      Arguments.of(ScheduleRelationship.DELETED, RealTimeState.DELETED)
+      Arguments.of(ScheduleRelationship.CANCELED, true, false),
+      Arguments.of(ScheduleRelationship.DELETED, false, true)
     );
   }
 
   @ParameterizedTest
   @MethodSource("cases")
-  void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
+  void cancelledTrip(ScheduleRelationship relationship, boolean cancelled, boolean deleted) {
     var env = envBuilder
       .addTrip(
         TripInput.of(TRIP_1_ID)
@@ -58,7 +57,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     var schedule = env.tripData(TRIP_1_ID).scheduledTripTimes();
     assertNotSame(forToday, schedule);
 
-    assertEquals(state, forToday.getRealTimeState());
+    assertEquals(cancelled, forToday.isCanceled());
+    assertEquals(deleted, forToday.isDeleted());
     assertTrue(forToday.isCanceledOrDeleted());
   }
 
@@ -74,7 +74,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
    */
   @ParameterizedTest
   @MethodSource("cases")
-  void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
+  void cancelingAddedTrip(ScheduleRelationship relationship, boolean cancelled, boolean deleted) {
     // just to set the scheduling period
     var env = envBuilder
       .addTrip(
@@ -118,7 +118,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
       realtimeTripTimes,
       "Added trip should be found in time table for the service date"
     );
-    assertEquals(state, realtimeTripTimes.getRealTimeState());
+    assertEquals(cancelled, realtimeTripTimes.isCanceled());
+    assertEquals(deleted, realtimeTripTimes.isDeleted());
 
     var scheduledTripTimes = schedule.getTripTimes(id(addedTripId));
     assertNull(scheduledTripTimes, "Added trip should not be found in scheduled time table");

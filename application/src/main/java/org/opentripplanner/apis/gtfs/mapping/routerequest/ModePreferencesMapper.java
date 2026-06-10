@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.getTransitModes;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.getPlanTransitModes;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper.getStreetModeForRouting;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper.validateStreetModes;
 
@@ -11,13 +11,15 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.request.JourneyRequestBuilder;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
+import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -37,7 +39,7 @@ public class ModePreferencesMapper {
       journey.withDirect(new StreetRequest(StreetMode.NOT_SET));
     } else if (direct != null) {
       if (direct.isEmpty()) {
-        throw new IllegalArgumentException("Direct modes must not be empty.");
+        throw new InvalidInputException("Direct modes must not be empty.");
       }
       var streetModes = direct.stream().map(DirectModeMapper::map).toList();
       var rentalDuration = getRentalDurationByQueryArgs(args);
@@ -50,12 +52,12 @@ public class ModePreferencesMapper {
     } else if (transit == null) {
       // even if there are no transit modes set, we need to set the filter to get the route/agency
       // filters for flex
-      setTransitFilters(journey, MainAndSubMode.all(), args);
+      setTransitFilters(journey, NarrowedTransitMode.all(), args);
     } else {
       var access = transit.getGraphQLAccess();
       if (access != null) {
         if (access.isEmpty()) {
-          throw new IllegalArgumentException("Access modes must not be empty.");
+          throw new InvalidInputException("Access modes must not be empty.");
         }
         var streetModes = access.stream().map(AccessModeMapper::map).toList();
         journey.withAccess(new StreetRequest(getStreetModeForRouting(streetModes)));
@@ -64,7 +66,7 @@ public class ModePreferencesMapper {
       var egress = transit.getGraphQLEgress();
       if (egress != null) {
         if (egress.isEmpty()) {
-          throw new IllegalArgumentException("Egress modes must not be empty.");
+          throw new InvalidInputException("Egress modes must not be empty.");
         }
         var streetModes = egress.stream().map(EgressModeMapper::map).toList();
         journey.withEgress(new StreetRequest(getStreetModeForRouting(streetModes)));
@@ -73,7 +75,7 @@ public class ModePreferencesMapper {
       var transfer = transit.getGraphQLTransfer();
       if (transfer != null) {
         if (transfer.isEmpty()) {
-          throw new IllegalArgumentException("Transfer modes must not be empty.");
+          throw new InvalidInputException("Transfer modes must not be empty.");
         }
         var streetModes = transfer.stream().map(TransferModeMapper::map).toList();
         journey.withTransfer(new StreetRequest(getStreetModeForRouting(streetModes)));
@@ -82,27 +84,43 @@ public class ModePreferencesMapper {
       // TODO: This validation should be moved into the journey constructor (Feature Envy)
       validateStreetModes(journey.build());
 
-      var transitModes = getTransitModes(environment);
-      if (transitModes == null) {
+      var planTransitModes = getPlanTransitModes(environment);
+      if (planTransitModes == null) {
         // even when there are no transit modes set we need to set the filters because of the route/agency
         // includes/excludes
-        setTransitFilters(journey, MainAndSubMode.all(), args);
+        setTransitFilters(journey, NarrowedTransitMode.all(), args);
       } else {
-        if (transitModes.isEmpty()) {
-          throw new IllegalArgumentException("Transit modes must not be empty.");
+        if (planTransitModes.isEmpty()) {
+          throw new InvalidInputException("Transit modes must not be empty.");
         }
-        var mainAndSubModes = transitModes
-          .stream()
-          .map(mode ->
-            new MainAndSubMode(
-              TransitModeMapper.map(
-                GraphQLTypes.GraphQLTransitMode.valueOf((String) mode.get("mode"))
-              )
-            )
-          )
-          .toList();
-        setTransitFilters(journey, mainAndSubModes, args);
+        var narrowedModes = planTransitModes.stream().map(ModePreferencesMapper::map).toList();
+        setTransitFilters(journey, narrowedModes, args);
       }
+    }
+  }
+
+  private static ReplacementRequirement map(
+    @Nullable GraphQLTypes.GraphQLReplacementFilterInput input
+  ) {
+    if (input == null || input.getGraphQLRequirement() == null) {
+      return ReplacementRequirement.IGNORED;
+    }
+    return switch (input.getGraphQLRequirement()) {
+      case REQUIRED -> ReplacementRequirement.REQUIRED;
+      case FORBIDDEN -> ReplacementRequirement.FORBIDDEN;
+      case FEATURE_IGNORED -> ReplacementRequirement.IGNORED;
+    };
+  }
+
+  private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
+    if (input != null) {
+      return new NarrowedTransitMode(
+        TransitModeMapper.map(input.getGraphQLMode()),
+        null,
+        map(input.getGraphQLReplacement())
+      );
+    } else {
+      return null;
     }
   }
 
@@ -113,7 +131,7 @@ public class ModePreferencesMapper {
    */
   private static void setTransitFilters(
     JourneyRequestBuilder journey,
-    List<MainAndSubMode> modes,
+    List<NarrowedTransitMode> modes,
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
   ) {
     var graphQlFilters = Optional.ofNullable(args.getGraphQLPreferences())
@@ -126,9 +144,9 @@ public class ModePreferencesMapper {
     }
     // if there isn't a transit filter or a mode set, then we can keep the default which is to include
     // everything
-    else if (!modes.equals(MainAndSubMode.all())) {
+    else if (!modes.equals(NarrowedTransitMode.all())) {
       var filter = TransitFilterRequest.of()
-        .addSelect(SelectRequest.of().withTransportModes(modes).build())
+        .addSelect(SelectRequest.of().withNarrowedTransportModes(modes).build())
         .build();
       journey.withTransit(b -> b.withFilters(List.of(filter)));
     }

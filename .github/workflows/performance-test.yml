@@ -39,12 +39,6 @@ jobs:
 
           # extended locations that are run only after merging to dev-2.x
 
-          # Hamburg is disabled because of https://github.com/opentripplanner/OpenTripPlanner/issues/6430
-          # - location: hamburg # German city
-          #  iterations: 1
-          #  jfr-delay: "50s"
-          #  profile: extended
-
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
@@ -66,7 +60,7 @@ jobs:
             profile: extended
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         with:
           fetch-depth: 0
@@ -81,7 +75,7 @@ jobs:
 
       - name: Set up Maven
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: stCarolas/setup-maven@v5
+        uses: stCarolas/setup-maven@v5.1
         with:
           maven-version: 3.9.12
 
@@ -95,27 +89,27 @@ jobs:
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         run: |
           cp otp-shaded/target/otp-shaded-*-SNAPSHOT.jar otp.jar
-          java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
+          java -Xmx32G -XX:+UseCompactObjectHeaders -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
       - name: Run RAPTOR speed test
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           SPEEDTEST_LOCATION: ${{ matrix.location }}
-          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr -Dmaven.repo.local=/home/lenni/.m2/repository/"
+          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr -Dmaven.repo.local=/home/lenni/.m2/repository/ -XX:+UseCompactObjectHeaders"
         run: |
           mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0"
 
       - name: Archive travel results file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
           path: test/performance/${{ matrix.location }}/travelSearch-results-md.csv
 
       - name: Archive Flight Recorder instrumentation file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.location }}-flight-recorder
           path: ${{ matrix.location }}-speed-test.jfr

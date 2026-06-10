@@ -9,11 +9,11 @@ import static org.opentripplanner.raptor.api.path.RaptorPath.compareNumberOfTran
 
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -71,11 +71,6 @@ public final class PathParetoSetComparators {
         case USE_TIMETABLE -> comparatorTimetableAndC1();
         case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndC1();
         case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1();
-      };
-      case USE_C1_AND_C2 -> switch (timeConfig) {
-        case USE_TIMETABLE -> comparatorTimetableAndC1AndC2(c2Comp);
-        case USE_ARRIVAL_TIME -> comparatorWithC1AndC2(c2Comp);
-        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1AndC2(c2Comp);
       };
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
         case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);

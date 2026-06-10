@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
@@ -14,7 +14,6 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
@@ -62,7 +61,7 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
     );
 
     assertEquals(
-      "UPDATED | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
+      "U | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 
@@ -79,11 +78,11 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
 
     // Trip should be CANCELED on the scheduled pattern
     var tripData = env.tripData(TRIP_1_ID);
-    assertEquals(RealTimeState.CANCELED, tripData.realTimeState());
+    assertTrue(tripData.tripTimes().isCanceled());
     assertTrue(tripData.tripTimes().isCanceledOrDeleted());
 
     assertEquals(
-      "CANCELED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
+      "C U | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
       tripData.showTimetable()
     );
   }

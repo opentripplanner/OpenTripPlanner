@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 
 public class GqlUtilTest {
@@ -42,7 +43,7 @@ public class GqlUtilTest {
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNegativeValue() {
     var env = buildEnvWithTestValue(-1);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
@@ -50,7 +51,7 @@ public class GqlUtilTest {
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNullValue() {
     var env = buildEnvWithTestValue(null);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
@@ -58,7 +59,7 @@ public class GqlUtilTest {
   @Test
   void testGetPositiveNonNullIntegerArgumentWithoutValue() {
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }

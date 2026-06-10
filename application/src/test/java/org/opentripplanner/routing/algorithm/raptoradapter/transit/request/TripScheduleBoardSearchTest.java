@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
@@ -111,7 +111,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
   }
 
   @Test
-  public void findTripWithGivenTripIndexUpperBound() {
+  public void findTripWithGivenTripScheduleIndexUpperBound() {
     // Given a pattern with the following trips: A, B
     int TRIP_INDEX_A = 0;
     int TRIP_INDEX_B = 1;

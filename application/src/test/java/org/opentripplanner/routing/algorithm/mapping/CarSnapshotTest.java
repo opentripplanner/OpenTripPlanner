@@ -20,32 +20,28 @@ public class CarSnapshotTest extends SnapshotTestBase {
 
   private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
-  static GenericLocation p1 = new GenericLocation(
-    "NW Pettygrove Ave. & NW 24th Ave. (P1)",
-    null,
+  static GenericLocation p1 = GenericLocation.fromCoordinate(
     45.53261,
-    -122.70075
+    -122.70075,
+    "NW Pettygrove Ave. & NW 24th Ave. (P1)"
   );
 
-  static GenericLocation p2 = new GenericLocation(
-    "NW Marshall St. & NW 24th Ave. (P2)",
-    null,
+  static GenericLocation p2 = GenericLocation.fromCoordinate(
     45.53046,
-    -122.70067
+    -122.70067,
+    "NW Marshall St. & NW 24th Ave. (P2)"
   );
 
-  static GenericLocation p3 = new GenericLocation(
-    "Chapman Elementary School (P3)",
-    null,
+  static GenericLocation p3 = GenericLocation.fromCoordinate(
     45.53335,
-    -122.70517
+    -122.70517,
+    "Chapman Elementary School (P3)"
   );
 
-  static GenericLocation p4 = new GenericLocation(
-    "Legacy Good Samaritan Medical Center (P4)",
-    null,
+  static GenericLocation p4 = GenericLocation.fromCoordinate(
     45.53060,
-    -122.69771
+    -122.69771,
+    "Legacy Good Samaritan Medical Center (P4)"
   );
 
   @BeforeAll

@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
-import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for
@@ -98,11 +98,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
   public RaptorRequestBuilder<T> clearOptimizations() {
     this.optimizations.clear();
-    return this;
-  }
-
-  public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
-    this.optimizations.remove(optimization);
     return this;
   }
 

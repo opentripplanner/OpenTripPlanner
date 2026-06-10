@@ -11,7 +11,7 @@ class TransferPreferencesTest {
 
   private static final int COST = 200;
   private static final Duration SLACK = Duration.ofSeconds(150);
-  private static final double WAIT_RELUCTANCE = 0.95;
+  private static final double WAIT_RELUCTANCE = 0.9;
   private static final int MAX_TRANSFERS = 17;
   private static final int MAX_ADDITIONAL_TRANSFERS = 7;
   private static final TransferOptimizationPreferences OPTIMIZATION =
@@ -81,7 +81,7 @@ class TransferPreferencesTest {
       "TransferPreferences{" +
         "cost: $200, " +
         "slack: 2m30s, " +
-        "waitReluctance: 0.95, " +
+        "waitReluctance: 0.9, " +
         "maxTransfers: 17, " +
         "maxAdditionalTransfers: 7, " +
         "optimization: TransferOptimizationPreferences{backTravelWaitTimeFactor: 2.5}, " +

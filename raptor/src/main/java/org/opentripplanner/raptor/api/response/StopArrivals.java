@@ -4,6 +4,9 @@ package org.opentripplanner.raptor.api.response;
  * Provide basic information for all stops reach in a Raptor search. This can be used to visualize
  * the search.
  */
+// Note! This interface is used to visualize Raptor - currently we do not have a ui for this.
+//       DO NOT DELETE THIS INTERFACE OR THE METHODS IN IT
+@SuppressWarnings("unused")
 public interface StopArrivals {
   /**
    * Returns {@code true} if the stop is reached.

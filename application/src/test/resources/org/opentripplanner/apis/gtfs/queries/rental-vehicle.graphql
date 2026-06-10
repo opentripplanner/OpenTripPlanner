@@ -25,4 +25,7 @@
     }
     availableUntil
   }
+  rentalVehicle2: rentalVehicle(id: "Network-2:free-floating-bicycle") {
+    availableUntil
+  }
 }

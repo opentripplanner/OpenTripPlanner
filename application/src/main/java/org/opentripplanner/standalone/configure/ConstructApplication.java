@@ -44,7 +44,6 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.logging.ProgressTracker;
-import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,10 +101,6 @@ public class ConstructApplication {
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
-    // We create the optional GraphVisualizer here, because it would be significant more complex to
-    // use Dagger DI to do it - passing in a parameter to enable it or not.
-    var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
-
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder
       .configModel(config)
@@ -113,7 +108,6 @@ public class ConstructApplication {
       .streetDetailsRepository(streetDetailsRepository)
       .timetableRepository(timetableRepository)
       .transferRepository(transferRepository)
-      .graphVisualizer(graphVisualizer)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
@@ -211,6 +205,9 @@ public class ConstructApplication {
       snapshotManager(),
       routerConfig().updaterConfig()
     );
+
+    // Start application warmup — runs routing queries to warm up the application
+    factory.warmupLauncher().start();
 
     initEllipsoidToGeoidDifference();
 
@@ -362,10 +359,6 @@ public class ConstructApplication {
 
   public RaptorConfig<TripSchedule> raptorConfig() {
     return factory.raptorConfig();
-  }
-
-  public GraphVisualizer graphVisualizer() {
-    return factory.graphVisualizer();
   }
 
   private OtpServerRequestContext createServerContext() {

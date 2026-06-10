@@ -27,6 +27,12 @@ public enum OTPFeature {
     false,
     "Enable limiting transfers so that there is only a single transfer to each pattern."
   ),
+  CostlyAssertions(
+    true,
+    false,
+    true,
+    "Enable some resource consuming assertions which are typically not meant to be run in production."
+  ),
   DebugUi(
     true,
     false,
@@ -166,14 +172,19 @@ public enum OTPFeature {
 
   private final boolean enabledByDefault;
   private final boolean sandbox;
-
+  private final boolean severeWarningWhenOn;
   private boolean enabled;
   private final String doc;
 
   OTPFeature(boolean defaultEnabled, boolean sandbox, String doc) {
+    this(defaultEnabled, sandbox, false, doc);
+  }
+
+  OTPFeature(boolean defaultEnabled, boolean sandbox, boolean severeWarningWhenOn, String doc) {
     this.enabledByDefault = defaultEnabled;
     this.enabled = defaultEnabled;
     this.sandbox = sandbox;
+    this.severeWarningWhenOn = severeWarningWhenOn;
     this.doc = doc;
   }
 
@@ -190,6 +201,10 @@ public enum OTPFeature {
   public static void logFeatureSetup() {
     LOG.info("Features turned on: \n\t{}", valuesAsString(true));
     LOG.info("Features turned off: \n\t{}", valuesAsString(false));
+    var featureWarnings = enabledValuesWithSevereWarningAsString();
+    if (!featureWarnings.isBlank()) {
+      LOG.warn("FEATURES THAT SHOULD BE TURNED OFF IN PRODUCTION: \n\t{}", featureWarnings);
+    }
   }
 
   /**
@@ -279,6 +294,13 @@ public enum OTPFeature {
   private static String valuesAsString(boolean enabled) {
     return Arrays.stream(values())
       .filter(it -> it.enabled == enabled)
+      .map(Enum::name)
+      .collect(Collectors.joining("\n\t"));
+  }
+
+  private static String enabledValuesWithSevereWarningAsString() {
+    return Arrays.stream(values())
+      .filter(it -> it.enabled && it.severeWarningWhenOn)
       .map(Enum::name)
       .collect(Collectors.joining("\n\t"));
   }

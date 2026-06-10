@@ -201,8 +201,8 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
-  public boolean isScheduled() {
-    return true;
+  public boolean hasAnyUpdates() {
+    return false;
   }
 
   @Override
@@ -216,17 +216,22 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
+  public boolean isAdded() {
+    return false;
+  }
+
+  @Override
+  public boolean isTripPatternModified() {
+    return false;
+  }
+
+  @Override
   public boolean isDeleted() {
     return false;
   }
 
   @Override
-  public RealTimeState getRealTimeState() {
-    return RealTimeState.SCHEDULED;
-  }
-
-  @Override
-  public boolean isCancelledStop(int stopPos) {
+  public boolean isCanceledStop(int stopPos) {
     return false;
   }
 

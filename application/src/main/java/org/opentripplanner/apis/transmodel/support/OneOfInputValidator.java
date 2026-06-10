@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import org.opentripplanner.apis.support.InvalidInputException;
 
 /**
  * Validate @oneOf directive, this validation is NOT done by the Java GraphQL library at the
@@ -36,7 +37,7 @@ public class OneOfInputValidator {
       .toList();
 
     if (fieldsInInput.isEmpty()) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "No entries in '%s @oneOf'. One of '%s' must be set.".formatted(
           inputTypeName,
           String.join("', '", definedFields)
@@ -44,7 +45,7 @@ public class OneOfInputValidator {
       );
     }
     if (fieldsInInput.size() > 1) {
-      throw new IllegalArgumentException(
+      throw new InvalidInputException(
         "Only one entry in '%s @oneOf' is allowed. Set: '%s'".formatted(
           inputTypeName,
           String.join("', '", fieldsInInput)
@@ -57,7 +58,7 @@ public class OneOfInputValidator {
     var field = fieldsInInput.getFirst();
     if (map.get(field) instanceof Collection<?> c) {
       if (c.isEmpty()) {
-        throw new IllegalArgumentException(
+        throw new InvalidInputException(
           "'%s' can not be empty in '%s @oneOf'.".formatted(field, inputTypeName)
         );
       }

@@ -1,6 +1,7 @@
 package org.opentripplanner.api.model.transit;
 
 import java.util.Objects;
+import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
@@ -17,8 +18,8 @@ public class HideFeedIdMapper implements FeedScopedIdMapper {
   }
 
   @Override
-  public FeedScopedId parse(String id) {
-    return new FeedScopedId(feedId, id);
+  public Optional<FeedScopedId> parse(String id) {
+    return FeedScopedId.ofOptional(feedId, id);
   }
 
   @Override

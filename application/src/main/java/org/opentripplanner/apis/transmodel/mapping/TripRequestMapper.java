@@ -48,10 +48,10 @@ public class TripRequestMapper {
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
     callWith.argument("from", (Map<String, Object> v) ->
-      requestBuilder.withFrom(genericLocationMapper.toGenericLocation(v))
+      genericLocationMapper.toGenericLocation(v).ifPresent(requestBuilder::withFrom)
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      requestBuilder.withTo(genericLocationMapper.toGenericLocation(v))
+      genericLocationMapper.toGenericLocation(v).ifPresent(requestBuilder::withTo)
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
       requestBuilder.withViaLocations(tripViaLocationMapper.toLegacyPassThroughLocations(v));

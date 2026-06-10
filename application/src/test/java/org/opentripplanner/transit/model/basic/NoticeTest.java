@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 class NoticeTest {
 
@@ -15,7 +16,7 @@ class NoticeTest {
   private static final String TEXT = "text";
   private static final String PUBLIC_CODE = "public code";
 
-  private static final Notice SUBJECT = Notice.of(TimetableRepositoryForTest.id(ID))
+  private static final Notice SUBJECT = Notice.of(id(ID))
     .withPublicCode(PUBLIC_CODE)
     .withText(TEXT)
     .build();
@@ -44,7 +45,7 @@ class NoticeTest {
   @Test
   void sameAs() {
     assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPublicCode("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withText("X").build()));
   }

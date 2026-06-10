@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model._data;
 
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -102,10 +104,6 @@ public class TimetableRepositoryForTest {
 
   public static TimetableRepositoryForTest of() {
     return new TimetableRepositoryForTest(SiteRepository.of());
-  }
-
-  public static FeedScopedId id(String id) {
-    return new FeedScopedId(FEED_ID, id);
   }
 
   public static Agency agency(String name) {

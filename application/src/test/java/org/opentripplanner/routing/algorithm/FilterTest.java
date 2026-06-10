@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.Collection;
 import java.util.List;
@@ -645,7 +645,7 @@ public class FilterTest {
     var filter = TransitFilterRequest.of()
       .addSelect(
         SelectRequest.of()
-          .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
+          .withGroupOfRoutes(List.of(FeedScopedId.of("F", GROUP_OF_Routes_ID_1)))
           .build()
       )
       .build();
@@ -677,7 +677,7 @@ public class FilterTest {
     var filter = TransitFilterRequest.of()
       .addNot(
         SelectRequest.of()
-          .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
+          .withGroupOfRoutes(List.of(FeedScopedId.of("F", GROUP_OF_Routes_ID_1)))
           .build()
       )
       .build();

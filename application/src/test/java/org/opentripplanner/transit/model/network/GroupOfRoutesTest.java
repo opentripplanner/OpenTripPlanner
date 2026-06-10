@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 
 public class GroupOfRoutesTest {
 
@@ -17,7 +17,7 @@ public class GroupOfRoutesTest {
   private static final String NAME = "test_name";
   private static final String DESCRIPTION = "description";
 
-  private static final GroupOfRoutes SUBJECT = GroupOfRoutes.of(TimetableRepositoryForTest.id(ID))
+  private static final GroupOfRoutes SUBJECT = GroupOfRoutes.of(FeedScopedIdForTestFactory.id(ID))
     .withPrivateCode(PRIVATE_CODE)
     .withShortName(SHORT_NAME)
     .withName(NAME)
@@ -51,7 +51,7 @@ public class GroupOfRoutesTest {
     // Make a copy, and set the same name (nothing is changed)
     var other = SUBJECT.copy().build();
     assertTrue(SUBJECT.sameAs(other));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(FeedScopedIdForTestFactory.id("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withDescription("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withShortName("X").build()));

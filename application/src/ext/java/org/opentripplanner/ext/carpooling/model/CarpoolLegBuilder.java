@@ -4,10 +4,12 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 public class CarpoolLegBuilder {
 
@@ -21,6 +23,9 @@ public class CarpoolLegBuilder {
   private LineString geometry;
   private double distanceMeters;
 
+  @Nullable
+  private BookingInfo pickupBookingInfo;
+
   CarpoolLegBuilder() {}
 
   CarpoolLegBuilder(CarpoolLeg original) {
@@ -33,6 +38,7 @@ public class CarpoolLegBuilder {
     to = original.to();
     geometry = original.legGeometry();
     distanceMeters = original.distanceMeters();
+    pickupBookingInfo = original.pickupBookingInfo();
   }
 
   public CarpoolLegBuilder withStartTime(ZonedDateTime startTime) {
@@ -114,6 +120,16 @@ public class CarpoolLegBuilder {
 
   public double distanceMeters() {
     return distanceMeters;
+  }
+
+  public CarpoolLegBuilder withPickupBookingInfo(@Nullable BookingInfo pickupBookingInfo) {
+    this.pickupBookingInfo = pickupBookingInfo;
+    return this;
+  }
+
+  @Nullable
+  public BookingInfo pickupBookingInfo() {
+    return pickupBookingInfo;
   }
 
   public CarpoolLeg build() {

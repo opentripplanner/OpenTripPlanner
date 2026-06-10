@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.routing.alertpatch.AlertEffect.DETOUR;
 import static org.opentripplanner.routing.alertpatch.AlertSeverity.INFO;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;

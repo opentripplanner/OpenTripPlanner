@@ -257,7 +257,7 @@ class RouteRequestTest {
   @Test
   void testValidateMissingFrom() {
     expectOneRoutingValidationException(
-      () -> minimal.copyOf().withFrom(GenericLocation.UNKNOWN).buildRequest(),
+      () -> minimal.copyOf().withFrom(null).buildRequest(),
       RoutingErrorCode.LOCATION_NOT_FOUND,
       InputField.FROM_PLACE
     );
@@ -266,7 +266,7 @@ class RouteRequestTest {
   @Test
   void testValidateMissingTo() {
     expectOneRoutingValidationException(
-      () -> minimal.copyOf().withTo(GenericLocation.UNKNOWN).buildRequest(),
+      () -> minimal.copyOf().withTo(null).buildRequest(),
       RoutingErrorCode.LOCATION_NOT_FOUND,
       InputField.TO_PLACE
     );

@@ -84,11 +84,10 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
    * A place used as dummy to/from, when testing from/to. It can be anywhere, except
    * the same location as the place under test.
    */
-  private static final GenericLocation ANY_PLACE = new GenericLocation(
-    "Any place - not used",
-    null,
+  private static final GenericLocation ANY_PLACE = GenericLocation.fromCoordinate(
     LATITUDE_START,
-    LONGITUDE_0
+    LONGITUDE_0,
+    "Any place - not used"
   );
 
   private Graph graph;
@@ -138,7 +137,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
     graph.hasStreets = true;
     TestStreetLinkerModule.link(graph, otpModel.timetableRepository());
-    this.stopLocation = new GenericLocation(stop.getLabelString(), stop.getId(), null, null);
+    String label = stop.getLabelString();
+    this.stopLocation = GenericLocation.fromStopId(stop.getId(), label);
   }
 
   private static List<Arguments> testPedestrianLinkingTestCases() {
@@ -327,7 +327,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
      * {@code N, N+1, N-1, N+2, N-2 ... }
      */
     GenericLocation placeCloseToStreet() {
-      return new GenericLocation("On " + name, null, LATITUDE_MIDDLE, longitude + OFFSET);
+      return GenericLocation.fromCoordinate(LATITUDE_MIDDLE, longitude + OFFSET, "On " + name);
     }
 
     StreetEdgeBuilder createStreetEdgeBuilder(GraphRoutingTest.Builder factory) {

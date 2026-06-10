@@ -7,7 +7,7 @@ supported. When loading NeTEx data OTP should print warnings for all NeTEx data 
 
 OTP is tested with data from Entur which uses
 the [Nordic NeTEx profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic+NeTEx+Profile) 
-and Data from HVV wich uses the [EPIP NeTEx Profile](http://www.normes-donnees-tc.org/wp-content/uploads/2019/11/WI00278457-TS16614-4-FV-e-Latest-Draft-sent-to-CEN.pdf). 
+and Data from HVV which uses the [EPIP NeTEx Profile](http://www.normes-donnees-tc.org/wp-content/uploads/2019/11/WI00278457-TS16614-4-FV-e-Latest-Draft-sent-to-CEN.pdf). 
 If you find that some part of your import is not imported/supported by OTP you will need to add
 support for it in this model. NeTEx is huge, and ONLY data relevant for travel planning should be
 imported.
