@@ -102,9 +102,7 @@ public class CarpoolSiriMapper {
       ? firstStop.getExpectedDepartureTime()
       : firstStop.getAimedDepartureTime();
 
-    var endTime = lastStop.getExpectedArrivalTime() != null
-      ? lastStop.getExpectedArrivalTime()
-      : lastStop.getAimedArrivalTime();
+    var endTime = lastStop.getScheduledArrivalTime();
 
     int totalCapacity = extractTotalCapacity(tripId, activeCalls);
 

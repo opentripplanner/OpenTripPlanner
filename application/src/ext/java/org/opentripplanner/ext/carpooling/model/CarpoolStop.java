@@ -73,6 +73,17 @@ public class CarpoolStop extends AbstractTransitEntity<CarpoolStop, CarpoolStopB
   }
 
   /**
+   * The arrival time the trip is currently scheduled to reach this stop: the expected arrival,
+   * falling back to the aimed arrival when no expected time is provided.
+   *
+   * @return The scheduled arrival time, or null if not applicable (e.g., origin stop)
+   */
+  @Nullable
+  public ZonedDateTime getScheduledArrivalTime() {
+    return expectedArrivalTime != null ? expectedArrivalTime : aimedArrivalTime;
+  }
+
+  /**
    * @return The latest expected arrival time, or null if not provided
    */
   @Nullable
