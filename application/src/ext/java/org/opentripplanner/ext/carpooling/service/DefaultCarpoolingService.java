@@ -2,12 +2,14 @@ package org.opentripplanner.ext.carpooling.service;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
@@ -15,6 +17,7 @@ import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter;
@@ -482,25 +485,24 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
       candidateTripsWithVertices.forEach(tripWithVertices -> {
         var vertices = tripWithVertices.vertices();
-        carpoolTreeVertexRouter.addVertex(
-          vertices.getFirst(),
-          CarpoolTreeStreetRouter.Direction.FROM,
-          MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
-        );
-        carpoolTreeVertexRouter.addVertex(
-          vertices.getLast(),
-          CarpoolTreeStreetRouter.Direction.TO,
-          MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
-        );
-
-        var middleVertices = vertices.subList(1, vertices.size() - 1);
-        middleVertices.forEach(vertex -> {
+        // Each waypoint's tree only has to span its own leg of the route — toward the next waypoint
+        // for the forward tree, back toward the previous one for the reverse tree — plus the detour
+        // a passenger insertion on that leg can add. Sizing every waypoint to the whole trip turns
+        // each into a region-wide car SPT even when consecutive waypoints are minutes apart, the
+        // dominant cost for long or multi-waypoint trips.
+        var legLimits = driverLegTreeLimits(tripWithVertices.trip());
+        for (int leg = 0; leg < legLimits.length; leg++) {
           carpoolTreeVertexRouter.addVertex(
-            vertex,
-            CarpoolTreeStreetRouter.Direction.BOTH,
-            MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
+            vertices.get(leg),
+            CarpoolTreeStreetRouter.Direction.FROM,
+            legLimits[leg]
           );
-        });
+          carpoolTreeVertexRouter.addVertex(
+            vertices.get(leg + 1),
+            CarpoolTreeStreetRouter.Direction.TO,
+            legLimits[leg]
+          );
+        }
       });
 
       var stopDuration = request.preferences().car().pickupTime();
@@ -563,6 +565,86 @@ public class DefaultCarpoolingService implements CarpoolingService {
         )
         .toList();
     }
+  }
+
+  /**
+   * Sizes the street routing tree for each leg of a driver trip to the leg it actually has to span,
+   * rather than to the whole trip. {@code result[k]} is the limit for the leg from waypoint
+   * {@code k} to waypoint {@code k + 1}, so the forward tree rooted at waypoint {@code k} grows
+   * toward the next waypoint under {@code result[k]} and the reverse tree rooted at waypoint
+   * {@code k} grows back toward the previous one under {@code result[k - 1]}. The returned array has
+   * one entry per leg ({@code stops - 1}); the origin has no reverse tree and the destination no
+   * forward tree.
+   * <p>
+   * A leg's limit only has to reach the adjacent waypoint plus any pickup or dropoff inserted on
+   * that leg. Sizing every waypoint to the full
+   * {@link CarpoolTrip#startTime()}→{@link CarpoolTrip#endTime()} span makes each tree a
+   * region-wide car SPT even when consecutive waypoints are minutes apart, which is the dominant
+   * cost for long or multi-waypoint trips.
+   * <p>
+   * Each leg is sized from its scheduled duration (see {@link #scheduledLegDurations}) padded by
+   * 50% to absorb the difference between the platform's scheduled durations and OTP's car routing
+   * model, plus the leg's detour allowance: the smallest deviation budget among the stops
+   * downstream of the leg. A detour inserted on a leg delays every downstream stop, and
+   * {@link org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints} checks each
+   * against its own budget, so the smallest downstream budget is the most a feasible detour can
+   * add. The allowance is what bounds the tree: a pickup or dropoff far enough from the leg to
+   * fall outside it would also push the insertion detour past some downstream stop's budget, so
+   * the delay constraints reject it regardless — the tree only has to reach as far as a
+   * budget-respecting detour can, and no floor is needed to keep viable insertions in range. When
+   * the scheduled timeline is incomplete or not non-decreasing the whole-trip span sizes every leg
+   * as a safe fallback.
+   */
+  static Duration[] driverLegTreeLimits(CarpoolTrip trip) {
+    var stops = trip.stops();
+    int n = stops.size();
+
+    var legDurations = scheduledLegDurations(trip);
+    if (legDurations == null) {
+      legDurations = new Duration[n - 1];
+      Arrays.fill(legDurations, Duration.between(trip.startTime(), trip.endTime()));
+    }
+
+    // Scheduled leg duration padded 50% (platform-vs-OTP model slack) plus the leg's detour
+    // allowance — the deviation budgets' backward running minimum, i.e. the smallest budget among
+    // the stops downstream of the leg. The origin's budget never participates: no detour can delay
+    // the origin.
+    var legLimits = new Duration[n - 1];
+    var detourAllowance = stops.get(n - 1).getDeviationBudget();
+    for (int k = n - 2; k >= 0; k--) {
+      var budget = stops.get(k + 1).getDeviationBudget();
+      if (budget.compareTo(detourAllowance) < 0) {
+        detourAllowance = budget;
+      }
+      legLimits[k] = legDurations[k].multipliedBy(3).dividedBy(2).plus(detourAllowance);
+    }
+    return legLimits;
+  }
+
+  /**
+   * Computes each leg's scheduled driving duration from the trip's waypoint arrival timeline —
+   * {@code startTime} at the origin and each subsequent stop's
+   * {@link org.opentripplanner.ext.carpooling.model.CarpoolStop#getScheduledArrivalTime() scheduled}
+   * arrival time. The destination's <em>latest</em> expected arrival is deliberately not used: it
+   * already contains the destination's deviation budget, which the leg limit adds separately as
+   * the detour allowance. Returns {@code null} when an arrival time is missing or the timeline is
+   * not non-decreasing, signalling the caller to fall back to whole-trip sizing.
+   */
+  @Nullable
+  private static Duration[] scheduledLegDurations(CarpoolTrip trip) {
+    var stops = trip.stops();
+    int n = stops.size();
+    var legDurations = new Duration[n - 1];
+    var legStart = trip.startTime();
+    for (int k = 1; k < n; k++) {
+      var arrival = stops.get(k).getScheduledArrivalTime();
+      if (arrival == null || arrival.isBefore(legStart)) {
+        return null;
+      }
+      legDurations[k - 1] = Duration.between(legStart, arrival);
+      legStart = arrival;
+    }
+    return legDurations;
   }
 
   private void validateRequest(RouteRequest request) throws RoutingValidationException {
