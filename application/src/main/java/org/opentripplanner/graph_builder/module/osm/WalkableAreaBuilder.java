@@ -734,6 +734,7 @@ class WalkableAreaBuilder {
       namedArea.setWalkSafety((float) wayData.walkSafety());
       namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
+      namedArea.setWheelchairAccessible(areaEntity.isWheelchairAccessible());
       areaGroup.addArea(namedArea);
 
       if (areaEntity.isBoardingLocation()) {
