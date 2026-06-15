@@ -589,11 +589,13 @@ public class OrcaFareServiceTest {
     );
 
     calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f).plus(usDollars(4.00f))));
+    calculateFare(rides, FareType.senior, usDollars(4.00f));
     calculateFare(rides, FareType.youth, ZERO_USD);
     calculateFare(rides, FareType.electronicRegular, usDollars(3.00f).plus(usDollars(4.00f)));
-    calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
+    // Monorail charges $2.00 reduced fare for senior/LIFT (no free transfer to/from monorail)
+    calculateFare(rides, FareType.electronicSenior, usDollars(3.00f));
     calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.00f));
 
     var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
 
@@ -603,6 +605,22 @@ public class OrcaFareServiceTest {
     assertLegFareEquals(400, rides.get(1), fares, false);
     // CommTrans still gets a free transfer from KC Metro (monorail doesn't break the chain)
     assertLegFareEquals(0, rides.get(2), fares, true);
+  }
+
+  /**
+   * Test single-leg monorail fares to confirm the reduced rate of $2.00 for senior and LIFT
+   * categories, and the regular adult fare of $4.00.
+   */
+  @Test
+  void calculateMonorailReducedFares() {
+    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
+    calculateFare(rides, regular, usDollars(4.00f));
+    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.youth, ZERO_USD);
+    calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
+    calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
   }
 
   static Stream<Arguments> allTypes() {

@@ -369,7 +369,7 @@ public class OrcaFareService extends DefaultFareService {
         EVERETT_TRANSIT,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR -> optionalUSD(1.00f);
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(2.00f);
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
@@ -409,7 +409,7 @@ public class OrcaFareService extends DefaultFareService {
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> optionalUSD(1f);
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(2.00f);
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
