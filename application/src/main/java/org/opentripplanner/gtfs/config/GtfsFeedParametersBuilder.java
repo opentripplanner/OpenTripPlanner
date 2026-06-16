@@ -10,6 +10,10 @@ public class GtfsFeedParametersBuilder extends GtfsDefaultParametersBuilder {
 
   private URI source;
 
+  private boolean ignoreHttps;
+
+  private boolean ignoreZipExtension;
+
   public GtfsFeedParametersBuilder(GtfsDefaultParameters original) {
     super(original);
   }
@@ -33,11 +37,31 @@ public class GtfsFeedParametersBuilder extends GtfsDefaultParametersBuilder {
     return source;
   }
 
+  public GtfsFeedParametersBuilder withIgnoreHttps(boolean ignoreHttps) {
+    this.ignoreHttps = ignoreHttps;
+    return this;
+  }
+
+  boolean ignoreHttps() {
+    return ignoreHttps;
+  }
+
+  public GtfsFeedParametersBuilder withIgnoreZipExtension(boolean ignoreZipExtension) {
+    this.ignoreZipExtension = ignoreZipExtension;
+    return this;
+  }
+
+  boolean ignoreZipExtension() {
+    return ignoreZipExtension;
+  }
+
   @Override
   public GtfsFeedParameters build() {
     return new GtfsFeedParameters(
       feedId,
       source,
+      ignoreHttps,
+      ignoreZipExtension,
       stationTransferPreference(),
       discardMinTransferTimes(),
       blockBasedInterlining(),

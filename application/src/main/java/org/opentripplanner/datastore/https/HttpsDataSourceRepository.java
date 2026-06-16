@@ -3,6 +3,7 @@ package org.opentripplanner.datastore.https;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import org.apache.hc.core5.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -22,6 +23,18 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   private static final Logger LOG = LoggerFactory.getLogger(HttpsFileDataSource.class);
 
   private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
+
+  private final Set<URI> insecureSources;
+  private final Set<URI> uncheckedZipSources;
+
+  public HttpsDataSourceRepository() {
+    this(Set.of(), Set.of());
+  }
+
+  public HttpsDataSourceRepository(Set<URI> insecureSources, Set<URI> uncheckedZipSources) {
+    this.insecureSources = insecureSources;
+    this.uncheckedZipSources = uncheckedZipSources;
+  }
 
   @Override
   public String description() {
@@ -49,8 +62,13 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
 
   /* private methods */
 
-  private static boolean skipUri(URI uri) {
-    return !"https".equals(uri.getScheme());
+  private boolean skipUri(URI uri) {
+    String scheme = uri.getScheme();
+    if ("https".equals(scheme)) {
+      return false;
+    }
+
+    return !("http".equals(scheme) && insecureSources.contains(uri));
   }
 
   private DataSource createSource(URI uri, FileType type) {
@@ -65,7 +83,11 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
       getHttpHeaders(uri)
     );
 
-    if (httpsDataSourceMetadata.isZipContentType() || uri.getPath().endsWith(".zip")) {
+    if (
+      uncheckedZipSources.contains(uri) ||
+      httpsDataSourceMetadata.isZipContentType() ||
+      uri.getPath().endsWith(".zip")
+    ) {
       DataSource httpsSource = new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
       return new ZipStreamDataSourceDecorator(httpsSource);
     } else {

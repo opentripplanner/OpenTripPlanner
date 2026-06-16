@@ -18,10 +18,14 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
 
   private final @Nullable String feedId;
   private final URI source;
+  private final boolean ignoreHttps;
+  private final boolean ignoreZipExtension;
 
   public GtfsFeedParameters(
     @Nullable String feedId,
     URI source,
+    boolean ignoreHttps,
+    boolean ignoreZipExtension,
     StopTransferPriority stationTransferPreference,
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
@@ -35,6 +39,8 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
     );
     this.feedId = feedId;
     this.source = Objects.requireNonNull(source);
+    this.ignoreHttps = ignoreHttps;
+    this.ignoreZipExtension = ignoreZipExtension;
   }
 
   /**
@@ -51,6 +57,20 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
   @Override
   public URI source() {
     return source;
+  }
+
+  /**
+   * See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
+   */
+  public boolean ignoreHttps() {
+    return ignoreHttps;
+  }
+
+  /**
+   * See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
+   */
+  public boolean ignoreZipExtension() {
+    return ignoreZipExtension;
   }
 
   @Override

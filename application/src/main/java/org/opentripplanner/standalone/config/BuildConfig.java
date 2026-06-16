@@ -631,6 +631,16 @@ public class BuildConfig implements OtpDataStoreConfig {
   }
 
   @Override
+  public Set<URI> insecureFeedSources() {
+    return transitFeeds.ignoreHttpsSources();
+  }
+
+  @Override
+  public Set<URI> uncheckedZipExtensionSources() {
+    return transitFeeds.ignoreZipExtensionSources();
+  }
+
+  @Override
   public List<URI> netexFiles() {
     return transitFeeds.netexFiles();
   }

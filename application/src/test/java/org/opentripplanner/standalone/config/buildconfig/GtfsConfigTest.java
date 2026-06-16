@@ -73,7 +73,8 @@ class GtfsConfigTest {
       """
       {
          'source': 'https://foo.bar/gtfs.zip',
-         'feedId': 'test'
+         'feedId': 'test',
+         'ignoreHttps': true
       }
       """
     );
@@ -86,6 +87,8 @@ class GtfsConfigTest {
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
     assertEquals(300, subject.maxInterlineDistance());
+    assertTrue(subject.ignoreHttps());
+    assertFalse(subject.ignoreZipExtension());
   }
 
   @Test

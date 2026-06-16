@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
@@ -42,6 +43,22 @@ public class GtfsConfig {
       )
       .withSource(
         node.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
+      )
+      .withIgnoreHttps(
+        node
+          .of("ignoreHttps")
+          .since(V2_10)
+          .summary("Whether or not the source URI can be fetched over plain http instead of https.")
+          .asBoolean(false)
+      )
+      .withIgnoreZipExtension(
+        node
+          .of("ignoreZipExtension")
+          .since(V2_10)
+          .summary(
+            "Whether or not the source URI should be treated as a ZIP archive even if the URI has no `.zip` extension or the server does not return a zip content-type."
+          )
+          .asBoolean(false)
       )
       .build();
   }

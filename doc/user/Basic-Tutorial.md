@@ -41,8 +41,12 @@ an empty directory you have created for your OTP instance such as `/home/usernam
 Linux, `/Users/username/otp` on MacOS, or `C:\Users\username\otp` on Windows. For OTP2 to detect a
 GTFS file, **its name must end in `.zip` and must contain the letters 'gtfs'**. We often use the
 convention of saving GTFS files with names ending in `.gtfs.zip` which meets both these criteria,
-reflecting the fact that a GTFS feed is just a ZIP file containing a specific set of files. If you
-don't have a particular feed in mind, the one for Portland, Oregon's TriMet agency is a good option.
+reflecting the fact that a GTFS feed is just a ZIP file containing a specific set of files.
+By default, a remote GTFS feed must be served over HTTPS and be recognizable as a ZIP archive 
+(a `.zip` extension or a zip content-type). The `ignoreHttps` and `ignoreZipExtension` parameters waive
+these requirements for an individual feed. See [Build Config](BuildConfiguration.md) for details.
+
+If you don't have a particular feed in mind, the one for Portland, Oregon's TriMet agency is a good option.
 It is available at [this URL](http://developer.trimet.org/schedule/gtfs.zip). This is a
 moderate-sized input of good quality (TriMet initiated OTP development and helped develop the GTFS
 format). On Linux, this could be done on the command line as follows:
