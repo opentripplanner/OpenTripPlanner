@@ -270,6 +270,8 @@ type EstimatedCall {
   realtimeState: RealtimeState!
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
+  "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"
+  scheduledQuay: Quay!
   serviceJourney: ServiceJourney!
   "Estimated calls for the ServiceJourney on this date."
   serviceJourneyEstimatedCalls: SJEstimatedCalls!

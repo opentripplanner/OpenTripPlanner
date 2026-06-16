@@ -67,6 +67,21 @@ public class EstimatedCallType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
+          .name("scheduledQuay")
+          .description(
+            "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"
+          )
+          .type(new GraphQLNonNull(quayType))
+          .dataFetcher(env -> {
+            TripTimeOnDate tripTimeOnDate = env.getSource();
+            return tripTimeOnDate.getScheduledStop(
+              GqlUtil.getTransitService(env).findPattern(tripTimeOnDate.getTrip())
+            );
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("aimedArrivalTime")
           .description("Scheduled time of arrival at quay. Not affected by read time updated")
           .type(new GraphQLNonNull(dateTimeScalar))

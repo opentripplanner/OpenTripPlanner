@@ -186,6 +186,19 @@ public class TripTimeOnDate {
     return tripPattern.getStop(stopPosition);
   }
 
+  /**
+   * The scheduled stop for this call, equal to {@link #getStop()} unless the stop was changed by a
+   * real time update. Falls back to the real time stop when the patterns differ in size.
+   */
+  public StopLocation getScheduledStop(@Nullable TripPattern scheduledPattern) {
+    if (
+      scheduledPattern != null && scheduledPattern.numberOfStops() == tripPattern.numberOfStops()
+    ) {
+      return scheduledPattern.getStop(stopPosition);
+    }
+    return getStop();
+  }
+
   public int getStopPosition() {
     return stopPosition;
   }
