@@ -232,7 +232,8 @@ class TripTimeOnDateTest {
   }
 
   @Test
-  void scheduledStopFallback() {
+  void testScheduledStopForExtraCall() {
+    // The scheduled stop should fall back to the same stop as realtime
     var route = TimetableRepositoryForTest.route("R1").build();
     var stopA = TEST_MODEL.stop("A").build();
     var realTimeStop = TEST_MODEL.stop("realtime").build();
@@ -244,10 +245,46 @@ class TripTimeOnDateTest {
     var realTimePattern = TimetableRepositoryForTest.tripPattern("P1", route)
       .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
       .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
 
-    var subject = new TripTimeOnDate(tripTimesFor(3), 1, realTimePattern);
+    var first = new TripTimeOnDate(tripTimes, 0, realTimePattern);
+    var second = new TripTimeOnDate(tripTimes, 1, realTimePattern);
+    var third = new TripTimeOnDate(tripTimes, 2, realTimePattern);
 
-    assertEquals(realTimeStop, subject.getScheduledStop(shorterScheduledPattern));
+    assertEquals(stopA, first.getScheduledStop(shorterScheduledPattern));
+    assertEquals(realTimeStop, second.getScheduledStop(shorterScheduledPattern));
+    assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
+  }
+
+  @Test
+  void testScheduledStopNoOriginalPattern() {
+    // The scheduled stop should fall back to the same stop as realtime
+    var route = TimetableRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var realTimeStop = TEST_MODEL.stop("realtime").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var shorterScheduledPattern = TimetableRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, stopC))
+      .build();
+    var realTimePattern = TimetableRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+      .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
+
+    var first = new TripTimeOnDate(tripTimes, 0, realTimePattern);
+    var second = new TripTimeOnDate(tripTimes, 1, realTimePattern);
+    var third = new TripTimeOnDate(tripTimes, 2, realTimePattern);
+
+    assertEquals(stopA, first.getScheduledStop(shorterScheduledPattern));
+    assertEquals(realTimeStop, second.getScheduledStop(shorterScheduledPattern));
+    assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
   }
 
   private static TripTimes tripTimesFor(int stops) {

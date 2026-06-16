@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -190,13 +191,25 @@ public class TripTimeOnDate {
    * The scheduled stop for this call, equal to {@link #getStop()} unless the stop was changed by a
    * real time update. Falls back to the real time stop when the patterns differ in size.
    */
-  public StopLocation getScheduledStop(@Nullable TripPattern scheduledPattern) {
-    if (
-      scheduledPattern != null && scheduledPattern.numberOfStops() == tripPattern.numberOfStops()
-    ) {
-      return scheduledPattern.getStop(stopPosition);
+  public StopLocation getScheduledStop(@Nullable TripPattern scheduledTripPattern) {
+    if (tripPattern.numberOfStops() == scheduledTripPattern.numberOfStops()) {
+      return scheduledTripPattern.getStop(stopPosition);
     }
-    return getStop();
+    // The number of stops is different. There must be extra stops in the tripPattern compared to
+    // the scheduledTripPattern.
+    if (isExtraCall()) {
+      // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
+      return getStop();
+    }
+    // The number of stops is different. There must be extra stops in tripPattern compared to scheduledTripPattern
+    var extraCallsBefore = (int) IntStream.range(0, stopPosition)
+      .filter(tripTimes::isExtraCall)
+      .count();
+    var scheduledPos = stopPosition - extraCallsBefore;
+    if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
+      throw new InvalidInputException("Number of stops is inconsistent in scheduled trip pattern");
+    }
+    return scheduledTripPattern.getStop(scheduledPos);
   }
 
   public int getStopPosition() {
