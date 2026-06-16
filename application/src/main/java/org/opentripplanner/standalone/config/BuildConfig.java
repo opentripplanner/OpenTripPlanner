@@ -16,11 +16,13 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.datastore.api.DataSourceOptions;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.datastore.gs.config.GsConfig;
@@ -631,13 +633,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   }
 
   @Override
-  public Set<URI> insecureFeedSources() {
-    return transitFeeds.ignoreHttpsSources();
-  }
-
-  @Override
-  public Set<URI> uncheckedZipExtensionSources() {
-    return transitFeeds.ignoreZipExtensionSources();
+  public Map<URI, DataSourceOptions> gtfsSourceOptions() {
+    return transitFeeds.gtfsSourceOptions();
   }
 
   @Override

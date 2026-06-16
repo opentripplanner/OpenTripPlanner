@@ -3,10 +3,11 @@ package org.opentripplanner.datastore.https;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.apache.hc.core5.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.DataSourceOptions;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
@@ -24,16 +25,14 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
 
   private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
 
-  private final Set<URI> insecureSources;
-  private final Set<URI> uncheckedZipSources;
+  private final Map<URI, DataSourceOptions> sourceOptions;
 
   public HttpsDataSourceRepository() {
-    this(Set.of(), Set.of());
+    this(Map.of());
   }
 
-  public HttpsDataSourceRepository(Set<URI> insecureSources, Set<URI> uncheckedZipSources) {
-    this.insecureSources = insecureSources;
-    this.uncheckedZipSources = uncheckedZipSources;
+  public HttpsDataSourceRepository(Map<URI, DataSourceOptions> sourceOptions) {
+    this.sourceOptions = sourceOptions;
   }
 
   @Override
@@ -68,7 +67,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
       return false;
     }
 
-    return !("http".equals(scheme) && insecureSources.contains(uri));
+    return !("http".equals(scheme) && optionsFor(uri).ignoreHttps());
   }
 
   private DataSource createSource(URI uri, FileType type) {
@@ -84,7 +83,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
     );
 
     if (
-      uncheckedZipSources.contains(uri) ||
+      optionsFor(uri).ignoreZipExtension() ||
       httpsDataSourceMetadata.isZipContentType() ||
       uri.getPath().endsWith(".zip")
     ) {
@@ -104,5 +103,9 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
       var otpHttpClient = otpHttpClientFactory.create(LOG);
       return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, HttpHeaders.empty());
     }
+  }
+
+  private DataSourceOptions optionsFor(URI uri) {
+    return sourceOptions.getOrDefault(uri, DataSourceOptions.DEFAULTS);
   }
 }

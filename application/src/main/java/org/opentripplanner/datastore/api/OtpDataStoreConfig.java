@@ -2,7 +2,7 @@ package org.opentripplanner.datastore.api;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
@@ -45,15 +45,10 @@ public interface OtpDataStoreConfig {
   List<URI> gtfsFiles();
 
   /**
-   * GTFS Feed source URIs allowed to be fetched over plain http instead of https.
+   * Per-gtfs-source options overriding default validations (http(s) and .zip check), keyed by feed source URI.
+   * Only feeds with at least one override set are present.
    */
-  Set<URI> insecureFeedSources();
-
-  /**
-   * GTFS Feed source URIs to treat as ZIP archives even without a `.zip` extension or
-   * zip content-type.
-   */
-  Set<URI> uncheckedZipExtensionSources();
+  Map<URI, DataSourceOptions> gtfsSourceOptions();
 
   /**
    * List of URIs to Netex data files.

@@ -59,12 +59,7 @@ public abstract class DataStoreModule {
       repositories.add(gsRepository);
     }
 
-    repositories.add(
-      new HttpsDataSourceRepository(
-        config.insecureFeedSources(),
-        config.uncheckedZipExtensionSources()
-      )
-    );
+    repositories.add(new HttpsDataSourceRepository(config.gtfsSourceOptions()));
 
     // The file data storage repository should be last, to allow
     // other repositories to "override" and grab files analyzing the
