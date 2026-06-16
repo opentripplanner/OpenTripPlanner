@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -23,6 +25,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
+import uk.org.siri.siri21.JourneyRelationStructure;
+import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -41,6 +45,7 @@ class ModifiedTripBuilder {
   private final OccupancyStatus occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
+  private final List<JourneyRelationStructure> journeyRelations;
 
   @Nullable
   private final String vehicleRef;
@@ -58,7 +63,6 @@ class ModifiedTripBuilder {
     this.serviceDate = serviceDate;
     this.zoneId = zoneId;
     this.entityResolver = entityResolver;
-
     this.calls = journey.calls();
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
@@ -66,6 +70,7 @@ class ModifiedTripBuilder {
     occupancy = journey.occupancy().orElse(null);
     dataSource = journey.dataSource().orElse(null);
     vehicleRef = journey.vehicleRef().orElse(null);
+    this.journeyRelations = journey.journeyRelations();
   }
 
   /**
@@ -97,6 +102,7 @@ class ModifiedTripBuilder {
     this.dataSource = dataSource;
     this.added = added;
     this.vehicleRef = vehicleRef;
+    this.journeyRelations = List.of();
   }
 
   /**
@@ -136,6 +142,39 @@ class ModifiedTripBuilder {
 
     applyUpdates(builder);
 
+    for (var r : journeyRelations) {
+      if (r.getJourneyRelationType().equals(JourneyRelationTypeEnumeration.REPLACED_BY_JOURNEY)) {
+        var replacedByTripsOnServiceDate = r
+          .getRelatedJourneies()
+          .stream()
+          .map(j ->
+            entityResolver.resolveTripOnServiceDate(
+              VehicleJourneyIdAndServiceDate.of(j.getFramedVehicleJourneyRef())
+            )
+          )
+          .filter(Objects::nonNull)
+          .toList();
+        for (var part : r.getJourneyParts().getJourneyPartInfos()) {
+          var fromPos = resolvePositionInPattern(
+            part.getFromStopPointRef().getValue(),
+            part.getStartTime(),
+            calls
+          );
+          var toPos = resolvePositionInPattern(
+            part.getToStopPointRef().getValue(),
+            part.getEndTime(),
+            calls
+          );
+          if (fromPos.isEmpty() || toPos.isEmpty()) {
+            continue;
+          }
+          replacedByTripsOnServiceDate.forEach(t ->
+            builder.withPartialReplacedBy(fromPos.get(), toPos.get(), t)
+          );
+        }
+      }
+    }
+
     if (!pattern.getStopPattern().equals(stopPattern)) {
       builder.withModifiedTripPattern();
     }
@@ -153,6 +192,27 @@ class ModifiedTripBuilder {
     } catch (DataValidationException e) {
       throw DataValidationExceptionMapper.map(e);
     }
+  }
+
+  private Optional<Integer> resolvePositionInPattern(
+    String id,
+    @Nullable ZonedDateTime time,
+    List<CallWrapper> calls
+  ) {
+    for (int i = 0; i < calls.size(); i++) {
+      var call = calls.get(i);
+      if (id.equals(call.getStopPointRef())) {
+        if (time == null) {
+          return Optional.of(i);
+        }
+        if (time.equals(call.getAimedArrivalTime()) || time.equals(call.getAimedDepartureTime())) {
+          // The spec is vague in how JourneyPartInfoStructure.startTime and endTime should be interpreted.
+          // If it is provided we require the call to match the aimed arrival time or aimed departure time.
+          return Optional.of(i);
+        }
+      }
+    }
+    return Optional.empty();
   }
 
   /**

@@ -20,12 +20,17 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.EstimatedVersionFrameStructure;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri21.JourneyRelationStructure;
+import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
+import uk.org.siri.siri21.JourneyRelationsStructure;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.QuayRefStructure;
 import uk.org.siri.siri21.RecordedCall;
+import uk.org.siri.siri21.RelatedJourney;
+import uk.org.siri.siri21.RelatedJourneyPartStructure;
 import uk.org.siri.siri21.StopAssignmentStructure;
 import uk.org.siri.siri21.StopPointRefStructure;
 import uk.org.siri.siri21.VehicleJourneyRef;
@@ -194,6 +199,59 @@ public class SiriEtBuilder {
     var builder = new FramedVehicleRefBuilder();
     builder = producer.apply(builder);
     evj.setFramedVehicleJourneyRef(builder.build());
+    return this;
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    RegularStop fromStop,
+    RegularStop toStop,
+    String replacementJourney,
+    LocalDate serviceDate
+  ) {
+    return withPartialReplacement(
+      fromStop.getId().getId(),
+      toStop.getId().getId(),
+      replacementJourney,
+      serviceDate
+    );
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    String fromStop,
+    String toStop,
+    String replacementJourney,
+    LocalDate servicceDate
+  ) {
+    var relations = evj.getJourneyRelations();
+    if (relations == null) {
+      relations = new JourneyRelationsStructure();
+      evj.setJourneyRelations(relations);
+    }
+
+    var part = new RelatedJourneyPartStructure();
+    var from = new StopPointRefStructure();
+    from.setValue(fromStop);
+    part.setFromStopPointRef(from);
+    var to = new StopPointRefStructure();
+    to.setValue(toStop);
+    part.setToStopPointRef(to);
+    var parts = new RelatedJourney.JourneyParts();
+    parts.getJourneyPartInfos().add(part);
+
+    var relatedJourney = new RelatedJourney();
+    var framedVehicleJoureyRef = new FramedVehicleJourneyRefStructure();
+    framedVehicleJoureyRef.setDatedVehicleJourneyRef(replacementJourney);
+    var dataFrameRefStructure = new DataFrameRefStructure();
+    dataFrameRefStructure.setValue(servicceDate.toString());
+    framedVehicleJoureyRef.setDataFrameRef(dataFrameRefStructure);
+    relatedJourney.setFramedVehicleJourneyRef(framedVehicleJoureyRef);
+
+    var rel = new JourneyRelationStructure();
+    rel.setJourneyParts(parts);
+    rel.setJourneyRelationType(JourneyRelationTypeEnumeration.REPLACED_BY_JOURNEY);
+    rel.getRelatedJourneies().add(relatedJourney);
+    relations.getJourneyRelations().add(rel);
+
     return this;
   }
 

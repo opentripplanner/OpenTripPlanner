@@ -334,6 +334,9 @@ public class TransmodelGraphQLSchemaFactory {
 
     GraphQLOutputType sjEstimatedCallsType = SJEstimatedCallsType.create();
 
+    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
+    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
+
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -344,6 +347,7 @@ public class TransmodelGraphQLSchemaFactory {
       sjEstimatedCallsType,
       DatedServiceJourneyType.REF,
       empiricalDelay,
+      replacedByRelationType,
       dateTimeScalar
     );
 
@@ -359,9 +363,6 @@ public class TransmodelGraphQLSchemaFactory {
       estimatedCallType,
       TimetabledPassingTimeType.REF
     );
-
-    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
-    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
 
     GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
