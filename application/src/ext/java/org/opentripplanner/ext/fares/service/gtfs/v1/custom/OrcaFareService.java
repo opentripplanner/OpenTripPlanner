@@ -294,7 +294,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare(rideType, defaultFare);
+      case youth, electronicYouth -> getYouthFare(fareType, rideType, defaultFare);
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
@@ -425,15 +425,21 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
-  private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
+  private Optional<Money> getYouthFare(
+    FareType fareType,
+    RideType rideType,
+    Optional<Money> defaultFare
+  ) {
     return switch (rideType) {
       case
         UNKNOWN,
         SKAGIT_TRANSIT,
         SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY,
-        MONORAIL,
         LINK_SHUTTLE -> Optional.empty();
+      case MONORAIL -> fareType == FareType.electronicYouth
+        ? Optional.of(ZERO_USD)
+        : optionalUSD(4.00f);
       default -> Optional.of(ZERO_USD);
     };
   }
