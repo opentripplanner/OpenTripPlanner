@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
 
@@ -18,7 +19,10 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TripTimesForTest;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -117,6 +121,93 @@ class LegImplTest implements PlanTestConstants {
   void walkLegWithFilter() throws Exception {
     var env = dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
     assertNull(IMPL.intermediateStops().get(env));
+  }
+
+  private static ScheduledTransitLeg legWithRealTimeTripTimes(
+    RealTimeTripTimesBuilder builder
+  ) {
+    return new ScheduledTransitLegBuilder<>()
+      .withStartTime(TIME)
+      .withEndTime(TIME)
+      .withZoneId(TIME.getZone())
+      .withServiceDate(TIME.toLocalDate())
+      .withTripTimes(builder.build())
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(4)
+      .withTripPattern(PATTERN)
+      .build();
+  }
+
+  // ---------------------------------------------------------------------------
+  // realTimeTripState
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void realTimeTripState_isNull_forNonTransitLeg() throws Exception {
+    // Walk legs have no trip state
+    var env = dataFetchingEnvironment(WALK_LEG);
+    assertNull(IMPL.realTimeTripState().get(env));
+  }
+
+  @Test
+  void realTimeTripState_allFlagsFalse_forScheduledTransitLeg() throws Exception {
+    // LEG uses ScheduledTripTimes — all flags default to false
+    var env = dataFetchingEnvironment(LEG);
+    var state = IMPL.realTimeTripState().get(env);
+    assertEquals(
+      new RealTimeTripStateModel(false, false, false, false, false, false),
+      state
+    );
+  }
+
+  @Test
+  void realTimeTripState_canceledFlagIsTrue_forCanceledTrip() throws Exception {
+    var builder = TripTimesForTest.scheduled().createRealTimeFromScheduledTimes();
+    builder.withCanceled();
+    var leg = legWithRealTimeTripTimes(builder);
+    var state = IMPL.realTimeTripState().get(dataFetchingEnvironment(leg));
+    assertEquals(true, state.canceled());
+    assertEquals(true, state.updated()); // hasAnyUpdates() is true
+    assertEquals(false, state.added());
+    assertEquals(false, state.deleted());
+    assertEquals(false, state.timesModified());
+    assertEquals(false, state.tripPatternModified());
+  }
+
+  @Test
+  void realTimeTripState_timesModifiedAndUpdated_forDelayedTrip() throws Exception {
+    var builder = TripTimesForTest.scheduled().createRealTimeFromScheduledTimes();
+    builder.withRealTimeUpdated();
+    var leg = legWithRealTimeTripTimes(builder);
+    var state = IMPL.realTimeTripState().get(dataFetchingEnvironment(leg));
+    assertEquals(true, state.timesModified());
+    assertEquals(true, state.updated());
+    assertEquals(false, state.canceled());
+    assertEquals(false, state.added());
+    assertEquals(false, state.deleted());
+    assertEquals(false, state.tripPatternModified());
+  }
+
+  @Test
+  void realTimeTripState_addedFlag_forAddedTrip() throws Exception {
+    var builder = TripTimesForTest.scheduled().createRealTimeFromScheduledTimes();
+    builder.withAdded();
+    var leg = legWithRealTimeTripTimes(builder);
+    var state = IMPL.realTimeTripState().get(dataFetchingEnvironment(leg));
+    assertEquals(true, state.added());
+    assertEquals(true, state.updated());
+    assertEquals(false, state.canceled());
+  }
+
+  @Test
+  void realTimeTripState_tripPatternModifiedFlag() throws Exception {
+    var builder = TripTimesForTest.scheduled().createRealTimeFromScheduledTimes();
+    builder.withModifiedTripPattern();
+    var leg = legWithRealTimeTripTimes(builder);
+    var state = IMPL.realTimeTripState().get(dataFetchingEnvironment(leg));
+    assertEquals(true, state.tripPatternModified());
+    assertEquals(true, state.updated());
+    assertEquals(false, state.canceled());
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {

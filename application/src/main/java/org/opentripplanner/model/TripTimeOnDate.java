@@ -13,6 +13,8 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -302,6 +304,14 @@ public class TripTimeOnDate {
 
   public boolean isNoDataStop() {
     return tripTimes.isNoDataStop(stopPosition);
+  }
+
+  /** Returns the real-time state of this stop. Returns {@link StopRealTimeState#DEFAULT} for scheduled trips. */
+  public StopRealTimeState getStopRealTimeState() {
+    if (tripTimes instanceof RealTimeTripTimes realTimeTripTimes) {
+      return realTimeTripTimes.getStopRealTimeState(stopPosition);
+    }
+    return StopRealTimeState.DEFAULT;
   }
 
   /// True if there is realtime information indicating that the trip has arrived at the stop.

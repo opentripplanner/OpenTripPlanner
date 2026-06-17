@@ -227,6 +227,14 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return isStopRealTimeStates(stopPos, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
+  /** Returns the real-time state of the stop at the given position. */
+  public StopRealTimeState getStopRealTimeState(int stopPos) {
+    if (stopRealTimeStates == null) {
+      return StopRealTimeState.DEFAULT;
+    }
+    return stopRealTimeStates[stopPos];
+  }
+
   @Override
   public boolean isExtraCall(int stopPos) {
     return extraCalls.get(stopPos);

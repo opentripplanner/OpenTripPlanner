@@ -23,6 +23,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoff
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalDirection;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
@@ -33,6 +34,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -472,6 +474,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLPickupDropoffType> pickupType();
     public DataFetcher<Iterable<Leg>> previousLegs();
     public DataFetcher<Boolean> realTime();
+    public DataFetcher<RealTimeTripStateModel> realTimeTripState();
     public DataFetcher<GraphQLRealtimeState> realtimeState();
     public DataFetcher<Boolean> rentedBike();
     public DataFetcher<RideEstimate> rideHailingEstimate();
@@ -749,6 +752,16 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> time();
   }
 
+  /** The real-time state of a trip */
+  public interface GraphQLRealTimeTripState {
+    public DataFetcher<Boolean> added();
+    public DataFetcher<Boolean> canceled();
+    public DataFetcher<Boolean> deleted();
+    public DataFetcher<Boolean> timesModified();
+    public DataFetcher<Boolean> tripPatternModified();
+    public DataFetcher<Boolean> updated();
+  }
+
   /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
   public interface GraphQLRentalPlace extends TypeResolver {}
 
@@ -987,6 +1000,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> stop();
     public DataFetcher<Integer> stopPosition();
     public DataFetcher<Integer> stopPositionInPattern();
+    public DataFetcher<GraphQLStopRealTimeState> stopRealTimeState();
     public DataFetcher<Boolean> timepoint();
     public DataFetcher<Trip> trip();
   }

@@ -15,6 +15,7 @@
         stopPosition
         stopPositionInPattern
         realtimeState
+        stopRealTimeState
         pickupType
         dropoffType
       }
@@ -29,6 +30,7 @@
         stopPosition
         stopPositionInPattern
         realtimeState
+        stopRealTimeState
         pickupType
         dropoffType
       }

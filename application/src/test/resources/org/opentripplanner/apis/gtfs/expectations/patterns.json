@@ -122,7 +122,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -136,7 +137,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -150,7 +152,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "stoptimesForDate": [
@@ -166,7 +169,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -180,7 +184,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -194,7 +199,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "occupancy": {
@@ -216,7 +222,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -230,7 +237,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -244,7 +252,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "stoptimesForDate": [
@@ -260,7 +269,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -274,7 +284,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -288,7 +299,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "occupancy": {
@@ -310,7 +322,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -324,7 +337,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -338,7 +352,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "SCHEDULED",
                 "pickupType": "SCHEDULED",
-                "dropoffType": "SCHEDULED"
+                "dropoffType": "SCHEDULED",
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "stoptimesForDate": [
@@ -354,7 +369,8 @@
                 "stopPositionInPattern": 0,
                 "realtimeState": "CANCELED",
                 "pickupType": null,
-                "dropoffType": null
+                "dropoffType": null,
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -368,7 +384,8 @@
                 "stopPositionInPattern": 1,
                 "realtimeState": "CANCELED",
                 "pickupType": null,
-                "dropoffType": null
+                "dropoffType": null,
+                "stopRealTimeState": "DEFAULT"
               },
               {
                 "stop": {
@@ -382,7 +399,8 @@
                 "stopPositionInPattern": 2,
                 "realtimeState": "CANCELED",
                 "pickupType": null,
-                "dropoffType": null
+                "dropoffType": null,
+                "stopRealTimeState": "DEFAULT"
               }
             ],
             "occupancy": {

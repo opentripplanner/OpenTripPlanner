@@ -5495,6 +5495,14 @@ public class GraphQLTypes {
     TRIPS,
   }
 
+  public enum GraphQLStopRealTimeState {
+    CANCELLED,
+    DEFAULT,
+    INACCURATE_PREDICTIONS,
+    NO_DATA,
+    RECORDED,
+  }
+
   public enum GraphQLStopType {
     LOCATION,
     LOCATION_GROUP,

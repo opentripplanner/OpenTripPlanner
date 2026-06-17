@@ -257,6 +257,14 @@
           accessibilityScore
           id
           realtimeState
+          realTimeTripState {
+            added
+            canceled
+            deleted
+            timesModified
+            tripPatternModified
+            updated
+          }
         }
       }
     }

@@ -942,8 +942,10 @@ type Leg {
   ): [Leg!]
   "Whether there is real-time data about this Leg"
   realTime: Boolean
+  "Real-time State of the trip on this Leg"
+  realTimeTripState: RealTimeTripState
   "State of real-time data"
-  realtimeState: RealtimeState
+  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` instead.")
   "Whether this leg is traversed with a rented vehicle."
   rentedBike: Boolean
   "Estimate of a hailed ride like Uber."
@@ -2123,6 +2125,22 @@ type RealTimeEstimate {
   time: OffsetDateTime!
 }
 
+"The real-time state of a trip"
+type RealTimeTripState {
+  "has the trip been added via real-time updates? (extra trip)"
+  added: Boolean!
+  "has the trip been canceled?"
+  canceled: Boolean!
+  "has the trip been deleted?"
+  deleted: Boolean!
+  "have the departure/ arrival times been modified?"
+  timesModified: Boolean!
+  "has the trip pattern been modified?"
+  tripPatternModified: Boolean!
+  "have there been any real-time updates on this trip?"
+  updated: Boolean!
+}
+
 "Rental vehicle represents a vehicle that belongs to a rental network."
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
@@ -2670,7 +2688,7 @@ type Stoptime {
   "Real-time prediction of departure time. Format: seconds since midnight of the departure date"
   realtimeDeparture: Int
   "State of real-time data"
-  realtimeState: RealtimeState
+  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` on the Leg for the trips real-time state or `stopRealTimeState` for the stops realtime state.")
   "Scheduled arrival time. Format: seconds since midnight of the departure date"
   scheduledArrival: Int
   "Scheduled departure time. Format: seconds since midnight of the departure date"
@@ -2701,6 +2719,8 @@ type Stoptime {
   between trips even within the same pattern.
   """
   stopPositionInPattern: Int!
+  "The realtime-state of the stop"
+  stopRealTimeState: StopRealTimeState!
   "true, if this stop is used as a time equalization stop. false otherwise."
   timepoint: Boolean
   "Trip which this stoptime is for"
@@ -4129,6 +4149,19 @@ enum StopAlertType {
   STOP_ON_TRIPS
   "Alerts affecting the trips that go through this stop"
   TRIPS
+}
+
+enum StopRealTimeState {
+  "The stop is cancelled."
+  CANCELLED
+  "Default state. Trip's realtime state should then determine the state of the stop."
+  DEFAULT
+  "The realtime data on the stop is inaccurate."
+  INACCURATE_PREDICTIONS
+  "The realtime feed has indicated that there is no data available for this stop."
+  NO_DATA
+  "The vehicle has arrived to the stop or already visited it and the times are no longer estimates."
+  RECORDED
 }
 
 enum StopType {
