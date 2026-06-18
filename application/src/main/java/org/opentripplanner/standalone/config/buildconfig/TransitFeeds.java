@@ -31,9 +31,8 @@ public record TransitFeeds(
       .stream()
       .filter(feed -> feed.ignoreHttps() || feed.ignoreZipExtension())
       .collect(
-        Collectors.toMap(
-          DataSourceConfig::source,
-          feed -> new DataSourceOptions(feed.ignoreHttps(), feed.ignoreZipExtension())
+        Collectors.toMap(DataSourceConfig::source, feed ->
+          new DataSourceOptions(feed.ignoreHttps(), feed.ignoreZipExtension())
         )
       );
   }
