@@ -57,19 +57,19 @@ class RealTimeTripStateImplTest {
 
   @Test
   void addedFlagIsIsolated() throws Exception {
-    var model = new RealTimeTripStateModel(true, false, false, false, false, false);
+    var model = new RealTimeTripStateModel(true, false, false, false, false, true);
     var env = dataFetchingEnvironment(model);
     assertEquals(true, SUBJECT.added().get(env));
     assertEquals(false, SUBJECT.canceled().get(env));
     assertEquals(false, SUBJECT.deleted().get(env));
     assertEquals(false, SUBJECT.timesModified().get(env));
     assertEquals(false, SUBJECT.tripPatternModified().get(env));
-    assertEquals(false, SUBJECT.updated().get(env));
+    assertEquals(true, SUBJECT.updated().get(env));
   }
 
   @Test
   void canceledFlagIsIsolated() throws Exception {
-    var model = new RealTimeTripStateModel(false, true, false, false, false, false);
+    var model = new RealTimeTripStateModel(false, true, false, false, false, true);
     var env = dataFetchingEnvironment(model);
     assertEquals(false, SUBJECT.added().get(env));
     assertEquals(true, SUBJECT.canceled().get(env));
@@ -78,16 +78,17 @@ class RealTimeTripStateImplTest {
 
   @Test
   void deletedFlagIsIsolated() throws Exception {
-    var model = new RealTimeTripStateModel(false, false, true, false, false, false);
+    var model = new RealTimeTripStateModel(false, false, true, false, false, true);
     var env = dataFetchingEnvironment(model);
     assertEquals(false, SUBJECT.canceled().get(env));
     assertEquals(true, SUBJECT.deleted().get(env));
     assertEquals(false, SUBJECT.timesModified().get(env));
+    assertEquals(true, SUBJECT.updated().get(env));
   }
 
   @Test
   void timesModifiedFlagIsIsolated() throws Exception {
-    var model = new RealTimeTripStateModel(false, false, false, true, false, false);
+    var model = new RealTimeTripStateModel(false, false, false, true, false, true);
     var env = dataFetchingEnvironment(model);
     assertEquals(false, SUBJECT.deleted().get(env));
     assertEquals(true, SUBJECT.timesModified().get(env));
@@ -96,11 +97,11 @@ class RealTimeTripStateImplTest {
 
   @Test
   void tripPatternModifiedFlagIsIsolated() throws Exception {
-    var model = new RealTimeTripStateModel(false, false, false, false, true, false);
+    var model = new RealTimeTripStateModel(false, false, false, false, true, true);
     var env = dataFetchingEnvironment(model);
     assertEquals(false, SUBJECT.timesModified().get(env));
     assertEquals(true, SUBJECT.tripPatternModified().get(env));
-    assertEquals(false, SUBJECT.updated().get(env));
+    assertEquals(true, SUBJECT.updated().get(env));
   }
 
   @Test

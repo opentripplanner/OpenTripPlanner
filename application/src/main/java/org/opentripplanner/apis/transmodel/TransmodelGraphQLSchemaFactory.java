@@ -80,6 +80,7 @@ import org.opentripplanner.apis.transmodel.model.network.PresentationType;
 import org.opentripplanner.apis.transmodel.model.network.StopToStopGeometryType;
 import org.opentripplanner.apis.transmodel.model.plan.ElevationProfileStepType;
 import org.opentripplanner.apis.transmodel.model.plan.LegType;
+import org.opentripplanner.apis.transmodel.model.plan.RealTimeTripStateType;
 import org.opentripplanner.apis.transmodel.model.plan.PathGuidanceType;
 import org.opentripplanner.apis.transmodel.model.plan.PlanPlaceType;
 import org.opentripplanner.apis.transmodel.model.plan.RefetchTripPatternQuery;
@@ -390,6 +391,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLObjectType elevationStepType = ElevationProfileStepType.create();
     GraphQLObjectType emissionType = EmissionType.create();
     GraphQLObjectType pathGuidanceType = PathGuidanceType.create(elevationStepType);
+    GraphQLObjectType realTimeTripStateType = RealTimeTripStateType.create();
     GraphQLObjectType legType = LegType.create(
       bookingArrangementType,
       interchangeType,
@@ -406,6 +408,7 @@ public class TransmodelGraphQLSchemaFactory {
       pathGuidanceType,
       elevationStepType,
       emissionType,
+      realTimeTripStateType,
       dateTimeScalar
     );
     GraphQLObjectType tripPatternType = TripPatternType.create(
