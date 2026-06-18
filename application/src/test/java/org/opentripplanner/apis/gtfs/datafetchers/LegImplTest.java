@@ -13,22 +13,22 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TripTimesForTest;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -123,9 +123,7 @@ class LegImplTest implements PlanTestConstants {
     assertNull(IMPL.intermediateStops().get(env));
   }
 
-  private static ScheduledTransitLeg legWithRealTimeTripTimes(
-    RealTimeTripTimesBuilder builder
-  ) {
+  private static ScheduledTransitLeg legWithRealTimeTripTimes(RealTimeTripTimesBuilder builder) {
     return new ScheduledTransitLegBuilder<>()
       .withStartTime(TIME)
       .withEndTime(TIME)
@@ -154,10 +152,7 @@ class LegImplTest implements PlanTestConstants {
     // LEG uses ScheduledTripTimes — all flags default to false
     var env = dataFetchingEnvironment(LEG);
     var state = IMPL.realTimeTripState().get(env);
-    assertEquals(
-      new RealTimeTripStateModel(false, false, false, false, false, false),
-      state
-    );
+    assertEquals(new RealTimeTripStateModel(false, false, false, false, false, false), state);
   }
 
   @Test
@@ -167,7 +162,7 @@ class LegImplTest implements PlanTestConstants {
     var leg = legWithRealTimeTripTimes(builder);
     var state = IMPL.realTimeTripState().get(dataFetchingEnvironment(leg));
     assertEquals(true, state.canceled());
-    assertEquals(true, state.updated()); // hasAnyUpdates() is true
+    assertEquals(true, state.updated());
     assertEquals(false, state.added());
     assertEquals(false, state.deleted());
     assertEquals(false, state.timesModified());

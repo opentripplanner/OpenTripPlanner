@@ -48,9 +48,7 @@ public class RealTimeTripStateType {
           .name("timesModified")
           .description("Have the departure/arrival times been modified?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env ->
-            ((TransmodelRealTimeTripStateModel) env.getSource()).timesModified()
-          )
+          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).timesModified())
           .build()
       )
       .field(

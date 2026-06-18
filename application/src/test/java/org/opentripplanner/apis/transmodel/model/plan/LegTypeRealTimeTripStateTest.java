@@ -20,9 +20,9 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
@@ -38,11 +38,9 @@ class LegTypeRealTimeTripStateTest {
   private static final RegularStop STOP_A = ENV_BUILDER.stop("A");
   private static final RegularStop STOP_B = ENV_BUILDER.stop("B");
   private static final TransitTestEnvironment ENV = ENV_BUILDER.addTrip(
-    TripInput.of(TRIP_ID).addStop(STOP_A, "10:00:00", "10:00:00").addStop(
-      STOP_B,
-      "10:10:00",
-      "10:10:00"
-    )
+    TripInput.of(TRIP_ID)
+      .addStop(STOP_A, "10:00:00", "10:00:00")
+      .addStop(STOP_B, "10:10:00", "10:10:00")
   ).build();
   private static final TripPattern PATTERN = ENV.tripData(TRIP_ID).tripPattern();
   private static final TripTimes SCHEDULED_TIMES = ENV.tripData(TRIP_ID).scheduledTripTimes();

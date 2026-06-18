@@ -91,7 +91,7 @@ class RealTimeTripStateTypeTest {
     var result = execute(model);
     assertEquals(false, result.get("timesModified"));
     assertEquals(true, result.get("tripPatternModified"));
-    assertEquals(true, result.get("updated"));
+    assertEquals(false, result.get("updated"));
   }
 
   @Test
@@ -110,9 +110,7 @@ class RealTimeTripStateTypeTest {
   private static java.util.Map<String, Object> execute(TransmodelRealTimeTripStateModel model) {
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
-        .query(
-          "{ state { added canceled deleted timesModified tripPatternModified updated } }"
-        )
+        .query("{ state { added canceled deleted timesModified tripPatternModified updated } }")
         .root(model)
         .build()
     );

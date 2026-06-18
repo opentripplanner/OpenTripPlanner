@@ -11,9 +11,9 @@ import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataF
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
@@ -60,7 +60,8 @@ class StoptimeImplTest {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = env.tripData(TRIP_ID);
     var builder = tripData.scheduledTripTimes().createRealTimeFromScheduledTimes();
-    builder.withNoData(1); // mark stop B as NO_DATA
+    // mark stop B as NO_DATA
+    builder.withNoData(1);
     var realTimeTripTimes = builder.build();
     var pattern = tripData.tripPattern();
 
@@ -73,7 +74,8 @@ class StoptimeImplTest {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = env.tripData(TRIP_ID);
     var builder = tripData.scheduledTripTimes().createRealTimeFromScheduledTimes();
-    builder.withCanceled(1); // mark stop B as CANCELLED
+    // mark stop B as CANCELLED
+    builder.withCanceled(1);
     var realTimeTripTimes = builder.build();
     var pattern = tripData.tripPattern();
 
@@ -129,21 +131,28 @@ class StoptimeImplTest {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = env.tripData(TRIP_ID);
     var builder = tripData.scheduledTripTimes().createRealTimeFromScheduledTimes();
-    builder.withNoData(1); // only stop B
+    // only stop B
+    builder.withNoData(1);
     var realTimeTripTimes = builder.build();
     var pattern = tripData.tripPattern();
 
     assertEquals(
       DEFAULT,
-      SUBJECT.stopRealTimeState().get(dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 0, pattern)))
+      SUBJECT.stopRealTimeState().get(
+        dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 0, pattern))
+      )
     );
     assertEquals(
       NO_DATA,
-      SUBJECT.stopRealTimeState().get(dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 1, pattern)))
+      SUBJECT.stopRealTimeState().get(
+        dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 1, pattern))
+      )
     );
     assertEquals(
       DEFAULT,
-      SUBJECT.stopRealTimeState().get(dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 2, pattern)))
+      SUBJECT.stopRealTimeState().get(
+        dataFetchingEnvironment(new TripTimeOnDate(realTimeTripTimes, 2, pattern))
+      )
     );
   }
 }
