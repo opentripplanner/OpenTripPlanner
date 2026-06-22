@@ -6,6 +6,7 @@ import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -24,7 +25,8 @@ public record GraphQLRequestContext(
   GraphQLSchema schema,
   NearbyPlaceFinder nearbyPlaceFinder,
   NearbyStopFinder nearbyStopFinder,
-  RouteRequest defaultRouteRequest
+  RouteRequest defaultRouteRequest,
+  RefetchItineraryService refetchItineraryService
 ) {
   public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
     return new GraphQLRequestContext(
@@ -38,7 +40,8 @@ public record GraphQLRequestContext(
       context.gtfsSchema(),
       context.nearbyPlaceFinder(),
       context.nearbyStopFinder(),
-      context.defaultRouteRequest()
+      context.defaultRouteRequest(),
+      new RefetchItineraryService(context)
     );
   }
 

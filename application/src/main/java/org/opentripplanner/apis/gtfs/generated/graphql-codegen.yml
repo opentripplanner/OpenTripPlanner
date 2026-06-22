@@ -145,3 +145,4 @@ config:
     CanceledTripsSummary: org.opentripplanner.apis.gtfs.model.CanceledTripsSummary#CanceledTripsSummary
     CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
+    RefetchItineraryResult: org.opentripplanner.apis.gtfs.model.RefetchItineraryResult#RefetchItineraryResult

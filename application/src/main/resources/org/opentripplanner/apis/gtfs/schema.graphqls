@@ -1273,6 +1273,13 @@ type PlanConnection {
   "What was the starting point for the itinerary search."
   searchDateTime: OffsetDateTime
 }
+"""
+Refetched data for an itinerary.
+"""
+type RefetchItineraryResult {
+  "The refetched itinerary."
+  itinerary: Itinerary
+}
 
 """
 Edge outputted by a plan search. Part of the
@@ -1489,6 +1496,29 @@ type QueryType {
   Fare products cannot be refetched using this query.
   """
   leg(id: String!): Leg @timingData
+  """
+  Get an updated version of an itinerary with realtime changes applied.
+  This uses the provided leg IDs to reconstruct the same itinerary with current realtime data.
+  """
+  refetchItinerary(
+    "The origin where the itinerary starts. Usually coordinates but can also be a stop location."
+    origin: PlanLabeledLocationInput!
+
+    "The destination where the itinerary ends. Usually coordinates but can also be a stop location."
+    destination: PlanLabeledLocationInput!
+
+    "A list of leg IDs describing the itinerary. At least one leg is required."
+    legs: [ID!]!
+
+    "Street and transit modes used during the search."
+    modes: PlanModesInput
+
+    "Preferences that affect the refetch search."
+    preferences: PlanPreferencesInput
+
+    "Locale used for translations."
+    locale: Locale
+  ): RefetchItineraryResult @timingData
   """
   Get all places (stops, stations, etc. with coordinates) within the specified
   radius from a location. The returned type is a Relay connection (see

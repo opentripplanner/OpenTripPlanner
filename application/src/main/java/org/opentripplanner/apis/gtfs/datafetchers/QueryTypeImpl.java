@@ -36,6 +36,7 @@ import org.opentripplanner.apis.gtfs.mapping.CanceledTripsFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
+import org.opentripplanner.apis.gtfs.model.RefetchItineraryResult;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -63,6 +64,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -517,6 +519,48 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       RouteRequest request = RouteRequestMapper.toRouteRequest(environment, context);
       return getPlanResult(context, request);
     };
+  }
+
+  @Override
+  public DataFetcher<RefetchItineraryResult> refetchItinerary() {
+    return environment -> {
+      GraphQLRequestContext context = getRequestContext(environment);
+      var args = new GraphQLTypes.GraphQLQueryTypeRefetchItineraryArgs(
+        environment.getArguments()
+      );
+
+      var legIds = args.getGraphQLLegs();
+
+      if (legIds == null || legIds.isEmpty()) {
+        throw new IllegalArgumentException("At least one leg is required");
+      }
+
+      var legReferences = legIds
+        .stream()
+        .map(legId -> LegReferenceSerializer.decode(legId.getId()))
+        .toList();
+
+      if (legReferences.stream().anyMatch(Objects::isNull)) {
+        throw new IllegalArgumentException("Invalid leg id");
+      }
+
+      RouteRequest routeRequest = RouteRequestMapper.toRouteRequest(environment, context);
+
+      var itinerary = context
+        .refetchItineraryService()
+        .refetchItinerary(
+          routeRequest.from(),
+          routeRequest.to(),
+          legReferences,
+          routeRequest
+        );
+
+      return new RefetchItineraryResult(itinerary);
+    };
+  }
+
+  private GraphQLRequestContext getRequestContext(DataFetchingEnvironment environment) {
+    return environment.getGraphQlContext().get(GraphQLRequestContext.class);
   }
 
   @Override

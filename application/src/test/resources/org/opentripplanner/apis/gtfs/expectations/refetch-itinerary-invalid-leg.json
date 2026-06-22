@@ -1,0 +1,22 @@
+{
+  "errors" : [
+    {
+      "message" : "Exception while fetching data (/refetchItinerary) : Invalid leg id",
+      "locations" : [
+        {
+          "line" : 2,
+          "column" : 5
+        }
+      ],
+      "path" : [
+        "refetchItinerary"
+      ],
+      "extensions" : {
+        "classification" : "DataFetchingException"
+      }
+    }
+  ],
+  "data" : {
+    "refetchItinerary" : null
+  }
+}
