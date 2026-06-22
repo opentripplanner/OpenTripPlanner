@@ -439,7 +439,7 @@ public class OrcaFareService extends DefaultFareService {
         LINK_SHUTTLE -> Optional.empty();
       case MONORAIL -> fareType == FareType.electronicYouth
         ? Optional.of(ZERO_USD)
-        : optionalUSD(4.00f);
+        : optionalUSD(2.00f);
       default -> Optional.of(ZERO_USD);
     };
   }

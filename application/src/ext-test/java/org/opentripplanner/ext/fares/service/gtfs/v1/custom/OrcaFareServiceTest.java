@@ -590,7 +590,7 @@ public class OrcaFareServiceTest {
 
     calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f).plus(usDollars(4.00f))));
     calculateFare(rides, FareType.senior, usDollars(4.00f));
-    calculateFare(rides, FareType.youth, usDollars(4.00f));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
     calculateFare(rides, FareType.electronicRegular, usDollars(3.00f).plus(usDollars(4.00f)));
     // Monorail charges $2.00 reduced fare for senior/LIFT (no free transfer to/from monorail)
     calculateFare(rides, FareType.electronicSenior, usDollars(3.00f));
@@ -616,7 +616,7 @@ public class OrcaFareServiceTest {
     List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
     calculateFare(rides, regular, usDollars(4.00f));
     calculateFare(rides, FareType.senior, TWO_DOLLARS);
-    calculateFare(rides, FareType.youth, usDollars(4.00f));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
     calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
     calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
