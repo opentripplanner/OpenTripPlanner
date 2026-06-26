@@ -64,6 +64,43 @@ class ArrivalStatusTest implements RealtimeTestConstants {
     assertFalse(tt.hasDeparted(2));
   }
 
+  /// A RecordedCall at the TERMINUS (last stop) carrying an ActualArrivalTime but no
+  /// ActualDepartureTime must be treated as arrived but NOT departed: the vehicle reaches
+  /// its final stop and never leaves. A terminus is only departed when an actual departure
+  /// time is present (CallWrapper.hasDeparted()).
+  @Test
+  void testRecordedTerminusWithArrivalButNoDeparture() {
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+    var update = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withRecordedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedActual("00:10", "00:10")
+          .call(STOP_B)
+          .arriveAimedActual("00:20", "00:20")
+          .departAimedActual("00:20", "00:20")
+          .call(STOP_C)
+          .arriveAimedActual("00:30", "00:30")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(update);
+    assertSuccess(result);
+
+    var tt = env.tripData(TRIP_1_ID).tripTimes();
+    // Origin: departed.
+    assertTrue(tt.hasDeparted(0));
+    // Middle recorded call with an actual departure: arrived AND departed.
+    assertTrue(tt.hasArrived(1));
+    assertTrue(tt.hasDeparted(1));
+    // Terminus recorded call with arrival only: arrived but NOT departed.
+    assertTrue(tt.hasArrived(2));
+    assertFalse(tt.hasDeparted(2));
+  }
+
   /// Verify handling of ArrivalStatus == ARRIVED
   @Test
   void testUpdateJourneyWithArrivalStatusArrived() {
