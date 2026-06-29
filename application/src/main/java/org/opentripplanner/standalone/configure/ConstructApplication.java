@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -92,6 +93,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionRepository emissionRepository,
+    @Nullable CarPickupZoneRepository carPickupZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -130,6 +132,7 @@ public class ConstructApplication {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
+      .carPickupZoneRepository(carPickupZoneRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -175,6 +178,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
+      factory.carPickupZoneRepository(),
       factory.empiricalDelayRepository(),
       factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
@@ -379,6 +383,11 @@ public class ConstructApplication {
 
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
+  }
+
+  @Nullable
+  public CarPickupZoneRepository carPickupZoneRepository() {
+    return factory.carPickupZoneRepository();
   }
 
   public StreetDetailsRepository streetDetailsRepository() {

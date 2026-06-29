@@ -10,6 +10,8 @@ import org.opentripplanner.apis.gtfs.configure.SchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
+import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneServiceModule;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
@@ -91,6 +93,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
     EmissionServiceModule.class,
+    CarPickupZoneServiceModule.class,
     EmpiricalDelayServiceModule.class,
     DeduplicatorServiceModule.class,
     GeocoderModule.class,
@@ -155,6 +158,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   EmissionRepository emissionRepository();
+
+  @Nullable
+  CarPickupZoneRepository carPickupZoneRepository();
 
   StreetDetailsRepository streetDetailsRepository();
 
@@ -231,6 +237,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionRepository(EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder carPickupZoneRepository(@Nullable CarPickupZoneRepository carPickupZoneRepository);
 
     @BindsInstance
     Builder streetDetailsRepository(StreetDetailsRepository streetDetailsRepository);

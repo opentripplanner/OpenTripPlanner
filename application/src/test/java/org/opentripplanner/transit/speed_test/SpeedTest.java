@@ -218,6 +218,7 @@ public class SpeedTest {
       null,
       null,
       null,
+      null,
       TestServerContext.createStreetDetailsService(),
       null,
       null,

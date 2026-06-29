@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.CACHE;
+import static org.opentripplanner.datastore.api.FileType.CAR_PICKUP_ZONE;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
@@ -123,7 +124,7 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public boolean hasTransitData() {
-    return hasOneOf(GTFS, NETEX);
+    return hasOneOf(GTFS, NETEX, CAR_PICKUP_ZONE);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -146,6 +147,12 @@ public class GraphBuilderDataSources implements Closeable {
 
   public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
+  }
+
+  public Iterable<
+    ConfiguredCompositeDataSource<GtfsFeedParameters>
+  > getCarPickupZoneConfiguredDataSource() {
+    return ofStream(CAR_PICKUP_ZONE).map(this::mapCarPickupZoneFeed).toList();
   }
 
   public Iterable<
@@ -285,6 +292,13 @@ public class GraphBuilderDataSources implements Closeable {
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
+  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapCarPickupZoneFeed(
+    DataSource dataSource
+  ) {
+    var p = buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build();
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
+  }
+
   private ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters> mapEmpiricalDelayFeed(
     DataSource dataSource
   ) {
@@ -339,7 +353,7 @@ public class GraphBuilderDataSources implements Closeable {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
-      if (!has(OSM)) {
+      if (!hasOsm()) {
         throw new OtpAppException("Unable to build street graph, no OSM data available.");
       }
     } else if (cli.load) {

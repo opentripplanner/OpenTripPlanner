@@ -130,6 +130,7 @@ public enum OTPFeature {
   ),
   CarPooling(false, true, "Enable the carpooling sandbox module."),
   Emission(false, true, "Enable the emission sandbox module."),
+  CarPickupZone(false, true, "Enable the car pickup zone sandbox module."),
   EmpiricalDelay(false, true, "Enable empirical delay sandbox module."),
   DataOverlay(
     false,

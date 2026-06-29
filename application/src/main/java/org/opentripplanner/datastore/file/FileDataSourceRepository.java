@@ -2,6 +2,7 @@ package org.opentripplanner.datastore.file;
 
 import static org.opentripplanner.datastore.OtpDataStore.BUILD_REPORT_DIR;
 import static org.opentripplanner.datastore.api.FileType.CACHE;
+import static org.opentripplanner.datastore.api.FileType.CAR_PICKUP_ZONE;
 import static org.opentripplanner.datastore.api.FileType.CONFIG;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
@@ -23,6 +24,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
@@ -38,6 +40,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   private final Pattern GRAPH_PATTERN = Pattern.compile("(?i)(street)?graph.*\\.obj");
   private final Pattern CACHE_PATTERN = Pattern.compile("(?i).*-cache-\\d+\\.obj");
   private final Pattern EMISSION_PATTERN = Pattern.compile("(?i)(emission).*\\.(txt|csv)");
+  private final Pattern CAR_PICKUP_ZONE_PATTERN = Pattern.compile(
+    "(?i)(car[_-]?pickup[_-]?zone).*"
+  );
   private final Pattern EMPIRICAL_DELAY_PATTERN = Pattern.compile("(?i)(empirical[_-]?delay).*");
 
   private final File baseDir;
@@ -180,6 +185,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   private FileType resolveFileType(File file) {
     String name = file.getName();
+    if (OTPFeature.CarPickupZone.isOn() && isTransitFile(file, CAR_PICKUP_ZONE_PATTERN)) {
+      return CAR_PICKUP_ZONE;
+    }
     if (isTransitFile(file, gtfsLocalFilePattern)) {
       return GTFS;
     }

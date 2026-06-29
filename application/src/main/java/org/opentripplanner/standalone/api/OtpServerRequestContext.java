@@ -28,6 +28,7 @@ import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
@@ -190,6 +191,9 @@ public interface OtpServerRequestContext {
 
   @Nullable
   ItineraryDecorator emissionItineraryDecorator();
+
+  @Nullable
+  ItineraryListFilter carPickupZoneDecorator();
 
   StreetDetailsService streetDetailsService();
 

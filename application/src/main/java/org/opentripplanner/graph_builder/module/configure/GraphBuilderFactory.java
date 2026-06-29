@@ -6,6 +6,9 @@ import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
+import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneGraphBuilderModule;
+import org.opentripplanner.ext.carpickupzone.internal.graphbuilder.CarPickupZoneGraphBuilder;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.edgenaming.configure.EdgeNamerModule;
@@ -58,6 +61,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     DataOverlayParameterBindingsModule.class,
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
+    CarPickupZoneGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
@@ -91,6 +95,9 @@ public interface GraphBuilderFactory {
 
   @Nullable
   EmissionGraphBuilder emissionGraphBuilder();
+
+  @Nullable
+  CarPickupZoneGraphBuilder carPickupZoneGraphBuilder();
 
   @Nullable
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
@@ -152,6 +159,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder emissionRepository(@Nullable EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder carPickupZoneRepository(@Nullable CarPickupZoneRepository carPickupZoneRepository);
 
     @BindsInstance
     Builder empiricalDelayRepository(@Nullable EmpiricalDelayRepository empiricalDelayRepository);

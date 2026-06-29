@@ -6,6 +6,8 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
+import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneRepositoryModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionRepositoryModule;
@@ -49,6 +51,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     StreetDetailsRepositoryModule.class,
     WorldEnvelopeRepositoryModule.class,
     EmissionRepositoryModule.class,
+    CarPickupZoneRepositoryModule.class,
     EmpiricalDelayRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     StreetRepositoryModule.class,
@@ -86,6 +89,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   EmissionRepository emptyEmissionsDataModel();
+
+  @Singleton
+  CarPickupZoneRepository emptyCarPickupZoneRepository();
 
   @Singleton
   @Nullable

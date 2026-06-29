@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Queue;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -85,6 +86,7 @@ public class GraphBuilder implements Runnable {
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable CarPickupZoneRepository carPickupZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
@@ -105,6 +107,7 @@ public class GraphBuilder implements Runnable {
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
       .emissionRepository(emissionRepository)
+      .carPickupZoneRepository(carPickupZoneRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .fareServiceFactory(fareServiceFactory)
       .dataSources(dataSources)
@@ -180,6 +183,8 @@ public class GraphBuilder implements Runnable {
         factory.empiricalDelayGraphBuilder(),
         OTPFeature.EmpiricalDelay
       );
+
+      graphBuilder.addModuleOptional(factory.carPickupZoneGraphBuilder(), OTPFeature.CarPickupZone);
     }
 
     if (loadStreetGraph || dataSources.hasOsm()) {

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
@@ -115,6 +114,13 @@ public class RouteRequestToFilterChainMapper {
     }
 
     if (
+      context.carPickupZoneDecorator() != null &&
+      hasAccessOrEgressMode(request, StreetMode.CAR_PICKUP)
+    ) {
+      builder.withCarPickupZoneDecorator(context.carPickupZoneDecorator());
+    }
+
+    if (
       context.stopConsolidationService() != null && context.stopConsolidationService().isActive()
     ) {
       builder.withConsolidatedStopNamesDecorator(
@@ -126,15 +132,14 @@ public class RouteRequestToFilterChainMapper {
   }
 
   private static double minBikeParkingDistance(RouteRequest request) {
-    var modes = request.journey().modes();
-    boolean hasBikePark = List.of(modes.accessMode, modes.egressMode).contains(
-      StreetMode.BIKE_TO_PARK
-    );
-
-    double minBikeParkingDistance = 0;
-    if (hasBikePark) {
-      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    if (hasAccessOrEgressMode(request, StreetMode.BIKE_TO_PARK)) {
+      return request.preferences().itineraryFilter().minBikeParkingDistance();
     }
-    return minBikeParkingDistance;
+    return 0;
+  }
+
+  private static boolean hasAccessOrEgressMode(RouteRequest request, StreetMode mode) {
+    var modes = request.journey().modes();
+    return modes.accessMode == mode || modes.egressMode == mode;
   }
 }

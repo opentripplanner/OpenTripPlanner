@@ -26,8 +26,10 @@ import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.ext.CarPickupZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -179,6 +181,7 @@ public class RequestScopedModule {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
+    @Nullable @CarPickupZoneDecorator ItineraryListFilter carPickupZoneDecorator,
     StreetDetailsService streetDetailsService,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
     @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
@@ -224,6 +227,7 @@ public class RequestScopedModule {
       carpoolingService,
       dataOverlayParameterBindings,
       emissionItineraryDecorator,
+      carPickupZoneDecorator,
       streetDetailsService,
       empiricalDelayService,
       luceneIndex,

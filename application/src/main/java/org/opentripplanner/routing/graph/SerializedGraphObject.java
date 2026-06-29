@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -91,6 +92,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final EmissionRepository emissionRepository;
+  public final @Nullable CarPickupZoneRepository carPickupZoneRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
   public final StreetRepository streetRepository;
@@ -109,6 +111,7 @@ public class SerializedGraphObject implements Serializable {
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
     EmissionRepository emissionRepository,
+    @Nullable CarPickupZoneRepository carPickupZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,
     FareServiceFactory fareServiceFactory
@@ -126,6 +129,7 @@ public class SerializedGraphObject implements Serializable {
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
     this.emissionRepository = emissionRepository;
+    this.carPickupZoneRepository = carPickupZoneRepository;
     this.empiricalDelayRepository = empiricalDelayRepository;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();

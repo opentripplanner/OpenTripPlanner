@@ -27,6 +27,7 @@ import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.carpickupzone.model.CarPickupZoneLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -510,6 +511,9 @@ public class LegType {
     Function<TransitLeg, T> transitLegAccessor
   ) {
     Leg leg = leg(environment);
+    if (leg instanceof CarPickupZoneLeg cpzl) {
+      return cpzl.mode();
+    }
     if (leg instanceof StreetLeg sl) {
       return streetLegAccessor.apply(sl);
     }

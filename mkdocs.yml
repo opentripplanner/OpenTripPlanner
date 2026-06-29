@@ -139,6 +139,7 @@ nav:
     - Fares: 'sandbox/Fares.md'
     - Ride Hailing: 'sandbox/RideHailing.md'
     - Emissions: 'sandbox/Emission.md'
+    - Car Pickup Zones: 'sandbox/CarPickupZone.md'
     - Empirical Delay: 'sandbox/EmpiricalDelay.md'
     - Stop Consolidation: 'sandbox/StopConsolidation.md'
     - Sørlandsbanen: 'sandbox/Sorlandsbanen.md'

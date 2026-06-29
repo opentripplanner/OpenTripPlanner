@@ -221,6 +221,7 @@ public class TestServerContext {
       null,
       null,
       createEmissionsItineraryDecorator(),
+      null,
       createStreetDetailsService(),
       null,
       null,
