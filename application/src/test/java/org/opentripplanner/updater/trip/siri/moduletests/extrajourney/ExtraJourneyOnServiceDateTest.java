@@ -7,7 +7,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -21,8 +20,6 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 /// This test adds an extra journey on a service date where the original pattern is not running.
-/// It correctly ends up in the API queries but the RAPTOR transit data drops it.
-@Disabled("Not supported right now but should be fixed")
 class ExtraJourneyOnServiceDateTest implements RealtimeTestConstants {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2026, 6, 23);
