@@ -86,7 +86,7 @@ public sealed class Cost implements Serializable, Comparable<Cost> permits Norma
     return new Cost(IntUtils.round(value * factor));
   }
 
-  /* Comparason <, >, <=, >= */
+  /* Comparison <, >, <=, >= */
 
   public boolean greaterThan(Cost other) {
     return this.value > other.value;

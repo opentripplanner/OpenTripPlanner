@@ -2,14 +2,6 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import static org.opentripplanner.routing.util.EllipsoidUtils.computeEllipsoidToGeoidDifference;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -34,6 +26,8 @@ import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.cache.CacheTask;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.street.geometry.PolylineEncoder;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -89,13 +83,8 @@ public class ElevationModule implements GraphBuilderModule {
 
   /** The elevation data to be used in calculating elevations. */
   private final ElevationGridCoverageFactory gridCoverageFactory;
-  /* Whether or not to attempt reading in a file of cached elevations */
-  private final boolean readCachedElevations;
-  /* Whether or not to attempt writing out a file of cached elevations */
-  private final boolean writeCachedElevations;
   private final Graph graph;
-  /* The file of cached elevations */
-  private final File cachedElevationsFile;
+  private final GraphBuildCacheManager cacheManager;
   private final double maxElevationPropagationMeters;
   /* Whether or not to include geoid difference values in individual elevation calculations */
   private final boolean includeEllipsoidToGeoidDifference;
@@ -141,10 +130,8 @@ public class ElevationModule implements GraphBuilderModule {
       factory,
       graph,
       DataImportIssueStore.NOOP,
-      null,
+      GraphBuildCacheManager.NOOP,
       new HashMap<>(),
-      false,
-      false,
       10,
       2000,
       true,
@@ -157,23 +144,19 @@ public class ElevationModule implements GraphBuilderModule {
     ElevationGridCoverageFactory factory,
     Graph graph,
     DataImportIssueStore issueStore,
-    File cachedElevationsFile,
+    GraphBuildCacheManager cacheManager,
     Map<Vertex, Double> elevationData,
-    boolean readCachedElevations,
-    boolean writeCachedElevations,
     double distanceBetweenSamplesM,
     double maxElevationPropagationMeters,
     boolean includeEllipsoidToGeoidDifference,
     boolean multiThreadElevationCalculations,
     int elevationTileCacheSizeMB
   ) {
-    gridCoverageFactory = factory;
+    this.gridCoverageFactory = factory;
     this.graph = graph;
     this.issueStore = issueStore;
-    this.cachedElevationsFile = cachedElevationsFile;
+    this.cacheManager = cacheManager;
     this.elevationData = elevationData;
-    this.readCachedElevations = readCachedElevations;
-    this.writeCachedElevations = writeCachedElevations;
     this.maxElevationPropagationMeters = maxElevationPropagationMeters;
     this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
     this.multiThreadElevationCalculations = multiThreadElevationCalculations;
@@ -189,24 +172,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
 
-    // try to load in the cached elevation data
-    if (readCachedElevations) {
-      // try to load in the cached elevation data
-      try {
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
-        cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
-        LOG.info("Cached elevation data loaded into memory!");
-      } catch (IOException | ClassNotFoundException e) {
-        issueStore.add(
-          new Graphwide(
-            String.format(
-              "Cached elevations file could not be read in due to error: %s!",
-              e.getMessage()
-            )
-          )
-        );
-      }
-    }
+    cachedElevations = cacheManager.load(CacheTask.ELEVATION);
     LOG.info("Setting street elevation profiles from digital elevation model...");
 
     List<StreetEdge> streetsWithElevationEdges = new LinkedList<>();
@@ -266,6 +232,15 @@ public class ElevationModule implements GraphBuilderModule {
       }
     }
 
+    int pointsOutsideDEM = nPointsOutsideDEM.get();
+    if (pointsOutsideDEM > 0) {
+      issueStore.add(
+        "ElevationProfilePointsOutsideDEM",
+        "Elevation lookup failed at %d sample points that lie outside the DEM coverage area.",
+        pointsOutsideDEM
+      );
+    }
+
     LOG.info(progress.completeMessage());
 
     // Iterate again to find edges that had elevation calculated.
@@ -276,9 +251,7 @@ public class ElevationModule implements GraphBuilderModule {
       }
     }
 
-    if (writeCachedElevations) {
-      // write information from edgesWithElevation to a new cache file for subsequent graph builds
-      LOG.info("Writing elevation cache");
+    if (cacheManager.isEnabled(CacheTask.ELEVATION)) {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
@@ -286,15 +259,7 @@ public class ElevationModule implements GraphBuilderModule {
           streetEdge.getElevationProfile()
         );
       }
-      try {
-        ObjectOutputStream out = new ObjectOutputStream(
-          new BufferedOutputStream(new FileOutputStream(cachedElevationsFile))
-        );
-        out.writeObject(newCachedElevations);
-        out.close();
-      } catch (IOException e) {
-        issueStore.add(new Graphwide("Failed to write cached elevation file: " + e.getMessage()));
-      }
+      cacheManager.save(CacheTask.ELEVATION, newCachedElevations);
     }
 
     @SuppressWarnings("unchecked")
@@ -320,21 +285,6 @@ public class ElevationModule implements GraphBuilderModule {
   @Override
   public void checkInputs() {
     gridCoverageFactory.checkInputs();
-
-    // check for the existence of cached elevation data.
-    if (readCachedElevations) {
-      if (Files.exists(cachedElevationsFile.toPath())) {
-        LOG.info("Cached elevations file found!");
-      } else {
-        LOG.warn(
-          "No cached elevations file found at {} or read access not allowed! Unable " +
-            "to load in cached elevations. This could take a while...",
-          cachedElevationsFile.toPath().toAbsolutePath()
-        );
-      }
-    } else {
-      LOG.warn("Not using cached elevations! This could take a while...");
-    }
   }
 
   /**
@@ -520,7 +470,12 @@ public class ElevationModule implements GraphBuilderModule {
       );
 
       setEdgeElevationProfile(ee, elevPCS);
-    } catch (ElevationLookupException e) {
+    } catch (PointOutsideCoverageException _) {
+      // Do not create an issue for each edge that falls out of coverage
+      // (there can be many of them).
+      // The total number of ignored edges is reported in a single issue
+      // ElevationProfilePointsOutsideDEM.
+    } catch (ArrayIndexOutOfBoundsException | TransformException e) {
       issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
     }
   }
@@ -551,7 +506,11 @@ public class ElevationModule implements GraphBuilderModule {
           // point on the edge to initialize these other items.
           try {
             getElevation(coverage, examplarCoordinate);
-          } catch (ElevationLookupException e) {
+          } catch (
+            PointOutsideCoverageException
+            | ArrayIndexOutOfBoundsException
+            | TransformException e
+          ) {
             LOG.warn(
               "Error processing elevation for coordinate: {} due to error: {}",
               examplarCoordinate,
@@ -593,21 +552,9 @@ public class ElevationModule implements GraphBuilderModule {
    * @param c        the coordinate (NAD83)
    * @return elevation in meters
    */
-  private double getElevation(Coverage coverage, Coordinate c) throws ElevationLookupException {
-    try {
-      return getElevation(coverage, c.x, c.y);
-    } catch (
-      ArrayIndexOutOfBoundsException
-      | PointOutsideCoverageException
-      | TransformException e
-    ) {
-      // Each of the above exceptions can occur when finding the elevation at a coordinate.
-      // - The ArrayIndexOutOfBoundsException seems to occur at the edges of some elevation tiles that
-      //     might have areas with NoData. See https://github.com/opentripplanner/OpenTripPlanner/issues/2792
-      // - The PointOutsideCoverageException can be thrown for points that are outside of the elevation tile area.
-      // - The TransformException can occur when trying to compute the EllipsoidToGeoidDifference.
-      throw new ElevationLookupException(e);
-    }
+  private double getElevation(Coverage coverage, Coordinate c)
+    throws PointOutsideCoverageException, TransformException {
+    return getElevation(coverage, c.x, c.y);
   }
 
   /**
@@ -618,6 +565,10 @@ public class ElevationModule implements GraphBuilderModule {
    * @param x        the query longitude (NAD83)
    * @param y        the query latitude (NAD83)
    * @return elevation in meters
+   * @throws PointOutsideCoverageException if the point lies outside the elevation tile area.
+   * @throws TransformException if computing the EllipsoidToGeoidDifference fails.
+   * @throws ArrayIndexOutOfBoundsException at the edges of some elevation tiles with NoData
+   *         regions, see <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
     throws PointOutsideCoverageException, TransformException {
@@ -675,15 +626,5 @@ public class ElevationModule implements GraphBuilderModule {
       geoidDifferenceCache.put(hash, difference);
     }
     return difference;
-  }
-
-  /**
-   * A custom exception wrapper for all known elevation lookup exceptions
-   */
-  static class ElevationLookupException extends Exception {
-
-    public ElevationLookupException(Exception e) {
-      super(e);
-    }
   }
 }

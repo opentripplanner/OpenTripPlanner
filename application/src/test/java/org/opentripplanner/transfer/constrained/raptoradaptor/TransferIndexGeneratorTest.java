@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
+package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -16,7 +16,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestR
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
-import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 

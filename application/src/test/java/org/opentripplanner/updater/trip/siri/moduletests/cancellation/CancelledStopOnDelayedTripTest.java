@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 /**
  * Tests that a cancelled stop on a delayed trip gets correct real-time times applied.
@@ -66,7 +66,7 @@ class CancelledStopOnDelayedTripTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "MODIFIED | A 0:02 0:07 | B 0:09 0:09 | C [C] 0:11 0:11 | D 0:13 0:13",
+      "P U | A 0:02 0:07 | B 0:09 0:09 | C [C] 0:11 0:11 | D 0:13 0:13",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

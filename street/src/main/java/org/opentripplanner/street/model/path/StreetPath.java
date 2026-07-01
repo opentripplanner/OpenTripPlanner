@@ -1,5 +1,7 @@
 package org.opentripplanner.street.model.path;
 
+import static org.opentripplanner.street.model.path.ElevationProfileEncoder.encodeElevationProfileWithNaN;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -10,6 +12,7 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 
@@ -91,9 +94,22 @@ public class StreetPath {
     return states.getLast();
   }
 
-  /// Get all the states of this path
-  public List<Edge> edges() {
-    return edges;
+  public ElevationProfile elevation(boolean geoidElevation, double ellipsoidToGeoidDifference) {
+    var builder = ElevationProfile.of();
+
+    double heightOffset = geoidElevation ? ellipsoidToGeoidDifference : 0;
+
+    double distanceOffset = 0;
+    for (final Edge edge : edges) {
+      if (edge.getDistanceMeters() > 0) {
+        builder.add(encodeElevationProfileWithNaN(edge, distanceOffset, heightOffset));
+        distanceOffset += edge.getDistanceMeters();
+      }
+    }
+
+    var p = builder.build();
+
+    return p.isAllYUnknown() ? null : p;
   }
 
   /// Calculate the elevationGained and elevationLost

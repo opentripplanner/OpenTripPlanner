@@ -6,7 +6,7 @@ import javax.inject.Qualifier;
 
 /**
  * This is used for dagger injection. Since we have multiple GraphQL APIs and therefore also
- * multiple GraphQL schemas, a qualifier is needed to tell dagger wich schema to inject where.
+ * multiple GraphQL schemas, a qualifier is needed to tell dagger which schema to inject where.
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

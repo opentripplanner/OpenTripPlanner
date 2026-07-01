@@ -80,8 +80,7 @@ class InsertionEvaluatorTest {
   }
 
   /**
-   * Helper method that mimics the old findOptimalInsertion() behavior for backwards compatibility in tests.
-   * This explicitly performs position finding followed by evaluation.
+   * Runs position finding followed by evaluation and returns the best insertion.
    */
   private InsertionCandidate findOptimalInsertion(
     CarpoolTrip trip,

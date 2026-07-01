@@ -1,9 +1,12 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
@@ -12,6 +15,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
 public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
+
+  /// The key used to store the itinerary in the GraphQL context for looking it up during
+  /// the fare resolution in [LegImpl#fareProducts].
+  static final String ITINERARY_CONTEXT_KEY = "itinerary";
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
@@ -55,8 +62,27 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public DataFetcher<Iterable<Leg>> legs() {
-    return environment -> getSource(environment).legs();
+    // Returns a DataFetcherResult so child resolvers (e.g. fareProducts) can look up the parent
+    // itinerary via localContext. The existing locale map from the parent query is preserved so
+    // that translation-aware resolvers downstream continue to work. The cast is to the raw
+    // fetcher type to avoid a JVM checkcast to Iterable — graphql-java handles DataFetcherResult
+    // at runtime without requiring the type to match.
+    DataFetcher<?> fetcher = environment -> {
+      var itinerary = getSource(environment);
+      var ctx = new HashMap<String, Object>();
+      Map<String, ?> parentCtx = environment.getLocalContext();
+      if (parentCtx != null) {
+        ctx.putAll(parentCtx);
+      }
+      ctx.put(ITINERARY_CONTEXT_KEY, itinerary);
+      return DataFetcherResult.<Iterable<Leg>>newResult()
+        .data(itinerary.legs())
+        .localContext(ctx)
+        .build();
+    };
+    return (DataFetcher<Iterable<Leg>>) fetcher;
   }
 
   @Override

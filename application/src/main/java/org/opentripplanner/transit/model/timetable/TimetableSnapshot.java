@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -146,6 +147,7 @@ public class TimetableSnapshot {
     TripIdAndServiceDate,
     TripOnServiceDate
   > realTimeAddedTripOnServiceDateForTripAndDay;
+  private final DefaultTripCalendars tripCalendars;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
@@ -159,7 +161,7 @@ public class TimetableSnapshot {
    */
   private boolean dirty = false;
 
-  public TimetableSnapshot() {
+  public TimetableSnapshot(DefaultTripCalendars tripCalendars) {
     this(
       new HashMap<>(),
       new HashMap<>(),
@@ -171,6 +173,7 @@ public class TimetableSnapshot {
       ArrayListMultimap.create(),
       new HashMap<>(),
       HashMultimap.create(),
+      tripCalendars,
       false
     );
   }
@@ -186,6 +189,7 @@ public class TimetableSnapshot {
     ListMultimap<FeedScopedId, TripOnServiceDate> realTimeAddedReplacedByTripOnServiceDateById,
     Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay,
     SetMultimap<StopLocation, TripPattern> patternsForStop,
+    DefaultTripCalendars tripCalendars,
     boolean readOnly
   ) {
     this.timetables = timetables;
@@ -199,6 +203,7 @@ public class TimetableSnapshot {
       realTimeAddedReplacedByTripOnServiceDateById;
     this.realTimeAddedTripOnServiceDateForTripAndDay = realTimeAddedTripOnServiceDateForTripAndDay;
     this.patternsForStop = patternsForStop;
+    this.tripCalendars = tripCalendars;
     this.readOnly = readOnly;
   }
 
@@ -402,6 +407,7 @@ public class TimetableSnapshot {
       ImmutableListMultimap.copyOf(realTimeAddedReplacedByTripOnServiceDateById),
       Map.copyOf(realTimeAddedTripOnServiceDateForTripAndDay),
       ImmutableSetMultimap.copyOf(patternsForStop),
+      tripCalendars,
       true
     );
 

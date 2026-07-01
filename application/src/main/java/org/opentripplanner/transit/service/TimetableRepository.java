@@ -7,7 +7,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.Instant;
@@ -30,9 +29,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -40,6 +37,8 @@ import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
@@ -54,6 +53,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.lang.ObjectUtils;
+import org.opentripplanner.utils.logging.PowerOfTwoThrottle;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,15 +65,15 @@ import org.slf4j.LoggerFactory;
  * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
  * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
  * only in NeTEx, the NeTEx name is used in the internal model.
- *
+ * <p>
  * A TimetableRepository instance also includes references to some transient indexes of its contents, to
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
- *
+ * <p>
  * The TimetableRepository stands in opposition to two other aggregates: the Graph (representing the
  * street network) and the RaptorTransitData (representing many of the same things in the TimetableRepository
  * but rearranged to be more efficient for Raptor routing).
- *
+ * <p>
  * At this point the TimetableRepository is not often read directly. Many requests will look at the
  * RaptorTransitData rather than the TimetableRepository it's derived from. Both are often accessed via the
  * TransitService rather than directly reading the fields of TimetableRepository or RaptorTransitData.
@@ -81,6 +81,7 @@ import org.slf4j.LoggerFactory;
 public class TimetableRepository implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableRepository.class);
+  private static final PowerOfTwoThrottle FREEZE_LOG_THROTTLE = new PowerOfTwoThrottle();
 
   private final Collection<Agency> agencies = new ArrayList<>();
   private final Collection<Operator> operators = new ArrayList<>();
@@ -90,8 +91,6 @@ public class TimetableRepository implements Serializable {
   private final Multimap<AbstractTransitEntity, Notice> noticesByElement = HashMultimap.create();
   private final ConstrainedTransferService constrainedTransferService =
     new DefaultConstrainedTransferService();
-
-  private final Map<FeedScopedId, Integer> serviceCodes = new HashMap<>();
 
   private SiteRepository siteRepository;
 
@@ -108,7 +107,7 @@ public class TimetableRepository implements Serializable {
   private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData =
     new ConcurrentPublished<>();
 
-  private final CalendarServiceData calendarServiceData = new CalendarServiceData();
+  private final DefaultTripCalendars tripCalendar = new DefaultTripCalendars();
 
   private transient TimetableRepositoryIndex index;
   private ZoneId timeZone = null;
@@ -130,6 +129,11 @@ public class TimetableRepository implements Serializable {
 
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
+  /// Updates are not allowed after the repository is frozen. All realtime updates should be
+  /// applied to the TimetableSnapshot. The repository is modifiable during graph build then
+  /// frozen when the server is started.
+  private boolean frozen = false;
+
   @Inject
   public TimetableRepository(SiteRepository siteRepository) {
     this.siteRepository = Objects.requireNonNull(siteRepository);
@@ -146,11 +150,22 @@ public class TimetableRepository implements Serializable {
    * from the graph builder to the server in memory, without a round trip through serialization.
    */
   public void index() {
+    assertModificationsAllowed();
     if (index == null) {
       LOG.info("Index timetable repository...");
+      this.tripCalendar.initializeServiceCodes();
       this.index = new TimetableRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }
+  }
+
+  /**
+   * Make the Timetable repository immutable when the otp server is started. After this point,
+   * all modifications should be done to the TimetableSnapshot.
+   */
+  public void freeze() {
+    index();
+    this.frozen = true;
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
@@ -158,7 +173,10 @@ public class TimetableRepository implements Serializable {
     return raptorTransitData;
   }
 
-  public void setRaptorTransitData(RaptorTransitData raptorTransitData) {
+  public void initRaptorTransitData(RaptorTransitData raptorTransitData) {
+    // TODO Enforce this is initialized once with ObjectUtils.requireNotInitialized()
+    //      Currently there is tests which violates this.
+    assertModificationsAllowed();
     this.raptorTransitData = raptorTransitData;
   }
 
@@ -171,7 +189,9 @@ public class TimetableRepository implements Serializable {
   /**
    * Publish the latest snapshot of the real-time transit layer.
    * Should be called only when creating a new RaptorTransitData, from the graph writer thread.
+   * @deprecated TODO This should be moved to the TimetableSnapshot for now
    */
+  @Deprecated
   public void setRealtimeRaptorTransitData(RaptorTransitData realtimeRaptorTransitData) {
     this.realtimeRaptorTransitData.publish(realtimeRaptorTransitData);
   }
@@ -196,14 +216,18 @@ public class TimetableRepository implements Serializable {
     return (!time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds()));
   }
 
-  public CalendarService getCalendarService() {
-    // No need to cache the CalendarService, it is a thin wrapper around the data
-    return new CalendarServiceImpl(calendarServiceData);
+  public TripCalendars getTripCalendar() {
+    return tripCalendar;
+  }
+
+  public DefaultTripCalendars copyTripCalendarForRealTimeUpdates() {
+    return tripCalendar.copyOf();
   }
 
   public void updateCalendarServiceData(CalendarServiceData data) {
+    assertModificationsAllowed();
     invalidateIndex();
-    calendarServiceData.add(data);
+    tripCalendar.merge(data);
   }
 
   /**
@@ -218,29 +242,13 @@ public class TimetableRepository implements Serializable {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     // Start of day
+    assertModificationsAllowed();
     ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
     if (!transitFeedCovers(time.toInstant())) {
       return null;
     }
-
-    // We make an explicit cast here to avoid adding the 'getOrCreateServiceIdForDate(..)'
-    // method to the {@link CalendarService} interface. We do not want to expose it because it
-    // is not thread-safe - and we want to limit the usage. See JavaDoc above as well.
-    FeedScopedId serviceId =
-      ((CalendarServiceImpl) getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
-
-    if (!serviceCodes.containsKey(serviceId)) {
-      // Calculating new unique serviceCode based on size (!)
-      final int serviceCode = serviceCodes.size();
-      serviceCodes.put(serviceId, serviceCode);
-
-      index
-        .getServiceCodesRunningForDate()
-        .computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
-        .add(serviceCode);
-    }
-    return serviceId;
+    return tripCalendar.getOrCreateServiceIdForDate(serviceDate);
   }
 
   public Collection<String> getFeedIds() {
@@ -256,6 +264,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addAgency(Agency agency) {
+    assertModificationsAllowed();
     invalidateIndex();
     agencies.add(agency);
     feedIds.add(agency.getId().getFeedId());
@@ -284,6 +293,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addFeedInfo(FeedInfo info) {
+    assertModificationsAllowed();
     invalidateIndex();
     this.feedInfoForId.put(info.getId(), info);
   }
@@ -308,6 +318,7 @@ public class TimetableRepository implements Serializable {
    * Initialize the time zone, if it has not been set previously.
    */
   public void initTimeZone(ZoneId timeZone) {
+    assertModificationsAllowed();
     if (timeZone == null || timeZone.equals(this.timeZone)) {
       return;
     }
@@ -337,6 +348,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addOperators(Collection<Operator> operators) {
+    assertModificationsAllowed();
     this.operators.addAll(operators);
   }
 
@@ -344,8 +356,8 @@ public class TimetableRepository implements Serializable {
    * The time when the transit service start. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceStarts() {
-    return calendarServiceData
-      .getFirstDate()
+    return tripCalendar
+      .startDate()
       .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
       .orElse(Instant.EPOCH);
   }
@@ -354,8 +366,8 @@ public class TimetableRepository implements Serializable {
    * The time when the transit service ends. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceEnds() {
-    return calendarServiceData
-      .getLastDate()
+    return tripCalendar
+      .endDate()
       .map(serviceDate ->
         ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
       )
@@ -372,6 +384,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addNoticeAssignments(Multimap<AbstractTransitEntity, Notice> noticesByElement) {
+    assertModificationsAllowed();
     invalidateIndex();
     this.noticesByElement.putAll(noticesByElement);
   }
@@ -392,6 +405,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
+    assertModificationsAllowed();
     invalidateIndex();
     tripOnServiceDates.put(tripOnServiceDate.getId(), tripOnServiceDate);
     for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
@@ -409,7 +423,7 @@ public class TimetableRepository implements Serializable {
    * from multiple feeds.
    */
   public Map<FeedScopedId, Integer> getServiceCodes() {
-    return serviceCodes;
+    return tripCalendar.getServiceCodes();
   }
 
   public SiteRepository getSiteRepository() {
@@ -417,11 +431,13 @@ public class TimetableRepository implements Serializable {
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
+    assertModificationsAllowed();
     invalidateIndex();
     tripPatternForId.put(id, tripPattern);
   }
 
   public void addScheduledStopPointMapping(Map<FeedScopedId, RegularStop> mapping) {
+    assertModificationsAllowed();
     stopsByScheduledStopPointRefs.putAll(mapping);
   }
 
@@ -475,7 +491,7 @@ public class TimetableRepository implements Serializable {
 
   /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
-    return !calendarServiceData.getServiceIds().isEmpty();
+    return !tripCalendar.isEmpty();
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
@@ -489,11 +505,13 @@ public class TimetableRepository implements Serializable {
    * Updating the site repository is only allowed during graph build
    */
   public void mergeSiteRepositories(SiteRepository childSiteRepository) {
+    assertModificationsAllowed();
     invalidateIndex();
     this.siteRepository = this.siteRepository.merge(childSiteRepository);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
+    assertModificationsAllowed();
     invalidateIndex();
     flexTripsById.put(id, flexTrip);
   }
@@ -507,6 +525,7 @@ public class TimetableRepository implements Serializable {
    * This logic is unfortunate and quite brittle. We would like to improve it in the future.
    */
   public void setUpdaterManager(GraphUpdaterManager updaterManager) {
+    assertModificationsAllowed();
     this.updaterManager = updaterManager;
     this.transitAlertService = null;
   }
@@ -519,6 +538,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void setHasFrequencyService(boolean hasFrequencyService) {
+    assertModificationsAllowed();
     this.hasFrequencyService = hasFrequencyService;
   }
 
@@ -531,6 +551,7 @@ public class TimetableRepository implements Serializable {
   }
 
   public void setHasScheduledService(boolean hasScheduledService) {
+    assertModificationsAllowed();
     this.hasScheduledService = hasScheduledService;
   }
 
@@ -547,7 +568,7 @@ public class TimetableRepository implements Serializable {
    * For all dates in the system get the service codes that run on it.
    */
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return Collections.unmodifiableMap(index.getServiceCodesRunningForDate());
+    return tripCalendar.getServiceCodesRunningForDate();
   }
 
   public boolean isIndexed() {
@@ -606,5 +627,21 @@ public class TimetableRepository implements Serializable {
 
   private void invalidateIndex() {
     this.index = null;
+  }
+
+  private void assertModificationsAllowed() {
+    if (frozen) {
+      FREEZE_LOG_THROTTLE.throttle(n ->
+        LOG.warn(
+          """
+          THIS SHOULD NOT HAPPEN
+          Attempting to modify TimetableRepository after it has been frozen.
+          Count: {}
+          """,
+          n,
+          new RuntimeException("StackTrace included to trace the source of the error.")
+        )
+      );
+    }
   }
 }

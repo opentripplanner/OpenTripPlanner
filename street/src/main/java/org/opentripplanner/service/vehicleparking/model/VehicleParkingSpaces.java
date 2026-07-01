@@ -34,7 +34,7 @@ public class VehicleParkingSpaces implements Serializable {
     this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
   }
 
-  public static VehicleParkingSpacesBuilder builder() {
+  public static VehicleParkingSpacesBuilder of() {
     return new VehicleParkingSpacesBuilder();
   }
 

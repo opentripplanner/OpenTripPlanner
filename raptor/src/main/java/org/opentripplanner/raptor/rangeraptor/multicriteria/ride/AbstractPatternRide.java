@@ -61,8 +61,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract class AbstractPatternRide<T extends RaptorTripSchedule>
-  implements PatternRideView<T, McStopArrival<T>> {
+public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
+  implements PatternRideView<T, McStopArrival<T>>
+  permits PatternRideC1, PatternRideC2 {
 
   private final McStopArrival<T> prevArrival;
   private final int boardStopIndex;
@@ -97,31 +98,31 @@ public abstract class AbstractPatternRide<T extends RaptorTripSchedule>
     return prevArrival;
   }
 
-  public int boardStopIndex() {
+  public final int boardStopIndex() {
     return boardStopIndex;
   }
 
-  public int boardPos() {
+  public final int boardPos() {
     return boardPos;
   }
 
-  public int boardTime() {
+  public final int boardTime() {
     return boardTime;
   }
 
-  public int boardC1() {
+  public final int boardC1() {
     return boardC1;
   }
 
-  public int relativeC1() {
+  public final int relativeC1() {
     return relativeC1;
   }
 
-  public int tripSortIndex() {
+  public final int tripSortIndex() {
     return tripSortIndex;
   }
 
-  public T trip() {
+  public final T trip() {
     return trip;
   }
 

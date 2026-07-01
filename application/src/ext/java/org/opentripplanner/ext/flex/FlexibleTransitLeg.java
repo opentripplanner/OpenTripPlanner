@@ -186,11 +186,6 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
-    return copyOf().withFareProducts(fares).build();
-  }
-
-  @Override
   public PickDrop boardRule() {
     return edge.getFlexTrip().getBoardRule(boardStopPosInPattern());
   }

@@ -25,7 +25,6 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 import org.opentripplanner.transit.service.ArrivalDeparture;
@@ -78,7 +77,7 @@ public class EnumTypes {
     .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)
     .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS)
     .value("flat", VehicleRoutingOptimizeType.FLAT_STREETS)
-    .value("greenways", VehicleRoutingOptimizeType.SAFEST_STREETS)
+    .value("greenways", VehicleRoutingOptimizeType.SAFE_STREETS)
     .value("triangle", VehicleRoutingOptimizeType.TRIANGLE)
     .build();
 
@@ -247,27 +246,27 @@ public class EnumTypes {
     .name("RealtimeState")
     .value(
       "scheduled",
-      RealTimeState.SCHEDULED,
+      TransmodelRealTimeState.SCHEDULED,
       "The service journey information comes from the regular time table, i.e. no real-time update has been applied."
     )
     .value(
       "updated",
-      RealTimeState.UPDATED,
+      TransmodelRealTimeState.UPDATED,
       "The service journey information has been updated, but the journey pattern stayed the same as the journey pattern of the scheduled service journey."
     )
     .value(
       "canceled",
-      RealTimeState.CANCELED,
+      TransmodelRealTimeState.CANCELED,
       "The service journey has been canceled by a real-time update."
     )
     .value(
       "Added",
-      RealTimeState.ADDED,
+      TransmodelRealTimeState.ADDED,
       "The service journey has been added using a real-time update, i.e. the service journey was not present in the regular time table."
     )
     .value(
       "modified",
-      RealTimeState.MODIFIED,
+      TransmodelRealTimeState.MODIFIED,
       "The service journey information has been updated and resulted in a different journey pattern compared to the journey pattern of the scheduled service journey."
     )
     .build();
@@ -337,6 +336,11 @@ public class EnumTypes {
       "walkingBetterThanTransit",
       RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
       "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
+    )
+    .value(
+      "serviceJourneyLocationMissingAimedDepartureTime",
+      RoutingErrorCode.TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
+      "The service journey location is ambiguous because the stop is visited more than once by the service journey. An aimedDepartureTime is necessary to disambiguate."
     )
     .value(
       "noDirectModeConnection",

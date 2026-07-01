@@ -10,7 +10,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A {@link AbstractPatternRide} with support for c1 {@code generalized-cost} and c2 (custom-use-case-cost).
  */
-public class PatternRideC2<T extends RaptorTripSchedule> extends AbstractPatternRide<T> {
+public final class PatternRideC2<T extends RaptorTripSchedule> extends AbstractPatternRide<T> {
 
   private final int c2;
 
@@ -48,7 +48,7 @@ public class PatternRideC2<T extends RaptorTripSchedule> extends AbstractPattern
         : l.compareC1(r));
   }
 
-  public int c2() {
+  public final int c2() {
     return c2;
   }
 

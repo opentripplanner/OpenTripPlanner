@@ -2,7 +2,9 @@ package org.opentripplanner.ext.carpooling.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -11,25 +13,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
+import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Integration tests that exercise the walk-to/from-carpool behavior added to
@@ -115,32 +111,9 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       }
     );
 
-    Graph graph = model.graph();
-    var timetableRepository = model.timetableRepository();
-    VertexLinker vertexLinker = VertexLinkerTestFactory.of(graph);
-    var vertexCreationService = new VertexCreationService(vertexLinker);
-    TransitService transitService = new DefaultTransitService(timetableRepository);
-    repository = new DefaultCarpoolingRepository();
-
-    StreetLimitationParametersService streetLimitationParams =
-      new StreetLimitationParametersService() {
-        @Override
-        public float maxCarSpeed() {
-          return 40.0f;
-        }
-
-        @Override
-        public int maxAreaNodes() {
-          return 500;
-        }
-      };
-
-    service = new DefaultCarpoolingService(
-      repository,
-      streetLimitationParams,
-      transitService,
-      vertexCreationService
-    );
+    var context = CarpoolingServiceTestContext.of(model);
+    service = context.service();
+    repository = context.repository();
   }
 
   private RouteRequest buildDirectCarpoolRequest(ZonedDateTime dateTime) {
@@ -283,5 +256,40 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
           walkFromDropoff.to().coordinate
       );
     }
+  }
+
+  /**
+   * Verifies that {@code from_coordinate} / {@code to_coordinate} on the booking URL reference the
+   * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out
+   * of the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's
+   * spec explicitly called out: the coordinates must not be where the passenger starts/finishes
+   * walking.
+   */
+  @Test
+  void walkLegItinerary_bookingUrlUsesCarpoolBoardingPoints_notPassengerWalkEndpoints() {
+    var departureTime = SEARCH_TIME.plusMinutes(10);
+    var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(
+      TRIP_START,
+      TRIP_END,
+      departureTime
+    );
+    var trip = new CarpoolTripBuilder(baseTrip)
+      .withPublicContactInformation(
+        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+      )
+      .build();
+    repository.upsertCarpoolTrip(trip);
+
+    var results = service.routeDirect(buildDirectCarpoolRequest(SEARCH_TIME));
+    assertFalse(results.isEmpty());
+
+    var carpoolLeg = results.getFirst().legs().get(1);
+    var bookingInfo = carpoolLeg.pickupBookingInfo();
+    assertNotNull(bookingInfo);
+
+    assertEquals(
+      expectedAugmentedUrl("https://book.example.com", B_COORD, C_COORD),
+      bookingInfo.getContactInfo().getBookingUrl()
+    );
   }
 }

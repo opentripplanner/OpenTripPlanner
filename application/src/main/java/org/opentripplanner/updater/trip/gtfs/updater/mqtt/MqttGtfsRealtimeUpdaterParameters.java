@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.trip.gtfs.updater.mqtt;
 
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 
 public record MqttGtfsRealtimeUpdaterParameters(
   String configRef,

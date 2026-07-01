@@ -47,7 +47,7 @@ class VectorTileResponseFactoryTest {
     Locale locale,
     OtpServerRequestContext context
   ) {
-    return new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
+    return new GeofencingZonesLayerBuilder(context.vehicleRentalService(), layerParameters);
   }
 
   private static Response computeResponse(List<String> layers) {

@@ -17,9 +17,6 @@ public class RealTimeTripTimesBuilder {
   private final Integer[] arrivalTimes;
   private final Integer[] departureTimes;
 
-  @Nullable
-  private RealTimeState realTimeState;
-
   private final StopRealTimeState[] stopRealTimeStates;
 
   private final BitSet extraCalls;
@@ -35,7 +32,7 @@ public class RealTimeTripTimesBuilder {
   @Nullable
   private Accessibility wheelchairAccessibility;
 
-  private boolean updated;
+  private final RealTimeTripState.Builder stateBuilder = RealTimeTripState.of();
 
   /**
    * This constructor takes a ScheduledTripTimes (not base TripTimes) to enforce creating a new
@@ -125,13 +122,13 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withArrivalTime(int stop, int time) {
-    updated = true;
+    stateBuilder.withTimesModified();
     arrivalTimes[stop] = time;
     return this;
   }
 
   public RealTimeTripTimesBuilder withArrivalDelay(int stop, int delay) {
-    updated = true;
+    stateBuilder.withTimesModified();
     arrivalTimes[stop] = getScheduledArrivalTime(stop) + delay;
     return this;
   }
@@ -168,35 +165,64 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withDepartureTime(int stop, int time) {
-    updated = true;
+    stateBuilder.withTimesModified();
     departureTimes[stop] = time;
     return this;
   }
 
   public RealTimeTripTimesBuilder withDepartureDelay(int stop, int delay) {
-    updated = true;
+    stateBuilder.withTimesModified();
     departureTimes[stop] = getScheduledDepartureTime(stop) + delay;
     return this;
   }
 
-  public RealTimeState realTimeState() {
-    if (realTimeState == null) {
-      return updated ? RealTimeState.UPDATED : RealTimeState.SCHEDULED;
-    }
-    return realTimeState;
-  }
-
-  public RealTimeTripTimesBuilder withRealTimeState(RealTimeState realTimeState) {
-    this.realTimeState = realTimeState;
+  public RealTimeTripTimesBuilder withRealTimeUpdated() {
+    stateBuilder.withTimesModified();
     return this;
   }
 
-  public RealTimeTripTimesBuilder cancelTrip() {
-    return withRealTimeState(RealTimeState.CANCELED);
+  public RealTimeTripTimesBuilder withModifiedTripPattern() {
+    stateBuilder.withTripPatternModified();
+    return this;
   }
 
-  public RealTimeTripTimesBuilder deleteTrip() {
-    return withRealTimeState(RealTimeState.DELETED);
+  boolean isTripPatternModified() {
+    return stateBuilder.isTripPatternModified();
+  }
+
+  public RealTimeTripTimesBuilder withAdded() {
+    stateBuilder.withAdded();
+    return this;
+  }
+
+  boolean isAdded() {
+    return stateBuilder.isAdded();
+  }
+
+  public RealTimeTripTimesBuilder withCanceled() {
+    stateBuilder.withCanceled();
+    return this;
+  }
+
+  boolean isCanceled() {
+    return stateBuilder.isCanceled();
+  }
+
+  public RealTimeTripTimesBuilder withDeleted() {
+    stateBuilder.withDeleted();
+    return this;
+  }
+
+  boolean isDeleted() {
+    return stateBuilder.isDeleted();
+  }
+
+  boolean isUpdated() {
+    return stateBuilder.isTimesModified();
+  }
+
+  RealTimeTripState state() {
+    return stateBuilder.build();
   }
 
   public StopRealTimeState getStopRealTimeState(int stop) {

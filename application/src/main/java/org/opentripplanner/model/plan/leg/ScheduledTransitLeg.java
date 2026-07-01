@@ -31,7 +31,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -61,7 +60,6 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
-  private final LineString legGeometry;
   private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
@@ -86,9 +84,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final List<FareOffer> fareOffers;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
-    // TODO - Add requireNonNull for trip-times. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.tripTimes = builder.tripTimes();
+    this.tripTimes = Objects.requireNonNull(builder.tripTimes());
     this.tripPattern = Objects.requireNonNull(builder.tripPattern());
 
     int maxStopPosInPatternLimit = tripPattern.numberOfStops() - 1;
@@ -117,7 +113,6 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.generalizedCost = builder.generalizedCost();
 
-    this.legGeometry = tripPattern.geometryBetween(boardStopPosInPattern, alightStopPosInPattern);
     this.distanceMeters = tripPattern.distanceBetween(
       boardStopPosInPattern,
       alightStopPosInPattern
@@ -236,7 +231,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public int departureDelay() {
     return (
-        tripTimes.isCancelledStop(boardStopPosInPattern) ||
+        tripTimes.isCanceledStop(boardStopPosInPattern) ||
         tripTimes.isNoDataStop(boardStopPosInPattern)
       )
       ? 0
@@ -246,7 +241,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public int arrivalDelay() {
     return (
-        tripTimes.isCancelledStop(alightStopPosInPattern) ||
+        tripTimes.isCanceledStop(alightStopPosInPattern) ||
         tripTimes.isNoDataStop(alightStopPosInPattern)
       )
       ? 0
@@ -259,11 +254,6 @@ public class ScheduledTransitLeg implements TransitLeg {
       tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
       tripTimes.isRealTimeUpdated(alightStopPosInPattern)
     );
-  }
-
-  @Override
-  public RealTimeState realTimeState() {
-    return tripTimes.getRealTimeState();
   }
 
   @Override
@@ -315,9 +305,13 @@ public class ScheduledTransitLeg implements TransitLeg {
     return visits;
   }
 
+  /**
+   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between
+   * the board and alight stops. It is not cached: each call recomputes it.
+   */
   @Override
   public LineString legGeometry() {
-    return legGeometry;
+    return tripPattern.geometryBetween(boardStopPosInPattern, alightStopPosInPattern);
   }
 
   @Override
@@ -328,11 +322,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public ScheduledTransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
     return copyOf().withAlerts(alerts).build();
-  }
-
-  @Override
-  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
-    return copyOf().withFareProducts(fares).build();
   }
 
   @Override

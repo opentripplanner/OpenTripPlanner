@@ -31,6 +31,7 @@ public class TestTripSchedule implements TripSchedule {
   private final int transitReluctanceIndex;
   private final Accessibility wheelchairBoarding;
   private final TripPattern originalPattern;
+  private final TripTimes tripTimes;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
@@ -38,7 +39,8 @@ public class TestTripSchedule implements TripSchedule {
     int[] departureTimes,
     int transitReluctanceIndex,
     Accessibility wheelchairBoarding,
-    TripPattern originalPattern
+    TripPattern originalPattern,
+    TripTimes tripTimes
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -46,6 +48,7 @@ public class TestTripSchedule implements TripSchedule {
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
     this.originalPattern = originalPattern;
+    this.tripTimes = tripTimes;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -122,7 +125,7 @@ public class TestTripSchedule implements TripSchedule {
 
   @Override
   public TripTimes getOriginalTripTimes() {
-    return null;
+    return tripTimes;
   }
 
   @Override
@@ -145,6 +148,7 @@ public class TestTripSchedule implements TripSchedule {
     private int transitReluctanceIndex = 0;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
     private TripPattern originalPattern;
+    private TripTimes tripTimes;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -153,6 +157,11 @@ public class TestTripSchedule implements TripSchedule {
 
     public TestTripSchedule.Builder originalPattern(TripPattern pattern) {
       this.originalPattern = pattern;
+      return this;
+    }
+
+    public TestTripSchedule.Builder withTripTimes(TripTimes tripTimes) {
+      this.tripTimes = tripTimes;
       return this;
     }
 
@@ -254,7 +263,8 @@ public class TestTripSchedule implements TripSchedule {
         departureTimes,
         transitReluctanceIndex,
         wheelchairBoarding,
-        originalPattern
+        originalPattern,
+        tripTimes
       );
     }
 

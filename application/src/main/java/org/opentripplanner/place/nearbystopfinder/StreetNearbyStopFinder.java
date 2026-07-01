@@ -190,9 +190,9 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
         StreetSearchRequestMapper.map(request)
           .withMode(streetMode)
           .withExtensionRequestContexts(extensionRequestContexts)
+          .withArriveBy(reverseDirection)
           .build()
       )
-      .withArriveBy(reverseDirection)
       .withFrom(reverseDirection ? null : originVertices)
       .withTo(reverseDirection ? originVertices : null);
 

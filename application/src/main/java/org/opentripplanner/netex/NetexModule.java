@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -45,7 +45,7 @@ public class NetexModule implements GraphBuilderModule {
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
-  private final LocalDateInterval transitPeriodLimit;
+  private final LocalDateRange transitPeriodLimit;
 
   /**
    * This collection is a queue because the bundles contain state that remains after loading.
@@ -61,7 +61,7 @@ public class NetexModule implements GraphBuilderModule {
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
-    LocalDateInterval transitPeriodLimit,
+    LocalDateRange transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;

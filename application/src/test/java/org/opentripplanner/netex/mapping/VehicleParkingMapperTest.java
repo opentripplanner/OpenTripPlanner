@@ -42,7 +42,7 @@ class VehicleParkingMapperTest {
     var vp = mapper().map(parking(vehicleTypes));
     assertCommonProperties(vp);
     assertTrue(vp.hasAnyCarPlaces());
-    assertEquals(VehicleParkingSpaces.builder().carSpaces(10).build(), vp.getCapacity());
+    assertEquals(VehicleParkingSpaces.of().carSpaces(10).build(), vp.getCapacity());
   }
 
   public static List<Set<ParkingVehicleEnumeration>> bicycleCases() {
@@ -55,7 +55,7 @@ class VehicleParkingMapperTest {
     var vp = mapper().map(parking(vehicleTypes));
     assertCommonProperties(vp);
     assertTrue(vp.hasBicyclePlaces());
-    assertEquals(VehicleParkingSpaces.builder().bicycleSpaces(10).build(), vp.getCapacity());
+    assertEquals(VehicleParkingSpaces.of().bicycleSpaces(10).build(), vp.getCapacity());
   }
 
   @Test

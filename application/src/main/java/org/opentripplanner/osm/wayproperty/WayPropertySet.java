@@ -34,7 +34,14 @@ public class WayPropertySet {
     Float,
     OsmEntity,
     Double
-  > DEFAULT_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
+  > DEFAULT_BICYCLE_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
+
+  public static final TriFunction<
+    StreetTraversalPermission,
+    Float,
+    OsmEntity,
+    Double
+  > DEFAULT_WALK_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.25);
 
   private final List<WayPropertyPicker> wayProperties;
 

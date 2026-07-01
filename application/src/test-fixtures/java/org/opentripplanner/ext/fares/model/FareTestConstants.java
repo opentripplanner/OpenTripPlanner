@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
@@ -15,6 +16,10 @@ public interface FareTestConstants {
   FareProduct FARE_PRODUCT_A = fareProduct("A");
   FareProduct FARE_PRODUCT_B = fareProduct("B");
   FareProduct TRANSFER_1 = FareProduct.of(id("transfer:1"), "transfer 1", Money.euros(1)).build();
+
+  RiderCategory CATEGORY_ALPHA = RiderCategory.of(id("cat-alpha"))
+    .withName("Category Alpha")
+    .build();
 
   GroupOfRoutes NETWORK_A = groupOfRoutes("A").build();
   GroupOfRoutes NETWORK_B = groupOfRoutes("B").build();

@@ -10,7 +10,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
+import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
@@ -48,7 +49,7 @@ public class TripTimeOnDateRequestBuilder {
     EXCLUDE_MODES,
     List.of()
   );
-  private List<TripTimeOnDateFilterRequest> transitFilters = List.of();
+  private List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters = List.of();
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
@@ -122,7 +123,7 @@ public class TripTimeOnDateRequestBuilder {
   }
 
   public TripTimeOnDateRequestBuilder withTransitFilters(
-    List<TripTimeOnDateFilterRequest> transitFilters
+    List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters
   ) {
     this.transitFilters = transitFilters;
     return this;

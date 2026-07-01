@@ -790,6 +790,33 @@ type QueryType {
     "Radius via streets (in meters) to search for from the specified location"
     radius: Float!
   ): quayAtDistanceConnection @timingData
+  "Get an updated version of a trip pattern with realtime changes applied."
+  refetchTripPattern(
+    "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
+    alightSlackDefault: Int = 0,
+    "List of alightSlack for a given set of modes. Defaults: []"
+    alightSlackList: [TransportModeSlack],
+    "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
+    boardSlackDefault: Int = 0,
+    "List of boardSlack for a given set of modes. Defaults: []"
+    boardSlackList: [TransportModeSlack],
+    "The start location, if null the trip pattern will start with the first provided leg"
+    from: Location,
+    "A list of legIds describing the trip pattern. At least one leg is required."
+    legs: [ID!]!,
+    "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
+    maxAccessEgressDurationForMode: [StreetModeDurationInput!] = [],
+    "The set of access/egress modes to be used for this search. The direct and transit modes are ignored"
+    modes: Modes,
+    "The destination location, if null the trip pattern will end with the last provided leg"
+    to: Location,
+    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
+    walkReluctance: Float = 2.0,
+    "The maximum walk speed along streets, in meters per second."
+    walkSpeed: Float = 1.35,
+    "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
+    wheelchairAccessible: Boolean = false
+  ): RefetchTripPatternResult! @deprecated(reason : "This query is experimental and might change in the future.") @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
   "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
@@ -919,8 +946,6 @@ type QueryType {
     
     - The `ratio` must be greater or equal to 1.0 and less then 1.2.
     - The `constant` must be greater or equal to '0s' and less then '1h'.
-    
-    THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
     """
     relaxTransitGroupPriority: RelaxCostInput = null,
     "Scooter routing preferences. If not provided, default values from the server configuration will be used."
@@ -1050,6 +1075,12 @@ type QueryType {
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
   ): ViaTrip! @deprecated(reason : "Use the regular trip query with via stop instead.") @timingData
+}
+
+"Refetched data for a trip pattern"
+type RefetchTripPatternResult {
+  "The refetched trip pattern"
+  tripPattern: TripPattern
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -1930,6 +1961,8 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
+  "The service journey location is ambiguous because the stop is visited more than once by the service journey. An aimedDepartureTime is necessary to disambiguate."
+  serviceJourneyLocationMissingAimedDepartureTime
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
   walkingBetterThanTransit
 }
@@ -2231,6 +2264,14 @@ input BikePreferencesInput {
   triangleFactors: TriangleFactors
 }
 
+"Identifies a specific service journey on a specific service date. Exactly one of the fields must be set."
+input DatedServiceJourneyReference @oneOf {
+  "Identifies the service journey by a dated service journey ID (e.g. from NeTEx data where a service journey on a date has a unique ID)."
+  datedServiceJourneyId: String
+  "Identifies the service journey by service journey ID and service date."
+  serviceJourneyOnServiceDate: ServiceJourneyOnServiceDate
+}
+
 "A collection of selectors for what estimated calls should be included / excluded. At least one of `select` or `not` must be provided. The `select` is always applied first, then `not`. If only `not` is present, the exclude is applied to the existing set of estimated calls."
 input EstimatedCallFilterInput {
   "A list of selectors for what estimated calls should be excluded during the search. If a call matches with at least one selector it will be excluded."
@@ -2317,7 +2358,7 @@ input ItineraryFilters {
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 
-"Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known."
+"Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. Alternatively, a serviceJourneyLocation can be used to start the search on-board a vehicle,or pinpoint a boarding on a specific dated service journey to start routing."
 input Location {
   "Coordinates for the location. This can be used alone or as fallback if the place id is not found."
   coordinates: InputCoordinates
@@ -2325,6 +2366,8 @@ input Location {
   name: String
   "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
   place: String
+  "Identifies a location on a specific transit trip. When set, the search starts from the specified vehicle,considered either to be starting on-board or boarding at the provided stop. In this case, the dateTime parameter of the request is ignored, as the time is resolved based on timetable data instead."
+  serviceJourneyLocation: ServiceJourneyLocationInput
 }
 
 "Input format for specifying which modes will be allowed for this search. If this element is not present, it will default to accessMode/egressMode/directMode of foot and all transport modes will be allowed."
@@ -2368,6 +2411,14 @@ input PenaltyForStreetMode {
   timePenalty: DoubleFunction!
 }
 
+"Identifies a point in a journey pattern by stop location ID, optionally with an aimed departure time for disambiguation."
+input PointInJourneyPatternReference {
+  "The exact aimed departure time at this stop, corresponding to the aimedDepartureTime on EstimatedCall. Must match exactly. Used for disambiguation when the stop location is visited more than once in the journey pattern (e.g. ring lines). If provided, it is always validated against the timetable."
+  aimedDepartureTime: DateTime
+  "The stop location ID (quay or stop place). Must not be the last stop in the journey pattern, as boarding there would not allow further travel."
+  stopLocationId: String!
+}
+
 """
 A relax-cost is used to increase the limit when comparing one cost to another cost.
 This is used to include more results into the result. A `ratio=2.0` means a path (itinerary)
@@ -2394,6 +2445,22 @@ input ScooterPreferencesInput {
   speed: Float = 5.0
   "When using optimisationMethod 'triangle', these values tell the routing engine how important each factor is compared to the others. All values should add up to 1."
   triangleFactors: TriangleFactors
+}
+
+"Identifies a specific dated service journey and a specific point within it."
+input ServiceJourneyLocationInput {
+  "Identifies the service journey and service date, either by service journey ID and service date, or by a dated service journey ID."
+  datedServiceJourneyReference: DatedServiceJourneyReference!
+  "Identifies a specific point in the journey pattern. Note that cancelled stops are not allowed unless includePlannedCancellations/includeRealtimeCancellations are set accordingly."
+  pointInJourneyPatternReference: PointInJourneyPatternReference!
+}
+
+"Identifies a service journey by service journey ID and service date."
+input ServiceJourneyOnServiceDate {
+  "The service date of the trip, in ISO 8601 format (YYYY-MM-DD)."
+  serviceDate: Date!
+  "The service journey ID."
+  serviceJourneyId: String!
 }
 
 "A combination of street mode and corresponding duration"
@@ -2459,7 +2526,7 @@ input TripFilterSelectInput {
   "Set of ids for lines that should be included in/excluded from search"
   lines: [ID!]
   "Set of ids for service journeys that should be included in/excluded from search"
-  serviceJourneys: [ID!]
+  serviceJourneys: [ID!] @deprecated(reason : "This field is not implemented and has no effect.")
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes!]
 }

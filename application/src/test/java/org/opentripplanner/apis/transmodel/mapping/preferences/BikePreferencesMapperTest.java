@@ -83,10 +83,10 @@ class BikePreferencesMapperTest {
     var preferences = BikePreferences.of();
     var callWith = TestDataFetcherDecorator.of(
       "bikePreferences",
-      Map.of("optimisationMethod", VehicleRoutingOptimizeType.SAFEST_STREETS)
+      Map.of("optimisationMethod", VehicleRoutingOptimizeType.SAFE_STREETS)
     );
     mapBikePreferences(preferences, callWith);
-    assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, preferences.build().optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, preferences.build().optimizeType());
   }
 
   @Test
@@ -200,7 +200,7 @@ class BikePreferencesMapperTest {
         "bikeSpeed",
         11.0,
         "bicycleOptimisationMethod",
-        VehicleRoutingOptimizeType.SAFEST_STREETS,
+        VehicleRoutingOptimizeType.SAFE_STREETS,
         "triangleFactors",
         Map.of("time", 0.6, "slope", 0.2, "safety", 0.1),
         // Wrapper takes precedence

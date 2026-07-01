@@ -26,6 +26,15 @@ public interface FlexParameters {
    * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
    */
   Duration maxEgressWalkDuration();
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
+  int boardCost();
+
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
+  double reluctance();
 
   /**
    * This defines the default values. This will be used by the OTP configuration and by tests,
@@ -51,6 +60,16 @@ public interface FlexParameters {
       @Override
       public Duration maxEgressWalkDuration() {
         return Duration.ofMinutes(45);
+      }
+
+      @Override
+      public int boardCost() {
+        return 600;
+      }
+
+      @Override
+      public double reluctance() {
+        return 1.0;
       }
     };
   }

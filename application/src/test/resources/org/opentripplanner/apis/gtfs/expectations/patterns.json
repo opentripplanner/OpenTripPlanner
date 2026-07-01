@@ -288,6 +288,14 @@
             }
           }
         ],
+        "canceledTrips": [
+          {
+            "serviceDate": "2024-08-09",
+            "trip": {
+              "gtfsId": "F:321Canceled"
+            }
+          }
+        ],
         "vehiclePositions": [
           {
             "vehicleId": "F:vehicle-1",

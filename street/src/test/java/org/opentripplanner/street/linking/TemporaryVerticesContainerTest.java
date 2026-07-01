@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -41,6 +42,7 @@ public class TemporaryVerticesContainerTest {
     try (var container = new TemporaryVerticesContainer()) {
       var vertexLinker = new VertexLinker(
         graph,
+        GeofencingZoneService.EMPTY,
         VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
         50,
         true

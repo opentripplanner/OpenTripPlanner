@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.mapping._support.model;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
@@ -74,11 +73,6 @@ public class ApiItinerary {
    * The number of transfers this trip has.
    */
   public Integer transfers = 0;
-
-  /**
-   * The cost of this trip
-   */
-  public ApiItineraryFares fare = new ApiItineraryFares(Map.of(), Map.of(), null, null);
 
   /**
    * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit

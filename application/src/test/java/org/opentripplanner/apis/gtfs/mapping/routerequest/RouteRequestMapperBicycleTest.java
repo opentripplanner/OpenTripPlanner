@@ -150,7 +150,7 @@ class RouteRequestMapperBicycleTest {
           Map.ofEntries(
             entry(
               "bicycle",
-              Map.ofEntries(entry("optimization", Map.ofEntries(entry("type", "SAFEST_STREETS"))))
+              Map.ofEntries(entry("optimization", Map.ofEntries(entry("type", "SAFE_STREETS"))))
             )
           )
         )
@@ -159,7 +159,7 @@ class RouteRequestMapperBicycleTest {
     var env = testCtx.executionContext(bicycleArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var bikePreferences = routeRequest.preferences().bike();
-    assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, bikePreferences.optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, bikePreferences.optimizeType());
   }
 
   @Test

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
@@ -281,7 +281,7 @@ public class TransitDataImportBuilder {
    * period. If a service is start before and/or ends after the period then the service is modified
    * to match the period.
    */
-  public void limitServiceDays(LocalDateInterval periodLimit) {
+  public void limitServiceDays(LocalDateRange periodLimit) {
     if (periodLimit.isUnbounded()) {
       LOG.info("Limiting transit service is skipped, the period is unbounded.");
       return;
@@ -290,7 +290,7 @@ public class TransitDataImportBuilder {
     LOG.warn("Limiting transit service days to time period: {}", periodLimit);
 
     int orgSize = calendarDates.size();
-    calendarDates.removeIf(c -> !periodLimit.include(c.getDate()));
+    calendarDates.removeIf(c -> !periodLimit.contains(c.getDate()));
     logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
 
     List<ServiceCalendar> keepCal = new ArrayList<>();

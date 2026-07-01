@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -57,6 +59,8 @@ public class TimetableHelperTest {
       .build();
 
     var stopTime = new StopTime();
+    stopTime.setArrivalTime(3600);
+    stopTime.setDepartureTime(3660);
     RegularStop stop = SiteRepository.of()
       .regularStop(SCOPED_STOP_ID)
       .withCoordinate(0.0, 0.0)
@@ -242,13 +246,123 @@ public class TimetableHelperTest {
     );
   }
 
+  @Test
+  public void testApplyUpdates_NoRealtime_setsNoDataOnStop() {
+    // A call with no realtime times at all should mark the stop as NO_DATA
+    // and must NOT set timesModified (so hasAnyUpdates stays false).
+    CallWrapper callWithNoTimes = TestCall.of().withStopPointRef(STOP_ID).build();
+
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, callWithNoTimes, null);
+
+    RealTimeTripTimes tripTimes = builder.build();
+    assertTrue(
+      tripTimes.isNoDataStop(0),
+      "Stop should be marked NO_DATA when no realtime times provided"
+    );
+    assertFalse(
+      tripTimes.isTimesModified(),
+      "timesModified must remain false when only NO_DATA stops"
+    );
+    assertFalse(
+      tripTimes.hasAnyUpdates(),
+      "hasAnyUpdates must be false when no times were modified"
+    );
+  }
+
+  @Test
+  public void testApplyUpdates_OnlyExpectedDeparture_doesNotSetNoData() {
+    // A call with only a departure time (no arrival) must still be treated as a real-time update
+    // and must NOT mark the stop as NO_DATA.
+    ZonedDateTime expectedDeparture = START_OF_SERVICE.plus(Duration.ofHours(1));
+    CallWrapper callWithOnlyDeparture = TestCall.of()
+      .withStopPointRef(STOP_ID)
+      .withExpectedDepartureTime(expectedDeparture)
+      .build();
+
+    TimetableHelper.applyUpdates(
+      START_OF_SERVICE,
+      builder,
+      0,
+      false,
+      false,
+      callWithOnlyDeparture,
+      null
+    );
+
+    RealTimeTripTimes tripTimes = builder.build();
+    assertFalse(
+      tripTimes.isNoDataStop(0),
+      "Stop must NOT be NO_DATA when a departure time is provided"
+    );
+    assertTrue(
+      tripTimes.isTimesModified(),
+      "timesModified must be true when a realtime departure is applied"
+    );
+  }
+
+  @Test
+  public void testApplyUpdates_OnlyExpectedArrival_doesNotSetNoData() {
+    // A call with only an arrival time (no departure) must still be treated as a real-time update.
+    // The arrival must be ≤ scheduled departure (3660s) to avoid a negative dwell time.
+    ZonedDateTime expectedArrival = START_OF_SERVICE.plus(Duration.ofSeconds(3620));
+    CallWrapper callWithOnlyArrival = TestCall.of()
+      .withStopPointRef(STOP_ID)
+      .withExpectedArrivalTime(expectedArrival)
+      .build();
+
+    TimetableHelper.applyUpdates(
+      START_OF_SERVICE,
+      builder,
+      0,
+      false,
+      false,
+      callWithOnlyArrival,
+      null
+    );
+
+    RealTimeTripTimes tripTimes = builder.build();
+    assertFalse(
+      tripTimes.isNoDataStop(0),
+      "Stop must NOT be NO_DATA when an arrival time is provided"
+    );
+    assertTrue(
+      tripTimes.isTimesModified(),
+      "timesModified must be true when a realtime arrival is applied"
+    );
+  }
+
+  @Test
+  public void testApplyUpdates_NoDataStop_doesNotPreventCancellationFromBeingApplied() {
+    // A cancelled stop with no realtime times: cancellation must still be set
+    // even though the times are NO_DATA.
+    CallWrapper cancelledNoTimesCall = TestCall.of()
+      .withStopPointRef(STOP_ID)
+      .withCancellation(true)
+      .build();
+
+    TimetableHelper.applyUpdates(
+      START_OF_SERVICE,
+      builder,
+      0,
+      false,
+      false,
+      cancelledNoTimesCall,
+      null
+    );
+
+    assertEquals(
+      "Occupancy:NO_DATA_AVAILABLE Cancelled:true Extra:false Arrived:false Departed:false Inaccurate:false",
+      showStatuses(0)
+    );
+  }
+
   private String showStatuses(int index) {
     RealTimeTripTimes tripTimes = builder.build();
     return (
       "Occupancy:" +
       tripTimes.getOccupancyStatus(index) +
       " Cancelled:" +
-      tripTimes.isCancelledStop(index) +
+      tripTimes.isCanceledStop(index) +
       " Extra:" +
       tripTimes.isExtraCall(index) +
       " Arrived:" +

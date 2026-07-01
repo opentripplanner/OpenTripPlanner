@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.BitSet;
 
 /**
  * The purpose of this interface is to provide information about the trip schedule. The trip is a
@@ -96,15 +95,18 @@ public interface RaptorTripSchedule {
    */
   default int findArrivalStopPosition(int latestArrivalTime, int stop) {
     RaptorTripPattern p = pattern();
-    int i = p.numberOfStopsInPattern() - 1;
 
-    while (!p.alightingPossibleAt(i) || arrival(i) > latestArrivalTime) {
-      --i;
-      if (i == -1) {
-        return -1;
+    int end = p.numberOfStopsInPattern() - 1;
+    // Skip position 0 — cannot alight where the trip originates
+    for (int i = end; i > 0; i--) {
+      if (!p.alightingPossibleAt(i) || arrival(i) > latestArrivalTime) {
+        continue;
+      }
+      if (p.stopIndex(i) == stop) {
+        return i;
       }
     }
-    return p.findStopPositionBefore(i, stop);
+    return -1;
   }
 
   /**
@@ -121,17 +123,7 @@ public interface RaptorTripSchedule {
    * @return the stop position in the trip pattern if found; otherwise, -1
    */
   default int findDepartureStopPosition(int earliestDepartureTime, int stop) {
-    var p = pattern();
-    final int size = p.numberOfStopsInPattern();
-    int i = 0;
-
-    while (!p.boardingPossibleAt(i) || departure(i) < earliestDepartureTime) {
-      ++i;
-      if (i == size) {
-        return -1;
-      }
-    }
-    return p.findStopPositionAfter(i, stop);
+    return findDepartureStopPosition(0, earliestDepartureTime, stop);
   }
 
   /**
@@ -142,28 +134,51 @@ public interface RaptorTripSchedule {
    *
    * @return list of all valid stop positions for a given stop index
    */
-  default List<Integer> findDepartureStopPositions(int earliestDepartureTime, int stop) {
+  default IntIterator findDepartureStopPositions(int earliestDepartureTime, int stop) {
+    // In the common case where there are zero or one stops, we can return early with an
+    // IntIterators.empty() or IntIterators.singleValueIterator(), thereby avoiding the
+    // overhead of creating a BitSet and adding a single stop to it.
+    int i0 = findDepartureStopPosition(earliestDepartureTime, stop);
+    if (i0 == -1) {
+      return IntIterators.empty();
+    }
+    int i = findDepartureStopPosition(i0 + 1, earliestDepartureTime, stop);
+    if (i == -1) {
+      return IntIterators.singleValueIterator(i0);
+    }
+    var stops = new BitSet();
+    stops.set(i0);
+    do {
+      stops.set(i);
+      i = findDepartureStopPosition(i + 1, earliestDepartureTime, stop);
+    } while (i != -1);
+    return IntIterators.of(stops);
+  }
+
+  /**
+   * Find the departure stop position for a stop index after the given earliest departure time
+   * (inclusive), starting the search at the given start stop position. This method returns the
+   * first stop position found, or -1 if no stop position is found.
+   *
+   * @param startStopPos the start stop position to search from
+   * @param earliestDepartureTime the earliest departure time to search for (inclusive)
+   * @param stop the stop index to search for
+   * @return the stop position in the trip pattern if found; otherwise, -1
+   */
+  default int findDepartureStopPosition(int startStopPos, int earliestDepartureTime, int stop) {
     var p = pattern();
-    final int size = p.numberOfStopsInPattern();
-    int i = 0;
 
-    while (departure(i) < earliestDepartureTime) {
-      ++i;
-      if (i == size) {
-        return new ArrayList<>();
+    // Skip last stop position — cannot board at the trip destination
+    final int end = p.numberOfStopsInPattern() - 1;
+
+    for (int i = startStopPos; i < end; i++) {
+      if (!p.boardingPossibleAt(i) || departure(i) < earliestDepartureTime) {
+        continue;
+      }
+      if (p.stopIndex(i) == stop) {
+        return i;
       }
     }
-
-    var stops = new ArrayList<Integer>();
-
-    while (i < size) {
-      if (stop == p.stopIndex(i)) {
-        stops.add(i);
-      }
-
-      i++;
-    }
-
-    return stops;
+    return -1;
   }
 }

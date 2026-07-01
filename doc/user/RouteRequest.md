@@ -50,7 +50,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | bicycle                                                                                                      |        `object`        | Bicycle preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
 |    [boardCost](#rd_bicycle_boardCost)                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.                                                                          | *Optional* | `600`            |  2.0  |
 |    [optimization](#rd_bicycle_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                          | *Optional* | `"safe-streets"` |  2.0  |
-|    reluctance                                                                                                |        `double`        | A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
+|    [reluctance](#rd_bicycle_reluctance)                                                                      |        `double`        | A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
 |    speed                                                                                                     |        `double`        | Max bicycle speed along streets, in meters per second                                                                                                    | *Optional* | `5.0`            |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                                       | *Optional* |                  |  2.5  |
 |       cost                                                                                                   |        `integer`       | Cost to park a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
@@ -496,11 +496,34 @@ This is the cost that is used when boarding while cycling. This is usually highe
 
 **Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
 **Path:** /routingDefaults/bicycle   
-**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
 If the triangle optimization is used, it's enough to just define the triangle parameters
+
+<h3 id="rd_bicycle_reluctance">reluctance</h3>
+
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
+**Path:** /routingDefaults/bicycle 
+
+A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.
+
+If the optimization is set to `safe-streets`, or if `safety` is non-zero in the triangle,
+the actual effect will further be affected by the safety of the cycle route.
+
+The effect of safety has changed between versions 2.9 and 2.10 by the removal of the
+safety normalizer. Before the change, all the safety values were multiplied such that
+the safest way in the whole map would have an effective value of 1, and traversal on any
+ways which are not the safest in the whole map would further multiply the cost. Since
+version 2.10, this multiplication is not done and the values set in the
+[OSM Tag Mapper](osm/OsmTag.md) are used as-is, so it is now possible to decrease the
+effective reluctance if a safe route is present.
+
+For further information, please see [#6782](https://github.com/opentripplanner/OpenTripPlanner/pull/6782).
+In particular, you may need to increase the reluctance if you have found that the
+upgrade has resulted in too much cycling than you would like to.
+
 
 <h3 id="rd_bicycle_parking_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
 
@@ -584,8 +607,13 @@ Optimization type doesn't need to be defined if these values are defined.
 
 Relative importance of safety (range 0.0, 1.0).
 
-This factor can also include other concerns such as convenience and general cyclist
-preferences by taking into account road surface etc.
+If this factor is set to 1.0, the safety value is applied in whole as a multiplier on
+top of the reluctance.
+
+The safety value is set for tags in OpenStreetMap by the [OSM Tag Mapper](osm/OsmTag.md)
+which is mainly determined by the amount of traffic, but can also include other
+concerns such as convenience and general cyclist preferences by taking into account road
+surface etc.
 
 
 <h3 id="rd_bicycle_walk_mountDismountCost">mountDismountCost</h3>
@@ -986,7 +1014,7 @@ done because some street modes searches are much more resource intensive than ot
 
 **Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
 **Path:** /routingDefaults/scooter   
-**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
@@ -1035,8 +1063,13 @@ Optimization type doesn't need to be defined if these values are defined.
 
 Relative importance of safety (range 0.0, 1.0).
 
-This factor can also include other concerns such as convenience and general cyclist
-preferences by taking into account road surface etc.
+If this factor is set to 1.0, the safety value is applied in whole as a multiplier on
+top of the reluctance.
+
+The safety value is set for tags in OpenStreetMap by the [OSM Tag Mapper](osm/OsmTag.md)
+which is mainly determined by the amount of traffic, but can also include other
+concerns such as convenience and general cyclist preferences by taking into account road
+surface etc.
 
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
@@ -1137,8 +1170,6 @@ only available in the TransmodelAPI for now.
 Unmatched patterns are put in the BASE priority-group.
 
 
-**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**
-
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 
 **Since version:** `2.1` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional`   
@@ -1193,6 +1224,9 @@ be taken as scientific or definitive. Your mileage may vary.
 See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
 high values.
 
+If safetyFactor is greater than 0, the actual effect will further be affected by the safety of the
+walk route. See `safetyFactor` for more details.
+
 
 <h3 id="rd_walk_safetyFactor">safetyFactor</h3>
 
@@ -1201,7 +1235,14 @@ high values.
 
 Factor for how much the walk safety is considered in routing.
 
-Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
+  Value should be between 0 and 1.
+
+  If the value is set to be 0, safety is ignored.
+
+  If the value is set to 1, the safety factor for the traversed way is applied in whole
+  as a multiplier on the cost, on top of the reluctance. The safety factors are set in
+  the [OSM Tag Mapper](osm/OsmTag.md) for tags in OpenStreetMap.
+
 
 <h3 id="rd_walk_stairsTimeFactor">stairsTimeFactor</h3>
 

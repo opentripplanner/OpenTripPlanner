@@ -4,12 +4,12 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -24,21 +24,21 @@ public class FlexDirectPathFactory {
   private final FlexAccessEgressCallbackAdapter callbackService;
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
-  private final Duration maxTransferDuration;
   private final Matcher<Trip> matcher;
+  private final FlexParameters flexParameters;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
-    Duration maxTransferDuration,
-    Matcher<Trip> matcher
+    Matcher<Trip> matcher,
+    FlexParameters flexParameters
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
-    this.maxTransferDuration = maxTransferDuration;
     this.matcher = matcher;
+    this.flexParameters = flexParameters;
   }
 
   public Collection<DirectFlexPath> calculateDirectFlexPaths(
@@ -53,15 +53,15 @@ public class FlexDirectPathFactory {
     var flexAccessTemplates = new FlexAccessFactory(
       callbackService,
       accessPathCalculator,
-      maxTransferDuration,
-      matcher
+      matcher,
+      flexParameters
     ).calculateFlexAccessTemplates(streetAccesses, dates);
 
     var flexEgressTemplates = new FlexEgressFactory(
       callbackService,
       egressPathCalculator,
-      maxTransferDuration,
-      matcher
+      matcher,
+      flexParameters
     ).calculateFlexEgressTemplates(streetEgresses, dates);
 
     Multimap<FeedScopedId, NearbyStop> streetEgressByStopId = HashMultimap.create();

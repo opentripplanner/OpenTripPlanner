@@ -1,54 +1,23 @@
 package org.opentripplanner.astar;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.astar.spi.DominanceFunction;
-import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 
-public class TestAStarBuilder
-  extends AStarBuilder<TestState, TestEdge, TestVertex, TestAStarBuilder> {
+public class TestAStarBuilder {
 
-  TestAStarBuilder() {
-    super();
-    setBuilder(this);
-    super.withDominanceFunction((a, b) -> a.getWeight() <= b.getWeight());
+  public static AStarBuilder<TestState, TestEdge, TestVertex> ofDefault(
+    TestVertex origin,
+    TestVertex destination
+  ) {
+    return new AStarBuilder<TestState, TestEdge, TestVertex>()
+      .withGoalVertices(Set.of(destination))
+      .withTimeout(Duration.ofMinutes(5))
+      .withDominanceFunction((a, b) -> a.getWeight() <= b.getWeight())
+      .withInitialStates(List.of(createInitialState(origin)));
   }
 
-  @Override
-  protected Duration streetRoutingTimeout() {
-    return Duration.ofMinutes(1);
-  }
-
-  @Override
-  protected Collection<TestState> createInitialStates(Set<TestVertex> originVertices) {
-    return originVertices
-      .stream()
-      .map(v -> new TestState(v, 0))
-      .toList();
-  }
-
-  @Override
-  protected void initializeHeuristic(
-    RemainingWeightHeuristic heuristic,
-    Set origin,
-    Set destination,
-    boolean arriveBy
-  ) {}
-
-  @Override
-  protected DominanceFunction createDefaultDominanceFunction() {
-    return null;
-  }
-
-  public ShortestPathTree<TestState, TestEdge, TestVertex> getShortestPathTree() {
-    return build().getShortestPathTree();
-  }
-
-  public List<GraphPath<TestState, TestEdge, TestVertex>> getPathsToTarget() {
-    return build().getPathsToTarget();
+  private static TestState createInitialState(TestVertex vertex) {
+    return new TestState(vertex, 0);
   }
 }

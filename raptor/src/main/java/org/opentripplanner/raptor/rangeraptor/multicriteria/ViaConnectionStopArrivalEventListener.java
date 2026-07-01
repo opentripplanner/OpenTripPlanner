@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
 import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
 
@@ -16,7 +17,6 @@ import org.opentripplanner.raptor.api.request.via.RaptorTransferViaConnection;
 import org.opentripplanner.raptor.api.request.via.RaptorVisitStopViaConnection;
 import org.opentripplanner.raptor.api.request.via.ViaConnection;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
@@ -46,7 +46,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
 
   private final McStopArrivalFactory<T> stopArrivalFactory;
   private final List<ViaConnection> connections;
-  private final McStopArrivals<T> next;
+  private final McRangeRaptorWorkerState<T> next;
   private final List<McStopArrival<T>> transfersCache = new ArrayList<>();
   private final Function<T, RaptorTripScheduleReference> tripInfoProvider;
 
@@ -58,7 +58,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
   private ViaConnectionStopArrivalEventListener(
     McStopArrivalFactory<T> stopArrivalFactory,
     List<ViaConnection> connections,
-    McStopArrivals<T> next,
+    McRangeRaptorWorkerState<T> next,
     Consumer<Runnable> publishTransfersEventHandler,
     Function<T, RaptorTripScheduleReference> tripInfoProvider
   ) {
@@ -78,7 +78,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
   > createEventListeners(
     @Nullable ViaConnections viaConnections,
     McStopArrivalFactory<T> stopArrivalFactory,
-    McStopArrivals<T> nextLegStopArrivals,
+    McRangeRaptorWorkerState<T> nextSegmentState,
     Consumer<Runnable> onTransitComplete,
     Function<T, RaptorTripScheduleReference> tripInfoProvider
   ) {
@@ -92,7 +92,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
       var listener = new ViaConnectionStopArrivalEventListener<>(
         stopArrivalFactory,
         connections,
-        nextLegStopArrivals,
+        nextSegmentState,
         onTransitComplete,
         tripInfoProvider
       );
@@ -115,10 +115,7 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
 
     for (ViaConnection connection : connections) {
       switch (connection) {
-        case RaptorPassThroughViaConnection _ -> {
-          continueOnSameTripInNextSegment(arrival);
-          continueFromSameStopArrival(arrival);
-        }
+        case RaptorPassThroughViaConnection _ -> handlePassThroughViaConnection(arrival);
         case RaptorVisitStopViaConnection visitStop -> {
           continueFromSameStopArrival(arrival, visitStop);
         }
@@ -139,9 +136,14 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
   public void notifyElementRejected(ArrivalView<T> arrival, ArrivalView<T> rejectedByElement) {
     for (ViaConnection connection : connections) {
       if (connection instanceof RaptorPassThroughViaConnection) {
-        continueOnSameTripInNextSegment(arrival);
+        handlePassThroughViaConnection((McStopArrival<T>) arrival);
       }
     }
+  }
+
+  private void handlePassThroughViaConnection(McStopArrival<T> arrival) {
+    continueOnSameTripInNextSegment(arrival);
+    continueFromSameStopArrivalFromPassThrough(arrival);
   }
 
   /// @param alightArrival Must be a transit arrival, if not it is ignored.
@@ -184,8 +186,17 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     continueFromSameStopArrival(d == 0 ? arrival : arrival.addSlackToArrivalTime(d));
   }
 
+  /// Transit and access arrivals are forwarded to the next segment. Walk-transfer arrivals
+  /// are dropped: they do not satisfy the pass-through constraint on their own, and forwarding
+  /// them would produce two consecutive transfer legs, which is not representable in a path.
+  private void continueFromSameStopArrivalFromPassThrough(McStopArrival<T> arrival) {
+    if (!arrival.arrivedBy(TRANSFER)) {
+      continueFromSameStopArrival(arrival);
+    }
+  }
+
   private void continueFromSameStopArrival(McStopArrival<T> arrival) {
-    next.addStopArrival(arrival);
+    next.addViaArrival(arrival);
   }
 
   private void continueWithTransfer(McStopArrival<T> from, RaptorTransferViaConnection via) {

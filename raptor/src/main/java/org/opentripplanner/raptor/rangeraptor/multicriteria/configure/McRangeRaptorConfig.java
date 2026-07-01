@@ -12,7 +12,6 @@ import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
@@ -52,7 +51,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private McRangeRaptorWorkerState<T> state;
   private Heuristics heuristics;
   private McStopArrivals<T> arrivals;
-  private McStopArrivals<T> nextSegmentArrivals = null;
+  private McRangeRaptorWorkerState<T> nextSegmentState = null;
   private McStopArrivalFactory<T> stopArrivalFactory = null;
 
   public McRangeRaptorConfig(SearchContextViaSegments<T> contextSegment) {
@@ -73,10 +72,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * next segment. If this is the last segment, the next segment should be {@code null}. This is
    * optional.
    */
-  public McRangeRaptorConfig<T> connectWithNextSegmentArrivals(
-    @Nullable McStopArrivals<T> nextSegmentArrivals
+  public McRangeRaptorConfig<T> connectWithNextSegmentState(
+    @Nullable McRangeRaptorWorkerState<T> nextSegmentState
   ) {
-    this.nextSegmentArrivals = nextSegmentArrivals;
+    this.nextSegmentState = nextSegmentState;
     return this;
   }
 
@@ -87,7 +86,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return createTransitWorkerStrategy(createState(heuristics));
   }
 
-  public RaptorWorkerState<T> state() {
+  public McRangeRaptorWorkerState<T> state() {
     return createState(heuristics);
   }
 
@@ -232,7 +231,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return ViaConnectionStopArrivalEventListener.createEventListeners(
       contextSegment.viaConnections(),
       createStopArrivalFactory(),
-      nextSegmentArrivals,
+      nextSegmentState,
       context().lifeCycle()::onTransfersForRoundComplete,
       context().transitData()::tripScheduleReference
     );

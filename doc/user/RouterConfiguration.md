@@ -53,6 +53,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                                                                                                                                                | *Optional* | `"PT1S"`       |  2.2  |
 |    purgeExpiredData                                                                       |       `boolean`       | Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates.                                                                                                                           | *Optional* | `true`         |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                                                                                                                                      | *Optional* |                |   na  |
+|    [earlyTransferPruning](#transit_earlyTransferPruning)                                  |       `boolean`       | Enable the Transfer Early Pruning optimization for standard RAPTOR.                                                                                                                                                  | *Optional* | `true`         |  2.10 |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                                                                                                                                        | *Optional* | `60`           |   na  |
 |    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                                                                                                                                   | *Optional* | `12`           |   na  |
 |    [maxSearchWindow](#transit_maxSearchWindow)                                            |       `duration`      | Upper limit of the request parameter searchWindow.                                                                                                                                                                   | *Optional* | `"PT24H"`      |  2.4  |
@@ -225,6 +226,22 @@ Configuration for transit searches with RAPTOR.
 Some of these parameters for tuning transit routing are only available through configuration and
 cannot be set in the routing request. These parameters work together with the default routing
 request and the actual routing request.
+
+
+<h3 id="transit_earlyTransferPruning">earlyTransferPruning</h3>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /transit 
+
+Enable the Transfer Early Pruning optimization for standard RAPTOR.
+
+When enabled, the transfer relaxation loop breaks early once the current arrival time
+exceeds the best known destination arrival time. Transfers must be sorted by duration for
+this to be correct (which OTP ensures). This optimization only applies to Standard RAPTOR
+(not Multi-Criteria searches).
+
+See _Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026_
+in the [Bibliography](Bibliography.md).
 
 
 <h3 id="transit_iterationDepartureStepInSeconds">iterationDepartureStepInSeconds</h3>
@@ -931,7 +948,9 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "language" : "en",
       "frequency" : "1m",
       "allowKeepingRentedVehicleAtDestination" : false,
-      "geofencingZones" : false,
+      "geofencing" : {
+        "enabled" : false
+      },
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
         "Auth" : "<any-token>",

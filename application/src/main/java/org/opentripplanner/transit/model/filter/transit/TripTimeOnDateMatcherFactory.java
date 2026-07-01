@@ -1,10 +1,8 @@
 package org.opentripplanner.transit.model.filter.transit;
 
-import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -12,7 +10,7 @@ import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
 import org.opentripplanner.transit.model.filter.expr.GenericUnaryMatcher;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.filter.expr.OrMatcher;
+import org.opentripplanner.transit.model.filter.selector.SelectorBasedMatcherFactory;
 
 /**
  * A factory for creating matchers for TripOnServiceDates.
@@ -32,7 +30,12 @@ public class TripTimeOnDateMatcherFactory {
     ExpressionBuilder<TripTimeOnDate> expr = ExpressionBuilder.of();
 
     if (!request.transitFilters().isEmpty()) {
-      expr.matches(ofSelectorBasedTransitFilters(request.transitFilters()));
+      expr.matches(
+        SelectorBasedMatcherFactory.of(
+          request.transitFilters(),
+          TripTimeOnDateMatcherFactory::buildSelectorMatcher
+        )
+      );
     }
 
     expr.atLeastOneMatch(request.includeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
@@ -43,41 +46,6 @@ public class TripTimeOnDateMatcherFactory {
     expr.matchesNone(request.excludeModes(), TripTimeOnDateMatcherFactory::mode);
 
     return expr.build();
-  }
-
-  /**
-   * Creates a matcher from a list of {@link TripTimeOnDateFilterRequest} objects.
-   * A TripTimeOnDate matches if it matches at least one of the filters (OR between filters).
-   */
-  static Matcher<TripTimeOnDate> ofSelectorBasedTransitFilters(
-    List<TripTimeOnDateFilterRequest> filters
-  ) {
-    List<Matcher<TripTimeOnDate>> filterMatchers = filters
-      .stream()
-      .map(TripTimeOnDateMatcherFactory::buildFilterMatcher)
-      .toList();
-
-    return OrMatcher.of(filterMatchers);
-  }
-
-  /**
-   * Builds a matcher for a single filter request implementing select/not semantics:
-   * <ul>
-   *   <li>Match at least one select criterion (or all if select is null), AND</li>
-   *   <li>Match none of the not criteria.</li>
-   * </ul>
-   */
-  private static Matcher<TripTimeOnDate> buildFilterMatcher(TripTimeOnDateFilterRequest filter) {
-    return ExpressionBuilder.<TripTimeOnDate>of()
-      .atLeastOneMatch(
-        FilterValues.ofNullIsEverything("select", filter.select()),
-        TripTimeOnDateMatcherFactory::buildSelectorMatcher
-      )
-      .matchesNone(
-        FilterValues.ofNullIsEverything("not", filter.not()),
-        TripTimeOnDateMatcherFactory::buildSelectorMatcher
-      )
-      .build();
   }
 
   /**

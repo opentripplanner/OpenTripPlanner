@@ -23,6 +23,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.GroupOfRoutesBuilder;

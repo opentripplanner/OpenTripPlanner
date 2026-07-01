@@ -20,6 +20,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -51,6 +52,7 @@ public class GraphBuilder implements Runnable {
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
   private final DeduplicatorService deduplicator;
+  private final GraphBuildCacheManager cacheManager;
 
   private boolean hasTransitData = false;
 
@@ -59,13 +61,15 @@ public class GraphBuilder implements Runnable {
     DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
-    Closeable closeDataSourcesHandle
+    Closeable closeDataSourcesHandle,
+    GraphBuildCacheManager cacheManager
   ) {
     this.graph = baseGraph;
     this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.closeDataSourcesHandle = closeDataSourcesHandle;
+    this.cacheManager = cacheManager;
   }
 
   /**
@@ -229,7 +233,11 @@ public class GraphBuilder implements Runnable {
 
       validate();
     } finally {
-      closeDataSources();
+      try {
+        cacheManager.close();
+      } finally {
+        closeDataSources();
+      }
     }
   }
 

@@ -31,6 +31,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -71,7 +72,7 @@ public class TimetableSnapshotTest {
 
   @Test
   void testUniqueDirtyTimetablesAfterMultipleUpdates() {
-    TimetableSnapshot snapshot = new TimetableSnapshot();
+    TimetableSnapshot snapshot = new TimetableSnapshot(new DefaultTripCalendars());
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
 
@@ -145,7 +146,7 @@ public class TimetableSnapshotTest {
 
   @Test
   void testClear() {
-    TimetableSnapshot snapshot = new TimetableSnapshot();
+    TimetableSnapshot snapshot = new TimetableSnapshot(new DefaultTripCalendars());
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
 
@@ -230,6 +231,7 @@ public class TimetableSnapshotTest {
       realTimeAddedReplacedByTripOnServiceDateById,
       new HashMap<>(Map.of(tripIdAndServiceDate, tripOnServiceDate)),
       patternsForStop,
+      new DefaultTripCalendars(),
       false
     );
     assertFalse(snapshot.isEmpty());
@@ -253,7 +255,7 @@ public class TimetableSnapshotTest {
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(new DefaultTripCalendars());
     return timetableSnapshot.commit(null, true);
   }
 }

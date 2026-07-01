@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.ext.fares.service.gtfs.v2.FareLookupService.DEFAULT_FREE_TRANSFER_MATCH_PREDICATE;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -115,7 +116,8 @@ class SameGroupIdPriorityTest implements FareTestConstants {
       List.of(r1, r2),
       List.of(),
       tc.stopAreas,
-      ImmutableMultimap.of()
+      ImmutableMultimap.of(),
+      DEFAULT_FREE_TRANSFER_MATCH_PREDICATE
     );
 
     assertThat(service.legRules(leg()).stream().map(FareLegRule::id)).containsExactlyElementsIn(

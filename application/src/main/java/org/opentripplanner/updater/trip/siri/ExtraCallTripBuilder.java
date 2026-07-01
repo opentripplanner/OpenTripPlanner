@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.STOP_MISMATCH;
@@ -20,14 +19,12 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
-import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.OccupancyEnumeration;
 
 class ExtraCallTripBuilder {
@@ -42,31 +39,32 @@ class ExtraCallTripBuilder {
   private final boolean isJourneyPredictionInaccurate;
   private final OccupancyEnumeration occupancy;
   private final boolean cancellation;
+  private final boolean added;
   private final StopTimesMapper stopTimesMapper;
   private final DeduplicatorService deduplicator;
 
   ExtraCallTripBuilder(
-    EstimatedVehicleJourney estimatedVehicleJourney,
+    EstimatedVehicleJourneyWrapper journey,
     TransitEditorService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> generateTripPatternId,
-    Trip trip,
-    List<CallWrapper> calls
+    Trip trip
   ) {
     this.trip = Objects.requireNonNull(trip);
 
     this.deduplicator = deduplicator;
     // DataSource of added trip
-    dataSource = estimatedVehicleJourney.getDataSource();
+    dataSource = journey.dataSource();
 
-    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
+    serviceDate = entityResolver.resolveServiceDate(journey);
 
-    isJourneyPredictionInaccurate = TRUE.equals(estimatedVehicleJourney.isPredictionInaccurate());
-    occupancy = estimatedVehicleJourney.getOccupancy();
-    cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
+    isJourneyPredictionInaccurate = journey.isPredictionInaccurate();
+    occupancy = journey.occupancy();
+    cancellation = journey.isCancellation();
+    added = journey.isExtraJourney();
 
-    this.calls = calls;
+    this.calls = journey.calls();
 
     this.transitService = transitService;
     this.generateTripPatternId = generateTripPatternId;
@@ -140,7 +138,7 @@ class ExtraCallTripBuilder {
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
-      transitService.getServiceCode(trip.getServiceId())
+      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
     );
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times
@@ -172,11 +170,12 @@ class ExtraCallTripBuilder {
     }
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      builder.cancelTrip();
-    } else {
-      builder.withRealTimeState(RealTimeState.MODIFIED);
+      builder.withCanceled();
     }
-
+    if (added) {
+      builder.withAdded();
+    }
+    builder.withModifiedTripPattern();
     /* Validate */
     try {
       return new TripUpdate(

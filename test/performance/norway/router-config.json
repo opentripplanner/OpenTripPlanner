@@ -171,7 +171,9 @@
       "sourceType" : "gbfs",
       "frequency" : "1h",
       "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json",
-      "geofencingZones": true
+      "geofencing": {
+        "enabled": true
+      }
     }
   ]
 }

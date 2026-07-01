@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder;
 
+import static org.opentripplanner.datastore.api.FileType.CACHE;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
@@ -15,6 +16,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +31,7 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayFeedParam
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.module.cache.CacheTask;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
@@ -62,7 +65,6 @@ public class GraphBuilderDataSources implements Closeable {
   private final Multimap<FileType, DataSource> inputData = ArrayListMultimap.create();
   private final Multimap<FileType, DataSource> skipData = ArrayListMultimap.create();
   private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(FileType.UNKNOWN));
-  private final File cacheDirectory;
   private final DataSource outputGraph;
   private final BuildConfig buildConfig;
   private final File baseDirectory;
@@ -80,13 +82,13 @@ public class GraphBuilderDataSources implements Closeable {
   ) {
     this.store = store;
     this.buildConfig = bc;
-    this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
     this.baseDirectory = baseDirectory;
 
     // Select which files to import
     include(cli.doBuildStreet(), OSM);
     include(cli.doBuildStreet(), DEM);
+    include(cli.doBuildStreet(), CACHE);
     include(cli.doBuildTransit(), GTFS);
     include(cli.doBuildTransit(), NETEX);
 
@@ -147,12 +149,28 @@ public class GraphBuilderDataSources implements Closeable {
     return store.stopConsolidation();
   }
 
+  public File getBaseDirectory() {
+    return baseDirectory;
+  }
+
   public CompositeDataSource getBuildReportDir() {
     return store.getBuildReportDir();
   }
 
-  public File getCacheDirectory() {
-    return cacheDirectory;
+  /**
+   * Returns a list of data sources for the graph-build cache manager - one for each
+   * cache task type.
+   */
+  public Iterable<DataSource> listCachedDataSources() {
+    return Arrays.stream(CacheTask.values())
+      .map(CacheTask::cacheFileName)
+      .map(buildConfig::cachePath)
+      .map(store::getCacheFile)
+      .toList();
+  }
+
+  public CompositeDataSource getNedCacheDirectory() {
+    return store.getCacheDir(buildConfig.cachePath("ned"));
   }
 
   /**

@@ -1,13 +1,16 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
@@ -57,6 +60,13 @@ public class CarpoolTrip
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;
 
+  /**
+   * The longest span a carpool trip may have — from the first stop's departure to the
+   * destination's latest expected arrival. A trip longer than this is not shaped like a carpool
+   * journey and is not modelled as one.
+   */
+  public static final Duration MAX_TRIP_DURATION = Duration.ofHours(2).plusMinutes(30);
+
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final String provider;
@@ -65,39 +75,36 @@ public class CarpoolTrip
   // Ordered list of stops along the carpool route where passengers can be picked up or dropped off
   private final List<CarpoolStop> stops;
 
+  @Nullable
+  private final ContactInfo publicContactInformation;
+
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
-    this.startTime = builder.startTime();
-    this.endTime = builder.endTime();
+    this.startTime = Objects.requireNonNull(builder.startTime());
+    this.endTime = Objects.requireNonNull(builder.endTime());
     this.provider = builder.provider();
     this.totalCapacity = builder.totalCapacity();
     this.stops = Collections.unmodifiableList(builder.stops());
+    if (stops.size() < 2) {
+      throw new IllegalArgumentException(
+        "Carpool trip " + getId() + " must contain at least an origin and a destination stop"
+      );
+    }
+    this.publicContactInformation = builder.publicContactInformation();
   }
 
   /**
    * Returns the origin stop (first stop in the trip).
-   *
-   * @return the origin stop
-   * @throws IllegalStateException if the trip has no stops
    */
   public CarpoolStop getOrigin() {
-    if (stops.isEmpty()) {
-      throw new IllegalStateException("Trip has no stops");
-    }
-    return stops.get(0);
+    return stops.getFirst();
   }
 
   /**
    * Returns the destination stop (last stop in the trip).
-   *
-   * @return the destination stop
-   * @throws IllegalStateException if the trip has no stops
    */
   public CarpoolStop getDestination() {
-    if (stops.isEmpty()) {
-      throw new IllegalStateException("Trip has no stops");
-    }
-    return stops.get(stops.size() - 1);
+    return stops.getLast();
   }
 
   public ZonedDateTime startTime() {
@@ -106,6 +113,17 @@ public class CarpoolTrip
 
   public ZonedDateTime endTime() {
     return endTime;
+  }
+
+  /**
+   * Returns the latest expected arrival time of the destination stop if available, otherwise
+   * falls back to {@link #endTime()}.
+   *
+   * @return the latest expected end time of the trip
+   */
+  public ZonedDateTime latestEndTime() {
+    var latest = getDestination().getLatestExpectedArrivalTime();
+    return latest != null ? latest : endTime;
   }
 
   public String provider() {
@@ -131,6 +149,11 @@ public class CarpoolTrip
    */
   public List<CarpoolStop> stops() {
     return stops;
+  }
+
+  @Nullable
+  public ContactInfo publicContactInformation() {
+    return publicContactInformation;
   }
 
   /**
@@ -226,7 +249,8 @@ public class CarpoolTrip
       getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
-      stops.equals(other.stops)
+      stops.equals(other.stops) &&
+      Objects.equals(publicContactInformation, other.publicContactInformation)
     );
   }
 

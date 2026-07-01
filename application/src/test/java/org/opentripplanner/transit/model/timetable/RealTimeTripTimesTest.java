@@ -338,8 +338,8 @@ class RealTimeTripTimesTest {
   @Test
   public void testCancel() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-    builder.cancelTrip();
-    assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
+    builder.withCanceled();
+    assertTrue(builder.build().isCanceled());
   }
 
   @Test
@@ -356,7 +356,8 @@ class RealTimeTripTimesTest {
   public void testRealTimeUpdated() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     assertFalse(builder.build().isRealTimeUpdated(1));
-    builder.withRealTimeState(RealTimeState.UPDATED);
+    builder.withArrivalTime(1, 70);
+    builder.withDepartureTime(1, 70);
     assertTrue(builder.build().isRealTimeUpdated(1));
     builder.withNoData(1);
     var updatedTripTimesA = builder.build();

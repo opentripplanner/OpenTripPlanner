@@ -3,8 +3,10 @@ package org.opentripplanner.ext.carpooling.model;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Builder for {@link CarpoolTrip} instances.
@@ -17,6 +19,9 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   private int totalCapacity = CarpoolTrip.DEFAULT_TOTAL_CAPACITY;
   private List<CarpoolStop> stops = new ArrayList<>();
 
+  @Nullable
+  private ContactInfo publicContactInformation;
+
   public CarpoolTripBuilder(FeedScopedId id) {
     super(id);
   }
@@ -28,6 +33,7 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     this.provider = original.provider();
     this.totalCapacity = original.totalCapacity();
     this.stops = new ArrayList<>(original.stops());
+    this.publicContactInformation = original.publicContactInformation();
   }
 
   public CarpoolTripBuilder withStartTime(ZonedDateTime startTime) {
@@ -64,6 +70,18 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
 
   public int totalCapacity() {
     return totalCapacity;
+  }
+
+  public CarpoolTripBuilder withPublicContactInformation(
+    @Nullable ContactInfo publicContactInformation
+  ) {
+    this.publicContactInformation = publicContactInformation;
+    return this;
+  }
+
+  @Nullable
+  public ContactInfo publicContactInformation() {
+    return publicContactInformation;
   }
 
   public CarpoolTripBuilder withStops(List<CarpoolStop> stops) {

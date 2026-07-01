@@ -10,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.model.plan.TestTransitLeg;
@@ -22,7 +21,7 @@ class TimeframeMatcherTest implements FareTestConstants {
     .withFromTimeframes(List.of(TIMEFRAME_TWELVE_TO_TWO))
     .withToTimeframes(List.of(TIMEFRAME_THREE_TO_FIVE))
     .build();
-  public static final FeedScopedId ID2 = FeedScopedIdForTestFactory.id("2");
+  public static final FeedScopedId ID2 = id("2");
 
   private static List<Arguments> outsideTimeframeCases() {
     return List.of(

@@ -15,7 +15,7 @@ class AStarTest {
     edges(vA, vB, 10);
     edges(vB, vC, 10);
 
-    var tree = new TestAStarBuilder().withFrom(vA).withTo(vC).getShortestPathTree();
+    var tree = TestAStarBuilder.ofDefault(vA, vC).build().getShortestPathTree();
 
     var path = tree.getPath(vC);
 
@@ -38,7 +38,7 @@ class AStarTest {
     edges(vB1, vC, 11);
     edges(vB2, vC, 11);
 
-    var tree = new TestAStarBuilder().withFrom(vA).withTo(vC).getShortestPathTree();
+    var tree = TestAStarBuilder.ofDefault(vA, vC).build().getShortestPathTree();
 
     var path = tree.getPath(vC);
 
@@ -63,7 +63,7 @@ class AStarTest {
     edges(vB2, vC, 5);
     edges(vC, to, 5);
 
-    var tree = new TestAStarBuilder().withFrom(from).withTo(to).getShortestPathTree();
+    var tree = TestAStarBuilder.ofDefault(from, to).build().getShortestPathTree();
 
     var path = tree.getPath(to);
 

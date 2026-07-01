@@ -12,6 +12,8 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
+import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -49,10 +51,10 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 public class TestServerContext {
@@ -72,6 +74,7 @@ public class TestServerContext {
       transferRepository,
       fareService,
       null,
+      null,
       null
     );
   }
@@ -83,19 +86,24 @@ public class TestServerContext {
     TransferRepository transferRepository,
     FareService fareService,
     @Nullable TimetableSnapshotManager snapshotManager,
-    @Nullable RouteRequest request
+    @Nullable RouteRequest request,
+    @Nullable FlexParameters flexParameters
   ) {
     var routerConfig = RouterConfig.DEFAULT;
 
-    if (request == null) {
-      request = routerConfig.routingRequestDefaults();
-    }
     if (snapshotManager == null) {
       snapshotManager = new TimetableSnapshotManager(
+        (DefaultTripCalendars) timetableRepository.getTripCalendar(),
         null,
         TimetableSnapshotParameters.DEFAULT,
         LocalDate::now
       );
+    }
+    if (request == null) {
+      request = routerConfig.routingRequestDefaults();
+    }
+    if (flexParameters == null) {
+      flexParameters = routerConfig.flexParameters();
     }
 
     timetableRepository.index();
@@ -122,7 +130,7 @@ public class TestServerContext {
     return new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       fareService,
-      routerConfig.flexParameters(),
+      flexParameters,
       graph,
       createLinkingContextFactory(graph, vertexLinker, transitService),
       Metrics.globalRegistry,

@@ -22,5 +22,8 @@
         </module>
         <module name="UnusedImports"/>
         <module name="UnusedLocalVariable"/>
+        <module name="PackageDeclaration">
+            <property name="matchDirectoryStructure" value="true"/>
+        </module>
     </module>
 </module>

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import gnu.trove.TCollections;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import jakarta.inject.Inject;
@@ -27,7 +28,6 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
@@ -39,6 +39,7 @@ import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.RegularStopMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.RouteMatcherFactory;
@@ -77,6 +78,10 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * duration of the request (which may involve several method calls).
  */
 public class DefaultTransitService implements TransitEditorService {
+
+  private static final TIntSet EMPTY_SERVICE_CODES = TCollections.unmodifiableSet(
+    new TIntHashSet()
+  );
 
   private final TimetableRepository timetableRepository;
 
@@ -199,15 +204,10 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Integer getServiceCode(FeedScopedId id) {
-    return this.timetableRepository.getServiceCodes().get(id);
-  }
-
-  @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return timetableRepositoryIndex
+    return timetableRepository
       .getServiceCodesRunningForDate()
-      .getOrDefault(serviceDate, new TIntHashSet());
+      .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
 
   @Override
@@ -357,7 +357,10 @@ public class DefaultTransitService implements TransitEditorService {
    */
   @Override
   public List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request) {
-    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
+      request,
+      this::findPattern
+    );
     return listCanceledTrips().stream().filter(matcher::match).toList();
   }
 
@@ -598,7 +601,10 @@ public class DefaultTransitService implements TransitEditorService {
    */
   @Override
   public List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request) {
-    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
+      request,
+      this::findPattern
+    );
     return listTripsOnServiceDate().stream().filter(matcher::match).toList();
   }
 
@@ -628,7 +634,7 @@ public class DefaultTransitService implements TransitEditorService {
   public List<Trip> getTrips(TripRequest request) {
     Matcher<Trip> matcher = TripMatcherFactory.of(
       request,
-      this.getCalendarService()::getServiceDatesForServiceId
+      this.getTripCalendars()::listServiceDates
     );
     return listTrips().stream().filter(matcher::match).toList();
   }
@@ -656,8 +662,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public CalendarService getCalendarService() {
-    return this.timetableRepository.getCalendarService();
+  public TripCalendars getTripCalendars() {
+    return this.timetableRepository.getTripCalendar();
   }
 
   @Override
@@ -732,13 +738,13 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Set<LocalDate> listServiceDates() {
     return Collections.unmodifiableSet(
-      timetableRepositoryIndex.getServiceCodesRunningForDate().keySet()
+      timetableRepository.getServiceCodesRunningForDate().keySet()
     );
   }
 
   @Override
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return Collections.unmodifiableMap(timetableRepositoryIndex.getServiceCodesRunningForDate());
+    return Collections.unmodifiableMap(timetableRepository.getServiceCodesRunningForDate());
   }
 
   @Override

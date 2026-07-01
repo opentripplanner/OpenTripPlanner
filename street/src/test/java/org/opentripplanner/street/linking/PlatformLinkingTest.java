@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.GraphDataFetcher;
@@ -169,6 +170,7 @@ public class PlatformLinkingTest {
 
     var linker = new VertexLinker(
       graph.graph(),
+      GeofencingZoneService.EMPTY,
       VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
       50,
       true
@@ -467,6 +469,7 @@ public class PlatformLinkingTest {
   private void linkStops(GraphDataFetcher graph, int maxAreaNodes, boolean permanent) {
     var linker = new VertexLinker(
       graph.graph(),
+      GeofencingZoneService.EMPTY,
       COMPUTE_AREA_VISIBILITY_LINES,
       maxAreaNodes,
       false

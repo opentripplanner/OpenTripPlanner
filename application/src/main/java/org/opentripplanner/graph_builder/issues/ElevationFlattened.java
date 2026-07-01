@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.issue.api.OsmUrlGenerator;
 import org.opentripplanner.street.model.edge.Edge;
 
 public record ElevationFlattened(Edge edge) implements DataImportIssue {
-  private static final String FMT = "Edge %s was steeper than 35 percent and flattened.";
+  private static final String FMT = "Edge %s was steeper than 100 percent and flattened.";
 
   @Override
   public String getMessage() {
@@ -20,7 +20,7 @@ public record ElevationFlattened(Edge edge) implements DataImportIssue {
 
   @Override
   public String getHTMLMessage() {
-    return "<a href='%s'>Edge %s</a> was steeper than 35 percent and flattened.".formatted(
+    return "<a href='%s'>Edge %s</a> was steeper than 100 percent and flattened.".formatted(
       OsmUrlGenerator.fromCoordinate(edge.getFromVertex().getCoordinate()),
       edge.getName()
     );

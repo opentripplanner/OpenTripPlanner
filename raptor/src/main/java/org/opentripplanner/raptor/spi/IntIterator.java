@@ -11,7 +11,7 @@ public interface IntIterator {
   int next();
 
   /**
-   * @return true if there is more int values in the sequence.
+   * @return true if there are more int values in the sequence.
    */
   boolean hasNext();
 }

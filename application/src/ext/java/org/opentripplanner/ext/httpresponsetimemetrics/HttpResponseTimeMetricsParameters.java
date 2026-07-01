@@ -26,7 +26,7 @@ public record HttpResponseTimeMetricsParameters(
     "/transmodel/v3",
     "/gtfs/v1/"
   );
-  public static final String DEFAULT_METRIC_NAME = "otp_http_server_requests";
+  public static final String DEFAULT_METRIC_NAME = "otp.http.server.requests";
   public static final Duration DEFAULT_MIN_EXPECTED_RESPONSE_TIME = Duration.ofMillis(10);
   public static final Duration DEFAULT_MAX_EXPECTED_RESPONSE_TIME = Duration.ofMillis(10_000);
 

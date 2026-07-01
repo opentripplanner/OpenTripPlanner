@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
@@ -316,6 +317,14 @@ public class Graph implements Serializable {
   public Collection<Edge> findEdges(Envelope env, Scope scope) {
     requireIndex();
     return streetIndex.findEdges(env, scope);
+  }
+
+  /**
+   * Find all edges near the segments of the given line strings.
+   */
+  public Set<Edge> findEdgesAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {
+    requireIndex();
+    return streetIndex.findEdgesAlongLineStrings(lineStrings, scope);
   }
 
   /**

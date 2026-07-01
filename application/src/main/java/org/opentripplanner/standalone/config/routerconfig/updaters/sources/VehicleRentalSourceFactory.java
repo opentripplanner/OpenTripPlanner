@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.config.routerconfig.updaters.sources;
 import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.util.Set;
@@ -38,6 +38,7 @@ public class VehicleRentalSourceFactory {
   }
 
   public VehicleRentalDataSourceParameters create() {
+    var geofencing = geofencing();
     return switch (type) {
       case GBFS -> new GbfsVehicleRentalDataSourceParameters(
         url(),
@@ -45,12 +46,16 @@ public class VehicleRentalSourceFactory {
         allowKeepingRentedVehicleAtDestination(),
         headers(),
         network(),
-        geofencingZones(),
+        geofencing.enabled(),
+        geofencing.businessAreaBorders(),
         overloadingAllowed(),
         rentalPickupTypes()
       );
     };
   }
+
+  /** Resolved geofencing configuration: {@code enabled} and {@code businessAreaBorders}. */
+  private record GeofencingConfig(boolean enabled, boolean businessAreaBorders) {}
 
   private String language() {
     return c.of("language").since(V2_1).summary("TODO").asString(null);
@@ -104,10 +109,16 @@ public class VehicleRentalSourceFactory {
       .asBoolean(false);
   }
 
-  private boolean geofencingZones() {
-    return c
-      .of("geofencingZones")
-      .since(V2_3)
+  private GeofencingConfig geofencing() {
+    var g = c
+      .of("geofencing")
+      .since(V2_10)
+      .summary("Configuration for GBFS geofencing-based rental restrictions.")
+      .asObject();
+
+    boolean enabled = g
+      .of("enabled")
+      .since(V2_10)
       .summary("Compute rental restrictions based on GBFS 2.2 geofencing zones.")
       .description(
         """
@@ -118,6 +129,25 @@ public class VehicleRentalSourceFactory {
         """
       )
       .asBoolean(false);
+
+    boolean businessAreaBorders = g
+      .of("businessAreaBorders")
+      .since(V2_10)
+      .summary(
+        "Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary."
+      )
+      .description(
+        """
+        When enabled, GBFS geofencing zones that have no restrictions (no traversal or drop-off bans)
+        are treated as business areas. The router will force a vehicle drop-off when exiting such an
+        area, preventing routes that leave the operator's service area with a rented vehicle.
+
+        Requires `enabled` to also be true.
+        """
+      )
+      .asBoolean(true);
+
+    return new GeofencingConfig(enabled, businessAreaBorders);
   }
 
   private Set<RentalPickupType> rentalPickupTypes() {

@@ -4,8 +4,8 @@ import java.time.Duration;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 
 public record PollingTripUpdaterParameters(
   String configRef,

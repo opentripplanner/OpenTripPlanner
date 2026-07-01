@@ -102,9 +102,9 @@ class TripPatternTest {
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withMode(TransitMode.RAIL).build()));
-    // Clearing hopGeometries is required because TripPatternGeometry now validates that the hop
-    // count matches the stop pattern; changing the stop pattern without clearing the inherited
-    // geometries would otherwise be a caller bug.
+    // Clearing hopGeometries is required because TripPatternBuilder.buildHopGeometries now
+    // validates that the hop count matches the stop pattern; changing the stop pattern without
+    // clearing the inherited geometries would otherwise be a caller bug.
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy().withStopPattern(TEST_MODEL.stopPattern(11)).withHopGeometries(null).build()

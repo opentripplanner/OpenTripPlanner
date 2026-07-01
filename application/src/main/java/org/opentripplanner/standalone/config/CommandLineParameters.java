@@ -29,7 +29,6 @@ public class CommandLineParameters {
 
   private static final String TIP = " Use --help to see available options.";
   private static final int DEFAULT_PORT = 8080;
-  private static final String DEFAULT_CACHE_PATH = "/var/otp/cache";
   private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
   /* Options for the command itself, rather than build or server sub-tasks. */
@@ -82,13 +81,6 @@ public class CommandLineParameters {
   )
   public boolean save = false;
 
-  @Parameter(
-    names = { "--cache" },
-    validateWith = ReadWriteDirectory.class,
-    description = "The directory under which to cache OSM and NED tiles."
-  )
-  public File cacheDirectory = new File(DEFAULT_CACHE_PATH);
-
   /* Options for the server sub-task. */
 
   @Parameter(names = { "--serve" }, description = "Run an OTP API server.")
@@ -132,6 +124,12 @@ public class CommandLineParameters {
     description = "Abort the startup if configuration files are found to contain unknown parameters."
   )
   public boolean abortOnUnknownConfig = false;
+
+  @Parameter(
+    names = { "--debugRequests" },
+    description = "Enable debug logging for OTP request and Raptor request handling."
+  )
+  public boolean debugRequests = false;
 
   /**
    * The remaining single parameter after the switches is the directory with the configuration

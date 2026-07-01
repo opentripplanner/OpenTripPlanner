@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 class CancelledStopTest implements RealtimeTestConstants {
 
@@ -47,7 +47,7 @@ class CancelledStopTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "MODIFIED | A 0:01:01 0:01:01 | B [C] 0:01:10 0:01:11 | D 0:01:30 0:01:30",
+      "P U | A 0:01:01 0:01:01 | B [C] 0:01:10 0:01:11 | D 0:01:30 0:01:30",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -80,7 +80,7 @@ class CancelledStopTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "MODIFIED | A [PI] 0:01:01 0:01:01 | B [C] 0:01:10 0:01:11 | D [PI] 0:01:30 0:01:30",
+      "P U | A [PI] 0:01:01 0:01:01 | B [C] 0:01:10 0:01:11 | D [PI] 0:01:30 0:01:30",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

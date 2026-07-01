@@ -32,7 +32,10 @@ class OregonHopFareFactoryTest implements FareTestConstants {
     TRIMET_ADULT_SINGLE_RIDE,
     "regular",
     Money.usDollars(10)
-  ).build();
+  )
+    .withCategory(CATEGORY_ADULT)
+    .withMedium(HOP_FASTPASS)
+    .build();
 
   private static final FareProduct FP_CTRAN_REGIONAL = FareProduct.of(
     ADULT_REGIONAL_SINGLE_RIDE,

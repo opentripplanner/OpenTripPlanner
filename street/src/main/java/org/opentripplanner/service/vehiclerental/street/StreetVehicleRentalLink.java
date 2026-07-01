@@ -1,8 +1,10 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.util.List;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -21,6 +23,16 @@ public class StreetVehicleRentalLink extends Edge {
   private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
+  }
+
+  public static List<Edge> createBidirectionalLinks(
+    Vertex rentalVertex,
+    StreetVertex streetVertex
+  ) {
+    return List.of(
+      createStreetVehicleRentalLink((VehicleRentalPlaceVertex) rentalVertex, streetVertex),
+      createStreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) rentalVertex)
+    );
   }
 
   public static StreetVehicleRentalLink createStreetVehicleRentalLink(

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
@@ -92,7 +94,10 @@ public class ElevationModuleTest {
       .buildAndConnect();
 
     // create the elevation module
-    File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
+    var cacheDirectory = new DirectoryDataSource(
+      new File(ElevationModuleTest.class.getResource("ned").getFile()),
+      FileType.DEM
+    );
     DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
     var datumUrl = new URI("https://example.com");
     NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(

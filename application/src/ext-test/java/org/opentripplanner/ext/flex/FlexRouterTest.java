@@ -20,8 +20,8 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.api.request.TripRequest;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TripInput;
 
 class FlexRouterTest {
 

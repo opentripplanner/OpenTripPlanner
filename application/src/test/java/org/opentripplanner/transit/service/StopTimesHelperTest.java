@@ -41,7 +41,7 @@ class StopTimesHelperTest {
     );
     var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes().getFirst().createRealTimeFromScheduledTimes();
-    newTripTimes.cancelTrip();
+    newTripTimes.withCanceled();
     pattern = originalPattern
       .copy()
       .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))

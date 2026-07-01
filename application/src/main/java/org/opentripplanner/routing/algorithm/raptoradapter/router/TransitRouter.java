@@ -52,7 +52,7 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContext linkingContext;
-  private final AccessEgressFetcher fetchAccessEgress;
+  private final CarpoolingService carpoolingService;
 
   private TransitRouter(
     RouteRequest request,
@@ -72,15 +72,7 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
     this.viaTransferResolver = serverContext.viaTransferResolver();
     this.linkingContext = linkingContext;
-
-    this.fetchAccessEgress = new AccessEgressFetcher(
-      request,
-      serverContext,
-      transitSearchTimeZero,
-      additionalSearchDays,
-      linkingContext,
-      carpoolingService
-    );
+    this.carpoolingService = carpoolingService;
   }
 
   public static TransitRouterResult route(
@@ -108,7 +100,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    // Skip the creation of raptor transit data when the request cannot use transit
     if (!request.journey().transit().enabled() || request.cannotReachTransit()) {
       return new TransitRouterResult(List.of(), null);
     }
@@ -122,16 +113,29 @@ public class TransitRouter {
     var raptorTransitData = request.preferences().transit().ignoreRealtimeUpdates()
       ? serverContext.transitService().getRaptorTransitData()
       : serverContext.transitService().getRealtimeRaptorTransitData();
-
     var requestTransitDataProvider = createRequestTransitDataProvider(raptorTransitData);
+    var fetchAccessEgress = new AccessEgressFetcher(
+      request,
+      serverContext,
+      transitSearchTimeZero,
+      additionalSearchDays,
+      linkingContext,
+      carpoolingService,
+      requestTransitDataProvider
+    );
 
     debugTimingAggregator.finishedPatternFiltering();
 
-    var accessEgresses = fetchAccessEgresses();
+    var accessEgresses = fetchAccessEgresses(fetchAccessEgress);
 
     debugTimingAggregator.finishedAccessEgress(
       accessEgresses.getAccesses().size(),
       accessEgresses.getEgresses().size()
+    );
+
+    var extraSearchForSorlandsbanen = createExtraMcRouterSearchForSorlandsbanen(
+      accessEgresses,
+      raptorTransitData
     );
 
     // Prepare transit search
@@ -152,7 +156,7 @@ public class TransitRouter {
     // Transit routing using Raptor
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
-      createExtraMcRouterSearch(accessEgresses, raptorTransitData)
+      extraSearchForSorlandsbanen
     );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
@@ -218,7 +222,7 @@ public class TransitRouter {
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
   }
 
-  private AccessEgresses fetchAccessEgresses() {
+  private AccessEgresses fetchAccessEgresses(AccessEgressFetcher fetchAccessEgress) {
     final var accessList = new ArrayList<RoutingAccessEgress>();
     final var egressList = new ArrayList<RoutingAccessEgress>();
 
@@ -227,15 +231,15 @@ public class TransitRouter {
         // TODO: This is not using {@link OtpRequestThreadFactory} which mean we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture.allOf(
-          CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
-          CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
+          CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess(fetchAccessEgress))),
+          CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress(fetchAccessEgress)))
         ).join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
-      accessList.addAll(fetchAccess());
-      egressList.addAll(fetchEgress());
+      accessList.addAll(fetchAccess(fetchAccessEgress));
+      egressList.addAll(fetchEgress(fetchAccessEgress));
     }
 
     verifyAccessEgress(accessList, egressList);
@@ -253,14 +257,18 @@ public class TransitRouter {
     return new AccessEgresses(accessListWithPenalty, egressListWithPenalty);
   }
 
-  private Collection<? extends RoutingAccessEgress> fetchAccess() {
+  private Collection<? extends RoutingAccessEgress> fetchAccess(
+    AccessEgressFetcher fetchAccessEgress
+  ) {
     debugTimingAggregator.startedAccessCalculating();
     var list = fetchAccessEgress.fetchAccess();
     debugTimingAggregator.finishedAccessCalculating();
     return list;
   }
 
-  private Collection<? extends RoutingAccessEgress> fetchEgress() {
+  private Collection<? extends RoutingAccessEgress> fetchEgress(
+    AccessEgressFetcher fetchAccessEgress
+  ) {
     debugTimingAggregator.startedEgressCalculating();
     var list = fetchAccessEgress.fetchEgress();
     debugTimingAggregator.finishedEgressCalculating();
@@ -329,10 +337,11 @@ public class TransitRouter {
   }
 
   /**
-   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance.
+   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance,
+   * specifically for the Sorlandsbanen OTP feature.
    */
   @Nullable
-  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearchForSorlandsbanen(
     AccessEgresses accessEgresses,
     RaptorTransitData raptorTransitData
   ) {

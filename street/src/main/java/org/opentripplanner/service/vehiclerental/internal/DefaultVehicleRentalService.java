@@ -3,18 +3,23 @@ package org.opentripplanner.service.vehiclerental.internal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 @Singleton
@@ -24,6 +29,8 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   public DefaultVehicleRentalService() {}
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
+
+  private final Map<String, GeofencingZoneIndex> geofencingZoneIndexes = new ConcurrentHashMap<>();
 
   @Override
   public Collection<VehicleRentalPlace> getVehicleRentalPlaces() {
@@ -128,5 +135,33 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       .filter(vr -> envelope.contains(new Coordinate(vr.longitude(), vr.latitude())));
 
     return vehicleRentalPlaceStream.toList();
+  }
+
+  @Override
+  public void setGeofencingZoneIndex(String dataSourceName, GeofencingZoneIndex index) {
+    geofencingZoneIndexes.put(dataSourceName, index);
+  }
+
+  @Override
+  public Set<GeofencingZone> zonesContaining(Coordinate coord) {
+    return geofencingZoneIndexes
+      .values()
+      .stream()
+      .flatMap(idx -> idx.findZonesContaining(coord).stream())
+      .collect(Collectors.toSet());
+  }
+
+  @Override
+  public boolean hasIndexedZones() {
+    return !geofencingZoneIndexes.isEmpty();
+  }
+
+  @Override
+  public Set<GeofencingZone> listZones() {
+    var zones = new HashSet<GeofencingZone>();
+    for (var idx : geofencingZoneIndexes.values()) {
+      zones.addAll(idx.listZones());
+    }
+    return zones;
   }
 }

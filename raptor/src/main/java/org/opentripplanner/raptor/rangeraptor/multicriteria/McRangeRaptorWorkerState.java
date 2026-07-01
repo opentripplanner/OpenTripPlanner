@@ -1,11 +1,16 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.view.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.view.PathLegType.TRANSIT;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
+import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.OnTripAccessArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
@@ -63,7 +68,8 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
   private final McStopArrivalFactory<T> stopArrivalFactory;
-  private final List<McStopArrival<T>> arrivalsCache = new ArrayList<>();
+  private final List<McStopArrival<T>> transitArrivalsCache = new ArrayList<>();
+  private final List<McStopArrival<T>> transferArrivalsCache = new ArrayList<>();
   private final RaptorCostCalculator<T> calculatorGeneralizedCost;
   private final RaptorTransitCalculator<T> transitCalculator;
 
@@ -89,7 +95,6 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
     // Attach to the RR life cycle
     lifeCycle.onSetupIteration(_ -> setupIteration());
-    lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
     lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
   }
 
@@ -187,7 +192,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       c1
     );
 
-    arrivalsCache.add(transitState);
+    transitArrivalsCache.add(transitState);
   }
 
   /* private methods */
@@ -200,28 +205,19 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
    * visible to round 1 boarding.
    */
   private void setupIteration() {
-    arrivalsCache.clear();
+    transitArrivalsCache.clear();
+    transferArrivalsCache.clear();
     arrivals.clearTouchedStopsAndSetStopMarkers();
   }
 
-  /**
-   * Called after the transit (pattern) scan for a round is complete. First advances the
-   * stop-arrival marker past the previous round's arrivals (so they are no longer "new"), then
-   * commits the transit alights cached during this round. The committed alights land after the
-   * marker and are immediately visible to the transfer step.
-   */
-  private void transitsForRoundComplete() {
+  @Override
+  public void transitsForRoundComplete() {
     arrivals.clearTouchedStopsAndSetStopMarkers();
-    commitCachedArrivals();
+    commitTransitArrivals();
   }
 
-  /**
-   * Called after the transfer step for a round is complete. Commits the transfer arrivals cached
-   * during the transfer step. They land after the marker alongside the round's transit alights,
-   * making both visible to boarding in the next round.
-   */
   private void transfersForRoundComplete() {
-    commitCachedArrivals();
+    commitTransferArrivals();
   }
 
   private void transferToStop(
@@ -234,19 +230,73 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
 
       if (!exceedsTimeLimit(arrivalTime)) {
-        arrivalsCache.add(stopArrivalFactory.createTransferStopArrival(it, transfer, arrivalTime));
+        var arrival = stopArrivalFactory.createTransferStopArrival(it, transfer, arrivalTime);
+        transferArrivalsCache.add(arrival);
       }
     }
   }
 
-  private void commitCachedArrivals() {
-    for (McStopArrival<T> arrival : arrivalsCache) {
+  private void commitTransitArrivals() {
+    for (McStopArrival<T> arrival : transitArrivalsCache) {
       addStopArrival(arrival);
     }
-    arrivalsCache.clear();
+    transitArrivalsCache.clear();
   }
 
-  private void addStopArrival(McStopArrival<T> arrival) {
+  private void commitTransferArrivals() {
+    for (McStopArrival<T> arrival : transferArrivalsCache) {
+      addStopArrival(arrival);
+    }
+    transferArrivalsCache.clear();
+  }
+
+  /**
+   * Add a stop arrival from a previous via segment's pass-through event. The arrival is queued for
+   * on-board trip continuation into the next segment.
+   */
+  void addOnBoardTripArrival(
+    ArrivalView<T> boardingArrival,
+    int startRoutingAtStopIndex,
+    int startRoutingAtStopPosition,
+    RaptorTripScheduleStopPosition boardingConstraint
+  ) {
+    arrivals.addOnBoardTripArrival(
+      boardingArrival,
+      startRoutingAtStopIndex,
+      startRoutingAtStopPosition,
+      boardingConstraint
+    );
+  }
+
+  /**
+   * Enqueue a stop arrival forwarded from the previous via segment.
+   * <p>
+   * Transit arrivals go into {@code transitArrivalsCache}, committed at
+   * {@code transitsForRoundComplete} (after
+   * {@link McStopArrivals#clearTouchedStopsAndSetStopMarkers()}). This makes them invisible to
+   * this segment's transit routing in the same round but picked up by transfers and the next
+   * transit round.
+   * <p>
+   * Access arrivals are committed immediately via {@link #addStopArrival}, matching how the first
+   * segment seeds its own access stops. This allows the via stop to be used as a boarding point
+   * in the current round.
+   * <p>
+   * Walk-transfer arrivals go into {@code transferArrivalsCache}, committed at
+   * {@code transfersForRoundComplete} — after {@code applyTransfers} has already run. This
+   * prevents the stop from being treated as transit-touched, which would otherwise trigger
+   * walk transfers and produce consecutive transfer legs.
+   */
+  void addViaArrival(McStopArrival<T> arrival) {
+    if (arrival.arrivedBy(TRANSIT)) {
+      transitArrivalsCache.add(arrival);
+    } else if (arrival.arrivedBy(ACCESS)) {
+      addStopArrival(arrival);
+    } else {
+      transferArrivalsCache.add(arrival);
+    }
+  }
+
+  void addStopArrival(McStopArrival<T> arrival) {
     // TODO: 2023-05-17 via pass through: this is a problem for passThrough searches
     //  we need to figure out how to perform heuristic optimization for those searches
     if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {

@@ -129,7 +129,7 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
   }
 
   private static VehicleParkingSpaces createVehicleAvailability(List<LiipiParkPatch> patches) {
-    VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.builder();
+    VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.of();
     boolean hasHandledSpaces = false;
 
     for (LiipiParkPatch patch : patches) {

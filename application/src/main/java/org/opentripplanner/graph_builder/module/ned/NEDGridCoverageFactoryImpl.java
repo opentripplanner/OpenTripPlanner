@@ -1,9 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import com.google.common.io.ByteStreams;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -15,6 +12,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.geotools.api.coverage.Coverage;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.street.graph.Graph;
@@ -35,14 +34,18 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     "g2012s00.gtx",
     "g2012u00.gtx",
   };
-  private final File cacheDirectory;
+  private final CompositeDataSource cacheDir;
   private final NEDTileSource tileSource;
   private final List<GridCoverage2D> regionCoverages = new ArrayList<>();
   private final URL datumUrl;
   private List<VerticalDatum> datums;
 
-  public NEDGridCoverageFactoryImpl(File cacheDirectory, URI datumUrl, NEDTileSource tileSource) {
-    this.cacheDirectory = cacheDirectory;
+  public NEDGridCoverageFactoryImpl(
+    CompositeDataSource cacheDir,
+    URI datumUrl,
+    NEDTileSource tileSource
+  ) {
+    this.cacheDir = cacheDir;
     this.tileSource = tileSource;
     try {
       this.datumUrl = datumUrl.toURL();
@@ -59,13 +62,13 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
    * run times which is likely due to too much memory competing for a slot in the processor cache.
    */
   public Coverage getGridCoverage() {
-    // If the tile data hasn't been loaded into memory yet, do that now.
+    // If the tile data hasn’t been loaded into memory yet, do that now.
     if (regionCoverages.size() == 0) {
       loadVerticalDatum();
-      // Make one grid coverage for each NED tile, adding them to a list of coverage instances that can then be
-      // wrapped with thread-specific interpolators.
-      for (File path : tileSource.getNEDTiles()) {
-        GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+      // Make one grid coverage for each NED tile, adding them to a list of coverage instances that
+      // can then be wrapped with thread-specific interpolators.
+      for (DataSource tile : tileSource.getNEDTiles()) {
+        GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(tile, 1.0);
         regionCoverages.add(factory.getUninterpolatedGridCoverage());
       }
     }
@@ -82,29 +85,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
   @Override
   public void checkInputs() {
-    /* Attempt to create cache directory if it doesn't exist. */
-    if (!cacheDirectory.exists()) {
-      LOG.info("Cache directory {} does not exist, creating it.", cacheDirectory);
-      if (!cacheDirectory.mkdirs()) {
-        throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
-      }
-    }
-    if (!cacheDirectory.canRead() || !cacheDirectory.canWrite()) {
+    if (!cacheDir.isWritable()) {
       throw new RuntimeException(
-        String.format("Can't write and write NED cache at '%s'. Check permissions.", cacheDirectory)
+        "Can’t read/write NED cache at ‘" + cacheDir.path() + "’. Check permissions."
       );
     }
     boolean missingDatum = false;
     for (String filename : DATUM_FILENAMES) {
-      File datumFile = new File(cacheDirectory, filename);
-      if (!datumFile.canRead()) {
+      if (!cacheDir.entry(filename).exists()) {
         missingDatum = true;
       }
     }
     if (missingDatum) {
-      /* Attempt to fetch the datum files from the web. */
       LOG.warn(
-        "OTP needs additional files (a vertical datum) to convert between NED elevations and OSM's WGS84 elevations."
+        "OTP needs additional files (a vertical datum) to convert between NED elevations and OSM’s WGS84 elevations."
       );
       try {
         fetchDatum();
@@ -121,7 +115,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
    */
   @Override
   public void fetchData(Graph graph) {
-    tileSource.fetchData(graph, cacheDirectory);
+    tileSource.fetchData(graph, cacheDir);
   }
 
   /*
@@ -134,7 +128,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
    * particular part of the world; the so-called 3D datums used in GPS and OSM are ellipsoids
    * intended to cover the whole Earth. Orthometric datums like NAVD 88 are equipotential
    * (gravitational) surfaces of the Earth (geoids [1]) which include the effects of topography
-   * because the Earth's mass is irregularly distributed. Ellipsoid datums like NAD83 are smooth
+   * because the Earth’s mass is irregularly distributed. Ellipsoid datums like NAD83 are smooth
    * geometric approximations of the earth’s surface (ellipsoids) without topography.
    * Differences between the two are significant (up to 100 meters).
    *
@@ -168,8 +162,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
       datums = new ArrayList<>();
       try {
         for (String filename : DATUM_FILENAMES) {
-          File datumFile = new File(cacheDirectory, filename);
-          VerticalDatum datum = VerticalDatum.fromGTX(new FileInputStream(datumFile));
+          VerticalDatum datum = VerticalDatum.fromGTX(cacheDir.entry(filename).asInputStream());
           datums.add(datum);
         }
       } catch (IOException e) {
@@ -186,17 +179,13 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   private void fetchDatum() throws Exception {
     LOG.info("Attempting to fetch datum files from OTP project web server...");
     ZipInputStream zis = new ZipInputStream(datumUrl.openStream());
-    /* Silly boilerplate because Java has no simple unzip-to-directory function. */
     for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-      if (entry.isDirectory()) {
+      String filename = entry.getName();
+      if (entry.isDirectory() || filename.contains("/") || filename.contains("\\")) {
         throw new RuntimeException("ZIP files containing directories are not supported");
       }
-      File file = new File(cacheDirectory, entry.getName());
-      if (!file.getParentFile().equals(cacheDirectory)) {
-        throw new RuntimeException("ZIP files containing directories are not supported");
-      }
-      LOG.info("decompressing {}", file);
-      OutputStream os = new FileOutputStream(file);
+      LOG.info("decompressing {}", filename);
+      OutputStream os = cacheDir.entry(filename).asOutputStream();
       ByteStreams.copy(zis, os);
       os.close();
     }

@@ -301,7 +301,9 @@
       "language": "en",
       "frequency": "1m",
       "allowKeepingRentedVehicleAtDestination": false,
-      "geofencingZones": false,
+      "geofencing": {
+        "enabled": false
+      },
       "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers": {
         // example for authentication headers

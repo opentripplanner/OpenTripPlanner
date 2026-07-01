@@ -5,11 +5,13 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OtpStartupInfo {
 
+  private static final long START_UP_TIME = System.currentTimeMillis();
   private static final Logger LOG = LoggerFactory.getLogger(OtpStartupInfo.class);
   private static final String NEW_LINE = "\n";
   public static final List<String> HEADER = List.of(
@@ -23,7 +25,6 @@ public class OtpStartupInfo {
 
   private static String info() {
     return (
-      "" +
       HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining()) +
       line("Version:     " + projectInfo().version.version) +
       line("Ser.ver.id:  " + projectInfo().getOtpSerializationVersionId()) +
@@ -44,7 +45,12 @@ public class OtpStartupInfo {
       javaVersion()
     );
     ApplicationShutdownSupport.addShutdownHook("server-shutdown-info", () ->
-      LOG.info("OTP SHUTTING DOWN - {} - {}", cliTaskInfo, projectInfo().getVersionString())
+      LOG.info(
+        "OTP SHUTTING DOWN {} - {} - {}",
+        DurationUtils.durationToStrMillisescond(System.currentTimeMillis() - START_UP_TIME),
+        cliTaskInfo,
+        projectInfo().getVersionString()
+      )
     );
     LOG.info(NEW_LINE + "{}", info());
   }

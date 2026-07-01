@@ -134,7 +134,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       TRANSFER_REPOSITORY,
       new DefaultFareService(),
       null,
-      defaultRequest
+      defaultRequest,
+      null
     );
 
     context = new TransmodelRequestContext(
@@ -215,7 +216,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode WALK. The value 45m1s is not greater than the default 45m.",
+      "Invalid duration for mode WALK. The value 45m1s is greater than the default 45m.",
       ex.getMessage()
     );
   }
@@ -230,7 +231,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode FLEXIBLE. The value 20m1s is not greater than the default 20m.",
+      "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
       ex.getMessage()
     );
   }
@@ -248,7 +249,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode WALK. The value 4h1s is not greater than the default 4h.",
+      "Invalid duration for mode WALK. The value 4h1s is greater than the default 4h.",
       ex.getMessage()
     );
   }
@@ -263,7 +264,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
-      "Invalid duration for mode FLEXIBLE. The value 20m1s is not greater than the default 20m.",
+      "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
       ex.getMessage()
     );
   }
@@ -406,6 +407,31 @@ public class TripRequestMapperTest implements PlanTestConstants {
     Map<String, Object> arguments = arguments(name, 101);
     var req = MAPPER.createRequest(executionContext(arguments));
     assertEquals(Duration.ofSeconds(101), req.preferences().transfer().slack());
+  }
+
+  @Test
+  void testOnBoardLocation() {
+    var fromWithOnBoardLocation = Map.of(
+      "serviceJourneyLocation",
+      Map.of(
+        "datedServiceJourneyReference",
+        Map.of(
+          "serviceJourneyOnServiceDate",
+          Map.of("serviceJourneyId", "F:T1", "serviceDate", LocalDate.of(2024, 11, 1))
+        ),
+        "pointInJourneyPatternReference",
+        Map.of("stopLocationId", "F:stop1")
+      )
+    );
+
+    var arguments = new HashMap<String, Object>();
+    arguments.put("from", fromWithOnBoardLocation);
+    arguments.put("to", Map.of("place", "F:Quay:2"));
+
+    var request = MAPPER.createRequest(executionContext(arguments));
+    var from = request.from();
+    assertNotNull(from);
+    assertNotNull(from.tripLocation());
   }
 
   @Test

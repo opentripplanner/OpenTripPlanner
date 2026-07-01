@@ -2,9 +2,8 @@
 
 ## Contact Info
 
-- Kyyti Group Oy, Finland
+- Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 - Entur, Norway
-- Hannes Junnila
 
 ## Documentation
 
@@ -49,13 +48,26 @@ following to `router-config.json`.
 
 | Config Parameter                                     |    Type    | Summary                                                                                                                       |  Req./Opt. | Default Value | Since |
 |------------------------------------------------------|:----------:|-------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [boardCost](#flex_boardCost)                         |  `integer` | A board cost added to the generalized cost of a flex leg.                                                                     | *Optional* | `600`         |  2.10 |
 | [maxAccessWalkDuration](#flex_maxAccessWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk to reach a flex stop or zone.                                      | *Optional* | `"PT45M"`     |  2.3  |
 | [maxEgressWalkDuration](#flex_maxEgressWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.           | *Optional* | `"PT45M"`     |  2.3  |
 | [maxFlexTripDuration](#flex_maxFlexTripDuration)     | `duration` | How long can a non-scheduled flex trip at maximum be.                                                                         | *Optional* | `"PT45M"`     |  2.3  |
 | [maxTransferDuration](#flex_maxTransferDuration)     | `duration` | How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. | *Optional* | `"PT5M"`      |  2.3  |
+| reluctance                                           |  `double`  | A factor multiplied with the travel time of a flex leg to calculate the weight.                                               | *Optional* | `1.0`         |  2.10 |
 
 
 ### Details
+
+<h4 id="flex_boardCost">boardCost</h4>
+
+**Since version:** `2.10` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `600`   
+**Path:** /flex 
+
+A board cost added to the generalized cost of a flex leg.
+
+This cost is applied once per any type of flex leg including access/egress and direct legs,
+penalizing the act of boarding the flex vehicle.
+
 
 <h4 id="flex_maxAccessWalkDuration">maxAccessWalkDuration</h4>
 

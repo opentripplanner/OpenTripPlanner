@@ -1,9 +1,14 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
+import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
@@ -16,35 +21,38 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 public class TripOnServiceDateRequest {
 
   private final FilterValues<LocalDate> includeServiceDates;
+  private final FilterValues<LocalDateRange> includeServiceDateRanges;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
+  private final FilterValues<FeedScopedId> includePatterns;
   private final FilterValues<FeedScopedId> includeServiceJourneys;
   private final FilterValues<FeedScopedId> includeReplacementFor;
   private final FilterValues<String> includeNetexInternalPlanningCodes;
   private final FilterValues<TripAlteration> includeAlterations;
-  private final FilterValues<TransitMode> includeModes;
-  private final FilterValues<TransitMode> excludeModes;
+  private final List<FilterRequest<TripOnServiceDateSelectRequest>> filters;
 
   TripOnServiceDateRequest(
     FilterValues<LocalDate> includeServiceDates,
+    FilterValues<LocalDateRange> includeServiceDateRanges,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
+    FilterValues<FeedScopedId> includePatterns,
     FilterValues<FeedScopedId> includeServiceJourneys,
     FilterValues<FeedScopedId> includeReplacementFor,
     FilterValues<String> includeNetexInternalPlanningCodes,
     FilterValues<TripAlteration> includeAlterations,
-    FilterValues<TransitMode> includeModes,
-    FilterValues<TransitMode> excludeModes
+    List<FilterRequest<TripOnServiceDateSelectRequest>> filters
   ) {
     this.includeServiceDates = includeServiceDates;
+    this.includeServiceDateRanges = includeServiceDateRanges;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
+    this.includePatterns = includePatterns;
     this.includeServiceJourneys = includeServiceJourneys;
     this.includeReplacementFor = includeReplacementFor;
     this.includeNetexInternalPlanningCodes = includeNetexInternalPlanningCodes;
     this.includeAlterations = includeAlterations;
-    this.includeModes = includeModes;
-    this.excludeModes = excludeModes;
+    this.filters = filters;
   }
 
   public static TripOnServiceDateRequestBuilder of() {
@@ -57,6 +65,10 @@ public class TripOnServiceDateRequest {
 
   public FilterValues<FeedScopedId> includeRoutes() {
     return includeRoutes;
+  }
+
+  public FilterValues<FeedScopedId> includePatterns() {
+    return includePatterns;
   }
 
   public FilterValues<FeedScopedId> includeServiceJourneys() {
@@ -79,11 +91,39 @@ public class TripOnServiceDateRequest {
     return includeServiceDates;
   }
 
+  public FilterValues<LocalDateRange> includeServiceDateRanges() {
+    return includeServiceDateRanges;
+  }
+
   public FilterValues<TransitMode> includeModes() {
-    return includeModes;
+    List<TransitMode> modesToInclude = null;
+    if (!filters.isEmpty()) {
+      // Since we currently only support a single filter, we only use the first filter and select
+      var includes = filters.getFirst().select();
+      if (includes != null && !includes.getFirst().transportModes().includeEverything()) {
+        modesToInclude = extractTransitModes(includes.getFirst());
+      }
+    }
+    return FilterValues.ofNullIsEverything("modesToInclude", modesToInclude);
   }
 
   public FilterValues<TransitMode> excludeModes() {
-    return excludeModes;
+    List<TransitMode> modesToExclude = null;
+    if (!filters.isEmpty()) {
+      // Since we currently only support a single filter, we only use the first filter and select
+      var excludes = filters.getFirst().not();
+      if (excludes != null && !excludes.getFirst().transportModes().includeEverything()) {
+        modesToExclude = extractTransitModes(excludes.getFirst());
+      }
+    }
+    return FilterValues.ofNullIsEverything("modesToExclude", modesToExclude);
+  }
+
+  public List<FilterRequest<TripOnServiceDateSelectRequest>> filters() {
+    return filters;
+  }
+
+  private List<TransitMode> extractTransitModes(TripOnServiceDateSelectRequest selectRequest) {
+    return selectRequest.transportModes().get().stream().map(MainAndSubMode::mainMode).toList();
   }
 }

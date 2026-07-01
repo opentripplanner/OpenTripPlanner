@@ -21,4 +21,14 @@ public class DefaultStreetLimitationParametersService implements StreetLimitatio
   public int maxAreaNodes() {
     return streetRepository.streetModelDetails().maxAreaNodes();
   }
+
+  @Override
+  public float getBestWalkSafety() {
+    return streetRepository.streetModelDetails().bestWalkSafety();
+  }
+
+  @Override
+  public float getBestBikeSafety() {
+    return streetRepository.streetModelDetails().bestBikeSafety();
+  }
 }

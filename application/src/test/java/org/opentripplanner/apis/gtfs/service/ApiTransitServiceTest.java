@@ -19,13 +19,13 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
+import org.opentripplanner.updater.trip.gtfs.TripUpdateBuilder;
 
 /**
  * This test uses the real-time test environment to establish the condition under test.

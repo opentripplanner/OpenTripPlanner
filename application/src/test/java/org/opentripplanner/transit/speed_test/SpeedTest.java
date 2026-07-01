@@ -16,6 +16,7 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -37,6 +38,7 @@ import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
@@ -49,7 +51,6 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
@@ -113,7 +114,12 @@ public class SpeedTest {
       new DefaultVehicleParkingRepository(),
       timetableRepository,
       new DefaultCarpoolingRepository(),
-      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
+      new TimetableSnapshotManager(
+        (DefaultTripCalendars) timetableRepository.getTripCalendar(),
+        null,
+        TimetableSnapshotParameters.DEFAULT,
+        LocalDate::now
+      ),
       routerConfig.updaterConfig()
     );
     if (timetableRepository.getUpdaterManager() != null) {

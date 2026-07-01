@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -22,7 +23,6 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
-import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
@@ -81,7 +81,7 @@ public class TestTransitData
         routes.set(i);
       }
     }
-    return new BitSetIterator(routes);
+    return IntIterators.of(routes);
   }
 
   @Override
@@ -141,7 +141,7 @@ public class TestTransitData
           return null;
         }
         if (list.size() == 1) {
-          return list.get(0);
+          return list.getFirst();
         }
         throw new IllegalStateException("More than on transfers found: " + list);
       }

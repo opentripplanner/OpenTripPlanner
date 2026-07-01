@@ -2,31 +2,40 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.arrivalIsAfterDepartureTime;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.expectedArrivalBeforeExpectedDeparture;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithAllButOneCallCancelled;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithCancelledIntermediateCall;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithDifferentCapacitiesPerCall;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithLatestExpectedArrivalTime;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithLatestExpectedArrivalTimeAimedOnly;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithOnboardCounts;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithPerStopLatestExpectedArrivalTimes;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithPublicContact;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithTotalCapacity;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.lessThanTwoStops;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourneyWithPolygon;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.stopTimesAreOutOfOrder;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDuration;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDurationViaDefaultDeviationBudget;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasAimedTimesOnly;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasExpectedTimesOnly;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripWithWaypointsTooFarApart;
 import static org.opentripplanner.ext.carpooling.model.CarpoolStop.DEFAULT_DEVIATION_BUDGET;
 import static org.opentripplanner.ext.carpooling.model.CarpoolStop.DEFAULT_ONBOARD_COUNT;
 import static org.opentripplanner.ext.carpooling.model.CarpoolTrip.DEFAULT_TOTAL_CAPACITY;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.org.siri.siri21.EstimatedCall;
 
 public class CarpoolSiriMapperTest {
 
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper();
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper("EN");
 
   @Test
   void mapSiriToCarpoolTrip_arrivalIsAfterDepartureTime_throwsIllegalArgumentException() {
@@ -39,6 +48,29 @@ public class CarpoolSiriMapperTest {
   void mapSiriToCarpoolTrip_lessThanTwoStops_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () ->
       mapper.mapSiriToCarpoolTrip(lessThanTwoStops())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_tripExceedsMaxDuration_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDuration())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_tripExceedsMaxDurationViaDefaultDeviationBudget_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDurationViaDefaultDeviationBudget())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_waypointsTooFarApart_throwsIllegalArgumentException() {
+    // Short claimed times but waypoints ~450 km apart: the timetable check passes, the geometry
+    // check rejects it.
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripWithWaypointsTooFarApart())
     );
   }
 
@@ -116,6 +148,13 @@ public class CarpoolSiriMapperTest {
   void mapSiriToCarpoolTrip_stopTimesAreOutOfOrder_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () ->
       mapper.mapSiriToCarpoolTrip(stopTimesAreOutOfOrder())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_expectedArrivalBeforeExpectedDeparture_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(expectedArrivalBeforeExpectedDeparture())
     );
   }
 
@@ -228,6 +267,26 @@ public class CarpoolSiriMapperTest {
     assertEquals(Duration.ZERO, lastStop.getDeviationBudget());
   }
 
+  // -- cancellation tests --
+
+  @Test
+  void mapSiriToCarpoolTrip_intermediateCallCancelled_dropsThatCall() {
+    var mapped = mapper.mapSiriToCarpoolTrip(journeyWithCancelledIntermediateCall());
+
+    assertNotNull(mapped);
+    var stopIds = mapped
+      .stops()
+      .stream()
+      .map(s -> s.getId().getId())
+      .toList();
+    assertEquals(List.of("unittest_trip_origin", "unittest_trip_destination"), stopIds);
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_fewerThanTwoActiveCalls_returnsNull() {
+    assertNull(mapper.mapSiriToCarpoolTrip(journeyWithAllButOneCallCancelled()));
+  }
+
   @Test
   void mapSiriToCarpoolTrip_multiStopWithDifferingBudgets_eachStopHasOwnBudget() {
     // 3-stop journey. Intermediate arrives at +20 with latest +23 (3 min slack),
@@ -239,5 +298,25 @@ public class CarpoolSiriMapperTest {
     assertEquals(Duration.ZERO, mapped.stops().get(0).getDeviationBudget());
     assertEquals(Duration.ofMinutes(3), mapped.stops().get(1).getDeviationBudget());
     assertEquals(Duration.ofMinutes(10), mapped.stops().get(2).getDeviationBudget());
+  }
+
+  // -- publicContact tests --
+
+  @Test
+  void mapSiriToCarpoolTrip_withPublicContact_mapsContactInformation() {
+    var journey = journeyWithPublicContact("+4712345678", "https://example.com/book");
+    var mapped = mapper.mapSiriToCarpoolTrip(journey);
+
+    assertNotNull(mapped.publicContactInformation());
+    assertEquals("+4712345678", mapped.publicContactInformation().getPhoneNumber());
+    assertEquals("https://example.com/book", mapped.publicContactInformation().getBookingUrl());
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_withoutPublicContact_contactInformationIsNull() {
+    var journey = minimalCompleteJourney();
+    var mapped = mapper.mapSiriToCarpoolTrip(journey);
+
+    assertNull(mapped.publicContactInformation());
   }
 }

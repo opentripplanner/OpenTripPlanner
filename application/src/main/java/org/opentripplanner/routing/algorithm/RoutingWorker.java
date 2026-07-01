@@ -200,6 +200,10 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectStreet() {
+    // Start-on-board trip locations don't have street vertices, so direct routing is not applicable
+    if (request.isStartOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
@@ -232,6 +236,9 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectFlex() {
+    if (request.isStartOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     if (!OTPFeature.FlexRouting.isOn()) {
       return RoutingResult.ok(List.of());
     }
@@ -248,6 +255,9 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectCarpooling() {
+    if (request.isStartOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     if (OTPFeature.CarPooling.isOff()) {
       return RoutingResult.ok(List.of());
     }

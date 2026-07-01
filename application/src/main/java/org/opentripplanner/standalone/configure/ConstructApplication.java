@@ -244,7 +244,7 @@ public class ConstructApplication {
       );
     }
     LOG.info("Creating transit layer for Raptor routing.");
-    timetableRepository.setRaptorTransitData(
+    timetableRepository.initRaptorTransitData(
       RaptorTransitDataMapper.map(tuningParameters, timetableRepository, transferRepository)
     );
     timetableRepository.setRealtimeRaptorTransitData(

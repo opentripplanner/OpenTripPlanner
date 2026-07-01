@@ -56,7 +56,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     List<TransitPathLeg<T>> transitLegs
   ) {
     List<List<TripToTripTransfer<T>>> result = new ArrayList<>();
-    var fromLeg = transitLegs.get(0);
+    var fromLeg = transitLegs.getFirst();
     TransitPathLeg<T> toLeg;
     var earliestDeparture = getFromStopTime(fromLeg);
 
@@ -78,7 +78,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   private static <T> T last(List<T> list) {
-    return list.get(list.size() - 1);
+    return list.getLast();
   }
 
   private List<TripToTripTransfer<T>> findTransfers(
@@ -128,11 +128,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), stop);
 
     // Loop through transfers and decide whether they are possible
-    for (var stopPos : possibleTransfers) {
+    while (possibleTransfers.hasNext()) {
+      int stopPos = possibleTransfers.next();
       // Find transfer constraint for stop position
       var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop, stopPos);
 
-      if (!isAllowedTransfer(stopPos, tx)) {
+      if (transferNotAllowed(stopPos, tx)) {
         continue;
       }
 
@@ -167,11 +168,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       // Find all possible transfers on given stop index, starting on from.time
       var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), toStop);
 
-      for (var stopPos : possibleTransfers) {
+      while (possibleTransfers.hasNext()) {
+        int stopPos = possibleTransfers.next();
         // Find transfer constraint for stop position
         var tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop, stopPos);
 
-        if (!isAllowedTransfer(stopPos, tx)) {
+        if (transferNotAllowed(stopPos, tx)) {
           continue;
         }
 
@@ -266,15 +268,15 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
    * @param tx optional transfer constraint
    * @return whether this transfer is possible
    */
-  private boolean isAllowedTransfer(int stopPosition, ConstrainedTransfer tx) {
+  private boolean transferNotAllowed(int stopPosition, ConstrainedTransfer tx) {
     // Check in trip pattern whether boarding is possible
     if (!toTrip.pattern().boardingPossibleAt(stopPosition)) {
-      return false;
+      return true;
     }
     // Transfer is allowed if no constrained transfer exist
     if (tx == null) {
-      return true;
+      return false;
     }
-    return !tx.getTransferConstraint().isNotAllowed();
+    return tx.getTransferConstraint().isNotAllowed();
   }
 }

@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.time.Duration;
@@ -25,12 +26,16 @@ public class FlexConfig implements FlexParameters {
   private final Duration maxFlexTripDuration;
   private final Duration maxAccessWalkDuration;
   private final Duration maxEgressWalkDuration;
+  private final int boardCost;
+  private final double reluctance;
 
   private FlexConfig() {
-    maxTransferDuration = Duration.ofMinutes(5);
-    maxFlexTripDuration = Duration.ofMinutes(45);
-    maxAccessWalkDuration = Duration.ofMinutes(45);
-    maxEgressWalkDuration = Duration.ofMinutes(45);
+    maxTransferDuration = DEFAULT.maxTransferDuration();
+    maxFlexTripDuration = DEFAULT.maxFlexTripDuration();
+    maxAccessWalkDuration = DEFAULT.maxAccessWalkDuration();
+    maxEgressWalkDuration = DEFAULT.maxEgressWalkDuration();
+    boardCost = DEFAULT.boardCost();
+    reluctance = DEFAULT.reluctance();
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
@@ -87,6 +92,24 @@ public class FlexConfig implements FlexParameters {
       )
       .description(ACCESS_EGRESS_DESCRIPTION)
       .asDuration(DEFAULT.maxEgressWalkDuration());
+
+    boardCost = json
+      .of("boardCost")
+      .since(V2_10)
+      .summary("A board cost added to the generalized cost of a flex leg.")
+      .description(
+        """
+        This cost is applied once per any type of flex leg including access/egress and direct legs,
+        penalizing the act of boarding the flex vehicle.
+        """
+      )
+      .asInt(DEFAULT.boardCost());
+
+    reluctance = json
+      .of("reluctance")
+      .since(V2_10)
+      .summary("A factor multiplied with the travel time of a flex leg to calculate the weight.")
+      .asDouble(DEFAULT.reluctance());
   }
 
   public Duration maxFlexTripDuration() {
@@ -103,5 +126,13 @@ public class FlexConfig implements FlexParameters {
 
   public Duration maxEgressWalkDuration() {
     return maxEgressWalkDuration;
+  }
+
+  public int boardCost() {
+    return boardCost;
+  }
+
+  public double reluctance() {
+    return reluctance;
   }
 }

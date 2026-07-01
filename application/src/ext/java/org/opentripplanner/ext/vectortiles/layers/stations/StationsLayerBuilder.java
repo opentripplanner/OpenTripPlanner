@@ -36,7 +36,7 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
     this.transitService = transitService;
   }
 
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     return transitService
       .listStations()
       .stream()

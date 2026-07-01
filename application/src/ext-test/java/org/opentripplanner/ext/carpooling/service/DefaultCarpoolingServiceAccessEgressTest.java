@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,26 +19,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
+import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
@@ -193,33 +192,10 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       }
     );
 
-    Graph graph = model.graph();
-    var timetableRepository = model.timetableRepository();
-    VertexLinker vertexLinker = VertexLinkerTestFactory.of(graph);
-    var vertexCreationService = new VertexCreationService(vertexLinker);
-    TransitService transitService = new DefaultTransitService(timetableRepository);
-    transitServiceResolver = new TransitServiceResolver(transitService);
-    repository = new DefaultCarpoolingRepository();
-
-    StreetLimitationParametersService streetLimitationParams =
-      new StreetLimitationParametersService() {
-        @Override
-        public float maxCarSpeed() {
-          return 40.0f;
-        }
-
-        @Override
-        public int maxAreaNodes() {
-          return 500;
-        }
-      };
-
-    service = new DefaultCarpoolingService(
-      repository,
-      streetLimitationParams,
-      transitService,
-      vertexCreationService
-    );
+    var context = CarpoolingServiceTestContext.of(model);
+    service = context.service();
+    repository = context.repository();
+    transitServiceResolver = context.transitServiceResolver();
   }
 
   private IntersectionVertex vertexA;
@@ -784,5 +760,75 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
           "time from P2 to stop"
       );
     }
+  }
+
+  /**
+   * Verifies the booking URL is rewritten with passenger pickup/dropoff query parameters when an
+   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial,
+   * the {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
+   * vertex incident to T5's pedestrian-only side branch) and the passenger then walks
+   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg,
+   * so the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the
+   * walking endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
+   */
+  @Test
+  void accessItinerary_appendsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
+    var departureTime = SEARCH_TIME.plusMinutes(30);
+    var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime);
+    var trip = new CarpoolTripBuilder(baseTrip)
+      .withPublicContactInformation(
+        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+      )
+      .build();
+    repository.upsertCarpoolTrip(trip);
+
+    var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME);
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
+    var stopT5Result = results
+      .stream()
+      .filter(r -> r.stop() == stopT5Index)
+      .findFirst()
+      .orElseThrow(() ->
+        new AssertionError("Expected an access result for stopT5 (forces a walk-from-dropoff leg)")
+      );
+
+    var mapper = new CarpoolItineraryMapper();
+    var itinerary = mapper.toItinerary(stopT5Result);
+    assertNotNull(itinerary);
+
+    // Sanity: the test only distinguishes carpool alighting (D) from the walk-leg endpoint
+    // (T5) if a WALK leg is actually present.
+    assertTrue(
+      itinerary
+        .legs()
+        .stream()
+        .anyMatch(l -> l instanceof StreetLeg sl && sl.getMode() == TraverseMode.WALK)
+    );
+
+    var carpoolLeg = itinerary
+      .legs()
+      .stream()
+      .filter(l -> l instanceof CarpoolLeg)
+      .findFirst()
+      .orElseThrow();
+    var bookingInfo = carpoolLeg.pickupBookingInfo();
+    assertNotNull(bookingInfo);
+
+    assertEquals(
+      expectedAugmentedUrl(
+        "https://book.example.com",
+        carpoolLeg.from().coordinate,
+        carpoolLeg.to().coordinate
+      ),
+      bookingInfo.getContactInfo().getBookingUrl()
+    );
   }
 }

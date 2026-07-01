@@ -682,7 +682,7 @@ class DefaultTransitDataProviderFilterTest {
     var cancelled = patternTimes
       .tripTimes()
       .createRealTimeFromScheduledTimes()
-      .cancelTrip()
+      .withCanceled()
       .build();
 
     var patternTimesWithCancellation = patternTimes.withTimes(cancelled);

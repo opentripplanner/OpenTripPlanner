@@ -44,8 +44,13 @@ public class TriangleOptimizationConfig {
           .summary("Relative importance of safety (range 0.0, 1.0).")
           .description(
             """
-            This factor can also include other concerns such as convenience and general cyclist
-            preferences by taking into account road surface etc.
+            If this factor is set to 1.0, the safety value is applied in whole as a multiplier on
+            top of the reluctance.
+
+            The safety value is set for tags in OpenStreetMap by the [OSM Tag Mapper](osm/OsmTag.md)
+            which is mainly determined by the amount of traffic, but can also include other
+            concerns such as convenience and general cyclist preferences by taking into account road
+            surface etc.
             """
           )
           .asDouble(builder.safety())

@@ -24,7 +24,7 @@ import org.opentripplanner.updater.trip.UrlUpdaterParameters;
  */
 public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
-  protected static final String METRICS_PREFIX = "batch_trip_updates";
+  protected static final String METRICS_PREFIX = "batch.trip.updates";
   private final AtomicInteger successfulGauge;
   private final AtomicInteger failureGauge;
   private final AtomicInteger warningsGauge;

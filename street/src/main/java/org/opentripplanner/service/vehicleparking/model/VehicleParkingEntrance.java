@@ -43,7 +43,7 @@ public class VehicleParkingEntrance implements Serializable {
     this.walkAccessible = walkAccessible;
   }
 
-  public static VehicleParkingEntranceBuilder builder() {
+  public static VehicleParkingEntranceBuilder of() {
     return new VehicleParkingEntranceBuilder();
   }
 

@@ -12,17 +12,23 @@ import java.util.List;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.RoutingStartOnBoardAccess;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripAndServiceDateResolver;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripLocationResolver;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripScheduleIndexResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.service.TransitServiceResolver;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * This class exposes methods for fetching access and egress legs for a request.
@@ -39,6 +45,8 @@ class AccessEgressFetcher {
   private final TransitServiceResolver transitServiceResolver;
   private final AccessEgressMapper accessEgressMapper;
   private final CarpoolingService carpoolingService;
+  private final TripScheduleIndexResolver tripScheduleIndexResolver;
+  private final TripLocationResolver tripLocationResolver;
 
   /**
    * Creates an {@code AccessEgressFetcher} for a single route request.
@@ -54,7 +62,8 @@ class AccessEgressFetcher {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService
+    CarpoolingService carpoolingService,
+    RaptorRoutingRequestTransitData requestTransitDataProvider
   ) {
     this.request = request;
     this.serverContext = serverContext;
@@ -64,14 +73,53 @@ class AccessEgressFetcher {
     this.carpoolingService = carpoolingService;
     this.transitServiceResolver = new TransitServiceResolver(serverContext.transitService());
     this.accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
+    this.tripScheduleIndexResolver = new TripScheduleIndexResolver(requestTransitDataProvider);
+    this.tripLocationResolver = new TripLocationResolver(serverContext.transitService());
   }
 
   Collection<? extends RoutingAccessEgress> fetchAccess() {
+    if (request.isStartOnBoardAccessRequest()) {
+      return List.of(fetchStartOnBoardAccess());
+    }
     return fetchAccessEgresses(ACCESS);
   }
 
   Collection<? extends RoutingAccessEgress> fetchEgress() {
     return fetchAccessEgresses(EGRESS);
+  }
+
+  RoutingStartOnBoardAccess fetchStartOnBoardAccess() {
+    var from = request.from();
+    var onBoardTripLocation = from != null ? from.tripLocation() : null;
+    if (onBoardTripLocation == null) {
+      throw new IllegalArgumentException(
+        "Cannot fetch start-on-board-access for a request without an on-board trip location"
+      );
+    }
+
+    var transitService = serverContext.transitService();
+    var tripAndServiceDate = new TripAndServiceDateResolver(transitService).resolve(
+      onBoardTripLocation.tripOnDateReference()
+    );
+    var aimedDeparture = onBoardTripLocation.aimedDepartureTime();
+    Integer aimedDepartureSeconds = aimedDeparture == null
+      ? null
+      : ServiceDateUtils.secondsSinceStartOfTime(
+          ServiceDateUtils.asStartOfService(
+            tripAndServiceDate.serviceDate(),
+            transitService.getTimeZone()
+          ),
+          aimedDeparture
+        );
+    var tripLocation = tripLocationResolver.resolve(
+      tripAndServiceDate,
+      onBoardTripLocation.stopLocationId(),
+      aimedDepartureSeconds
+    );
+
+    var tripScheduleIndex = tripScheduleIndexResolver.resolve(tripAndServiceDate, tripLocation);
+
+    return new RoutingStartOnBoardAccess(tripScheduleIndex, tripLocation);
   }
 
   private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {

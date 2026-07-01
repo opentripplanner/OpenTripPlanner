@@ -33,6 +33,22 @@ public class GeometryUtils {
   private static final PackedCoordinateSequenceFactory CSF = new PackedCoordinateSequenceFactory();
   private static final GeometryFactory GF = new GeometryFactory(CSF);
 
+  /**
+   * Return a fresh empty {@link LineString}. Prefer this to constructing one ad-hoc from a
+   * zero-length coordinate array — callers reading the call site shouldn't have to recognize
+   * {@code makeLineString(new double[0])} as the "no shape" sentinel.
+   * <p>
+   * A new instance is returned on every call rather than a cached singleton: JTS
+   * {@link org.locationtech.jts.geom.Geometry#setUserData(Object) Geometry.setUserData} and
+   * {@code setSRID} mutate the wrapper, and the inspector/vector-tile layer builders rely on
+   * setUserData. Sharing a singleton across unrelated callers would surface as cross-thread
+   * userData leaks if any future caller pipes an empty geometry into one of those paths. The
+   * allocation is irrelevant — empty results only happen on degenerate inputs.
+   */
+  public static LineString emptyLineString() {
+    return makeLineString(new double[0]);
+  }
+
   public static <T> Geometry makeConvexHull(
     Collection<T> collection,
     Function<T, Coordinate> mapToCoordinate

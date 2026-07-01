@@ -2,14 +2,15 @@ package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
-import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -83,17 +84,34 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
       )
       .buildEstimatedVehicleJourney();
 
-    assertFailure(NO_FUZZY_TRIP_MATCH, () -> match(journey, env));
+    assertFailure(UNKNOWN_STOP, () -> match(journey, env));
+  }
+
+  @Test
+  void noDepartureTime() {
+    var trip1input = tripInput(TRIP_1_ID);
+
+    var env = ENV_BUILDER.addTrip(trip1input).build();
+
+    var journey = new SiriEtBuilder(env.localTimeParser())
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected(null, null)
+          .call("SOME_MADE_UP_ID")
+          .arriveAimedExpected("00:20:00", "00:20:00")
+      )
+      .buildEstimatedVehicleJourney();
+
+    assertFailure(INVALID_DEPARTURE_TIME, () -> match(journey, env));
   }
 
   private static TripAndPattern match(EstimatedVehicleJourney evj, TransitTestEnvironment env)
     throws UpdateException {
     var transitService = env.transitService();
     var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
-    var calls = CallWrapper.of(evj);
     return fuzzyMatcher.match(
-      evj,
-      calls,
+      EstimatedVehicleJourneyWrapper.of(evj),
       new EntityResolver(transitService, env.feedId()),
       transitService::findTimetable,
       transitService::findNewTripPatternForModifiedTrip

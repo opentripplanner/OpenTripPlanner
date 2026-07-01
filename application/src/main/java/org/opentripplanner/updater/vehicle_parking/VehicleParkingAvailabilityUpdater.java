@@ -77,7 +77,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
         );
       } else {
         var parking = parkingById.get(update.vehicleParkingId());
-        var builder = VehicleParkingSpaces.builder();
+        var builder = VehicleParkingSpaces.of();
         if (parking.hasCarPlaces()) {
           builder.carSpaces(update.spacesAvailable());
         }

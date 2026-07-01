@@ -241,10 +241,9 @@ class J01_PassThroughTest {
   @Test
   @DisplayName("Multiple stops in same pass-through group")
   void passThroughGroup() {
-    // Create two routes.
-    // Route one includes STOP_B and route two includes STOP_C.
-    // Both stops will be part of the same pass-through group
-    //  so that both routes should be valid
+    // Create two routes, route one includes STOP_B and route two includes STOP_C.
+    // Both stops will be part of the same pass-through group so that both routes should be pareto
+    // optimal. R2 is faster, but it contains more walk so R1 is better on cost(only 2 cost points).
     data.withTimetables(
       """
       R1
@@ -257,22 +256,20 @@ class J01_PassThroughTest {
       """
     );
 
-    // Both routes are pareto optimal.
-    // Route 2 is faster but it contains more walk
-    // NOTE! There is a bug in the code for R1. OTP process the pass-through event in round 2, not
-    // 1. This result in adding transferCost to the stop arrival at E. If the walking distance is
-    // increased by 1 second then R1 will be dominated at E. The cost is calculated again by the
-    // path-mapper and this time around the cost is correct as shown in the result.
+    // NOTE! We keep the cost calculation tight (2 cost points in favor of R1) to ensure the
+    //       cost is handled correct in all steps during the algorithm, not just at the end where
+    //       we compare paths. The cost is "recalculated" in the PathMapper, so by keeping it tight
+    //       we are more likely to discover mistakes in the algorithm - if the cost is off.
     //
     // COST CALCULATION
     //
-    //  |            | R1                | R2 |
-    //  | Access     | 29s   58    58 |  2m  240   240 |
-    //  | board-cost |      600   658 |      600   840 |
-    //  | Transit    | 11m  660  1318 |  9m  540  1380 |
-    //  | Egress     | 30s   60  1378 | 30s   60  1440 |
+    //  |            | R1             | R2             |
+    //  | Access     | 59s  118   118 |  2m  240   240 |
+    //  | board-cost |      600   718 |      600   840 |
+    //  | Transit    | 11m  660  1378 |  9m  540  1380 |
+    //  | Egress     | 30s   60  1438 | 30s   60  1440 |
     //
-    data.access("Walk 29s ~ A", "Walk 2m ~ B").egress("E ~ Walk 30s");
+    data.access("Walk 59s ~ A", "Walk 2m ~ B").egress("E ~ Walk 30s");
 
     var requestBuilder = prepareRequest();
 
@@ -281,7 +278,7 @@ class J01_PassThroughTest {
     assertEquals(
       """
       Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s Tₙ0 C₁1_440]
-      Walk 29s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:31 0:15:30 11m59s Tₙ0 C₁1_378]
+      Walk 59s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:01 0:15:30 12m29s Tₙ0 C₁1_438]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );

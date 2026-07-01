@@ -125,8 +125,8 @@ class ScheduledTripTimesTest {
   }
 
   @Test
-  void isScheduled() {
-    assertTrue(subject.isScheduled());
+  void hasAnyUpdates() {
+    assertFalse(subject.hasAnyUpdates());
   }
 
   @Test
@@ -142,11 +142,6 @@ class ScheduledTripTimesTest {
   @Test
   void isDeleted() {
     assertFalse(subject.isDeleted());
-  }
-
-  @Test
-  void getRealTimeState() {
-    assertEquals(RealTimeState.SCHEDULED, subject.getRealTimeState());
   }
 
   @Test

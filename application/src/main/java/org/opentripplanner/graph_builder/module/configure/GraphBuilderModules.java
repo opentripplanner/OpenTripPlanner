@@ -5,11 +5,11 @@ import static org.opentripplanner.datastore.api.FileType.DEM;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -64,6 +65,15 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  static GraphBuildCacheManager provideGraphBuildCacheManager(
+    BuildConfig config,
+    GraphBuilderDataSources dataSources
+  ) {
+    return new GraphBuildCacheManager(config.cache(), dataSources.listCachedDataSources());
+  }
+
+  @Provides
+  @Singleton
   static OsmModule provideOsmModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
@@ -73,7 +83,8 @@ public class GraphBuilderModules {
     StreetRepository streetRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EdgeNamer edgeNamer,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    GraphBuildCacheManager cacheManager
   ) {
     List<OsmProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<
@@ -106,6 +117,7 @@ public class GraphBuilderModules {
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
       .withIncludeOsmStationEntrances(config.osmDefaults.includeOsmStationEntrances())
+      .withCacheManager(cacheManager)
       .withIssueStore(issueStore)
       .build();
   }
@@ -224,13 +236,14 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     Graph graph,
     OsmModule osmModule,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    GraphBuildCacheManager cacheManager
   ) {
     List<ElevationModule> result = new ArrayList<>();
     List<ElevationGridCoverageFactory> gridCoverageFactories = new ArrayList<>();
     if (config.elevationBucket != null) {
       gridCoverageFactories.add(
-        createNedElevationFactory(new File(dataSources.getCacheDirectory(), "ned"), config)
+        createNedElevationFactory(dataSources.getNedCacheDirectory(), config)
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
@@ -241,16 +254,7 @@ public class GraphBuilderModules {
     // modules to the same graph builder. We do not actually know if this is supported by the
     // ElevationModule class.
     for (ElevationGridCoverageFactory it : gridCoverageFactories) {
-      result.add(
-        createElevationModule(
-          config,
-          graph,
-          issueStore,
-          it,
-          osmModule,
-          dataSources.getCacheDirectory()
-        )
-      );
+      result.add(createElevationModule(config, graph, issueStore, it, osmModule, cacheManager));
     }
     return result;
   }
@@ -370,7 +374,7 @@ public class GraphBuilderModules {
   /* private methods */
 
   private static ElevationGridCoverageFactory createNedElevationFactory(
-    File nedCacheDirectory,
+    CompositeDataSource nedCacheDir,
     BuildConfig config
   ) {
     // Download the elevation tiles from an Amazon S3 bucket
@@ -380,7 +384,7 @@ public class GraphBuilderModules {
     awsTileSource.awsBucketName = config.elevationBucket.bucketName;
 
     return new NEDGridCoverageFactoryImpl(
-      nedCacheDirectory,
+      nedCacheDir,
       config.elevationBucket.datumUrl,
       awsTileSource
     );
@@ -405,18 +409,14 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore,
     ElevationGridCoverageFactory it,
     OsmModule osmModule,
-    File cacheDirectory
+    GraphBuildCacheManager cacheManager
   ) {
-    var cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
-
     return new ElevationModule(
       it,
       graph,
       issueStore,
-      cachedElevationsFile,
+      cacheManager,
       osmModule.elevationDataOutput(),
-      config.readCachedElevations,
-      config.writeCachedElevations,
       config.distanceBetweenElevationSamples,
       config.maxElevationPropagationMeters,
       config.includeEllipsoidToGeoidDifference,

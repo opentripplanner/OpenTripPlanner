@@ -11,12 +11,12 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
-import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -71,10 +71,10 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     for (RaptorAccessEgress it : accesses) {
       accessStopBitSet.set(it.stop());
     }
-    return new BitSetIterator(accessStopBitSet);
+    return IntIterators.of(accessStopBitSet);
   }
 
-  /// First find ONE path for each combination of access/egress. This corresponds to the
+  /// First, find ONE path for each combination of access/egress. This corresponds to the
   /// first iteration of a RangeRaptor search. We will later expand this to all trip schedules
   /// within the search-window. All paths with the same (route, access, and egress) will have
   /// almost identical cost, so we can use this to prune the set of paths before expanding the

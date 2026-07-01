@@ -45,5 +45,16 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    */
   void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
 
+  /**
+   * Called after all transit routes are processed for this worker's round. This is intentionally
+   * NOT a {@link WorkerLifeCycle} event: in a via search there are multiple workers sharing one
+   * lifecycle, so lifecycle events fire after all workers finish. This method must fire per worker
+   * so that each worker's touched-stop markers and cached arrivals are committed before the next
+   * worker begins its transit routing in the same round.
+   */
+  default void transitsForRoundComplete() {
+    /* empty */
+  }
+
   RaptorRouterResult<T> results();
 }

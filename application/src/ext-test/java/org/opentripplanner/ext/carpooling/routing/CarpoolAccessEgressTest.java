@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
@@ -14,11 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class CarpoolAccessEgressTest {
 
@@ -138,6 +141,85 @@ class CarpoolAccessEgressTest {
   }
 
   /**
+   * For an access the transit stop sits at the chain end, so the final state is the last state of
+   * the trailing walk from the dropoff to the stop.
+   */
+  @Test
+  void getFinalStateForAccessReturnsStateAtTransitStopChainEnd() {
+    var walkToPickup = createGraphPath(Duration.ofSeconds(80));
+    var walkFromDropoff = createGraphPath(Duration.ofSeconds(40));
+    var stop = TimetableRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
+
+    var access = newAccessEgress(
+      1_000,
+      walkToPickup,
+      Duration.ofSeconds(60),
+      walkFromDropoff,
+      1.0,
+      EndpointLabel.forLocation(GenericLocation.fromCoordinate(59.92, 10.75, "Home")),
+      EndpointLabel.forStop(stop)
+    );
+
+    assertEquals(walkFromDropoff.states.getLast(), access.getFinalState());
+  }
+
+  /**
+   * For an egress the transit stop sits at the chain start, so the final state is the first state
+   * of the leading walk from the stop to the pickup.
+   */
+  @Test
+  void getFinalStateForEgressReturnsStateAtTransitStopChainStart() {
+    var walkToPickup = createGraphPath(Duration.ofSeconds(80));
+    var walkFromDropoff = createGraphPath(Duration.ofSeconds(40));
+    var stop = TimetableRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
+
+    var egress = newAccessEgress(
+      1_000,
+      walkToPickup,
+      Duration.ofSeconds(60),
+      walkFromDropoff,
+      1.0,
+      EndpointLabel.forStop(stop),
+      EndpointLabel.forLocation(GenericLocation.fromCoordinate(59.92, 10.75, "Office"))
+    );
+
+    assertEquals(walkToPickup.states.getFirst(), egress.getFinalState());
+  }
+
+  /**
+   * With no walks bracketing the ride, the final state falls back to the shared ride segment
+   * endpoint at the transit stop — the last shared segment's last state for an access.
+   */
+  @Test
+  void getFinalStateWithoutWalksFallsBackToSharedSegment() {
+    var access = newAccessEgress(
+      0,
+      null,
+      Duration.ofSeconds(300),
+      null,
+      1.0,
+      EndpointLabel.EMPTY,
+      EndpointLabel.forStop(TimetableRepositoryForTest.of().stop("Stop", 59.91, 10.74).build())
+    );
+
+    assertEquals(access.sharedSegments().getLast().states.getLast(), access.getFinalState());
+  }
+
+  /** A carpool passenger rides in the driver's car, never a station-rented vehicle. */
+  @Test
+  void getFinalStateIsNotRentingVehicleFromStation() {
+    var access = newAccessEgress(
+      1_000,
+      createGraphPath(Duration.ofSeconds(80)),
+      Duration.ofSeconds(60),
+      createGraphPath(Duration.ofSeconds(40)),
+      1.0
+    );
+
+    assertFalse(access.getFinalState().isRentingVehicleFromStation());
+  }
+
+  /**
    * Builds a CarpoolAccessEgress with the passenger picked up mid-trip (pickupPos = 1, dropoffPos
    * = 2). The route segments list is therefore [pickupSegment, sharedSegment]: the driver runs
    * the first to reach the passenger and the second is the passenger's shared ride. The
@@ -150,6 +232,26 @@ class CarpoolAccessEgressTest {
     Duration sharedSegmentDuration,
     @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
     double carpoolReluctance
+  ) {
+    return newAccessEgress(
+      passengerDepartureTime,
+      walkToPickup,
+      sharedSegmentDuration,
+      walkFromDropoff,
+      carpoolReluctance,
+      EndpointLabel.EMPTY,
+      EndpointLabel.EMPTY
+    );
+  }
+
+  private static CarpoolAccessEgress newAccessEgress(
+    int passengerDepartureTime,
+    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
+    Duration sharedSegmentDuration,
+    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    double carpoolReluctance,
+    EndpointLabel startLabel,
+    EndpointLabel endLabel
   ) {
     var candidate = new InsertionCandidate(
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
@@ -166,7 +268,9 @@ class CarpoolAccessEgressTest {
       passengerDepartureTime,
       candidate,
       TimeAndCost.ZERO,
-      carpoolReluctance
+      carpoolReluctance,
+      startLabel,
+      endLabel
     );
   }
 }

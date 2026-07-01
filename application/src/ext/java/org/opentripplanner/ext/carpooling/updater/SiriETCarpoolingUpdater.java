@@ -1,6 +1,9 @@
 package org.opentripplanner.ext.carpooling.updater;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
@@ -22,6 +25,16 @@ import uk.org.siri.siri21.ServiceDelivery;
 public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETCarpoolingUpdater.class);
+
+  /**
+   * How long a carpool trip is kept after its latest end time before it is purged. The SIRI-ET
+   * source is not guaranteed to send an explicit cancellation once a journey has completed, so
+   * completed trips are removed once their latest end time is further in the past than this
+   * duration. This keeps instances that run for a long time from accumulating trips that can no
+   * longer be routed.
+   */
+  private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
+
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
@@ -38,7 +51,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    this.mapper = new CarpoolSiriMapper();
+    this.mapper = new CarpoolSiriMapper(config.feedId());
   }
 
   /**
@@ -50,6 +63,17 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     do {
       moreData = fetchAndProcessUpdates();
     } while (moreData);
+    removeExpiredTrips();
+  }
+
+  /**
+   * Asks the repository to purge trips that have ended more than {@link #TRIP_EXPIRY} ago, so
+   * completed trips are eventually removed even when the source stops sending updates for them. The
+   * repository throttles the actual scan and shares that throttle across every feed, so calling
+   * this on every poll is cheap.
+   */
+  private void removeExpiredTrips() {
+    repository.removeExpiredTrips(Instant.now(), TRIP_EXPIRY);
   }
 
   /**
@@ -96,17 +120,22 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Processes a single estimated vehicle journey, mapping it to a carpool trip and upserting it
-   * to the repository.
-   *
-   * @param estimatedVehicleJourney the estimated vehicle journey to process
+   * Maps a single estimated vehicle journey to a carpool trip and upserts it, or removes the
+   * trip when the journey is cancelled or has fewer than 2 non-cancelled calls.
    */
-  private void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
+  void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
-      var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
-      if (carpoolTrip != null) {
-        repository.upsertCarpoolTrip(carpoolTrip);
+      FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
+      if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
+        repository.removeCarpoolTrip(tripId);
+        return;
       }
+      var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
+      if (carpoolTrip == null) {
+        repository.removeCarpoolTrip(tripId);
+        return;
+      }
+      repository.upsertCarpoolTrip(carpoolTrip);
     } catch (Exception e) {
       LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
     }

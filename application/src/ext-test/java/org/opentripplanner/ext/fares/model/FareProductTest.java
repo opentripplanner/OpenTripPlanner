@@ -1,10 +1,14 @@
 package org.opentripplanner.ext.fares.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -43,6 +47,57 @@ class FareProductTest {
     var instanceId = fareProduct.uniqueInstanceId(startTime);
 
     assertEquals(expectedInstanceId, instanceId);
+  }
+
+  @Test
+  void equalEligibilityBothNullCategoryAndMedium() {
+    var a = fareProduct(null, null);
+    var b = fareProduct(null, null);
+    assertTrue(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilitySameCategoryAndMedium() {
+    var a = fareProduct(CATEGORY, MEDIUM);
+    var b = fareProduct(CATEGORY, MEDIUM);
+    assertTrue(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilitySameCategoryNullMedium() {
+    var a = fareProduct(CATEGORY, null);
+    var b = fareProduct(CATEGORY, null);
+    assertTrue(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilityDifferentCategory() {
+    var otherCategory = RiderCategory.of(id("students")).withName("Students").build();
+    var a = fareProduct(CATEGORY, MEDIUM);
+    var b = fareProduct(otherCategory, MEDIUM);
+    assertFalse(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilityDifferentMedium() {
+    var otherMedium = new FareMedium(id("card"), "Card");
+    var a = fareProduct(CATEGORY, MEDIUM);
+    var b = fareProduct(CATEGORY, otherMedium);
+    assertFalse(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilityNullCategoryVsNonNull() {
+    var a = fareProduct(null, MEDIUM);
+    var b = fareProduct(CATEGORY, MEDIUM);
+    assertFalse(a.equalEligibility(b));
+  }
+
+  @Test
+  void equalEligibilityNullMediumVsNonNull() {
+    var a = fareProduct(CATEGORY, null);
+    var b = fareProduct(CATEGORY, MEDIUM);
+    assertFalse(a.equalEligibility(b));
   }
 
   private static FareProduct fareProduct(RiderCategory cat, FareMedium medium) {

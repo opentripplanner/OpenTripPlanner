@@ -20,6 +20,7 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.PassengerCapacityStructure;
+import uk.org.siri.siri21.SimpleContactStructure;
 import uk.org.siri.siri21.StopAssignmentStructure;
 import uk.org.siri.siri21.VehicleOccupancyStructure;
 
@@ -132,6 +133,83 @@ public class CarpoolEstimatedVehicleJourneyData {
     return journey;
   }
 
+  /**
+   * Aimed times are absent, so call-order validation cannot compare them — the inverted timeline
+   * is only visible on the derived expected start/end times.
+   */
+  public static EstimatedVehicleJourney expectedArrivalBeforeExpectedDeparture() {
+    var journey = minimalCompleteJourney();
+
+    var firstStop = journey.getEstimatedCalls().getEstimatedCalls().getFirst();
+    var lastStop = journey.getEstimatedCalls().getEstimatedCalls().getLast();
+
+    firstStop.setAimedDepartureTime(null);
+    firstStop.setExpectedDepartureTime(ZonedDateTime.now().plusMinutes(45));
+    lastStop.setAimedArrivalTime(null);
+    lastStop.setExpectedArrivalTime(ZonedDateTime.now());
+
+    return journey;
+  }
+
+  public static EstimatedVehicleJourney journeyWithPublicContact(String phoneNumber, String url) {
+    var journey = minimalCompleteJourney();
+    var contact = new SimpleContactStructure();
+    contact.setPhoneNumber(phoneNumber);
+    contact.setUrl(url);
+    journey.setPublicContact(contact);
+    return journey;
+  }
+
+  /**
+   * A minimal complete journey flagged as cancelled at the trip level.
+   */
+  public static EstimatedVehicleJourney cancelledJourney() {
+    var journey = minimalCompleteJourney();
+    journey.setCancellation(true);
+    return journey;
+  }
+
+  /**
+   * A 3-stop journey where the intermediate call is flagged as cancelled — the driver still
+   * drives origin → destination but skips the middle waypoint.
+   */
+  public static EstimatedVehicleJourney journeyWithCancelledIntermediateCall() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var base = calls.getFirst().getAimedDepartureTime();
+
+    var intermediate = forPoint(OSLO_NORTH);
+    intermediate.setAimedArrivalTime(base.plusMinutes(20));
+    intermediate.setAimedDepartureTime(base.plusMinutes(20));
+    intermediate.setCancellation(true);
+    addStopName(intermediate, "Cancelled intermediate");
+
+    calls.add(1, intermediate);
+    return journey;
+  }
+
+  /**
+   * A 3-stop journey where two of three calls are cancelled, leaving fewer than 2 active calls.
+   */
+  public static EstimatedVehicleJourney journeyWithAllButOneCallCancelled() {
+    var journey = journeyWithCancelledIntermediateCall();
+    journey.getEstimatedCalls().getEstimatedCalls().getLast().setCancellation(true);
+    return journey;
+  }
+
+  /**
+   * Same trip id as {@link #minimalCompleteJourney()} but with the last call's aimed arrival
+   * time set before the first call's aimed departure time, causing the mapper to throw during
+   * call-order validation. Not flagged as cancelled.
+   */
+  public static EstimatedVehicleJourney malformedNonCancelledJourney() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var firstDeparture = calls.getFirst().getAimedDepartureTime();
+    calls.getLast().setAimedArrivalTime(firstDeparture.minusMinutes(45));
+    return journey;
+  }
+
   public static EstimatedVehicleJourney stopTimesAreOutOfOrder() {
     var journey = new EstimatedVehicleJourney();
     journey.setEstimatedCalls(new EstimatedVehicleJourney.EstimatedCalls());
@@ -230,6 +308,56 @@ public class CarpoolEstimatedVehicleJourneyData {
     var base = lastStop.getAimedArrivalTime();
     lastStop.setExpectedArrivalTime(null);
     lastStop.setLatestExpectedArrivalTime(base.plusMinutes(latestExpectedArrivalMinutes));
+    return journey;
+  }
+
+  /**
+   * A two-stop journey whose destination latest-expected arrival is 3 hours after departure —
+   * beyond the mapper's 2.5-hour maximum trip duration — used to exercise the max-duration
+   * safeguard. The scheduled arrival stays short, so only the latest-expected arrival pushes the
+   * span over the limit.
+   */
+  public static EstimatedVehicleJourney tripExceedingMaxDuration() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var departure = calls.getFirst().getAimedDepartureTime();
+    calls.getLast().setLatestExpectedArrivalTime(departure.plusHours(3));
+    return journey;
+  }
+
+  /**
+   * A two-stop journey with no latest-expected arrival whose scheduled arrival (2h20m after
+   * departure) is within the 2.5-hour limit, but exceeds it once the default 15-minute deviation
+   * budget is added — exercising the safeguard's deviation-budget fallback.
+   */
+  public static EstimatedVehicleJourney tripExceedingMaxDurationViaDefaultDeviationBudget() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var departure = calls.getFirst().getAimedDepartureTime();
+    calls.getLast().setAimedArrivalTime(departure.plusMinutes(140));
+    return journey;
+  }
+
+  /**
+   * A two-stop journey whose claimed schedule is short (well within the limit) but whose waypoints
+   * lie hundreds of kilometres apart, so the straight-line drive time exceeds the maximum trip
+   * duration even at the fastest modelled car speed. Exercises the geometry safeguard, which the
+   * timetable check cannot catch: a malformed feed can claim any times it likes regardless of how
+   * far apart the coordinates actually are.
+   */
+  public static EstimatedVehicleJourney tripWithWaypointsTooFarApart() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var departure = calls.getFirst().getAimedDepartureTime();
+
+    // ~450 km north of the Oslo origin: unreachable within 2.5 h even at the maximum modelled car
+    // speed, yet the claimed arrival stays a plausible 45 minutes out.
+    var farStop = forPoint(new WgsCoordinate(64.0, 10.81));
+    farStop.setAimedDepartureTime(departure);
+    farStop.setAimedArrivalTime(departure.plusMinutes(45));
+    addStopName(farStop, "Far stop");
+    calls.set(1, farStop);
+
     return journey;
   }
 

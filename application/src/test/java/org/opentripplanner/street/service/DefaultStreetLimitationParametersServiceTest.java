@@ -22,7 +22,7 @@ public class DefaultStreetLimitationParametersServiceTest {
     // (current strategy) we could cashe the StreetLimitationParameters in the service.
     var maxSpeed = 25f;
     int maxAreaNodes = 100;
-    repository.setStreetModelDetails(new StreetModelDetails(maxSpeed, maxAreaNodes));
+    repository.setStreetModelDetails(new StreetModelDetails(maxSpeed, maxAreaNodes, 1.0f, 1.0f));
 
     assertEquals(maxSpeed, service.maxCarSpeed());
     assertEquals(maxAreaNodes, service.maxAreaNodes());

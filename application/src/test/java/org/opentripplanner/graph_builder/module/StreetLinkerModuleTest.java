@@ -20,6 +20,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
@@ -229,7 +230,7 @@ class StreetLinkerModuleTest {
 
       module = new StreetLinkerModule(
         graph,
-        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0, false),
+        new VertexLinker(graph, GeofencingZoneService.EMPTY, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         timetableRepository,
         DataImportIssueStore.NOOP

@@ -23,6 +23,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -30,6 +31,8 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 /**
@@ -66,7 +69,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate yesterday = today.minusDays(1);
     LocalDate tomorrow = today.plusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
-    TimetableSnapshot resolver = new TimetableSnapshot();
+    TimetableSnapshot resolver = new TimetableSnapshot(new DefaultTripCalendars());
 
     Timetable scheduled = resolver.resolve(pattern, today);
     assertEquals(scheduled, resolver.resolve(pattern, null));
@@ -114,7 +117,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate yesterday = today.minusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-    TimetableSnapshot resolver = new TimetableSnapshot();
+    TimetableSnapshot resolver = new TimetableSnapshot(new DefaultTripCalendars());
     Timetable origNow = resolver.resolve(pattern, today);
 
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -165,7 +168,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
       LocalDate yesterday = today.minusDays(1);
       TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-      TimetableSnapshot resolver = new TimetableSnapshot();
+      TimetableSnapshot resolver = new TimetableSnapshot(new DefaultTripCalendars());
 
       // only return a new snapshot if there are changes
       TimetableSnapshot snapshot = resolver.commit();
@@ -242,7 +245,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    TimetableSnapshot resolver = new TimetableSnapshot();
+    TimetableSnapshot resolver = new TimetableSnapshot(new DefaultTripCalendars());
     updateSnapshot(resolver, pattern, tripUpdate, today);
     updateSnapshot(resolver, pattern, tripUpdate, yesterday);
 

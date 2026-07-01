@@ -17,7 +17,6 @@ import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
@@ -29,6 +28,7 @@ import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -102,8 +102,6 @@ public interface TransitService {
   MultiModalStation getMultiModalStation(FeedScopedId id);
 
   Collection<Station> listStations();
-
-  Integer getServiceCode(FeedScopedId id);
 
   TIntSet getServiceCodesRunningForDate(LocalDate date);
 
@@ -349,7 +347,7 @@ public interface TransitService {
 
   RaptorTransitData getRealtimeRaptorTransitData();
 
-  CalendarService getCalendarService();
+  TripCalendars getTripCalendars();
 
   ZoneId getTimeZone();
 

@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 

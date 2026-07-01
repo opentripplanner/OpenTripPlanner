@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
@@ -17,6 +18,7 @@ import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
+import org.opentripplanner.raptor.rangeraptor.standard.StdTransferEarlyPruning;
 import org.opentripplanner.raptor.rangeraptor.standard.StdWorkerState;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
@@ -112,7 +114,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           resolveBestTimes(),
           createStopArrivals(),
           resolveBestNumberOfTransfers(),
-          resolveArrivedAtDestinationCheck()
+          resolveArrivedAtDestinationCheck(),
+          createEarlyPruning()
         ),
         StdWorkerState.class
       );
@@ -268,6 +271,19 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return Objects.requireNonNull(
       ctx.segments().getLast().egressPaths(),
       "Last leg must have non-null egressPaths"
+    );
+  }
+
+  @Nullable
+  private StdTransferEarlyPruning<T> createEarlyPruning() {
+    if (!ctx.earlyTransferPruning()) {
+      return null;
+    }
+    return new StdTransferEarlyPruning<T>(
+      egressPaths().listAll(),
+      ctx.nRounds(),
+      ctx.calculator(),
+      ctx.lifeCycle()
     );
   }
 

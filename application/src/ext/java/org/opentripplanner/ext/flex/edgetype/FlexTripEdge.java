@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.street.model.edge.Edge;
@@ -25,6 +26,7 @@ public class FlexTripEdge extends Edge {
   private final int alightStopPosInPattern;
   private final LocalDate serviceDate;
   private final FlexPath flexPath;
+  private final FlexParameters flexParameters;
 
   public FlexTripEdge(
     Vertex v1,
@@ -35,7 +37,8 @@ public class FlexTripEdge extends Edge {
     int boardStopPosInPattern,
     int alightStopPosInPattern,
     LocalDate serviceDate,
-    FlexPath flexPath
+    FlexPath flexPath,
+    FlexParameters flexParameters
   ) {
     super(v1, v2);
     this.fromStopId = fromStopId;
@@ -45,6 +48,7 @@ public class FlexTripEdge extends Edge {
     this.alightStopPosInPattern = alightStopPosInPattern;
     this.serviceDate = serviceDate;
     this.flexPath = Objects.requireNonNull(flexPath);
+    this.flexParameters = flexParameters;
   }
 
   public FeedScopedId fromStopId() {
@@ -94,11 +98,11 @@ public class FlexTripEdge extends Edge {
   public State[] traverse(State s0) {
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.FLEX);
-    // TODO: decide good value
-    editor.incrementWeight(10 * 60);
     int timeInSeconds = getTimeInSeconds();
     editor.incrementTimeInSeconds(timeInSeconds);
-    editor.incrementWeight(timeInSeconds);
+    editor.incrementWeight(
+      flexParameters.reluctance() * timeInSeconds + flexParameters.boardCost()
+    );
     editor.resetEnteredNoThroughTrafficArea();
     return editor.makeStateArray();
   }

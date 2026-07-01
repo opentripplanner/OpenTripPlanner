@@ -48,15 +48,6 @@ public interface WorkerLifeCycle {
   void onPrepareForNextRound(IntConsumer prepareForNextRound);
 
   /**
-   * Subscribe to 'transits for round complete' events by register listener. This event occur when
-   * the transit calculation in each round is finished/complete and the registered listener(the
-   * input parameter) is notified/invoked.
-   *
-   * @param transitsForRoundComplete if {@code null} nothing is added to the publisher.
-   */
-  void onTransitsForRoundComplete(Runnable transitsForRoundComplete);
-
-  /**
    * Subscribe to 'transfers for round complete' events by register listener. This event occur when
    * the all transfers are calculated in each round. The registered listener(the input parameter) is
    * notified/invoked when this happens.

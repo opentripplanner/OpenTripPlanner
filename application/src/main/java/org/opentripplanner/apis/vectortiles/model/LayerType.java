@@ -8,4 +8,5 @@ public enum LayerType {
   Edge,
   Vertex,
   Rental,
+  Transfers,
 }

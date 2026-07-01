@@ -12,7 +12,6 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
-import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 
@@ -29,7 +28,8 @@ public class ViaTripQuery {
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
     GraphQLInputObjectType viaSegmentInputType,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    GraphQLInputObjectType locationInputType
   ) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("viaTrip")
@@ -101,14 +101,14 @@ public class ViaTripQuery {
         GraphQLArgument.newArgument()
           .name("from")
           .description("The start location")
-          .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
+          .type(new GraphQLNonNull(locationInputType))
           .build()
       )
       .argument(
         GraphQLArgument.newArgument()
           .name("to")
           .description("The destination location")
-          .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
+          .type(new GraphQLNonNull(locationInputType))
           .build()
       )
       .argument(

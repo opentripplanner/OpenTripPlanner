@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.Iterator;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
@@ -20,8 +21,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * This is grouped into a separate class (rather than just having the fields in the raptor worker
  * class) because we want to separate the logic of maintaining stop arrival state and performing the
- * steps of the algorithm. This also make it possible to have more than one state implementation,
- * which have ben used in the past to test different memory optimizations.
+ * steps of the algorithm. This also makes it possible to have more than one state implementation,
+ * which has been used in the past to test different memory optimizations.
  * <p>
  * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code
  * stopArrivalsState} implementation can be swapped to achieve different results.
@@ -49,30 +50,36 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final BestNumberOfTransfers bestNumberOfTransfers;
 
   /**
-   * The list of egress stops, can be used to terminate the search when the stops are reached.
+   * The list of egress stops can be used to terminate the search when the stops are reached.
    */
   private final ArrivedAtDestinationCheck arrivedAtDestinationCheck;
 
   /**
-   * The calculator is used to calculate transit related times/events like access arrival time.
+   * The calculator is used to calculate transit-related times/events like access arrival time.
    */
   private final RaptorTransitCalculator<T> calculator;
 
+  @Nullable
+  // null if early pruning is not used
+  private final StdTransferEarlyPruning<T> earlyPruning;
+
   /**
-   * create a BestTimes Range Raptor State for given context.
+   * create a BestTimes Range Raptor State for the given context.
    */
   public StdRangeRaptorWorkerState(
     RaptorTransitCalculator<T> calculator,
     BestTimes bestTimes,
     StopArrivalsState<T> stopArrivalsState,
     BestNumberOfTransfers bestNumberOfTransfers,
-    ArrivedAtDestinationCheck arrivedAtDestinationCheck
+    ArrivedAtDestinationCheck arrivedAtDestinationCheck,
+    @Nullable StdTransferEarlyPruning<T> earlyPruning
   ) {
     this.calculator = calculator;
     this.bestTimes = bestTimes;
     this.stopArrivalsState = stopArrivalsState;
     this.bestNumberOfTransfers = bestNumberOfTransfers;
     this.arrivedAtDestinationCheck = arrivedAtDestinationCheck;
+    this.earlyPruning = earlyPruning;
   }
 
   @Override
@@ -119,14 +126,13 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
   }
 
-  /**
-   * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
-   */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
     int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
     while (transfers.hasNext()) {
-      transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+      if (transferToStop(arrivalTimeTransit, fromStop, transfers.next())) {
+        break;
+      }
     }
   }
 
@@ -187,16 +193,22 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return stopArrivalsState.previousTransit(boardStopIndex);
   }
 
-  private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
-    // Use the calculator to make sure the calculation is done correct for a normal
-    // forward search and a reverse search.
+  /**
+   * @return {@code true} if the transfer loop should terminate early. The transfers are sorted
+   *     by duration, so if a transfer exceeds the time limit or the early pruning bound, so will
+   *     all later transfers also exceed the time limit or the early pruning bound.
+   */
+  private boolean transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
     final int arrivalTime = calculator.plusDuration(
       arrivalTimeTransit,
       transfer.durationInSeconds()
     );
 
     if (exceedsTimeLimit(arrivalTime)) {
-      return;
+      return true;
+    }
+    if (earlyPruning != null && earlyPruning.exceedsBound(arrivalTime)) {
+      return true;
     }
 
     final int toStop = transfer.stop();
@@ -206,6 +218,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     } else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
+    return false;
   }
 
   @Override
@@ -220,7 +233,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   /* private methods */
 
   private boolean newOverallBestTime(int stop, int alightTime) {
-    return bestTimes.updateNewBestTime(stop, alightTime);
+    boolean updated = bestTimes.updateNewBestTime(stop, alightTime);
+    if (updated) {
+      updateEarlyPruning(stop, alightTime);
+    }
+    return updated;
   }
 
   private boolean newBestTransitArrivalTime(int stop, int alightTime) {
@@ -229,5 +246,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   private boolean exceedsTimeLimit(int time) {
     return calculator.exceedsTimeLimit(time);
+  }
+
+  private void updateEarlyPruning(int stop, int alightTime) {
+    if (earlyPruning != null) {
+      earlyPruning.updateArrival(stop, alightTime);
+    }
   }
 }

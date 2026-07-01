@@ -31,7 +31,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -197,8 +196,7 @@ class AddedTripBuilderTest {
     var scheduledTimes = pattern.getScheduledTimetable().getTripTimes(trip);
     assertNotNull(scheduledTimes);
     // TODO - is this correct?
-    assertEquals(RealTimeState.SCHEDULED, scheduledTimes.getRealTimeState());
-    assertTrue(scheduledTimes.isScheduled());
+    assertFalse(scheduledTimes.hasAnyUpdates());
     assertEquals(secondsInDay(10, 20), scheduledTimes.getArrivalTime(0));
     assertEquals(secondsInDay(10, 20), scheduledTimes.getDepartureTime(0));
     assertEquals(0, scheduledTimes.getDepartureDelay(0));
@@ -216,8 +214,8 @@ class AddedTripBuilderTest {
     // Assert updated trip times
     var times = tripUpdate.tripTimes();
     assertEquals(trip, times.getTrip());
-    assertEquals(RealTimeState.ADDED, times.getRealTimeState());
-    assertFalse(times.isScheduled());
+    assertTrue(times.isAdded());
+    assertTrue(times.hasAnyUpdates());
     assertEquals(secondsInDay(10, 19), times.getArrivalTime(0));
     assertEquals(secondsInDay(10, 19), times.getDepartureTime(0));
     assertEquals(-60, times.getDepartureDelay(0));
@@ -300,7 +298,7 @@ class AddedTripBuilderTest {
     // Assert trip times
     var times = secondAddedTrip.tripTimes();
     assertEquals(secondTrip, times.getTrip());
-    assertEquals(RealTimeState.ADDED, times.getRealTimeState());
+    assertTrue(times.isAdded());
     assertEquals(secondsInDay(11, 19), times.getArrivalTime(0));
     assertEquals(secondsInDay(11, 19), times.getDepartureTime(0));
     assertEquals(secondsInDay(11, 29), times.getArrivalTime(1));

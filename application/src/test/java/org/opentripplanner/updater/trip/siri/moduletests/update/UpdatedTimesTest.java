@@ -5,15 +5,15 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.OccupancyEnumeration;
 
 class UpdatedTimesTest implements RealtimeTestConstants {
@@ -43,7 +43,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     assertSuccess(result);
     assertTripUpdated(env);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -113,7 +113,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A [R] 0:00:15 0:00:15 | B 0:00:25 0:00:26 | C 0:00:35 0:00:35",
+      "U | A [R] 0:00:15 0:00:15 | B 0:00:25 0:00:26 | C 0:00:35 0:00:35",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -143,7 +143,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var result1 = siri.applyEstimatedTimetable(firstUpdate);
     assertSuccess(result1);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 
@@ -163,7 +163,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var result2 = siri.applyEstimatedTimetable(secondUpdate);
     assertSuccess(result2);
     assertEquals(
-      "UPDATED | A 0:00:20 0:00:20 | B 0:00:33 0:00:33",
+      "U | A 0:00:20 0:00:20 | B 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -222,7 +222,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A [PI] 0:00:15 0:00:15 | B [PI] 0:00:25 0:00:25",
+      "U | A [PI] 0:00:15 0:00:15 | B [PI] 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -241,7 +241,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
 
   private static void assertTripUpdated(TransitTestEnvironment env) {
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

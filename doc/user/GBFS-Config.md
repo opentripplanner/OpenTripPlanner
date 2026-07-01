@@ -25,13 +25,15 @@ Furthermore, support is limited to the following form factors:
 | type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                                                                                                       | *Required* |               |  1.5  |
 | [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                                | *Optional* | `false`       |  2.1  |
 | frequency                                                                             |    `duration`   | How often the data should be updated.                                                                                                                          | *Optional* | `"PT1M"`      |  1.5  |
-| [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                                                                | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                                                                                                           | *Optional* |               |  2.1  |
 | [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.                                                                                      | *Optional* |               |  1.5  |
 | overloadingAllowed                                                                    |    `boolean`    | Allow leaving vehicles at a station even though there are no free slots.                                                                                       | *Optional* | `false`       |  2.2  |
 | [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                                                                                                  | *Required* |               |  1.5  |
 | [startupRetryPeriod](#u_1_startupRetryPeriod)                                         |    `duration`   | How long to retry loading the vehicle rental data source on startup if it initially fails.                                                                     | *Optional* | `"PT0S"`      |  2.10 |
 | url                                                                                   |     `string`    | The URL to download the data from.                                                                                                                             | *Required* |               |  1.5  |
+| geofencing                                                                            |     `object`    | Configuration for GBFS geofencing-based rental restrictions.                                                                                                   | *Optional* |               |  2.10 |
+|    [businessAreaBorders](#u_1_geofencing_businessAreaBorders)                         |    `boolean`    | Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary.                                                          | *Optional* | `true`        |  2.10 |
+|    [enabled](#u_1_geofencing_enabled)                                                 |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                                                                | *Optional* | `false`       |  2.10 |
 | [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                                                                                     | *Optional* |               |  1.5  |
 | [rentalPickupTypes](#u_1_rentalPickupTypes)                                           |    `enum set`   | This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source. | *Optional* |               |  2.7  |
 
@@ -53,19 +55,6 @@ For this to be possible three things need to be configured:
  - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
  - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
  - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
-
-
-<h4 id="u_1_geofencingZones">geofencingZones</h4>
-
-**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /updaters/[1] 
-
-Compute rental restrictions based on GBFS 2.2 geofencing zones.
-
-This feature is somewhat experimental and therefore turned off by default for the following reasons:
-
-- It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
-- It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug report.
 
 
 <h4 id="u_1_network">network</h4>
@@ -95,6 +84,33 @@ How long to retry loading the vehicle rental data source on startup if it initia
 The first time the data source is loaded, OTP will retry for this duration every
 5 seconds before giving up. This is useful to handle temporary network failures during
 OTP startup. Set to `PT0S` to disable retries.
+
+
+<h4 id="u_1_geofencing_businessAreaBorders">businessAreaBorders</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /updaters/[1]/geofencing 
+
+Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary.
+
+When enabled, GBFS geofencing zones that have no restrictions (no traversal or drop-off bans)
+are treated as business areas. The router will force a vehicle drop-off when exiting such an
+area, preventing routes that leave the operator's service area with a rented vehicle.
+
+Requires `enabled` to also be true.
+
+
+<h4 id="u_1_geofencing_enabled">enabled</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /updaters/[1]/geofencing 
+
+Compute rental restrictions based on GBFS 2.2 geofencing zones.
+
+This feature is somewhat experimental and therefore turned off by default for the following reasons:
+
+- It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
+- It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug report.
 
 
 <h4 id="u_1_headers">headers</h4>
@@ -131,7 +147,9 @@ This is temporary and will be removed in a future version of OTP. Use this to sp
       "language" : "en",
       "frequency" : "1m",
       "allowKeepingRentedVehicleAtDestination" : false,
-      "geofencingZones" : false,
+      "geofencing" : {
+        "enabled" : false
+      },
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
         "Auth" : "<any-token>",

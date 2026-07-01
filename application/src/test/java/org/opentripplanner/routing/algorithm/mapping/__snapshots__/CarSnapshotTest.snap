@@ -6,11 +6,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:14:05.000+00:00",
-      "fare" : {
-        "details" : { },
-        "fare" : { }
-      },
-      "generalizedCost" : 494,
+      "generalizedCost" : 541,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -141,7 +137,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             },
             "vertexType" : "BIKEPARK"
           },
-          "generalizedCost" : 408,
+          "generalizedCost" : 455,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -223,10 +219,6 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:16:03.000+00:00",
-      "fare" : {
-        "details" : { },
-        "fare" : { }
-      },
       "generalizedCost" : 728,
       "legs" : [
         {
@@ -409,10 +401,6 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:16:54.000+00:00",
-      "fare" : {
-        "details" : { },
-        "fare" : { }
-      },
       "generalizedCost" : 728,
       "legs" : [
         {
@@ -595,10 +583,6 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:10:30.000+00:00",
-      "fare" : {
-        "details" : { },
-        "fare" : { }
-      },
       "generalizedCost" : 61,
       "legs" : [
         {

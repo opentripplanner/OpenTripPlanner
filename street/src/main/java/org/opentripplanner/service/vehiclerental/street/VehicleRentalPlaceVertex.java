@@ -1,18 +1,26 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 
 /**
  * A vertex for a rental vehicle or station. It is connected to the streets by a
- * {@link StreetVehicleRentalLink}. To allow transitions on and
- * off a vehicle, it has {@link VehicleRentalEdge} loop edges.
+ * {@link StreetVehicleRentalLink}. To allow transitions on and off a vehicle, it has
+ * {@link VehicleRentalEdge} loop edges.
  */
 public class VehicleRentalPlaceVertex extends Vertex {
 
   private VehicleRentalPlace station;
+
+  // Populated at runtime by the vehicle-rental updater; not persisted in graph.obj.
+  // Null until first write — readers go through {@link #getInitialGeofencingZones}.
+  @Nullable
+  private transient Set<GeofencingZone> initialGeofencingZones;
 
   public VehicleRentalPlaceVertex(VehicleRentalPlace station) {
     super(station.longitude(), station.latitude());
@@ -35,5 +43,18 @@ public class VehicleRentalPlaceVertex extends Vertex {
 
   public void setStation(VehicleRentalPlace station) {
     this.station = station;
+  }
+
+  /**
+   * All geofencing zones containing this vertex, pre-resolved at updater time. Used by the routing
+   * algorithm to initialize zone state when picking up a vehicle.
+   */
+  public Set<GeofencingZone> getInitialGeofencingZones() {
+    // null after Kryo deserialization (transient fields skip the inline initializer).
+    return initialGeofencingZones == null ? Set.of() : initialGeofencingZones;
+  }
+
+  public void setInitialGeofencingZones(Set<GeofencingZone> zones) {
+    this.initialGeofencingZones = Set.copyOf(zones);
   }
 }

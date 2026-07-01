@@ -2,8 +2,6 @@ package org.opentripplanner.astar;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
@@ -17,137 +15,114 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AStarBuilder<
+public class AStarBuilder<
   State extends AStarState<State, Edge, Vertex>,
   Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>,
-  Builder extends AStarBuilder<State, Edge, Vertex, Builder>
+  Vertex extends AStarVertex<State, Edge, Vertex>
 > {
 
   Logger LOG = LoggerFactory.getLogger(AStarBuilder.class);
 
-  private Builder builder;
   private Runnable preStartHook = () ->
     LOG.warn("No pre-start hook provided. Call withPreStartHook() to set one.");
-  private RemainingWeightHeuristic<State> heuristic = RemainingWeightHeuristic.TRIVIAL;
+  private RemainingWeightHeuristic<State> heuristic;
   private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private TraverseVisitor<State, Edge> traverseVisitor;
   private boolean arriveBy;
-  private Set<Vertex> fromVertices;
-  private Set<Vertex> toVertices;
+  private Set<Vertex> goalVertices;
   private SearchTerminationStrategy<State> terminationStrategy;
   private DominanceFunction<State> dominanceFunction;
   private StatisticsCallback<Vertex> statisticsCallback = StatisticsCallback.NOOP;
+  private Duration timeout;
+  private Collection<State> initialStates;
 
-  protected AStarBuilder() {}
+  public AStarBuilder() {}
 
-  protected void setBuilder(Builder builder) {
-    this.builder = builder;
-  }
-
-  public Builder withHeuristic(RemainingWeightHeuristic<State> heuristic) {
+  public AStarBuilder<State, Edge, Vertex> withHeuristic(
+    RemainingWeightHeuristic<State> heuristic
+  ) {
     this.heuristic = heuristic;
-    return builder;
+    return this;
   }
 
   /**
    * Set a function that will be called before the search begins. Useful for checking that
    * a timeout has not been reached before the search begins.
    */
-  public Builder withPreStartHook(Runnable hook) {
+  public AStarBuilder<State, Edge, Vertex> withPreStartHook(Runnable hook) {
     this.preStartHook = hook;
-    return builder;
+    return this;
   }
 
-  public Builder withSkipEdgeStrategy(SkipEdgeStrategy<State, Edge> skipEdgeStrategy) {
+  public AStarBuilder<State, Edge, Vertex> withSkipEdgeStrategy(
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy
+  ) {
     this.skipEdgeStrategy = skipEdgeStrategy;
-    return builder;
+    return this;
   }
 
-  public Builder withTraverseVisitor(TraverseVisitor<State, Edge> traverseVisitor) {
+  public AStarBuilder<State, Edge, Vertex> withTraverseVisitor(
+    TraverseVisitor<State, Edge> traverseVisitor
+  ) {
     this.traverseVisitor = traverseVisitor;
-    return builder;
+    return this;
   }
 
-  public Builder withStatisticsCallback(StatisticsCallback<Vertex> statisticsCallback) {
+  public AStarBuilder<State, Edge, Vertex> withStatisticsCallback(
+    StatisticsCallback<Vertex> statisticsCallback
+  ) {
     this.statisticsCallback = statisticsCallback;
-    return builder;
+    return this;
   }
 
-  public Builder withArriveBy(boolean arriveBy) {
+  public AStarBuilder<State, Edge, Vertex> withArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
-    return builder;
+    return this;
   }
 
-  protected boolean arriveBy() {
-    return arriveBy;
+  public AStarBuilder<State, Edge, Vertex> withGoalVertices(Set<Vertex> goalVertices) {
+    this.goalVertices = goalVertices;
+    return this;
   }
 
-  public Builder withFrom(Set<Vertex> fromVertices) {
-    this.fromVertices = fromVertices;
-    return builder;
-  }
-
-  public Builder withFrom(Vertex fromVertex) {
-    this.fromVertices = Collections.singleton(fromVertex);
-    return builder;
-  }
-
-  public Builder withTo(Set<Vertex> toVertices) {
-    this.toVertices = toVertices;
-    return builder;
-  }
-
-  public Builder withTo(Vertex toVertex) {
-    this.toVertices = Collections.singleton(toVertex);
-    return builder;
-  }
-
-  public Builder withTerminationStrategy(SearchTerminationStrategy<State> terminationStrategy) {
+  public AStarBuilder<State, Edge, Vertex> withTerminationStrategy(
+    SearchTerminationStrategy<State> terminationStrategy
+  ) {
     this.terminationStrategy = terminationStrategy;
-    return builder;
+    return this;
   }
 
   /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
-  public Builder withDominanceFunction(DominanceFunction<State> dominanceFunction) {
+  public AStarBuilder<State, Edge, Vertex> withDominanceFunction(
+    DominanceFunction<State> dominanceFunction
+  ) {
     this.dominanceFunction = dominanceFunction;
-    return builder;
+    return this;
   }
 
-  protected abstract Duration streetRoutingTimeout();
+  public AStarBuilder<State, Edge, Vertex> withTimeout(Duration timeout) {
+    this.timeout = timeout;
+    return this;
+  }
 
-  protected AStar<State, Edge, Vertex> build() {
-    final Set<Vertex> origin = arriveBy ? toVertices : fromVertices;
-    final Set<Vertex> destination = arriveBy ? fromVertices : toVertices;
+  public AStarBuilder<State, Edge, Vertex> withInitialStates(Collection<State> initialStates) {
+    this.initialStates = initialStates;
+    return this;
+  }
 
-    Collection<State> initialStates = createInitialStates(origin);
-
-    initializeHeuristic(heuristic, origin, destination, arriveBy);
-
+  public AStar<State, Edge, Vertex> build() {
     return new AStar<>(
-      heuristic,
-      preStartHook,
-      skipEdgeStrategy,
-      traverseVisitor,
-      arriveBy,
-      origin,
-      destination,
-      terminationStrategy,
-      Optional.ofNullable(dominanceFunction).orElseGet(this::createDefaultDominanceFunction),
-      streetRoutingTimeout(),
       initialStates,
+      arriveBy,
+      dominanceFunction,
+      goalVertices,
+      heuristic,
+      traverseVisitor,
+      skipEdgeStrategy,
+      terminationStrategy,
+      timeout,
+      preStartHook,
       statisticsCallback
     );
   }
-
-  protected abstract Collection<State> createInitialStates(Set<Vertex> originVertices);
-
-  protected abstract void initializeHeuristic(
-    RemainingWeightHeuristic<State> heuristic,
-    Set<Vertex> origin,
-    Set<Vertex> destination,
-    boolean arriveBy
-  );
-
-  protected abstract DominanceFunction<State> createDefaultDominanceFunction();
 }

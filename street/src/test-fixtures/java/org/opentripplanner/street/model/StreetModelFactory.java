@@ -135,7 +135,7 @@ public class StreetModelFactory {
   }
 
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
-    return VehicleParking.builder().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
+    return VehicleParking.of().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
   }
 
   public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {

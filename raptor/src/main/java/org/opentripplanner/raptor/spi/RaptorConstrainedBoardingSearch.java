@@ -31,8 +31,8 @@ public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   boolean transferExistSourceStop(int targetStopPos);
 
   /**
-   * Get the board-/alight-event for the current pattern at the target stop position coming from the
-   * source stop and trip with the given source arrival board-/alight time (exclude slack).
+   * Get the board-/alight-event for the current pattern at the target stop position coming from
+   * the source stop and trip with the given source arrival board-/alight time (exclude slack).
    * <p>
    *
    * @return An "empty" event if no target trip is found

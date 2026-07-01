@@ -12,8 +12,12 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
  * The read-only service for getting information about rental vehicles.
  * <p>
  * For writing data see {@link VehicleRentalRepository}
+ * <p>
+ * Extends {@link GeofencingZoneService} so consumers that only need zone queries can depend on the
+ * narrower interface — geofencing zones are part of rental data (registered per network by the
+ * GBFS updater) and the rental service is their natural owner.
  */
-public interface VehicleRentalService {
+public interface VehicleRentalService extends GeofencingZoneService {
   Collection<VehicleRentalPlace> getVehicleRentalPlaces();
 
   VehicleRentalPlace getVehicleRentalPlace(FeedScopedId id);

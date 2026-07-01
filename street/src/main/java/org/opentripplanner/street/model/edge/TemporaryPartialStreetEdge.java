@@ -21,12 +21,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
    */
   TemporaryPartialStreetEdge(TemporaryPartialStreetEdgeBuilder builder) {
     super(builder);
-    builder
-      .fromVertex()
-      .addRentalRestriction(builder.parentEdge().getFromVertex().rentalRestrictions());
-    builder
-      .toVertex()
-      .addRentalRestriction(builder.parentEdge().getToVertex().rentalRestrictions());
     this.parentEdge = builder.parentEdge();
     this.geometry = super.getGeometry();
   }

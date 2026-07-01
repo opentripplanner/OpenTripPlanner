@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.trip.TimetableSnapshotManagerTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotManagerTest.SameAssert.Same;
 
@@ -16,17 +17,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 
 class TimetableSnapshotManagerTest {
 
@@ -139,6 +140,7 @@ class TimetableSnapshotManagerTest {
     final AtomicReference<LocalDate> clock = new AtomicReference<>(YESTERDAY);
 
     var snapshotManager = new TimetableSnapshotManager(
+      new DefaultTripCalendars(),
       null,
       TimetableSnapshotParameters.DEFAULT.withPurgeExpiredData(purgeExpiredData),
       clock::get
@@ -191,7 +193,7 @@ class TimetableSnapshotManagerTest {
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
-    assertEquals(RealTimeState.UPDATED, tripTimes.getRealTimeState());
+    assertTrue(tripTimes.hasAnyUpdates());
   }
 
   /**
@@ -216,11 +218,11 @@ class TimetableSnapshotManagerTest {
 
     // Trip should be DELETED in the scheduled pattern
     var scheduledTimetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
-    assertEquals(RealTimeState.DELETED, scheduledTimetable.getTripTimes(TRIP).getRealTimeState());
+    assertTrue(scheduledTimetable.getTripTimes(TRIP).isDeleted());
 
     // Trip should be UPDATED in the modified pattern
     var modifiedTimetable = manager.resolve(MODIFIED_PATTERN, TODAY);
-    assertEquals(RealTimeState.UPDATED, modifiedTimetable.getTripTimes(TRIP).getRealTimeState());
+    assertTrue(modifiedTimetable.getTripTimes(TRIP).hasAnyUpdates());
 
     // Modified pattern should be registered for this trip
     assertEquals(MODIFIED_PATTERN, manager.getNewTripPatternForModifiedTrip(TRIP.getId(), TODAY));
@@ -262,7 +264,7 @@ class TimetableSnapshotManagerTest {
 
     // Trip should be UPDATED in the scheduled pattern
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
-    assertEquals(RealTimeState.UPDATED, timetable.getTripTimes(TRIP).getRealTimeState());
+    assertTrue(timetable.getTripTimes(TRIP).hasAnyUpdates());
   }
 
   /**
@@ -300,14 +302,11 @@ class TimetableSnapshotManagerTest {
 
     // Trip should be DELETED in the scheduled pattern
     var scheduledTimetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
-    assertEquals(RealTimeState.DELETED, scheduledTimetable.getTripTimes(TRIP).getRealTimeState());
+    assertTrue(scheduledTimetable.getTripTimes(TRIP).isDeleted());
 
     // Trip should be UPDATED in the second modified pattern
     var secondModifiedTimetable = manager.resolve(SECOND_MODIFIED_PATTERN, TODAY);
-    assertEquals(
-      RealTimeState.UPDATED,
-      secondModifiedTimetable.getTripTimes(TRIP).getRealTimeState()
-    );
+    assertTrue(secondModifiedTimetable.getTripTimes(TRIP).hasAnyUpdates());
 
     // Modified pattern registration should point to the second modified pattern
     assertEquals(
@@ -324,7 +323,7 @@ class TimetableSnapshotManagerTest {
   void updateBufferCancelScheduledTrip() {
     var manager = createManager();
     var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .cancelTrip()
+      .withCanceled()
       .build();
 
     manager.updateBuffer(
@@ -336,7 +335,7 @@ class TimetableSnapshotManagerTest {
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
-    assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
+    assertTrue(tripTimes.isCanceled());
   }
 
   /**
@@ -347,7 +346,7 @@ class TimetableSnapshotManagerTest {
   void updateBufferDeleteScheduledTrip() {
     var manager = createManager();
     var deletedTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .deleteTrip()
+      .withDeleted()
       .build();
 
     manager.updateBuffer(
@@ -359,7 +358,7 @@ class TimetableSnapshotManagerTest {
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
     var tripTimes = timetable.getTripTimes(TRIP);
     assertNotNull(tripTimes);
-    assertEquals(RealTimeState.DELETED, tripTimes.getRealTimeState());
+    assertTrue(tripTimes.isDeleted());
   }
 
   /**
@@ -388,7 +387,7 @@ class TimetableSnapshotManagerTest {
 
     // Now revert and cancel on the scheduled pattern
     var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .cancelTrip()
+      .withCanceled()
       .build();
     manager.updateBuffer(
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
@@ -401,10 +400,15 @@ class TimetableSnapshotManagerTest {
 
     // Trip should be CANCELED in the scheduled pattern
     var timetable = manager.resolve(SCHEDULED_PATTERN, TODAY);
-    assertEquals(RealTimeState.CANCELED, timetable.getTripTimes(TRIP).getRealTimeState());
+    assertTrue(timetable.getTripTimes(TRIP).isCanceled());
   }
 
   private static TimetableSnapshotManager createManager() {
-    return new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, () -> TODAY);
+    return new TimetableSnapshotManager(
+      new DefaultTripCalendars(),
+      null,
+      TimetableSnapshotParameters.DEFAULT,
+      () -> TODAY
+    );
   }
 }

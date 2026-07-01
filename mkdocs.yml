@@ -22,9 +22,20 @@ theme:
         - search.suggest
         - search.highlight
     palette:
-        primary: blue
-        accent: blue
-        scheme: default
+        # Palette toggle for light mode
+        - scheme: default
+          primary: blue
+          accent: blue
+          toggle:
+            icon: material/brightness-7 
+            name: Switch to dark mode
+        # Palette toggle for dark mode
+        - scheme: slate
+          primary: blue
+          accent: blue
+          toggle:
+            icon: material/brightness-4
+            name: Switch to light mode
 
 
 extra:
@@ -54,7 +65,7 @@ nav:
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
     - Visual Identity: 'Visual-Identity.md'
-- 'Usage':
+- Usage:
     - Basic Tutorial: 'Basic-Tutorial.md'
     - Netex and SIRI Tutorial: 'Netex-Tutorial.md'
     - Getting OTP: 'Getting-OTP.md'
@@ -81,25 +92,25 @@ nav:
         - Norway: 'osm/Norway.md'
         - UK: 'osm/UK.md'
     - Router: 'RouterConfiguration.md'
-    - "Route Request": 'RouteRequest.md'
-    - "Realtime Updaters":
+    - Route Request: 'RouteRequest.md'
+    - Realtime Updaters:
         - Introduction: 'Realtime-Updaters.md'
         - "GTFS-RT": 'GTFS-RT-Config.md'
         - SIRI: 'SIRI-Config.md'
         - GBFS: 'GBFS-Config.md'
-    - "Debug UI": 'DebugUiConfiguration.md'
+    - Debug UI: 'DebugUiConfiguration.md'
     - "Migrating between versions/builds": 'Migrating-Configuration.md'
 - Features explained:
-    - "Feed ID": 'features-explained/Feed-ID.md'
-    - "Routing modes": 'RoutingModes.md'
-    - "In-station navigation": 'In-Station-Navigation.md'
-    - "Boarding Locations": 'BoardingLocations.md'
-    - "Stop Area Relations": 'StopAreas.md'
-    - "Street Graph Pruning": 'IslandPruning.md'
+    - Feed ID: 'features-explained/Feed-ID.md'
+    - Routing Modes: 'RoutingModes.md'
+    - In-Station Navigation: 'In-Station-Navigation.md'
+    - Boarding Locations: 'BoardingLocations.md'
+    - Stop Area Relations: 'StopAreas.md'
+    - Street Graph Pruning: 'IslandPruning.md'
     - Accessibility: 'Accessibility.md'
-    - "NeTEx and SIRI compatibility": 'features-explained/Netex-Siri-Compatibility.md'
-    - "Travel Time Analysis": 'Analysis.md'
-    - "Logging": "Logging.md"
+    - NeTEx and SIRI Compatibility: 'features-explained/Netex-Siri-Compatibility.md'
+    - Travel Time Analysis: 'Analysis.md'
+    - Logging: "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Bibliography: 'Bibliography.md'

@@ -38,7 +38,7 @@ class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
       context.transitService()::getTrip,
       context.transitService()::findPattern,
       context.transitService()::findPattern,
-      context.transitService().getCalendarService()::getServiceDatesForServiceId,
+      context.transitService().getTripCalendars()::listServiceDates,
       realtimeVehicleRepository,
       context.transitService().getTimeZone(),
       fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,

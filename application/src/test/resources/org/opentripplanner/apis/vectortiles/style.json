@@ -52,6 +52,37 @@
       }
     },
     {
+      "id" : "flex-transfers",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "transfers",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#277eb5",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ]
+      },
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Transfers"
+      }
+    },
+    {
       "id" : "rental-vehicle",
       "type" : "circle",
       "source" : "vectorSource",
@@ -695,23 +726,8 @@
             "min",
             255,
             [
-              "*",
-              80.0,
-              [
-                "log2",
-                [
-                  "get",
-                  "bicycleSafetyFactor"
-                ]
-              ]
-            ]
-          ],
-          [
-            "max",
-            0,
-            [
-              "-",
-              255,
+              "max",
+              0,
               [
                 "*",
                 80.0,
@@ -720,6 +736,29 @@
                   [
                     "get",
                     "bicycleSafetyFactor"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "min",
+            255,
+            [
+              "max",
+              0,
+              [
+                "-",
+                255,
+                [
+                  "*",
+                  80.0,
+                  [
+                    "log2",
+                    [
+                      "get",
+                      "bicycleSafetyFactor"
+                    ]
                   ]
                 ]
               ]
@@ -840,23 +879,8 @@
             "min",
             255,
             [
-              "*",
-              80.0,
-              [
-                "log2",
-                [
-                  "get",
-                  "walkSafetyFactor"
-                ]
-              ]
-            ]
-          ],
-          [
-            "max",
-            0,
-            [
-              "-",
-              255,
+              "max",
+              0,
               [
                 "*",
                 80.0,
@@ -865,6 +889,29 @@
                   [
                     "get",
                     "walkSafetyFactor"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "min",
+            255,
+            [
+              "max",
+              0,
+              [
+                "-",
+                255,
+                [
+                  "*",
+                  80.0,
+                  [
+                    "log2",
+                    [
+                      "get",
+                      "walkSafetyFactor"
+                    ]
                   ]
                 ]
               ]
@@ -1535,26 +1582,34 @@
             "min",
             255,
             [
-              "*",
-              728.57,
-              [
-                "get",
-                "maximumSlope"
-              ]
-            ]
-          ],
-          [
-            "max",
-            0,
-            [
-              "-",
-              255,
+              "max",
+              0,
               [
                 "*",
                 728.57,
                 [
                   "get",
                   "maximumSlope"
+                ]
+              ]
+            ]
+          ],
+          [
+            "min",
+            255,
+            [
+              "max",
+              0,
+              [
+                "-",
+                255,
+                [
+                  "*",
+                  728.57,
+                  [
+                    "get",
+                    "maximumSlope"
+                  ]
                 ]
               ]
             ]

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -19,10 +20,12 @@ public class LinkingServiceModule {
   @Provides
   static VertexLinker provideVertexLinker(
     Graph graph,
+    VehicleRentalService vehicleRentalService,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
     return new VertexLinker(
       graph,
+      vehicleRentalService,
       COMPUTE_AREA_VISIBILITY_LINES,
       streetLimitationParametersService.maxAreaNodes(),
       OTPFeature.FlexRouting.isOn()

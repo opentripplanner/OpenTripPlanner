@@ -7,12 +7,12 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 class MissingCallOrderTest implements RealtimeTestConstants {
 
@@ -132,7 +132,7 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:20 0:00:25 | C 0:00:45 0:00:45",
+      "U | A 0:00:15 0:00:15 | B 0:00:20 0:00:25 | C 0:00:45 0:00:45",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

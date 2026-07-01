@@ -66,17 +66,13 @@ OTP. If all goes well you should see a success message like the following:
 
 This build process should produce a JAR file called `otp-shaded-x.y.z.jar` in the
 `otp-shaded/target/` directory which contains all the compiled OTP classes and their dependencies
-(the external libraries they use). The shell script called 'otp' in the root of the cloned repository
-will start the main class of that JAR file under a Java virtual machine, so after the Maven build
-completes you should be able to run `./otp --help` and see an OTP help message including command line
-options. Due to the way Maven works, this script is not executable by default, so you will need to do
-`chmod u+x ./otp` before you run it to mark it as executable.
+(the external libraries they use).
 
 The words "clean package" are the build steps you want to run. You're telling maven to clean up any
 extraneous junk in the directory, then perform all the build steps, including compilation, up to and
 including "package", which bundles the compiled program into a single JAR file for distribution.
 
-If you have just cloned OTP you will be working with the default "master" branch, where most active
+If you have just cloned OTP you will be working with the default "dev-2.x" branch, where most active
 development occurs. This is not the most stable or deployment-ready code available. To avoid newly
 minted bugs or undocumented behavior, you can use Git to check out a specific release (tag or
 branch) of OTP to work with. The Maven build also includes many time-consuming integration tests.

@@ -5,14 +5,14 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
 class FuzzyTripMatchingTest implements RealtimeTestConstants {
@@ -46,7 +46,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
@@ -76,7 +76,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
-    assertFailure(UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
+    assertFailure(UpdateErrorType.INVALID_DEPARTURE_TIME, result);
   }
 
   /**
@@ -123,7 +123,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData("RailTrip1").showTimetable()
     );
   }
@@ -163,7 +163,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData("RailTrip3").showTimetable()
     );
   }
@@ -193,7 +193,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertSuccess(result);
     assertEquals(
-      "UPDATED | A [R] 0:00:15 0:00:15 | B 0:00:25 0:00:25",
+      "U | A [R] 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

@@ -58,25 +58,25 @@
 
 
     <properties>
-        <otp.serialization.version.id>257</otp.serialization.version.id>
+        <otp.serialization.version.id>265</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>34.3</geotools.version>
+        <geotools.version>34.4</geotools.version>
         <google.dagger.version>2.59.2</google.dagger.version>
-        <jackson.version>2.21.3</jackson.version>
-        <jaxb-runtime.version>4.0.8</jaxb-runtime.version>
-        <jersey.version>3.1.11</jersey.version>
-        <junit.version>6.0.3</junit.version>
+        <jackson.version>2.22.0</jackson.version>
+        <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
+        <jersey.version>3.1.12</jersey.version>
+        <junit.version>6.1.0</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.32</logback.version>
+        <logback.version>1.5.34</logback.version>
         <lucene.version>10.4.0</lucene.version>
         <micrometer.version>1.16.5</micrometer.version>
         <netex-java-model.version>2.0.15.3</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.34.1</protobuf.version>
+        <protobuf.version>4.35.1</protobuf.version>
         <siri-java-model.version>2.0.6</siri-java-model.version>
-        <slf4j.version>2.0.17</slf4j.version>
+        <slf4j.version>2.0.18</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -298,7 +298,12 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.14</version>
+                <version>0.8.15</version>
+                <configuration>
+                    <excludes>
+                        <exclude>org/opentripplanner/apis/gtfs/generated/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -332,7 +337,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.37.0</version>
+                <version>6.42.0</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -351,7 +356,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.33.1</version>
+                        <version>2.37.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -375,7 +380,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>13.4.0</version>
+                        <version>13.6.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -467,7 +472,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.81.0</version>
+                <version>26.84.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -749,7 +754,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.10.0</version>
+                        <version>0.11.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->

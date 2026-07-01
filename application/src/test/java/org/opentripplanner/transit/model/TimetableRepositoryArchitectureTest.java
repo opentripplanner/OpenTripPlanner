@@ -25,6 +25,7 @@ public class TimetableRepositoryArchitectureTest {
   private static final Package NETWORK = TRANSIT_MODEL.subPackage("network");
   private static final Package SITE = TRANSIT_MODEL.subPackage("site");
   private static final Package TIMETABLE = TRANSIT_MODEL.subPackage("timetable");
+  private static final Package CALENDAR = TRANSIT_MODEL.subPackage("calendar");
   private static final Package TIMETABLE_BOOKING = TIMETABLE.subPackage("booking");
   private static final Package LEGACY_MODEL = OTP_ROOT.subPackage("model");
 
@@ -86,6 +87,7 @@ public class TimetableRepositoryArchitectureTest {
       ORGANIZATION,
       NETWORK,
       SITE,
+      CALENDAR,
       TIMETABLE_BOOKING,
       LEGACY_MODEL
     ).verify();

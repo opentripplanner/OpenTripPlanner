@@ -5,11 +5,13 @@ import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.ItemVisitor;
@@ -157,6 +159,70 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   }
 
   /**
+   * Query all items near any segment of the given line strings. Collects the unique set of bin
+   * keys touched by every segment, then reads each bin exactly once. Avoids per-segment
+   * {@link Envelope} and lambda allocations, and the re-read of bins shared by consecutive
+   * segments (which is the common case — adjacent segments always share at least one bin via
+   * their shared endpoint).
+   */
+  public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
+    Set<T> result = new HashSet<>(1024);
+    TLongSet keys = new TLongHashSet(256);
+    for (LineString ls : lineStrings) {
+      CoordinateSequence seq = ls.getCoordinateSequence();
+      for (int i = 0; i < seq.size() - 1; i++) {
+        collectBinKeys(seq.getX(i), seq.getY(i), seq.getX(i + 1), seq.getY(i + 1), keys);
+      }
+    }
+    keys.forEach(key -> {
+      ArrayList<T> bin = bins.get(key);
+      if (bin != null) {
+        result.addAll(bin);
+      }
+      return true;
+    });
+    return result;
+  }
+
+  /**
+   * Collect the bin keys touched by a segment's axis-aligned bounding box into {@code out}.
+   * Mirrors the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on
+   * primitive coordinates so the hot query loop has no per-segment object allocations.
+   */
+  private void collectBinKeys(double x1, double y1, double x2, double y2, TLongSet out) {
+    double minX = clampLon(Math.min(x1, x2));
+    double maxX = clampLon(Math.max(x1, x2));
+    double minY = clampLat(Math.min(y1, y2));
+    double maxY = clampLat(Math.max(y1, y2));
+    long minXKey = Math.round(minX / xBinSize);
+    long maxXKey = Math.round(maxX / xBinSize);
+    long minYKey = Math.round(minY / yBinSize);
+    long maxYKey = Math.round(maxY / yBinSize);
+    for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
+      for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
+        out.add(binKey(xKey, yKey));
+      }
+    }
+  }
+
+  /**
+   * Pack (xKey, yKey) into a single {@code long} hash key. The xKey halves are swapped so the
+   * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the
+   * note in {@link #visit(Envelope, boolean, BinVisitor)}.
+   */
+  private static long binKey(long xKey, long yKey) {
+    return (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);
+  }
+
+  private static double clampLon(double x) {
+    return Math.clamp(x, -180, 180);
+  }
+
+  private static double clampLat(double y) {
+    return Math.clamp(y, -90, 90);
+  }
+
+  /**
    * Make each bin be exactly the required size. This is helpful for large indices, which are mostly
    * used for reads only.
    */
@@ -181,31 +247,15 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     );
   }
 
-  /** Clamp a coordinate to allowable lat/lon values */
+  /** Clamp a coordinate to allowable lat/lon values. */
   private static Coordinate clamp(Coordinate coord) {
     if (Math.abs(coord.x) > 180 || Math.abs(coord.y) > 90) {
       LOG.warn(
         "Corner of envelope {} was invalid, clamping to valid range. Perhaps you're buffering something near a pole?",
         coord
       );
-
-      // make a defensive copy as we're about to modify the coordinate
-      coord = new Coordinate(coord);
-
-      if (coord.x > 180) {
-        coord.x = 180;
-      }
-      if (coord.x < -180) {
-        coord.x = -180;
-      }
-      if (coord.y > 90) {
-        coord.y = 90;
-      }
-      if (coord.y < -90) {
-        coord.y = -90;
-      }
+      return new Coordinate(clampLon(coord.x), clampLat(coord.y));
     }
-
     return coord;
   }
 
@@ -236,7 +286,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
          * xKey in order to have a well-behaving long hash, fitting in an int, because the
          * default implementation is: hashInt = (int)(value ^ (value >>> 32));
          */
-        long mapKey = (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);
+        long mapKey = binKey(xKey, yKey);
         ArrayList<T> bin = bins.get(mapKey);
         if (createIfEmpty && bin == null) {
           bin = new ArrayList<>();

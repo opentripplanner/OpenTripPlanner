@@ -14,6 +14,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
@@ -26,7 +27,6 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
-import org.opentripplanner.raptor.util.BitSetIterator;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
@@ -110,7 +110,7 @@ public class TestTransitData
         routes.set(i);
       }
     }
-    return new BitSetIterator(routes);
+    return IntIterators.of(routes);
   }
 
   @Override

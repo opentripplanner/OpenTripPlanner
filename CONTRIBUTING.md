@@ -126,7 +126,7 @@ that there is an organizational commitment to long term maintenance.
 Most of the contributors to OTP2 are full-time software developers working for organizations with a
 long term stake in OpenTripPlanner, and are professionally bound to ensure its reliability and
 efficiency. It is an accepted fact among this team that a large part, perhaps the most important
-part of software development is careful design and communication with current collaborators and
+part of software development, is careful design and communication with current collaborators and
 future maintainers of the system.
 
 You will see a steady stream of pull requests being merged from different organizations. What almost
@@ -142,8 +142,8 @@ want to solve your problem or implement your feature. In the past, most contribu
 undertaken without any discussion up front required major changes before acceptance.
 
 We try to reduce the time demands on reviewers by putting more responsibilities on the PR submitter.
-This does carry a risk of discouraging contributions, but without a "sponsor" organization for a
-change, the time available to review is the bottleneck in the process.
+This does carry a risk of discouraging contributions, but without a "sponsor" organization behind a
+proposed change, the time available to review is the bottleneck in the process.
 
 In summary, if you are interested in integrating your code into core OTP, a significant amount of the
 time you invest in OTP will need to be spent on collaboration, discussion, documentation, etc. and

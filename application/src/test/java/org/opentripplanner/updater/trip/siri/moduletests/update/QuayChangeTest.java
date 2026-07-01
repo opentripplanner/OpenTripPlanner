@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 class QuayChangeTest implements RealtimeTestConstants {
 
@@ -30,7 +30,7 @@ class QuayChangeTest implements RealtimeTestConstants {
   @Test
   void testChangeQuay() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -46,15 +46,15 @@ class QuayChangeTest implements RealtimeTestConstants {
 
     assertSuccess(result);
     assertEquals(
-      "MODIFIED | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
+      "P U | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[MODIFIED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
   }
 
   /**
-   * Change quay (B to C) producing a MODIFIED pattern, then send a second update referencing the
+   * Change quay (B to C) producing a PATTERN_MODIFIED pattern, then send a second update referencing the
    * original stop B, reverting the pattern back to the scheduled one.
    */
   @Test
@@ -75,7 +75,7 @@ class QuayChangeTest implements RealtimeTestConstants {
     var result1 = siri.applyEstimatedTimetable(quayChange);
     assertSuccess(result1);
     assertEquals(
-      "MODIFIED | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
+      "P U | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
 
@@ -92,11 +92,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     var result2 = siri.applyEstimatedTimetable(revert);
     assertSuccess(result2);
     assertEquals(
-      "UPDATED | A [R] 0:00:16 0:00:16 | B 0:00:30 0:00:30",
+      "U | A [R] 0:00:16 0:00:16 | B 0:00:30 0:00:30",
       env.tripData(TRIP_1_ID).showTimetable()
     );
     // Pattern reverts to the scheduled one (not an RT pattern), but trip state is UPDATED
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[UPDATED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[U]");
   }
 
   /**
@@ -121,10 +121,10 @@ class QuayChangeTest implements RealtimeTestConstants {
     var result1 = siri.applyEstimatedTimetable(quayChange);
     assertSuccess(result1);
     assertEquals(
-      "MODIFIED | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
+      "P U | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[MODIFIED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
 
     // Step 2: Keep quay change (still C) but with different delay
     var updatedTimes = siri
@@ -138,11 +138,11 @@ class QuayChangeTest implements RealtimeTestConstants {
 
     var result2 = siri.applyEstimatedTimetable(updatedTimes);
     assertSuccess(result2);
-    // Quay change must be preserved - still MODIFIED on RT pattern, not reverted to scheduled
+    // Quay change must be preserved - still PATTERN_MODIFIED on RT pattern, not reverted to scheduled
     assertEquals(
-      "MODIFIED | A [R] 0:00:16 0:00:16 | C 0:00:35 0:00:35",
+      "P U | A [R] 0:00:16 0:00:16 | C 0:00:35 0:00:35",
       env.tripData(TRIP_1_ID).showTimetable()
     );
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[MODIFIED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
   }
 }

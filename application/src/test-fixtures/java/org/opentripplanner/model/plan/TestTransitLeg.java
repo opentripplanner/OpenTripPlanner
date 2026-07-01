@@ -84,11 +84,6 @@ public class TestTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
-    throw new NotImplementedException();
-  }
-
-  @Override
   public LegCallTime start() {
     return LegCallTime.ofStatic(startTime);
   }

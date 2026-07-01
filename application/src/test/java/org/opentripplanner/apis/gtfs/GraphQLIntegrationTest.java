@@ -48,8 +48,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
@@ -76,6 +74,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -104,6 +103,7 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -198,7 +198,7 @@ class GraphQLIntegrationTest {
   static void setup() {
     PARKING_REPOSITORY.updateVehicleParking(
       List.of(
-        VehicleParking.builder()
+        VehicleParking.of()
           .id(id("parking-1"))
           .coordinate(WgsCoordinate.GREENWICH)
           .name(NonLocalizedString.ofNullable("parking"))
@@ -275,11 +275,11 @@ class GraphQLIntegrationTest {
     timetableRepository.updateCalendarServiceData(calendarServiceData);
     timetableRepository.index();
 
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(new DefaultTripCalendars());
     timetableSnapshot.update(
       RealTimeTripUpdate.of(
         pattern,
-        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
+        tripTimes2.createRealTimeFromScheduledTimes().withCanceled().build(),
         secondDate
       ).build()
     );
@@ -459,23 +459,23 @@ class GraphQLIntegrationTest {
 
     i1 = add10MinuteDelay(i1);
 
-    var busLeg = i1.transitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
     railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
     i1 = i1.copyOf().withLegs(legs).build();
 
-    var fares = new ItineraryFare();
-
     var dayPass = fareProduct("day-pass");
-    fares.addItineraryProducts(List.of(dayPass));
-
     var singleTicket = fareProduct("single-ticket");
-    fares.addFareProduct(railLeg, FareOffer.of(railLeg.startTime(), singleTicket));
-    fares.addFareProduct(busLeg, FareOffer.of(busLeg.startTime(), singleTicket));
-
-    i1 = ItineraryFaresDecorator.decorateItineraryWithFare(i1, fares);
+    FareService fareService = itinerary -> {
+      var fares = new ItineraryFare();
+      fares.addItineraryProducts(List.of(dayPass));
+      var bl = (Leg) itinerary.transitLeg(1);
+      var rl = (Leg) itinerary.transitLeg(2);
+      fares.addFareProduct(bl, FareOffer.of(bl.startTime(), singleTicket));
+      fares.addFareProduct(rl, FareOffer.of(rl.startTime(), singleTicket));
+      return fares;
+    };
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
@@ -520,7 +520,7 @@ class GraphQLIntegrationTest {
       new TestRoutingService(List.of(i1)),
       transitService,
       TransferServiceTestFactory.defaultTransferService(),
-      new DefaultFareService(),
+      fareService,
       defaultVehicleRentalService,
       new DefaultVehicleParkingService(PARKING_REPOSITORY),
       realtimeVehicleService,

@@ -38,6 +38,12 @@ public enum RoutingErrorCode {
   NO_STOPS_IN_RANGE,
 
   /**
+   * The service journey location is ambiguous because the stop is visited more than once by the
+   * service journey. A {@code scheduledDepartureTime} is necessary to disambiguate.
+   */
+  TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
+
+  /**
    * No usable itineraries were found for a direct-only search (no transit modes requested).
    * This includes both the case where no route exists and the case where routes were found
    * but all were filtered out (e.g. by quality or distance filters).

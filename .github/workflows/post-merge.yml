@@ -16,7 +16,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
@@ -63,7 +63,7 @@ jobs:
           git config --global user.email 'serialization-version-bot@opentripplanner.org'
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 

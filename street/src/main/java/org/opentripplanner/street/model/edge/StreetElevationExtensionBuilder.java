@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.util.Optional;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.street.model.elevation.ElevationUtils;
+import org.opentripplanner.street.model.elevation.SlopeCostCalculator;
 import org.opentripplanner.street.model.elevation.SlopeCosts;
 
 /**
@@ -87,7 +87,7 @@ public class StreetElevationExtensionBuilder {
   }
 
   private StreetElevationExtension buildInternal() {
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elevationProfile);
+    SlopeCosts costs = SlopeCostCalculator.getSlopeCosts(elevationProfile);
 
     var effectiveBikeDistanceFactor = costs.slopeSpeedFactor;
     var effectiveBikeWorkFactor = costs.slopeWorkFactor;

@@ -23,7 +23,7 @@ public enum ParetoSetCost {
    */
   USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
 
-  /// Return `true` if the c1 criteria is included in the pareto comparason.
+  /// Return `true` if the c1 criteria is included in the pareto comparison.
   public boolean useC1() {
     return this != NONE;
   }

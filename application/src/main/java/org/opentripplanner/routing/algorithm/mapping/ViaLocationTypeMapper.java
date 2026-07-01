@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.leg.ViaLocationType;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -13,9 +14,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class ViaLocationTypeMapper {
 
   @Nullable
-  public static ViaLocationType map(RouteRequest request, StopLocation stop) {
-    return request
-      .listViaLocations()
+  public static ViaLocationType map(List<ViaLocation> viaLocations, StopLocation stop) {
+    return viaLocations
       .stream()
       .flatMap(viaLocation ->
         viaLocation
@@ -38,9 +38,11 @@ public class ViaLocationTypeMapper {
   }
 
   @Nullable
-  public static ViaLocationType map(RouteRequest request, TemporaryStreetLocation location) {
-    var isViaLocation = request
-      .listVisitViaLocations()
+  public static ViaLocationType map(
+    List<ViaLocation> viaLocations,
+    TemporaryStreetLocation location
+  ) {
+    var isViaLocation = viaLocations
       .stream()
       .anyMatch(viaLocation ->
         viaLocation

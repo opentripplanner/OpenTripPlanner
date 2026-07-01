@@ -14,11 +14,12 @@ import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.OnTripAccessArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
@@ -140,11 +141,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   /** Return an iterator over all stops touched since the last marker reset. */
   public IntIterator stopsTouchedIterator() {
-    return new BitSetIterator(touchedStops);
+    return IntIterators.of(touchedStops);
   }
 
   /**
-   * Add a stop arrival to the Pareto set for its stop. If the arrival is accepted,
+   * Add a stop arrival in the Pareto set for its stop. If the arrival is accepted,
    * the stop is marked as touched.
    */
   public void addStopArrival(McStopArrival<T> arrival) {

@@ -32,10 +32,10 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 ┌────────────────────────────────────────────┐
 │ DefaultCarpoolingService                   │
 │                                            │
-│  1. Filter Phase (FilterChain)            │
-│     - Capacity check                       │
+│  1. Filter Phase (TripPreFilters)         │
 │     - Time window check                    │
 │     - Distance check                       │
+│     - Direction check                      │
 │                                            │
 │  2. Insertion Phase                        │
 │     2a. Position Pre-screening             │
@@ -44,15 +44,11 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │         - Beeline delay heuristic          │
 │                                            │
 │     2b. Routing & Selection                │
-│         (OptimalInsertionStrategy)         │
+│         (InsertionEvaluator)               │
 │         - Route baseline segments (cached) │
 │         - Route viable positions           │
 │         - Endpoint-matching segment reuse  │
 │         - Select minimum additional time   │
-│                                            │
-│  3. Validation Phase (CompositeValidator) │
-│     - Capacity timeline check              │
-│     - Deviation budget check               │
 │                                            │
 └────────┬───────────────────────────────────┘
          │
@@ -79,20 +75,18 @@ org.opentripplanner.ext.carpooling/
 ├── service/                         # Service implementation
 │   └── DefaultCarpoolingService.java  # Main service orchestration
 │
-├── filter/                          # Pre-screening filters
-│   ├── FilterChain.java            # Composite filter
-│   ├── TimeBasedFilter.java        # Time window check
-│   └── DistanceBasedFilter.java    # Distance check
+├── filter/                          # Pre- and post-screening filters
+│   ├── TripPreFilters.java         # Pre-filter composite (AND, short-circuit)
+│   ├── ItineraryPostFilters.java   # Post-filter composite (AND, short-circuit)
+│   ├── TimeTripFilter.java   # Pre-filter: depart-after & arrive-by time checks
+│   ├── TimeItineraryFilter.java # Post-filter: depart-after & arrive-by enforcement
+│   └── DistanceTripFilter.java # Distance check
 │
 ├── routing/                         # Insertion optimization
-│   ├── OptimalInsertionStrategy.java  # Main insertion algorithm
+│   ├── InsertionEvaluator.java        # Routing evaluation and selection
 │   ├── InsertionPositionFinder.java   # Viable position pre-screening
 │   ├── InsertionPosition.java      # Position pair (pickup, dropoff)
 │   └── InsertionCandidate.java     # Result of insertion computation
-│
-├── validation/                      # Constraint validation
-│   ├── CompositeValidator.java     # Composite validator
-│   └── CapacityValidator.java      # Capacity timeline check
 │
 ├── internal/                        # Implementation details
 │   ├── DefaultCarpoolingRepository.java  # In-memory repository
@@ -117,8 +111,8 @@ org.opentripplanner.ext.carpooling/
 
 Filters eliminate obviously incompatible trips **without any street routing**:
 
-1. **TimeBasedFilter**: Is the trip timing compatible with passenger request?
-2. **DistanceBasedFilter**: Is the passenger's journey within reasonable distance of driver route?
+1. **TimeTripFilter**: Is the trip timing compatible with the passenger's request (depart-after or arrive-by)?
+2. **DistanceTripFilter**: Is the passenger's journey within reasonable distance of driver route?
 
 **Performance**: O(n) where n = number of active trips.
 
@@ -148,7 +142,7 @@ For each remaining trip:
 - **Beeline heuristic**: Optimistic straight-line estimates eliminate positions early
 - **No routing yet**: All checks use geometric calculations only
 
-#### Stage 2: Routing and Selection (OptimalInsertionStrategy)
+#### Stage 2: Routing and Selection (InsertionEvaluator)
 
 For viable positions from Stage 1, perform A* routing to find the optimal insertion:
 
@@ -174,18 +168,6 @@ For each trip with viable positions:
 - Only segments with changed endpoints are re-routed
 - Prevents incorrect reuse when passenger insertion splits existing segments
 
-### Phase 3: Validation (Constraint Satisfaction)
-
-Ensures the proposed insertion satisfies all constraints:
-
-1. **CapacityValidator**: Verifies sufficient capacity throughout passenger's journey
-   - Tracks passenger count at each stop
-   - Ensures capacity never exceeds vehicle limit
-
-2. **Deviation Budget Check**: Ensures additional time ≤ driver's stated willingness
-
-**All validators must pass** for an insertion to be considered valid.
-
 ## Usage Examples
 
 ### Basic Carpooling Query
@@ -201,7 +183,7 @@ request.setTo(new GenericLocation(59.95, 10.75));   // Passenger dropoff
 request.setDateTime(Instant.now());
 
 // Find carpool options
-List<Itinerary> carpoolOptions = carpoolingService.route(request);
+List<Itinerary> carpoolOptions = carpoolingService.routeDirect(request, linkingContext);
 
 // Process results
 for (Itinerary itinerary : carpoolOptions) {
@@ -338,45 +320,21 @@ Multiple routing requests can execute concurrently without coordination.
 
 ### Custom Filters
 
-Add domain-specific filters by implementing `TripFilter`:
+Add domain-specific filters by implementing `CarpoolTripFilter`:
 
 ```java
-public class CustomFilter implements TripFilter {
+public class CustomFilter implements CarpoolTripFilter {
   @Override
-  public boolean accepts(CarpoolTrip trip, WgsCoordinate pickup,
-                        WgsCoordinate dropoff, Instant requestTime) {
+  public boolean isCandidateTrip(CarpoolTrip trip, CarpoolingRequest request) {
     // Custom logic
     return true;
-  }
-
-  @Override
-  public String name() {
-    return "CustomFilter";
   }
 }
 
 // Add to filter chain
-FilterChain chain = FilterChain.of(
-  new TimeBasedFilter(),
-  new CustomFilter()
+var preFilters = new TripPreFilters(
+  List.of(new TimeTripFilter(), new DistanceTripFilter(), new CustomFilter())
 );
-```
-
-### Custom Validators
-
-Add constraint validation by implementing `InsertionValidator`:
-
-```java
-public class CustomValidator implements InsertionValidator {
-  @Override
-  public ValidationResult validate(ValidationContext context) {
-    // Custom validation logic
-    if (violatesConstraint) {
-      return ValidationResult.invalid("Constraint violated");
-    }
-    return ValidationResult.valid();
-  }
-}
 ```
 
 ## Testing
@@ -387,12 +345,12 @@ Test individual components in isolation:
 
 ```java
 @Test
-void testTimeBasedFilter() {
-  var filter = new TimeBasedFilter();
+void testTimeTripFilter() {
+  var filter = new TimeTripFilter();
   var trip = createSimpleTrip(origin, destination);
+  var request = new CarpoolingRequestBuilder().withRequestedDateTime(now()).build();
 
-  // Should pass - within time window
-  assertTrue(filter.accepts(trip, pickup, dropoff, now()));
+  assertTrue(filter.isCandidateTrip(trip, request, Duration.ofMinutes(30)));
 }
 ```
 
@@ -412,7 +370,7 @@ void testCarpoolingRouting() {
 
   // Execute routing
   RouteRequest request = createRequest(from, to);
-  List<Itinerary> results = carpoolingService.route(request);
+  List<Itinerary> results = carpoolingService.routeDirect(request, linkingContext);
 
   // Verify
   assertFalse(results.isEmpty());

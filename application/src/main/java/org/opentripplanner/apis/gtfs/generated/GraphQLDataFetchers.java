@@ -28,6 +28,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalDirec
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
+import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
+import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
+import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -212,6 +215,27 @@ public class GraphQLDataFetchers {
 
   /** Location where a transit vehicle stops at. */
   public interface GraphQLCallStopLocation extends TypeResolver {}
+
+  /** Cancellation statistics grouped by entities. */
+  public interface GraphQLCanceledTripsSummary {
+    public DataFetcher<Iterable<CanceledTripsSummaryRoute>> routes();
+  }
+
+  /** Contains pattern and the information for how many canceled trips there are for the pattern. */
+  public interface GraphQLCanceledTripsSummaryPattern {
+    public DataFetcher<Integer> cancellationCount();
+    public DataFetcher<TripPattern> pattern();
+  }
+
+  /**
+   * Contains route, how many canceled trips there are for the route and cancellation statistics grouped
+   * by patterns.
+   */
+  public interface GraphQLCanceledTripsSummaryRoute {
+    public DataFetcher<Integer> cancellationCount();
+    public DataFetcher<Iterable<CanceledTripsSummaryPattern>> patterns();
+    public DataFetcher<Route> route();
+  }
 
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
@@ -544,6 +568,7 @@ public class GraphQLDataFetchers {
    */
   public interface GraphQLPattern {
     public DataFetcher<Iterable<TransitAlert>> alerts();
+    public DataFetcher<Iterable<TripOnServiceDate>> canceledTrips();
     public DataFetcher<String> code();
     public DataFetcher<Integer> directionId();
     public DataFetcher<Iterable<Coordinate>> geometry();
@@ -663,6 +688,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
     public DataFetcher<CountedConnection<TripOnServiceDate>> canceledTrips();
+    public DataFetcher<CanceledTripsSummary> canceledTripsSummary();
     public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
     public DataFetcher<VehicleParking> carPark();
     public DataFetcher<Iterable<VehicleParking>> carParks();
@@ -676,6 +702,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> node();
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Iterable<TripPattern>> patterns();
+    public DataFetcher<Iterable<TripPattern>> patternsByIds();
     public DataFetcher<
       graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     > plan();
@@ -1209,7 +1236,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> bogusName();
     public DataFetcher<Double> distance();
     public DataFetcher<
-      Iterable<org.opentripplanner.model.plan.leg.ElevationProfile.Step>
+      Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>
     > elevationProfile();
     public DataFetcher<String> exit();
     public DataFetcher<Object> feature();

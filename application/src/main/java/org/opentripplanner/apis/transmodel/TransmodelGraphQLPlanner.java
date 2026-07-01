@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
@@ -13,6 +14,7 @@ import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.error.InvalidRoutingInputException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,8 @@ public class TransmodelGraphQLPlanner {
         .withNextPageCursor(res.getNextPageCursor())
         .build();
       locale = request.preferences().locale();
+    } catch (InvalidRoutingInputException e) {
+      throw new InvalidInputException(e.getMessage());
     } catch (RoutingValidationException e) {
       response = PlanResponse.of()
         .withPlan(TripPlanMapper.mapEmptyTripPlan(requestBuilder))
@@ -67,6 +71,8 @@ public class TransmodelGraphQLPlanner {
       var request = viaRequestMapper.createRouteViaRequest(environment);
       response = ctx.getRoutingService().route(request);
       locale = request.locale();
+    } catch (InvalidRoutingInputException e) {
+      throw new InvalidInputException(e.getMessage());
     } catch (RoutingValidationException e) {
       response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
       locale = defaultLocale(ctx);

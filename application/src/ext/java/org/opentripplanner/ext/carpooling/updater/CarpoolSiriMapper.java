@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.opengis.gml.siri.LinearRingType;
 import net.opengis.gml.siri.PolygonType;
 import org.locationtech.jts.geom.Coordinate;
@@ -18,7 +19,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
+import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.StreetConstants;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.AimedFlexibleArea;
@@ -33,9 +37,43 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 public class CarpoolSiriMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolSiriMapper.class);
-  private static final String FEED_ID = "ENT";
   private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
+  private final String feedId;
+
+  /**
+   * @param feedId the feed prefix used for every {@link FeedScopedId} this mapper produces.
+   *        Owned by the enclosing updater instance and supplied from
+   *        {@code router-config.json}, so one OTP can run multiple carpool updaters
+   *        side-by-side without trip-id collisions across feeds.
+   */
+  public CarpoolSiriMapper(String feedId) {
+    this.feedId = feedId;
+  }
+
+  /**
+   * Returns the trip id for the given journey.
+   */
+  FeedScopedId tripId(EstimatedVehicleJourney journey) {
+    return new FeedScopedId(feedId, journey.getEstimatedVehicleJourneyCode());
+  }
+
+  private static boolean isCancelled(EstimatedCall call) {
+    return Boolean.TRUE.equals(call.isCancellation());
+  }
+
+  /**
+   * Maps a SIRI {@link EstimatedVehicleJourney} to a {@link CarpoolTrip}. Calls flagged as
+   * cancelled are filtered out before stops are built. Returns {@code null} when fewer than
+   * 2 non-cancelled calls remain.
+   *
+   * @throws IllegalArgumentException if the raw message is malformed (fewer than 2 calls
+   *         before filtering, calls out of order, missing flexible areas, no departure time
+   *         on the first call or no arrival time on the last call, end time not after start
+   *         time, etc.) or if the trip span or its straight-line drive time exceeds
+   *         {@link CarpoolTrip#MAX_TRIP_DURATION}
+   */
+  @Nullable
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
     if (calls.size() < 2) {
@@ -45,14 +83,28 @@ public class CarpoolSiriMapper {
     }
 
     var tripId = journey.getEstimatedVehicleJourneyCode();
-    validateEstimatedCallOrder(calls);
+    var activeCalls = calls
+      .stream()
+      .filter(c -> !isCancelled(c))
+      .toList();
+    if (activeCalls.size() < 2) {
+      LOG.info(
+        "Trip {}: fewer than 2 non-cancelled calls remain ({} of {}), treating as cancellation",
+        tripId,
+        activeCalls.size(),
+        calls.size()
+      );
+      return null;
+    }
+
+    validateEstimatedCallOrder(activeCalls);
 
     List<CarpoolStop> stops = new ArrayList<>();
 
-    for (int i = 0; i < calls.size(); i++) {
-      EstimatedCall call = calls.get(i);
+    for (int i = 0; i < activeCalls.size(); i++) {
+      EstimatedCall call = activeCalls.get(i);
       boolean isFirst = (i == 0);
-      boolean isLast = (i == calls.size() - 1);
+      boolean isLast = (i == activeCalls.size() - 1);
 
       var stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
       stops.add(stop);
@@ -62,23 +114,109 @@ public class CarpoolSiriMapper {
     var firstStop = stops.getFirst();
     var lastStop = stops.getLast();
 
-    var startTime = firstStop.getExpectedDepartureTime() != null
-      ? firstStop.getExpectedDepartureTime()
-      : firstStop.getAimedDepartureTime();
+    var startTime = firstStop.getScheduledDepartureTime();
 
-    var endTime = lastStop.getExpectedArrivalTime() != null
-      ? lastStop.getExpectedArrivalTime()
-      : lastStop.getAimedArrivalTime();
+    var endTime = lastStop.getScheduledArrivalTime();
 
-    int totalCapacity = extractTotalCapacity(tripId, calls);
+    if (startTime == null) {
+      throw new IllegalArgumentException(
+        "Trip " + tripId + ": first call has neither expected nor aimed departure time."
+      );
+    }
+    if (endTime == null) {
+      throw new IllegalArgumentException(
+        "Trip " + tripId + ": last call has neither expected nor aimed arrival time."
+      );
+    }
+    if (!endTime.isAfter(startTime)) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: end time (%s) is not after start time (%s).",
+          tripId,
+          endTime,
+          startTime
+        )
+      );
+    }
 
-    return new CarpoolTripBuilder(new FeedScopedId(FEED_ID, tripId))
+    // Reject over-long trips at ingestion. A malformed feed (e.g. a wrong date on one call) could
+    // otherwise create an absurdly long trip whose access/egress routing expands street search
+    // trees across the network and degrades every later request. When the destination has no
+    // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
+    // the same default the destination stop itself receives when the feed omits a latest arrival.
+    var latestArrival = lastStop.getLatestExpectedArrivalTime() != null
+      ? lastStop.getLatestExpectedArrivalTime()
+      : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
+    var tripDuration = Duration.between(startTime, latestArrival);
+    if (tripDuration.compareTo(CarpoolTrip.MAX_TRIP_DURATION) > 0) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: duration (%s) exceeds the maximum of %s (start %s, latest arrival %s).",
+          tripId,
+          tripDuration,
+          CarpoolTrip.MAX_TRIP_DURATION,
+          startTime,
+          latestArrival
+        )
+      );
+    }
+
+    // The timetable above bounds only the claimed schedule, which says nothing about how far apart
+    // the waypoints are. Tree-expansion cost is driven by distance, so reject a trip whose
+    // waypoints cannot be reached in order within the same bound even at the maximum modelled car
+    // speed: such a trip is malformed and would expand street trees far beyond a real carpool trip.
+    var minimumDriveDuration = minimumDriveDuration(stops);
+    if (minimumDriveDuration.compareTo(CarpoolTrip.MAX_TRIP_DURATION) > 0) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Trip %s: straight-line drive time (%s) exceeds the maximum of %s; its waypoints are too" +
+            " far apart to be a real carpool trip whatever the schedule claims.",
+          tripId,
+          minimumDriveDuration,
+          CarpoolTrip.MAX_TRIP_DURATION
+        )
+      );
+    }
+
+    int totalCapacity = extractTotalCapacity(tripId, activeCalls);
+
+    var builder = new CarpoolTripBuilder(new FeedScopedId(feedId, tripId))
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withProvider(journey.getOperatorRef().getValue())
       .withTotalCapacity(totalCapacity)
-      .withStops(stops)
-      .build();
+      .withStops(stops);
+
+    var publicContact = journey.getPublicContact();
+    if (publicContact != null) {
+      builder.withPublicContactInformation(
+        ContactInfo.of()
+          .withPhoneNumber(publicContact.getPhoneNumber())
+          .withBookingUrl(publicContact.getUrl())
+          .build()
+      );
+    }
+
+    return builder.build();
+  }
+
+  /**
+   * Lower bound on the time needed to drive the trip's waypoints in order, summing the straight-
+   * line distance between consecutive stops at {@link StreetConstants#DEFAULT_MAX_CAR_SPEED}. No
+   * street route is shorter than the beeline and no car drives faster than the modelled maximum, so
+   * the real drive can only take longer; a value above {@link CarpoolTrip#MAX_TRIP_DURATION} therefore proves
+   * the trip cannot be driven within the cap whatever its claimed timetable says, with no risk of
+   * rejecting a trip that actually could.
+   */
+  private static Duration minimumDriveDuration(List<CarpoolStop> stops) {
+    var estimator = new BeelineEstimator();
+    var total = Duration.ZERO;
+    for (int i = 1; i < stops.size(); i++) {
+      total = total.plus(
+        estimator.estimateDuration(stops.get(i - 1).getCoordinate(), stops.get(i).getCoordinate())
+      );
+    }
+    return total;
   }
 
   /**
@@ -109,10 +247,11 @@ public class CarpoolSiriMapper {
 
   /**
    * Extracts the total capacity from the EstimatedCalls' ExpectedDepartureCapacities.
-   * Only the first element of each call's capacities list is inspected; additional
-   * entries are ignored. Uses the value from the first call that has it. Logs a warning
-   * if different calls report different capacity values. Returns
-   * {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data or if the value is invalid.
+   * Expects the cancelled calls to have already been filtered out. Only the first element
+   * of each call's capacities list is inspected; additional entries are ignored. Uses the
+   * value from the first call that has it. Logs a warning if calls report different capacity
+   * values. Returns {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data
+   * or if the value is invalid.
    */
   private int extractTotalCapacity(String tripId, List<EstimatedCall> calls) {
     Integer firstCapacity = null;
@@ -300,7 +439,7 @@ public class CarpoolSiriMapper {
       ? toWgsCoordinate(toPolygon(legacyGeometry))
       : toWgsCoordinate(circleLocation);
 
-    return CarpoolStop.of(new FeedScopedId(FEED_ID, id))
+    return CarpoolStop.of(new FeedScopedId(feedId, id))
       .withCoordinate(centroid)
       .withAimedDepartureTime(isLast ? null : call.getAimedDepartureTime())
       .withExpectedDepartureTime(isLast ? null : call.getExpectedDepartureTime())

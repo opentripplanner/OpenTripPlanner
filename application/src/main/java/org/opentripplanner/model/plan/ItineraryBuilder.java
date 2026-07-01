@@ -6,7 +6,6 @@ import java.util.function.Function;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.street.model.path.ElevationChange;
 
 public class ItineraryBuilder {
@@ -40,7 +39,6 @@ public class ItineraryBuilder {
   /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
   Emission emissionPerPerson;
-  ItineraryFare fare = ItineraryFare.empty();
 
   ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
     this.legs = legs;
@@ -77,7 +75,6 @@ public class ItineraryBuilder {
     // Sandbox experimental properties
     this.accessibilityScore = original.accessibilityScore();
     this.emissionPerPerson = original.emissionPerPerson();
-    this.fare = original.fare();
   }
 
   /**
@@ -187,15 +184,6 @@ public class ItineraryBuilder {
 
   public ItineraryBuilder withEmissionPerPerson(Emission emissionPerPerson) {
     this.emissionPerPerson = emissionPerPerson;
-    return this;
-  }
-
-  public ItineraryFare fare() {
-    return fare;
-  }
-
-  public ItineraryBuilder withFare(ItineraryFare fare) {
-    this.fare = fare;
     return this;
   }
 

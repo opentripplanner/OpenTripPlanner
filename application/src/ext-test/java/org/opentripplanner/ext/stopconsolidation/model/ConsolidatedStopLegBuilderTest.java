@@ -15,9 +15,12 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
@@ -25,25 +28,26 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
-  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
-  private static final TripPattern PATTERN = MODEL.pattern(TransitMode.BUS)
-    .withStopPattern(
-      TimetableRepositoryForTest.stopPattern(
-        MODEL.stop("S0", 60.0, 10.0).build(),
-        MODEL.stop("S1", 60.0, 10.01).build(),
-        MODEL.stop("S2", 60.0, 10.02).build()
-      )
-    )
-    .build();
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final TransitTestEnvironment ENV = ENV_BUILDER.addTrip(
+    TripInput.of("test-trip")
+      .addStop(ENV_BUILDER.stop("S0", b -> b.withCoordinate(60.0, 10.0)), "08:00", "08:00")
+      .addStop(ENV_BUILDER.stop("S1", b -> b.withCoordinate(60.0, 10.01)), "08:05", "08:05")
+      .addStop(ENV_BUILDER.stop("S2", b -> b.withCoordinate(60.0, 10.02)), "08:10", "08:10")
+  ).build();
+  private static final TripOnDateDataFetcher TRIP_DATA = ENV.tripData("test-trip");
+  private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
+  private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
     new ScheduledTransitLegBuilder<>()
-      .withZoneId(ZoneIds.BERLIN)
+      .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .withStartTime(TIME)
       .withEndTime(TIME)
       .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
       .build();
   private static final List<FareOffer> FARES = List.of(ANY_FARE_OFFER);
 

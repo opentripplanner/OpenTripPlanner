@@ -6,15 +6,15 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
@@ -34,30 +34,30 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
   @Test
   void extraThenCanceledJourney() {
     var env = envBuilder.addTrip(TRIP_1_INPUT).build();
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
     var siri = SiriTestHelper.of(env);
 
     assertSuccess(siri.applyEstimatedTimetable(addedJourney(siri)));
 
     assertEquals(
-      "ADDED | A [R] 11:00 11:00 | B 11:10 11:10",
+      "A U | A [R] 11:00 11:00 | B 11:10 11:10",
       env.tripData(ADDED_TRIP_ID).showTimetable()
     );
 
     assertThat(env.raptorData().summarizePatterns()).containsExactly(
-      "F:Pattern1[SCHEDULED]",
-      "F:routeId::001:RT[ADDED]"
+      "F:Pattern1[S]",
+      "F:routeId::001:RT[A U]"
     );
 
     // cancel the added journey again, should add a cancelled trip to the raptor data
     assertSuccess(siri.applyEstimatedTimetable(cancelledJourney(siri)));
     assertThat(env.raptorData().summarizePatterns()).containsExactly(
-      "F:Pattern1[SCHEDULED]",
-      "F:routeId::001:RT[CANCELED]"
+      "F:Pattern1[S]",
+      "F:routeId::001:RT[A C U]"
     );
 
     assertEquals(
-      "CANCELED | A 11:00 11:00 | B 11:10 11:10",
+      "A C U | A 11:00 11:00 | B 11:10 11:10",
       env.tripData(ADDED_TRIP_ID).showTimetable()
     );
   }
@@ -88,7 +88,7 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
     assertSuccess(siri.applyEstimatedTimetable(updates));
     // Individual stop [C] flags remain even though the trip is implicitly cancelled
     assertEquals(
-      "CANCELED | A [C,R] 11:00 11:00 | B [C] 11:10 11:10",
+      "A C U | A [C,R] 11:00 11:00 | B [C] 11:10 11:10",
       env.tripData(ADDED_TRIP_ID).showTimetable()
     );
   }
@@ -98,7 +98,10 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
   }
 
   private List<EstimatedTimetableDeliveryStructure> cancelledJourney(SiriTestHelper siri) {
-    return siriEtBuilder(siri).withCancellation(true).buildEstimatedTimetableDeliveries();
+    return siriEtBuilder(siri)
+      .withCancellation(true)
+      .withIsExtraJourney(true)
+      .buildEstimatedTimetableDeliveries();
   }
 
   private SiriEtBuilder siriEtBuilder(SiriTestHelper siri) {

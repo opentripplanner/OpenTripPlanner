@@ -43,7 +43,7 @@ class VehicleParkingMapper {
       );
       return null;
     }
-    return VehicleParking.builder()
+    return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
       .name(NonLocalizedString.ofNullable(parking.getName().getValue()))
       .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
@@ -80,7 +80,7 @@ class VehicleParkingMapper {
   }
 
   private static VehicleParkingSpaces mapCapacity(Parking parking) {
-    var builder = VehicleParkingSpaces.builder();
+    var builder = VehicleParkingSpaces.of();
     int capacity = parking.getTotalCapacity().intValue();
 
     // we assume that if we have something bicycle-like in the vehicle types it's a bicycle parking

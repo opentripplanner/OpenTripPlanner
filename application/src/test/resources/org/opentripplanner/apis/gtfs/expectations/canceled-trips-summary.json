@@ -1,0 +1,22 @@
+{
+  "data": {
+    "canceledTripsSummary": {
+      "routes": [
+        {
+          "route": {
+            "gtfsId": "F:R321Canceled"
+          },
+          "cancellationCount": 1,
+          "patterns": [
+            {
+              "cancellationCount": 1,
+              "pattern": {
+                "code": "F:BUS"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -18,18 +18,17 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
+import org.opentripplanner.updater.trip.gtfs.TripUpdateBuilder;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
@@ -177,10 +176,10 @@ class AddedTest implements RealtimeTestConstants {
     var trip = env.transitService().getTrip(id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
     assertEquals(I18NString.of("A loop"), tripTimes.getHeadsign(0));
-    assertFalse(tripTimes.isCancelledStop(0));
-    assertTrue(tripTimes.isCancelledStop(1));
-    assertTrue(tripTimes.isCancelledStop(2));
-    assertFalse(tripTimes.isCancelledStop(3));
+    assertFalse(tripTimes.isCanceledStop(0));
+    assertTrue(tripTimes.isCanceledStop(1));
+    assertTrue(tripTimes.isCanceledStop(2));
+    assertFalse(tripTimes.isCanceledStop(3));
     assertEquals(I18NString.of("A (non-stop)"), tripTimes.getHeadsign(3));
   }
 
@@ -293,15 +292,10 @@ class AddedTest implements RealtimeTestConstants {
   }
 
   private TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {
-    return assertAddedTrip(tripId, env, RealTimeState.ADDED, STOP_A);
+    return assertAddedTrip(tripId, env, STOP_A);
   }
 
-  static TripPattern assertAddedTrip(
-    String tripId,
-    TransitTestEnvironment env,
-    RealTimeState realTimeState,
-    RegularStop stop
-  ) {
+  static TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env, RegularStop stop) {
     var tripFetcher = env.tripData(tripId);
 
     TransitService transitService = env.transitService();
@@ -318,7 +312,7 @@ class AddedTest implements RealtimeTestConstants {
       "Added trip should be found in time table for service date"
     );
 
-    assertEquals(realTimeState, tripFetcher.realTimeState());
+    assertTrue(tripFetcher.tripTimes().isAdded());
 
     // Assert that the tripPattern exists at the given stop
     assertTrue(

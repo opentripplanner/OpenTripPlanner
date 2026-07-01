@@ -18,6 +18,10 @@ public class DirectTransitRequestMapper {
     RouteRequest request,
     SearchParams searchParamsUsed
   ) {
+    if (request.isViaSearch()) {
+      // The direct transit search is not compatible with via points
+      return Optional.empty();
+    }
     var directTransitRequestOpt = request.preferences().transit().directTransit();
     if (directTransitRequestOpt.isEmpty()) {
       return Optional.empty();

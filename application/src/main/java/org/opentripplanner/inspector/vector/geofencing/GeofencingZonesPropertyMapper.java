@@ -31,9 +31,9 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<GeofencingZone
 
     if (zone.isBusinessArea()) {
       properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_BUSINESS_AREA));
-    } else if (zone.traversalBanned()) {
+    } else if (Boolean.TRUE.equals(zone.traversalBanned())) {
       properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_TRAVERSAL));
-    } else if (zone.dropOffBanned()) {
+    } else if (Boolean.TRUE.equals(zone.dropOffBanned())) {
       properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_DROP_OFF));
     }
 

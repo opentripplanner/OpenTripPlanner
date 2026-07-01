@@ -18,7 +18,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
@@ -93,17 +93,16 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   ) {
     var context = context(transitData, request);
     RangeRaptorWorker<T> nextWorker = null;
-    McStopArrivals<T> nextStopArrivals = null;
+    McRangeRaptorWorkerState<T> nextWorkerState = null;
 
     if (request.searchParams().isViaSearch()) {
       // Note! We start with the last segment to be able to link the segments together
       for (SearchContextViaSegments<T> ctxSegment : context.segments().reversed()) {
-        var c = new McRangeRaptorConfig<>(ctxSegment).connectWithNextSegmentArrivals(
-          nextStopArrivals
-        );
-        var w = createWorker(ctxSegment, c.state(), c.strategy());
+        var c = new McRangeRaptorConfig<>(ctxSegment).connectWithNextSegmentState(nextWorkerState);
+        var s = c.state();
+        var w = createWorker(ctxSegment, s, c.strategy());
         nextWorker = RangeRaptorWorkerComposite.of(c.createPathParetoComparator(), w, nextWorker);
-        nextStopArrivals = c.stopArrivals();
+        nextWorkerState = s;
       }
     } else {
       // The first segment is the only segment

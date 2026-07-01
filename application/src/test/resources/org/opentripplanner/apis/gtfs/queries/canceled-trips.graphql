@@ -1,5 +1,17 @@
 {
-  canceledTrips(first: 2, filters: [{ include: [{ modes: [BUS] }] }]) {
+  canceledTrips(
+    first: 2
+    filters: [
+      {
+        include: [
+          {
+            modes: [BUS]
+            serviceDateRanges: [{ start: "2024-08-09", end: "2024-08-10" }]
+          }
+        ]
+      }
+    ]
+  ) {
     pageInfo {
       hasNextPage
       hasPreviousPage

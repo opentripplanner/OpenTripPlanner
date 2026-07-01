@@ -32,7 +32,7 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
     this.transitService = transitService;
   }
 
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     return transitService
       .findAreaStops(query)
       .stream()

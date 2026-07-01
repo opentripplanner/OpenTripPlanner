@@ -1,7 +1,9 @@
 package org.opentripplanner.updater.trip.siri;
 
+import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -14,8 +16,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -28,8 +30,6 @@ import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.VehicleModesEnumeration;
 
 /**
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
@@ -61,26 +61,23 @@ public class SiriFuzzyTripMatcher {
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
   public TripAndPattern match(
-    EstimatedVehicleJourney journey,
-    List<CallWrapper> calls,
+    EstimatedVehicleJourneyWrapper journeyWrapper,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
   ) throws UpdateException {
+    var calls = journeyWrapper.calls();
     if (calls.isEmpty()) {
       throw UpdateException.of(NO_VALID_STOPS);
     }
 
     if (calls.getFirst().getAimedDepartureTime() == null) {
-      throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+      throw UpdateException.of(INVALID_DEPARTURE_TIME);
     }
 
     Set<Trip> trips = null;
-    if (
-      journey.getVehicleRef() != null &&
-      journey.getVehicleModes().contains(VehicleModesEnumeration.RAIL)
-    ) {
-      trips = getCachedTripsByInternalPlanningCode(journey.getVehicleRef().getValue());
+    if (journeyWrapper.internalPlanningCode() != null && journeyWrapper.isRail()) {
+      trips = getCachedTripsByInternalPlanningCode(journeyWrapper.internalPlanningCode());
     }
 
     if (trips == null || trips.isEmpty()) {
@@ -89,7 +86,7 @@ public class SiriFuzzyTripMatcher {
       // quay ids also work
       RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
       if (stop == null) {
-        throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
+        throw UpdateException.of(UNKNOWN_STOP);
       }
       ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
         ? lastCall.getAimedArrivalTime()
@@ -103,8 +100,8 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
-    if (journey.getLineRef() != null) {
-      var lineRef = journey.getLineRef().getValue();
+    String lineRef = journeyWrapper.lineRef();
+    if (lineRef != null) {
       Route route = entityResolver.resolveRoute(lineRef);
       if (route != null) {
         trips = trips
@@ -133,8 +130,8 @@ public class SiriFuzzyTripMatcher {
     List<FeedScopedId> matches = new ArrayList<>();
     for (Trip trip : getCachedTripsByInternalPlanningCode(internalPlanningCode)) {
       Set<LocalDate> serviceDates = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(trip.getServiceId());
+        .getTripCalendars()
+        .listServiceDates(trip.getServiceId());
       if (serviceDates.contains(serviceDate)) {
         matches.add(trip.getId());
       }
@@ -256,10 +253,10 @@ public class SiriFuzzyTripMatcher {
       date,
       transitService.getTimeZone()
     );
-    CalendarService calendarService = transitService.getCalendarService();
+    TripCalendars calendarService = transitService.getTripCalendars();
     Set<TripAndPattern> possibleTrips = new HashSet<>();
     for (Trip trip : trips) {
-      if (!calendarService.getServiceDatesForServiceId(trip.getServiceId()).contains(serviceDate)) {
+      if (!calendarService.listServiceDates(trip.getServiceId()).contains(serviceDate)) {
         continue;
       }
 
@@ -293,7 +290,6 @@ public class SiriFuzzyTripMatcher {
     if (possibleTrips.isEmpty()) {
       throw UpdateException.of(UpdateErrorType.NO_FUZZY_TRIP_MATCH);
     } else if (possibleTrips.size() > 1) {
-      LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
       throw UpdateException.of(UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     } else {
       return possibleTrips.iterator().next();

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
@@ -28,6 +29,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   private final int iterationDepartureStepInSeconds;
   private final int searchThreadPoolSize;
   private final int transferCacheMaxSize;
+  private final boolean earlyTransferPruning;
   private final List<RouteRequest> transferCacheRequests;
   private final List<Duration> pagingSearchWindowAdjustments;
 
@@ -107,6 +109,22 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asInt(0);
+    this.earlyTransferPruning = c
+      .of("earlyTransferPruning")
+      .since(V2_10)
+      .summary("Enable the Transfer Early Pruning optimization for standard RAPTOR.")
+      .description(
+        """
+        When enabled, the transfer relaxation loop breaks early once the current arrival time
+        exceeds the best known destination arrival time. Transfers must be sorted by duration for
+        this to be correct (which OTP ensures). This optimization only applies to Standard RAPTOR
+        (not Multi-Criteria searches).
+
+        See _Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026_
+        in the [Bibliography](Bibliography.md).
+        """
+      )
+      .asBoolean(dft.earlyTransferPruning());
     // Dynamic Search Window
     this.stopBoardAlightDuringTransferCost = c
       .of("stopBoardAlightDuringTransferCost")
@@ -234,6 +252,11 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
 
   public int searchThreadPoolSize() {
     return searchThreadPoolSize;
+  }
+
+  @Override
+  public boolean earlyTransferPruning() {
+    return earlyTransferPruning;
   }
 
   @Override

@@ -36,6 +36,7 @@ public class DefaultRoutingService implements RoutingService {
     var timeZone = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
 
     this.requestPreProcessor = new RequestPreProcessor(
+      serverContext.transitService(),
       serverContext.raptorTuningParameters(),
       timeZone
     );

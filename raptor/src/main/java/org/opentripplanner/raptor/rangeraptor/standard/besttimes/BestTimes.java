@@ -7,7 +7,8 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArri
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.util.BitSetIterator;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -16,10 +17,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * is optimized for performance, all information here is also in the state, but this class keeps
  * things in the fastest possible data structure.
  * <p/>
- * We keep track of the best over all times to be able to drop a new arrivals exceeding the time
+ * We keep track of the best over all times to be able to drop new arrivals exceeding the time
  * already found by another branch.
  * <p/>
- * We need to keep track of the arrive "on-board" times(transit and flex-on-board arrivals), not
+ * We need to keep track of the "on-board" arrivaltimes(transit and flex-on-board arrivals), not
  * only the overall bet times, to find all the best transfers. When arriving at a stop on-board, we
  * need to find all transfers to other stops, event if there is another transfer arrival with a
  * better arrival time. The reason is that after transfer to the next stop, the new arrival may
@@ -74,15 +75,15 @@ public final class BestTimes {
   /**
    * @return an iterator for all stops reached (overall best) in the last round.
    */
-  public BitSetIterator stopsReachedLastRound() {
-    return new BitSetIterator(reachedLastRound);
+  public IntIterator stopsReachedLastRound() {
+    return IntIterators.of(reachedLastRound);
   }
 
   /**
    * @return an iterator of all stops reached on-board in the current round.
    */
-  public BitSetIterator reachedByTransitCurrentRound() {
-    return new BitSetIterator(reachedByTransitCurrentRound);
+  public IntIterator reachedByTransitCurrentRound() {
+    return IntIterators.of(reachedByTransitCurrentRound);
   }
 
   /**

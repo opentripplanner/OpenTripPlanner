@@ -15,7 +15,7 @@ The current members of this committee are (in alphabetical order):
 | David Emory        | [IBI Group](https://www.ibigroup.com/)                       |
 | Leonard Ehrenfried | [Independent contractor](https://leonard.io)                 |
 | Thomas Gran        | [Entur](https://entur.no/) (Norway)                          |
-| Joel Lappalainan   | [Digitransit](https://digitransit.fi/) (Finland)             |
+| Joel Lappalainen   | [Digitransit](https://digitransit.fi/) (Finland)             |
 | Frank Purcell      | [TriMet](https://trimet.org/) (Portland, Oregon)             |
 | Anders Thorén      | [Skanetrafiken](https://www.skanetrafiken.se/)               |
 

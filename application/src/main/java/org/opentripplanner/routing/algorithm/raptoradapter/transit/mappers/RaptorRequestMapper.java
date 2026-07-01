@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -105,13 +104,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     var searchParams = builder.searchParams();
     var preferences = request.preferences();
 
-    // TODO Fix the Raptor search so pass-through and via search can be used together.
-    if (hasViaLocationsAndPassThroughLocations()) {
-      throw new IllegalArgumentException(
-        "A mix of via-locations and pass-through is not allowed in this version."
-      );
-    }
-
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());
 
@@ -150,8 +142,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
 
-      // relax transit group priority can be used with via-visit-stop, but not with pass-through
-      if (pt.isRelaxTransitGroupPrioritySet() && !hasPassThroughOnly()) {
+      if (pt.isRelaxTransitGroupPrioritySet()) {
         mapRelaxTransitGroupPriority(mcBuilder, pt);
       }
     });
@@ -208,22 +199,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       );
     }
     return builder.build();
-  }
-
-  private boolean hasPassThroughOnly() {
-    return (
-      request.isViaSearch() &&
-      request.listViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
-    );
-  }
-
-  private boolean hasViaLocationsAndPassThroughLocations() {
-    var c = request.listViaLocations();
-    return (
-      request.isViaSearch() &&
-      c.stream().anyMatch(ViaLocation::isPassThroughLocation) &&
-      c.stream().anyMatch(Predicate.not(ViaLocation::isPassThroughLocation))
-    );
   }
 
   private List<RaptorViaLocation> mapViaLocations() {

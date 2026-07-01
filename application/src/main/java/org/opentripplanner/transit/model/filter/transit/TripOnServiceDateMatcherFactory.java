@@ -1,14 +1,22 @@
 package org.opentripplanner.transit.model.filter.transit;
 
 import java.time.LocalDate;
+import java.util.function.BiFunction;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
+import org.opentripplanner.transit.model.filter.expr.GenericUnaryMatcher;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.selector.SelectorBasedMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
@@ -24,17 +32,36 @@ public class TripOnServiceDateMatcherFactory {
    * Creates a matcher for TripOnServiceDates.
    *
    * @param request the criteria for filtering TripOnServiceDates.
+   * @param patternResolver resolves the pattern of a trip on a service date, or {@code null} if it
+   *                        has no pattern.
    * @return a matcher for filtering TripOnServiceDates.
    */
-  public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
+  public static Matcher<TripOnServiceDate> of(
+    TripOnServiceDateRequest request,
+    BiFunction<Trip, LocalDate, TripPattern> patternResolver
+  ) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
+
+    if (!request.filters().isEmpty()) {
+      expr.matches(
+        SelectorBasedMatcherFactory.of(
+          request.filters(),
+          TripOnServiceDateMatcherFactory::buildSelectorMatcher
+        )
+      );
+    }
 
     expr.atLeastOneMatch(
       request.includeServiceDates(),
       TripOnServiceDateMatcherFactory::serviceDate
     );
+    expr.atLeastOneMatch(
+      request.includeServiceDateRanges(),
+      TripOnServiceDateMatcherFactory::serviceDateRange
+    );
     expr.atLeastOneMatch(request.includeAgencies(), TripOnServiceDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripOnServiceDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(request.includePatterns(), id -> patternId(id, patternResolver));
     expr.atLeastOneMatch(
       request.includeServiceJourneys(),
       TripOnServiceDateMatcherFactory::serviceJourneyId
@@ -53,12 +80,55 @@ public class TripOnServiceDateMatcherFactory {
     return expr.build();
   }
 
+  /**
+   * Builds a matcher from a single {@link TripOnServiceDateSelectRequest}, combining its
+   * agencies, routes, and transport modes with AND logic.
+   */
+  private static Matcher<TripOnServiceDate> buildSelectorMatcher(
+    TripOnServiceDateSelectRequest selector
+  ) {
+    ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
+
+    expr.atLeastOneMatch(selector.agencies(), TripOnServiceDateMatcherFactory::agencyId);
+    expr.atLeastOneMatch(selector.routes(), TripOnServiceDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(
+      selector.serviceDateRanges(),
+      TripOnServiceDateMatcherFactory::serviceDateRange
+    );
+
+    if (!selector.transportModes().includeEverything()) {
+      var transportModeFilter = AllowTransitModeFilter.of(
+        selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
+      );
+      expr.matches(
+        new GenericUnaryMatcher<>("transportMode", (TripOnServiceDate tripTime) ->
+          transportModeFilter.match(
+            tripTime.getTrip().getMode(),
+            tripTime.getTrip().getNetexSubMode()
+          )
+        )
+      );
+    }
+
+    return expr.build();
+  }
+
   static Matcher<TripOnServiceDate> agencyId(FeedScopedId id) {
     return new EqualityMatcher<>("agency", id, t -> t.getTrip().getRoute().getAgency().getId());
   }
 
   static Matcher<TripOnServiceDate> routeId(FeedScopedId id) {
     return new EqualityMatcher<>("route", id, t -> t.getTrip().getRoute().getId());
+  }
+
+  static Matcher<TripOnServiceDate> patternId(
+    FeedScopedId id,
+    BiFunction<Trip, LocalDate, TripPattern> patternResolver
+  ) {
+    return new EqualityMatcher<>("pattern", id, t -> {
+      TripPattern pattern = patternResolver.apply(t.getTrip(), t.getServiceDate());
+      return pattern == null ? null : pattern.getId();
+    });
   }
 
   static Matcher<TripOnServiceDate> serviceJourneyId(FeedScopedId id) {
@@ -81,6 +151,12 @@ public class TripOnServiceDateMatcherFactory {
 
   static Matcher<TripOnServiceDate> serviceDate(LocalDate date) {
     return new EqualityMatcher<>("serviceDate", date, TripOnServiceDate::getServiceDate);
+  }
+
+  static Matcher<TripOnServiceDate> serviceDateRange(LocalDateRange dateRange) {
+    return new GenericUnaryMatcher<>("serviceDateRange", date ->
+      dateRange.contains(date.getServiceDate())
+    );
   }
 
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {

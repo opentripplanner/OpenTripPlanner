@@ -24,6 +24,7 @@ class GbfsVehicleRentalDataSourceTest {
       HttpHeaders.empty(),
       "n",
       false,
+      true,
       false,
       Set.of()
     );

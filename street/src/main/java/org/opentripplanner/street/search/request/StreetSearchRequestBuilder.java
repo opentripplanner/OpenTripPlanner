@@ -3,9 +3,11 @@ package org.opentripplanner.street.search.request;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -33,6 +35,7 @@ public class StreetSearchRequestBuilder {
   IntersectionTraversalCalculator intersectionTraversalCalculator;
   Collection<ExtensionRequestContext> extensionRequestContexts;
   Duration timeout;
+  Set<GeofencingZone> arriveByDestinationZones;
 
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
@@ -53,6 +56,7 @@ public class StreetSearchRequestBuilder {
     this.intersectionTraversalCalculator = original.intersectionTraversalCalculator();
     this.extensionRequestContexts = original.listExtensionRequestContexts();
     this.timeout = original.timeout();
+    this.arriveByDestinationZones = original.arriveByDestinationZones();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -153,6 +157,11 @@ public class StreetSearchRequestBuilder {
     Collection<ExtensionRequestContext> contexts
   ) {
     this.extensionRequestContexts = contexts;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withArriveByDestinationZones(Set<GeofencingZone> zones) {
+    this.arriveByDestinationZones = zones;
     return this;
   }
 

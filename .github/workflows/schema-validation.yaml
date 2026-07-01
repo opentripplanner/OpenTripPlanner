@@ -1,0 +1,61 @@
+name: Validate schema changes
+ 
+on:
+  pull_request:
+    branches:
+      - dev-2.x
+  # We have to run this on merge_group despite it doing nothing since otherwise this required check isn't "successful"
+  merge_group:
+    branches:
+      - dev-2.x
+ 
+jobs:
+  validate-gtfs-schema:
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'pull_request'
+    name: Validate GTFS GraphQL schema changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: 'Fetch dev.2.x for diffing'
+        run: |
+          git fetch origin dev-2.x --depth 1
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install GraphQL Inspector
+        run: |
+          npm i --global @graphql-inspector/ci@5.0.7 graphql@16.14.2 @graphql-inspector/diff-command@6.0.8 @graphql-inspector/graphql-loader@5.0.1 @graphql-inspector/git-loader@5.0.1
+
+      - name: Validate GTFS GraphQL schema changes
+        run: |
+          graphql-inspector diff 'git:origin/dev-2.x:application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls' 'application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'
+
+  validate-transmodel-schema:
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'pull_request'
+    name: Validate Transmodel GraphQL schema changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: 'Fetch dev.2.x for diffing'
+        run: |
+          git fetch origin dev-2.x --depth 1
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install GraphQL Inspector
+        run: |
+          npm i --global @graphql-inspector/ci@5.0.7 graphql@16.14.2 @graphql-inspector/diff-command@6.0.8 @graphql-inspector/graphql-loader@5.0.1 @graphql-inspector/git-loader@5.0.1
+
+      - name: Validate Transmodel GraphQL schema changes
+        run: |
+          graphql-inspector diff 'git:origin/dev-2.x:application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql' 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'

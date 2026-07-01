@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 /**
  * Tests that stops can be SKIPPED for a trip which repeats times for consecutive stops.
@@ -43,7 +43,7 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     assertEquals(
-      "UPDATED | A 10:00 10:00 | B [C] 10:00 10:00 | C 10:01 10:01",
+      "U | A 10:00 10:00 | B [C] 10:00 10:00 | C 10:01 10:01",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

@@ -33,7 +33,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     if (service == null) {
       return List.of();
     }

@@ -30,6 +30,7 @@ public abstract class TransitModule {
     TimetableRepository timetableRepository
   ) {
     return new TimetableSnapshotManager(
+      timetableRepository.copyTripCalendarForRealTimeUpdates(),
       realtimeRaptorTransitDataUpdater,
       config.routerConfig().updaterConfig().timetableSnapshotParameters(),
       () -> LocalDate.now(timetableRepository.getTimeZone())

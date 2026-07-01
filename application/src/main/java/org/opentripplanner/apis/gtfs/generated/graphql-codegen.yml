@@ -66,7 +66,7 @@ config:
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.place.api.PatternAtStop#PatternAtStop
-    elevationProfileComponent: org.opentripplanner.model.plan.leg.ElevationProfile.Step
+    elevationProfileComponent: org.opentripplanner.street.model.elevation.ElevationProfile.Step
     Emissions: org.opentripplanner.model.plan.Emission#Emission
     Feed: String
     FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
@@ -142,3 +142,6 @@ config:
     CallScheduledTime: org.opentripplanner.apis.gtfs.model.CallScheduledTime#CallScheduledTime
     RentalVehicleFuel: org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel#RentalVehicleFuel
     ViaLocationType: org.opentripplanner.model.plan.leg.ViaLocationType#ViaLocationType
+    CanceledTripsSummary: org.opentripplanner.apis.gtfs.model.CanceledTripsSummary#CanceledTripsSummary
+    CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
+    CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute

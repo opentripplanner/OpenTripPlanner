@@ -87,7 +87,7 @@ public class FlexRouter {
     this.flexIndex = transitService.getFlexIndex();
     this.matcher = TripMatcherFactory.of(
       filterRequest,
-      transitService.getCalendarService()::getServiceDatesForServiceId
+      transitService.getTripCalendars()::listServiceDates
     );
     this.callbackService = new CallbackAdapter();
     this.streetPathToLegsMapper = new StreetPathToLegsMapper(
@@ -136,8 +136,8 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
-      matcher
+      matcher,
+      flexParameters
     ).calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
     var itineraries = new ArrayList<Itinerary>();
@@ -158,8 +158,8 @@ public class FlexRouter {
     return new FlexAccessFactory(
       callbackService,
       accessFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
-      matcher
+      matcher,
+      flexParameters
     ).createFlexAccesses(streetAccesses, dates);
   }
 
@@ -168,8 +168,8 @@ public class FlexRouter {
     return new FlexEgressFactory(
       callbackService,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
-      matcher
+      matcher,
+      flexParameters
     ).createFlexEgresses(streetEgresses, dates);
   }
 

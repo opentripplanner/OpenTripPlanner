@@ -30,7 +30,6 @@ public class TransitGroupPriorityConfig {
         Unmatched patterns are put in the BASE priority-group.
         """
       )
-      .experimentalFeature()
       .asObject();
 
     transit.withPriorityGroupsByAgency(

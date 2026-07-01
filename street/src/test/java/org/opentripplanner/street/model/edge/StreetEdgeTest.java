@@ -26,7 +26,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
-import org.opentripplanner.street.model.elevation.ElevationUtils;
+import org.opentripplanner.street.model.elevation.SlopeCostCalculator;
 import org.opentripplanner.street.model.elevation.SlopeCosts;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -354,7 +354,7 @@ public class StreetEdgeTest {
       .build()
       .ifPresent(testStreet::setElevationExtension);
 
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev);
+    SlopeCosts costs = SlopeCostCalculator.getSlopeCosts(elev);
     double trueLength = costs.lengthMultiplier * length;
     double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();

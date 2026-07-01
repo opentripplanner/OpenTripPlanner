@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
@@ -42,6 +42,8 @@ import org.opentripplanner.transit.service.TimetableRepository;
  * This test checks the combination of transit and flex works.
  */
 public class FlexIntegrationTest {
+
+  private static final FlexParameters FLEX_PARAMETERS = FlexParameters.defaultValues();
 
   public static final GenericLocation OUTSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
     33.7552,
@@ -84,7 +86,10 @@ public class FlexIntegrationTest {
       graph,
       timetableRepository,
       transferRepository,
-      model.fareServiceFactory().makeFareService()
+      model.fareServiceFactory().makeFareService(),
+      null,
+      null,
+      FLEX_PARAMETERS
     ).routingService();
   }
 
@@ -205,7 +210,7 @@ public class FlexIntegrationTest {
       gtfsBundles,
       timetableRepository,
       graph,
-      LocalDateInterval.unbounded()
+      LocalDateRange.ofUnbounded()
     );
     gtfsModule.buildGraph();
 
@@ -250,9 +255,11 @@ public class FlexIntegrationTest {
       .withNumItineraries(10)
       .withSearchWindow(Duration.ofHours(2))
       .withPreferences(p ->
-        p.withStreet(s ->
-          s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
-        )
+        p
+          .withStreet(s ->
+            s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+          )
+          .withWalk(walk -> walk.withSafetyFactor(0))
       )
       .withJourney(journeyBuilder -> {
         var modes = JourneyRequest.DEFAULT.modes().copyOf();

@@ -16,10 +16,15 @@ org.opentripplanner.ext.carpooling/
 │   ├── InsertionEvaluator   # Finds optimal passenger insertion
 │   ├── InsertionCandidate   # Represents a viable insertion
 │   └── CarpoolStreetRouter  # Street routing for carpooling
-├── filter/                   # Trip pre-filtering
-│   ├── TripFilter           # Filter interface
-│   ├── TimeBasedFilter      # Time window filtering
-│   └── DistanceBasedFilter  # Geographic distance checks
+├── filter/                   # Pre- and post-screening
+│   ├── CarpoolingRequest    # Passenger-side request abstraction
+│   ├── CarpoolTripFilter    # Pre-filter interface (raw trips)
+│   ├── CarpoolItineraryFilter # Post-filter interface (routed itineraries)
+│   ├── TripPreFilters       # Composite of pre-filters (AND)
+│   ├── ItineraryPostFilters # Composite of post-filters (AND)
+│   ├── TimeTripFilter       # Pre-filter: loose time-window check
+│   ├── TimeItineraryFilter  # Post-filter: tight time-window enforcement
+│   └── DistanceTripFilter   # Pre-filter: geographic proximity
 ├── constraints/              # Post-routing constraints
 │   └── PassengerDelayConstraints # Protects existing passengers
 ├── util/                     # Utilities
@@ -36,11 +41,13 @@ org.opentripplanner.ext.carpooling/
 
 The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool trips:
 
-### 1. Filter Phase
-Fast pre-screening to eliminate incompatible trips:
+### 1. Pre-Filter Phase
+Fast pre-screening to eliminate incompatible trips using necessary conditions only (loose bounds);
+tight enforcement is deferred to the post-filter once actual times are known:
 - **Capacity Filter**: Checks if any seats are available
-- **Time-Based Filter**: Ensures departure time compatibility
-- **Distance-Based Filter**: Validates pickup/dropoff are within 50km of driver's route
+- **TimeTripFilter**: Trip start/end is loosely compatible with the passenger's depart-after or
+  arrive-by window
+- **DistanceTripFilter**: Validates pickup/dropoff are within 50km of driver's route
 
 ### 2. Routing Phase
 Optimal insertion point calculation:
@@ -49,7 +56,12 @@ Optimal insertion point calculation:
 - Evaluates all viable insertion positions
 - Selects position with minimum additional travel time
 
-### 3. Constraint Validation
+### 3. Post-Filter Phase
+Applied to fully-routed itineraries with actual computed times:
+- **TimeItineraryFilter**: Tight enforcement of the passenger's depart-after / arrive-by window
+  against the itinerary's real start/end times
+
+### 4. Constraint Validation
 - **Capacity constraints**: Ensures vehicle capacity is not exceeded
 - **Passenger delay constraints**: Protects existing passengers (max 5 minutes additional delay)
 - **Deviation budget**: Respects driver's maximum acceptable detour time
@@ -80,5 +92,7 @@ Currently assumes a 15 minute budget for carpooling. Future versions will suppor
 ### Static Capacity
 Available seats are static trip properties. There is no reservation system yet.
 
-### Basic Time Windows
-Only simple departure time compatibility is implemented. "Arrive by" constraints are planned for future versions.
+### Time Windows
+Both depart-after and arrive-by requests are supported. The pre-filter uses loose bounds
+(necessary conditions) to limit routing cost; the post-filter enforces the passenger's window
+tightly against the routed itinerary times.

@@ -33,7 +33,8 @@ public abstract class DirectStreetRouter {
     }
     OTPRequestTimeoutException.checkForTimeout();
 
-    var maxCarSpeed = serverContext.streetLimitationParametersService().maxCarSpeed();
+    var streetLimitationParametersService = serverContext.streetLimitationParametersService();
+    var maxCarSpeed = streetLimitationParametersService.maxCarSpeed();
     var maxDistanceLimit = calculateDistanceMaxLimit(request, maxCarSpeed);
     if (!isStraightLineDistanceWithinLimit(linkingContext, request, maxDistanceLimit)) {
       return Collections.emptyList();
@@ -43,7 +44,8 @@ public abstract class DirectStreetRouter {
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.listExtensionRequestContexts(request),
-        maxCarSpeed
+        streetLimitationParametersService,
+        serverContext.vehicleRentalService()
       );
       var itineraries = findItineraries(serverContext, gpFinder, linkingContext, request);
       return decorateItineraries(request, itineraries);

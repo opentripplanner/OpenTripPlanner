@@ -17,7 +17,6 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
   final List<Consumer<Boolean>> onRouteSearchListeners = new ArrayList<>();
   final List<IntConsumer> setupIterationListeners = new ArrayList<>();
   final List<IntConsumer> prepareForNextRoundListeners = new ArrayList<>();
-  final List<Runnable> transitsForRoundCompleteListeners = new ArrayList<>();
   final List<Runnable> transfersForRoundCompleteListeners = new ArrayList<>();
   final List<Consumer<Boolean>> roundCompleteListeners = new ArrayList<>();
   final List<Runnable> iterationCompleteListeners = new ArrayList<>();
@@ -37,11 +36,6 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
   @Override
   public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
     subscribe(prepareForNextRoundListeners, prepareForNextRound);
-  }
-
-  @Override
-  public void onTransitsForRoundComplete(Runnable transitsForRoundComplete) {
-    subscribe(transitsForRoundCompleteListeners, transitsForRoundComplete);
   }
 
   @Override

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
+import static org.opentripplanner.ext.fares.service.gtfs.v2.FareLookupService.DEFAULT_FREE_TRANSFER_MATCH_PREDICATE;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -16,6 +18,7 @@ public class GtfsFaresV2ServiceBuilder {
   private List<FareTransferRule> fareTransferRules = List.of();
   private Multimap<FeedScopedId, FeedScopedId> stopAreas = ImmutableMultimap.of();
   private Multimap<FeedScopedId, LocalDate> serviceDatesForServiceId = HashMultimap.create();
+  private FreeTransferEligibility freeTransferElibility = DEFAULT_FREE_TRANSFER_MATCH_PREDICATE;
 
   public GtfsFaresV2ServiceBuilder withLegRules(List<FareLegRule> legRules) {
     this.legRules = legRules;
@@ -52,7 +55,20 @@ public class GtfsFaresV2ServiceBuilder {
     return this;
   }
 
+  public GtfsFaresV2ServiceBuilder withFreeTransferMatchPredicate(
+    FreeTransferEligibility freeTranferElibility
+  ) {
+    this.freeTransferElibility = freeTranferElibility;
+    return this;
+  }
+
   public GtfsFaresV2Service build() {
-    return new GtfsFaresV2Service(legRules, fareTransferRules, stopAreas, serviceDatesForServiceId);
+    return new GtfsFaresV2Service(
+      legRules,
+      fareTransferRules,
+      stopAreas,
+      serviceDatesForServiceId,
+      freeTransferElibility
+    );
   }
 }

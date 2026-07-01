@@ -1,5 +1,6 @@
 package org.opentripplanner.street.linking;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,11 +18,13 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
@@ -34,8 +37,6 @@ import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -52,10 +53,16 @@ import org.slf4j.LoggerFactory;
  * <p>
  * See discussion in pull request #1922, follow up issue #1934, and the original issue calling for
  * replacement of the stop linker, #1305.
+ * <p>
+ * <b>Expanding-envelope search.</b> Linking searches for nearby street edges with an expanding
+ * envelope: a small radius is tried first and widened only if nothing is found. This keeps the
+ * common case cheap, because the spatial index ({@code HashGridSpatialIndex}) returns whole grid
+ * cells as candidates, so a smaller envelope touches fewer cells and yields fewer candidate edges to
+ * distance-check, filter and dedup. The per-scope radius steps are defined in {@link SearchPlan}
+ * (e.g. real-time GBFS rental linking starts at 25 m — the vast majority of rental vehicles sit
+ * within ~25 m of a street — and expands to 100 m).
  */
 public class VertexLinker {
-
-  private static final Logger LOG = LoggerFactory.getLogger(VertexLinker.class);
 
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
@@ -65,22 +72,11 @@ public class VertexLinker {
     SphericalDistanceLibrary.metersToDegrees(0.001);
 
   /**
-   * Edge - area intersection often tests edges which start/end at area edge.
-   * Shrink egde slightly to avoid accuracy errors
-   */
-  private static final double AREA_INTERSECTION_SHRINKING = 0.0001;
-
-  /**
    * Minimal distance for considering two nodes the same
    */
   private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED =
     SphericalDistanceLibrary.metersToDegrees(1) * SphericalDistanceLibrary.metersToDegrees(1);
 
-  private static final double INITIAL_SEARCH_RADIUS_DEGREES =
-    SphericalDistanceLibrary.metersToDegrees(100);
-  private static final double MAX_SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(
-    1000
-  );
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
   private static final Set<TraverseMode> NO_THRU_MODES = Set.of(
@@ -89,7 +85,14 @@ public class VertexLinker {
     TraverseMode.CAR
   );
 
+  /**
+   * If vertex linking tries to split an edge very close to the endpoint, do not split the edge,
+   * use the existing edge endpoint instead. This is the limit of how far we still use the endpoint.
+   */
+  private static final double EDGE_SPLIT_END_TOLERANCE_METERS = 0.1;
+
   private final Graph graph;
+  private final GeofencingZoneService geofencingZoneService;
 
   private final VisibilityMode visibilityMode;
   private final int maxAreaNodes;
@@ -101,11 +104,13 @@ public class VertexLinker {
    */
   public VertexLinker(
     Graph graph,
+    GeofencingZoneService geofencingZoneService,
     VisibilityMode visibilityMode,
     int maxAreaNodes,
     boolean linkFlex
   ) {
     this.graph = Objects.requireNonNull(graph);
+    this.geofencingZoneService = Objects.requireNonNull(geofencingZoneService);
     this.visibilityMode = Objects.requireNonNull(visibilityMode);
     this.maxAreaNodes = maxAreaNodes;
     this.shouldLinkFlex = linkFlex;
@@ -145,14 +150,15 @@ public class VertexLinker {
     }
   }
 
-  /** projected distance from stop to edge, in latitude degrees */
-  private static double distance(Vertex tstop, StreetEdge edge, double xscale) {
-    // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
-    // for the actual distance calculations.
-    LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
-    return transformed.distance(
-      GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat()))
-    );
+  /**
+   * Squared projected distance from stop to edge, in latitude degrees squared. Computed directly on
+   * the packed edge geometry, without materializing a LineString or going through JTS DistanceOp.
+   * The square is returned because the linker only orders and thresholds by distance (both
+   * monotonic), so the per-candidate sqrt is unnecessary; callers compare against squared
+   * thresholds.
+   */
+  private static double squaredDistance(Vertex tstop, StreetEdge edge, double xscale) {
+    return edge.squaredEquirectangularDistanceToPoint(tstop.getLon(), tstop.getLat(), xscale);
   }
 
   /** project this linestring to an equirectangular projection */
@@ -198,23 +204,22 @@ public class VertexLinker {
       : null;
 
     try {
-      Set<StreetVertex> streetVertices = linkToStreetEdges(
-        vertex,
-        traverseModes,
-        direction,
-        scope,
-        INITIAL_SEARCH_RADIUS_DEGREES,
-        tempEdges
-      );
-      if (streetVertices.isEmpty() && scope == Scope.REQUEST) {
+      // Expanding-envelope search: try each radius step (smallest first) and stop at the first that
+      // links, so a wider — and more expensive — search only runs when the smaller one finds nothing.
+      // The maximum reach per scope is unchanged, so anything linkable before still links.
+      Set<StreetVertex> streetVertices = Set.of();
+      for (double radius : SearchPlan.forScope(scope).radiusStepsDegrees()) {
         streetVertices = linkToStreetEdges(
           vertex,
           traverseModes,
           direction,
           scope,
-          MAX_SEARCH_RADIUS_DEGREES,
+          radius,
           tempEdges
         );
+        if (!streetVertices.isEmpty()) {
+          break;
+        }
       }
 
       for (StreetVertex streetVertex : streetVertices) {
@@ -255,7 +260,7 @@ public class VertexLinker {
       null,
       edges
         .stream()
-        .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
+        .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
         .toList(),
       xscale
     );
@@ -281,14 +286,16 @@ public class VertexLinker {
     // street edges traversable by at least one of the given modes and are still present in the
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
+    // Distances are squared (see squaredDistance), so compare against the squared radius.
+    final double radiusDegSq = radiusDeg * radiusDeg;
     var candidateEdges = graph.findEdges(env, scope);
     List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
-      .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
-      .filter(ead -> ead.distanceDegreesLat < radiusDeg)
+      .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
+      .filter(ead -> ead.squaredDistanceDegreesLat < radiusDegSq)
       .toList();
 
     return linkToCandidateEdges(
@@ -304,6 +311,41 @@ public class VertexLinker {
 
   private static double getXscale(Vertex vertex) {
     return Math.cos((vertex.getLat() * Math.PI) / 180);
+  }
+
+  /**
+   * Expanding-envelope search: the radius steps (smallest first) to try per linking {@link Scope}.
+   * {@link #link} tries each step in turn and stops at the first that links, so a wider (more
+   * expensive) search only runs when the smaller one finds nothing; the largest step is that scope's
+   * maximum reach, so the set of vertices that link at all is unchanged.
+   */
+  private enum SearchPlan {
+    /** GBFS rental — the vast majority of rental vehicles sit within ~25 m of a street. */
+    REALTIME(25, 100),
+    /** Request-time access/egress linking. */
+    REQUEST(100, 1000),
+    /** Graph build — a single pass, no expansion. */
+    PERMANENT(100);
+
+    private final double[] radiusStepsDegrees;
+
+    SearchPlan(double... radiusStepsMetres) {
+      this.radiusStepsDegrees = Arrays.stream(radiusStepsMetres)
+        .map(SphericalDistanceLibrary::metersToDegrees)
+        .toArray();
+    }
+
+    static SearchPlan forScope(Scope scope) {
+      return switch (scope) {
+        case REALTIME -> REALTIME;
+        case REQUEST -> REQUEST;
+        case PERMANENT -> PERMANENT;
+      };
+    }
+
+    double[] radiusStepsDegrees() {
+      return radiusStepsDegrees;
+    }
   }
 
   private Set<StreetVertex> linkToCandidateEdges(
@@ -342,7 +384,7 @@ public class VertexLinker {
     // The following logic has gone through several different versions using different approaches.
     // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
     // catch things like superimposed edges going in opposite directions.
-    // First, all edges within INITIAL_SEARCH_RADIUS_DEGREES of of the best distance were selected.
+    // First, all edges within the initial search radius of the best distance were selected.
     // More recently, the edges were sorted in order of increasing distance, and all edges in the list were selected
     // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to the next.
     // This was in response to concerns about arbitrary cutoff distances: at any distance, it's always possible
@@ -364,18 +406,24 @@ public class VertexLinker {
         continue;
       }
 
-      double closestDistance = candidateEdgesForMode
+      double closestSquaredDistance = candidateEdgesForMode
         .stream()
-        .mapToDouble(ce -> ce.distanceDegreesLat)
+        .mapToDouble(ce -> ce.squaredDistanceDegreesLat)
         .min()
         .getAsDouble();
+
+      // The duplicate-way epsilon is an additive tolerance on the (non-squared) distance, which is
+      // not preserved by squaring. Recover the closest distance with a single sqrt per mode and
+      // compare against the squared band: dSq <= (closest + eps)^2 is exactly d <= closest + eps.
+      double band = Math.sqrt(closestSquaredDistance) + DUPLICATE_WAY_EPSILON_DEGREES;
+      double bandSquared = band * band;
 
       // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
       // Note: add only closest edges of each mode
       closestEdges.addAll(
         candidateEdgesForMode
           .stream()
-          .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
+          .filter(ce -> ce.squaredDistanceDegreesLat <= bandSquared)
           .collect(Collectors.toSet())
       );
     }
@@ -403,10 +451,11 @@ public class VertexLinker {
       edge instanceof AreaEdge aEdge
     ) {
       AreaGroup ag = aEdge.getArea();
+      var area = new PreparedAreaGroup(ag);
       // is area already linked ?
       start = linkedAreas.get(ag);
       if (start == null) {
-        if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+        if (area.containsPoint(vertex.getCoordinate())) {
           // vertex is inside an area
           if (distSquared(vertex, split) <= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
             // vertex is so close to the edge that we can use the split point directly
@@ -425,14 +474,14 @@ public class VertexLinker {
         // vertex is inside the area. try connecting the vertex to the edge's split point, because
         // connections to visibility vertices may fail or do not always provide an optimal route
         // note that by definition, connection to closest edge cannot be blocked and edge can be forced
-        addVisibilityEdges(start, split, ag, scope, tempEdges, true);
+        addVisibilityEdges(start, split, area, scope, tempEdges, true);
       } else {
         // vertex is outside an area. Use split point for area connections
         start = split;
       }
       // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
-        addAreaVertex(start, ag, scope, tempEdges, false);
+        addAreaVertex(start, area, scope, tempEdges, false);
       }
     } else {
       start = split;
@@ -468,24 +517,26 @@ public class VertexLinker {
     LineString transformed = equirectangularProject(geom, xScale);
     LocationIndexedLine il = new LocationIndexedLine(transformed);
     LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
-    double length = SphericalDistanceLibrary.length(geom);
+    var projection = ll.getCoordinate(geom);
 
     // if we're very close to one end of the edge, don't split
-    if (
-      ll.getSegmentIndex() == 0 &&
-      (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
-    ) {
+    var startDistance = SphericalDistanceLibrary.fastDistance(
+      projection,
+      edge.getFromVertex().getCoordinate()
+    );
+    if (startDistance < EDGE_SPLIT_END_TOLERANCE_METERS) {
       return (IntersectionVertex) edge.getFromVertex();
-    } else if (ll.getSegmentIndex() == geom.getNumPoints() - 1) {
-      return (IntersectionVertex) edge.getToVertex();
-    } else if (
-      ll.getSegmentIndex() == geom.getNumPoints() - 2 &&
-      (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
-    ) {
+    }
+    var toDistance = SphericalDistanceLibrary.fastDistance(
+      projection,
+      edge.getToVertex().getCoordinate()
+    );
+    if (toDistance < EDGE_SPLIT_END_TOLERANCE_METERS) {
       return (IntersectionVertex) edge.getToVertex();
     }
+
     // split the edge and return the split vertex
-    return split(edge, ll.getCoordinate(geom), scope, direction, tempEdges);
+    return split(edge, projection, scope, direction, tempEdges);
   }
 
   /**
@@ -554,8 +605,27 @@ public class VertexLinker {
     } else {
       v = splitterVertex(originalEdge, x, y, uniqueSplitLabel);
     }
-    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
-    v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
+    // Compute geofencing boundaries spatially for the split vertex.
+    // The entering flag encodes position: outside=true, inside=false.
+    // Blind-copying from parent vertices would give the wrong flag when
+    // the split point is on the opposite side of the zone boundary.
+    var fromBoundaries = originalEdge.getFromVertex().listGeofencingBoundaries();
+    var toBoundaries = originalEdge.getToVertex().listGeofencingBoundaries();
+    if (!fromBoundaries.isEmpty() || !toBoundaries.isEmpty()) {
+      var splitCoord = new Coordinate(x, y);
+      var containingZones = geofencingZoneService.zonesContaining(splitCoord);
+      var boundaryZones = new HashSet<GeofencingZone>();
+      for (var b : fromBoundaries) {
+        boundaryZones.add(b.zone());
+      }
+      for (var b : toBoundaries) {
+        boundaryZones.add(b.zone());
+      }
+      for (var zone : boundaryZones) {
+        boolean splitInZone = containingZones.contains(zone);
+        v.addGeofencingBoundary(new GeofencingBoundaryExtension(zone, !splitInZone));
+      }
+    }
 
     return v;
   }
@@ -563,11 +633,11 @@ public class VertexLinker {
   private static class DistanceTo<T> {
 
     T item;
-    double distanceDegreesLat;
+    double squaredDistanceDegreesLat;
 
-    public DistanceTo(T item, double distanceDegreesLat) {
+    public DistanceTo(T item, double squaredDistanceDegreesLat) {
       this.item = item;
-      this.distanceDegreesLat = distanceDegreesLat;
+      this.squaredDistanceDegreesLat = squaredDistanceDegreesLat;
     }
 
     @Override
@@ -592,7 +662,7 @@ public class VertexLinker {
    * Link a new vertex permanently with area geometry
    */
   public boolean addPermanentAreaVertex(IntersectionVertex newVertex, AreaGroup areaGroup) {
-    return addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null, true);
+    return addAreaVertex(newVertex, new PreparedAreaGroup(areaGroup), Scope.PERMANENT, null, true);
   }
 
   /**
@@ -612,11 +682,12 @@ public class VertexLinker {
    */
   private boolean addAreaVertex(
     IntersectionVertex newVertex,
-    AreaGroup areaGroup,
+    PreparedAreaGroup area,
     Scope scope,
     DisposableEdgeCollection tempEdges,
     boolean force
   ) {
+    AreaGroup areaGroup = area.areaGroup();
     Geometry polygon = areaGroup.getGeometry();
 
     int added = 0;
@@ -643,7 +714,7 @@ public class VertexLinker {
       }
     }
     for (IntersectionVertex v : visibilityVertices) {
-      if (addVisibilityEdges(newVertex, v, areaGroup, scope, tempEdges, false)) {
+      if (addVisibilityEdges(newVertex, v, area, scope, tempEdges, false)) {
         added++;
       }
     }
@@ -667,7 +738,7 @@ public class VertexLinker {
           nearest = areaGroup.visibilityVertices().stream().findFirst();
         }
         if (nearest.isPresent()) {
-          return addVisibilityEdges(newVertex, nearest.get(), areaGroup, scope, tempEdges, true);
+          return addVisibilityEdges(newVertex, nearest.get(), area, scope, tempEdges, true);
         }
       }
       return false;
@@ -692,25 +763,11 @@ public class VertexLinker {
     return modes;
   }
 
-  /**
-   * Create a slightly shortened line between two coordinates.
-   * This is used when testing if a polygon contains a line between two
-   * of its boundary points. Floating point math cannot represent boundaries
-   * precisely, so we need to shrink the line to ensure robust testing.
-   */
-  private LineString createShrunkLine(Coordinate from, Coordinate to) {
-    var dx = AREA_INTERSECTION_SHRINKING * (to.x - from.x);
-    var dy = AREA_INTERSECTION_SHRINKING * (to.y - from.y);
-    var c1 = new Coordinate(from.x + dx, from.y + dy);
-    var c2 = new Coordinate(to.x - dx, to.y - dy);
-    return GEOMETRY_FACTORY.createLineString(new Coordinate[] { c1, c2 });
-  }
-
   /* Check if an edge candiate does not cross the area boundary and add it if it does not */
   private boolean addVisibilityEdges(
     IntersectionVertex from,
     IntersectionVertex to,
-    AreaGroup ag,
+    PreparedAreaGroup area,
     Scope scope,
     DisposableEdgeCollection tempEdges,
     boolean force
@@ -726,12 +783,12 @@ public class VertexLinker {
     var c1 = from.getCoordinate();
     var c2 = to.getCoordinate();
     // ensure that new edge does not leave the bounds of the area or hit any holes
-    if (!force && !ag.getGeometry().contains(createShrunkLine(c1, c2))) {
+    if (!force && !area.containsSegment(c1, c2)) {
       return false;
     }
     LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] { c1, c2 });
     // add connecting edges
-    createEdges(line, from, to, ag, scope, tempEdges);
+    createEdges(line, from, to, area, scope, tempEdges);
 
     return true;
   }
@@ -741,30 +798,13 @@ public class VertexLinker {
     LineString line,
     IntersectionVertex from,
     IntersectionVertex to,
-    AreaGroup ag,
+    PreparedAreaGroup area,
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
-    Area hit = null;
-    var areas = ag.getAreas();
-    if (areas.size() == 1) {
-      hit = areas.getFirst();
-    } else {
-      // If more than one area intersects, we pick first one for the name & properties
-      for (Area area : areas) {
-        Geometry polygon = area.getGeometry();
-        Geometry intersection = polygon.intersection(line);
-        if (intersection.getLength() > 0.000001) {
-          hit = area;
-          break;
-        }
-      }
-    }
-    // hit may be null when force linking a point from outside
-    if (hit == null) {
-      LOG.warn("No intersecting area found. This may indicate a bug.");
-      hit = areas.getFirst();
-    }
+    AreaGroup ag = area.areaGroup();
+    // The edge borrows the worst-case name/permission/safety over every sub-area it crosses.
+    var hit = AreaEdgeProperties.merge(area.areasCrossedBy(line));
     double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
     // apply consistent NoThru restrictions
     // if all joining edges are nothru, then the new edge should be as well
@@ -775,11 +815,12 @@ public class VertexLinker {
       .withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
-      .withName(hit.getName())
+      .withName(hit.name())
       .withMeterLength(length)
-      .withPermission(hit.getPermission())
-      .withBicycleSafetyFactor(hit.getBicycleSafety())
-      .withWalkSafetyFactor(hit.getWalkSafety())
+      .withPermission(hit.permission())
+      .withBicycleSafetyFactor(hit.bicycleSafety())
+      .withWalkSafetyFactor(hit.walkSafety())
+      .withWheelchairAccessible(hit.wheelchairAccessible())
       .withBack(false)
       .withArea(ag);
     for (TraverseMode tm : outgoingNoThruModes) {
@@ -794,11 +835,12 @@ public class VertexLinker {
       .withFromVertex(to)
       .withToVertex(from)
       .withGeometry(line.reverse())
-      .withName(hit.getName())
+      .withName(hit.name())
       .withMeterLength(length)
-      .withPermission(hit.getPermission())
-      .withBicycleSafetyFactor(hit.getBicycleSafety())
-      .withWalkSafetyFactor(hit.getWalkSafety())
+      .withPermission(hit.permission())
+      .withBicycleSafetyFactor(hit.bicycleSafety())
+      .withWalkSafetyFactor(hit.walkSafety())
+      .withWheelchairAccessible(hit.wheelchairAccessible())
       .withBack(true)
       .withArea(ag);
     for (TraverseMode tm : incomingNoThruModes) {

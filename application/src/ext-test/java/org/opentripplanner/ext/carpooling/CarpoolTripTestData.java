@@ -11,7 +11,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Builder utility for creating test CarpoolTrip instances without requiring full Graph infrastructure.
+ * Builder utility for creating test CarpoolTrip instances without requiring full Graph
+ * infrastructure.
  */
 public class CarpoolTripTestData {
 
@@ -41,6 +42,25 @@ public class CarpoolTripTestData {
       createDestinationStopWithTime(alighting, startTime.plusHours(1), startTime.plusHours(1))
     );
     return buildTrip(DEFAULT_TOTAL_CAPACITY, startTime, stops);
+  }
+
+  /**
+   * Creates a simple trip with specific start and end times.
+   */
+  public static CarpoolTrip createSimpleTripWithTimes(
+    WgsCoordinate boarding,
+    WgsCoordinate alighting,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime
+  ) {
+    var origin = createOriginStopWithTime(boarding, startTime, startTime);
+    var destination = createDestinationStopWithTime(alighting, endTime, endTime);
+    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter))
+      .withStops(List.of(origin, destination))
+      .withTotalCapacity(DEFAULT_TOTAL_CAPACITY)
+      .withStartTime(origin.getAimedDepartureTime())
+      .withEndTime(destination.getAimedArrivalTime())
+      .build();
   }
 
   /**
@@ -242,13 +262,11 @@ public class CarpoolTripTestData {
     List<CarpoolStop> stops
   ) {
     var actualStartTime = startTime != null ? startTime : ZonedDateTime.now();
-    var builder = new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter))
+    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter))
       .withStops(stops)
       .withTotalCapacity(capacity)
-      .withStartTime(actualStartTime);
-    if (startTime != null) {
-      builder.withEndTime(startTime.plusHours(1));
-    }
-    return builder.build();
+      .withStartTime(actualStartTime)
+      .withEndTime(actualStartTime.plusHours(1))
+      .build();
   }
 }

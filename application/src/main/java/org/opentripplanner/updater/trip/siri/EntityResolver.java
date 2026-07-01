@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -16,8 +15,6 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri21.DatedVehicleJourneyRef;
-import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri21.MonitoredVehicleJourneyStructure;
 
@@ -43,20 +40,23 @@ public class EntityResolver {
   }
 
   /**
-   * Resolve a {@link Trip} either by resolving a service journey id from EstimatedVehicleJourney ->
-   * FramedVehicleJourneyRef -> DatedVehicleJourneyRef or a dated service journey id from
-   * EstimatedVehicleJourney -> DatedVehicleJourneyRef.
+   * Resolve a {@link Trip} either by resolving a service journey id from the journey's
+   * FramedVehicleJourneyRef -> DatedVehicleJourneyRef, from its DatedVehicleJourneyRef, or from its
+   * EstimatedVehicleJourneyCode (for a trip that was previously added by a real-time message).
    */
-  public Trip resolveTrip(EstimatedVehicleJourney journey) {
-    Trip trip = resolveTrip(journey.getFramedVehicleJourneyRef());
-    if (trip != null) {
-      return trip;
+  @Nullable
+  public Trip resolveTrip(EstimatedVehicleJourneyWrapper journey) {
+    var vehicleJourneyIdAndServiceDate = journey.vehicleJourneyIdAndServiceDate();
+    if (vehicleJourneyIdAndServiceDate != null) {
+      Trip trip = resolveTrip(vehicleJourneyIdAndServiceDate.vehicleJourneyId());
+      if (trip != null) {
+        return trip;
+      }
     }
 
-    if (journey.getDatedVehicleJourneyRef() != null) {
-      String datedServiceJourneyId = journey.getDatedVehicleJourneyRef().getValue();
+    if (journey.datedVehicleJourneyRef() != null) {
       TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDate(
-        resolveId(datedServiceJourneyId)
+        resolveId(journey.datedVehicleJourneyRef())
       );
 
       if (tripOnServiceDate != null) {
@@ -65,10 +65,8 @@ public class EntityResolver {
     }
 
     // It is possible that the trip has previously been added, resolve the added trip
-    if (journey.getEstimatedVehicleJourneyCode() != null) {
-      var adapter = new EstimatedVehicleJourneyCodeAdapter(
-        journey.getEstimatedVehicleJourneyCode()
-      );
+    if (journey.estimatedVehicleJourneyCode() != null) {
+      var adapter = new EstimatedVehicleJourneyCodeAdapter(journey.estimatedVehicleJourneyCode());
       var addedTrip = transitService.getTrip(resolveId(adapter.getServiceJourneyId()));
       if (addedTrip != null) {
         return addedTrip;
@@ -86,16 +84,6 @@ public class EntityResolver {
     return resolveTrip(journey.getFramedVehicleJourneyRef());
   }
 
-  public TripOnServiceDate resolveTripOnServiceDate(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
-    FeedScopedId datedServiceJourneyId = resolveDatedServiceJourneyId(estimatedVehicleJourney);
-    if (datedServiceJourneyId != null) {
-      return resolveTripOnServiceDate(datedServiceJourneyId);
-    }
-    return resolveTripOnServiceDate(estimatedVehicleJourney.getFramedVehicleJourneyRef());
-  }
-
   public TripOnServiceDate resolveTripOnServiceDate(String datedServiceJourneyId) {
     return resolveTripOnServiceDate(resolveId(datedServiceJourneyId));
   }
@@ -106,6 +94,16 @@ public class EntityResolver {
     return resolveTripOnServiceDate(
       framedVehicleJourney.getDatedVehicleJourneyRef(),
       resolveServiceDate(framedVehicleJourney)
+    );
+  }
+
+  @Nullable
+  public TripOnServiceDate resolveTripOnServiceDate(
+    VehicleJourneyIdAndServiceDate vehicleJourneyIdAndServiceDate
+  ) {
+    return resolveTripOnServiceDate(
+      vehicleJourneyIdAndServiceDate.vehicleJourneyId(),
+      parseServiceDate(vehicleJourneyIdAndServiceDate.serviceDate())
     );
   }
 
@@ -127,34 +125,38 @@ public class EntityResolver {
     return transitService.getTripOnServiceDate(datedServiceJourneyId);
   }
 
-  public FeedScopedId resolveDatedServiceJourneyId(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
-    DatedVehicleJourneyRef datedVehicleJourneyRef =
-      estimatedVehicleJourney.getDatedVehicleJourneyRef();
-    if (datedVehicleJourneyRef != null) {
-      return resolveId(datedVehicleJourneyRef.getValue());
+  public FeedScopedId resolveDatedServiceJourneyId(EstimatedVehicleJourneyWrapper journey) {
+    if (journey.datedVehicleJourneyRef() != null) {
+      return resolveId(journey.datedVehicleJourneyRef());
     }
 
-    if (estimatedVehicleJourney.getEstimatedVehicleJourneyCode() != null) {
-      return resolveId(estimatedVehicleJourney.getEstimatedVehicleJourneyCode());
+    if (journey.estimatedVehicleJourneyCode() != null) {
+      return resolveId(journey.estimatedVehicleJourneyCode());
     }
 
     return null;
   }
 
   public LocalDate resolveServiceDate(FramedVehicleJourneyRefStructure vehicleJourneyRefStructure) {
-    if (vehicleJourneyRefStructure.getDataFrameRef() != null) {
-      var dataFrame = vehicleJourneyRefStructure.getDataFrameRef();
-      if (dataFrame != null) {
-        try {
-          return LocalDate.parse(dataFrame.getValue());
-        } catch (DateTimeParseException ignored) {
-          LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
-        }
-      }
+    var dataFrame = vehicleJourneyRefStructure.getDataFrameRef();
+    return parseServiceDate(dataFrame != null ? dataFrame.getValue() : null);
+  }
+
+  /**
+   * Parse a SIRI data frame ref (an ISO-8601 date) into a service date, returning {@code null} if it
+   * is missing or malformed.
+   */
+  @Nullable
+  private LocalDate parseServiceDate(@Nullable String dataFrameRef) {
+    if (dataFrameRef == null) {
+      return null;
     }
-    return null;
+    try {
+      return LocalDate.parse(dataFrameRef);
+    } catch (DateTimeParseException ignored) {
+      LOG.warn("Invalid dataFrame format: {}", dataFrameRef);
+      return null;
+    }
   }
 
   /**
@@ -215,22 +217,16 @@ public class EntityResolver {
   }
 
   @Nullable
-  public LocalDate resolveServiceDate(
-    EstimatedVehicleJourney vehicleJourney,
-    List<CallWrapper> calls
-  ) {
-    if (vehicleJourney.getFramedVehicleJourneyRef() != null) {
-      var dataFrame = vehicleJourney.getFramedVehicleJourneyRef().getDataFrameRef();
-      if (dataFrame != null) {
-        try {
-          return LocalDate.parse(dataFrame.getValue());
-        } catch (DateTimeParseException ignored) {
-          LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
-        }
+  public LocalDate resolveServiceDate(EstimatedVehicleJourneyWrapper journey) {
+    var vehicleJourneyIdAndServiceDate = journey.vehicleJourneyIdAndServiceDate();
+    if (vehicleJourneyIdAndServiceDate != null) {
+      var serviceDate = parseServiceDate(vehicleJourneyIdAndServiceDate.serviceDate());
+      if (serviceDate != null) {
+        return serviceDate;
       }
     }
 
-    FeedScopedId datedServiceJourneyId = resolveDatedServiceJourneyId(vehicleJourney);
+    FeedScopedId datedServiceJourneyId = resolveDatedServiceJourneyId(journey);
     if (datedServiceJourneyId != null) {
       var datedServiceJourney = resolveTripOnServiceDate(datedServiceJourneyId);
       if (datedServiceJourney != null) {
@@ -238,6 +234,7 @@ public class EntityResolver {
       }
     }
 
+    var calls = journey.calls();
     if (calls.isEmpty()) {
       return null;
     }
@@ -247,7 +244,7 @@ public class EntityResolver {
       return null;
     }
 
-    var daysOffset = calculateDayOffset(vehicleJourney);
+    var daysOffset = calculateDayOffset(journey);
 
     return departureTime.toLocalDate().minusDays(daysOffset);
   }
@@ -255,8 +252,8 @@ public class EntityResolver {
   /**
    * Calculate the difference in days between the service date and the departure at the first stop.
    */
-  private int calculateDayOffset(EstimatedVehicleJourney vehicleJourney) {
-    Trip trip = resolveTrip(vehicleJourney);
+  private int calculateDayOffset(EstimatedVehicleJourneyWrapper journey) {
+    Trip trip = resolveTrip(journey);
     if (trip == null) {
       return 0;
     }

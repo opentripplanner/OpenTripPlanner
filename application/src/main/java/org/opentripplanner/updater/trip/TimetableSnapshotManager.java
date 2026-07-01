@@ -5,13 +5,14 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public final class TimetableSnapshotManager {
    * The working copy of the timetable snapshot. Should not be visible to routing threads.
    * By design, only one thread should ever be writing to this buffer.
    */
-  private final TimetableSnapshot buffer = new TimetableSnapshot();
+  private final TimetableSnapshot buffer;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -56,10 +57,12 @@ public final class TimetableSnapshotManager {
    *                     considered 'today'. This is useful for unit testing.
    */
   public TimetableSnapshotManager(
+    DefaultTripCalendars tripCalendars,
     @Nullable RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
     TimetableSnapshotParameters parameters,
     Supplier<LocalDate> localDateNow
   ) {
+    this.buffer = new TimetableSnapshot(tripCalendars);
     this.realtimeRaptorTransitDataUpdater = realtimeRaptorTransitDataUpdater;
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = Objects.requireNonNull(localDateNow);
@@ -183,7 +186,7 @@ public final class TimetableSnapshotManager {
       var scheduledTripTimes = scheduledPattern.getScheduledTimetable().getTripTimes(trip);
       if (scheduledTripTimes != null) {
         var builder = scheduledTripTimes.createRealTimeFromScheduledTimes();
-        builder.deleteTrip();
+        builder.withDeleted();
         buffer.update(
           RealTimeTripUpdate.of(scheduledPattern, builder.build(), serviceDate).build()
         );

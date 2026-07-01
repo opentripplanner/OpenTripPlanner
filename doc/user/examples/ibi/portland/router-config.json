@@ -42,7 +42,9 @@
       "network": "BIRD",
       "sourceType": "gbfs",
       "url": "https://mds.bird.co/gbfs/v2/public/portland.gbfs",
-      "geofencingZones": "true"
+      "geofencing": {
+        "enabled": true
+      }
     },
     {
       "type": "vehicle-rental",

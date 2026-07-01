@@ -1,12 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -17,7 +20,6 @@ import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
-import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -168,7 +170,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       }
     }
 
-    return new BitSetIterator(activeTripPatternsForGivenStops);
+    return IntIterators.of(activeTripPatternsForGivenStops);
   }
 
   @Override
@@ -270,5 +272,10 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   @Override
   public RaptorTripScheduleReference tripScheduleReference(TripSchedule trip) {
     return new RaptorTripScheduleReference(trip.pattern().patternIndex(), trip.tripScheduleIndex());
+  }
+
+  public Collection<TripPatternForDates> activeTripPatternsPerStop(int stopIndex) {
+    var routeIndices = activeTripPatternsPerStop.get(stopIndex);
+    return Arrays.stream(routeIndices).mapToObj(patternIndex::get).toList();
   }
 }

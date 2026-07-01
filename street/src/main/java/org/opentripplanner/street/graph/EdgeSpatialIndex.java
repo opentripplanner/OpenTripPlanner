@@ -1,5 +1,7 @@
 package org.opentripplanner.street.graph;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -69,6 +71,17 @@ class EdgeSpatialIndex {
         permanentEdgeIndex.query(envelope).stream(),
         realTimeEdgeIndex.query(envelope).stream()
       );
+    };
+  }
+
+  public Set<Edge> queryAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {
+    return switch (scope) {
+      case PERMANENT, REALTIME -> permanentEdgeIndex.queryAlongLineStrings(lineStrings);
+      case REQUEST -> {
+        var result = permanentEdgeIndex.queryAlongLineStrings(lineStrings);
+        result.addAll(realTimeEdgeIndex.queryAlongLineStrings(lineStrings));
+        yield result;
+      }
     };
   }
 

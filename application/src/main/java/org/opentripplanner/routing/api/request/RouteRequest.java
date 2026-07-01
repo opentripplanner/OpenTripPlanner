@@ -20,6 +20,7 @@ import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.InvalidRoutingInputException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.street.model.StreetMode;
@@ -231,6 +232,7 @@ public class RouteRequest implements Serializable {
    * TODO - Refactor and make separate requests for one-to-one and the other searches.
    *
    * @throws RoutingValidationException if either origin or destination is missing.
+   * @throws InvalidRoutingInputException if the destination is an on-board location.
    */
   public void validateOriginAndDestination() {
     List<RoutingError> routingErrors = new ArrayList<>(2);
@@ -247,6 +249,12 @@ public class RouteRequest implements Serializable {
 
     if (!routingErrors.isEmpty()) {
       throw new RoutingValidationException(routingErrors);
+    }
+
+    if (to.isOnBoard()) {
+      throw new InvalidRoutingInputException(
+        "'serviceJourneyLocation' is only supported for the 'from' location, not 'to'"
+      );
     }
   }
 
@@ -282,14 +290,17 @@ public class RouteRequest implements Serializable {
    * Returns {@code true} when the request has no way to reach transit on at least one of the
    * access and egress sides. A side is unreachable when its street mode is
    * {@link StreetMode#NOT_SET} and the corresponding endpoint is not a stop (a stop endpoint
-   * provides a zero-distance access/egress, so it does not need a street mode).
+   * provides a zero-distance access/egress, so it does not need a street mode). An on-board
+   * origin is always considered reachable since the traveler is already on a transit vehicle.
    */
   public boolean cannotReachTransit() {
     boolean accessUnreachable =
       journey.access().mode() == StreetMode.NOT_SET && (from == null || from.stopId() == null);
     boolean egressUnreachable =
       journey.egress().mode() == StreetMode.NOT_SET && (to == null || to.stopId() == null);
-    return accessUnreachable || egressUnreachable;
+    boolean isOnBoard = from != null && from.isOnBoard();
+
+    return (accessUnreachable && !isOnBoard) || egressUnreachable;
   }
 
   /**
@@ -297,6 +308,14 @@ public class RouteRequest implements Serializable {
    */
   public boolean isViaSearch() {
     return !via.isEmpty();
+  }
+
+  /**
+   * Return {@code true} if the origin is on-board a transit vehicle rather than a geographic
+   * location.
+   */
+  public boolean isStartOnBoardAccessRequest() {
+    return from != null && from.isOnBoard();
   }
 
   public List<ViaLocation> listViaLocations() {

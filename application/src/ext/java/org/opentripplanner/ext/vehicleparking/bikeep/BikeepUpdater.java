@@ -42,12 +42,10 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
       List<String> tags = STRING_LIST_READER.readValue(props.path("tags"));
 
-      var availability = VehicleParkingSpaces.builder()
+      var availability = VehicleParkingSpaces.of()
         .bicycleSpaces(parking.get("available").asInt())
         .build();
-      var capacity = VehicleParkingSpaces.builder()
-        .bicycleSpaces(parking.get("total").asInt())
-        .build();
+      var capacity = VehicleParkingSpaces.of().bicycleSpaces(parking.get("total").asInt()).build();
 
       VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
         builder
@@ -56,7 +54,7 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
           .walkAccessible(true)
           .carAccessible(true);
 
-      return VehicleParking.builder()
+      return VehicleParking.of()
         .id(vehicleParkId)
         .name(name)
         .state(VehicleParkingState.OPERATIONAL)

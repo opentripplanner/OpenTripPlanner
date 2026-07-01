@@ -4,12 +4,14 @@ import static org.opentripplanner.service.vehicleparking.model.VehicleParkingSta
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -36,6 +38,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   private static final Logger LOG = LoggerFactory.getLogger(BikelyUpdater.class);
 
   private static final String JSON_PARSE_PATH = "result";
+  private static final Set<String> INCLUDED_TYPES = Set.of("Standard", "Rack");
   private static final Currency NOK = Currency.getInstance("NOK");
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private static final ObjectNode POST_PARAMS = OBJECT_MAPPER.createObjectNode()
@@ -85,7 +88,19 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
 
   @Nullable
   private VehicleParking parseElement(JsonNode jsonNode) {
-    if (jsonNode.path("hasStandardParking").asBoolean()) {
+    var avail = jsonNode.path("doorAvailibilities");
+    if (avail instanceof ArrayNode && !avail.isEmpty()) {
+      int availableSpots = 0;
+      int totalSpots = 0;
+
+      for (var node : avail) {
+        var type = node.get("doorTypeName").asText();
+        if (INCLUDED_TYPES.contains(type)) {
+          availableSpots += node.get("availableSpots").asInt();
+          totalSpots += node.get("totalSpots").asInt();
+        }
+      }
+
       var vehicleParkId = new FeedScopedId(parameters.feedId(), jsonNode.get("id").asText());
 
       var lat = jsonNode.get("latitude").asDouble();
@@ -94,8 +109,6 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
 
       var name = new NonLocalizedString(jsonNode.path("name").asText());
 
-      var totalSpots = jsonNode.get("totalStandardSpots").asInt();
-      var freeSpots = jsonNode.get("availableStandardSpots").asInt();
       var isUnderMaintenance = jsonNode.get("isInMaintenance").asBoolean();
 
       LocalizedString note = toNote(jsonNode);
@@ -108,12 +121,12 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
           .walkAccessible(true)
           .carAccessible(false);
 
-      return VehicleParking.builder()
+      return VehicleParking.of()
         .id(vehicleParkId)
         .name(name)
         .bicyclePlaces(true)
-        .capacity(VehicleParkingSpaces.builder().bicycleSpaces(totalSpots).build())
-        .availability(VehicleParkingSpaces.builder().bicycleSpaces(freeSpots).build())
+        .capacity(VehicleParkingSpaces.of().bicycleSpaces(totalSpots).build())
+        .availability(VehicleParkingSpaces.of().bicycleSpaces(availableSpots).build())
         .state(toState(isUnderMaintenance))
         .coordinate(coord)
         .entrance(entrance)

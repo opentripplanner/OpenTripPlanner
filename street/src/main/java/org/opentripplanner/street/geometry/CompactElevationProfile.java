@@ -24,10 +24,26 @@ public final class CompactElevationProfile implements Serializable {
   public static final double DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS = 10;
 
   /**
-   * Multipler for fixed-float representation. In meters, the precision is 1 cm (elevation and arc
-   * length).
+   * Multiplier for fixed-float representation. In meters, the precision is 1 cm (elevation and arc
+   * length). Referenced only by {@link #toFixedPoint(double)} / {@link #toFloatingPoint(int)} so
+   * the conversion mechanism is encapsulated.
    */
   private static final double FIXED_FLOAT_MULT = 1.0e2;
+
+  /**
+   * Encode a floating-point elevation value as a fixed-point integer at 1 cm precision. Rounds to
+   * the nearest integer.
+   */
+  private static int toFixedPoint(double v) {
+    return IntUtils.round(v * FIXED_FLOAT_MULT);
+  }
+
+  /**
+   * Decode a fixed-point integer back to the corresponding floating-point elevation value.
+   */
+  private static double toFloatingPoint(int v) {
+    return v / FIXED_FLOAT_MULT;
+  }
 
   /**
    * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
@@ -56,7 +72,7 @@ public final class CompactElevationProfile implements Serializable {
        * accumulating on long line strings.
        */
       Coordinate c = elevation.getCoordinate(i);
-      int iy = IntUtils.round(c.y * FIXED_FLOAT_MULT);
+      int iy = toFixedPoint(c.y);
       int diy = iy - oiy;
       coords[i] = diy;
       oiy = iy;
@@ -90,7 +106,7 @@ public final class CompactElevationProfile implements Serializable {
       int iy = oiy + coords[i];
       c[i] = new Coordinate(
         i == c.length - 1 ? lengthM : i * distanceBetweenSamplesM,
-        iy / FIXED_FLOAT_MULT
+        toFloatingPoint(iy)
       );
       oiy = iy;
     }

@@ -1,10 +1,10 @@
 package org.opentripplanner.transfer.constrained.raptoradaptor;
 
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
-import org.opentripplanner.raptor.util.IntIterators;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 
 final class ConstrainedBoardingSearchReverse implements ConstrainedBoardingSearchStrategy {

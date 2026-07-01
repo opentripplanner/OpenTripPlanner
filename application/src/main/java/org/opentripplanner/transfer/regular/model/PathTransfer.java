@@ -61,10 +61,6 @@ public class PathTransfer implements Serializable {
     this.modes = modes;
   }
 
-  public String getName() {
-    return from + " => " + to;
-  }
-
   public double getDistanceMeters() {
     return distanceMeters;
   }

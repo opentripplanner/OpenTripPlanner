@@ -9,11 +9,11 @@ import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateFilterRequest;
+import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 
 /**
- * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link TripTimeOnDateFilterRequest}
+ * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link FilterRequest}
  * objects by extracting the {@code select} and {@code not} criteria from the GraphQL input.
  * <p>
  * Each filter has {@code select} and {@code not} arrays of select criteria.
@@ -29,13 +29,13 @@ public class TripTimeOnDateFilterMapper {
   }
 
   @SuppressWarnings("unchecked")
-  public List<TripTimeOnDateFilterRequest> mapFilters(List<Map<String, ?>> filters) {
+  public List<FilterRequest<TripTimeOnDateSelectRequest>> mapFilters(List<Map<String, ?>> filters) {
     validateFieldNotEmpty("filters", filters);
 
-    var filterRequests = new ArrayList<TripTimeOnDateFilterRequest>();
+    var filterRequests = new ArrayList<FilterRequest<TripTimeOnDateSelectRequest>>();
 
     for (var filterInput : filters) {
-      var filterRequestBuilder = TripTimeOnDateFilterRequest.of();
+      var filterRequestBuilder = FilterRequest.<TripTimeOnDateSelectRequest>of();
 
       if (filterInput.containsKey("select")) {
         var select = (List<Map<String, List<?>>>) filterInput.get("select");

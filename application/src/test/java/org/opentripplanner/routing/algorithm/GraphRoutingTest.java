@@ -438,7 +438,7 @@ public abstract class GraphRoutingTest {
       List<VehicleParkingEntranceCreator> entrances,
       String... tags
     ) {
-      var vehicleParking = VehicleParking.builder()
+      var vehicleParking = VehicleParking.of()
         .id(id(id))
         .coordinate(new WgsCoordinate(y, x))
         .bicyclePlaces(bicyclePlaces)

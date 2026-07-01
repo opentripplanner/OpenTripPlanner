@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
@@ -37,6 +38,8 @@ public class OsmModuleBuilder {
   private boolean includeOsmStationEntrances = false;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
+  private GraphBuildCacheManager cacheManager = GraphBuildCacheManager.NOOP;
+
   public OsmModuleBuilder(
     Collection<OsmProvider> providers,
     Graph graph,
@@ -70,6 +73,11 @@ public class OsmModuleBuilder {
 
   public OsmModuleBuilder withAreaVisibility(boolean areaVisibility) {
     this.areaVisibility = areaVisibility;
+    return this;
+  }
+
+  public OsmModuleBuilder withCacheManager(GraphBuildCacheManager cacheManager) {
+    this.cacheManager = cacheManager;
     return this;
   }
 
@@ -122,7 +130,8 @@ public class OsmModuleBuilder {
         staticBikeParkAndRide,
         includeInclinedEdgeLevelInfo,
         includeOsmStationEntrances
-      )
+      ),
+      cacheManager
     );
   }
 }
