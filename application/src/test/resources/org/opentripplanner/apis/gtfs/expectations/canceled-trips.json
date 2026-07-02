@@ -109,6 +109,14 @@
                 }
               }
             ],
+            "realTimeTripState": {
+              "added": false,
+              "canceled": true,
+              "deleted": false,
+              "timesModified": false,
+              "tripPatternModified": false,
+              "updated": true
+            },
             "trip": {
               "gtfsId": "F:321Canceled"
             }

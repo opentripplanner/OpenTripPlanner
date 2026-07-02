@@ -16,7 +16,6 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
-import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
@@ -245,25 +244,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Boolean> realTime() {
     return environment -> getSource(environment).isRealTimeUpdated();
-  }
-
-  @Override
-  public DataFetcher<RealTimeTripStateModel> realTimeTripState() {
-    return environment -> {
-      var leg = getSource(environment);
-      if (leg instanceof ScheduledTransitLeg stl) {
-        var tripTimes = stl.tripTimes();
-        return new RealTimeTripStateModel(
-          tripTimes.isAdded(),
-          tripTimes.isCanceled(),
-          tripTimes.isDeleted(),
-          tripTimes.isTimesModified(),
-          tripTimes.isTripPatternModified(),
-          tripTimes.hasAnyUpdates()
-        );
-      }
-      return null;
-    };
   }
 
   @Override

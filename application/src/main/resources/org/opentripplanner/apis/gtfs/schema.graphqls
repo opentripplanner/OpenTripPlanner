@@ -941,9 +941,7 @@ type Leg {
     originModesWithParentStation: [TransitMode!]
   ): [Leg!]
   "Whether there is real-time data about this Leg"
-  realTime: Boolean
-  "Real-time State of the trip on this Leg"
-  realTimeTripState: RealTimeTripState
+  realTime: Boolean @deprecated(reason : "Use `realTimeTripState.updated` on `TripOnServiceDate` instead.")
   "State of real-time data"
   realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` instead.")
   "Whether this leg is traversed with a rented vehicle."
@@ -2688,7 +2686,7 @@ type Stoptime {
   "Real-time prediction of departure time. Format: seconds since midnight of the departure date"
   realtimeDeparture: Int
   "State of real-time data"
-  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` on the Leg for the trips real-time state or `stopRealTimeState` for the stops realtime state.")
+  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` on `TripOnServiceDate` for the trip's real-time state.")
   "Scheduled arrival time. Format: seconds since midnight of the departure date"
   scheduledArrival: Int
   "Scheduled departure time. Format: seconds since midnight of the departure date"
@@ -2719,8 +2717,6 @@ type Stoptime {
   between trips even within the same pattern.
   """
   stopPositionInPattern: Int!
-  "The realtime-state of the stop"
-  stopRealTimeState: StopRealTimeState!
   "true, if this stop is used as a time equalization stop. false otherwise."
   timepoint: Boolean
   "Trip which this stoptime is for"
@@ -2914,6 +2910,8 @@ type TripOnServiceDate {
   end: StopCall!
   "Is this TripOnServiceDate a replacement? For GTFS-sourced data this might be all we know."
   isReplacement: Boolean
+  "Real-time state of the trip on this service date."
+  realTimeTripState: RealTimeTripState
   "Replaced by these TripOnServiceDates."
   replacedByRelation: [ReplacedByRelation!]!
   "Replacement for these TripOnServiceDates."
@@ -4149,19 +4147,6 @@ enum StopAlertType {
   STOP_ON_TRIPS
   "Alerts affecting the trips that go through this stop"
   TRIPS
-}
-
-enum StopRealTimeState {
-  "The stop is cancelled."
-  CANCELLED
-  "Default state. Trip's realtime state should then determine the state of the stop."
-  DEFAULT
-  "The realtime data on the stop is inaccurate."
-  INACCURATE_PREDICTIONS
-  "The realtime feed has indicated that there is no data available for this stop."
-  NO_DATA
-  "The vehicle has arrived to the stop or already visited it and the times are no longer estimates."
-  RECORDED
 }
 
 enum StopType {

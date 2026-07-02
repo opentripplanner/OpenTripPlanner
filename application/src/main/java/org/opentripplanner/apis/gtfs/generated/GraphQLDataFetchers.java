@@ -23,7 +23,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoff
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalDirection;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
@@ -474,7 +473,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLPickupDropoffType> pickupType();
     public DataFetcher<Iterable<Leg>> previousLegs();
     public DataFetcher<Boolean> realTime();
-    public DataFetcher<RealTimeTripStateModel> realTimeTripState();
     public DataFetcher<GraphQLRealtimeState> realtimeState();
     public DataFetcher<Boolean> rentedBike();
     public DataFetcher<RideEstimate> rideHailingEstimate();
@@ -1000,7 +998,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> stop();
     public DataFetcher<Integer> stopPosition();
     public DataFetcher<Integer> stopPositionInPattern();
-    public DataFetcher<GraphQLStopRealTimeState> stopRealTimeState();
     public DataFetcher<Boolean> timepoint();
     public DataFetcher<Trip> trip();
   }
@@ -1092,6 +1089,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLTripOnServiceDate {
     public DataFetcher<TripTimeOnDate> end();
     public DataFetcher<Boolean> isReplacement();
+    public DataFetcher<RealTimeTripStateModel> realTimeTripState();
     public DataFetcher<Iterable<ReplacedByRelation>> replacedByRelation();
     public DataFetcher<Iterable<ReplacementForRelation>> replacementForRelation();
     public DataFetcher<java.time.LocalDate> serviceDate();

@@ -8,7 +8,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
-import org.opentripplanner.apis.gtfs.mapping.StopRealTimeStateMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -92,12 +91,6 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   @Override
   public DataFetcher<Object> stop() {
     return environment -> getSource(environment).getStop();
-  }
-
-  @Override
-  public DataFetcher<GraphQLTypes.GraphQLStopRealTimeState> stopRealTimeState() {
-    return environment ->
-      StopRealTimeStateMapper.map(getSource(environment).getStopRealTimeState());
   }
 
   @Override

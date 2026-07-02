@@ -79,8 +79,7 @@
                 "rideHailingEstimate": null,
                 "accessibilityScore": null,
                 "id": null,
-                "realtimeState": null,
-                "realTimeTripState": null
+                "realtimeState": null
               },
               {
                 "mode": "BUS",
@@ -174,15 +173,7 @@
                 "rideHailingEstimate": null,
                 "accessibilityScore": null,
                 "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6MTIyAAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QgADRjpDAAA=",
-                "realtimeState": "UPDATED",
-                "realTimeTripState": {
-                  "added": false,
-                  "canceled": false,
-                  "deleted": false,
-                  "timesModified": true,
-                  "tripPatternModified": false,
-                  "updated": true
-                }
+                "realtimeState": "UPDATED"
               },
               {
                 "mode": "RAIL",
@@ -296,15 +287,7 @@
                 "rideHailingEstimate": null,
                 "accessibilityScore": 3.0,
                 "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6NDM5AAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QwADRjpEAAA=",
-                "realtimeState": "UPDATED",
-                "realTimeTripState": {
-                  "added": false,
-                  "canceled": false,
-                  "deleted": false,
-                  "timesModified": true,
-                  "tripPatternModified": false,
-                  "updated": true
-                }
+                "realtimeState": "UPDATED"
               },
               {
                 "mode": "CAR",
@@ -378,8 +361,7 @@
                 },
                 "accessibilityScore": null,
                 "id": null,
-                "realtimeState": null,
-                "realTimeTripState": null
+                "realtimeState": null
               }
             ]
           }

@@ -148,4 +148,3 @@ config:
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
     Notice: org.opentripplanner.transit.model.basic.Notice
     RealTimeTripState: org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel#RealTimeTripStateModel
-    StopRealTimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState#GraphQLStopRealTimeState

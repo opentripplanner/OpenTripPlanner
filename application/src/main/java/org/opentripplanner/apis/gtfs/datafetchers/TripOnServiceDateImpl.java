@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.ReplacementForRelation;
@@ -47,6 +48,28 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
       getTransitService(environment)
         .getReplacementHelper()
         .isReplacementTripOnServiceDate(getSource(environment));
+  }
+
+  @Override
+  public DataFetcher<RealTimeTripStateModel> realTimeTripState() {
+    return environment -> {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
+        return null;
+      }
+      var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
+      if (tripTimes == null) {
+        return null;
+      }
+      return new RealTimeTripStateModel(
+        tripTimes.isAdded(),
+        tripTimes.isCanceled(),
+        tripTimes.isDeleted(),
+        tripTimes.isTimesModified(),
+        tripTimes.isTripPatternModified(),
+        tripTimes.hasAnyUpdates()
+      );
+    };
   }
 
   @Override
