@@ -131,7 +131,8 @@ public class EntityResolver {
     }
 
     if (journey.estimatedVehicleJourneyCode() != null) {
-      return resolveId(journey.estimatedVehicleJourneyCode());
+      var adapter = new EstimatedVehicleJourneyCodeAdapter(journey.estimatedVehicleJourneyCode());
+      return resolveId(adapter.getDatedServiceJourneyId());
     }
 
     return null;

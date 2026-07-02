@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -24,7 +25,7 @@ public class TripTimeOnDateRequestBuilder {
   private static final String EXCLUDE_ROUTES = "excludeRoutes";
   private static final String EXCLUDE_MODES = "excludeModes";
   private final Collection<StopLocation> stopLocations;
-  private boolean includeCancelledTrips = false;
+  private CancellationPolicy cancellationPolicy = CancellationPolicy.NO_CANCELLATIONS;
   private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
     INCLUDE_AGENCIES,
     null
@@ -54,19 +55,33 @@ public class TripTimeOnDateRequestBuilder {
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
   private Instant time;
+  private List<LocalDateRange> serviceDateRanges = List.of();
   private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByDeparture();
 
   TripTimeOnDateRequestBuilder(Collection<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;
   }
 
-  public TripTimeOnDateRequestBuilder withIncludeCancelledTrips(boolean includeCancelledTrips) {
-    this.includeCancelledTrips = includeCancelledTrips;
+  public TripTimeOnDateRequestBuilder withCancellationPolicy(
+    CancellationPolicy cancellationPolicy
+  ) {
+    this.cancellationPolicy = cancellationPolicy;
     return this;
   }
 
   public TripTimeOnDateRequestBuilder withTime(Instant time) {
     this.time = time;
+    return this;
+  }
+
+  /**
+   * Limit the search by the trip times' service date instead of a time window. When set to a
+   * non-empty list, {@link #withTime(Instant)} and {@link #withTimeWindow(Duration)} are ignored.
+   */
+  public TripTimeOnDateRequestBuilder withServiceDateRanges(
+    List<LocalDateRange> serviceDateRanges
+  ) {
+    this.serviceDateRanges = serviceDateRanges;
     return this;
   }
 
@@ -133,11 +148,12 @@ public class TripTimeOnDateRequestBuilder {
     return new TripTimeOnDateRequest(
       stopLocations,
       time,
+      serviceDateRanges,
       timeWindow,
       arrivalDeparture,
       numberOfDepartures,
       sortOrder,
-      includeCancelledTrips,
+      cancellationPolicy,
       includeAgencies,
       includeRoutes,
       excludeAgencies,

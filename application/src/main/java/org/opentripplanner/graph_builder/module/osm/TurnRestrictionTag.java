@@ -38,5 +38,7 @@ class TurnRestrictionTag {
     RIGHT,
     U,
     STRAIGHT,
+    ENTRY,
+    EXIT,
   }
 }

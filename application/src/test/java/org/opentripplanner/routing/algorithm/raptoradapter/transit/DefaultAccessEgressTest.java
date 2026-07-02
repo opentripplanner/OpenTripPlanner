@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
+import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -59,6 +61,32 @@ class DefaultAccessEgressTest {
   @Test
   void hasOpeningHours() {
     assertFalse(subject.hasOpeningHours());
+  }
+
+  /**
+   * A long access leg — e.g. a walk over steep, wheelchair-inaccessible stairs — can accumulate a
+   * generalized cost so large that converting it straight to Raptor's {@code int} cost overflows to
+   * a negative value, crashing the whole request (issue #7679). The cost must instead be capped to
+   * {@link CostLimit#MAX_COST} so a valid (finite, non-negative) cost is produced.
+   */
+  @Test
+  void generalizedCostDoesNotOverflow() {
+    var builder = TestStateBuilder.ofWalking();
+    for (int i = 0; i < 20; i++) {
+      builder.streetEdge();
+    }
+    var state = builder.build();
+
+    // Precondition: the raw weight must exceed the cap, otherwise this test proves nothing.
+    assertTrue(
+      state.getWeight() > CostLimit.MAX_COST,
+      () -> "test fixture weight " + state.getWeight() + " must exceed the cap to be meaningful"
+    );
+
+    var subject = new DefaultAccessEgress(STOP, state);
+
+    assertEquals(RaptorCostConverter.toRaptorCost((double) CostLimit.MAX_COST), subject.c1());
+    assertTrue(subject.c1() > 0, "capped access cost must stay positive");
   }
 
   @Test

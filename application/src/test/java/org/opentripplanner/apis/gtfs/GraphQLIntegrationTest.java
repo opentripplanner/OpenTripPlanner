@@ -49,6 +49,7 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.FeedInfoTestFactory;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareOffer;
@@ -251,6 +252,31 @@ class GraphQLIntegrationTest {
 
     timetableRepository.addTripPattern(id("pattern-1"), pattern);
 
+    // A trip whose visit at stop B is canceled (skipped), while it still calls at stops A and D.
+    // Stop B is part of the stops query, so its canceledCalls field returns this skipped call.
+    var canceledTrip = TimetableRepositoryForTest.trip("CanceledTrip")
+      .withHeadsign(I18NString.of("Trip Headsign"))
+      .withServiceId(cal_id)
+      .build();
+    var canceledStopTimes = List.of(
+      stopTime(canceledTrip, 10, A.stop, 11 * 3600),
+      stopTime(canceledTrip, 20, B.stop, 11 * 3600 + 300),
+      stopTime(canceledTrip, 30, D.stop, 11 * 3600 + 600)
+    );
+    var canceledTripTimes = TripTimesFactory.tripTimes(
+      canceledTrip,
+      canceledStopTimes,
+      DEDUPLICATOR
+    ).withServiceCode(SERVICE_CODE);
+    final TripPattern canceledPattern = TimetableRepositoryForTest.tripPattern(
+      "canceled-pattern",
+      TimetableRepositoryForTest.route("canceled-route").withMode(BUS).build()
+    )
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, D.stop))
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(canceledTripTimes))
+      .build();
+    timetableRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
+
     var feedInfo = FeedInfoTestFactory.dummyForTest(FEED_ID);
     timetableRepository.addFeedInfo(feedInfo);
 
@@ -280,6 +306,13 @@ class GraphQLIntegrationTest {
       RealTimeTripUpdate.of(
         pattern,
         tripTimes2.createRealTimeFromScheduledTimes().withCanceled().build(),
+        secondDate
+      ).build()
+    );
+    timetableSnapshot.update(
+      RealTimeTripUpdate.of(
+        canceledPattern,
+        canceledTripTimes.createRealTimeFromScheduledTimes().withCanceled(1).build(),
         secondDate
       ).build()
     );
@@ -628,6 +661,13 @@ class GraphQLIntegrationTest {
       .withDirectionText(I18NString.of(name))
       .withStartLocation(WgsCoordinate.GREENWICH)
       .withAngle(10);
+  }
+
+  private static StopTime stopTime(Trip trip, int seq, StopLocation stop, int time) {
+    var stopTime = TEST_MODEL.stopTime(trip, seq, stop);
+    stopTime.setArrivalTime(time);
+    stopTime.setDepartureTime(time);
+    return stopTime;
   }
 
   private static FareProduct fareProduct(String name) {

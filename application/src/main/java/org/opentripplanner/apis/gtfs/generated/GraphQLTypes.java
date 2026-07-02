@@ -5091,6 +5091,31 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLStopCanceledCallsArgs {
+
+    private List<GraphQLLocalDateRangeInput> serviceDateRanges;
+
+    public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("serviceDateRanges") != null) {
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
+              "serviceDateRanges"
+            )).stream()
+            .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
+      return this.serviceDateRanges;
+    }
+
+    public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {
+      this.serviceDateRanges = serviceDateRanges;
+    }
+  }
+
   public static class GraphQLStopDescArgs {
 
     private String language;

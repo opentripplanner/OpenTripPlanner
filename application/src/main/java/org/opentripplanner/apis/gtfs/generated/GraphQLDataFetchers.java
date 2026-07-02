@@ -34,6 +34,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
+import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -881,6 +882,7 @@ public class GraphQLDataFetchers {
    */
   public interface GraphQLStop {
     public DataFetcher<Iterable<TransitAlert>> alerts();
+    public DataFetcher<Iterable<StopCallOnTripOnServiceDate>> canceledCalls();
     public DataFetcher<Object> cluster();
     public DataFetcher<String> code();
     public DataFetcher<String> desc();
@@ -922,6 +924,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<CallRealTime> realTime();
     public DataFetcher<CallSchedule> schedule();
     public DataFetcher<Object> stopLocation();
+  }
+
+  /** A stop call together with the trip on service date it belongs to. */
+  public interface GraphQLStopCallOnTripOnServiceDate {
+    public DataFetcher<TripTimeOnDate> stopCall();
+    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
   }
 
   public interface GraphQLStopGeometries {

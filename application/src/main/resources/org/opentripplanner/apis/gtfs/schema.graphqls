@@ -2379,6 +2379,22 @@ type Stop implements Node & PlaceInterface {
     """
     types: [StopAlertType]
   ): [Alert]
+  """
+  Canceled stop calls (arrivals/departures) at this stop. A call is included if either the trip it
+  belongs to has been canceled, or the visit at this stop has been canceled (skipped).
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+  correspond to how a passenger thinks of a calendar date. For example, a night bus running on
+  Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  canceledCalls(
+    """
+    Only include canceled calls whose trip's service date is within any of these date ranges.
+    If omitted (or `null`), no service date filter is applied and canceled calls across the entire
+    transit service period are returned. Defining a range is recommended.
+    """
+    serviceDateRanges: [LocalDateRangeInput!]
+  ): [StopCallOnTripOnServiceDate!]!
   "The cluster which this stop is part of"
   cluster: Cluster @deprecated(reason : "Not implemented")
   "Stop code which is visible at the stop"
@@ -2542,6 +2558,14 @@ type StopCall {
   schedule: CallSchedule
   "The stop where this arrival/departure happens."
   stopLocation: CallStopLocation!
+}
+
+"A stop call together with the trip on service date it belongs to."
+type StopCallOnTripOnServiceDate {
+  "A stop call which belongs to the trip on a service date."
+  stopCall: StopCall!
+  "The trip on service date that the stop call belongs to."
+  tripOnServiceDate: TripOnServiceDate!
 }
 
 type StopGeometries {

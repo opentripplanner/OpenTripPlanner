@@ -116,7 +116,11 @@ public class SiriRealTimeTripUpdateAdapter {
           try {
             successes.add(apply(journey, transitEditorService, fuzzyTripMatcher, entityResolver));
           } catch (UpdateException e) {
-            errors.add(e.toError(journey.getDataSource()));
+            errors.add(
+              e
+                .withTripReference(DebugString.tripReference(journey))
+                .toError(journey.getDataSource())
+            );
           }
         }
       }

@@ -1,5 +1,6 @@
 package org.opentripplanner.core.model.time;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -199,5 +200,46 @@ public class LocalDateRangeTest {
   @Test
   public void daysInPeriod() {
     assertEquals(7, LocalDateRange.ofInclusiveEnd(d0, d1).daysInPeriod());
+  }
+
+  @Test
+  public void asLocalDatesEnumeratesBoundedRange() {
+    var range = LocalDateRange.ofExclusiveEnd(d1, d1.plusDays(3));
+    assertThat(range.asLocalDates(LocalDate.MIN, LocalDate.MAX))
+      .containsExactly(d1, d1.plusDays(1), d1.plusDays(2))
+      .inOrder();
+  }
+
+  @Test
+  public void asLocalDatesUsesDefaultsForUnboundedSides() {
+    var range = LocalDateRange.ofUnbounded();
+    assertThat(range.asLocalDates(d1, d1.plusDays(2)))
+      .containsExactly(d1, d1.plusDays(1))
+      .inOrder();
+  }
+
+  @Test
+  public void asLocalDatesClampsToTighterBounds() {
+    var range = LocalDateRange.ofExclusiveEnd(d0, d4);
+    assertThat(range.asLocalDates(d1, d1.plusDays(2)))
+      .containsExactly(d1, d1.plusDays(1))
+      .inOrder();
+
+    var tight = LocalDateRange.ofExclusiveEnd(d1, d1.plusDays(2));
+    assertThat(tight.asLocalDates(d0, d4)).containsExactly(d1, d1.plusDays(1)).inOrder();
+  }
+
+  @Test
+  public void asLocalDatesReturnsEmptyWhenNoOverlap() {
+    var range = LocalDateRange.ofExclusiveEnd(d0, d1);
+    assertThat(range.asLocalDates(d2, d3)).isEmpty();
+  }
+
+  @Test
+  public void asLocalDatesThrowsWhenRangeTooLarge() {
+    var range = LocalDateRange.ofExclusiveEnd(d0, d0.plusDays(10001));
+    assertThrows(IllegalArgumentException.class, () ->
+      range.asLocalDates(LocalDate.MIN, LocalDate.MAX)
+    );
   }
 }

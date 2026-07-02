@@ -914,11 +914,25 @@ public class OsmDatabase {
         Direction.LEFT,
         relation.getId()
       );
+    } else if (relation.isTag("restriction", "no_entry")) {
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.ENTRY,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_u_turn")) {
       tag = new TurnRestrictionTag(
         via,
         TurnRestrictionType.ONLY_TURN,
         Direction.U,
+        relation.getId()
+      );
+    } else if (relation.isTag("restriction", "no_exit")) {
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.EXIT,
         relation.getId()
       );
     } else {

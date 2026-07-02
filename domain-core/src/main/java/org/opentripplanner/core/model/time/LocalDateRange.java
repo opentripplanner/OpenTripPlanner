@@ -5,6 +5,8 @@ import static java.time.LocalDate.MIN;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -24,6 +26,12 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public final class LocalDateRange {
 
   private static final LocalDateRange UNBOUNDED = new LocalDateRange(MIN, MAX);
+
+  /**
+   * Upper limit on the number of days {@link #asLocalDates(LocalDate, LocalDate)} is allowed to
+   * enumerate. This is a guard against accidentally materializing an enormous list of dates.
+   */
+  private static final int MAX_DAYS_AS_LOCAL_DATES = 10000;
 
   private final LocalDate inclusiveStart;
   private final LocalDate exclusiveEnd;
@@ -102,7 +110,15 @@ public final class LocalDateRange {
   }
 
   public boolean isUnbounded() {
-    return inclusiveStart.equals(MIN) && exclusiveEnd.equals(MAX);
+    return isUnboundedStart() && isUnboundedEnd();
+  }
+
+  public boolean isUnboundedStart() {
+    return inclusiveStart.equals(MIN);
+  }
+
+  public boolean isUnboundedEnd() {
+    return exclusiveEnd.equals(MAX);
   }
 
   /**
@@ -136,6 +152,59 @@ public final class LocalDateRange {
       throw new IllegalArgumentException("ranges do not overlap: " + this + " and " + other);
     }
     return new LocalDateRange(newStart, newEnd);
+  }
+
+  /**
+   * Enumerate the dates in this range as a list, narrowing each open side to the given defaults.
+   * <p>
+   * The effective range is the intersection of this range with
+   * {@code [defaultInclusiveStart, defaultExclusiveEnd)}: the start is the later of this range's
+   * start and {@code defaultInclusiveStart}, and the exclusive end is the earlier of this range's
+   * end and {@code defaultExclusiveEnd}. This makes the enumerated range as small as possible. When
+   * the two do not overlap an empty list is returned.
+   *
+   * @param defaultInclusiveStart the start used when this range is unbounded (or wider) at the
+   *                              start
+   * @param defaultExclusiveEnd   the exclusive end used when this range is unbounded (or wider) at
+   *                              the end
+   * @throws IllegalArgumentException if the effective range spans more than
+   *                                  {@value #MAX_DAYS_AS_LOCAL_DATES} days
+   */
+  public List<LocalDate> asLocalDates(
+    LocalDate defaultInclusiveStart,
+    LocalDate defaultExclusiveEnd
+  ) {
+    LocalDate effectiveInclusiveStart = ServiceDateUtils.max(inclusiveStart, defaultInclusiveStart);
+    LocalDate effectiveExclusiveEnd = ServiceDateUtils.min(exclusiveEnd, defaultExclusiveEnd);
+
+    if (!effectiveInclusiveStart.isBefore(effectiveExclusiveEnd)) {
+      return List.of();
+    }
+
+    long days = ChronoUnit.DAYS.between(effectiveInclusiveStart, effectiveExclusiveEnd);
+    if (days > MAX_DAYS_AS_LOCAL_DATES) {
+      throw new IllegalArgumentException(
+        "The date range [" +
+          effectiveInclusiveStart +
+          ", " +
+          effectiveExclusiveEnd +
+          ") spans " +
+          days +
+          " days, which exceeds the limit of " +
+          MAX_DAYS_AS_LOCAL_DATES +
+          " days."
+      );
+    }
+
+    List<LocalDate> dates = new ArrayList<>((int) days);
+    for (
+      LocalDate date = effectiveInclusiveStart;
+      date.isBefore(effectiveExclusiveEnd);
+      date = date.plusDays(1)
+    ) {
+      dates.add(date);
+    }
+    return dates;
   }
 
   /**

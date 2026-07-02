@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -27,7 +28,7 @@ class PathTransferTest {
   );
   private static final IntersectionVertex BOSTON_V = intersectionVertex(Coordinates.BOSTON);
   private static final int MAX_RAPTOR_TRANSFER_C1 = RaptorCostConverter.toRaptorCost(
-    PathTransfer.MAX_TRANSFER_COST
+    (double) CostLimit.MAX_COST
   );
 
   private static final RegularStop S1 = RegularStop.of(id("Stop1"), () -> 1).build();

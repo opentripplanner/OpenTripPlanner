@@ -60,7 +60,7 @@ jobs:
             profile: extended
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         with:
           fetch-depth: 0
