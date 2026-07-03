@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntityKey;
@@ -77,22 +76,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId stopId,
     Set<StopCondition> stopConditions
   ) {
-    EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
-    var result = findMatchingAlerts(entitySelector);
-    var stop = transitRepository.getSiteRepository().getStopLocation(stopId);
-
-    if (stop != null && stop.isPartOfStation()) {
-      // Add alerts for parent-station
-      result.addAll(
-        findMatchingAlerts(
-          new EntitySelector.Stop(
-            Objects.requireNonNull(stop.getParentStation()).getId(),
-            stopConditions
-          )
-        )
-      );
-    }
-    return result;
+    return findMatchingAlerts(new EntitySelector.Stop(stopId, stopConditions));
   }
 
   @Override

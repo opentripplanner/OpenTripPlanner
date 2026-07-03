@@ -66,12 +66,10 @@ class TransitAlertServiceImplTest {
       .build();
     iut.setAlerts(List.of(railStationAlert, railStopAlert, busStopAlert));
 
+    // getStopAlerts only returns alerts for the exact stop - parent stations are not included.
     assertEquals(Set.of(railStationAlert), Set.copyOf(iut.getStopAlerts(id(RAIL_STATION_ID))));
-    assertEquals(
-      Set.of(railStationAlert, railStopAlert),
-      Set.copyOf(iut.getStopAlerts(id(RAIL_P1_ID)))
-    );
-    assertEquals(Set.of(railStationAlert), Set.copyOf(iut.getStopAlerts(id(RAIL_PA_ID))));
+    assertEquals(Set.of(railStopAlert), Set.copyOf(iut.getStopAlerts(id(RAIL_P1_ID))));
+    assertEquals(Set.of(), Set.copyOf(iut.getStopAlerts(id(RAIL_PA_ID))));
     assertEquals(Set.of(), Set.copyOf(iut.getStopAlerts(id(METRO_STATION_ID))));
     assertEquals(Set.of(), Set.copyOf(iut.getStopAlerts(id(METRO_P1_ID))));
     assertEquals(Set.of(busStopAlert), Set.copyOf(iut.getStopAlerts(id(BUS_STOP_ID))));

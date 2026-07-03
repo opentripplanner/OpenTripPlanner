@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +31,7 @@ import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScala
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -357,11 +359,15 @@ public class QuayType {
           .name("situations")
           .description("Get all situations active for the quay.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(env ->
-            GqlUtil.getTransitService(env)
-              .getTransitAlertService()
-              .getStopAlerts(((StopLocation) env.getSource()).getId())
-          )
+          .dataFetcher(env -> {
+            var alertService = GqlUtil.getTransitService(env).getTransitAlertService();
+            var quay = (StopLocation) env.getSource();
+            var alerts = new HashSet<TransitAlert>(alertService.getStopAlerts(quay.getId()));
+            if (quay.isPartOfStation()) {
+              alerts.addAll(alertService.getStopAlerts(quay.getParentStation().getId()));
+            }
+            return alerts;
+          })
           .build()
       )
       .field(

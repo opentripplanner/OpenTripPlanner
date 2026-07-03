@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,7 +57,21 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         if (types.contains(GraphQLTypes.GraphQLStopAlertType.STOP)) {
-          alerts.addAll(alertService.getStopAlerts(id));
+          alerts.addAll(
+            getValue(
+              environment,
+              stop -> {
+                Collection<TransitAlert> stopAlerts = new HashSet<>(
+                  alertService.getStopAlerts(stop.getId())
+                );
+                if (stop.isPartOfStation()) {
+                  stopAlerts.addAll(alertService.getStopAlerts(stop.getParentStation().getId()));
+                }
+                return stopAlerts;
+              },
+              station -> alertService.getStopAlerts(station.getId())
+            )
+          );
         }
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_ROUTES) ||
@@ -124,7 +139,19 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         }
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
-        return alertService.getStopAlerts(id);
+        return getValue(
+          environment,
+          stop -> {
+            Collection<TransitAlert> stopAlerts = new HashSet<>(
+              alertService.getStopAlerts(stop.getId())
+            );
+            if (stop.isPartOfStation()) {
+              stopAlerts.addAll(alertService.getStopAlerts(stop.getParentStation().getId()));
+            }
+            return stopAlerts;
+          },
+          station -> alertService.getStopAlerts(station.getId())
+        );
       }
     };
   }

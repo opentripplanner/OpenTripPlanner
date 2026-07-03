@@ -118,8 +118,13 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
                   .toList()
               );
               getStops(environment).forEach(stop -> {
-                FeedScopedId stopId = ((StopLocation) stop).getId();
-                alerts.addAll(alertService.getStopAlerts(stopId));
+                StopLocation stopLocation = (StopLocation) stop;
+                alerts.addAll(alertService.getStopAlerts(stopLocation.getId()));
+                if (stopLocation.isPartOfStation()) {
+                  alerts.addAll(
+                    alertService.getStopAlerts(stopLocation.getParentStation().getId())
+                  );
+                }
               });
               break;
           }

@@ -20,7 +20,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsO
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.apis.support.SemanticHash;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -100,8 +99,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
               getSource(environment)
                 .getStops()
                 .forEach(stop -> {
-                  FeedScopedId stopId = stop.getId();
-                  alerts.addAll(alertService.getStopAlerts(stopId));
+                  alerts.addAll(alertService.getStopAlerts(stop.getId()));
+                  if (stop.isPartOfStation()) {
+                    alerts.addAll(alertService.getStopAlerts(stop.getParentStation().getId()));
+                  }
                 });
               break;
             case STOPS_ON_TRIPS:

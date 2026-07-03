@@ -37,6 +37,10 @@ public interface TransitAlertService {
     return getStopAlerts(stop, Set.of());
   }
 
+  /**
+   * Returns the alerts for the exact stop only. Alerts on the parent station (or any other related
+   * stop) are not included; call this method again with the parent station id to obtain those.
+   */
   Collection<TransitAlert> getStopAlerts(FeedScopedId stop, Set<StopCondition> stopConditions);
 
   Collection<TransitAlert> getRouteAlerts(FeedScopedId route);
