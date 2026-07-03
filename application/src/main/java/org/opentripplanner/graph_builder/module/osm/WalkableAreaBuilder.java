@@ -173,10 +173,9 @@ class WalkableAreaBuilder {
       }
 
       // Phase 2: build immutable AreaGroup with areas and visibility vertices
-      var areaGroupBuilder = AreaGroup.of(ring.jtsPolygon);
-      populateAreaGroupBuilder(areaGroupBuilder, ring.jtsPolygon, group.areas);
-      areaGroupBuilder.withVisibilityVertices(vertices);
-      AreaGroup areaGroup = areaGroupBuilder.build();
+      AreaGroup areaGroup = createAreaGroupBuilder(ring.jtsPolygon, group.areas)
+        .withVisibilityVertices(vertices)
+        .build();
 
       // Phase 3: create ring edges
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
@@ -354,10 +353,9 @@ class WalkableAreaBuilder {
       }
 
       // Phase 1b: build immutable AreaGroup with areas and visibility vertices
-      var areaGroupBuilder = AreaGroup.of(polygon);
-      populateAreaGroupBuilder(areaGroupBuilder, polygon, group.areas);
-      areaGroupBuilder.withVisibilityVertices(visibilityVertices);
-      AreaGroup areaGroup = areaGroupBuilder.build();
+      AreaGroup areaGroup = createAreaGroupBuilder(polygon, group.areas)
+        .withVisibilityVertices(visibilityVertices)
+        .build();
 
       for (IntersectionVertex v : visibilityVertices) {
         vertexToAreaGroup.putIfAbsent(v, areaGroup);
@@ -706,11 +704,11 @@ class WalkableAreaBuilder {
     return Set.of(street, backStreet);
   }
 
-  private void populateAreaGroupBuilder(
-    AreaGroup.Builder builder,
+  private AreaGroup.Builder createAreaGroupBuilder(
     Polygon containingArea,
     Collection<OsmArea> osmAreas
   ) {
+    var builder = AreaGroup.of(containingArea);
     for (OsmArea area : osmAreas) {
       // intersects is a quick filter to remove candidates
       if (!area.jtsMultiPolygon.intersects(containingArea)) {
@@ -742,6 +740,7 @@ class WalkableAreaBuilder {
         }
       }
     }
+    return builder;
   }
 
   /**
