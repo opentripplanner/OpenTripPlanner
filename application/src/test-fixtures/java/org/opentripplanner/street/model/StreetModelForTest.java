@@ -121,7 +121,7 @@ public class StreetModelForTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    AreaGroup area = new AreaGroup(null);
+    AreaGroup area = AreaGroup.of(null).build();
 
     return new AreaEdgeBuilder()
       .withFromVertex(vA)

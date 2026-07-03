@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,21 +18,23 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  */
 public class AreaGroup implements Serializable {
 
-  private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
-  private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
+  // Mutable backing set: callers see an unmodifiable view; addVisibilityVertex may append at runtime.
+  private final HashSet<IntersectionVertex> visibilityVertices;
   private final Polygon geometry;
-  private final List<Area> areas = new ArrayList<>();
+  private final List<Area> areas;
 
-  public AreaGroup(Polygon geometry) {
-    this.geometry = geometry;
+  private AreaGroup(Builder builder) {
+    this.geometry = builder.geometry;
+    this.areas = List.copyOf(builder.areas);
+    this.visibilityVertices = new HashSet<>(builder.visibilityVertices);
+  }
+
+  public static Builder of(Polygon geometry) {
+    return new Builder(geometry);
   }
 
   public String toString() {
     return String.format("AreaGroup: visibilityVertices=%s, %s", visibilityVertices, geometry);
-  }
-
-  public void addArea(Area area) {
-    areas.add(area);
   }
 
   public List<Area> getAreas() {
@@ -43,24 +46,43 @@ public class AreaGroup implements Serializable {
   }
 
   /**
-   * Returns the list of visibility vertices.
+   * Returns the set of visibility vertices.
    */
   public Set<IntersectionVertex> visibilityVertices() {
-    return visibilityVertices;
+    return Collections.unmodifiableSet(visibilityVertices);
   }
 
   /**
-   * Add a set of visibility vertices to this area group
+   * Append a vertex discovered during permanent transit-stop linking. This is the only
+   * post-construction mutation allowed on AreaGroup; it ensures future linking operations
+   * can reach this vertex without re-linking the entire area.
    */
-  public void addVisibilityVertices(Set<IntersectionVertex> toAdd) {
-    synchronized (this) {
-      if (visibilityVertices == EMPTY_SET) {
-        visibilityVertices = Set.copyOf(toAdd);
-      } else {
-        var temp = new HashSet<>(visibilityVertices);
-        temp.addAll(toAdd);
-        visibilityVertices = Set.copyOf(temp);
-      }
+  public void addVisibilityVertex(IntersectionVertex vertex) {
+    visibilityVertices.add(vertex);
+  }
+
+  public static class Builder {
+
+    private final Polygon geometry;
+    private final List<Area> areas = new ArrayList<>();
+    private Set<IntersectionVertex> visibilityVertices = Set.of();
+
+    private Builder(Polygon geometry) {
+      this.geometry = geometry;
+    }
+
+    public Builder addArea(Area area) {
+      areas.add(area);
+      return this;
+    }
+
+    public Builder withVisibilityVertices(Set<IntersectionVertex> vertices) {
+      this.visibilityVertices = vertices;
+      return this;
+    }
+
+    public AreaGroup build() {
+      return new AreaGroup(this);
     }
   }
 }

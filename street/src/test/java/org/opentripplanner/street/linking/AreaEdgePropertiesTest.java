@@ -58,12 +58,12 @@ class AreaEdgePropertiesTest {
     float bike,
     boolean wheelchairAccessible
   ) {
-    var a = new Area();
-    a.setName(I18NString.of(name));
-    a.setPermission(permission);
-    a.setWalkSafety(walk);
-    a.setBicycleSafety(bike);
-    a.setWheelchairAccessible(wheelchairAccessible);
-    return a;
+    return Area.of()
+      .withName(I18NString.of(name))
+      .withPermission(permission)
+      .withWalkSafety(walk)
+      .withBicycleSafety(bike)
+      .withWheelchairAccessible(wheelchairAccessible)
+      .build();
   }
 }
