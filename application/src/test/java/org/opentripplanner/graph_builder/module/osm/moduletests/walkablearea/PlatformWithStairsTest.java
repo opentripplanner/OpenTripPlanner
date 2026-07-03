@@ -21,12 +21,12 @@ class PlatformWithStairsTest {
   @Test
   void platformConnectedToStairway() {
     // Square platform: corners listed in order to form a closed polygon
-    var platformBottomLeft = node(0, new WgsCoordinate(0, 0));
-    var platformTopLeft = node(1, new WgsCoordinate(5, 0));
-    var platformTopRight = node(2, new WgsCoordinate(5, 5));
-    var platformBottomRight = node(3, new WgsCoordinate(0, 5));
+    var bl = node(0, new WgsCoordinate(0, 0));
+    var tl = node(1, new WgsCoordinate(5, 0));
+    var tr = node(2, new WgsCoordinate(5, 5));
+    var br = node(3, new WgsCoordinate(0, 5));
 
-    var platform = List.of(platformBottomLeft, platformTopLeft, platformTopRight, platformBottomRight);
+    var platform = List.of(bl, tl, tr, br);
 
     // Stair rises from outside and terminates inside the platform area.
     // Neither node is shared with the platform polygon.
