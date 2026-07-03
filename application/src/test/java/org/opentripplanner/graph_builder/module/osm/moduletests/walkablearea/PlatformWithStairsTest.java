@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
