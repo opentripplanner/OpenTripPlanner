@@ -13,8 +13,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge
  * splitting, such as adding new edges during transit linking.
- *
- * @author novalis
  */
 public class AreaGroup implements Serializable {
 
