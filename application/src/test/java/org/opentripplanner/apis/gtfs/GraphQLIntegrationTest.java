@@ -78,7 +78,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -376,18 +375,9 @@ class GraphQLIntegrationTest {
     var snapshot = timetableSnapshot.commit();
 
     TransitEditorService transitService = new DefaultTransitService(transitRepository, snapshot) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(
-        transitRepository
-      );
-
       @Override
       public List<TransitMode> findTransitModes(StopLocation stop) {
         return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
       }
 
       @Override
@@ -521,7 +511,8 @@ class GraphQLIntegrationTest {
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
-    transitService.getTransitAlertService().setAlerts(alerts);
+    var transitAlertService = new TransitAlertServiceImpl();
+    transitAlertService.setAlerts(alerts);
 
     var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
     var realtimeVehicleService = new DefaultRealtimeVehicleService(
@@ -561,6 +552,7 @@ class GraphQLIntegrationTest {
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
+      transitAlertService,
       TransferServiceTestFactory.defaultTransferService(),
       fareService,
       defaultVehicleRentalService,

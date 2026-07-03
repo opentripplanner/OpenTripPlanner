@@ -29,7 +29,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
@@ -673,12 +672,6 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitRepository.getTimeZone();
   }
 
-  @Override
-  public TransitAlertService getTransitAlertService() {
-    return this.transitRepository.getTransitAlertService();
-  }
-
-  @Override
   public FlexIndex getFlexIndex() {
     return this.transitRepositoryIndex.getFlexIndex();
   }

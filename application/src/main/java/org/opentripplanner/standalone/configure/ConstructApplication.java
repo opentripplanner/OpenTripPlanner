@@ -218,6 +218,7 @@ public class ConstructApplication {
       carpoolTripVertexResolver(),
       factory.updateManager(),
       factory.timetableRepositoryHandle(),
+      factory.transitAlertService(),
       routerConfig().updaterConfig()
     );
 

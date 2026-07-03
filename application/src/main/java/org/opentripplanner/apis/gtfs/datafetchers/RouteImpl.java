@@ -278,7 +278,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   }
 
   private TransitAlertService getAlertService(DataFetchingEnvironment environment) {
-    return getTransitService(environment).getTransitAlertService();
+    return environment.<GraphQLRequestContext>getContext().transitAlertService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

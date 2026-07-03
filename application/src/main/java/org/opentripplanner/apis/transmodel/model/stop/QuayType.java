@@ -360,7 +360,7 @@ public class QuayType {
           .description("Get all situations active for the quay.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(env -> {
-            var alertService = GqlUtil.getTransitService(env).getTransitAlertService();
+            var alertService = GqlUtil.getTransitAlertService(env);
             var quay = (StopLocation) env.getSource();
             var alerts = new HashSet<TransitAlert>(alertService.getStopAlerts(quay.getId()));
             if (quay.isPartOfStation()) {

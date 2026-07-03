@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -158,6 +159,7 @@ public class SpeedTest {
       null,
       updateManager,
       timetableHandle,
+      new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig()
     );
     if (transitRepository.getUpdaterManager() != null) {
@@ -194,6 +196,7 @@ public class SpeedTest {
         transitRepository,
         timetableHandle.repositorySnapshot(registry.scope())
       ),
+      new DelegatingTransitAlertServiceImpl(),
       null,
       null,
       VectorTileConfig.DEFAULT,

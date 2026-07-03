@@ -39,6 +39,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -85,6 +86,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     CONTEXT = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
+      new TransitAlertServiceImpl(),
       transferService,
       new DefaultFareService(),
       new DefaultVehicleRentalService(),

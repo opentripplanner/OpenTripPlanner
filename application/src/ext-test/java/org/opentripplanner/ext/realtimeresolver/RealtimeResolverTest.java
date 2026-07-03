@@ -43,6 +43,8 @@ class RealtimeResolverTest {
   private final RegularStop stop2 = testModel.stop("stop2", 2, 1).build();
   private final RegularStop stop3 = testModel.stop("stop3", 3, 1).build();
 
+  private final TransitAlertService transitAlertService = new TransitAlertServiceImpl();
+
   @Test
   void testPopulateLegsWithRealtime() {
     var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
@@ -61,11 +63,12 @@ class RealtimeResolverTest {
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .addTimePeriod(new TimePeriod(0, 0))
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    transitAlertService.setAlerts(List.of(alert));
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
-      transitService
+      transitService,
+      transitAlertService
     );
 
     assertFalse(itinerariesWithRealtime.isEmpty());
@@ -98,7 +101,11 @@ class RealtimeResolverTest {
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      transitAlertService
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -120,7 +127,11 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      transitAlertService
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -179,13 +190,6 @@ class RealtimeResolverTest {
     transitRepository.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
-    return new DefaultTransitService(transitRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(transitRepository);
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
+    return new DefaultTransitService(transitRepository);
   }
 }

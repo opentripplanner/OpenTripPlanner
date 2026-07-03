@@ -247,7 +247,7 @@ public abstract class GtfsTest {
       new Deduplicator(),
       LocalDate::now
     );
-    alertPatchServiceImpl = new TransitAlertServiceImpl(transitRepository);
+    alertPatchServiceImpl = new TransitAlertServiceImpl();
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(FEED_ID);
 

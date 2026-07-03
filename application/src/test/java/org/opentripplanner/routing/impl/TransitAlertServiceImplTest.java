@@ -54,7 +54,7 @@ class TransitAlertServiceImplTest {
 
   @Test
   void getStopAlerts() {
-    var iut = new TransitAlertServiceImpl(TIMETABLE_REPOSITORY);
+    var iut = new TransitAlertServiceImpl();
     var railStationAlert = TransitAlert.of(id("rail_station_alert"))
       .addEntity(new EntitySelector.Stop(id(RAIL_STATION_ID)))
       .build();

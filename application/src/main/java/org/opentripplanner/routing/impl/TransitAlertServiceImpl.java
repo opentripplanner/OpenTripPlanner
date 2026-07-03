@@ -13,7 +13,6 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This is the primary implementation of TransitAlertService, which actually retains its own set
@@ -32,13 +31,7 @@ import org.opentripplanner.transit.service.TransitRepository;
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
-  private final TransitRepository transitRepository;
-
   private Multimap<EntityKey, TransitAlert> alerts = HashMultimap.create();
-
-  public TransitAlertServiceImpl(TransitRepository transitRepository) {
-    this.transitRepository = transitRepository;
-  }
 
   @Override
   public void setAlerts(Collection<TransitAlert> alerts) {

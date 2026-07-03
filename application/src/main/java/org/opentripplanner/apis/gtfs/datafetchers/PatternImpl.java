@@ -42,7 +42,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
+      TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLPatternAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLPatternAlertType> types = args.getGraphQLTypes();
       if (types != null) {
@@ -297,6 +297,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
+  }
+
+  private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitAlertService();
   }
 
   private TripPattern getSource(DataFetchingEnvironment environment) {

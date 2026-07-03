@@ -34,7 +34,6 @@ import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.retry.OtpRetryException;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -134,14 +133,9 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   public static SiriAzureUpdater createSXUpdater(
     SiriAzureSXUpdaterParameters config,
-    TransitRepository transitRepository,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
-    var messageHandler = new SiriAzureSXUpdater(
-      config,
-      transitRepository,
-      siriFuzzyTripMatcherCache
-    );
+    var messageHandler = new SiriAzureSXUpdater(config, siriFuzzyTripMatcherCache);
     return new SxWrapper(config, messageHandler);
   }
 

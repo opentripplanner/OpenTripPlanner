@@ -24,6 +24,7 @@ import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -37,7 +38,8 @@ public class MetricsLogging {
     TransitRepository transitRepository,
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary,
-    UpdateManager updateManager
+    UpdateManager updateManager,
+    TransitAlertService transitAlertService
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -51,7 +53,7 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
     if (OTPFeature.AlertMetrics.isOn()) {
-      new AlertMetrics(transitRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+      new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }
 
     if (transitRepository.getRaptorTransitData() != null) {

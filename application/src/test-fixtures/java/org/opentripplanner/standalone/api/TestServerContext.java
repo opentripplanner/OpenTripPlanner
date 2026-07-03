@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -207,6 +208,7 @@ public class TestServerContext {
       transactionScope,
       routerConfig.transitTuningConfig(),
       transitService,
+      new TransitAlertServiceImpl(),
       routerConfig.triasApiParameters(),
       routerConfig.gtfsApiParameters(),
       routerConfig.vectorTileConfig(),
