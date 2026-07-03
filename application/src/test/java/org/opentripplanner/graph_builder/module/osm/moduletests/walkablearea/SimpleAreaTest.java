@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
@@ -41,18 +40,20 @@ class SimpleAreaTest {
       .builder()
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
-      .build().buildGraph();
+      .build()
+      .buildGraph();
 
-    assertFalse(graph.getVertices().isEmpty());
     var summarizer = new GraphSummarizer(graph);
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
       .containsExactly(
-        // stair edges — wheelchair-inaccessible, as expected for steps
-        "(-1,2.5) → (2,2.5) PEDESTRIAN ♿❌",
-        "(2,2.5) → (-1,2.5) PEDESTRIAN ♿❌",
-        // platform ring edges (boundary of the square)
+        // connecting ways from outside into two opposite corners
+        "(0,0) → (-1,0) PEDESTRIAN ♿✅",
+        "(-1,0) → (0,0) PEDESTRIAN ♿✅",
+        "(5,5) → (6,5) PEDESTRIAN ♿✅",
+        "(6,5) → (5,5) PEDESTRIAN ♿✅",
+        // ring edges (boundary of the square)
         "(0,0) → (5,0) PEDESTRIAN ♿✅",
         "(5,0) → (0,0) PEDESTRIAN ♿✅",
         "(5,0) → (5,5) PEDESTRIAN ♿✅",
@@ -61,11 +62,9 @@ class SimpleAreaTest {
         "(0,5) → (5,5) PEDESTRIAN ♿✅",
         "(0,5) → (0,0) PEDESTRIAN ♿✅",
         "(0,0) → (0,5) PEDESTRIAN ♿✅",
-        // stairTop connected to visible platform corners via visibility edges
-        "(2,2.5) → (0,0) PEDESTRIAN ♿✅",
-        "(0,0) → (2,2.5) PEDESTRIAN ♿✅",
-        "(2,2.5) → (5,5) PEDESTRIAN ♿✅",
-        "(5,5) → (2,2.5) PEDESTRIAN ♿✅"
+        // diagonal visibility edge between the two connected corners (shortest crossing)
+        "(0,0) → (5,5) PEDESTRIAN ♿✅",
+        "(5,5) → (0,0) PEDESTRIAN ♿✅"
       );
   }
 }

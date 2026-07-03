@@ -53,6 +53,19 @@ class WheelchairInaccessibleAreaTest {
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
-      .containsExactly("PLACEHOLDER");
+      .containsExactly(
+        // connecting footway stays accessible
+        "(0,0) → (-0.001,0) PEDESTRIAN ♿✅",
+        "(-0.001,0) → (0,0) PEDESTRIAN ♿✅",
+        // all ring edges inherit wheelchair=no from the area
+        "(0,0) → (0.001,0) PEDESTRIAN ♿❌",
+        "(0.001,0) → (0,0) PEDESTRIAN ♿❌",
+        "(0,0) → (0,0.001) PEDESTRIAN ♿❌",
+        "(0,0.001) → (0,0) PEDESTRIAN ♿❌",
+        "(0.001,0) → (0.001,0.001) PEDESTRIAN ♿❌",
+        "(0.001,0.001) → (0.001,0) PEDESTRIAN ♿❌",
+        "(0.001,0.001) → (0,0.001) PEDESTRIAN ♿❌",
+        "(0,0.001) → (0.001,0.001) PEDESTRIAN ♿❌"
+      );
   }
 }

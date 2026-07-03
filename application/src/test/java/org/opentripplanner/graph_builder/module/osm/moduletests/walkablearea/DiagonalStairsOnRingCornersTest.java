@@ -53,6 +53,24 @@ class DiagonalStairsOnRingCornersTest {
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
-      .containsExactly("PLACEHOLDER");
+      .containsExactly(
+        // stairs at bl and tr (wheelchair-inaccessible steps)
+        "(0,0) → (-0.001,0) PEDESTRIAN ♿❌",
+        "(-0.001,0) → (0,0) PEDESTRIAN ♿❌",
+        "(0.001,0.001) → (0.002,0.001) PEDESTRIAN ♿❌",
+        "(0.002,0.001) → (0.001,0.001) PEDESTRIAN ♿❌",
+        // ring segments (4 sides × 2 directions)
+        "(0,0) → (0.001,0) PEDESTRIAN ♿✅",
+        "(0.001,0) → (0,0) PEDESTRIAN ♿✅",
+        "(0,0) → (0,0.001) PEDESTRIAN ♿✅",
+        "(0,0.001) → (0,0) PEDESTRIAN ♿✅",
+        "(0.001,0) → (0.001,0.001) PEDESTRIAN ♿✅",
+        "(0.001,0.001) → (0.001,0) PEDESTRIAN ♿✅",
+        "(0.001,0.001) → (0,0.001) PEDESTRIAN ♿✅",
+        "(0,0.001) → (0.001,0.001) PEDESTRIAN ♿✅",
+        // surviving diagonal visibility edge bl↔tr (shorter than the two-segment ring detour)
+        "(0,0) → (0.001,0.001) PEDESTRIAN ♿✅",
+        "(0.001,0.001) → (0,0) PEDESTRIAN ♿✅"
+      );
   }
 }

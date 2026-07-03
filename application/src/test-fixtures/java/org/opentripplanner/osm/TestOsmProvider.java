@@ -105,7 +105,10 @@ public class TestOsmProvider implements OsmProvider {
       return addAreaFromNodes(way -> way.withTag("highway", "pedestrian"), id, areaNodes);
     }
 
-    public Builder addAreaFromNodes(Consumer<OsmWayBuilder> areaBuilderConsumer, List<OsmNode> areaNodes) {
+    public Builder addAreaFromNodes(
+      Consumer<OsmWayBuilder> areaBuilderConsumer,
+      List<OsmNode> areaNodes
+    ) {
       return addAreaFromNodes(areaBuilderConsumer, counter.incrementAndGet(), areaNodes);
     }
 

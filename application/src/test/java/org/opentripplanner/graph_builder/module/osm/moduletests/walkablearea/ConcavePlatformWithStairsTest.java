@@ -25,10 +25,11 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * {@code Ring.isNodeConvex(C)} returns {@code true} for a CW ring because the cross-product at
  * a re-entrant corner is positive. This adds C to {@code visibilityVertices}.
  *
- * <p>Stairs connect from outside to the top-left (A) and the bottom-right (F). A direct
- * line-of-sight from A to F exits the L-shape through the empty upper-right quadrant, so those
- * two stair entries can only reach each other via C. The SPT uses A→C and C→F visibility edges,
- * making them survive pruning.
+ * <p>Stairs connect from outside to the top-left (A) and the bottom-right (F). The direct
+ * line-of-sight from A to F grazes the re-entrant corner C exactly (the segment A–F passes
+ * through C's coordinate), so it stays inside the L-shape and is a valid visibility edge. Being
+ * shorter than the ring detour A→E→F, this direct diagonal survives the SPT pruning between the
+ * two stair entries; no separate A–C or C–F visibility edges are needed.
  */
 class ConcavePlatformWithStairsTest {
 
@@ -67,6 +68,29 @@ class ConcavePlatformWithStairsTest {
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
-      .containsExactly("PLACEHOLDER");
+      .containsExactly(
+        // stairs into A (wheelchair-inaccessible steps)
+        "(0.004,0) → (0.005,0) PEDESTRIAN ♿❌",
+        "(0.005,0) → (0.004,0) PEDESTRIAN ♿❌",
+        // stairs into F
+        "(0,0.004) → (0,0.005) PEDESTRIAN ♿❌",
+        "(0,0.005) → (0,0.004) PEDESTRIAN ♿❌",
+        // ring segments (6 sides × 2 directions)
+        "(0.004,0) → (0.004,0.002) PEDESTRIAN ♿✅",
+        "(0.004,0.002) → (0.004,0) PEDESTRIAN ♿✅",
+        "(0.004,0.002) → (0.002,0.002) PEDESTRIAN ♿✅",
+        "(0.002,0.002) → (0.004,0.002) PEDESTRIAN ♿✅",
+        "(0.002,0.002) → (0.002,0.004) PEDESTRIAN ♿✅",
+        "(0.002,0.004) → (0.002,0.002) PEDESTRIAN ♿✅",
+        "(0.002,0.004) → (0,0.004) PEDESTRIAN ♿✅",
+        "(0,0.004) → (0.002,0.004) PEDESTRIAN ♿✅",
+        "(0,0.004) → (0,0) PEDESTRIAN ♿✅",
+        "(0,0) → (0,0.004) PEDESTRIAN ♿✅",
+        "(0.004,0) → (0,0) PEDESTRIAN ♿✅",
+        "(0,0) → (0.004,0) PEDESTRIAN ♿✅",
+        // visibility diagonal A↔F grazing the re-entrant corner C — the surviving shortest path
+        "(0.004,0) → (0,0.004) PEDESTRIAN ♿✅",
+        "(0,0.004) → (0.004,0) PEDESTRIAN ♿✅"
+      );
   }
 }
