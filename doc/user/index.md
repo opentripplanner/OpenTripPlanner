@@ -14,6 +14,8 @@ released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). As 
 codebase has been in active development for over ten years, and is relied upon by transportation
 authorities and travel planning applications in [deployments](Deployments.md) around the world.
 
+For a comprehensive list of all OTP capabilities, see the [Features](Features.md) page.
+
 You are currently reading the documentation for **OpenTripPlanner 2**, the second major version of
 OTP.
 
