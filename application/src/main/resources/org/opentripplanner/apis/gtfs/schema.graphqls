@@ -2125,17 +2125,20 @@ type RealTimeEstimate {
 
 "The real-time state of a trip"
 type RealTimeTripState {
-  "has the trip been added via real-time updates? (extra trip)"
+  "Has the trip been added via real-time updates? (extra trip)"
   added: Boolean!
-  "has the trip been canceled?"
+  "Has the trip been canceled?"
   canceled: Boolean!
-  "has the trip been deleted?"
+  "Has the trip been deleted?"
   deleted: Boolean!
-  "have the departure/ arrival times been modified?"
+  "Have any stop arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!
-  "has the trip pattern been modified?"
+  """
+  Has the stop sequence changed from the scheduled pattern? True if stops were added, removed,
+  reordered, or reassigned to a different stop location (`assigned_stop_id`).
+  """
   tripPatternModified: Boolean!
-  "have there been any real-time updates on this trip?"
+  "Have there been any real-time updates on this trip?"
   updated: Boolean!
 }
 
