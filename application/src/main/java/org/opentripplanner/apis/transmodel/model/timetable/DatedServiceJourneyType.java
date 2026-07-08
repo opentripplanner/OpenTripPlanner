@@ -17,6 +17,7 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.plan.TransmodelRealTimeTripStateModel;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -43,7 +44,8 @@ public class DatedServiceJourneyType {
     GraphQLType estimatedCallType,
     GraphQLType quayType,
     GraphQLOutputType replacedByType,
-    GraphQLOutputType replacementForType
+    GraphQLOutputType replacementForType,
+    GraphQLOutputType realTimeTripStateType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -188,6 +190,39 @@ public class DatedServiceJourneyType {
             return GqlUtil.getTransitService(environment)
               .findTripTimesOnDate(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
               .orElse(List.of());
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("realTimeTripState")
+          .description("The real-time state of this dated service journey.")
+          .type(realTimeTripStateType)
+          .dataFetcher(environment -> {
+            TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
+            TransitService transitService = GqlUtil.getTransitService(environment);
+            var trip = tripOnServiceDate.getTrip();
+            var serviceDate = tripOnServiceDate.getServiceDate();
+            var pattern = transitService.findPattern(trip, serviceDate);
+            if (pattern == null) {
+              return null;
+            }
+            var timetable = transitService.findTimetable(pattern, serviceDate);
+            if (timetable == null) {
+              return null;
+            }
+            var tripTimes = timetable.getTripTimes(trip);
+            if (tripTimes == null) {
+              return null;
+            }
+            return new TransmodelRealTimeTripStateModel(
+              tripTimes.isAdded(),
+              tripTimes.isCanceled(),
+              tripTimes.isDeleted(),
+              tripTimes.isTimesModified(),
+              tripTimes.isTripPatternModified(),
+              tripTimes.hasAnyUpdates()
+            );
           })
           .build()
       )

@@ -46,7 +46,7 @@ public class RealTimeTripStateType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("timesModified")
-          .description("Have the departure/arrival times been modified?")
+          .description("Have any stop arrival or departure times been modified from the scheduled times?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).timesModified())
           .build()
@@ -54,7 +54,9 @@ public class RealTimeTripStateType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatternModified")
-          .description("Has the trip pattern been modified?")
+          .description(
+            "Has the stop sequence changed from the scheduled pattern? True if stops were added, removed, reordered, or reassigned to a different stop location (assigned_stop_id)."
+          )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env ->
             ((TransmodelRealTimeTripStateModel) env.getSource()).tripPatternModified()

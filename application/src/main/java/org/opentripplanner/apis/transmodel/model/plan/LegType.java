@@ -30,7 +30,6 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
@@ -58,7 +57,6 @@ public class LegType {
     GraphQLObjectType pathGuidanceType,
     GraphQLType elevationStepType,
     GraphQLObjectType emissionType,
-    GraphQLOutputType realTimeTripStateType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -192,30 +190,6 @@ public class LegType {
           .description("Whether there is real-time data about this leg")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env -> leg(env).isRealTimeUpdated())
-          .build()
-      )
-      .field(
-        GraphQLFieldDefinition.newFieldDefinition()
-          .name("realTimeTripState")
-          .description(
-            "The detailed real-time state of the trip on this leg. Null for non-transit legs."
-          )
-          .type(realTimeTripStateType)
-          .dataFetcher(env -> {
-            Leg l = leg(env);
-            if (l instanceof ScheduledTransitLeg stl) {
-              var tt = stl.tripTimes();
-              return new TransmodelRealTimeTripStateModel(
-                tt.isAdded(),
-                tt.isCanceled(),
-                tt.isDeleted(),
-                tt.isTimesModified(),
-                tt.isTripPatternModified(),
-                tt.hasAnyUpdates()
-              );
-            }
-            return null;
-          })
           .build()
       )
       .field(
