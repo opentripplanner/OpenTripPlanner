@@ -943,7 +943,7 @@ type Leg {
   "Whether there is real-time data about this Leg"
   realTime: Boolean @deprecated(reason : "Use `realTimeTripState.updated` on `TripOnServiceDate` instead.")
   "State of real-time data"
-  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` instead.")
+  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` on `TripOnServiceDate` instead.")
   "Whether this leg is traversed with a rented vehicle."
   rentedBike: Boolean
   "Estimate of a hailed ride like Uber."
