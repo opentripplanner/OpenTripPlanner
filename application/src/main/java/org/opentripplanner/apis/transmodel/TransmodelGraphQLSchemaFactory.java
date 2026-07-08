@@ -364,7 +364,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
     GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
 
-    GraphQLObjectType realTimeTripStateType = RealTimeTripStateType.create();
+    GraphQLObjectType realTimeJourneyStateType = RealTimeTripStateType.create();
     GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
       journeyPatternType,
@@ -372,7 +372,7 @@ public class TransmodelGraphQLSchemaFactory {
       quayType,
       replacedByRelationType,
       replacementForRelationType,
-      realTimeTripStateType
+      realTimeJourneyStateType
     );
 
     var timetabledPassingTime = TimetabledPassingTimeType.create(

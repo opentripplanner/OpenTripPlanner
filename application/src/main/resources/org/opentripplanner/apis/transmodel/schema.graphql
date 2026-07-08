@@ -185,6 +185,8 @@ type DatedServiceJourney {
     "Only fetch the last n quays on the service journey"
     last: Int
   ): [Quay!]!
+  "The real-time state of this dated service journey."
+  realTimeJourneyState: RealTimeJourneyState
   "Dated service journeys this dated service journey is replaced by"
   replacedByRelation: [ReplacedByRelation!]!
   "List of the dated service journeys this dated service journeys replaces"
@@ -195,8 +197,6 @@ type DatedServiceJourney {
   serviceJourney: ServiceJourney!
   "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
-  "The real-time state of this dated service journey."
-  realTimeTripState: RealTimeTripState
 }
 
 "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
@@ -269,7 +269,7 @@ type EstimatedCall {
   quay: Quay!
   "Whether this call has been updated with real time information."
   realtime: Boolean!
-  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeTripState on datedServiceJourney for the trip's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the stop's state.")
+  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the stop's state.")
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   serviceJourney: ServiceJourney!
@@ -1080,7 +1080,7 @@ type QueryType {
 }
 
 "The real-time state of a trip on a leg."
-type RealTimeTripState {
+type RealTimeJourneyState {
   "Has the trip been added via real-time updates? (extra trip)"
   added: Boolean!
   "Has the trip been canceled?"
@@ -1089,10 +1089,7 @@ type RealTimeTripState {
   deleted: Boolean!
   "Have any stop arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!
-  """
-  Has the stop sequence changed from the scheduled pattern? True if stops were added, removed,
-  reordered, or reassigned to a different stop location (`assigned_stop_id`).
-  """
+  "Has the stop sequence changed from the scheduled pattern? True if stops were added, removed, reordered, or reassigned to a different stop location (assigned_stop_id)."
   tripPatternModified: Boolean!
   "Have there been any real-time updates on this trip?"
   updated: Boolean!

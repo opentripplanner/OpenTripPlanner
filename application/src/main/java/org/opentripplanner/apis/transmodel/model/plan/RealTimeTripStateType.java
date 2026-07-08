@@ -7,12 +7,13 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 
 /**
- * GraphQL type for the structured real-time state of a trip, exposed on the {@code Leg} type.
- * Each field corresponds to one boolean flag on {@link TransmodelRealTimeTripStateModel}.
+ * GraphQL type for the structured real-time state of a journey, exposed on the
+ * {@code DatedServiceJourney} type. Each field corresponds to one boolean flag on
+ * {@link TransmodelRealTimeTripStateModel}.
  */
 public class RealTimeTripStateType {
 
-  private static final String NAME = "RealTimeTripState";
+  private static final String NAME = "RealTimeJourneyState";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
   public static GraphQLObjectType create() {
@@ -46,7 +47,9 @@ public class RealTimeTripStateType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("timesModified")
-          .description("Have any stop arrival or departure times been modified from the scheduled times?")
+          .description(
+            "Have any stop arrival or departure times been modified from the scheduled times?"
+          )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).timesModified())
           .build()

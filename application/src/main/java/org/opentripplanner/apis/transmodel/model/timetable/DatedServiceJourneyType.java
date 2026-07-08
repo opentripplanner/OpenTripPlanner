@@ -45,7 +45,7 @@ public class DatedServiceJourneyType {
     GraphQLType quayType,
     GraphQLOutputType replacedByType,
     GraphQLOutputType replacementForType,
-    GraphQLOutputType realTimeTripStateType
+    GraphQLOutputType realTimeJourneyStateType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -195,9 +195,9 @@ public class DatedServiceJourneyType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("realTimeTripState")
+          .name("realTimeJourneyState")
           .description("The real-time state of this dated service journey.")
-          .type(realTimeTripStateType)
+          .type(realTimeJourneyStateType)
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             TransitService transitService = GqlUtil.getTransitService(environment);
