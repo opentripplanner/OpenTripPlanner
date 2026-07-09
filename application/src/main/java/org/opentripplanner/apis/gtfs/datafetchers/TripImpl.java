@@ -39,6 +39,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -269,6 +271,37 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   @Override
   public DataFetcher<Iterable<Notice>> notices() {
     return env -> getTransitService(env).findNotices(getSource(env));
+  }
+
+  @Override
+  public DataFetcher<TripOnServiceDate> onServiceDate() {
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      Trip trip = getSource(environment);
+      var args = new GraphQLTypes.GraphQLTripOnServiceDateArgs(environment.getArguments());
+      LocalDate serviceDate = args.getGraphQLDate() != null
+        ? args.getGraphQLDate()
+        : LocalDate.now();
+
+      // Prefer a real TripOnServiceDate (e.g. a NeTEx dated service journey or a real-time added
+      // trip) if one exists for this trip and date.
+      var tripOnServiceDate = transitService.getTripOnServiceDate(
+        new TripIdAndServiceDate(trip.getId(), serviceDate)
+      );
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+
+      // Otherwise synthesize one from the scheduled trip, but only if it actually runs on the date.
+      boolean runsOnDate = transitService
+        .getTripCalendars()
+        .listServiceDates(trip.getServiceId())
+        .contains(serviceDate);
+      if (!runsOnDate) {
+        return null;
+      }
+      return TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build();
+    };
   }
 
   @Override

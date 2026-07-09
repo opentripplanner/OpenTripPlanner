@@ -5933,6 +5933,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLTripOnServiceDateArgs {
+
+    private java.time.LocalDate date;
+
+    public GraphQLTripOnServiceDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.date = (java.time.LocalDate) args.get("date");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLDate() {
+      return this.date;
+    }
+
+    public void setGraphQLDate(java.time.LocalDate date) {
+      this.date = date;
+    }
+  }
+
   public static class GraphQLTripStoptimesForDateArgs {
 
     private String serviceDate;

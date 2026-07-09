@@ -2571,6 +2571,7 @@ type StopCall {
   schedule: CallSchedule
   "The stop where this arrival/departure happens."
   stopLocation: CallStopLocation!
+  notices: [Notice!]!
 }
 
 "A stop call together with the trip on service date it belongs to."
@@ -2849,7 +2850,7 @@ type Trip implements Node {
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
-  ): [Stoptime]
+  ): [Stoptime] @deprecated(reason: "Use `onServiceDate` instead.")
   "Coordinates of the route of this trip in Google polyline encoded format"
   tripGeometry: Geometry
   "Headsign of the vehicle when running on this trip"
@@ -2863,6 +2864,7 @@ type Trip implements Node {
   tripShortName: String
   "Whether the vehicle running this trip can be boarded by a wheelchair"
   wheelchairAccessible: WheelchairBoarding
+  onServiceDate(date: LocalDate): TripOnServiceDate
 }
 
 """
