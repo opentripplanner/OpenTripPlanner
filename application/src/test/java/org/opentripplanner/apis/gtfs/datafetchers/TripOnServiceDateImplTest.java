@@ -120,8 +120,9 @@ class TripOnServiceDateImplTest {
     TransitTestEnvironment env,
     RealTimeTripUpdate update
   ) {
-    var snapshot = new TimetableSnapshot(new DefaultTripCalendars());
+    var repo = env.timetableRepository();
+    var snapshot = new TimetableSnapshot(repo.getRaptorTransitData(), new DefaultTripCalendars());
     snapshot.update(update);
-    return new DefaultTransitService(env.timetableRepository(), snapshot.commit());
+    return new DefaultTransitService(repo, snapshot.commit());
   }
 }
