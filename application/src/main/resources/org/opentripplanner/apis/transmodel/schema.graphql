@@ -1079,19 +1079,19 @@ type QueryType {
   ): ViaTrip! @deprecated(reason : "Use the regular trip query with via stop instead.") @timingData
 }
 
-"The real-time state of a trip on a leg."
+"The real-time state of a service journey."
 type RealTimeJourneyState {
-  "Has the trip been added via real-time updates? (extra trip)"
-  added: Boolean!
-  "Has the trip been canceled?"
-  canceled: Boolean!
-  "Has the trip been deleted?"
+  "Has this journey been cancelled?"
+  cancellation: Boolean!
+  "Has this journey been deleted from the real-time feed? Deleted journeys should not be shown to travellers."
   deleted: Boolean!
+  "Has this journey been added via real-time updates? (extra journey not in the planned data)"
+  extraJourney: Boolean!
+  "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location."
+  journeyPatternModified: Boolean!
   "Have any stop arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!
-  "Has the stop sequence changed from the scheduled pattern? True if stops were added, removed, reordered, or reassigned to a different stop location (assigned_stop_id)."
-  tripPatternModified: Boolean!
-  "Have there been any real-time updates on this trip?"
+  "Have there been any real-time updates on this journey?"
   updated: Boolean!
 }
 

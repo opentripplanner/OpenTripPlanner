@@ -24,22 +24,22 @@ class RealTimeTripStateTypeTest {
   @Test
   void allFlagsAreFalse_whenNoUpdatesPresent() {
     var result = execute(ALL_FALSE);
-    assertEquals(false, result.get("added"));
-    assertEquals(false, result.get("canceled"));
+    assertEquals(false, result.get("extraJourney"));
+    assertEquals(false, result.get("cancellation"));
     assertEquals(false, result.get("deleted"));
     assertEquals(false, result.get("timesModified"));
-    assertEquals(false, result.get("tripPatternModified"));
+    assertEquals(false, result.get("journeyPatternModified"));
     assertEquals(false, result.get("updated"));
   }
 
   @Test
   void allFlagsAreTrue_whenAllUpdatesPresent() {
     var result = execute(ALL_TRUE);
-    assertEquals(true, result.get("added"));
-    assertEquals(true, result.get("canceled"));
+    assertEquals(true, result.get("extraJourney"));
+    assertEquals(true, result.get("cancellation"));
     assertEquals(true, result.get("deleted"));
     assertEquals(true, result.get("timesModified"));
-    assertEquals(true, result.get("tripPatternModified"));
+    assertEquals(true, result.get("journeyPatternModified"));
     assertEquals(true, result.get("updated"));
   }
 
@@ -47,23 +47,23 @@ class RealTimeTripStateTypeTest {
   // field definitions in RealTimeTripStateType.
 
   @Test
-  void addedFlagIsIsolated() {
+  void extraJourneyFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(true, false, false, false, false, false);
     var result = execute(model);
-    assertEquals(true, result.get("added"));
-    assertEquals(false, result.get("canceled"));
+    assertEquals(true, result.get("extraJourney"));
+    assertEquals(false, result.get("cancellation"));
     assertEquals(false, result.get("deleted"));
     assertEquals(false, result.get("timesModified"));
-    assertEquals(false, result.get("tripPatternModified"));
+    assertEquals(false, result.get("journeyPatternModified"));
     assertEquals(false, result.get("updated"));
   }
 
   @Test
-  void canceledFlagIsIsolated() {
+  void cancellationFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, true, false, false, false, false);
     var result = execute(model);
-    assertEquals(false, result.get("added"));
-    assertEquals(true, result.get("canceled"));
+    assertEquals(false, result.get("extraJourney"));
+    assertEquals(true, result.get("cancellation"));
     assertEquals(false, result.get("deleted"));
   }
 
@@ -71,7 +71,7 @@ class RealTimeTripStateTypeTest {
   void deletedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, true, false, false, false);
     var result = execute(model);
-    assertEquals(false, result.get("canceled"));
+    assertEquals(false, result.get("cancellation"));
     assertEquals(true, result.get("deleted"));
     assertEquals(false, result.get("timesModified"));
   }
@@ -82,15 +82,15 @@ class RealTimeTripStateTypeTest {
     var result = execute(model);
     assertEquals(false, result.get("deleted"));
     assertEquals(true, result.get("timesModified"));
-    assertEquals(false, result.get("tripPatternModified"));
+    assertEquals(false, result.get("journeyPatternModified"));
   }
 
   @Test
-  void tripPatternModifiedFlagIsIsolated() {
+  void journeyPatternModifiedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, false, false, true, false);
     var result = execute(model);
     assertEquals(false, result.get("timesModified"));
-    assertEquals(true, result.get("tripPatternModified"));
+    assertEquals(true, result.get("journeyPatternModified"));
     assertEquals(false, result.get("updated"));
   }
 
@@ -98,7 +98,7 @@ class RealTimeTripStateTypeTest {
   void updatedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, false, false, false, true);
     var result = execute(model);
-    assertEquals(false, result.get("tripPatternModified"));
+    assertEquals(false, result.get("journeyPatternModified"));
     assertEquals(true, result.get("updated"));
   }
 
@@ -110,7 +110,9 @@ class RealTimeTripStateTypeTest {
   private static java.util.Map<String, Object> execute(TransmodelRealTimeTripStateModel model) {
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
-        .query("{ state { added canceled deleted timesModified tripPatternModified updated } }")
+        .query(
+          "{ state { extraJourney cancellation deleted timesModified journeyPatternModified updated } }"
+        )
         .root(model)
         .build()
     );

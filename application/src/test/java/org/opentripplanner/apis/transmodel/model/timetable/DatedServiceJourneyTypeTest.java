@@ -74,25 +74,25 @@ class DatedServiceJourneyTypeTest {
   @Test
   void realTimeJourneyState_allFlagsFalse_forScheduledTrip() {
     var state = fetch(withTripTimes(SCHEDULED_TIMES.createRealTimeFromScheduledTimes().build()));
-    assertEquals(false, state.get("added"));
-    assertEquals(false, state.get("canceled"));
+    assertEquals(false, state.get("extraJourney"));
+    assertEquals(false, state.get("cancellation"));
     assertEquals(false, state.get("deleted"));
     assertEquals(false, state.get("timesModified"));
-    assertEquals(false, state.get("tripPatternModified"));
+    assertEquals(false, state.get("journeyPatternModified"));
     assertEquals(false, state.get("updated"));
   }
 
   @Test
-  void realTimeJourneyState_canceledFlag() {
+  void realTimeJourneyState_cancellationFlag() {
     var builder = SCHEDULED_TIMES.createRealTimeFromScheduledTimes();
     builder.withCanceled();
     var state = fetch(withTripTimes(builder.build()));
-    assertEquals(true, state.get("canceled"));
+    assertEquals(true, state.get("cancellation"));
     assertEquals(true, state.get("updated"));
-    assertEquals(false, state.get("added"));
+    assertEquals(false, state.get("extraJourney"));
     assertEquals(false, state.get("deleted"));
     assertEquals(false, state.get("timesModified"));
-    assertEquals(false, state.get("tripPatternModified"));
+    assertEquals(false, state.get("journeyPatternModified"));
   }
 
   @Test
@@ -102,30 +102,30 @@ class DatedServiceJourneyTypeTest {
     var state = fetch(withTripTimes(builder.build()));
     assertEquals(true, state.get("timesModified"));
     assertEquals(true, state.get("updated"));
-    assertEquals(false, state.get("canceled"));
-    assertEquals(false, state.get("added"));
+    assertEquals(false, state.get("cancellation"));
+    assertEquals(false, state.get("extraJourney"));
     assertEquals(false, state.get("deleted"));
-    assertEquals(false, state.get("tripPatternModified"));
+    assertEquals(false, state.get("journeyPatternModified"));
   }
 
   @Test
-  void realTimeJourneyState_addedFlag() {
+  void realTimeJourneyState_extraJourneyFlag() {
     var builder = SCHEDULED_TIMES.createRealTimeFromScheduledTimes();
     builder.withAdded();
     var state = fetch(withTripTimes(builder.build()));
-    assertEquals(true, state.get("added"));
+    assertEquals(true, state.get("extraJourney"));
     assertEquals(true, state.get("updated"));
-    assertEquals(false, state.get("canceled"));
+    assertEquals(false, state.get("cancellation"));
   }
 
   @Test
-  void realTimeJourneyState_tripPatternModifiedFlag() {
+  void realTimeJourneyState_journeyPatternModifiedFlag() {
     var builder = SCHEDULED_TIMES.createRealTimeFromScheduledTimes();
     builder.withModifiedTripPattern();
     var state = fetch(withTripTimes(builder.build()));
-    assertEquals(true, state.get("tripPatternModified"));
+    assertEquals(true, state.get("journeyPatternModified"));
     assertEquals(true, state.get("updated"));
-    assertEquals(false, state.get("canceled"));
+    assertEquals(false, state.get("cancellation"));
   }
 
   // ---------------------------------------------------------------------------
@@ -149,7 +149,7 @@ class DatedServiceJourneyTypeTest {
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
         .query(
-          "{ dsj { realTimeJourneyState { added canceled deleted timesModified tripPatternModified updated } } }"
+          "{ dsj { realTimeJourneyState { extraJourney cancellation deleted timesModified journeyPatternModified updated } } }"
         )
         .root(TRIP_ON_SERVICE_DATE)
         .context(context)

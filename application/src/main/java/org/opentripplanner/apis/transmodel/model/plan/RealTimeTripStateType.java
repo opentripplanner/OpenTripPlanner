@@ -19,27 +19,31 @@ public class RealTimeTripStateType {
   public static GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name(NAME)
-      .description("The real-time state of a trip on a leg.")
+      .description("The real-time state of a service journey.")
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("added")
-          .description("Has the trip been added via real-time updates? (extra trip)")
+          .name("extraJourney")
+          .description(
+            "Has this journey been added via real-time updates? (extra journey not in the planned data)"
+          )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).added())
+          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).extraJourney())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("canceled")
-          .description("Has the trip been canceled?")
+          .name("cancellation")
+          .description("Has this journey been cancelled?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).canceled())
+          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).cancellation())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("deleted")
-          .description("Has the trip been deleted?")
+          .description(
+            "Has this journey been deleted from the real-time feed? Deleted journeys should not be shown to travellers."
+          )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).deleted())
           .build()
@@ -56,20 +60,20 @@ public class RealTimeTripStateType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("tripPatternModified")
+          .name("journeyPatternModified")
           .description(
-            "Has the stop sequence changed from the scheduled pattern? True if stops were added, removed, reordered, or reassigned to a different stop location (assigned_stop_id)."
+            "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location."
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env ->
-            ((TransmodelRealTimeTripStateModel) env.getSource()).tripPatternModified()
+            ((TransmodelRealTimeTripStateModel) env.getSource()).journeyPatternModified()
           )
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("updated")
-          .description("Have there been any real-time updates on this trip?")
+          .description("Have there been any real-time updates on this journey?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).updated())
           .build()
