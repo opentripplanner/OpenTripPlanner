@@ -100,7 +100,7 @@ public class ItineraryListFilterChainBuilder {
 
   @Sandbox
   @Nullable
-  private ItineraryDecorator emissionDecorator;
+  private ItineraryDecorator emissionItineraryDecorator;
 
   @Sandbox
   private ItineraryListFilter rideHailingDecorator;
@@ -344,10 +344,10 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(
-    @Nullable ItineraryDecorator emissionDecorator
+  public ItineraryListFilterChainBuilder withEmissionItineraryDecorator(
+    @Nullable ItineraryDecorator emissionItineraryDecorator
   ) {
-    this.emissionDecorator = emissionDecorator;
+    this.emissionItineraryDecorator = emissionItineraryDecorator;
     return this;
   }
 
@@ -527,8 +527,8 @@ public class ItineraryListFilterChainBuilder {
         addDecorateFilter(filters, new DecorateWithAccessibilityScore(wheelchairMaxSlope));
       }
 
-      if (emissionDecorator != null) {
-        addDecorateFilter(filters, emissionDecorator);
+      if (emissionItineraryDecorator != null) {
+        addDecorateFilter(filters, emissionItineraryDecorator);
       }
 
       if (rideHailingDecorator != null) {

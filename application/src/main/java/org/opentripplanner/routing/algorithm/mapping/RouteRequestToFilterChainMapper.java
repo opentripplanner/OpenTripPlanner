@@ -110,7 +110,7 @@ public class RouteRequestToFilterChainMapper {
     }
 
     if (context.emissionItineraryDecorator() != null) {
-      builder.withEmissions(context.emissionItineraryDecorator());
+      builder.withEmissionItineraryDecorator(context.emissionItineraryDecorator());
     }
 
     if (
