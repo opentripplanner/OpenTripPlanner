@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
@@ -110,7 +109,7 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (OTPFeature.Emission.isOn()) {
+    if (context.emissionItineraryDecorator() != null) {
       builder.withEmissions(context.emissionItineraryDecorator());
     }
 

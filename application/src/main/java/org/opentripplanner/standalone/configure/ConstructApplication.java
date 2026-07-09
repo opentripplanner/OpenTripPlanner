@@ -90,7 +90,7 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    EmissionRepository emissionRepository,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -367,6 +367,7 @@ public class ConstructApplication {
     factory.metricsLogging();
   }
 
+  @Nullable
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
   }
