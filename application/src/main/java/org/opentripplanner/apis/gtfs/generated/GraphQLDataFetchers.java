@@ -593,6 +593,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Trip>> trips();
     public DataFetcher<Iterable<Trip>> tripsForDate();
+    public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate();
     public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions();
   }
 

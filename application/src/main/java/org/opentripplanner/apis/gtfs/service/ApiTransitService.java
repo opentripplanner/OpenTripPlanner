@@ -5,8 +5,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
@@ -112,6 +114,38 @@ public class ApiTransitService {
       .stream()
       .map(call -> new StopCallOnTripOnServiceDate(resolveTripOnServiceDate(call), call))
       .toList();
+  }
+
+  /**
+   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a NeTEx
+   * dated service journey or a real-time added trip) is preferred if it exists. Otherwise one is
+   * synthesized from the scheduled trip, but only if the trip actually runs on the given date.
+   */
+  public Optional<TripOnServiceDate> findTripOnServiceDate(
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
+    var tripOnServiceDate = transitService.getTripOnServiceDate(
+      new TripIdAndServiceDate(tripId, serviceDate)
+    );
+    if (tripOnServiceDate != null) {
+      return Optional.of(tripOnServiceDate);
+    }
+
+    Trip trip = transitService.getTrip(tripId);
+    if (trip == null) {
+      return Optional.empty();
+    }
+    boolean runsOnDate = transitService
+      .getTripCalendars()
+      .listServiceDates(trip.getServiceId())
+      .contains(serviceDate);
+    if (!runsOnDate) {
+      return Optional.empty();
+    }
+    return Optional.of(
+      TripOnServiceDate.of(tripId).withTrip(trip).withServiceDate(serviceDate).build()
+    );
   }
 
   /**

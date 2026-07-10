@@ -1976,6 +1976,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPatternTripsOnServiceDateArgs {
+
+    private java.time.LocalDate serviceDate;
+
+    public GraphQLPatternTripsOnServiceDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (java.time.LocalDate) args.get("serviceDate");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLServiceDate() {
+      return this.serviceDate;
+    }
+
+    public void setGraphQLServiceDate(java.time.LocalDate serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+  }
+
   /** Entities, which are relevant for a pattern and can contain alerts */
   public enum GraphQLPatternAlertType {
     AGENCY,

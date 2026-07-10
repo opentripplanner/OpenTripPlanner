@@ -1167,7 +1167,8 @@ type Pattern implements Node {
   tripsForDate(
     "Return trips of the pattern active on this date. Format: YYYYMMDD"
     serviceDate: String
-  ): [Trip!]
+  ): [Trip!] @deprecated(reason : "Use `tripsOnServiceDate`")
+  tripsOnServiceDate(serviceDate: LocalDate): [TripOnServiceDate!]!
   "Real-time updated position of vehicles that are serving this pattern."
   vehiclePositions: [VehiclePosition!]
 }
@@ -2565,13 +2566,13 @@ from a specific stop location.
 This may contain real-time information, if available.
 """
 type StopCall {
+  notices: [Notice!]!
   "Real-time estimates for arrival and departure times for this stop location."
   realTime: CallRealTime
   "Scheduled arrival and departure times for this stop location."
   schedule: CallSchedule
   "The stop where this arrival/departure happens."
   stopLocation: CallStopLocation!
-  notices: [Notice!]!
 }
 
 "A stop call together with the trip on service date it belongs to."
@@ -2821,6 +2822,7 @@ type Trip implements Node {
   trip.
   """
   occupancy: TripOccupancy
+  onServiceDate(date: LocalDate): TripOnServiceDate
   "The pattern the trip is running on"
   pattern: Pattern
   """
@@ -2850,7 +2852,7 @@ type Trip implements Node {
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
-  ): [Stoptime] @deprecated(reason: "Use `onServiceDate` instead.")
+  ): [Stoptime] @deprecated(reason : "Use `onServiceDate` instead.")
   "Coordinates of the route of this trip in Google polyline encoded format"
   tripGeometry: Geometry
   "Headsign of the vehicle when running on this trip"
@@ -2864,7 +2866,6 @@ type Trip implements Node {
   tripShortName: String
   "Whether the vehicle running this trip can be boarded by a wheelchair"
   wheelchairAccessible: WheelchairBoarding
-  onServiceDate(date: LocalDate): TripOnServiceDate
 }
 
 """
