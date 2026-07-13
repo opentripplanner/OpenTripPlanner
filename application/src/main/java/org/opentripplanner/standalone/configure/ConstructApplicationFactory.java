@@ -66,6 +66,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
@@ -146,9 +147,12 @@ public interface ConstructApplicationFactory {
   @Nullable
   EmpiricalDelayRepository empiricalDelayRepository();
 
+  @StaticTransitService
   TransitService transitService();
 
   OtpServerRequestContext createServerContext();
+
+  RequestScopedComponent.Builder requestScopedComponentBuilder();
 
   MetricsLogging metricsLogging();
 

@@ -45,7 +45,7 @@ import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
-@Module
+@Module(subcomponents = RequestScopedComponent.class)
 public class ConstructApplicationModule {
 
   @Provides

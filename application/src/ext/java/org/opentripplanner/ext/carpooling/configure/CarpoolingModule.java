@@ -11,6 +11,7 @@ import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
 @Module
@@ -31,7 +32,7 @@ public class CarpoolingModule {
   public static CarpoolingService provideCarpoolingService(
     @Nullable CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
-    TransitService transitService,
+    @StaticTransitService TransitService transitService,
     VertexCreationService vertexCreationService
   ) {
     if (OTPFeature.CarPooling.isOff()) {

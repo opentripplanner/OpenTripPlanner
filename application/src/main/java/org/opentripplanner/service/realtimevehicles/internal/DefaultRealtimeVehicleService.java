@@ -14,6 +14,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -33,7 +34,7 @@ public class DefaultRealtimeVehicleService
   private final TransitService transitService;
 
   @Inject
-  public DefaultRealtimeVehicleService(TransitService transitService) {
+  public DefaultRealtimeVehicleService(@StaticTransitService TransitService transitService) {
     this.transitService = transitService;
   }
 

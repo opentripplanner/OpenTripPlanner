@@ -9,7 +9,6 @@ import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
@@ -23,8 +22,14 @@ import org.opentripplanner.transit.service.TransitService;
 @Module
 public abstract class TransitModule {
 
+  /**
+   * Binds the app-singleton, no-real-time-data {@link TransitService} used by consumers that live
+   * outside any HTTP request (e.g. {@code DefaultRealtimeVehicleService}). The request-scoped,
+   * snapshot-consistent {@link TransitService} is a distinct binding inside {@link
+   * org.opentripplanner.standalone.configure.RequestScopedComponent} — do not retarget this one.
+   */
   @Binds
-  @HttpRequestScoped
+  @StaticTransitService
   abstract TransitService bind(DefaultTransitService service);
 
   @Provides
