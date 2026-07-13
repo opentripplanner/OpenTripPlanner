@@ -539,9 +539,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<RefetchItineraryResult> refetchItinerary() {
     return environment -> {
       GraphQLRequestContext context = getRequestContext(environment);
-      var args = new GraphQLTypes.GraphQLQueryTypeRefetchItineraryArgs(
-        environment.getArguments()
-      );
+      var args = new GraphQLTypes.GraphQLQueryTypeRefetchItineraryArgs(environment.getArguments());
 
       var legIds = args.getGraphQLLegs();
 
@@ -562,12 +560,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       var itinerary = context
         .refetchItineraryService()
-        .refetchItinerary(
-          routeRequest.from(),
-          routeRequest.to(),
-          legReferences,
-          routeRequest
-        );
+        .refetchItinerary(routeRequest.from(), routeRequest.to(), legReferences, routeRequest);
 
       return new RefetchItineraryResult(itinerary);
     };
