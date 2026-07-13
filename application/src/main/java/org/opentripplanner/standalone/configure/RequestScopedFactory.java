@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.configure;
 import dagger.Subcomponent;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
@@ -29,6 +30,8 @@ public interface RequestScopedFactory {
   Graph graph();
 
   RouteRequest defaultRouteRequest();
+
+  VehicleParkingService vehicleParkingService();
 
   @Subcomponent.Builder
   interface Builder {

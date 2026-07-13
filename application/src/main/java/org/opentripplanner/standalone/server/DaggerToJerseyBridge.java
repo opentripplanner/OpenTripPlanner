@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
@@ -51,6 +52,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::createServerContext, OtpServerRequestContext.class);
     bridge(factory, RequestScopedFactory::graph, Graph.class);
     bridge(factory, RequestScopedFactory::defaultRouteRequest, RouteRequest.class);
+    bridge(factory, RequestScopedFactory::vehicleParkingService, VehicleParkingService.class);
   }
 
   /**
