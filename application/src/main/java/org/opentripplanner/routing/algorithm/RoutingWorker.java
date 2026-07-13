@@ -129,7 +129,11 @@ public class RoutingWorker {
 
       ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
         request,
-        serverContext,
+        serverContext.transitService(),
+        serverContext.transitAlertService(),
+        serverContext.rideHailingServices(),
+        serverContext.emissionItineraryDecorator(),
+        serverContext.stopConsolidationService(),
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
         result.removeWalkAllTheWayResults() || removeWalkAllTheWayResultsFromDirectFlex,
