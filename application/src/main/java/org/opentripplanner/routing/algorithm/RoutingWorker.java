@@ -232,7 +232,16 @@ public class RoutingWorker {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
       return RoutingResult.ok(
-        DirectStreetRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
+        DirectStreetRouter.route(
+          serverContext.graph(),
+          serverContext.transitService(),
+          serverContext.streetLimitationParametersService(),
+          serverContext.vehicleRentalService(),
+          serverContext.streetDetailsService(),
+          serverContext.dataOverlayParameterBindings(),
+          directBuilder.buildRequest(),
+          linkingContext()
+        ),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } catch (RoutingValidationException e) {
