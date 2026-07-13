@@ -10,22 +10,21 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
  * Common functionality for creating a vector tile response.
  */
 public class VectorTileResponseFactory {
 
-  public static <LayerType extends Enum<LayerType>> Response create(
+  public static <LayerType extends Enum<LayerType>, C> Response create(
     int x,
     int y,
     int z,
     Locale locale,
     List<String> requestedLayers,
     List<LayerParameters<LayerType>> availableLayers,
-    LayerBuilderFactory<LayerType> layerBuilderFactory,
-    OtpServerRequestContext context
+    LayerBuilderFactory<LayerType, C> layerBuilderFactory,
+    C context
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
@@ -73,11 +72,11 @@ public class VectorTileResponseFactory {
   }
 
   @FunctionalInterface
-  public interface LayerBuilderFactory<LayerType extends Enum<LayerType>> {
+  public interface LayerBuilderFactory<LayerType extends Enum<LayerType>, C> {
     LayerBuilder<?> createLayerBuilder(
       LayerParameters<LayerType> layerParameters,
       Locale locale,
-      OtpServerRequestContext context
+      C context
     );
   }
 }
