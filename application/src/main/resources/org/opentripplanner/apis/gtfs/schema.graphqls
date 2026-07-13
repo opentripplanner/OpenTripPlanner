@@ -2822,6 +2822,7 @@ type Trip implements Node {
   trip.
   """
   occupancy: TripOccupancy
+  "Return the trip on a specific service date or `null` if the trip does not run on it."
   onServiceDate(date: LocalDate): TripOnServiceDate
   "The pattern the trip is running on"
   pattern: Pattern
