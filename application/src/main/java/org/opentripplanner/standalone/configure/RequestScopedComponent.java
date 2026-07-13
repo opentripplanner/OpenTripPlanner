@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.configure;
 import dagger.Subcomponent;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -11,8 +12,8 @@ import org.opentripplanner.transit.service.TransitService;
  * guaranteed to be consistent with each other — no possibility of a mid-request update being
  * visible to one binding but not another.
  * <p>
- * Not yet wired into the Jersey/HK2 bridge — see issue #7441. Build one instance per actual HTTP
- * request (never reuse across requests, never share across concurrent requests).
+ * Build one instance per actual HTTP request (never reuse across requests, never share across
+ * concurrent requests) — see issue #7441.
  */
 @HttpRequestScoped
 @Subcomponent(modules = { RequestScopedModule.class })
@@ -20,6 +21,8 @@ public interface RequestScopedComponent {
   TransactionScope transactionScope();
 
   TransitService transitService();
+
+  OtpServerRequestContext createServerContext();
 
   @Subcomponent.Builder
   interface Builder {

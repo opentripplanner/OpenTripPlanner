@@ -37,9 +37,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public class OTPWebApplication extends Application {
 
-  /* This object groups together all the modules for a single running OTP server. */
-  private final Supplier<OtpServerRequestContext> contextProvider;
-
   /* Builds one Dagger RequestScopedComponent per actual HTTP request, see issue #7441. */
   private final Supplier<RequestScopedComponent> requestScopedComponentProvider;
 
@@ -56,10 +53,8 @@ public class OTPWebApplication extends Application {
 
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
-    Supplier<OtpServerRequestContext> contextProvider,
     Supplier<RequestScopedComponent> requestScopedComponentProvider
   ) {
-    this.contextProvider = contextProvider;
     this.requestScopedComponentProvider = requestScopedComponentProvider;
     this.customFilters = createCustomFilters(parameters.traceParameters());
     this.httpResponseTimeMetricsParameters = parameters.httpResponseTimeMetricsParameters();
@@ -111,10 +106,9 @@ public class OTPWebApplication extends Application {
         new OTPExceptionMapper(),
         // Enable Jackson JSON response serialization
         new JacksonJsonProvider(),
-        // Allow injecting the OTP server object into Jersey resource classes
-        makeBinder(contextProvider),
-        // Allow injecting individual, request-scoped services (e.g. TransitService) directly,
-        // backed by a Dagger RequestScopedComponent pinned to one transaction per HTTP request
+        // Allow injecting the OTP server object, and individual request-scoped services (e.g.
+        // TransitService) directly, all backed by one Dagger RequestScopedComponent pinned to one
+        // transaction per HTTP request
         makeRequestScopedBinder(requestScopedComponentProvider),
         // Add performance instrumentation of Jersey requests to micrometer
         getMetricsApplicationEventListener()
@@ -152,31 +146,16 @@ public class OTPWebApplication extends Application {
   }
 
   /**
-   * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
-   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
-   * a singleton. Jersey forces us to use injection to get application context into HTTP method
-   * handlers, but in OTP we always just inject this OTP server context and grab anything else we
-   * need (graph and other application components) from this single object.
+   * Bridges the Dagger-managed {@link RequestScopedComponent} into HK2/Jersey: the component
+   * itself, {@link OtpServerRequestContext} (grab-bag of everything not yet migrated), and
+   * individual request-scoped services (currently just {@link TransitService}) that resources can
+   * inject directly with {@code @Context}. All three bindings are scoped {@code
+   * .in(RequestScoped.class)} — Jersey's own per-actual-HTTP-request HK2 scope — and all resolve
+   * from the SAME cached {@link RequestScopedComponent} instance for a given request, so they see
+   * one pinned transaction. See issue #7441.
    * <p>
    * More on custom injection in Jersey 2:
    * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
-   */
-  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
-    return new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bindFactory(contextProvider).to(OtpServerRequestContext.class);
-      }
-    };
-  }
-
-  /**
-   * Bridges the Dagger-managed {@link RequestScopedComponent} into HK2/Jersey, and from it, the
-   * individual services it exposes (currently just {@link TransitService}) so resources can
-   * inject them directly with {@code @Context}, instead of going through {@link
-   * OtpServerRequestContext}. Both bindings are scoped {@code .in(RequestScoped.class)} — Jersey's
-   * own per-actual-HTTP-request HK2 scope — so a request that asks for either binding more than
-   * once still gets one pinned transaction, see issue #7441.
    */
   private Binder makeRequestScopedBinder(
     Supplier<RequestScopedComponent> requestScopedComponentProvider
@@ -186,6 +165,9 @@ public class OTPWebApplication extends Application {
       protected void configure() {
         bindFactory(requestScopedComponentProvider)
           .to(RequestScopedComponent.class)
+          .in(RequestScoped.class);
+        bindFactory(RequestScopedServerContextSupplier.class)
+          .to(OtpServerRequestContext.class)
           .in(RequestScoped.class);
         bindFactory(RequestScopedTransitServiceSupplier.class)
           .to(TransitService.class)
