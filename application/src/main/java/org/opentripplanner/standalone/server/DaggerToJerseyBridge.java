@@ -13,6 +13,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.RegularTransferService;
@@ -65,6 +66,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::vehicleRentalService, VehicleRentalService.class);
     bridge(factory, RequestScopedFactory::streetDetailsService, StreetDetailsService.class);
     bridge(factory, RequestScopedFactory::transferService, RegularTransferService.class);
+    bridge(factory, RequestScopedFactory::vectorTileConfig, VectorTileConfig.class);
   }
 
   /**
