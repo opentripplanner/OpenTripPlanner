@@ -2,8 +2,10 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -23,6 +25,10 @@ public interface RequestScopedFactory {
   TransitService transitService();
 
   OtpServerRequestContext createServerContext();
+
+  Graph graph();
+
+  RouteRequest defaultRouteRequest();
 
   @Subcomponent.Builder
   interface Builder {

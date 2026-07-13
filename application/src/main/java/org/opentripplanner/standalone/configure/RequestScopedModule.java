@@ -23,6 +23,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -73,6 +74,15 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static RouteRequest defaultRouteRequest(
+    RouterConfig routerConfig,
+    LauncherRequestDecorator launcherRequestDecorator
+  ) {
+    return launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OtpServerRequestContext serverRequestContext(
     RouterConfig routerConfig,
     DebugUiConfig debugUiConfig,
@@ -82,6 +92,7 @@ public class RequestScopedModule {
     VertexLinker vertexLinker,
     TransactionScope transactionScope,
     TransitService transitService,
+    RouteRequest defaultRequest,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleRepository realtimeVehicleRepository,
@@ -103,8 +114,6 @@ public class RequestScopedModule {
     @Nullable LuceneIndex luceneIndex,
     FareService fareService
   ) {
-    var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
-
     var transitRoutingConfig = routerConfig.transitTuningConfig();
     var triasApiParameters = routerConfig.triasApiParameters();
     var ojpApiParameters = routerConfig.ojpApiParameters();

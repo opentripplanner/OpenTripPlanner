@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.standalone.configure.StaticRouteRequestDefaults;
 
 /**
  * The schema is used during application serve phase, not loading, and it depends on the default
@@ -22,7 +23,7 @@ public class SchemaModule {
   @Singleton
   @Nullable
   @GtfsSchema
-  public GraphQLSchema provideSchema(RouteRequest defaultRouteRequest) {
+  public GraphQLSchema provideSchema(@StaticRouteRequestDefaults RouteRequest defaultRouteRequest) {
     return OTPFeature.GtfsGraphQlApi.isOn()
       ? SchemaFactory.createSchemaWithDefaultInjection(defaultRouteRequest)
       : null;

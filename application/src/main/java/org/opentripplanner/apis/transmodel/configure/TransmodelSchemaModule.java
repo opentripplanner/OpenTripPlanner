@@ -13,6 +13,7 @@ import org.opentripplanner.apis.transmodel.mapping.FixedFeedIdGenerator;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.configure.StaticRouteRequestDefaults;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
@@ -23,7 +24,7 @@ public class TransmodelSchemaModule {
   @Nullable
   @TransmodelSchema
   public GraphQLSchema provideTransmodelSchema(
-    RouteRequest defaultRouteRequest,
+    @StaticRouteRequestDefaults RouteRequest defaultRouteRequest,
     TransitRepository transitRepository,
     RouterConfig routerConfig
   ) {
