@@ -239,9 +239,9 @@ class NorwayMapper extends OsmTagMapper {
     // Discourage cycling along tram tracks
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.OneOf("embedded_rails", "tram", "light_rail", "disused")
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "disused", "yes")
       ),
-      ofBicycleSafety(1.2)
+      ofBicycleSafety(1.8)
     );
 
     // Discourage cycling and walking in road tunnels
@@ -557,13 +557,6 @@ class NorwayMapper extends OsmTagMapper {
     props.setMixinProperties("sac_scale=mountain_hiking", ofWalkSafety(1.8));
 
     props.setMixinProperties("trail_visibility=intermediate", ofWalkSafety(1.8));
-
-    props.setMixinProperties(
-      new ExactMatchSpecifier(
-        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "yes")
-      ),
-      ofBicycleSafety(1.8)
-    );
 
     /*
      * Automobile speeds in Norway.
