@@ -4,17 +4,21 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RouteRequestToFilterChainMapper {
 
@@ -26,7 +30,10 @@ public class RouteRequestToFilterChainMapper {
 
   public static ItineraryListFilterChain createFilterChain(
     RouteRequest request,
-    OtpServerRequestContext context,
+    TransitService transitService,
+    List<RideHailingService> rideHailingServices,
+    @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable StopConsolidationService stopConsolidationService,
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
@@ -90,8 +97,8 @@ public class RouteRequestToFilterChainMapper {
         params.removeItinerariesWithSameRoutesAndStops()
       )
       .withTransitAlerts(
-        context.transitService().getTransitAlertService(),
-        context.transitService()::findMultiModalStation
+        transitService.getTransitAlertService(),
+        transitService::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)
@@ -104,21 +111,19 @@ public class RouteRequestToFilterChainMapper {
       builder.withTransitGroupPriority();
     }
 
-    if (!context.rideHailingServices().isEmpty()) {
+    if (!rideHailingServices.isEmpty()) {
       builder.withRideHailingDecoratingFilter(
-        new DecorateWithRideHailing(context.rideHailingServices(), request.journey().wheelchair())
+        new DecorateWithRideHailing(rideHailingServices, request.journey().wheelchair())
       );
     }
 
     if (OTPFeature.Emission.isOn()) {
-      builder.withEmissions(context.emissionItineraryDecorator());
+      builder.withEmissions(emissionItineraryDecorator);
     }
 
-    if (
-      context.stopConsolidationService() != null && context.stopConsolidationService().isActive()
-    ) {
+    if (stopConsolidationService != null && stopConsolidationService.isActive()) {
       builder.withConsolidatedStopNamesDecorator(
-        new DecorateConsolidatedStopNames(context.stopConsolidationService())
+        new DecorateConsolidatedStopNames(stopConsolidationService)
       );
     }
 
