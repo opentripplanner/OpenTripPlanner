@@ -252,7 +252,17 @@ public class RoutingWorker {
     debugTimingAggregator.startedDirectFlexRouter();
     try {
       return RoutingResult.ok(
-        DirectFlexRouter.route(serverContext, request, additionalSearchDays, linkingContext())
+        DirectFlexRouter.route(
+          serverContext.graph(),
+          serverContext.transitService(),
+          serverContext.transferService(),
+          serverContext.streetDetailsService(),
+          serverContext.flexParameters(),
+          serverContext.dataOverlayParameterBindings(),
+          request,
+          additionalSearchDays,
+          linkingContext()
+        )
       );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());

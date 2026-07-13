@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -12,13 +16,21 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transit.service.TransitService;
 
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-    OtpServerRequestContext serverContext,
+    Graph graph,
+    TransitService transitService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    FlexParameters flexParameters,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     RouteRequest request,
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext
@@ -31,28 +43,28 @@ public class DirectFlexRouter {
     Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
-      serverContext.listExtensionRequestContexts(request),
+      DataOverlayContext.listExtensionRequestContexts(request, dataOverlayParameterBindings),
       AccessEgressType.ACCESS,
-      serverContext.flexParameters().maxAccessWalkDuration(),
+      flexParameters.maxAccessWalkDuration(),
       0,
       linkingContext
     );
     Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
-      serverContext.listExtensionRequestContexts(request),
+      DataOverlayContext.listExtensionRequestContexts(request, dataOverlayParameterBindings),
       AccessEgressType.EGRESS,
-      serverContext.flexParameters().maxEgressWalkDuration(),
+      flexParameters.maxEgressWalkDuration(),
       0,
       linkingContext
     );
 
     var flexRouter = new FlexRouter(
-      serverContext.graph(),
-      serverContext.transitService(),
-      serverContext.transferService(),
-      serverContext.streetDetailsService(),
-      serverContext.flexParameters(),
+      graph,
+      transitService,
+      transferService,
+      streetDetailsService,
+      flexParameters,
       FilterMapper.map(request.journey().transit().filters()),
       request.dateTime(),
       request.bookingTime(),
