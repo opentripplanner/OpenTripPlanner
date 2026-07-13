@@ -3,8 +3,11 @@ package org.opentripplanner.standalone.configure;
 import dagger.Subcomponent;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
+import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -55,6 +58,12 @@ public interface RequestScopedFactory {
   RegularTransferService transferService();
 
   VectorTileConfig vectorTileConfig();
+
+  LinkingContextFactory linkingContextFactory();
+
+  OjpApiParameters ojpApiParameters();
+
+  TriasApiParameters triasApiParameters();
 
   @Subcomponent.Builder
   interface Builder {
