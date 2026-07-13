@@ -7,10 +7,15 @@ import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -55,6 +60,11 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::defaultRouteRequest, RouteRequest.class);
     bridge(factory, RequestScopedFactory::vehicleParkingService, VehicleParkingService.class);
     bridge(factory, RequestScopedFactory::luceneIndex, LuceneIndex.class);
+    bridge(factory, RequestScopedFactory::debugUiConfig, DebugUiConfig.class);
+    bridge(factory, RequestScopedFactory::worldEnvelopeService, WorldEnvelopeService.class);
+    bridge(factory, RequestScopedFactory::vehicleRentalService, VehicleRentalService.class);
+    bridge(factory, RequestScopedFactory::streetDetailsService, StreetDetailsService.class);
+    bridge(factory, RequestScopedFactory::transferService, RegularTransferService.class);
   }
 
   /**
