@@ -6,6 +6,7 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
@@ -90,6 +91,12 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static GtfsApiParameters gtfsApiParameters(RouterConfig routerConfig) {
+    return routerConfig.gtfsApiParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OtpServerRequestContext serverRequestContext(
     RouterConfig routerConfig,
     DebugUiConfig debugUiConfig,
@@ -101,6 +108,7 @@ public class RequestScopedModule {
     TransitService transitService,
     RouteRequest defaultRequest,
     VectorTileConfig vectorTileConfig,
+    GtfsApiParameters gtfsApiConfig,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleRepository realtimeVehicleRepository,
@@ -125,7 +133,6 @@ public class RequestScopedModule {
     var transitRoutingConfig = routerConfig.transitTuningConfig();
     var triasApiParameters = routerConfig.triasApiParameters();
     var ojpApiParameters = routerConfig.ojpApiParameters();
-    var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var flexParameters = routerConfig.flexParameters();
     var transmodelAPIParameters = routerConfig.transmodelApi();
 
