@@ -12,6 +12,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
@@ -52,6 +53,8 @@ public interface RequestScopedFactory {
   StreetDetailsService streetDetailsService();
 
   RegularTransferService transferService();
+
+  VectorTileConfig vectorTileConfig();
 
   @Subcomponent.Builder
   interface Builder {

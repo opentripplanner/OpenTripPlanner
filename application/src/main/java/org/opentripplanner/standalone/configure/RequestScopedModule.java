@@ -36,6 +36,7 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
@@ -83,6 +84,12 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static VectorTileConfig vectorTileConfig(RouterConfig routerConfig) {
+    return routerConfig.vectorTileConfig();
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OtpServerRequestContext serverRequestContext(
     RouterConfig routerConfig,
     DebugUiConfig debugUiConfig,
@@ -93,6 +100,7 @@ public class RequestScopedModule {
     TransactionScope transactionScope,
     TransitService transitService,
     RouteRequest defaultRequest,
+    VectorTileConfig vectorTileConfig,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleRepository realtimeVehicleRepository,
@@ -118,7 +126,6 @@ public class RequestScopedModule {
     var triasApiParameters = routerConfig.triasApiParameters();
     var ojpApiParameters = routerConfig.ojpApiParameters();
     var gtfsApiConfig = routerConfig.gtfsApiParameters();
-    var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
     var transmodelAPIParameters = routerConfig.transmodelApi();
 
