@@ -1,4 +1,4 @@
-package org.opentripplanner.osm.wayproperty.specifier;
+package org.opentripplanner.osm;
 
 import org.opentripplanner.osm.model.OsmWay;
 
@@ -278,5 +278,14 @@ public class WayTestData {
 
   public static OsmWay platform() {
     return OsmWay.of().withTag("public_transport", "platform").withTag("ref", "123").build();
+  }
+
+  public static OsmWay embeddedRails() {
+    // https://www.openstreetmap.org/way/36973177
+    return OsmWay.of()
+      .withTag("bus", "designated")
+      .withTag("embedded_rails", "tram")
+      .withTag("highway", "unclassified")
+      .build();
   }
 }

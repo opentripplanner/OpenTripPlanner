@@ -398,6 +398,13 @@ public class OsmTagMapper {
     props.setMixinProperties("foot=use_sidepath", ofWalkSafety(5));
     props.setMixinProperties("bicycle=use_sidepath", ofBicycleSafety(5));
 
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "yes")
+      ),
+      ofBicycleSafety(1.8)
+    );
+
     populateNotesAndNames(props);
 
     // slope overrides

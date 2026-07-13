@@ -558,6 +558,13 @@ class NorwayMapper extends OsmTagMapper {
 
     props.setMixinProperties("trail_visibility=intermediate", ofWalkSafety(1.8));
 
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "yes")
+      ),
+      ofBicycleSafety(1.8)
+    );
+
     /*
      * Automobile speeds in Norway.
      * The national speed limit is 80 km/h in rural areas and 50 km/h i urban areas.
