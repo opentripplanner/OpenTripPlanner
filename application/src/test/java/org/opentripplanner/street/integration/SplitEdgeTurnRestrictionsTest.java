@@ -177,7 +177,16 @@ public class SplitEdgeTurnRestrictionsTest {
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var ctx = TestServerContext.ofGraph(graph);
 
-      var itineraries = DirectStreetRouter.route(ctx, request, linkingContext);
+      var itineraries = DirectStreetRouter.route(
+        ctx.graph(),
+        ctx.transitService(),
+        ctx.streetLimitationParametersService(),
+        ctx.vehicleRentalService(),
+        ctx.streetDetailsService(),
+        ctx.dataOverlayParameterBindings(),
+        request,
+        linkingContext
+      );
 
       // make sure that we only get CAR legs
       itineraries.forEach(i ->
