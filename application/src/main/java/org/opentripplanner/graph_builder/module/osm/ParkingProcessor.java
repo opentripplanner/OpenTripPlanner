@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -18,7 +19,8 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
-import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
+import org.opentripplanner.graph_builder.issues.IsolatedParkAndRide;
+import org.opentripplanner.graph_builder.issues.ParkAndRideWalkAccessibilityMismatch;
 import org.opentripplanner.osm.OsmOpeningHoursParser;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -214,58 +216,24 @@ class ParkingProcessor {
 
     var creativeName = nameParkAndRideEntity(entity);
 
-    // Check P+R accessibility by walking and driving.
-    boolean walkAccessibleIn = false;
-    boolean carAccessibleIn = false;
-    boolean walkAccessibleOut = false;
-    boolean carAccessibleOut = false;
-    for (VertexAndName access : accessVertices) {
-      var accessVertex = access.vertex();
-      for (Edge incoming : accessVertex.getIncoming()) {
-        if (incoming instanceof StreetEdge streetEdge) {
-          if (streetEdge.canTraverse(TraverseMode.WALK)) {
-            walkAccessibleIn = true;
-          }
-          if (streetEdge.canTraverse(TraverseMode.CAR)) {
-            carAccessibleIn = true;
-          }
-        }
-      }
-      for (Edge outgoing : accessVertex.getOutgoing()) {
-        if (outgoing instanceof StreetEdge streetEdge) {
-          if (streetEdge.canTraverse(TraverseMode.WALK)) {
-            walkAccessibleOut = true;
-          }
-          if (streetEdge.canTraverse(TraverseMode.CAR)) {
-            carAccessibleOut = true;
-          }
-        }
-      }
-    }
-
-    if (walkAccessibleIn != walkAccessibleOut) {
-      LOG.error(
-        "P+R walk IN/OUT accessibility mismatch! Please have a look as this should not happen."
-      );
-    }
-
-    if (isCarParkAndRide) {
-      if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
-        // This will prevent the P+R to be useful.
-        issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-      }
-    } else {
-      if (!walkAccessibleOut || !walkAccessibleIn) {
-        // This will prevent the P+R to be useful.
-        issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-      }
-    }
-
     List<VehicleParking.VehicleParkingEntranceCreator> entrances =
       createParkingEntrancesFromAccessVertices(accessVertices, creativeName, entity);
 
-    if (entrances.isEmpty()) {
+    var access = new ParkingAreaAccessibility(accessVertices);
+    if (access.walkMismatch()) {
+      issueStore.add(new ParkAndRideWalkAccessibilityMismatch(entity));
+    }
+
+    if (entrances.isEmpty() || (isCarParkAndRide && !access.carAccessible())) {
+      // This P+R is not connected to the drivable street network.
+      // We create an artificial entrance to the centroid and add an issue.
+      // The solution would be to connect it to the street network in OSM.
       entrances = createArtificialEntrances(group, creativeName, entity, isCarParkAndRide);
+      // We only add the issue for car parking lots because the majority of bike facilities are not
+      // connected to the street network.
+      if (isCarParkAndRide) {
+        issueStore.add(new IsolatedParkAndRide(creativeName.toString(), entity));
+      }
     }
 
     var vehicleParking = createVehicleParkingObjectFromOsmEntity(
@@ -293,10 +261,6 @@ class ParkingProcessor {
     OsmEntity entity,
     boolean isCarPark
   ) {
-    LOG.debug(
-      "Creating an artificial entrance for {} as it's not linked to the street network",
-      entity.url()
-    );
     return List.of(builder ->
       builder
         .entranceId(
@@ -471,3 +435,28 @@ class ParkingProcessor {
 }
 
 record VertexAndName(I18NString name, IntersectionVertex vertex) {}
+
+record ParkingAreaAccessibility(Set<VertexAndName> accessVertices) {
+  private static final Predicate<Edge> PREDICATE_DRIVABLE = e ->
+    e instanceof StreetEdge se && se.canTraverse(TraverseMode.CAR);
+  private static final Predicate<Edge> PREDICATE_WALKABLE = e ->
+    e instanceof StreetEdge se && se.canTraverse(TraverseMode.WALK);
+
+  boolean carAccessible() {
+    return (
+      accessVertices
+        .stream()
+        .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_DRIVABLE)) &&
+      accessVertices.stream().anyMatch(a -> a.vertex().hasAnyOutgoingMatching(PREDICATE_DRIVABLE))
+    );
+  }
+
+  boolean walkMismatch() {
+    return (
+      accessVertices
+        .stream()
+        .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_WALKABLE)) !=
+      accessVertices.stream().anyMatch(a1 -> a1.vertex().hasAnyOutgoingMatching(PREDICATE_WALKABLE))
+    );
+  }
+}

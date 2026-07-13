@@ -496,7 +496,7 @@ This is the cost that is used when boarding while cycling. This is usually highe
 
 **Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
 **Path:** /routingDefaults/bicycle   
-**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
@@ -509,9 +509,8 @@ If the triangle optimization is used, it's enough to just define the triangle pa
 
 A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.
 
-If the optimization is set to `safe-streets` or `safest-streets`, or if `safety` is non-zero
-in the triangle, the actual effect will further be affected by the safety of the cycle
-route.
+If the optimization is set to `safe-streets`, or if `safety` is non-zero in the triangle,
+the actual effect will further be affected by the safety of the cycle route.
 
 The effect of safety has changed between versions 2.9 and 2.10 by the removal of the
 safety normalizer. Before the change, all the safety values were multiplied such that
@@ -1015,7 +1014,7 @@ done because some street modes searches are much more resource intensive than ot
 
 **Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
 **Path:** /routingDefaults/scooter   
-**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
@@ -1170,8 +1169,6 @@ only available in the TransmodelAPI for now.
 
 Unmatched patterns are put in the BASE priority-group.
 
-
-**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**
 
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 

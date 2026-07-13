@@ -68,8 +68,8 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(TransmodelScalars.DATE_SCALAR)))
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment)
-              .getCalendarService()
-              .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
+              .getTripCalendars()
+              .listServiceDates(((trip(environment)).getServiceId()))
               .stream()
               .sorted()
               .collect(Collectors.toList())

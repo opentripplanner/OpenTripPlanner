@@ -13,12 +13,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -36,6 +34,7 @@ import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.LineStringShrinker;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
@@ -156,7 +155,7 @@ class WalkableAreaBuilder {
       AreaGroup areaGroup = new AreaGroup(ring.jtsPolygon);
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       for (OsmArea area : group.areas) {
-        if (!ring.jtsPolygon.contains(area.jtsMultiPolygon)) {
+        if (!ring.jtsPolygon.contains(area.jtsMultiPolygon.getGeometry())) {
           continue;
         }
 
@@ -283,7 +282,7 @@ class WalkableAreaBuilder {
       for (OsmArea area : group.areas) {
         OsmEntity areaEntity = area.parent;
 
-        if (!group.isSimpleAreaGroup() && !polygon.contains(area.jtsMultiPolygon)) {
+        if (!group.isSimpleAreaGroup() && !polygon.contains(area.jtsMultiPolygon.getGeometry())) {
           continue;
         }
 
@@ -389,7 +388,7 @@ class WalkableAreaBuilder {
       perRingData.add(
         new PerRingData(
           areaGroup,
-          polygon,
+          new PreparedPolygon(polygon),
           visibilityVertices,
           platformLinkingVertices,
           alreadyAddedEdges
@@ -418,7 +417,6 @@ class WalkableAreaBuilder {
    */
   private List<VisibilityPair> computeVisiblePairs(RingSetData ringSetData) {
     List<VisibilityPair> pairs = new ArrayList<>();
-    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     for (PerRingData ringData : ringSetData.perRingData()) {
       float skipRatio = (float) maxAreaNodes / (float) ringData.visibilityVertices().size();
@@ -441,11 +439,7 @@ class WalkableAreaBuilder {
           if (shouldSkipEdge(vertex1, vertex2, ringData.alreadyAddedEdges())) {
             continue;
           }
-          Coordinate[] coordinates = new Coordinate[] {
-            vertex1.getCoordinate(),
-            vertex2.getCoordinate(),
-          };
-          LineString line = geometryFactory.createLineString(coordinates);
+          var line = LineStringShrinker.shrink(vertex1.getCoordinate(), vertex2.getCoordinate());
           if (ringData.polygon().contains(line)) {
             boolean platformLinked =
               ringData.platformLinkingVertices().contains(vertex1) ||
@@ -627,10 +621,6 @@ class WalkableAreaBuilder {
     AreaGroup areaGroup,
     boolean testIntersection
   ) {
-    Coordinate[] coordinates = new Coordinate[] {
-      vertex1.getCoordinate(),
-      vertex2.getCoordinate(),
-    };
     double length = SphericalDistanceLibrary.distance(
       vertex1.getCoordinate(),
       vertex2.getCoordinate()
@@ -639,9 +629,7 @@ class WalkableAreaBuilder {
       // vertex1 and vertex2 are in the same position
       return Set.of();
     }
-
-    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    LineString line = geometryFactory.createLineString(coordinates);
+    var line = LineStringShrinker.shrink(vertex1.getCoordinate(), vertex2.getCoordinate());
 
     OsmEntity parent = null;
     WayProperties wayData = null;
@@ -650,11 +638,8 @@ class WalkableAreaBuilder {
 
     // combine properties of intersected areas
     for (OsmArea area : areas) {
-      MultiPolygon polygon = area.jtsMultiPolygon;
-      // intersects() is a cheap spatial predicate; only compute the full intersection when needed
-      boolean crosses =
-        !testIntersection ||
-        (polygon.intersects(line) && polygon.intersection(line).getLength() > 0.000001);
+      var polygon = area.jtsMultiPolygon;
+      boolean crosses = !testIntersection || polygon.intersects(line);
       if (crosses) {
         parent = area.parent;
         wayData = findAreaProperties(parent);
@@ -718,10 +703,12 @@ class WalkableAreaBuilder {
   private void createAreas(AreaGroup areaGroup, Ring ring, Collection<OsmArea> areas) {
     Polygon containingArea = ring.jtsPolygon;
     for (OsmArea area : areas) {
-      Geometry intersection = containingArea.intersection(area.jtsMultiPolygon);
-      if (intersection.getArea() == 0) {
+      // intersects is a quick filter to remove candidates
+      if (!area.jtsMultiPolygon.intersects(containingArea)) {
         continue;
       }
+      // here we compute the exact intersection (slow) only if we need it
+      Geometry intersection = containingArea.intersection(area.jtsMultiPolygon.getGeometry());
       Area namedArea = new Area();
       OsmEntity areaEntity = area.parent;
 
@@ -734,6 +721,7 @@ class WalkableAreaBuilder {
       namedArea.setWalkSafety((float) wayData.walkSafety());
       namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
+      namedArea.setWheelchairAccessible(areaEntity.isWheelchairAccessible());
       areaGroup.addArea(namedArea);
 
       if (areaEntity.isBoardingLocation()) {
@@ -808,7 +796,7 @@ class WalkableAreaBuilder {
    */
   private record PerRingData(
     AreaGroup areaGroup,
-    Polygon polygon,
+    PreparedPolygon polygon,
     HashSet<IntersectionVertex> visibilityVertices,
     Set<IntersectionVertex> platformLinkingVertices,
     HashSet<NodeEdge> alreadyAddedEdges

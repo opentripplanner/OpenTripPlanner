@@ -33,6 +33,10 @@ public class InsertionEvaluator {
   private static final Logger LOG = LoggerFactory.getLogger(InsertionEvaluator.class);
 
   private final CarpoolRouter carpoolRouter;
+
+  @Nullable
+  private final CarpoolRouter baselineFallbackRouter;
+
   private final Duration stopDuration;
 
   /**
@@ -44,7 +48,33 @@ public class InsertionEvaluator {
    *        passenger-ride durations.
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
+    this(carpoolRouter, null, stopDuration);
+  }
+
+  /**
+   * @param carpoolRouter routes a single street segment between two vertices in the candidate
+   *        carpool route — used both to build the baseline route and to re-route only the
+   *        segments that change when a passenger pickup/dropoff is inserted.
+   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not,
+   *        or {@code null} for no fallback. Only the baseline route falls back. When
+   *        {@code carpoolRouter} is a tree router whose per-leg trees are sized to a bounded
+   *        per-leg limit, an underestimate of that limit would leave a waypoint outside its tree
+   *        and drop the whole trip; a goal-directed fallback re-routes just that leg instead.
+   *        Inserted passenger
+   *        segments deliberately do not fall back — a segment that cannot be routed within the
+   *        tree is an insertion the delay constraints reject anyway, so failing fast there is
+   *        correct and avoids a goal-directed search per nearby stop.
+   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
+   *        preference); applied between consecutive segments when computing total trip and
+   *        passenger-ride durations.
+   */
+  public InsertionEvaluator(
+    CarpoolRouter carpoolRouter,
+    @Nullable CarpoolRouter baselineFallbackRouter,
+    Duration stopDuration
+  ) {
     this.carpoolRouter = carpoolRouter;
+    this.baselineFallbackRouter = baselineFallbackRouter;
     this.stopDuration = stopDuration;
   }
 
@@ -62,6 +92,12 @@ public class InsertionEvaluator {
       var to = routePoints.get(i + 1);
 
       GraphPath<State, Edge, Vertex> segment = carpoolRouter.route(from, to);
+      if (segment == null && baselineFallbackRouter != null) {
+        segment = baselineFallbackRouter.route(from, to);
+        if (segment != null) {
+          LOG.debug("Baseline segment {} → {} routed by the fallback router", i, i + 1);
+        }
+      }
       if (segment == null) {
         LOG.debug("Baseline routing failed for segment {} → {}", i, i + 1);
         return null;
@@ -82,6 +118,14 @@ public class InsertionEvaluator {
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
     var tripWithVertices = tripWithViableAccessEgress.tripWithVertices();
+
+    // No nearby stop produced a viable insertion position for this trip, so there is nothing to
+    // evaluate. Return before routing the baseline: that routing builds the trip's street trees,
+    // which are expensive for long trips — wasted work for a trip that cannot yield an
+    // access/egress leg.
+    if (tripWithViableAccessEgress.viableAccessEgress().isEmpty()) {
+      return List.of();
+    }
 
     GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {

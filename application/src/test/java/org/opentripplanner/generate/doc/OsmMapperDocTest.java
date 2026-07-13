@@ -11,6 +11,7 @@ import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.CONSTANT_SPE
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HAMBURG;
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HOUSTON;
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.PORTLAND;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.TWIN_CITIES;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import java.io.File;
@@ -37,7 +38,8 @@ public class OsmMapperDocTest {
     HOUSTON,
     PORTLAND,
     HAMBURG,
-    CONSTANT_SPEED_FINLAND
+    CONSTANT_SPEED_FINLAND,
+    TWIN_CITIES
   );
 
   public static List<OsmTagMapperSource> mappers() {

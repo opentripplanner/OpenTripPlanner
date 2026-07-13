@@ -139,6 +139,11 @@ public sealed interface TripTimes<T extends TripTimes>
    */
   boolean isDeleted();
 
+  /**
+   * Return {@code true} if any stop arrival or departure time was updated via real-time data.
+   */
+  boolean isTimesModified();
+
   boolean isCanceledStop(int stopPos);
 
   /// True if there is realtime information indicating that the trip has arrived at the stop.

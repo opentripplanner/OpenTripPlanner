@@ -16,6 +16,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -177,8 +178,8 @@ class CanceledTripsFilterMapperTest {
     var include = request.filters().getFirst().select().getFirst();
     assertThat(include.serviceDateRanges().get()).hasSize(1);
     var includeRange = include.serviceDateRanges().get().iterator().next();
-    assertEquals(start, includeRange.startInclusive());
-    assertEquals(end, includeRange.endExclusive());
+    assertEquals(start, includeRange.getStartInclusive());
+    assertEquals(end, includeRange.getEndExclusive());
   }
 
   @Test
@@ -196,8 +197,9 @@ class CanceledTripsFilterMapperTest {
     var exclude = request.filters().getFirst().not().getFirst();
     assertThat(exclude.serviceDateRanges().get()).hasSize(1);
     var excludeRange = exclude.serviceDateRanges().get().iterator().next();
-    assertEquals(start, excludeRange.startInclusive());
-    assertNull(excludeRange.endExclusive());
+    assertEquals(start, excludeRange.getStartInclusive());
+    var unboundedRange = LocalDateRange.ofUnbounded();
+    assertEquals(unboundedRange.getEndExclusive(), excludeRange.getEndExclusive());
   }
 
   @Test

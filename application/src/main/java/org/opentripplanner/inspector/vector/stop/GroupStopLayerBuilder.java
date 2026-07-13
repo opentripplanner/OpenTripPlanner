@@ -43,7 +43,7 @@ public class GroupStopLayerBuilder extends LayerBuilder<StopLocation> {
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     return geometries;
   }
 }

@@ -1,7 +1,7 @@
 import { MapView } from '../components/MapView/MapView.tsx';
 import { ItineraryListContainer } from '../components/ItineraryList/ItineraryListContainer.tsx';
 import { ItineraryCompareDialog } from '../components/ItineraryList/ItineraryCompareDialog.tsx';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTripQuery } from '../hooks/useTripQuery.ts';
 import { useServerInfo } from '../hooks/useServerInfo.ts';
 import { useTripQueryVariables } from '../hooks/useTripQueryVariables.ts';
@@ -24,11 +24,16 @@ export function App() {
   const [expandedArguments, setExpandedArguments] = useState<Record<string, boolean>>({});
   const timeZone = serverInfo?.internalTransitModelTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  useEffect(() => {
+  // Reset the selection to the first trip pattern whenever a new result arrives.
+  // Adjusting state during render (rather than in an effect) avoids a redundant
+  // re-render and complies with react-hooks/set-state-in-effect.
+  const [prevTripQueryResult, setPrevTripQueryResult] = useState(tripQueryResult);
+  if (tripQueryResult !== prevTripQueryResult) {
+    setPrevTripQueryResult(tripQueryResult);
     if (tripQueryResult?.trip.tripPatterns.length) {
       setSelectedTripPatternIndexes([0]);
     }
-  }, [tripQueryResult]);
+  }
 
   return (
     <div className="app">

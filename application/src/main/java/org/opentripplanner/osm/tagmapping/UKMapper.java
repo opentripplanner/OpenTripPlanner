@@ -1,11 +1,13 @@
 package org.opentripplanner.osm.tagmapping;
 
+import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 
 /**
  * OSM way properties for UK roads. The main differences compared to the default property set are:
@@ -27,12 +29,33 @@ class UKMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
-    props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
+    props.setProperties(
+      "highway=cycleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.2).bicycleSafety(0.6)
+    );
+    props.setProperties(
+      "highway=bridleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.2).bicycleSafety(1.3)
+    );
 
     // reduce trunk safety compared to default mapper
-    props.setProperties("highway=trunk", withModes(ALL).walkSafety(2.5).bicycleSafety(2.5));
-    props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(2.5).bicycleSafety(2.06));
+    props.setProperties("highway=trunk", withModes(ALL).walkSafety(3.8).bicycleSafety(2.5));
+    props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(3.8).bicycleSafety(2.06));
+
+    // cancel out the effect of the reduced safety mixin for walking on trunk roads with pavement
+    props.setMixinProperties(
+      new LogicalOrSpecifier(
+        "highway=trunk;sidewalk=yes",
+        "highway=trunk;sidewalk=left",
+        "highway=trunk;sidewalk=right",
+        "highway=trunk;sidewalk=both",
+        "highway=trunk_link;sidewalk=yes",
+        "highway=trunk_link;sidewalk=left",
+        "highway=trunk_link;sidewalk=right",
+        "highway=trunk_link;sidewalk=both"
+      ),
+      ofWalkSafety(2)
+    );
 
     props.setMixinProperties(
       "expressway=yes",

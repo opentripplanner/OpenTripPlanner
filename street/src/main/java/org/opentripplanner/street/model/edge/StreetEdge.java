@@ -10,8 +10,8 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
-import org.opentripplanner.street.geometry.CompactLineStringUtils;
 import org.opentripplanner.street.geometry.DirectionUtils;
+import org.opentripplanner.street.geometry.EndpointContextLineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.SplitLineString;
@@ -385,13 +385,34 @@ public class StreetEdge
 
   @Override
   public LineString getGeometry() {
-    return CompactLineStringUtils.uncompactLineString(
+    return EndpointContextLineString.uncompact(
       fromv.getLon(),
       fromv.getLat(),
       tov.getLon(),
       tov.getLat(),
       compactGeometry,
       isBack()
+    );
+  }
+
+  /**
+   * Squared distance (in projected latitude degrees squared) from the point {@code (lon, lat)} to
+   * this edge's geometry, using the linker's local equirectangular projection. Computed directly on
+   * the packed geometry without materializing a {@link LineString}; see {@link
+   * EndpointContextLineString#squaredEquirectangularDistanceToPoint}. The square is returned because
+   * the linker only orders and thresholds by distance, so the per-candidate {@code sqrt} is avoided.
+   */
+  public double squaredEquirectangularDistanceToPoint(double lon, double lat, double xscale) {
+    return EndpointContextLineString.squaredEquirectangularDistanceToPoint(
+      fromv.getLon(),
+      fromv.getLat(),
+      tov.getLon(),
+      tov.getLat(),
+      compactGeometry,
+      isBack(),
+      lon,
+      lat,
+      xscale
     );
   }
 
@@ -737,7 +758,7 @@ public class StreetEdge
   }
 
   private void setGeometry(LineString geometry) {
-    this.compactGeometry = CompactLineStringUtils.compactLineString(
+    this.compactGeometry = EndpointContextLineString.compact(
       fromv.getLon(),
       fromv.getLat(),
       tov.getLon(),
@@ -919,13 +940,6 @@ public class StreetEdge
       ? req.bike().optimizeType()
       : req.scooter().optimizeType();
     switch (optimizeType) {
-      case SAFEST_STREETS -> {
-        weight = (bicycleSafetyFactor * getDistanceMeters()) / speed;
-        if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
-          // safest streets are treated as even safer than they really are
-          weight *= 0.66;
-        }
-      }
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS ->
         /* see notes in StreetVertex on speed overhead */ weight =

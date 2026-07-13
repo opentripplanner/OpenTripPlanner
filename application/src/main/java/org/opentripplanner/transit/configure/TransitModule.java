@@ -6,9 +6,9 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.time.LocalDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -25,27 +25,17 @@ public abstract class TransitModule {
   @Provides
   @Singleton
   public static TimetableSnapshotManager timetableSnapshotManager(
-    RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
     ConfigModel config,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    RaptorTransitData scheduledRaptorTransitData,
+    DefaultTripCalendars scheduledTripCalendars
   ) {
     return new TimetableSnapshotManager(
-      realtimeRaptorTransitDataUpdater,
       config.routerConfig().updaterConfig().timetableSnapshotParameters(),
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+      () -> LocalDate.now(timetableRepository.getTimeZone()),
+      scheduledRaptorTransitData,
+      scheduledTripCalendars
     );
-  }
-
-  /**
-   * Create a single instance of the transit layer updater which holds the incremental caches for
-   * the updates that need to applied to the {@link RaptorTransitData}.
-   */
-  @Provides
-  @Singleton
-  public static RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater(
-    TimetableRepository timetableRepository
-  ) {
-    return new RealTimeRaptorTransitDataUpdater(timetableRepository);
   }
 
   /**

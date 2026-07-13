@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
-import org.opentripplanner.raptor.spi.RaptorCostConverter;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -54,7 +54,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     this(
       stop,
       (int) finalState.getElapsedTimeSeconds(),
-      RaptorCostConverter.toRaptorCost(finalState.getWeight()),
+      CostLimit.toRaptorCost(finalState.getWeight()),
       TimeAndCost.ZERO,
       finalState
     );

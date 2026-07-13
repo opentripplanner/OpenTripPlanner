@@ -12,12 +12,16 @@ import static org.opentripplanner.updater.trip.TimetableSnapshotManagerTest.Same
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -26,7 +30,6 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 
 class TimetableSnapshotManagerTest {
 
@@ -138,8 +141,7 @@ class TimetableSnapshotManagerTest {
     // yesterday is candidate to expire
     final AtomicReference<LocalDate> clock = new AtomicReference<>(YESTERDAY);
 
-    var snapshotManager = new TimetableSnapshotManager(
-      null,
+    var snapshotManager = createManager(
       TimetableSnapshotParameters.DEFAULT.withPurgeExpiredData(purgeExpiredData),
       clock::get
     );
@@ -178,7 +180,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferPhase3Only() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
@@ -200,7 +202,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferWithDeleteFromScheduled() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
@@ -232,7 +234,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferWithRevertThenUpdate() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
@@ -271,7 +273,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferAllThreePhases() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
@@ -319,7 +321,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferCancelScheduledTrip() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var canceledTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();
@@ -342,7 +344,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferDeleteScheduledTrip() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var deletedTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withDeleted()
       .build();
@@ -365,7 +367,7 @@ class TimetableSnapshotManagerTest {
    */
   @Test
   void updateBufferCancelWithRevert() {
-    var manager = createManager();
+    var manager = createManager(TimetableSnapshotParameters.DEFAULT, () -> TODAY);
     var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes()
       .withArrivalDelay(0, 60)
       .withDepartureDelay(0, 60)
@@ -401,7 +403,15 @@ class TimetableSnapshotManagerTest {
     assertTrue(timetable.getTripTimes(TRIP).isCanceled());
   }
 
-  private static TimetableSnapshotManager createManager() {
-    return new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, () -> TODAY);
+  private static TimetableSnapshotManager createManager(
+    TimetableSnapshotParameters snapshotParameters,
+    Supplier<LocalDate> dateSupplier
+  ) {
+    return new TimetableSnapshotManager(
+      snapshotParameters,
+      dateSupplier,
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
   }
 }

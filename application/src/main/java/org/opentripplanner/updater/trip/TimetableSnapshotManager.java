@@ -5,31 +5,30 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
+ * A class that abstracts away locking, updating, committing, and purging of the timetable snapshot.
  */
 public final class TimetableSnapshotManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotManager.class);
 
-  private final RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater;
-
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads.
-   * By design, only one thread should ever be writing to this buffer.
+   * By design, only one thread should ever be written to this buffer.
    */
-  private final TimetableSnapshot buffer = new TimetableSnapshot();
+  private final TimetableSnapshot buffer;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -51,19 +50,26 @@ public final class TimetableSnapshotManager {
   private LocalDate lastPurgeDate = null;
 
   /**
+   * Creates and immediately initializes the snapshot with the provided scheduled Raptor data.
+   * <p>
+   * This constructor is intended for production use where the Raptor data is computed before
+   * Dagger constructs this instance, avoiding a separate init call.
    *
-   * @param localDateNow This supplier allows you to inject a custom lambda to override what is
-   *                     considered 'today'. This is useful for unit testing.
+   * @param localDateNow               This supplier allows you to inject a custom lambda to
+   *                                   override what is considered 'today'. This is useful for
+   *                                   unit testing.
+   * @param scheduledRaptorTransitData The pre-computed scheduled Raptor transit data.
+   * @param tripCalendars              The trip calendars copied for real-time updates.
    */
   public TimetableSnapshotManager(
-    @Nullable RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
     TimetableSnapshotParameters parameters,
-    Supplier<LocalDate> localDateNow
+    Supplier<LocalDate> localDateNow,
+    RaptorTransitData scheduledRaptorTransitData,
+    DefaultTripCalendars tripCalendars
   ) {
-    this.realtimeRaptorTransitDataUpdater = realtimeRaptorTransitDataUpdater;
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = Objects.requireNonNull(localDateNow);
-    // Force commit so that snapshot initializes
+    this.buffer = new TimetableSnapshot(scheduledRaptorTransitData, tripCalendars);
     commitTimetableSnapshot(true);
   }
 
@@ -97,7 +103,7 @@ public final class TimetableSnapshotManager {
    */
   void commitTimetableSnapshot(final boolean force) {
     if (force || buffer.isDirty()) {
-      snapshot.publish(buffer.commit(realtimeRaptorTransitDataUpdater, force));
+      snapshot.publish(buffer.commit(force));
     }
   }
 

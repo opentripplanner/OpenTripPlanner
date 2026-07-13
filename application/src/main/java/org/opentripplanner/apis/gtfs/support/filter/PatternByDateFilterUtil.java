@@ -15,9 +15,9 @@ public class PatternByDateFilterUtil {
     TransitService transitService
   ) {
     return new PatternByServiceDatesFilter(
-      new LocalDateRange(range.getGraphQLStart(), range.getGraphQLEnd()),
+      LocalDateRange.ofExclusiveEnd(range.getGraphQLStart(), range.getGraphQLEnd()),
       transitService::findPatterns,
-      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
+      trip -> transitService.getTripCalendars().listServiceDates(trip.getServiceId())
     );
   }
 }

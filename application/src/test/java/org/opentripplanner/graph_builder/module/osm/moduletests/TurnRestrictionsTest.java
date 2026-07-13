@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmNode;
@@ -41,7 +42,12 @@ class TurnRestrictionsTest {
       Arguments.of("no_straight_on", true, node05, node15, node24),
       Arguments.of("no_left_turn", true, node05, node15, node26),
       Arguments.of("no_right_turn", true, node05, node15, node24),
-      Arguments.of("no_u_turn", true, node05, node15, node16)
+      Arguments.of("no_u_turn", true, node05, node15, node16),
+      // Support no_entry & no_exit https://github.com/opentripplanner/OpenTripPlanner/issues/2731
+      Arguments.of("no_entry", false, node05, node15, node16),
+      Arguments.of("no_exit", false, node05, node15, node16),
+      // noexit is a misspelling which we don't check for
+      Arguments.of("noexit", true, node05, node15, node16)
     );
   }
 
@@ -79,7 +85,7 @@ class TurnRestrictionsTest {
       issueStore
         .listIssues()
         .stream()
-        .filter(i -> i instanceof TurnRestrictionBad)
+        .filter(i -> i instanceof TurnRestrictionBad || i instanceof TurnRestrictionUnknown)
         .toList()
     ).hasSize(shouldWarn ? 1 : 0);
   }

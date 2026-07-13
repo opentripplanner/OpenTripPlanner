@@ -77,7 +77,7 @@ public class EnumTypes {
     .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)
     .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS)
     .value("flat", VehicleRoutingOptimizeType.FLAT_STREETS)
-    .value("greenways", VehicleRoutingOptimizeType.SAFEST_STREETS)
+    .value("greenways", VehicleRoutingOptimizeType.SAFE_STREETS)
     .value("triangle", VehicleRoutingOptimizeType.TRIANGLE)
     .build();
 

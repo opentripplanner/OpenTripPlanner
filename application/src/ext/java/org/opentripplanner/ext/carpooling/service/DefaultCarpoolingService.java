@@ -2,12 +2,14 @@ package org.opentripplanner.ext.carpooling.service;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
@@ -15,7 +17,9 @@ import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
+import org.opentripplanner.ext.carpooling.routing.CarpoolRouter;
 import org.opentripplanner.ext.carpooling.routing.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
@@ -108,9 +112,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultCarpoolingService.class);
 
   /**
-   * Caps the radius of the nearby-stop search used in access/egress routing. Required to keep
-   * computational complexity bounded; remove or widen only after the nearby-stop search is made
-   * smarter.
+   * Hard ceiling on the nearby-stop search radius used in access/egress routing. The search uses
+   * the request's {@code accessEgress} max duration for {@link StreetMode#CARPOOL}, but never more
+   * than this, so an unusually large preference cannot blow up the search. Lower or remove only
+   * once the nearby-stop search is made smarter.
    */
   public static final Duration MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS =
     Duration.ofMinutes(60);
@@ -147,7 +152,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
     this.preFilters = TripPreFilters.defaults();
     this.postFilters = ItineraryPostFilters.defaults();
     this.itineraryMapper = new CarpoolItineraryMapper();
-    this.positionFinder = new InsertionPositionFinder(new BeelineEstimator());
+    this.positionFinder = new InsertionPositionFinder(
+      new BeelineEstimator(streetLimitationParametersService.maxCarSpeed())
+    );
     this.vertexCreationService = vertexCreationService;
   }
 
@@ -209,7 +216,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     var itineraries = List.<Itinerary>of();
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var router = new CarpoolStreetRouter(streetLimitationParametersService, request);
+      var router = new CarpoolStreetRouter(streetLimitationParametersService);
 
       var streetVertexUtils = new StreetVertexUtils(
         this.vertexCreationService,
@@ -419,11 +426,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
         return List.of();
       }
 
-      var streetNearbyStopFinder = StreetNearbyStopFinder.of(
-        null,
-        MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS,
-        0
+      // A carpool access/egress leg is an access/egress leg, so the search may not exceed the
+      // request's accessEgress max duration: stops beyond that reach only yield legs that violate
+      // the cap. Bound it further by MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS so an
+      // unusually large preference cannot blow up the search.
+      var preferredSearchDuration = request
+        .preferences()
+        .street()
+        .accessEgress()
+        .maxDuration()
+        .valueOf(StreetMode.CARPOOL);
+      var nearbyStopSearchDuration = min(
+        preferredSearchDuration,
+        MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
       );
+
+      var streetNearbyStopFinder = StreetNearbyStopFinder.of(null, nearbyStopSearchDuration, 0);
 
       // CAR_PICKUP models a walk → drive → walk chain inside a single A*. Using it here (instead
       // of plain CAR) lets the search find transit stops whose link endpoint is only walk-reachable
@@ -475,39 +493,57 @@ public class DefaultCarpoolingService implements CarpoolingService {
         .filter(Objects::nonNull)
         .toList();
 
+      // Sizes each leg's tree from OTP's own routed leg durations (cached per trip) and re-routes
+      // any baseline leg the tree misses — see resolveLegDurations and the InsertionEvaluator
+      // fallback below.
+      var baselineRouter = new CarpoolStreetRouter(streetLimitationParametersService);
+
+      // Each waypoint's tree only has to span its own leg plus the feasible insertion detour —
+      // see driverLegTreeLimits.
+      var routableTrips = new ArrayList<CarpoolTripWithVertices>(candidateTripsWithVertices.size());
+      var passengerTreeLimit = Duration.ZERO;
+      for (var tripWithVertices : candidateTripsWithVertices) {
+        var legDurations = resolveLegDurations(tripWithVertices, baselineRouter);
+        // A trip whose baseline cannot be routed within the carpool bound cannot carry a passenger:
+        // skip it before sizing and building trees its baseline would fail to route in anyway.
+        if (legDurations == null) {
+          continue;
+        }
+        var legLimits = driverLegTreeLimits(tripWithVertices.trip(), legDurations);
+        var vertices = tripWithVertices.vertices();
+        for (int leg = 0; leg < legLimits.length; leg++) {
+          carpoolTreeVertexRouter.addVertex(
+            vertices.get(leg),
+            CarpoolTreeStreetRouter.Direction.FROM,
+            legLimits[leg]
+          );
+          carpoolTreeVertexRouter.addVertex(
+            vertices.get(leg + 1),
+            CarpoolTreeStreetRouter.Direction.TO,
+            legLimits[leg]
+          );
+          passengerTreeLimit = max(passengerTreeLimit, legLimits[leg]);
+        }
+        routableTrips.add(tripWithVertices);
+      }
+      // Every passenger segment lies on a single leg of some candidate trip, so the largest leg
+      // limit bounds them all. A smaller cap would silently drop feasible insertions: route()
+      // never falls back from the passenger's own forward tree.
       carpoolTreeVertexRouter.addVertex(
         passengerSnap.vertex(),
         CarpoolTreeStreetRouter.Direction.BOTH,
-        MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
+        passengerTreeLimit
       );
-      candidateTripsWithVertices.forEach(tripWithVertices -> {
-        var vertices = tripWithVertices.vertices();
-        carpoolTreeVertexRouter.addVertex(
-          vertices.getFirst(),
-          CarpoolTreeStreetRouter.Direction.FROM,
-          MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
-        );
-        carpoolTreeVertexRouter.addVertex(
-          vertices.getLast(),
-          CarpoolTreeStreetRouter.Direction.TO,
-          MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
-        );
-
-        var middleVertices = vertices.subList(1, vertices.size() - 1);
-        middleVertices.forEach(vertex -> {
-          carpoolTreeVertexRouter.addVertex(
-            vertex,
-            CarpoolTreeStreetRouter.Direction.BOTH,
-            MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
-          );
-        });
-      });
 
       var stopDuration = request.preferences().car().pickupTime();
 
-      var insertionEvaluator = new InsertionEvaluator(carpoolTreeVertexRouter, stopDuration);
+      var insertionEvaluator = new InsertionEvaluator(
+        carpoolTreeVertexRouter,
+        baselineRouter,
+        stopDuration
+      );
 
-      var candidateTripsWithViableStopsAndPositions = candidateTripsWithVertices
+      var candidateTripsWithViableStopsAndPositions = routableTrips
         .stream()
         .map(tripWithVertices -> {
           var viableSegmentInsertions = stopSnaps
@@ -563,6 +599,122 @@ public class DefaultCarpoolingService implements CarpoolingService {
         )
         .toList();
     }
+  }
+
+  /**
+   * Sizes the street routing tree for each leg of a driver trip from the leg's travel duration:
+   * {@code result[k]} limits the leg from waypoint {@code k} to {@code k + 1} — waypoint
+   * {@code k}'s forward tree and waypoint {@code k + 1}'s reverse tree — one entry per leg. Sizing
+   * per leg instead of to the whole {@link CarpoolTrip#startTime()}→{@link CarpoolTrip#endTime()}
+   * span keeps trees local even when consecutive waypoints are minutes apart, the dominant cost
+   * for long or multi-waypoint trips.
+   * <p>
+   * A leg's limit is its travel duration plus a small slack plus the detour
+   * allowance: the smallest deviation budget among the stops downstream of the leg. A detour on a
+   * leg delays every downstream stop, each checked against its own budget by
+   * {@link org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints}, so the
+   * smallest downstream budget is the most a feasible detour can add — a stop beyond the tree
+   * would be rejected by the delay constraints anyway.
+   * <p>
+   * Each limit is finally capped at {@link CarpoolTrip#MAX_TRIP_DURATION}, the same bound the
+   * SIRI mapper rejects over-long trips at. A consistent trip's leg never approaches that bound, so
+   * the cap only trims the detour margin of a trip at the very edge of the accepted range; its real
+   * purpose is to keep every driver tree bounded should a trip with inconsistent geometry slip past
+   * the mapper's checks, so that no single request can expand a multi-hour tree.
+   *
+   * @param legDurations the travel duration of each leg, one entry per leg (length
+   *        {@code stops().size() - 1}). The caller passes OTP's own routed durations (see
+   *        {@link #resolveLegDurations}) so the tree is sized against the same routing model it is
+   *        built with; a leg's tree then spans its baseline whatever the SIRI schedule claimed.
+   */
+  static Duration[] driverLegTreeLimits(CarpoolTrip trip, Duration[] legDurations) {
+    var stops = trip.stops();
+    int n = stops.size();
+
+    // Small slack: a floor for zero-length legs and a guard against rounding or routing-model
+    // discrepancy. Not load-bearing — the OTP-measured leg duration plus the downstream deviation
+    // budget already span the baseline and any feasible detour.
+    var slack = Duration.ofMinutes(1);
+
+    // Detour allowance = backward running minimum of the downstream deviation budgets; the
+    // origin's budget never participates — no detour can delay the origin.
+    var legLimits = new Duration[n - 1];
+    var detourAllowance = stops.get(n - 1).getDeviationBudget();
+    for (int k = n - 2; k >= 0; k--) {
+      detourAllowance = min(detourAllowance, stops.get(k + 1).getDeviationBudget());
+      legLimits[k] = min(
+        legDurations[k].plus(slack).plus(detourAllowance),
+        CarpoolTrip.MAX_TRIP_DURATION
+      );
+    }
+    return legLimits;
+  }
+
+  /**
+   * Resolves the per-leg travel durations used to size a trip's routing trees, or {@code null}
+   * when the trip's baseline cannot be routed and the trip should be skipped.
+   * <p>
+   * The outcome is memoized on the repository
+   * ({@link CarpoolingRepository#cachedBaselineRouting}) — both success and failure — because the
+   * baseline route depends only on the trip's waypoint geometry and the static street graph, never
+   * on the passenger request: the baseline router is bounded by
+   * {@link CarpoolTrip#MAX_TRIP_DURATION}, a fixed ceiling, not by any request preference. On a
+   * cache miss every leg is routed with {@code baselineRouter}; the result — the durations if all
+   * legs route, or unroutable if any leg cannot be driven within that ceiling — is cached either
+   * way, so a trip that cannot carry a passenger is routed once and skipped cheaply thereafter. The
+   * cache validates its entry against the trip's current route points, so a re-routed trip never
+   * reads a stale verdict.
+   */
+  @Nullable
+  private Duration[] resolveLegDurations(
+    CarpoolTripWithVertices tripWithVertices,
+    CarpoolRouter baselineRouter
+  ) {
+    var trip = tripWithVertices.trip();
+    var cached = repository.cachedBaselineRouting(trip);
+    if (cached != null) {
+      return cached.legDurations();
+    }
+    var routed = routeBaselineLegDurations(tripWithVertices, baselineRouter);
+    repository.cacheBaselineRouting(trip, routed);
+    return routed;
+  }
+
+  /**
+   * Routes every leg of the trip with {@code baselineRouter} and returns OTP's travel duration for
+   * each, or {@code null} if any leg cannot be routed. {@code baselineRouter} is a goal-directed
+   * search bounded by {@link CarpoolTrip#MAX_TRIP_DURATION} — the same ceiling the trees are capped
+   * at — so a {@code null} here means the leg cannot be driven within the carpool bound: no tree
+   * could route it either, and the trip is dropped.
+   */
+  @Nullable
+  private static Duration[] routeBaselineLegDurations(
+    CarpoolTripWithVertices tripWithVertices,
+    CarpoolRouter baselineRouter
+  ) {
+    var vertices = tripWithVertices.vertices();
+    var durations = new Duration[vertices.size() - 1];
+    for (int leg = 0; leg < durations.length; leg++) {
+      var path = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
+      if (path == null) {
+        LOG.debug(
+          "OTP could not route baseline leg {} of trip {} within the carpool bound; skipping it",
+          leg,
+          tripWithVertices.trip().getId()
+        );
+        return null;
+      }
+      durations[leg] = GraphPathUtils.durationOrZero(path);
+    }
+    return durations;
+  }
+
+  private static Duration min(Duration a, Duration b) {
+    return a.compareTo(b) <= 0 ? a : b;
+  }
+
+  private static Duration max(Duration a, Duration b) {
+    return a.compareTo(b) >= 0 ? a : b;
   }
 
   private void validateRequest(RouteRequest request) throws RoutingValidationException {

@@ -9,6 +9,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.Condition;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.GreaterThan;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.OneOf;
@@ -49,17 +50,28 @@ class PortlandMapper extends OsmTagMapper {
       ofWalkSafety(1.2)
     );
 
-    props.setMixinProperties(oneOfHighway("primary", "primary_link"), ofWalkSafety(1.8));
-    props.setMixinProperties(oneOfHighway("secondary", "secondary_link"), ofWalkSafety(1.6));
+    props.setMixinProperties(oneOfHighway("trunk", "trunk_link"), ofWalkSafety(0.8032));
+    props.setMixinProperties(oneOfHighway("primary", "primary_link"), ofWalkSafety(0.6923));
+    props.setMixinProperties(oneOfHighway("secondary", "secondary_link"), ofWalkSafety(0.8421));
     props.setMixinProperties(
-      oneOfHighway("tertiary", "tertiary_link", "unclassified", "service"),
-      ofWalkSafety(1.5)
+      oneOfHighway("tertiary", "tertiary_link", "unclassified"),
+      ofWalkSafety(1.2)
     );
-    props.setMixinProperties(oneOfHighway("residential"), ofWalkSafety(1.3));
+    props.setMixinProperties(oneOfHighway("service"), ofWalkSafety(1.1538));
+    props.setMixinProperties(oneOfHighway("residential"), ofWalkSafety(1.0833));
 
     props.setMixinProperties(
       new ExactMatchSpecifier(new GreaterThan("lanes", 4)),
       ofWalkSafety(1.1)
+    );
+
+    // revert the sidewalk mixin inherited from the base mapper
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.OneOf("sidewalk", "yes", "left", "right", "both"),
+        new Condition.Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
+      ),
+      ofWalkSafety(1.1111)
     );
     props.setMixinProperties(highwaySidewalk("both"), ofWalkSafety(0.8));
     props.setMixinProperties(highwaySidewalk("left"), ofWalkSafety(0.9));

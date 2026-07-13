@@ -1,10 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +13,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -50,7 +47,6 @@ class TimetableRepositoryIndex {
   private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
 
   private Map<StopLocation, LocalDate> endOfServiceDateForStop = new HashMap<>();
-  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay =
     new HashMap<>();
 
@@ -102,7 +98,7 @@ class TimetableRepositoryIndex {
       );
     }
 
-    initializeServiceData(timetableRepository);
+    initializeServiceData(timetableRepository.getTripCalendar());
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(timetableRepository);
@@ -191,59 +187,27 @@ class TimetableRepositoryIndex {
     return Collections.unmodifiableCollection(patternsForRoute.get(route));
   }
 
-  Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return serviceCodesRunningForDate;
-  }
-
   FlexIndex getFlexIndex() {
     return flexIndex;
   }
 
-  private void initializeServiceData(TimetableRepository timetableRepository) {
-    CalendarService calendarService = timetableRepository.getCalendarService();
-
-    if (calendarService == null) {
+  private void initializeServiceData(TripCalendars tripCalendar) {
+    if (tripCalendar == null) {
       return;
     }
-
-    // CalendarService has one main implementation (CalendarServiceImpl) which contains a
-    // CalendarServiceData which can easily supply all of the dates. But it's impossible to
-    // actually see those dates without modifying the interfaces and inheritance. So we have
-    // to work around this abstraction and reconstruct the CalendarData.
-    // Note the "multiCalendarServiceImpl" which has docs saying it expects one single
-    // CalendarData. It seems to merge the calendar services from multiple GTFS feeds, but
-    // its only documentation says it's a hack.
-    // TODO OTP2 - This cleanup is added to the 'Final cleanup OTP2' issue #2757
-
     // Reconstruct set of all dates where service is defined, keeping track of which services
     // run on which days.
-    Multimap<LocalDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
     Map<FeedScopedId, LocalDate> endOfServiceDateForService = new HashMap<>();
 
-    for (FeedScopedId serviceId : calendarService.getServiceIds()) {
-      Set<LocalDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
-        serviceId
-      );
+    for (FeedScopedId serviceId : tripCalendar.listServiceIds()) {
+      Set<LocalDate> serviceDatesForService = tripCalendar.listServiceDates(serviceId);
       for (LocalDate serviceDate : serviceDatesForService) {
-        serviceIdsForServiceDate.put(serviceDate, serviceId);
-
-        // Save the last service date for each service.
-        if (
-          endOfServiceDateForService.get(serviceId) == null ||
-          (serviceDate != null && serviceDate.isAfter(endOfServiceDateForService.get(serviceId)))
-        ) {
+        var endDate = endOfServiceDateForService.get(serviceId);
+        if (endDate == null || serviceDate.isAfter(endDate)) {
           endOfServiceDateForService.put(serviceId, serviceDate);
         }
       }
     }
-    for (LocalDate serviceDate : serviceIdsForServiceDate.keySet()) {
-      TIntSet serviceCodesRunning = new TIntHashSet();
-      for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-        serviceCodesRunning.add(timetableRepository.getServiceCodes().get(serviceId));
-      }
-      serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
-    }
-
     initializeTheEndOfServiceDateForStop(endOfServiceDateForService);
   }
 

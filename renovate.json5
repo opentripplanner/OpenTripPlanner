@@ -11,7 +11,8 @@
   "enabledManagers": [
     "npm",
     "maven",
-    "pip_requirements"
+    "pip_requirements",
+    "github-actions"
   ],
   "packageRules": [
     {
@@ -24,7 +25,9 @@
         "commons-cli:commons-cli",
         "org.processing:core",
         "edu.ucar:netcdf4",
-        "org.opentripplanner:ojp-java-model"
+        "org.opentripplanner:ojp-java-model",
+        // not sure why, but this update creates an immortal PR, need to update manually when Entur is ready
+        "org.entur:netex-java-model"
       ],
       "enabled": false
     },
@@ -234,6 +237,14 @@
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+    },
+    {
+      "groupName": "GitHub Actions",
+      "description": "Update GitHub Actions quarterly",
+      "matchManagers": ["github-actions"],
+      "extends": [
+        "schedule:quarterly"
+      ]
     },
     {
       "groupName": "Hive MQTT client",

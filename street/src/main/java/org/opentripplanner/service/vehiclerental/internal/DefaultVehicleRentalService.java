@@ -157,7 +157,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   }
 
   @Override
-  public Set<GeofencingZone> allZones() {
+  public Set<GeofencingZone> listZones() {
     var zones = new HashSet<GeofencingZone>();
     for (var idx : geofencingZoneIndexes.values()) {
       zones.addAll(idx.listZones());

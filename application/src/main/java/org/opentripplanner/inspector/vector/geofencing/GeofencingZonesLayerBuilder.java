@@ -28,8 +28,12 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<GeofencingZone> {
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope query) {
-    return geofencingZoneService.allZones().stream().map(this::createGeometryWithUserData).toList();
+  protected List<Geometry> findGeometries(Envelope query) {
+    return geofencingZoneService
+      .listZones()
+      .stream()
+      .map(this::createGeometryWithUserData)
+      .toList();
   }
 
   private Geometry createGeometryWithUserData(GeofencingZone zone) {

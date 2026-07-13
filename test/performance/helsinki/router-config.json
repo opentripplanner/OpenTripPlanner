@@ -10,7 +10,7 @@
       "speed": 5.55,
       "reluctance": 1.7,
       "boardCost": 120,
-      "optimization": "safest-streets"
+      "optimization": "safe-streets"
     },
     "car": {
       "reluctance": 10.0

@@ -17,8 +17,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.dataloader.DataLoaderRegistry;
 import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+import org.opentripplanner.ext.fares.ItineraryFareDataLoader;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 
@@ -52,12 +54,21 @@ class GtfsGraphQLIndex {
       variables = new HashMap<>();
     }
 
+    var registryBuilder = DataLoaderRegistry.newRegistry();
+    if (requestContext.fareService() != null) {
+      registryBuilder.register(
+        ItineraryFareDataLoader.KEY,
+        ItineraryFareDataLoader.create(requestContext.fareService())
+      );
+    }
+
     ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query(query)
       .operationName(operationName)
       .context(requestContext)
       .variables(variables)
       .locale(locale)
+      .dataLoaderRegistry(registryBuilder.build())
       .build();
     try {
       return graphQL.executeAsync(executionInput).get(timeoutMs, TimeUnit.MILLISECONDS);

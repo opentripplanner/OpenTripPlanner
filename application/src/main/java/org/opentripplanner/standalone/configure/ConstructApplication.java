@@ -59,9 +59,9 @@ import org.slf4j.LoggerFactory;
  * using the {@link LoadApplication} - An application is constructed AFTER config and input files
  * are loaded.
  * <p>
- * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
- * should be really fast, since the only IO operations are reading config files and logging. Loading
- * transit or map data should NOT happen during this phase.
+ * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The
+ * constructor performs the heavy Raptor data mapping before handing results to Dagger; all other
+ * wiring is fast (no IO beyond config file reads).
  */
 public class ConstructApplication {
 
@@ -101,6 +101,24 @@ public class ConstructApplication {
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
+    // Compute Raptor data before Dagger construction so it can be injected as instances.
+    // This is intentionally done here rather than in a Dagger provider because the mapping
+    // is heavy and should not run inside the DI container's initialization.
+    var tuningParameters = config.routerConfig().transitTuningConfig();
+    if (!timetableRepository.hasTransit() || !timetableRepository.isIndexed()) {
+      LOG.warn(
+        "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
+      );
+    }
+    LOG.info("Creating transit layer for Raptor routing.");
+    timetableRepository.initRaptorTransitData(
+      RaptorTransitDataMapper.map(tuningParameters, timetableRepository, transferRepository)
+    );
+    var scheduledRaptorTransitData = new RaptorTransitData(
+      timetableRepository.getRaptorTransitData()
+    );
+    var scheduledTripCalendars = timetableRepository.copyTripCalendarForRealTimeUpdates();
+
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder
       .configModel(config)
@@ -117,6 +135,8 @@ public class ConstructApplication {
       .streetStreetRepository(streetRepository)
       .schema(config.routerConfig().routingRequestDefaults())
       .fareServiceFactory(fareServiceFactory)
+      .scheduledRaptorTransitData(scheduledRaptorTransitData)
+      .scheduledTripCalendars(scheduledTripCalendars)
       .build();
   }
 
@@ -186,12 +206,6 @@ public class ConstructApplication {
     enableRequestTraceLogging();
     createMetricsLogging();
 
-    createRaptorTransitData(
-      timetableRepository(),
-      transferRepository(),
-      routerConfig().transitTuningConfig()
-    );
-
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
@@ -228,28 +242,6 @@ public class ConstructApplication {
     } catch (Exception e) {
       LOG.error("Error computing ellipsoid/geoid difference");
     }
-  }
-
-  /**
-   * Create transit layer for Raptor routing. Here we map the scheduled timetables.
-   */
-  public static void createRaptorTransitData(
-    TimetableRepository timetableRepository,
-    TransferRepository transferRepository,
-    TransitTuningParameters tuningParameters
-  ) {
-    if (!timetableRepository.hasTransit() || !timetableRepository.isIndexed()) {
-      LOG.warn(
-        "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
-      );
-    }
-    LOG.info("Creating transit layer for Raptor routing.");
-    timetableRepository.setRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, timetableRepository, transferRepository)
-    );
-    timetableRepository.setRealtimeRaptorTransitData(
-      new RaptorTransitData(timetableRepository.getRaptorTransitData())
-    );
   }
 
   public static void initializeTransferCache(

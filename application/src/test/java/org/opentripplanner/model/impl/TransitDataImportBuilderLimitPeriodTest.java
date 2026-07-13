@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -118,7 +118,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(new LocalDateInterval(D2, D3));
+    subject.limitServiceDays(LocalDateRange.ofInclusiveEnd(D2, D3));
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
@@ -174,7 +174,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     LocalDate end
   ) {
     ServiceCalendar calendar = new ServiceCalendar();
-    calendar.setPeriod(new LocalDateInterval(start, end));
+    calendar.setPeriod(LocalDateRange.ofInclusiveEnd(start, end));
     calendar.setAllDays(1);
     calendar.setServiceId(serviceId);
     return calendar;

@@ -94,7 +94,7 @@ class RouteRequestMapperScooterTest {
           Map.ofEntries(
             entry(
               "scooter",
-              Map.ofEntries(entry("optimization", Map.ofEntries(entry("type", "SAFEST_STREETS"))))
+              Map.ofEntries(entry("optimization", Map.ofEntries(entry("type", "SAFE_STREETS"))))
             )
           )
         )
@@ -103,7 +103,7 @@ class RouteRequestMapperScooterTest {
     var env = testCtx.executionContext(scooterArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var scooterPreferences = routeRequest.preferences().scooter();
-    assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, scooterPreferences.optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, scooterPreferences.optimizeType());
   }
 
   @Test

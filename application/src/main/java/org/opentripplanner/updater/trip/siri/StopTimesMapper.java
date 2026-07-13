@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
@@ -10,7 +8,6 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class StopTimesMapper {
@@ -80,7 +77,7 @@ class StopTimesMapper {
     stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
 
     // Update destination display
-    var destinationDisplay = getFirstStringFromList(call.getDestinationDisplays());
+    var destinationDisplay = call.destinationDisplay();
     if (!destinationDisplay.isEmpty()) {
       stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
     } else if (trip.getHeadsign() != null) {
@@ -91,10 +88,8 @@ class StopTimesMapper {
     }
 
     // Update pickup / dropoff
-    PickDropMapper.mapPickUpType(call, stopTime.getPickupType()).ifPresent(stopTime::setPickupType);
-    PickDropMapper.mapDropOffType(call, stopTime.getDropOffType()).ifPresent(
-      stopTime::setDropOffType
-    );
+    call.pickUp().applyTo(stopTime.getPickupType()).ifPresent(stopTime::setPickupType);
+    call.dropOff().applyTo(stopTime.getDropOffType()).ifPresent(stopTime::setDropOffType);
 
     return stopTime;
   }

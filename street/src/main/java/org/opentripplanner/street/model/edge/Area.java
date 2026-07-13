@@ -16,6 +16,7 @@ public final class Area implements Serializable {
   private float bicycleSafety;
   private float walkSafety;
   private StreetTraversalPermission permission;
+  private boolean wheelchairAccessible = true;
 
   public I18NString getName() {
     return name;
@@ -55,6 +56,14 @@ public final class Area implements Serializable {
 
   public void setPermission(StreetTraversalPermission permission) {
     this.permission = permission;
+  }
+
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
+
+  public void setWheelchairAccessible(boolean wheelchairAccessible) {
+    this.wheelchairAccessible = wheelchairAccessible;
   }
 
   /**

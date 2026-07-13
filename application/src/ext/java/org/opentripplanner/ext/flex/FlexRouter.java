@@ -87,7 +87,7 @@ public class FlexRouter {
     this.flexIndex = transitService.getFlexIndex();
     this.matcher = TripMatcherFactory.of(
       filterRequest,
-      transitService.getCalendarService()::getServiceDatesForServiceId
+      transitService.getTripCalendars()::listServiceDates
     );
     this.callbackService = new CallbackAdapter();
     this.streetPathToLegsMapper = new StreetPathToLegsMapper(

@@ -35,10 +35,8 @@ public class PatternByServiceDatesFilter {
     this.getServiceDatesForTrip = Objects.requireNonNull(getServiceDatesForTrip);
     this.range = range;
 
-    if (range.unlimited()) {
+    if (range.isUnbounded()) {
       throw new IllegalArgumentException("start and end cannot be both null");
-    } else if (range.startBeforeEnd()) {
-      throw new IllegalArgumentException("start must be before end");
     }
   }
 

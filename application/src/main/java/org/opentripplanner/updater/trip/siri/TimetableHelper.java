@@ -5,11 +5,9 @@ import static java.lang.Boolean.TRUE;
 import java.time.ZonedDateTime;
 import java.util.function.Supplier;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
-import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 class TimetableHelper {
 
@@ -18,7 +16,7 @@ class TimetableHelper {
    * service time. If none of the suppliers provide a time, return null.
    */
   @SafeVarargs
-  private static int getAvailableTime(
+  private static Integer getAvailableTime(
     ZonedDateTime startOfService,
     Supplier<ZonedDateTime>... timeSuppliers
   ) {
@@ -28,26 +26,7 @@ class TimetableHelper {
         return ServiceDateUtils.secondsSinceStartOfService(startOfService, time);
       }
     }
-    return -1;
-  }
-
-  /**
-   * Loop through all passed times, return the first non-negative one or the last one
-   */
-  private static int handleMissingRealtime(int... times) {
-    if (times.length == 0) {
-      throw new IllegalArgumentException("Need at least one value");
-    }
-
-    int time = -1;
-    for (int t : times) {
-      time = t;
-      if (time >= 0) {
-        break;
-      }
-    }
-
-    return time;
+    return null;
   }
 
   public static void applyUpdates(
@@ -57,10 +36,41 @@ class TimetableHelper {
     boolean isLastStop,
     boolean isJourneyPredictionInaccurate,
     CallWrapper call,
-    OccupancyEnumeration journeyOccupancy
+    OccupancyStatus journeyOccupancy
   ) {
     tripTimesBuilder.withHasArrived(index, call.hasArrived());
     tripTimesBuilder.withHasDeparted(index, call.hasDeparted());
+
+    int scheduledArrivalTime = tripTimesBuilder.getArrivalTime(index);
+    Integer realTimeArrivalTime = getAvailableTime(
+      departureDate,
+      call::getActualArrivalTime,
+      call::getExpectedArrivalTime
+    );
+
+    int scheduledDepartureTime = tripTimesBuilder.getDepartureTime(index);
+    Integer realTimeDepartureTime = getAvailableTime(
+      departureDate,
+      call::getActualDepartureTime,
+      call::getExpectedDepartureTime
+    );
+
+    StopTimeUpdate stopTimeUpdate = new StopTimeUpdate(
+      scheduledArrivalTime,
+      realTimeArrivalTime,
+      scheduledDepartureTime,
+      realTimeDepartureTime,
+      index == 0,
+      isLastStop
+    );
+
+    if (stopTimeUpdate.hasRealTimeUpdate()) {
+      tripTimesBuilder.withArrivalDelay(index, stopTimeUpdate.getArrivalDelay());
+      tripTimesBuilder.withDepartureDelay(index, stopTimeUpdate.getDepartureDelay());
+    } else {
+      // other flags must follow withNoData so they take precedence
+      tripTimesBuilder.withNoData(index);
+    }
 
     // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
     boolean isCallPredictionInaccurate = TRUE.equals(call.isPredictionInaccurate());
@@ -76,52 +86,17 @@ class TimetableHelper {
       tripTimesBuilder.withExtraCall(index, true);
     }
 
-    int scheduledArrivalTime = tripTimesBuilder.getArrivalTime(index);
-    int realTimeArrivalTime = getAvailableTime(
-      departureDate,
-      call::getActualArrivalTime,
-      call::getExpectedArrivalTime
-    );
-
-    int scheduledDepartureTime = tripTimesBuilder.getDepartureTime(index);
-    int realTimeDepartureTime = getAvailableTime(
-      departureDate,
-      call::getActualDepartureTime,
-      call::getExpectedDepartureTime
-    );
-
-    // TODO: refactor missing data out into separate class
-    int[] possibleArrivalTimes = index == 0
-      ? new int[] { realTimeArrivalTime, realTimeDepartureTime, scheduledArrivalTime }
-      : new int[] { realTimeArrivalTime, scheduledArrivalTime };
-    var arrivalTime = handleMissingRealtime(possibleArrivalTimes);
-    int arrivalDelay = arrivalTime - scheduledArrivalTime;
-    tripTimesBuilder.withArrivalDelay(index, arrivalDelay);
-
-    int[] possibleDepartureTimes = isLastStop
-      ? new int[] { realTimeDepartureTime, realTimeArrivalTime, scheduledDepartureTime }
-      : new int[] { realTimeDepartureTime, scheduledDepartureTime };
-    var departureTime = handleMissingRealtime(possibleDepartureTimes);
-    int departureDelay = departureTime - scheduledDepartureTime;
-    tripTimesBuilder.withDepartureDelay(index, departureDelay);
-
-    OccupancyEnumeration callOccupancy = call.getOccupancy() != null
+    OccupancyStatus callOccupancy = call.getOccupancy() != null
       ? call.getOccupancy()
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimesBuilder.withOccupancyStatus(
-        index,
-        OccupancyMapper.mapOccupancyStatus(callOccupancy)
-      );
+      tripTimesBuilder.withOccupancyStatus(index, callOccupancy);
     }
 
-    if (call.getDestinationDisplays() != null && !call.getDestinationDisplays().isEmpty()) {
-      NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplays().get(0);
-      tripTimesBuilder.withStopHeadsign(
-        index,
-        new NonLocalizedString(destinationDisplay.getValue())
-      );
+    var destinationDisplay = call.destinationDisplay();
+    if (!destinationDisplay.isEmpty()) {
+      tripTimesBuilder.withStopHeadsign(index, new NonLocalizedString(destinationDisplay));
     }
   }
 }

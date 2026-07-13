@@ -190,7 +190,7 @@ class SidewalkNamer implements EdgeNamer {
           .stream()
           .mapToDouble(this::intersectionLength)
           .sum();
-        case Point ignored -> 0;
+        case Point _ -> 0;
         case Geometry g -> throw new IllegalStateException(
           "Didn't expect geometry %s".formatted(g.getClass())
         );

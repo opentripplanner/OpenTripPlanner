@@ -4,63 +4,50 @@ import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.StreetConstants;
 
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
  * <p>
  * Used as a heuristic to quickly reject incompatible insertion positions before
  * performing expensive A* street routing. The estimates are intentionally optimistic
- * (lower bounds) to ensure we never incorrectly reject valid insertions.
+ * (lower bounds) so that valid insertions are never incorrectly rejected.
  * <p>
- * Formula: duration = (beeline_distance × detour_factor) / average_speed (in m/s)
+ * Formula: duration = beeline_distance / speed (in m/s)
  * <p>
- * The detour factor accounts for the fact that street routes are rarely straight lines.
- * Typical values: 1.2-1.5, with 1.3 being a reasonable default for urban areas.
+ * No street route is shorter than the beeline, so dividing it by the fastest speed any street
+ * can be driven yields a guaranteed lower bound on the real drive time, whatever the road
+ * geometry.
  */
 public class BeelineEstimator {
 
   /**
-   * Default detour factor: 1.3
-   * Assumes actual street routes are ~30% longer than straight-line distance.
-   * This is conservative - works well for most urban areas.
+   * Fallback speed for the no-arg constructor when no graph-derived speed is supplied
+   * ({@link StreetConstants#DEFAULT_MAX_CAR_SPEED}, 40 m/s ≈ 144 km/h). Production passes the
+   * graph's actual maximum car speed instead — the tightest divisor that still keeps the estimate
+   * a lower bound, since dividing by anything slower would over-estimate and discard feasible
+   * insertions on fast roads.
    */
-  public static final double DEFAULT_DETOUR_FACTOR = 1.3;
+  public static final double DEFAULT_SPEED_MPS = StreetConstants.DEFAULT_MAX_CAR_SPEED;
 
-  /**
-   * Default average speed: 10 m/s (~36 km/h or ~22 mph)
-   * Typical urban carpooling speed accounting for traffic, turns, stops.
-   */
-  public static final double DEFAULT_SPEED_MPS = 10.0;
-
-  private final double detourFactor;
   private final double speed;
 
   /**
-   * Creates estimator with default parameters.
+   * Creates estimator with the default speed.
    */
   public BeelineEstimator() {
-    this(DEFAULT_DETOUR_FACTOR, DEFAULT_SPEED_MPS);
+    this(DEFAULT_SPEED_MPS);
   }
 
   /**
-   * Creates estimator with custom parameters.
-   *
-   * @param detourFactor Factor by which street routes are longer than beeline (typically 1.2-1.5)
-   * @param speed Average travel speed in meters per second
+   * @param speed Travel speed in meters per second; must be at least the fastest speed a car can
+   *        reach in the street model to preserve the lower-bound guarantee
    */
-  public BeelineEstimator(double detourFactor, double speed) {
-    if (detourFactor < 1.0) {
-      throw new IllegalArgumentException("detourFactor must be >= 1.0 (got " + detourFactor + ")");
-    }
+  public BeelineEstimator(double speed) {
     if (speed <= 0) {
-      throw new IllegalArgumentException("speedMps must be positive (got " + speed + ")");
+      throw new IllegalArgumentException("speed must be positive (got " + speed + ")");
     }
-    this.detourFactor = detourFactor;
     this.speed = speed;
-  }
-
-  public double getDetourFactor() {
-    return detourFactor;
   }
 
   public double getSpeed() {
@@ -79,8 +66,7 @@ public class BeelineEstimator {
       from.asJtsCoordinate(),
       to.asJtsCoordinate()
     );
-    double routeDistance = beelineDistance * detourFactor;
-    double seconds = routeDistance / speed;
+    double seconds = beelineDistance / speed;
     return Duration.ofSeconds((long) seconds);
   }
 

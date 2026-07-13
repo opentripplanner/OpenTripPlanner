@@ -68,7 +68,7 @@ public final class GeofencingZone {
   ) {
     this.id = Objects.requireNonNull(id);
     this.name = name;
-    this.geometry = geometry;
+    this.geometry = Objects.requireNonNull(geometry);
     this.dropOffBanned = dropOffBanned;
     this.traversalBanned = traversalBanned;
     this.rideStartBanned = rideStartBanned;

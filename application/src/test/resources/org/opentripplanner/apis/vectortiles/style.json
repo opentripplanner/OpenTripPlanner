@@ -52,6 +52,37 @@
       }
     },
     {
+      "id" : "flex-transfers",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "transfers",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#277eb5",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ]
+      },
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Transfers"
+      }
+    },
+    {
       "id" : "rental-vehicle",
       "type" : "circle",
       "source" : "vectorSource",

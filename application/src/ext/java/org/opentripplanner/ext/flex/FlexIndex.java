@@ -48,8 +48,8 @@ public class FlexIndex {
       }
 
       timetableRepository
-        .getCalendarService()
-        .getServiceDatesForServiceId(flexTrip.getTrip().getServiceId())
+        .getTripCalendar()
+        .listServiceDates(flexTrip.getTrip().getServiceId())
         .forEach(serviceDate -> {
           LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
           FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);

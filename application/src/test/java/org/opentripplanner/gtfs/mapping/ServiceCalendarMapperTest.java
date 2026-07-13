@@ -76,11 +76,11 @@ public class ServiceCalendarMapperTest {
     assertEquals(SUNDAY, result.getSunday());
     assertEquals(
       START_DATE.getAsString(),
-      ServiceDateUtils.asCompactString(result.getPeriod().getStart())
+      ServiceDateUtils.asCompactString(result.getPeriod().getStartInclusive())
     );
     assertEquals(
       END_DATE.getAsString(),
-      ServiceDateUtils.asCompactString(result.getPeriod().getEnd())
+      ServiceDateUtils.asCompactString(result.getPeriod().getEndInclusive())
     );
   }
 
@@ -97,8 +97,8 @@ public class ServiceCalendarMapperTest {
     assertEquals(0, result.getFriday());
     assertEquals(0, result.getSaturday());
     assertEquals(0, result.getSunday());
-    assertEquals(LocalDate.MIN, result.getPeriod().getStart());
-    assertEquals(LocalDate.MAX, result.getPeriod().getEnd());
+    assertEquals(LocalDate.MIN, result.getPeriod().getStartInclusive());
+    assertEquals(LocalDate.MAX, result.getPeriod().getEndInclusive());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

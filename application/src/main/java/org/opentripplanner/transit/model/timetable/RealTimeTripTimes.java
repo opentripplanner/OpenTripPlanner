@@ -271,6 +271,11 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   }
 
   @Override
+  public boolean isTimesModified() {
+    return state.timesModified();
+  }
+
+  @Override
   public boolean isAdded() {
     return state.added();
   }

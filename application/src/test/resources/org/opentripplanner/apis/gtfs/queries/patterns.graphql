@@ -36,6 +36,14 @@
         occupancyStatus
       }
     }
+    canceledTrips(
+      serviceDateRanges: [{ start: "2024-08-01", end: "2024-09-01" }]
+    ) {
+      serviceDate
+      trip {
+        gtfsId
+      }
+    }
     vehiclePositions {
       vehicleId
       label

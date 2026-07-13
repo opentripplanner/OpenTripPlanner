@@ -22,7 +22,7 @@ class ParkingProcessorTest {
   private static final ParkingProcessor PROCESSOR = new ParkingProcessor(
     new Graph(),
     DataImportIssueStore.NOOP,
-    (n, w) -> INTERSECTION_VERTEX
+    (_, _) -> INTERSECTION_VERTEX
   );
 
   @Test

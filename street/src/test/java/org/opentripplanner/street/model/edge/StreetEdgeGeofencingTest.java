@@ -19,6 +19,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.model.TestGeofencingZoneBuilder;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
+import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -33,10 +34,12 @@ class StreetEdgeGeofencingTest {
   static String NETWORK_BIRD = "bird-oslo";
 
   static GeofencingZone NO_DROP_OFF_ZONE_TIER = TestGeofencingZoneBuilder.of(NETWORK_TIER, "a-park")
+    .withGeometry(Polygons.OSLO)
     .noDropOff()
     .build();
 
   static GeofencingZone NO_DROP_OFF_ZONE_BIRD = TestGeofencingZoneBuilder.of(NETWORK_BIRD, "a-park")
+    .withGeometry(Polygons.OSLO)
     .noDropOff()
     .build();
 
@@ -44,6 +47,7 @@ class StreetEdgeGeofencingTest {
     NETWORK_TIER,
     "b-park"
   )
+    .withGeometry(Polygons.OSLO)
     .noDropOff()
     .build();
 
@@ -51,6 +55,7 @@ class StreetEdgeGeofencingTest {
     NETWORK_TIER,
     "no-traverse"
   )
+    .withGeometry(Polygons.OSLO)
     .noTraversal()
     .build();
 
@@ -58,6 +63,7 @@ class StreetEdgeGeofencingTest {
     NETWORK_TIER,
     "business-area"
   )
+    .withGeometry(Polygons.OSLO)
     .asBusinessArea()
     .build();
 
@@ -271,10 +277,12 @@ class StreetEdgeGeofencingTest {
       // No-drop-off zone: dropOffBanned=true, traversalBanned=null (unspecified).
       // Higher priority (lower value) so its dropOffBanned wins per-field precedence.
       var noDropOffOnly = TestGeofencingZoneBuilder.of(NETWORK_TIER, "no-dropoff-only")
+        .withGeometry(Polygons.OSLO)
         .withDropOffBanned(true)
         .build();
       // No-traversal zone: traversalBanned=true, dropOffBanned=null (unspecified).
       var noTraversalOnly = TestGeofencingZoneBuilder.of(NETWORK_TIER, "no-traverse-only")
+        .withGeometry(Polygons.OSLO)
         .withTraversalBanned(true)
         .withPriority(1)
         .build();

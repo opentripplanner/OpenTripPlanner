@@ -65,7 +65,7 @@ class AreaStopsLayerBuilderTest {
       LAYER_CONFIG,
       Locale.ENGLISH
     );
-    var geometries = subject.getGeometries(AREA_STOP.getGeometry().getEnvelopeInternal());
+    var geometries = subject.findGeometries(AREA_STOP.getGeometry().getEnvelopeInternal());
     assertEquals(List.of(Polygons.BERLIN), geometries);
   }
 }

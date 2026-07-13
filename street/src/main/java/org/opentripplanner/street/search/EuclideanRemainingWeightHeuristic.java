@@ -157,7 +157,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       case SHORTEST_DURATION -> 1.0;
       case SAFE_STREETS -> safety;
       case FLAT_STREETS -> 1.0;
-      case SAFEST_STREETS -> safety;
       case TRIANGLE -> scaleSafety(
         safety,
         Objects.requireNonNull(

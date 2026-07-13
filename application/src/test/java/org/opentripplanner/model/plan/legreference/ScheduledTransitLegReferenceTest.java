@@ -15,8 +15,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -72,7 +74,11 @@ class ScheduledTransitLegReferenceTest {
     TimetableRepository timetableRepository = new TimetableRepository(siteRepository);
     timetableRepository.setUpdaterManager(
       new GraphUpdaterManager(
-        new DefaultRealTimeUpdateContext(new Graph(), timetableRepository, new TimetableSnapshot()),
+        new DefaultRealTimeUpdateContext(
+          new Graph(),
+          timetableRepository,
+          new TimetableSnapshot(RaptorTransitDataTestFactory.empty(), new DefaultTripCalendars())
+        ),
         List.of()
       )
     );

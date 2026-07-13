@@ -40,7 +40,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
     this.filter = LayerFilters.forType(layerParameters.filterType(), transitService);
   }
 
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     return transitService
       .findRegularStopsByBoundingBox(query)
       .stream()

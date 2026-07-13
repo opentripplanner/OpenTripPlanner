@@ -207,7 +207,7 @@ class VertexLinkerGeofencingTest {
       }
 
       @Override
-      public Set<GeofencingZone> allZones() {
+      public Set<GeofencingZone> listZones() {
         return index.listZones();
       }
     };

@@ -115,16 +115,6 @@ class EuclideanRemainingWeightHeuristicTest {
           .build(),
         28
       ),
-      // safest bike
-      Arguments.argumentSet(
-        "safest bike",
-        safeStreets,
-        StreetSearchRequest.of()
-          .withMode(StreetMode.BIKE)
-          .withBike(b -> b.withOptimizeType(VehicleRoutingOptimizeType.SAFEST_STREETS))
-          .build(),
-        24
-      ),
       // a slow car
       Arguments.argumentSet(
         "slow car",

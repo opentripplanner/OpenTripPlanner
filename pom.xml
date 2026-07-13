@@ -58,23 +58,23 @@
 
 
     <properties>
-        <otp.serialization.version.id>262</otp.serialization.version.id>
+        <otp.serialization.version.id>266</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.4</geotools.version>
         <google.dagger.version>2.59.2</google.dagger.version>
         <jackson.version>2.22.0</jackson.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
-        <jersey.version>3.1.11</jersey.version>
+        <jersey.version>3.1.12</jersey.version>
         <junit.version>6.1.0</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.34</logback.version>
-        <lucene.version>10.4.0</lucene.version>
+        <logback.version>1.5.37</logback.version>
+        <lucene.version>10.5.0</lucene.version>
         <micrometer.version>1.16.5</micrometer.version>
         <netex-java-model.version>2.0.15.3</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.35.0</protobuf.version>
+        <protobuf.version>4.35.1</protobuf.version>
         <siri-java-model.version>2.0.6</siri-java-model.version>
         <slf4j.version>2.0.18</slf4j.version>
         <!-- Other properties -->
@@ -337,7 +337,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.40.0</version>
+                <version>6.42.0</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -356,7 +356,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.35.0</version>
+                        <version>2.37.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -380,7 +380,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>13.4.2</version>
+                        <version>13.6.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -754,7 +754,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.10.0</version>
+                        <version>0.11.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->

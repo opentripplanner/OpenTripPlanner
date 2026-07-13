@@ -9,25 +9,15 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.DefaultOsmProvider;
-import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.model.OsmEntity;
-import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.wayproperty.CreativeNamer;
-import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -149,46 +139,6 @@ public class OsmModuleTest {
     assertEquals(20, streetRepository.streetModelDetails().maxCarSpeed());
   }
 
-  @Test
-  public void testCreativeNaming() {
-    OsmEntity way = OsmWay.of()
-      .withTag("highway", "footway")
-      .withTag("cycleway", "lane")
-      .withTag("access", "no")
-      .build();
-
-    CreativeNamer namer = new CreativeNamer(
-      "Highway with cycleway {cycleway} and access {access} and morx {morx}"
-    );
-    assertEquals(
-      "Highway with cycleway lane and access no and morx ",
-      namer.generateCreativeName(way).toString()
-    );
-  }
-
-  @Test
-  void addParkingLotsToService() {
-    var service = new DefaultVehicleParkingService(buildParkingLots().repository);
-
-    assertEquals(11, service.listVehicleParkings().size());
-    assertEquals(6, service.listBikeParks().size());
-    assertEquals(5, service.listCarParks().size());
-  }
-
-  @Test
-  void createArtificalEntrancesToUnlikedParkingLots() {
-    var graph = buildParkingLots().graph;
-
-    graph
-      .getVerticesOfType(VehicleParkingEntranceVertex.class)
-      .stream()
-      .filter(v -> v.getLabelString().contains("centroid"))
-      .forEach(v -> {
-        assertFalse(v.getOutgoing().isEmpty());
-        assertFalse(v.getIncoming().isEmpty());
-      });
-  }
-
   /**
    * Test that a barrier vertex at ending street will get no access limit
    */
@@ -211,30 +161,6 @@ public class OsmModuleTest {
     // assert that pruning removed traversal restrictions
     assertEquals(barrier.getBarrierPermissions(), ALL);
   }
-
-  private BuildResult buildParkingLots() {
-    var graph = new Graph();
-    var parkingRepository = new DefaultVehicleParkingRepository();
-
-    List<OsmProvider> providers = Stream.of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(RESOURCE_LOADER::file)
-      .map(f -> (OsmProvider) new DefaultOsmProvider(f, false))
-      .toList();
-
-    var osmModule = OsmModuleTestFactory.of(providers)
-      .withGraph(graph)
-      .withVehicleParkingRepository(parkingRepository)
-      .builder()
-      .withStaticParkAndRide(true)
-      .withStaticBikeParkAndRide(true)
-      .build();
-
-    osmModule.buildGraph();
-
-    return new BuildResult(graph, parkingRepository);
-  }
-
-  private record BuildResult(Graph graph, VehicleParkingRepository repository) {}
 
   private record VertexPair(Vertex v0, Vertex v1) {}
 }

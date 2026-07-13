@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.STOP_MISMATCH;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_MANY_STOPS;
@@ -17,14 +16,12 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
-import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -40,18 +37,17 @@ class ModifiedTripBuilder {
   private final List<CallWrapper> calls;
   private final boolean cancellation;
   private final boolean added;
-  private final OccupancyEnumeration occupancy;
+  private final OccupancyStatus occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
 
   public ModifiedTripBuilder(
     TripTimes existingTripTimes,
     TripPattern pattern,
-    EstimatedVehicleJourney journey,
+    EstimatedVehicleJourneyWrapper journey,
     LocalDate serviceDate,
     ZoneId zoneId,
-    EntityResolver entityResolver,
-    List<CallWrapper> calls
+    EntityResolver entityResolver
   ) {
     this.existingTripTimes = existingTripTimes;
     this.pattern = pattern;
@@ -59,12 +55,12 @@ class ModifiedTripBuilder {
     this.zoneId = zoneId;
     this.entityResolver = entityResolver;
 
-    this.calls = calls;
-    cancellation = TRUE.equals(journey.isCancellation());
-    added = TRUE.equals(journey.isExtraJourney());
-    predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
-    occupancy = journey.getOccupancy();
-    dataSource = journey.getDataSource();
+    this.calls = journey.calls();
+    cancellation = journey.isCancellation();
+    added = journey.isExtraJourney();
+    predictionInaccurate = journey.isPredictionInaccurate();
+    occupancy = journey.occupancy();
+    dataSource = journey.dataSource();
   }
 
   /**
@@ -78,7 +74,7 @@ class ModifiedTripBuilder {
     EntityResolver entityResolver,
     List<CallWrapper> calls,
     boolean cancellation,
-    OccupancyEnumeration occupancy,
+    OccupancyStatus occupancy,
     boolean predictionInaccurate,
     String dataSource,
     boolean added
@@ -249,13 +245,15 @@ class ModifiedTripBuilder {
         final int stopIndex = i;
         builder.stops.with(stopIndex, callStop);
 
-        PickDropMapper.mapPickUpType(call, builder.pickups.original(stopIndex)).ifPresent(value ->
-          builder.pickups.with(stopIndex, value)
-        );
+        call
+          .pickUp()
+          .applyTo(builder.pickups.original(stopIndex))
+          .ifPresent(value -> builder.pickups.with(stopIndex, value));
 
-        PickDropMapper.mapDropOffType(call, builder.dropoffs.original(stopIndex)).ifPresent(value ->
-          builder.dropoffs.with(stopIndex, value)
-        );
+        call
+          .dropOff()
+          .applyTo(builder.dropoffs.original(stopIndex))
+          .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
 
         alreadyVisited.add(call);
         break;

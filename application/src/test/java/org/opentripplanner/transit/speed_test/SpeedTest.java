@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
@@ -16,9 +15,13 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -49,7 +52,6 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
@@ -104,6 +106,22 @@ public class SpeedTest {
 
     var transitService = new DefaultTransitService(timetableRepository);
 
+    TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
+    var scheduledRaptorData = RaptorTransitDataMapper.map(
+      tuningParameters,
+      timetableRepository,
+      transferRepository
+    );
+
+    timetableRepository.initRaptorTransitData(scheduledRaptorData);
+    TimetableSnapshotManager snapshotManager = new TimetableSnapshotManager(
+      TimetableSnapshotParameters.DEFAULT,
+      LocalDate::now,
+      new RaptorTransitData(timetableRepository.getRaptorTransitData()),
+      timetableRepository.copyTripCalendarForRealTimeUpdates()
+    );
+
+    snapshotManager.purgeAndCommit();
     UpdaterConfigurator.configure(
       graph,
       DeduplicatorService.NOOP,
@@ -113,7 +131,7 @@ public class SpeedTest {
       new DefaultVehicleParkingRepository(),
       timetableRepository,
       new DefaultCarpoolingRepository(),
-      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
+      snapshotManager,
       routerConfig.updaterConfig()
     );
     if (timetableRepository.getUpdaterManager() != null) {
@@ -126,6 +144,9 @@ public class SpeedTest {
     );
 
     var vertexLinker = VertexLinkerTestFactory.of(graph);
+
+    // Creating raptor transit data should be integrated into the TimetableRepository, but for now
+    // we do it manually here
 
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
@@ -142,7 +163,7 @@ public class SpeedTest {
       TestServerContext.createStreetLimitationParametersService(),
       TransferServiceTestFactory.transferService(transferRepository),
       routerConfig.transitTuningConfig(),
-      new DefaultTransitService(timetableRepository),
+      new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot()),
       null,
       null,
       VectorTileConfig.DEFAULT,
@@ -162,13 +183,6 @@ public class SpeedTest {
       null,
       null,
       null
-    );
-    // Creating raptor transit data should be integrated into the TimetableRepository, but for now
-    // we do it manually here
-    createRaptorTransitData(
-      timetableRepository,
-      transferRepository,
-      routerConfig.transitTuningConfig()
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), timetableRepository);

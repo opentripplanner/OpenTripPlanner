@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.speed_test;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.util.stream.IntStream;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
@@ -35,10 +36,9 @@ public class TransferCacheTest {
 
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
-      createRaptorTransitData(
-        timetableRepository,
-        transferRepository,
-        routerConfig.transitTuningConfig()
+      TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
+      timetableRepository.initRaptorTransitData(
+        RaptorTransitDataMapper.map(tuningParameters, timetableRepository, transferRepository)
       );
 
       assertTestDateHasData(timetableRepository, config, buildConfig);

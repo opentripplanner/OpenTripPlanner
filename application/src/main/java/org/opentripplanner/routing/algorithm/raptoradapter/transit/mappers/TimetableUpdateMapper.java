@@ -24,6 +24,25 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Maps real-time timetable updates into a new {@link RaptorTransitData} instance.
+ *
+ * <p>This class is <em>stateful</em> and must be instantiated exactly once and reused across all
+ * update cycles. The caches ({@code tripPatternsStartingOnDateMapCache},
+ * {@code tripPatternsForTripIdAndServiceDateCache}, and {@code tripPatternsRunningOnDateMapCache})
+ * accumulate state from previous calls to {@link #map} and are essential for tracking how trips
+ * move between {@link TripPatternForDate}s over time. Creating a new instance on each update
+ * would discard this history and break the bookkeeping that determines which old patterns need to
+ * be removed.
+ *
+ * <p><b>Future improvement:</b> The per-date caches maintained here duplicate information that
+ * would ideally come from a single authoritative datasource. However,
+ * {@link org.opentripplanner.transit.model.timetable.TimetableSnapshot} only stores real-time
+ * timetables, while these caches also cover scheduled trip patterns sourced from
+ * {@link RaptorTransitData}. Once scheduled and real-time data live in the same structure, the
+ * state tracked here could be derived directly from that structure on each call, making this
+ * class stateless.
+ */
 public class TimetableUpdateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableUpdateMapper.class);

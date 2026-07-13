@@ -18,10 +18,12 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.place.api.NearbyStop;
@@ -130,6 +132,28 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   @Deprecated
   public DataFetcher<Object> cluster() {
     return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Iterable<StopCallOnTripOnServiceDate>> canceledCalls() {
+    return environment -> {
+      var args = new GraphQLTypes.GraphQLStopCanceledCallsArgs(environment.getArguments());
+      var rawRanges = args.getGraphQLServiceDateRanges();
+      var serviceDateRanges = rawRanges == null
+        ? List.of(LocalDateRange.ofUnbounded())
+        : LocalDateRangeUtil.mapRanges(rawRanges);
+      var service = new ApiTransitService(getTransitService(environment));
+      return getValue(
+        environment,
+        stop -> service.findCanceledStopCalls(stop, serviceDateRanges),
+        station ->
+          station
+            .getChildStops()
+            .stream()
+            .flatMap(stop -> service.findCanceledStopCalls(stop, serviceDateRanges).stream())
+            .collect(Collectors.toList())
+      );
+    };
   }
 
   @Override

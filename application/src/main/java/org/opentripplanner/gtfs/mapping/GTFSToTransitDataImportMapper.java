@@ -87,6 +87,9 @@ public class GTFSToTransitDataImportMapper {
 
   private final StopAreaMapper stopAreaMapper;
 
+  private final NoticeMapper noticeMapper;
+  private final NoticeAssignmentMapper noticeAssignmentMapper;
+
   private final TranslationHelper translationHelper;
   private final boolean discardMinTransferTimes;
 
@@ -167,6 +170,14 @@ public class GTFSToTransitDataImportMapper {
     );
     fareTransferRuleMapper = new FareTransferRuleMapper(idFactory, fareProductMapper);
     stopAreaMapper = new StopAreaMapper(idFactory);
+    noticeMapper = new NoticeMapper(idFactory);
+    noticeAssignmentMapper = new NoticeAssignmentMapper(
+      idFactory,
+      issueStore,
+      noticeMapper,
+      tripMapper,
+      routeMapper
+    );
   }
 
   public TransitDataImportBuilder getBuilder() {
@@ -218,6 +229,11 @@ public class GTFSToTransitDataImportMapper {
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
     fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+
+    noticeMapper.map(data.getAllNotices());
+    builder
+      .getNoticeAssignments()
+      .putAll(noticeAssignmentMapper.map(data.getAllNoticeAssignments()));
   }
 
   private void mapGtfsStopsToOtpTypes(Collection<Stop> stops) {

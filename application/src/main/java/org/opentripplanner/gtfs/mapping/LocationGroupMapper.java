@@ -59,9 +59,7 @@ class LocationGroupMapper {
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
         case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
-        case LocationGroup ignored -> throw new RuntimeException(
-          "Nested GroupStops are not allowed"
-        );
+        case LocationGroup _ -> throw new RuntimeException("Nested GroupStops are not allowed");
         default -> throw new RuntimeException(
           "Unknown location type: " + location.getClass().getSimpleName()
         );

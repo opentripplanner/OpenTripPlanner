@@ -155,9 +155,4 @@ public class CombinedInterlinedTransitLeg implements TransitLeg {
   public TransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
     throw new UnsupportedOperationException();
   }
-
-  @Override
-  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
-    throw new UnsupportedOperationException();
-  }
 }

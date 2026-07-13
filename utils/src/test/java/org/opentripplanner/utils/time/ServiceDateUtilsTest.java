@@ -19,6 +19,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -229,6 +230,18 @@ public class ServiceDateUtilsTest {
       () -> ServiceDateUtils.parseString("0-03-12"),
       "error parsing date: 0-03-12"
     );
+  }
+
+  @Test
+  public void parseStringToOptional() {
+    assertEquals(
+      Optional.of(LocalDate.of(2020, 3, 12)),
+      ServiceDateUtils.parseStringToOptional("2020-03-12")
+    );
+    // Malformed format -> empty (ParseException)
+    assertEquals(Optional.empty(), ServiceDateUtils.parseStringToOptional("not-a-date"));
+    // Well-formed but out-of-range date -> empty (DateTimeException from LocalDate.of)
+    assertEquals(Optional.empty(), ServiceDateUtils.parseStringToOptional("2020-13-40"));
   }
 
   @Test

@@ -1,7 +1,5 @@
 package org.opentripplanner.standalone.api;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
-
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -13,9 +11,13 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -53,7 +55,6 @@ import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 public class TestServerContext {
@@ -90,26 +91,30 @@ public class TestServerContext {
   ) {
     var routerConfig = RouterConfig.DEFAULT;
 
-    if (snapshotManager == null) {
-      snapshotManager = new TimetableSnapshotManager(
-        null,
-        TimetableSnapshotParameters.DEFAULT,
-        LocalDate::now
-      );
-    }
     if (request == null) {
       request = routerConfig.routingRequestDefaults();
     }
     if (flexParameters == null) {
       flexParameters = routerConfig.flexParameters();
     }
-
     timetableRepository.index();
-    createRaptorTransitData(
+
+    TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
+    var scheduledRaptorData = RaptorTransitDataMapper.map(
+      tuningParameters,
       timetableRepository,
-      transferRepository,
-      routerConfig.transitTuningConfig()
+      transferRepository
     );
+    timetableRepository.initRaptorTransitData(scheduledRaptorData);
+
+    if (snapshotManager == null) {
+      snapshotManager = new TimetableSnapshotManager(
+        TimetableSnapshotParameters.DEFAULT,
+        LocalDate::now,
+        new RaptorTransitData(timetableRepository.getRaptorTransitData()),
+        timetableRepository.copyTripCalendarForRealTimeUpdates()
+      );
+    }
 
     snapshotManager.purgeAndCommit();
 

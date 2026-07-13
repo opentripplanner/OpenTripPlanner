@@ -103,9 +103,6 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryDecorator emissionDecorator;
 
   @Sandbox
-  private ItineraryDecorator fareDecorator;
-
-  @Sandbox
   private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
@@ -347,11 +344,6 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFareDecorator(ItineraryDecorator decorator) {
-    this.fareDecorator = decorator;
-    return this;
-  }
-
   public ItineraryListFilterChainBuilder withEmissions(
     @Nullable ItineraryDecorator emissionDecorator
   ) {
@@ -537,10 +529,6 @@ public class ItineraryListFilterChainBuilder {
 
       if (emissionDecorator != null) {
         addDecorateFilter(filters, emissionDecorator);
-      }
-
-      if (fareDecorator != null) {
-        addDecorateFilter(filters, fareDecorator);
       }
 
       if (rideHailingDecorator != null) {

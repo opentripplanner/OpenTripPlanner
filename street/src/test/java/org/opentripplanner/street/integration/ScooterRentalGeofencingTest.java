@@ -21,6 +21,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
+import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -51,6 +52,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     NETWORK,
     "no-dropoff-zone"
   )
+    .withGeometry(Polygons.OSLO)
     .noDropOff()
     .build();
 
@@ -161,6 +163,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   @Test
   public void forwardSearchBlocksRidingIntoNoTraversalZone() {
     var noTraversalZone = TestGeofencingZoneBuilder.of(NETWORK, "no-traversal-zone")
+      .withGeometry(Polygons.OSLO)
       .noTraversal()
       .build();
 
@@ -174,6 +177,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   @Test
   public void arriveBySearchBlocksRidingIntoNoTraversalZone() {
     var noTraversalZone = TestGeofencingZoneBuilder.of(NETWORK, "no-traversal-zone")
+      .withGeometry(Polygons.OSLO)
       .noTraversal()
       .build();
 
@@ -220,8 +224,14 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
 
   @Test
   public void forwardSearchDoesNotDropOffBetweenAdjacentNoDropOffZones() {
-    var zoneA = TestGeofencingZoneBuilder.of(NETWORK, "zone-a").noDropOff().build();
-    var zoneB = TestGeofencingZoneBuilder.of(NETWORK, "zone-b").noDropOff().build();
+    var zoneA = TestGeofencingZoneBuilder.of(NETWORK, "zone-a")
+      .withGeometry(Polygons.OSLO)
+      .noDropOff()
+      .build();
+    var zoneB = TestGeofencingZoneBuilder.of(NETWORK, "zone-b")
+      .withGeometry(Polygons.OSLO)
+      .noDropOff()
+      .build();
 
     modelOf(
       new Builder() {
@@ -264,6 +274,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   @Test
   public void forwardSearchRidesAroundNoTraversalZoneInsteadOfWalkingThrough() {
     var noTraversalZone = TestGeofencingZoneBuilder.of(NETWORK, "no-traversal-zone")
+      .withGeometry(Polygons.OSLO)
       .noTraversal()
       .build();
 
@@ -333,8 +344,14 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
    */
   @Test
   public void arriveByAdjacentNoDropOffZonesDropsOutsideBothZones() {
-    var zoneA = TestGeofencingZoneBuilder.of(NETWORK, "zone-a").noDropOff().build();
-    var zoneB = TestGeofencingZoneBuilder.of(NETWORK, "zone-b").noDropOff().build();
+    var zoneA = TestGeofencingZoneBuilder.of(NETWORK, "zone-a")
+      .withGeometry(Polygons.OSLO)
+      .noDropOff()
+      .build();
+    var zoneB = TestGeofencingZoneBuilder.of(NETWORK, "zone-b")
+      .withGeometry(Polygons.OSLO)
+      .noDropOff()
+      .build();
 
     modelOf(
       new Builder() {
@@ -469,6 +486,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   @Test
   public void forwardSearchDropsOffInsideBusinessArea() {
     var businessArea = TestGeofencingZoneBuilder.of(NETWORK, "business-area")
+      .withGeometry(Polygons.OSLO)
       .asBusinessArea()
       .build();
 
@@ -516,6 +534,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   @Test
   public void arriveBySearchDropsOffInsideBusinessArea() {
     var businessArea = TestGeofencingZoneBuilder.of(NETWORK, "business-area")
+      .withGeometry(Polygons.OSLO)
       .asBusinessArea()
       .build();
 

@@ -12,7 +12,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
 
 /**
  * Standard itinerary data for carpooling filter tests.

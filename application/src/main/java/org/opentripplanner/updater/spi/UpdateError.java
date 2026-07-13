@@ -11,15 +11,23 @@ public record UpdateError(
   @Nullable FeedScopedId tripId,
   UpdateErrorType errorType,
   @Nullable Integer stopIndex,
-  @Nullable String producer
+  @Nullable String producer,
+  /**
+   * A best-effort, human-readable trip identifier used for logging when the trip could not be
+   * resolved to a {@link FeedScopedId}, for example because the failure was raised during parsing
+   * or validation, before the trip was resolved. It typically holds the raw reference carried by
+   * the realtime message.
+   */
+  @Nullable String tripReference
 ) {
   public String debugId() {
-    if (tripId == null) {
+    var id = tripId != null ? tripId.toString() : tripReference;
+    if (id == null) {
       return "no trip id";
     } else if (stopIndex == null) {
-      return tripId.toString();
+      return id;
     } else {
-      return "%s{stopIndex=%s}".formatted(tripId, stopIndex);
+      return "%s{stopIndex=%s}".formatted(id, stopIndex);
     }
   }
 }

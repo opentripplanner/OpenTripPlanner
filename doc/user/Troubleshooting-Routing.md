@@ -16,7 +16,6 @@ process, OTP prints a summary of all the issues, like the following:
  11:35:57.518 INFO (Graph.java:976)     HopSpeedSlow - 22
  11:35:57.518 INFO (Graph.java:976)     Graphwide - 1
  11:35:57.518 INFO (Graph.java:976)     GraphConnectivity - 407
- 11:35:57.519 INFO (Graph.java:976)     ParkAndRideUnlinked - 1
  11:35:57.519 INFO (Graph.java:976)     StopNotLinkedForTransfers - 31
  11:35:57.519 INFO (Graph.java:976)     NoFutureDates - 1
 ```

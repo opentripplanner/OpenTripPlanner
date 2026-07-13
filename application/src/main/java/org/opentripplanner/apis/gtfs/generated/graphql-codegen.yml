@@ -61,6 +61,7 @@ config:
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     StopCall: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
+    StopCallOnTripOnServiceDate: org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate#StopCallOnTripOnServiceDate
     TripOnServiceDate: org.opentripplanner.transit.model.timetable.TripOnServiceDate#TripOnServiceDate
     TripOnServiceDateConnection: org.opentripplanner.framework.graphql.CountedConnection#CountedConnection<TripOnServiceDate>
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
@@ -146,3 +147,4 @@ config:
     CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
     RefetchItineraryResult: org.opentripplanner.apis.gtfs.model.RefetchItineraryResult#RefetchItineraryResult
+    Notice: org.opentripplanner.transit.model.basic.Notice

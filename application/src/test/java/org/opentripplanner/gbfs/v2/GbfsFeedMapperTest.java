@@ -375,6 +375,41 @@ class GbfsFeedMapperTest {
     assertEquals(10, duplicateStation.vehiclesAvailable());
   }
 
+  @Test
+  void vehicleTypesWithMissingFormFactorOrPropulsionAreSkippedWithoutThrowing() {
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+
+    GBFSVehicleType valid = new GBFSVehicleType();
+    valid.setVehicleTypeId("valid");
+    valid.setFormFactor(GBFSVehicleType.FormFactor.BICYCLE);
+    valid.setPropulsionType(GBFSVehicleType.PropulsionType.ELECTRIC);
+
+    // A feed that omits the required form_factor / propulsion_type (or sends an unrecognized value
+    // that Jackson deserializes to null) must not abort the whole feed update with a NPE. The
+    // malformed vehicle types are skipped; the valid one survives.
+    GBFSVehicleType missingFormFactor = new GBFSVehicleType();
+    missingFormFactor.setVehicleTypeId("missingFormFactor");
+    missingFormFactor.setFormFactor(null);
+    missingFormFactor.setPropulsionType(GBFSVehicleType.PropulsionType.ELECTRIC);
+
+    GBFSVehicleType missingPropulsion = new GBFSVehicleType();
+    missingPropulsion.setVehicleTypeId("missingPropulsion");
+    missingPropulsion.setFormFactor(GBFSVehicleType.FormFactor.BICYCLE);
+    missingPropulsion.setPropulsionType(null);
+
+    Map<String, RentalVehicleType> vehicleTypes = assertDoesNotThrow(() ->
+      GbfsFeedMapper.mapVehicleTypes(
+        vehicleTypeMapper,
+        List.of(valid, missingFormFactor, missingPropulsion)
+      )
+    );
+
+    assertEquals(1, vehicleTypes.size());
+    assertTrue(vehicleTypes.containsKey("valid"));
+    assertFalse(vehicleTypes.containsKey("missingFormFactor"));
+    assertFalse(vehicleTypes.containsKey("missingPropulsion"));
+  }
+
   private static List<GBFSVehicleType> getDuplicatedGbfsVehicleTypes() {
     GBFSVehicleType gbfsVehicleType1 = new GBFSVehicleType();
     gbfsVehicleType1.setVehicleTypeId("sameId");

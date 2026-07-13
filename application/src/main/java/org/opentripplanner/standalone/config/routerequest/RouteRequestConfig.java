@@ -364,9 +364,8 @@ public class RouteRequestConfig {
           )
           .description(
             """
-            If the optimization is set to `safe-streets` or `safest-streets`, or if `safety` is non-zero
-            in the triangle, the actual effect will further be affected by the safety of the cycle
-            route.
+            If the optimization is set to `safe-streets`, or if `safety` is non-zero in the triangle,
+            the actual effect will further be affected by the safety of the cycle route.
 
             The effect of safety has changed between versions 2.9 and 2.10 by the removal of the
             safety normalizer. Before the change, all the safety values were multiplied such that

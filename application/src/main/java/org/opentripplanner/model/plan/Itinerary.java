@@ -13,7 +13,6 @@ import org.opentripplanner.core.model.basic.NormalizedCost;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
@@ -89,7 +88,6 @@ public class Itinerary implements ItinerarySortKey {
 
   private final Float accessibilityScore;
   private final Emission emissionPerPerson;
-  private final ItineraryFare fare;
 
   Itinerary(ItineraryBuilder builder) {
     this.legs = List.copyOf(builder.legs);
@@ -112,7 +110,6 @@ public class Itinerary implements ItinerarySortKey {
     this.systemNotices = builder.systemNotices;
     this.accessibilityScore = builder.accessibilityScore;
     this.emissionPerPerson = builder.emissionPerPerson;
-    this.fare = builder.fare;
 
     // Set aggregated data
     this.generalizedCostIncludingPenalty = generalizedCost
@@ -566,13 +563,6 @@ public class Itinerary implements ItinerarySortKey {
     return totalWalkDuration;
   }
 
-  /**
-   * The fare products of this itinerary.
-   */
-  public ItineraryFare fare() {
-    return fare;
-  }
-
   /** @see #equals(Object) */
   @Override
   public final int hashCode() {
@@ -581,8 +571,8 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * Return {@code true} it the other object is the same object using the {@link
-   * Object#equals(Object)}. An itinerary is a temporary object and the equals method should not be
-   * used for comparision of 2 instances, only to check that to objects are the same instance.
+   * Object#equals(Object)}. An itinerary is a temporary object, and the equals method should not be
+   * used for comparison of 2 instances, only to check that two objects are the same instance.
    */
   @Override
   public final boolean equals(Object o) {
@@ -611,7 +601,6 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationLost", totalElevationLost(), "m")
       .addCol("legs", legs)
       .addObj("emissionPerPerson", emissionPerPerson)
-      .addObj("fare", fare)
       .toString();
   }
 

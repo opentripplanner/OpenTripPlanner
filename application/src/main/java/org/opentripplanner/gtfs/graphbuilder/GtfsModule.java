@@ -18,7 +18,7 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -64,7 +64,7 @@ public class GtfsModule implements GraphBuilderModule {
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
-  private final LocalDateInterval transitPeriodLimit;
+  private final LocalDateRange transitPeriodLimit;
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
 
@@ -84,7 +84,7 @@ public class GtfsModule implements GraphBuilderModule {
     Graph graph,
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
-    LocalDateInterval transitPeriodLimit,
+    LocalDateRange transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
     int subwayAccessTime_s
@@ -108,7 +108,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
-    LocalDateInterval transitPeriodLimit
+    LocalDateRange transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,
