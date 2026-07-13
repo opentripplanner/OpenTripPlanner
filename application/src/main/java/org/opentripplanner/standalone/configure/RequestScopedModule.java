@@ -16,6 +16,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
+import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -113,6 +115,18 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static OjpApiParameters ojpApiParameters(RouterConfig routerConfig) {
+    return routerConfig.ojpApiParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TriasApiParameters triasApiParameters(RouterConfig routerConfig) {
+    return routerConfig.triasApiParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OtpServerRequestContext serverRequestContext(
     RouterConfig routerConfig,
     DebugUiConfig debugUiConfig,
@@ -126,6 +140,8 @@ public class RequestScopedModule {
     VectorTileConfig vectorTileConfig,
     GtfsApiParameters gtfsApiConfig,
     TransmodelAPIParameters transmodelAPIParameters,
+    OjpApiParameters ojpApiParameters,
+    TriasApiParameters triasApiParameters,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleRepository realtimeVehicleRepository,
@@ -148,8 +164,6 @@ public class RequestScopedModule {
     FareService fareService
   ) {
     var transitRoutingConfig = routerConfig.transitTuningConfig();
-    var triasApiParameters = routerConfig.triasApiParameters();
-    var ojpApiParameters = routerConfig.ojpApiParameters();
     var flexParameters = routerConfig.flexParameters();
 
     return new DefaultServerRequestContext(

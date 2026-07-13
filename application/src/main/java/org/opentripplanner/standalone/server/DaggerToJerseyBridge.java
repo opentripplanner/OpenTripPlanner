@@ -9,7 +9,10 @@ import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
+import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -73,6 +76,9 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::gtfsApiParameters, GtfsApiParameters.class);
     bridge(factory, RequestScopedFactory::transmodelAPIParameters, TransmodelAPIParameters.class);
     bridge(factory, RequestScopedFactory::transmodelGraphQLSchema, TransmodelGraphQLSchema.class);
+    bridge(factory, RequestScopedFactory::linkingContextFactory, LinkingContextFactory.class);
+    bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
+    bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);
   }
 
   /**
