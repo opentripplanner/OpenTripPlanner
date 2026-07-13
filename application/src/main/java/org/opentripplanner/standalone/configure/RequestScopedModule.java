@@ -8,6 +8,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -97,6 +99,20 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static TransmodelAPIParameters transmodelAPIParameters(RouterConfig routerConfig) {
+    return routerConfig.transmodelApi();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TransmodelGraphQLSchema transmodelGraphQLSchema(
+    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema
+  ) {
+    return new TransmodelGraphQLSchema(transmodelSchema);
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OtpServerRequestContext serverRequestContext(
     RouterConfig routerConfig,
     DebugUiConfig debugUiConfig,
@@ -109,6 +125,7 @@ public class RequestScopedModule {
     RouteRequest defaultRequest,
     VectorTileConfig vectorTileConfig,
     GtfsApiParameters gtfsApiConfig,
+    TransmodelAPIParameters transmodelAPIParameters,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleRepository realtimeVehicleRepository,
@@ -134,7 +151,6 @@ public class RequestScopedModule {
     var triasApiParameters = routerConfig.triasApiParameters();
     var ojpApiParameters = routerConfig.ojpApiParameters();
     var flexParameters = routerConfig.flexParameters();
-    var transmodelAPIParameters = routerConfig.transmodelApi();
 
     return new DefaultServerRequestContext(
       debugUiConfig,
