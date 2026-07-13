@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
+import javax.annotation.Nullable;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -32,6 +34,9 @@ public interface RequestScopedFactory {
   RouteRequest defaultRouteRequest();
 
   VehicleParkingService vehicleParkingService();
+
+  @Nullable
+  LuceneIndex luceneIndex();
 
   @Subcomponent.Builder
   interface Builder {
