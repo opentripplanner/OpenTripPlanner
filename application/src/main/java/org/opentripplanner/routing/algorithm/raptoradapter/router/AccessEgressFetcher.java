@@ -9,8 +9,13 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.RoutingStartOnBoardAccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripAndServiceDateResolver;
@@ -25,8 +30,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -38,7 +46,16 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 class AccessEgressFetcher {
 
   private final RouteRequest request;
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+  private final Graph graph;
+  private final RegularTransferService transferService;
+  private final StreetDetailsService streetDetailsService;
+  private final FlexParameters flexParameters;
+  private final List<RideHailingService> rideHailingServices;
+
+  @Nullable
+  private final DataOverlayParameterBindings dataOverlayParameterBindings;
+
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final LinkingContext linkingContext;
@@ -58,7 +75,13 @@ class AccessEgressFetcher {
    */
   public AccessEgressFetcher(
     RouteRequest request,
-    OtpServerRequestContext serverContext,
+    TransitService transitService,
+    Graph graph,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    FlexParameters flexParameters,
+    List<RideHailingService> rideHailingServices,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext,
@@ -66,15 +89,21 @@ class AccessEgressFetcher {
     RaptorRoutingRequestTransitData requestTransitDataProvider
   ) {
     this.request = request;
-    this.serverContext = serverContext;
+    this.transitService = transitService;
+    this.graph = graph;
+    this.transferService = transferService;
+    this.streetDetailsService = streetDetailsService;
+    this.flexParameters = flexParameters;
+    this.rideHailingServices = rideHailingServices;
+    this.dataOverlayParameterBindings = dataOverlayParameterBindings;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
-    this.transitServiceResolver = new TransitServiceResolver(serverContext.transitService());
+    this.transitServiceResolver = new TransitServiceResolver(transitService);
     this.accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
     this.tripScheduleIndexResolver = new TripScheduleIndexResolver(requestTransitDataProvider);
-    this.tripLocationResolver = new TripLocationResolver(serverContext.transitService());
+    this.tripLocationResolver = new TripLocationResolver(transitService);
   }
 
   Collection<? extends RoutingAccessEgress> fetchAccess() {
@@ -97,7 +126,6 @@ class AccessEgressFetcher {
       );
     }
 
-    var transitService = serverContext.transitService();
     var tripAndServiceDate = new TripAndServiceDateResolver(transitService).resolve(
       onBoardTripLocation.tripOnDateReference()
     );
@@ -149,7 +177,7 @@ class AccessEgressFetcher {
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
       mode,
-      serverContext.listExtensionRequestContexts(accessRequest),
+      DataOverlayContext.listExtensionRequestContexts(accessRequest, dataOverlayParameterBindings),
       type,
       durationLimit,
       stopCountLimit,
@@ -164,13 +192,16 @@ class AccessEgressFetcher {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
-        serverContext.transitService(),
-        serverContext.graph(),
-        serverContext.transferService(),
-        serverContext.streetDetailsService(),
+        transitService,
+        graph,
+        transferService,
+        streetDetailsService,
         additionalSearchDays,
-        serverContext.flexParameters(),
-        serverContext.listExtensionRequestContexts(accessRequest),
+        flexParameters,
+        DataOverlayContext.listExtensionRequestContexts(
+          accessRequest,
+          dataOverlayParameterBindings
+        ),
         type,
         linkingContext
       );
@@ -212,7 +243,7 @@ class AccessEgressFetcher {
     return RideHailingAccessShifter.shiftAccesses(
       type.isAccess(),
       accessEgressList,
-      serverContext.rideHailingServices(),
+      rideHailingServices,
       request,
       Instant.now()
     );

@@ -116,7 +116,13 @@ public class TransitRouter {
     var requestTransitDataProvider = createRequestTransitDataProvider(raptorTransitData);
     var fetchAccessEgress = new AccessEgressFetcher(
       request,
-      serverContext,
+      serverContext.transitService(),
+      serverContext.graph(),
+      serverContext.transferService(),
+      serverContext.streetDetailsService(),
+      serverContext.flexParameters(),
+      serverContext.rideHailingServices(),
+      serverContext.dataOverlayParameterBindings(),
       transitSearchTimeZero,
       additionalSearchDays,
       linkingContext,
