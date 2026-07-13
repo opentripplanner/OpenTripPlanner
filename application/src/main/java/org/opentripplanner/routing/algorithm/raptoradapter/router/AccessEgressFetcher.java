@@ -164,7 +164,10 @@ class AccessEgressFetcher {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
-        serverContext,
+        serverContext.transitService(),
+        serverContext.graph(),
+        serverContext.transferService(),
+        serverContext.streetDetailsService(),
         additionalSearchDays,
         serverContext.flexParameters(),
         serverContext.listExtensionRequestContexts(accessRequest),
