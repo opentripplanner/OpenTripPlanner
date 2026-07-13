@@ -198,7 +198,11 @@ public class ConstructApplication {
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(routerConfig().server(), this::createServerContext);
+    return new OTPWebApplication(
+      routerConfig().server(),
+      this::createServerContext,
+      this::requestScopedComponent
+    );
   }
 
   private void setupTransitRoutingServer() {
@@ -351,6 +355,10 @@ public class ConstructApplication {
 
   private OtpServerRequestContext createServerContext() {
     return factory.createServerContext();
+  }
+
+  private RequestScopedComponent requestScopedComponent() {
+    return factory.requestScopedComponentBuilder().build();
   }
 
   private void enableRequestTraceLogging() {

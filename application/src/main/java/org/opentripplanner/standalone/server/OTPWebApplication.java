@@ -16,12 +16,15 @@ import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
 import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsFilter;
 import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.configure.RequestScopedComponent;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
@@ -37,6 +40,9 @@ public class OTPWebApplication extends Application {
   /* This object groups together all the modules for a single running OTP server. */
   private final Supplier<OtpServerRequestContext> contextProvider;
 
+  /* Builds one Dagger RequestScopedComponent per actual HTTP request, see issue #7441. */
+  private final Supplier<RequestScopedComponent> requestScopedComponentProvider;
+
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
   private final HttpResponseTimeMetricsParameters httpResponseTimeMetricsParameters;
 
@@ -50,9 +56,11 @@ public class OTPWebApplication extends Application {
 
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
-    Supplier<OtpServerRequestContext> contextProvider
+    Supplier<OtpServerRequestContext> contextProvider,
+    Supplier<RequestScopedComponent> requestScopedComponentProvider
   ) {
     this.contextProvider = contextProvider;
+    this.requestScopedComponentProvider = requestScopedComponentProvider;
     this.customFilters = createCustomFilters(parameters.traceParameters());
     this.httpResponseTimeMetricsParameters = parameters.httpResponseTimeMetricsParameters();
   }
@@ -105,6 +113,9 @@ public class OTPWebApplication extends Application {
         new JacksonJsonProvider(),
         // Allow injecting the OTP server object into Jersey resource classes
         makeBinder(contextProvider),
+        // Allow injecting individual, request-scoped services (e.g. TransitService) directly,
+        // backed by a Dagger RequestScopedComponent pinned to one transaction per HTTP request
+        makeRequestScopedBinder(requestScopedComponentProvider),
         // Add performance instrumentation of Jersey requests to micrometer
         getMetricsApplicationEventListener()
       )
@@ -155,6 +166,30 @@ public class OTPWebApplication extends Application {
       @Override
       protected void configure() {
         bindFactory(contextProvider).to(OtpServerRequestContext.class);
+      }
+    };
+  }
+
+  /**
+   * Bridges the Dagger-managed {@link RequestScopedComponent} into HK2/Jersey, and from it, the
+   * individual services it exposes (currently just {@link TransitService}) so resources can
+   * inject them directly with {@code @Context}, instead of going through {@link
+   * OtpServerRequestContext}. Both bindings are scoped {@code .in(RequestScoped.class)} — Jersey's
+   * own per-actual-HTTP-request HK2 scope — so a request that asks for either binding more than
+   * once still gets one pinned transaction, see issue #7441.
+   */
+  private Binder makeRequestScopedBinder(
+    Supplier<RequestScopedComponent> requestScopedComponentProvider
+  ) {
+    return new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bindFactory(requestScopedComponentProvider)
+          .to(RequestScopedComponent.class)
+          .in(RequestScoped.class);
+        bindFactory(RequestScopedTransitServiceSupplier.class)
+          .to(TransitService.class)
+          .in(RequestScoped.class);
       }
     };
   }
