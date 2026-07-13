@@ -4,13 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.service.TransitService;
 
 public class GraphReportBuilder {
 
-  public static GraphStats build(OtpServerRequestContext context) {
-    var transitService = context.transitService();
-    var graph = context.graph();
+  public static GraphStats build(TransitService transitService, Graph graph) {
     var constrainedTransfers = transitService.getConstrainedTransferService().listAll();
 
     var constrainedTransferCounts = countValues(constrainedTransfers, transfer -> {
