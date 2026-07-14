@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import gnu.trove.TCollections;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,14 +39,13 @@ class WayPropertiesComputer {
 
     var distinctPairs = new ConcurrentHashMap<WayPropertiesPair, WayPropertiesPair>();
     TLongObjectMap<WayPropertiesPair> props = new TLongObjectHashMap<>(ways.size());
+    var synchronizedProps = TCollections.synchronizedMap(props);
     ways
       .parallelStream()
       .forEach(way -> {
         var pair = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
         var canonicalPair = distinctPairs.computeIfAbsent(pair, p -> p);
-        synchronized (props) {
-          props.put(way.getId(), canonicalPair);
-        }
+        synchronizedProps.put(way.getId(), canonicalPair);
         //Keep lambda! A method-ref would log incorrect class and line number
         //noinspection Convert2MethodRef
         progress.step(m -> LOG.info(m));
