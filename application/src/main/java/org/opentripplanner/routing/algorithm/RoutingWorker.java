@@ -305,7 +305,17 @@ public class RoutingWorker {
     try {
       var transitResults = TransitRouter.route(
         request,
-        serverContext,
+        serverContext.transitService(),
+        serverContext.graph(),
+        serverContext.raptorConfig(),
+        serverContext.meterRegistry(),
+        serverContext.streetDetailsService(),
+        serverContext.transferService(),
+        serverContext.flexParameters(),
+        serverContext.rideHailingServices(),
+        serverContext.dataOverlayParameterBindings(),
+        serverContext.sorlandsbanenService(),
+        serverContext.viaTransferResolver(),
         transitGroupPriorityService,
         transitSearchTimeZero,
         additionalSearchDays,

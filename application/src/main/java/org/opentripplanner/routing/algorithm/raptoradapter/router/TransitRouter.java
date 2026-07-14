@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,11 +11,16 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
@@ -35,17 +41,34 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 
 public class TransitRouter {
 
   public static final int NOT_SET = -1;
 
   private final RouteRequest request;
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+  private final Graph graph;
+  private final RaptorConfig<TripSchedule> raptorConfig;
+  private final MeterRegistry meterRegistry;
+  private final StreetDetailsService streetDetailsService;
+  private final RegularTransferService transferService;
+  private final FlexParameters flexParameters;
+  private final List<RideHailingService> rideHailingServices;
+
+  @Nullable
+  private final DataOverlayParameterBindings dataOverlayParameterBindings;
+
+  @Nullable
+  private final SorlandsbanenNorwayService sorlandsbanenService;
+
   private final TransitGroupPriorityService transitGroupPriorityService;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
@@ -56,7 +79,17 @@ public class TransitRouter {
 
   private TransitRouter(
     RouteRequest request,
-    OtpServerRequestContext serverContext,
+    TransitService transitService,
+    Graph graph,
+    RaptorConfig<TripSchedule> raptorConfig,
+    MeterRegistry meterRegistry,
+    StreetDetailsService streetDetailsService,
+    RegularTransferService transferService,
+    FlexParameters flexParameters,
+    List<RideHailingService> rideHailingServices,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    ViaCoordinateTransferFactory viaTransferResolver,
     TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
@@ -65,19 +98,38 @@ public class TransitRouter {
     CarpoolingService carpoolingService
   ) {
     this.request = request;
-    this.serverContext = serverContext;
+    this.transitService = transitService;
+    this.graph = graph;
+    this.raptorConfig = raptorConfig;
+    this.meterRegistry = meterRegistry;
+    this.streetDetailsService = streetDetailsService;
+    this.transferService = transferService;
+    this.flexParameters = flexParameters;
+    this.rideHailingServices = rideHailingServices;
+    this.dataOverlayParameterBindings = dataOverlayParameterBindings;
+    this.sorlandsbanenService = sorlandsbanenService;
     this.transitGroupPriorityService = transitGroupPriorityService;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
-    this.viaTransferResolver = serverContext.viaTransferResolver();
+    this.viaTransferResolver = viaTransferResolver;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
   }
 
   public static TransitRouterResult route(
     RouteRequest request,
-    OtpServerRequestContext serverContext,
+    TransitService transitService,
+    Graph graph,
+    RaptorConfig<TripSchedule> raptorConfig,
+    MeterRegistry meterRegistry,
+    StreetDetailsService streetDetailsService,
+    RegularTransferService transferService,
+    FlexParameters flexParameters,
+    List<RideHailingService> rideHailingServices,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    ViaCoordinateTransferFactory viaTransferResolver,
     TransitGroupPriorityService priorityGroupConfigurator,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
@@ -87,7 +139,17 @@ public class TransitRouter {
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
-      serverContext,
+      transitService,
+      graph,
+      raptorConfig,
+      meterRegistry,
+      streetDetailsService,
+      transferService,
+      flexParameters,
+      rideHailingServices,
+      dataOverlayParameterBindings,
+      sorlandsbanenService,
+      viaTransferResolver,
       priorityGroupConfigurator,
       transitSearchTimeZero,
       additionalSearchDays,
@@ -104,25 +166,25 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
+    if (!transitService.transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
     var raptorTransitData = request.preferences().transit().ignoreRealtimeUpdates()
-      ? serverContext.transitService().getRaptorTransitData()
-      : serverContext.transitService().getRealtimeRaptorTransitData();
+      ? transitService.getRaptorTransitData()
+      : transitService.getRealtimeRaptorTransitData();
     var requestTransitDataProvider = createRequestTransitDataProvider(raptorTransitData);
     var fetchAccessEgress = new AccessEgressFetcher(
       request,
-      serverContext.transitService(),
-      serverContext.graph(),
-      serverContext.transferService(),
-      serverContext.streetDetailsService(),
-      serverContext.flexParameters(),
-      serverContext.rideHailingServices(),
-      serverContext.dataOverlayParameterBindings(),
+      transitService,
+      graph,
+      transferService,
+      streetDetailsService,
+      flexParameters,
+      rideHailingServices,
+      dataOverlayParameterBindings,
       transitSearchTimeZero,
       additionalSearchDays,
       linkingContext,
@@ -149,10 +211,10 @@ public class TransitRouter {
     var mapper = RaptorRequestMapper.<TripSchedule>of(
       request,
       transitSearchTimeZero,
-      serverContext.raptorConfig().isMultiThreaded(),
+      raptorConfig.isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
-      serverContext.meterRegistry(),
+      meterRegistry,
       viaTransferResolver,
       this::listStopIndexes,
       linkingContext
@@ -160,10 +222,7 @@ public class TransitRouter {
     var raptorRequest = mapper.mapRaptorRequest();
 
     // Transit routing using Raptor
-    var raptorService = new RaptorService<>(
-      serverContext.raptorConfig(),
-      extraSearchForSorlandsbanen
-    );
+    var raptorService = new RaptorService<>(raptorConfig, extraSearchForSorlandsbanen);
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
     checkIfTransitConnectionExists(transitResponse);
@@ -201,7 +260,7 @@ public class TransitRouter {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         raptorTransitData::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
-        serverContext.transitService().getConstrainedTransferService(),
+        transitService.getConstrainedTransferService(),
         requestTransitDataProvider,
         raptorTransitData.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
@@ -213,9 +272,9 @@ public class TransitRouter {
     // Create itineraries
 
     RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
-      serverContext.graph(),
-      serverContext.transitService(),
-      serverContext.streetDetailsService(),
+      graph,
+      transitService,
+      streetDetailsService,
       raptorTransitData,
       transitSearchTimeZero,
       request
@@ -329,9 +388,7 @@ public class TransitRouter {
   }
 
   private IntStream listStopIndexes(FeedScopedId stopLocationId) {
-    Collection<StopLocation> stops = serverContext
-      .transitService()
-      .findStopOrChildStops(stopLocationId);
+    Collection<StopLocation> stops = transitService.findStopOrChildStops(stopLocationId);
 
     if (stops.isEmpty()) {
       throw new EntityNotFoundException(
@@ -354,9 +411,8 @@ public class TransitRouter {
     if (OTPFeature.Sorlandsbanen.isOff()) {
       return null;
     }
-    var service = serverContext.sorlandsbanenService();
-    return service == null
+    return sorlandsbanenService == null
       ? null
-      : service.createExtraMcRouterSearch(request, accessEgresses, raptorTransitData);
+      : sorlandsbanenService.createExtraMcRouterSearch(request, accessEgresses, raptorTransitData);
   }
 }

@@ -233,7 +233,17 @@ class ScheduledDeviatedTripIntegrationTest {
         .create(temporaryVerticesContainer, linkingRequest);
       var result = TransitRouter.route(
         request,
-        serverContext,
+        serverContext.transitService(),
+        serverContext.graph(),
+        serverContext.raptorConfig(),
+        serverContext.meterRegistry(),
+        serverContext.streetDetailsService(),
+        serverContext.transferService(),
+        serverContext.flexParameters(),
+        serverContext.rideHailingServices(),
+        serverContext.dataOverlayParameterBindings(),
+        serverContext.sorlandsbanenService(),
+        serverContext.viaTransferResolver(),
         TransitGroupPriorityService.empty(),
         transitStartOfTime,
         additionalSearchDays,
