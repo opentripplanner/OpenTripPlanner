@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -9,13 +10,21 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -24,6 +33,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
@@ -33,12 +43,20 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.paging.PagingService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +73,35 @@ public class RoutingWorker {
   private final DebugTimingAggregator debugTimingAggregator;
 
   private final RouteRequest request;
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+  private final Graph graph;
+  private final RaptorConfig<TripSchedule> raptorConfig;
+  private final MeterRegistry meterRegistry;
+  private final StreetLimitationParametersService streetLimitationParametersService;
+  private final VehicleRentalService vehicleRentalService;
+  private final StreetDetailsService streetDetailsService;
+  private final RegularTransferService transferService;
+  private final FlexParameters flexParameters;
+  private final List<RideHailingService> rideHailingServices;
+  private final ViaCoordinateTransferFactory viaTransferResolver;
+  private final LinkingContextFactory linkingContextFactory;
+  private final TransitRoutingConfig transitRoutingConfig;
+
+  @Nullable
+  private final DataOverlayParameterBindings dataOverlayParameterBindings;
+
+  @Nullable
+  private final SorlandsbanenNorwayService sorlandsbanenService;
+
+  @Nullable
+  private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final ItineraryDecorator emissionItineraryDecorator;
+
+  @Nullable
+  private final StopConsolidationService stopConsolidationService;
+
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
@@ -66,13 +112,50 @@ public class RoutingWorker {
   @Nullable
   private LinkingContext currentLinkingContext = null;
 
-  public RoutingWorker(OtpServerRequestContext serverContext, RoutingWorkerRequest workerRequest) {
+  public RoutingWorker(
+    TransitService transitService,
+    Graph graph,
+    RaptorConfig<TripSchedule> raptorConfig,
+    MeterRegistry meterRegistry,
+    StreetLimitationParametersService streetLimitationParametersService,
+    VehicleRentalService vehicleRentalService,
+    StreetDetailsService streetDetailsService,
+    RegularTransferService transferService,
+    FlexParameters flexParameters,
+    List<RideHailingService> rideHailingServices,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    ViaCoordinateTransferFactory viaTransferResolver,
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable StopConsolidationService stopConsolidationService,
+    LinkingContextFactory linkingContextFactory,
+    TransitRoutingConfig transitRoutingConfig,
+    RoutingWorkerRequest workerRequest
+  ) {
     this.request = workerRequest.request();
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();
     this.additionalSearchDays = workerRequest.additionalSearchDays();
-    this.serverContext = serverContext;
+    this.transitService = transitService;
+    this.graph = graph;
+    this.raptorConfig = raptorConfig;
+    this.meterRegistry = meterRegistry;
+    this.streetLimitationParametersService = streetLimitationParametersService;
+    this.vehicleRentalService = vehicleRentalService;
+    this.streetDetailsService = streetDetailsService;
+    this.transferService = transferService;
+    this.flexParameters = flexParameters;
+    this.rideHailingServices = rideHailingServices;
+    this.dataOverlayParameterBindings = dataOverlayParameterBindings;
+    this.sorlandsbanenService = sorlandsbanenService;
+    this.viaTransferResolver = viaTransferResolver;
+    this.carpoolingService = carpoolingService;
+    this.emissionItineraryDecorator = emissionItineraryDecorator;
+    this.stopConsolidationService = stopConsolidationService;
+    this.linkingContextFactory = linkingContextFactory;
+    this.transitRoutingConfig = transitRoutingConfig;
     this.debugTimingAggregator = new DebugTimingAggregator(
-      serverContext.meterRegistry(),
+      meterRegistry,
       request.preferences().system().tags()
     );
     this.transitGroupPriorityService = TransitGroupPriorityService.of(
@@ -129,10 +212,10 @@ public class RoutingWorker {
 
       ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
         request,
-        serverContext.transitService(),
-        serverContext.rideHailingServices(),
-        serverContext.emissionItineraryDecorator(),
-        serverContext.stopConsolidationService(),
+        transitService,
+        rideHailingServices,
+        emissionItineraryDecorator,
+        stopConsolidationService,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
         result.removeWalkAllTheWayResults() || removeWalkAllTheWayResultsFromDirectFlex,
@@ -169,7 +252,7 @@ public class RoutingWorker {
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
-      serverContext.transitService(),
+      transitService,
       pagingService
     );
   }
@@ -236,12 +319,12 @@ public class RoutingWorker {
     try {
       return RoutingResult.ok(
         DirectStreetRouter.route(
-          serverContext.graph(),
-          serverContext.transitService(),
-          serverContext.streetLimitationParametersService(),
-          serverContext.vehicleRentalService(),
-          serverContext.streetDetailsService(),
-          serverContext.dataOverlayParameterBindings(),
+          graph,
+          transitService,
+          streetLimitationParametersService,
+          vehicleRentalService,
+          streetDetailsService,
+          dataOverlayParameterBindings,
           directBuilder.buildRequest(),
           linkingContext()
         ),
@@ -265,12 +348,12 @@ public class RoutingWorker {
     try {
       return RoutingResult.ok(
         DirectFlexRouter.route(
-          serverContext.graph(),
-          serverContext.transitService(),
-          serverContext.transferService(),
-          serverContext.streetDetailsService(),
-          serverContext.flexParameters(),
-          serverContext.dataOverlayParameterBindings(),
+          graph,
+          transitService,
+          transferService,
+          streetDetailsService,
+          flexParameters,
+          dataOverlayParameterBindings,
           request,
           additionalSearchDays,
           linkingContext()
@@ -292,7 +375,7 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectCarpoolRouter();
     try {
-      return RoutingResult.ok(serverContext.carpoolingService().routeDirect(request));
+      return RoutingResult.ok(carpoolingService.routeDirect(request));
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
@@ -305,23 +388,23 @@ public class RoutingWorker {
     try {
       var transitResults = TransitRouter.route(
         request,
-        serverContext.transitService(),
-        serverContext.graph(),
-        serverContext.raptorConfig(),
-        serverContext.meterRegistry(),
-        serverContext.streetDetailsService(),
-        serverContext.transferService(),
-        serverContext.flexParameters(),
-        serverContext.rideHailingServices(),
-        serverContext.dataOverlayParameterBindings(),
-        serverContext.sorlandsbanenService(),
-        serverContext.viaTransferResolver(),
+        transitService,
+        graph,
+        raptorConfig,
+        meterRegistry,
+        streetDetailsService,
+        transferService,
+        flexParameters,
+        rideHailingServices,
+        dataOverlayParameterBindings,
+        sorlandsbanenService,
+        viaTransferResolver,
         transitGroupPriorityService,
         transitSearchTimeZero,
         additionalSearchDays,
         debugTimingAggregator,
         linkingContext(),
-        serverContext.carpoolingService()
+        carpoolingService
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       var itineraries = transitResults.getItineraries();
@@ -341,8 +424,8 @@ public class RoutingWorker {
   private PagingService createPagingService(List<Itinerary> itineraries) {
     return PagingServiceFactory.createPagingService(
       searchStartTime(),
-      serverContext.transitTuningParameters(),
-      serverContext.raptorTuningParameters(),
+      transitRoutingConfig,
+      transitRoutingConfig,
       request,
       raptorSearchParamsUsed,
       pageCursorInput,
@@ -388,6 +471,6 @@ public class RoutingWorker {
 
   private LinkingContext createLinkingContext(TemporaryVerticesContainer container) {
     var linkingRequest = LinkingContextRequestMapper.map(request);
-    return serverContext.linkingContextFactory().create(container, linkingRequest);
+    return linkingContextFactory.create(container, linkingRequest);
   }
 }
