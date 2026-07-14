@@ -338,15 +338,17 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     /* build the street segment graph from OSM ways */
     long wayCount = osmdb.getWays().size();
-    ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
-    LOG.info(progress.startMessage());
     var escalatorProcessor = new EscalatorProcessor(issueStore);
     var inclinedEdgeLevelInfoProcessor = params.includeInclinedEdgeLevelInfo()
       ? new DefaultInclinedEdgeLevelInfoProcessor(issueStore, streetDetailsRepository, osmdb)
       : new NoopInclinedEdgeLevelInfoProcessor();
 
+    var props = WayPropertiesComputer.compute(osmdb);
+
+    ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
+    LOG.info(progress.startMessage());
     WAY: for (OsmWay way : osmdb.getWays()) {
-      WayPropertiesPair wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
+      WayPropertiesPair wayData = props.get(way.getId());
 
       var forwardPermission = wayData.forward().getPermission();
       var backwardPermission = wayData.backward().getPermission();
