@@ -15,6 +15,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
@@ -24,8 +25,6 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -46,7 +45,6 @@ class DatedServiceJourneyTypeTest {
   ).build();
 
   private static final Trip TRIP = ENV.tripData(TRIP_ID).trip();
-  private static final TripPattern PATTERN = ENV.tripData(TRIP_ID).tripPattern();
   private static final TripTimes SCHEDULED_TIMES = ENV.tripData(TRIP_ID).scheduledTripTimes();
 
   private static final TripOnServiceDate TRIP_ON_SERVICE_DATE = TripOnServiceDate.of(
@@ -57,17 +55,9 @@ class DatedServiceJourneyTypeTest {
     .build();
 
   @Test
-  void realTimeJourneyState_isNull_whenPatternNotFound() {
+  void realTimeJourneyState_isNull_whenTripTimesNotFound() {
     var transitService = mock(TransitService.class);
-    when(transitService.findPattern(TRIP, SERVICE_DATE)).thenReturn(null);
-    assertNull(fetch(transitService));
-  }
-
-  @Test
-  void realTimeJourneyState_isNull_whenTimetableNotFound() {
-    var transitService = mock(TransitService.class);
-    when(transitService.findPattern(TRIP, SERVICE_DATE)).thenReturn(PATTERN);
-    when(transitService.findTimetable(PATTERN, SERVICE_DATE)).thenReturn(null);
+    when(transitService.findTripTimes(TRIP, SERVICE_DATE)).thenReturn(Optional.empty());
     assertNull(fetch(transitService));
   }
 
@@ -134,12 +124,8 @@ class DatedServiceJourneyTypeTest {
 
   /** Returns a TransitService mock that resolves the given TripTimes for TRIP on SERVICE_DATE. */
   private static TransitService withTripTimes(TripTimes tripTimes) {
-    var timetable = mock(Timetable.class);
-    when(timetable.getTripTimes(TRIP)).thenReturn(tripTimes);
-
     var transitService = mock(TransitService.class);
-    when(transitService.findPattern(TRIP, SERVICE_DATE)).thenReturn(PATTERN);
-    when(transitService.findTimetable(PATTERN, SERVICE_DATE)).thenReturn(timetable);
+    when(transitService.findTripTimes(TRIP, SERVICE_DATE)).thenReturn(Optional.of(tripTimes));
     return transitService;
   }
 

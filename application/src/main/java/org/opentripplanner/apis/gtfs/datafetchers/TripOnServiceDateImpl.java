@@ -53,22 +53,21 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<RealTimeTripStateModel> realTimeTripState() {
     return environment -> {
-      var arguments = getFromTripTimesArguments(environment);
-      if (arguments.timetable() == null) {
-        return null;
-      }
-      var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
-      if (tripTimes == null) {
-        return null;
-      }
-      return new RealTimeTripStateModel(
-        tripTimes.isAdded(),
-        tripTimes.isCanceled(),
-        tripTimes.isDeleted(),
-        tripTimes.isTimesModified(),
-        tripTimes.isTripPatternModified(),
-        tripTimes.hasAnyUpdates()
-      );
+      var transitService = getTransitService(environment);
+      var tripOnServiceDate = getSource(environment);
+      return transitService
+        .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
+        .map(tripTimes ->
+          new RealTimeTripStateModel(
+            tripTimes.isAdded(),
+            tripTimes.isCanceled(),
+            tripTimes.isDeleted(),
+            tripTimes.isTimesModified(),
+            tripTimes.isTripPatternModified(),
+            tripTimes.hasAnyUpdates()
+          )
+        )
+        .orElse(null);
     };
   }
 

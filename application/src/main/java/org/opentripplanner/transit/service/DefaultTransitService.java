@@ -153,6 +153,13 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate) {
+    return Optional.ofNullable(findPattern(trip, serviceDate))
+      .map(pattern -> findTimetable(pattern, serviceDate))
+      .map(timetable -> timetable.getTripTimes(trip));
+  }
+
+  @Override
   public Collection<String> listFeedIds() {
     return this.timetableRepository.getFeedIds();
   }

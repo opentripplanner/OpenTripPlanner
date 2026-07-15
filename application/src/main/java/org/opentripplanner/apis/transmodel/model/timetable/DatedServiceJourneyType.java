@@ -201,28 +201,19 @@ public class DatedServiceJourneyType {
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             TransitService transitService = GqlUtil.getTransitService(environment);
-            var trip = tripOnServiceDate.getTrip();
-            var serviceDate = tripOnServiceDate.getServiceDate();
-            var pattern = transitService.findPattern(trip, serviceDate);
-            if (pattern == null) {
-              return null;
-            }
-            var timetable = transitService.findTimetable(pattern, serviceDate);
-            if (timetable == null) {
-              return null;
-            }
-            var tripTimes = timetable.getTripTimes(trip);
-            if (tripTimes == null) {
-              return null;
-            }
-            return new TransmodelRealTimeTripStateModel(
-              tripTimes.isAdded(),
-              tripTimes.isCanceled(),
-              tripTimes.isDeleted(),
-              tripTimes.isTimesModified(),
-              tripTimes.isTripPatternModified(),
-              tripTimes.hasAnyUpdates()
-            );
+            return transitService
+              .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
+              .map(tripTimes ->
+                new TransmodelRealTimeTripStateModel(
+                  tripTimes.isAdded(),
+                  tripTimes.isCanceled(),
+                  tripTimes.isDeleted(),
+                  tripTimes.isTimesModified(),
+                  tripTimes.isTripPatternModified(),
+                  tripTimes.hasAnyUpdates()
+                )
+              )
+              .orElse(null);
           })
           .build()
       )
