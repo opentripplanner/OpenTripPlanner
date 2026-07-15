@@ -5,7 +5,7 @@
       "locations": [
         {
           "line": 2,
-          "column": 5
+          "column": 3
         }
       ],
       "path": ["refetchItinerary"],
