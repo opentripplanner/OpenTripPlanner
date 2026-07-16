@@ -400,7 +400,9 @@ public class OsmTagMapper {
 
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "disused", "yes")
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "disused", "yes"),
+        new Not(new Condition.Equals("cycleway", "lane")),
+        new Not(new Condition.Equals("cycleway:both", "lane"))
       ),
       ofBicycleSafety(1.8)
     );

@@ -478,6 +478,12 @@ class OsmTagMapperTest {
     assertEquals(1.8, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
   }
 
+  @Test
+  void embeddedRailsWithBikeLane() {
+    var way = WayTestData.embeddedRails().copy().withTag("cycleway", "lane").build();
+    assertEquals(0.87, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
+  }
+
   /**
    * Test that car speeds are calculated accurately
    */
