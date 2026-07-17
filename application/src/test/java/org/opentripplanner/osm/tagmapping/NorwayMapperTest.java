@@ -176,6 +176,6 @@ class NorwayMapperTest {
 
   @Test
   void embeddedRails() {
-    assertEquals(6.174, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
+    assertEquals(6.86, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
   }
 }

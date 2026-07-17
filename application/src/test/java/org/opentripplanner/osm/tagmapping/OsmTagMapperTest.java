@@ -475,7 +475,7 @@ class OsmTagMapperTest {
 
   @Test
   void embeddedRails() {
-    assertEquals(1.8, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
+    assertEquals(2.0, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
   }
 
   @Test

@@ -404,7 +404,7 @@ public class OsmTagMapper {
         new Not(new Condition.Equals("cycleway", "lane")),
         new Not(new Condition.Equals("cycleway:both", "lane"))
       ),
-      ofBicycleSafety(1.8)
+      ofBicycleSafety(2)
     );
 
     populateNotesAndNames(props);

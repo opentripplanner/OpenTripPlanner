@@ -244,7 +244,7 @@ class NorwayMapper extends OsmTagMapper {
         new Not(new Condition.Equals("cycleway", "lane")),
         new Not(new Condition.Equals("cycleway:both", "lane"))
       ),
-      ofBicycleSafety(1.8)
+      ofBicycleSafety(2)
     );
 
     // Discourage cycling and walking in road tunnels
