@@ -28,7 +28,7 @@ class GbfsFeedLoaderAndMapperTest {
   void fetchV30AutoConfigurationOnlyOnce() {
     var client = spyClient();
 
-    var loaderAndMapper = new GbfsFeedLoaderAndMapper(
+    var loaderAndMapper = GbfsFeedLoaderAndMapper.create(
       params("file:src/test/resources/gbfs/ridecheck/almere/gbfs.json"),
       factoryOf(client)
     );
@@ -41,7 +41,7 @@ class GbfsFeedLoaderAndMapperTest {
   void fetchV23AutoConfigurationOnlyOnce() {
     var client = spyClient();
 
-    var loaderAndMapper = new GbfsFeedLoaderAndMapper(
+    var loaderAndMapper = GbfsFeedLoaderAndMapper.create(
       params("file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json"),
       factoryOf(client)
     );
