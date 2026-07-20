@@ -1,18 +1,15 @@
 package org.opentripplanner.gbfs.v3;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeed;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeedName;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSGbfs;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.gbfs.GbfsConstructionException;
 import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class for managing the state and loading of complete GBFS version 3.0 datasets, and updating them according
@@ -21,38 +18,34 @@ import org.slf4j.LoggerFactory;
 public class GbfsFeedLoader
   extends GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoader.class);
-
+  /**
+   * Fetches the auto-configuration file from the given url and sets up updaters for the feeds
+   * listed in it.
+   */
   public GbfsFeedLoader(String url, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
-    super(fetchFeedInfo(url, httpHeaders, otpHttpClient), httpHeaders, otpHttpClient);
+    this(
+      url,
+      fetchAutoConfiguration(toUri(url), httpHeaders, otpHttpClient),
+      httpHeaders,
+      otpHttpClient
+    );
   }
 
-  private static List<GBFSFeedV30Details> fetchFeedInfo(
+  /**
+   * Sets up updaters for the feeds listed in an already fetched auto-configuration file, avoiding
+   * a second fetch of that file.
+   */
+  public GbfsFeedLoader(
     String url,
+    JsonNode autoConfiguration,
     HttpHeaders httpHeaders,
     OtpHttpClient otpHttpClient
   ) {
-    URI uri;
-    try {
-      uri = new URI(url);
-    } catch (URISyntaxException e) {
-      throw new GbfsConstructionException("Invalid url " + url);
-    }
+    super(feedInfo(url, autoConfiguration), httpHeaders, otpHttpClient);
+  }
 
-    // Fetch autoconfiguration file
-    GBFSGbfs data = fetchFeed(uri, httpHeaders, otpHttpClient, GBFSGbfs.class);
-    if (data == null) {
-      if (!url.endsWith("gbfs.json")) {
-        LOG.warn(
-          "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
-          url
-        );
-      }
-      throw new GbfsConstructionException(
-        "Could not fetch the feed auto-configuration file from " + uri
-      );
-    }
-
+  private static List<GBFSFeedV30Details> feedInfo(String url, JsonNode autoConfiguration) {
+    GBFSGbfs data = mapAutoConfiguration(autoConfiguration, url, GBFSGbfs.class);
     return data.getData().getFeeds().stream().map(GBFSFeedV30Details::new).toList();
   }
 

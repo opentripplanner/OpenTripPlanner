@@ -1,10 +1,6 @@
 package org.opentripplanner.gbfs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -26,17 +22,22 @@ public class GbfsFeedLoaderAndMapper {
   public GbfsFeedLoaderAndMapper(
     GbfsDataSourceParameters params,
     OtpHttpClientFactory otpHttpClientFactory
-  ) throws URISyntaxException {
-    URI uri = new URI(params.url());
-
+  ) {
     var client = otpHttpClientFactory.create(LOG);
-    var gbfsNode = client.getAndMapAsJsonNode(uri, HttpHeaders.empty(), new ObjectMapper());
-    var gbfsFeedVersion = JsonUtils.asText(gbfsNode, "version").orElse(null);
+    // The auto-configuration file is fetched once as a JSON tree and handed over to the
+    // version-specific loader, since some servers throttle repeated fetches of the same file.
+    var autoConfiguration = GbfsFeedLoaderImpl.fetchAutoConfiguration(
+      GbfsFeedLoaderImpl.toUri(params.url()),
+      params.httpHeaders(),
+      client
+    );
+    var gbfsFeedVersion = JsonUtils.asText(autoConfiguration, "version").orElse(null);
 
     switch (gbfsFeedVersion) {
       case "3.0" -> {
         var loaderv30 = new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
           params.url(),
+          autoConfiguration,
           params.httpHeaders(),
           client
         );
@@ -53,6 +54,7 @@ public class GbfsFeedLoaderAndMapper {
         }
         var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
           params.url(),
+          autoConfiguration,
           params.httpHeaders(),
           params.language(),
           client
@@ -63,6 +65,7 @@ public class GbfsFeedLoaderAndMapper {
       case null -> {
         var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
           params.url(),
+          autoConfiguration,
           params.httpHeaders(),
           params.language(),
           client
