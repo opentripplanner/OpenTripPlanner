@@ -1,6 +1,5 @@
 package org.opentripplanner.gbfs.v2;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.util.List;
 import org.mobilitydata.gbfs.v2_3.gbfs.GBFS;
@@ -9,6 +8,7 @@ import org.mobilitydata.gbfs.v2_3.gbfs.GBFSFeedName;
 import org.mobilitydata.gbfs.v2_3.gbfs.GBFSFeeds;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.opentripplanner.gbfs.GbfsConstructionException;
 import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
@@ -24,15 +24,14 @@ public class GbfsFeedLoader
    * Fetches the auto-configuration file from the given url and sets up updaters for the feeds
    * listed in it.
    */
-  public GbfsFeedLoader(
+  public static GbfsFeedLoader create(
     String url,
     HttpHeaders httpHeaders,
     String languageCode,
     OtpHttpClient otpHttpClient
   ) {
-    this(
-      url,
-      fetchAutoConfiguration(toUri(url), httpHeaders, otpHttpClient),
+    return create(
+      GbfsAutoConfiguration.fetch(url, httpHeaders, otpHttpClient),
       httpHeaders,
       languageCode,
       otpHttpClient
@@ -43,22 +42,13 @@ public class GbfsFeedLoader
    * Sets up updaters for the feeds listed in an already fetched auto-configuration file, avoiding
    * a second fetch of that file.
    */
-  public GbfsFeedLoader(
-    String url,
-    JsonNode autoConfiguration,
+  public static GbfsFeedLoader create(
+    GbfsAutoConfiguration autoConfiguration,
     HttpHeaders httpHeaders,
     String languageCode,
     OtpHttpClient otpHttpClient
   ) {
-    super(feedInfo(url, autoConfiguration, languageCode), httpHeaders, otpHttpClient);
-  }
-
-  private static List<GBFSFeedV23Details> feedInfo(
-    String url,
-    JsonNode autoConfiguration,
-    String languageCode
-  ) {
-    GBFS data = mapAutoConfiguration(autoConfiguration, url, GBFS.class);
+    GBFS data = autoConfiguration.mapTo(GBFS.class);
 
     // Pick first language if none defined
     GBFSFeeds feeds = languageCode == null
@@ -66,11 +56,20 @@ public class GbfsFeedLoader
       : data.getFeedsData().get(languageCode);
     if (feeds == null) {
       throw new GbfsConstructionException(
-        "Language " + languageCode + " does not exist in feed " + url
+        "Language " + languageCode + " does not exist in feed " + autoConfiguration.url()
       );
     }
 
-    return feeds.getFeeds().stream().map(GBFSFeedV23Details::new).toList();
+    var feedDetails = feeds.getFeeds().stream().map(GBFSFeedV23Details::new).toList();
+    return new GbfsFeedLoader(feedDetails, httpHeaders, otpHttpClient);
+  }
+
+  private GbfsFeedLoader(
+    List<GBFSFeedV23Details> feeds,
+    HttpHeaders httpHeaders,
+    OtpHttpClient otpHttpClient
+  ) {
+    super(feeds, httpHeaders, otpHttpClient);
   }
 
   @Override

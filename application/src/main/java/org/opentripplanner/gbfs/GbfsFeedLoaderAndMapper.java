@@ -2,7 +2,6 @@ package org.opentripplanner.gbfs;
 
 import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.slf4j.Logger;
@@ -24,19 +23,14 @@ public class GbfsFeedLoaderAndMapper {
     OtpHttpClientFactory otpHttpClientFactory
   ) {
     var client = otpHttpClientFactory.create(LOG);
-    // The auto-configuration file is fetched once as a JSON tree and handed over to the
-    // version-specific loader, since some servers throttle repeated fetches of the same file.
-    var autoConfiguration = GbfsFeedLoaderImpl.fetchAutoConfiguration(
-      GbfsFeedLoaderImpl.toUri(params.url()),
-      params.httpHeaders(),
-      client
-    );
-    var gbfsFeedVersion = JsonUtils.asText(autoConfiguration, "version").orElse(null);
+    // Fetched once and handed over to the version-specific loader, since some servers throttle
+    // repeated fetches of the same file.
+    var autoConfiguration = GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), client);
+    var gbfsFeedVersion = autoConfiguration.version().orElse(null);
 
     switch (gbfsFeedVersion) {
       case "3.0" -> {
-        var loaderv30 = new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
-          params.url(),
+        var loaderv30 = org.opentripplanner.gbfs.v3.GbfsFeedLoader.create(
           autoConfiguration,
           params.httpHeaders(),
           client
@@ -52,8 +46,7 @@ public class GbfsFeedLoaderAndMapper {
             gbfsFeedVersion
           );
         }
-        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-          params.url(),
+        var loaderv23 = org.opentripplanner.gbfs.v2.GbfsFeedLoader.create(
           autoConfiguration,
           params.httpHeaders(),
           params.language(),
@@ -63,8 +56,7 @@ public class GbfsFeedLoaderAndMapper {
         mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loaderv23, params);
       }
       case null -> {
-        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-          params.url(),
+        var loaderv23 = org.opentripplanner.gbfs.v2.GbfsFeedLoader.create(
           autoConfiguration,
           params.httpHeaders(),
           params.language(),

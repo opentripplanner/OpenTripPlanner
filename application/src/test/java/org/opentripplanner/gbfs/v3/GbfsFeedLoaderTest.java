@@ -31,7 +31,7 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV30Feed() {
-    GbfsFeedLoader loader = new GbfsFeedLoader(
+    GbfsFeedLoader loader = GbfsFeedLoader.create(
       "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
       HttpHeaders.empty(),
       OTP_HTTP_CLIENT

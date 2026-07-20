@@ -47,7 +47,7 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV22FeedWithExplicitLanguage() {
-    GbfsFeedLoader loader = new GbfsFeedLoader(
+    GbfsFeedLoader loader = GbfsFeedLoader.create(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_NB,
@@ -59,7 +59,7 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV22FeedWithNoLanguage() {
-    GbfsFeedLoader loader = new GbfsFeedLoader(
+    GbfsFeedLoader loader = GbfsFeedLoader.create(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
       null,
@@ -72,7 +72,7 @@ class GbfsFeedLoaderTest {
   @Test
   void getV22FeedWithWrongLanguage() {
     assertThrows(RuntimeException.class, () ->
-      new GbfsFeedLoader(
+      GbfsFeedLoader.create(
         "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
         HttpHeaders.empty(),
         LANGUAGE_EN,
@@ -83,7 +83,7 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV10FeedWithExplicitLanguage() {
-    GbfsFeedLoader loader = new GbfsFeedLoader(
+    GbfsFeedLoader loader = GbfsFeedLoader.create(
       "file:src/test/resources/gbfs/helsinki/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_EN,
@@ -106,7 +106,7 @@ class GbfsFeedLoaderTest {
         while (reader.readRecord()) {
           try {
             String url = reader.get("Auto-Discovery URL");
-            new GbfsFeedLoader(url, HttpHeaders.empty(), null, OTP_HTTP_CLIENT).update();
+            GbfsFeedLoader.create(url, HttpHeaders.empty(), null, OTP_HTTP_CLIENT).update();
           } catch (Exception e) {
             cvsExceptions.add(e);
           }
@@ -125,7 +125,7 @@ class GbfsFeedLoaderTest {
   @Test
   @Disabled
   void testSpin() {
-    new GbfsFeedLoader(
+    GbfsFeedLoader.create(
       "https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs",
       HttpHeaders.empty(),
       null,
@@ -135,7 +135,7 @@ class GbfsFeedLoaderTest {
 
   @Test
   void geofencingZones() {
-    GbfsFeedLoader loader = new GbfsFeedLoader(
+    GbfsFeedLoader loader = GbfsFeedLoader.create(
       "file:src/test/resources/gbfs/tieroslo/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_EN,

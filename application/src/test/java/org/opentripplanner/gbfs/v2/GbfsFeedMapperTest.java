@@ -45,7 +45,7 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(
+    var loader = GbfsFeedLoader.create(
       params.url(),
       params.httpHeaders(),
       params.language(),
@@ -256,7 +256,7 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(
+    var loader = GbfsFeedLoader.create(
       params.url(),
       params.httpHeaders(),
       params.language(),
@@ -319,7 +319,7 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(
+    var loader = GbfsFeedLoader.create(
       params.url(),
       params.httpHeaders(),
       params.language(),
@@ -350,7 +350,7 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(
+    var loader = GbfsFeedLoader.create(
       params.url(),
       params.httpHeaders(),
       params.language(),

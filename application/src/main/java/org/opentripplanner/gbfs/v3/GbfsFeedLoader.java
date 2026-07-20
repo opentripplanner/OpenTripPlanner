@@ -1,6 +1,5 @@
 package org.opentripplanner.gbfs.v3;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.util.List;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeed;
@@ -8,6 +7,7 @@ import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeedName;
 import org.mobilitydata.gbfs.v3_0.gbfs.GBFSGbfs;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
 
@@ -22,10 +22,13 @@ public class GbfsFeedLoader
    * Fetches the auto-configuration file from the given url and sets up updaters for the feeds
    * listed in it.
    */
-  public GbfsFeedLoader(String url, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
-    this(
-      url,
-      fetchAutoConfiguration(toUri(url), httpHeaders, otpHttpClient),
+  public static GbfsFeedLoader create(
+    String url,
+    HttpHeaders httpHeaders,
+    OtpHttpClient otpHttpClient
+  ) {
+    return create(
+      GbfsAutoConfiguration.fetch(url, httpHeaders, otpHttpClient),
       httpHeaders,
       otpHttpClient
     );
@@ -35,18 +38,27 @@ public class GbfsFeedLoader
    * Sets up updaters for the feeds listed in an already fetched auto-configuration file, avoiding
    * a second fetch of that file.
    */
-  public GbfsFeedLoader(
-    String url,
-    JsonNode autoConfiguration,
+  public static GbfsFeedLoader create(
+    GbfsAutoConfiguration autoConfiguration,
     HttpHeaders httpHeaders,
     OtpHttpClient otpHttpClient
   ) {
-    super(feedInfo(url, autoConfiguration), httpHeaders, otpHttpClient);
+    var feeds = autoConfiguration
+      .mapTo(GBFSGbfs.class)
+      .getData()
+      .getFeeds()
+      .stream()
+      .map(GBFSFeedV30Details::new)
+      .toList();
+    return new GbfsFeedLoader(feeds, httpHeaders, otpHttpClient);
   }
 
-  private static List<GBFSFeedV30Details> feedInfo(String url, JsonNode autoConfiguration) {
-    GBFSGbfs data = mapAutoConfiguration(autoConfiguration, url, GBFSGbfs.class);
-    return data.getData().getFeeds().stream().map(GBFSFeedV30Details::new).toList();
+  private GbfsFeedLoader(
+    List<GBFSFeedV30Details> feeds,
+    HttpHeaders httpHeaders,
+    OtpHttpClient otpHttpClient
+  ) {
+    super(feeds, httpHeaders, otpHttpClient);
   }
 
   @Override

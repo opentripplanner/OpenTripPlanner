@@ -1,12 +1,9 @@
 package org.opentripplanner.gbfs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -100,65 +97,6 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
   protected abstract <T> N nameForClass(Class<T> feed);
 
   protected abstract <T> Class<T> classForName(N name);
-
-  /**
-   * Fetches the GBFS auto-configuration file (gbfs.json) and returns it as a JSON tree. Returning
-   * the raw tree allows the caller to determine the GBFS version before mapping the file onto the
-   * version-specific model with {@link #mapAutoConfiguration(JsonNode, String, Class)}, so the
-   * file needs to be fetched only once. Some servers throttle or fail repeated requests for the
-   * same resource, so the file must not be fetched twice during setup.
-   */
-  public static JsonNode fetchAutoConfiguration(
-    URI uri,
-    HttpHeaders httpHeaders,
-    OtpHttpClient otpHttpClient
-  ) {
-    try {
-      return otpHttpClient.getAndMapAsJsonNode(uri, httpHeaders, OBJECT_MAPPER);
-    } catch (OtpHttpClientException e) {
-      LOG.warn("Error fetching GBFS feed from {}. Details: {}.", uri, e.getMessage(), e);
-      if (!uri.toString().endsWith("gbfs.json")) {
-        LOG.warn(
-          "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
-          uri
-        );
-      }
-      throw new GbfsConstructionException(
-        "Could not fetch the feed auto-configuration file from " + uri
-      );
-    }
-  }
-
-  /**
-   * Maps an already fetched auto-configuration file onto the version-specific model class.
-   */
-  protected static <T> T mapAutoConfiguration(
-    JsonNode autoConfiguration,
-    String url,
-    Class<T> clazz
-  ) {
-    try {
-      return OBJECT_MAPPER.treeToValue(autoConfiguration, clazz);
-    } catch (JsonProcessingException e) {
-      LOG.warn(
-        "Error parsing GBFS auto-configuration file from {}. Details: {}.",
-        url,
-        e.getMessage(),
-        e
-      );
-      throw new GbfsConstructionException(
-        "Could not parse the feed auto-configuration file from " + url
-      );
-    }
-  }
-
-  protected static URI toUri(String url) {
-    try {
-      return new URI(url);
-    } catch (URISyntaxException e) {
-      throw new GbfsConstructionException("Invalid url " + url);
-    }
-  }
 
   /**
    * Fetches a feed with conditional request support (ETag/If-None-Match).
