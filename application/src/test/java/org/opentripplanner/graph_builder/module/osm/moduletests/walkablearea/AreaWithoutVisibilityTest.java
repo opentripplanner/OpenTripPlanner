@@ -28,13 +28,14 @@ class AreaWithoutVisibilityTest {
     var br = node(3, new WgsCoordinate(0, 0.001));
     var area = List.of(bl, tl, tr, br);
 
-    // Footway that touches corner bl — would normally make bl a startingNode,
-    // but with visibility disabled there is no visibility graph at all.
-    var outside = node(4, new WgsCoordinate(-0.001, 0));
+    // Footways that touches corner bl and tr
+    var outside1 = node(4, new WgsCoordinate(-0.001, 0));
+    var outside2 = node(5, new WgsCoordinate(0.002, 0));
 
     var provider = TestOsmProvider.of()
       .addAreaFromNodes(area)
-      .addWayFromNodes(way -> way.withTag("highway", "footway"), outside, bl)
+      .addWayFromNodes(way -> way.withTag("highway", "footway"), outside1, bl)
+      .addWayFromNodes(way -> way.withTag("highway", "footway"), outside2, tr)
       .build();
 
     var graph = new Graph();
@@ -50,9 +51,12 @@ class AreaWithoutVisibilityTest {
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
       .containsExactly(
-        // footway from outside to bl
+        // footway from outside1 to bl
         "(0,0) → (-0.001,0) PEDESTRIAN ♿✅",
         "(-0.001,0) → (0,0) PEDESTRIAN ♿✅",
+        // footway from outside2 to tr
+        "(0.001,0.001) → (0.002,0) PEDESTRIAN ♿✅",
+        "(0.002,0) → (0.001,0.001) PEDESTRIAN ♿✅",
         // ring: all 4 segments × 2 directions, no visibility edges added
         "(0,0) → (0.001,0) PEDESTRIAN ♿✅",
         "(0.001,0) → (0,0) PEDESTRIAN ♿✅",
