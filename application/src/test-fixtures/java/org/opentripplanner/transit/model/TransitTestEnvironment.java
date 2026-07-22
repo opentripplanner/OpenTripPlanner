@@ -128,6 +128,16 @@ public final class TransitTestEnvironment {
     return updateManager;
   }
 
+  /**
+   * The registry backing {@link #timetableHandle()} and {@link #updateManager()}. Use it to
+   * register additional transactional repositories in the same transaction sequence as the
+   * timetable, or to create a {@link org.opentripplanner.framework.transaction.api.TransactionScope}
+   * for resolving committed snapshots.
+   */
+  public RepositoryRegistry repositoryRegistry() {
+    return repositoryRegistry;
+  }
+
   public TimetableRepositorySnapshot timetableSnapshot() {
     return timetableHandle.repositorySnapshot(repositoryRegistry.scope());
   }
