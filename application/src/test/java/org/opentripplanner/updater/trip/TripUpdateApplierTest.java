@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -27,10 +27,10 @@ class TripUpdateApplierTest {
 
   private static final LocalDate TODAY = LocalDate.of(2024, Month.MAY, 30);
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
-  private static final Route ROUTE = TimetableRepositoryForTest.route("route1").build();
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("trip1").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("route1").build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip("trip1").build();
   private static final RegularStop STOP_1 = TEST_MODEL.stop("S1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("S2").build();
   private static final RegularStop STOP_3 = TEST_MODEL.stop("S3").build();
@@ -44,31 +44,31 @@ class TripUpdateApplierTest {
    * Scheduled pattern (stops S1, S2) with the trip in its scheduled timetable. Phase 2 of
    * apply() reads from the scheduled timetable to create a DELETED entry.
    */
-  private static final TripPattern SCHEDULED_PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final TripPattern SCHEDULED_PATTERN = TransitRepositoryForTest.tripPattern(
     "sched",
     ROUTE
   )
-    .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_1, STOP_2))
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_1, STOP_2))
     .withScheduledTimeTableBuilder(ttb -> ttb.addTripTimes(SCHEDULED_TRIP_TIMES))
     .build();
 
   /**
    * Modified pattern (stops S1, S3) flagged as real-time stop-pattern-modified.
    */
-  private static final TripPattern MODIFIED_PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final TripPattern MODIFIED_PATTERN = TransitRepositoryForTest.tripPattern(
     "modified",
     ROUTE
   )
-    .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_1, STOP_3))
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_1, STOP_3))
     .withRealTimeStopPatternModified()
     .build();
 
   /** A second modified pattern (stops S2, S3) for the all-three-phases test. */
-  private static final TripPattern SECOND_MODIFIED_PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final TripPattern SECOND_MODIFIED_PATTERN = TransitRepositoryForTest.tripPattern(
     "modified2",
     ROUTE
   )
-    .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_2, STOP_3))
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_2, STOP_3))
     .withRealTimeStopPatternModified()
     .build();
 

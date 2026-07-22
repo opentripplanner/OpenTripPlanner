@@ -15,13 +15,13 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
  */
 public class TripTimesForTest {
 
-  private static final TimetableRepositoryForTest REPO = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest REPO = TransitRepositoryForTest.of();
 
   /**
    * A minimal {@link ScheduledTripTimes} with two stops and no real-time updates.
    */
   public static TripTimes scheduled() {
-    Trip trip = TimetableRepositoryForTest.trip("test-trip").build();
+    Trip trip = TransitRepositoryForTest.trip("test-trip").build();
     var stop1 = REPO.stop("A", 0.0, 0.0).build();
     var stop2 = REPO.stop("B", 0.0, 0.0).build();
 

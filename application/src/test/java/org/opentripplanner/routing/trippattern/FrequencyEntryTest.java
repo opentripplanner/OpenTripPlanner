@@ -9,7 +9,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
@@ -23,7 +23,7 @@ public class FrequencyEntryTest {
   private static final ScheduledTripTimes TRIP_TIMES;
 
   static {
-    Trip trip = TimetableRepositoryForTest.trip("testtrip").build();
+    Trip trip = TransitRepositoryForTest.trip("testtrip").build();
 
     List<StopTime> stopTimes = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class FrequencyEntryTest {
     for (int i = 0; i < STOP_NUM; ++i) {
       FeedScopedId id = FeedScopedIdForTestFactory.id(i + "");
 
-      RegularStop stop = TimetableRepositoryForTest.of().stop(id.getId(), 0.0, 0.0).build();
+      RegularStop stop = TransitRepositoryForTest.of().stop(id.getId(), 0.0, 0.0).build();
 
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);

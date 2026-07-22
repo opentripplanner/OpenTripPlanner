@@ -18,7 +18,7 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -32,7 +32,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
 
@@ -40,9 +40,9 @@ class ModifiedTripBuilderTest {
 
   /* Transit model */
 
-  private static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
+  private static final Agency AGENCY = TransitRepositoryForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Station STATION_A = TEST_MODEL.station("A").build();
   private static final Station STATION_B = TEST_MODEL.station("B").build();
   private static final Station STATION_C = TEST_MODEL.station("C").build();
@@ -61,20 +61,20 @@ class ModifiedTripBuilderTest {
     .build();
   private static final RegularStop STOP_D = TEST_MODEL.stop("D").build();
 
-  private static final Route ROUTE = TimetableRepositoryForTest.route("ROUTE_ID")
+  private static final Route ROUTE = TransitRepositoryForTest.route("ROUTE_ID")
     .withAgency(AGENCY)
     .build();
 
-  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
     "PATTERN_ID",
     ROUTE
   )
-    .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
     .build();
 
   private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("CAL_1");
 
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP")
+  private static final Trip TRIP = TransitRepositoryForTest.trip("TRIP")
     .withRoute(ROUTE)
     .withServiceId(SERVICE_ID)
     .build();
@@ -122,14 +122,14 @@ class ModifiedTripBuilderTest {
     .withRegularStop(STOP_C_1)
     .withRegularStop(STOP_D)
     .build();
-  private final TimetableRepository timetableRepository = new TimetableRepository(siteRepository);
+  private final TransitRepository transitRepository = new TransitRepository(siteRepository);
   private EntityResolver entityResolver;
 
   @BeforeEach
   void setUp() {
     // Add entities to transit model for the entity resolver
-    timetableRepository.addAgency(AGENCY);
-    timetableRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    transitRepository.addAgency(AGENCY);
+    transitRepository.addTripPattern(PATTERN.getId(), PATTERN);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -137,16 +137,16 @@ class ModifiedTripBuilderTest {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    timetableRepository.getServiceCodes().put(SERVICE_ID, 0);
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.getServiceCodes().put(SERVICE_ID, 0);
+    transitRepository.updateCalendarServiceData(calendarServiceData);
 
     // Create transit model index
-    timetableRepository.index();
+    transitRepository.index();
 
     // Create the entity resolver only after the model has been indexed
     entityResolver = new EntityResolver(
-      new DefaultTransitService(timetableRepository),
-      TimetableRepositoryForTest.FEED_ID
+      new DefaultTransitService(transitRepository),
+      TransitRepositoryForTest.FEED_ID
     );
   }
 
@@ -156,7 +156,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(),
       false,
@@ -176,7 +176,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -216,7 +216,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -262,7 +262,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -305,7 +305,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -351,7 +351,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -527,7 +527,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()
@@ -567,7 +567,7 @@ class ModifiedTripBuilderTest {
       TRIP_TIMES,
       PATTERN,
       SERVICE_DATE,
-      timetableRepository.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver,
       List.of(
         TestCall.of()

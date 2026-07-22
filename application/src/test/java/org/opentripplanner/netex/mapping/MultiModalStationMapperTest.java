@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.rutebanken.netex.model.StopPlace;
 
 class MultiModalStationMapperTest {
@@ -18,7 +18,7 @@ class MultiModalStationMapperTest {
   void testMissingCoordinates() {
     DataImportIssueStore dataIssueStore = new DefaultDataImportIssueStore();
     FeedScopedIdFactory feedScopeIdFactory = new FeedScopedIdFactory(
-      TimetableRepositoryForTest.FEED_ID
+      TransitRepositoryForTest.FEED_ID
     );
     MultiModalStationMapper multiModalStationMapper = new MultiModalStationMapper(
       dataIssueStore,

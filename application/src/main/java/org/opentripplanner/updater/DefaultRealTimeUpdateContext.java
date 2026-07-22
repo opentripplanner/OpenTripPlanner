@@ -3,7 +3,7 @@ package org.opentripplanner.updater;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
@@ -19,7 +19,7 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
    * all in-progress real-time additions that have not yet been committed to a published snapshot.
    * <p>
    * A {@link MutableTimetableSnapshot} cannot be used directly for these lookups, because every
-   * lookup must also fall back to scheduled data in the {@link TimetableRepository} when an entity
+   * lookup must also fall back to scheduled data in the {@link TransitRepository} when an entity
    * is not found in the real-time snapshot. The {@link DefaultTransitService} combines both: it
    * checks the snapshot first, then falls back to the static index.
    * <p>
@@ -32,19 +32,19 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
    */
   public DefaultRealTimeUpdateContext(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     MutableTimetableSnapshot timetableSnapshotBuffer
   ) {
     this.graph = graph;
     this.timetableSnapshotBuffer = timetableSnapshotBuffer;
-    this.transitService = new DefaultTransitService(timetableRepository, timetableSnapshotBuffer);
+    this.transitService = new DefaultTransitService(transitRepository, timetableSnapshotBuffer);
   }
 
   /**
    * Constructor for unit tests only.
    */
-  public DefaultRealTimeUpdateContext(Graph graph, TimetableRepository timetableRepository) {
-    this(graph, timetableRepository, null);
+  public DefaultRealTimeUpdateContext(Graph graph, TransitRepository transitRepository) {
+    this(graph, transitRepository, null);
   }
 
   @Override

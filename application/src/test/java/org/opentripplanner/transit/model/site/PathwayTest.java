@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class PathwayTest {
 
@@ -20,7 +20,7 @@ class PathwayTest {
   private static final PathwayNode FROM = PathwayNode.of(FeedScopedIdForTestFactory.id("1:node"))
     .withCoordinate(new WgsCoordinate(20, 30))
     .build();
-  private static final RegularStop TO = TimetableRepositoryForTest.of().stop("1:stop").build();
+  private static final RegularStop TO = TransitRepositoryForTest.of().stop("1:stop").build();
   public static final int TRAVERSAL_TIME = 120;
 
   private final Pathway subject = Pathway.of(FeedScopedIdForTestFactory.id(ID))

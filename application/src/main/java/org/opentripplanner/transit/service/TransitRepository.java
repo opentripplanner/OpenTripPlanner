@@ -58,28 +58,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The TimetableRepository groups together all instances making up OTP's primary internal representation
+ * The TransitRepository groups together all instances making up OTP's primary internal representation
  * of the public transportation network. Although the names of many entities are derived from
  * GTFS concepts, these are actually independent of the data source from which they are loaded.
  * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
  * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
  * only in NeTEx, the NeTEx name is used in the internal model.
  * <p>
- * A TimetableRepository instance also includes references to some transient indexes of its contents, to
+ * A TransitRepository instance also includes references to some transient indexes of its contents, to
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
  * <p>
- * The TimetableRepository stands in opposition to two other aggregates: the Graph (representing the
- * street network) and the RaptorTransitData (representing many of the same things in the TimetableRepository
+ * The TransitRepository stands in opposition to two other aggregates: the Graph (representing the
+ * street network) and the RaptorTransitData (representing many of the same things in the TransitRepository
  * but rearranged to be more efficient for Raptor routing).
  * <p>
- * At this point the TimetableRepository is not often read directly. Many requests will look at the
- * RaptorTransitData rather than the TimetableRepository it's derived from. Both are often accessed via the
- * TransitService rather than directly reading the fields of TimetableRepository or RaptorTransitData.
+ * At this point the TransitRepository is not often read directly. Many requests will look at the
+ * RaptorTransitData rather than the TransitRepository it's derived from. Both are often accessed via the
+ * TransitService rather than directly reading the fields of TransitRepository or RaptorTransitData.
  */
-public class TimetableRepository implements Serializable {
+public class TransitRepository implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableRepository.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitRepository.class);
   private static final PowerOfTwoThrottle FREEZE_LOG_THROTTLE = new PowerOfTwoThrottle();
 
   private final Collection<Agency> agencies = new ArrayList<>();
@@ -94,14 +94,14 @@ public class TimetableRepository implements Serializable {
   private SiteRepository siteRepository;
 
   /**
-   * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TimetableRepository's
+   * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TransitRepository's
    * scheduled (non-realtime) contents.
    */
   private transient RaptorTransitData raptorTransitData;
 
   private final DefaultTripCalendars tripCalendar = new DefaultTripCalendars();
 
-  private transient TimetableRepositoryIndex index;
+  private transient TransitRepositoryIndex index;
   private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
 
@@ -127,12 +127,12 @@ public class TimetableRepository implements Serializable {
   private boolean frozen = false;
 
   @Inject
-  public TimetableRepository(SiteRepository siteRepository) {
+  public TransitRepository(SiteRepository siteRepository) {
     this.siteRepository = Objects.requireNonNull(siteRepository);
   }
 
   /** No-argument constructor, required for deserialization. */
-  public TimetableRepository() {
+  public TransitRepository() {
     this(new SiteRepository());
   }
 
@@ -146,7 +146,7 @@ public class TimetableRepository implements Serializable {
     if (index == null) {
       LOG.info("Index timetable repository...");
       this.tripCalendar.initializeServiceCodes();
-      this.index = new TimetableRepositoryIndex(this);
+      this.index = new TransitRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }
   }
@@ -358,7 +358,7 @@ public class TimetableRepository implements Serializable {
 
   /**
    * Returns the alert service. If no updaters are configured an empty instance is returned.
-   * See  {@link TimetableRepository#initUpdaterManager(GraphUpdaterManager)}.
+   * See  {@link TransitRepository#initUpdaterManager(GraphUpdaterManager)}.
    */
   public TransitAlertService getTransitAlertService() {
     if (transitAlertService == null) {
@@ -535,7 +535,7 @@ public class TimetableRepository implements Serializable {
    * possibility that the index is not initialized (during graph build).
    */
   @Nullable
-  TimetableRepositoryIndex getTimetableRepositoryIndex() {
+  TransitRepositoryIndex getTransitRepositoryIndex() {
     return index;
   }
 
@@ -610,7 +610,7 @@ public class TimetableRepository implements Serializable {
         LOG.warn(
           """
           THIS SHOULD NOT HAPPEN
-          Attempting to modify TimetableRepository after it has been frozen.
+          Attempting to modify TransitRepository after it has been frozen.
           Count: {}
           """,
           n,

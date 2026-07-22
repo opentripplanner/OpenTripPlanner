@@ -31,12 +31,12 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * A builder for timetable repository to simplify setting up timetable entities for tests
  */
-public class TimetableRepositoryTestBuilder {
+public class TransitRepositoryTestBuilder {
 
   private final List<Agency> agencies = new ArrayList<>();
   private final List<Operator> operators = new ArrayList<>();
@@ -55,7 +55,7 @@ public class TimetableRepositoryTestBuilder {
   private final Agency defaultAgency;
   private final Route defaultRoute;
 
-  TimetableRepositoryTestBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
+  TransitRepositoryTestBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.timeZone = timeZone;
     this.defaultServiceDate = defaultServiceDate;
 
@@ -63,53 +63,53 @@ public class TimetableRepositoryTestBuilder {
     defaultRoute = route("Route1");
   }
 
-  public TimetableRepository build(SiteRepository siteRepository) {
-    var timetableRepository = new TimetableRepository(siteRepository);
-    timetableRepository.initTimeZone(timeZone);
+  public TransitRepository build(SiteRepository siteRepository) {
+    var transitRepository = new TransitRepository(siteRepository);
+    transitRepository.initTimeZone(timeZone);
 
     for (var agency : agencies) {
-      timetableRepository.addAgency(agency);
+      transitRepository.addAgency(agency);
     }
 
-    timetableRepository.addOperators(operators);
+    transitRepository.addOperators(operators);
 
     for (TripPattern tripPattern : tripPatterns.values()) {
-      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     for (var flexTrip : flexTrips) {
-      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      transitRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
 
     for (TripOnServiceDate tripOnServiceDate : tripOnServiceDates) {
-      timetableRepository.addTripOnServiceDate(tripOnServiceDate);
+      transitRepository.addTripOnServiceDate(tripOnServiceDate);
     }
 
     var calendarServiceData = new CalendarServiceData();
     int serviceCodeCounter = 0;
     for (var serviceCode : serviceCodes.values()) {
       calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
-      timetableRepository.getServiceCodes().put(serviceCode.id(), serviceCodeCounter);
+      transitRepository.getServiceCodes().put(serviceCode.id(), serviceCodeCounter);
       serviceCodeCounter += 1;
     }
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.updateCalendarServiceData(calendarServiceData);
 
-    timetableRepository
+    transitRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
-        pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+        pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
       });
 
-    timetableRepository
+    transitRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
-        pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+        pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
       });
 
-    timetableRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
+    transitRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
 
-    timetableRepository.index();
-    return timetableRepository;
+    transitRepository.index();
+    return transitRepository;
   }
 
   public Agency agency(String id) {
@@ -219,7 +219,7 @@ public class TimetableRepositoryTestBuilder {
     return trip;
   }
 
-  public TimetableRepositoryTestBuilder addScheduledStopPointMapping(
+  public TransitRepositoryTestBuilder addScheduledStopPointMapping(
     FeedScopedId scheduledStopPointId,
     RegularStop stop
   ) {

@@ -34,7 +34,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    transitService = new DefaultTransitService(timetableRepository);
+    transitService = new DefaultTransitService(transitRepository);
   }
 
   @Override
@@ -47,7 +47,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     /* Graph vertices */
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex tsv) {
-        RegularStop stop = timetableRepository.getSiteRepository().getRegularStop(tsv.getId());
+        RegularStop stop = transitRepository.getSiteRepository().getRegularStop(tsv.getId());
         Vertex index_vertex = graph.getStopVertex(stop.getId());
         assertEquals(index_vertex, vertex);
       }

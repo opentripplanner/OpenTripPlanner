@@ -69,7 +69,7 @@ import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
@@ -116,7 +116,7 @@ public interface ConstructApplicationFactory {
   Graph graph();
   LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();
-  TimetableRepository timetableRepository();
+  TransitRepository transitRepository();
   TransferRepository transferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
@@ -189,7 +189,7 @@ public interface ConstructApplicationFactory {
     Builder graph(Graph graph);
 
     @BindsInstance
-    Builder timetableRepository(TimetableRepository timetableRepository);
+    Builder transitRepository(TransitRepository transitRepository);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

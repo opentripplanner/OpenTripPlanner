@@ -10,7 +10,7 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class VectorTilesResourceTest {
 
@@ -21,7 +21,7 @@ class VectorTilesResourceTest {
     var resource = new VectorTilesResource(
       TestServerContext.createServerContext(
         new Graph(),
-        new TimetableRepository(),
+        new TransitRepository(),
         TransferServiceTestFactory.defaultTransferRepository(),
         new DefaultFareService()
       ),

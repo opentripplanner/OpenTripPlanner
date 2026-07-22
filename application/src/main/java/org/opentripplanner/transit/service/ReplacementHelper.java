@@ -32,24 +32,24 @@ public class ReplacementHelper {
   );
 
   private final TransitService transitService;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   @Nullable
   private final ReadOnlyTimetableSnapshot timetableSnapshot;
 
   public ReplacementHelper(
     TransitService transitService,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     @Nullable ReadOnlyTimetableSnapshot timetableSnapshot
   ) {
     this.transitService = transitService;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.timetableSnapshot = timetableSnapshot;
   }
 
   public Collection<ReplacedByRelation> getReplacedBy(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
-    var replacedBy = timetableRepository.getReplacedByTripOnServiceDate(id);
+    var replacedBy = transitRepository.getReplacedByTripOnServiceDate(id);
     Stream<TripOnServiceDate> tripsOnServiceDate;
     if (timetableSnapshot != null) {
       tripsOnServiceDate = Stream.concat(
@@ -96,7 +96,7 @@ public class ReplacementHelper {
   private boolean hasReplacedByTripOnServiceDates(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
     return (
-      !timetableRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
+      !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
       (timetableSnapshot != null &&
         timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
     );

@@ -6,7 +6,7 @@ import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,25 +28,25 @@ public class GraphWriterService implements WriteToGraphCallback {
     MutableTimetableSnapshot
   > timetableHandle;
   private final Graph graph;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   public GraphWriterService(
     UpdateManager updateManager,
     RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle,
     Graph graph,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     this.updateManager = updateManager;
     this.timetableHandle = timetableHandle;
     this.graph = graph;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
   }
 
   @Override
   public Future<Void> execute(GraphWriterRunnable runnable) {
     return updateManager.submit(ctx -> {
       var mutableSnapshot = ctx.repository(timetableHandle);
-      var context = new DefaultRealTimeUpdateContext(graph, timetableRepository, mutableSnapshot);
+      var context = new DefaultRealTimeUpdateContext(graph, transitRepository, mutableSnapshot);
       try {
         runnable.run(context);
       } catch (Exception e) {

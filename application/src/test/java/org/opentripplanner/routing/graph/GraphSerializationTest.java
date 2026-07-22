@@ -54,7 +54,7 @@ import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -106,7 +106,7 @@ public class GraphSerializationTest {
       osmGraphBuildRepository,
       streetDetailsRepository,
       streetRepository,
-      model.timetableRepository(),
+      model.transitRepository(),
       model.transferRepository(),
       weRepo,
       parkingRepository,
@@ -139,7 +139,7 @@ public class GraphSerializationTest {
       osmGraphBuildRepository,
       streetDetailsRepository,
       streetRepository,
-      model.timetableRepository(),
+      model.transitRepository(),
       model.transferRepository(),
       worldEnvelopeRepository,
       parkingRepository,
@@ -247,7 +247,7 @@ public class GraphSerializationTest {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
-    TimetableRepository originalTimetableRepository,
+    TransitRepository originalTransitRepository,
     TransferRepository originalTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
@@ -262,7 +262,7 @@ public class GraphSerializationTest {
       osmInfoGraphBuildRepository,
       streetDetailsRepository,
       streetRepository,
-      originalTimetableRepository,
+      originalTransitRepository,
       originalTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
@@ -277,22 +277,22 @@ public class GraphSerializationTest {
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
     Graph copiedGraph1 = deserializedGraph.graph;
-    TimetableRepository copiedTimetableRepository1 = deserializedGraph.timetableRepository;
+    TransitRepository copiedTransitRepository1 = deserializedGraph.transitRepository;
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
 
-    originalTimetableRepository.index();
+    originalTransitRepository.index();
     originalGraph.index();
 
-    copiedTimetableRepository1.index();
+    copiedTransitRepository1.index();
     copiedGraph1.index();
 
     assertNoDifferences(originalGraph, copiedGraph1);
 
     SerializedGraphObject deserializedGraph2 = SerializedGraphObject.load(tempFile);
     Graph copiedGraph2 = deserializedGraph2.graph;
-    TimetableRepository copiedTimetableRepository2 = deserializedGraph2.timetableRepository;
-    copiedTimetableRepository2.index();
+    TransitRepository copiedTransitRepository2 = deserializedGraph2.transitRepository;
+    copiedTransitRepository2.index();
     copiedGraph2.index();
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }

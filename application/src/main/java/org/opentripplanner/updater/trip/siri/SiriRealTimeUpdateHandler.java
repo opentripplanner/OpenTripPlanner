@@ -316,7 +316,7 @@ public class SiriRealTimeUpdateHandler {
   }
 
   /**
-   * Add a (new) trip to the timetableRepository and the buffer
+   * Add a (new) trip to the transitRepository and the buffer
    */
   private UpdateSuccess addTripToGraphAndBuffer(TripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();

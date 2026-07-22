@@ -60,7 +60,7 @@ import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
@@ -75,7 +75,7 @@ class RequestScopedFactoryTest {
 
   @Test
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
-    var timetableRepository = new TimetableRepository();
+    var transitRepository = new TransitRepository();
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new TimetableSnapshot(
       RaptorTransitDataTestFactory.empty(),
@@ -91,10 +91,10 @@ class RequestScopedFactoryTest {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var transferRepository = new DefaultTransferRepository(new TransferIndex());
     // Only used to wire up the throwaway helper services below; not part of what's under test.
-    var placeholderTransitService = new DefaultTransitService(timetableRepository);
+    var placeholderTransitService = new DefaultTransitService(transitRepository);
 
     var factory = DaggerRequestScopedFactoryTest_TestFactory.builder()
-      .timetableRepository(timetableRepository)
+      .transitRepository(transitRepository)
       .repositoryRegistry(repositoryRegistry)
       .timetableRepositoryHandle(timetableRepositoryHandle)
       .routerConfig(routerConfig)
@@ -176,7 +176,7 @@ class RequestScopedFactoryTest {
     @Component.Builder
     interface Builder {
       @BindsInstance
-      Builder timetableRepository(TimetableRepository timetableRepository);
+      Builder transitRepository(TransitRepository transitRepository);
 
       @BindsInstance
       Builder repositoryRegistry(RepositoryRegistry repositoryRegistry);

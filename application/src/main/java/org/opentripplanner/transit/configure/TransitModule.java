@@ -17,7 +17,7 @@ import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 @Module
@@ -46,7 +46,7 @@ public abstract class TransitModule {
     MutableTimetableSnapshot
   > timetableRepositoryHandle(
     TimetableSnapshotParameters parameters,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     RepositoryRegistry repositoryRegistry,
     RaptorTransitData scheduledRaptorTransitData,
     DefaultTripCalendars tripCalendars
@@ -55,7 +55,7 @@ public abstract class TransitModule {
     var timetableSnapshotLifecycle = new TimetableSnapshotLifecycle(
       mutableBuffer,
       parameters.purgeExpiredData(),
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+      () -> LocalDate.now(transitRepository.getTimeZone())
     );
     return repositoryRegistry.registerRepository(mutableBuffer, timetableSnapshotLifecycle);
   }

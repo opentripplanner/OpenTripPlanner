@@ -12,14 +12,14 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class MultiModalStationTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Station STATION_1 = TEST_MODEL.station("1:1").build();
   private static final Station STATION_2 = TEST_MODEL.station("1:2").build();
 

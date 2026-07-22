@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -21,12 +21,12 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class TripTimeOnDateTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final LocalDate DATE = LocalDate.of(2025, 3, 18);
   private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(
@@ -37,7 +37,7 @@ class TripTimeOnDateTest {
   @Test
   void gtfsSequence() {
     var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
@@ -54,7 +54,7 @@ class TripTimeOnDateTest {
   @Test
   void hasArrivedStop() {
     var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
@@ -72,7 +72,7 @@ class TripTimeOnDateTest {
   @Test
   void hasDepartedStop() {
     var pattern = TEST_MODEL.pattern(TransitMode.BUS).build();
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
@@ -160,11 +160,11 @@ class TripTimeOnDateTest {
   }
 
   private static TripTimeOnDate tripTimeOnDate() {
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00");
     var stops = stopTimes.stream().map(StopTime::getStop).toList();
     var pattern = TEST_MODEL.pattern(TransitMode.BUS)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(stops))
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stops))
       .build();
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     return new TripTimeOnDate(tripTimes, 2, pattern, DATE, MIDNIGHT);
@@ -172,10 +172,10 @@ class TripTimeOnDateTest {
 
   @Test
   void testFromTripTimesWithScheduleFallback() {
-    var testModel = TimetableRepositoryForTest.of();
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var testModel = TransitRepositoryForTest.of();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var siteRepository = testModel.siteRepositoryBuilder().build();
-    var timetableRepository = new TimetableRepository(siteRepository);
+    var transitRepository = new TransitRepository(siteRepository);
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(trip)
       .withDepartureTimes(new int[] { 0, 1 })
@@ -184,8 +184,8 @@ class TripTimeOnDateTest {
       .pattern(TransitMode.BUS)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
-    timetableRepository.index();
+    transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
+    transitRepository.index();
     var timetableSnapshot = new TimetableSnapshot(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()

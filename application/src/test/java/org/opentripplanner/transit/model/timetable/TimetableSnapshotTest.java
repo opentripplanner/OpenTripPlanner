@@ -27,7 +27,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,7 +35,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.TestStopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class TimetableSnapshotTest {
 
@@ -47,12 +47,12 @@ public class TimetableSnapshotTest {
   @BeforeAll
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    TimetableRepository timetableRepository = model.timetableRepository();
+    TransitRepository transitRepository = model.transitRepository();
 
-    feedId = timetableRepository.getFeedIds().iterator().next();
+    feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : timetableRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -173,7 +173,7 @@ public class TimetableSnapshotTest {
 
   @Test
   void testClearWithAllCollections() {
-    TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+    TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
     RegularStop STOP_A = TEST_MODEL.stop("A").build();
     RegularStop STOP_B = TEST_MODEL.stop("B").build();
 
@@ -185,11 +185,11 @@ public class TimetableSnapshotTest {
     TestStopLocation testStopLocation = new TestStopLocation(
       new FeedScopedId(feedId, "stoplocationid")
     );
-    Route route = TimetableRepositoryForTest.route(new FeedScopedId(feedId, "routeId")).build();
-    Trip trip = TimetableRepositoryForTest.trip(feedId, "tripId").build();
+    Route route = TransitRepositoryForTest.route(new FeedScopedId(feedId, "routeId")).build();
+    Trip trip = TransitRepositoryForTest.trip(feedId, "tripId").build();
     TripPattern tripPattern = TripPattern.of(new FeedScopedId(feedId, "tripPatternId"))
       .withRoute(route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B))
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .withScheduledTimeTableBuilder(builder ->
         builder.addTripTimes(
           ScheduledTripTimes.of().withTrip(trip).withDepartureTimes(new int[] { 0, 1 }).build()

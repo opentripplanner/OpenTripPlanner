@@ -15,12 +15,12 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 
 class AreasTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest MODEL = TransitRepositoryForTest.of();
 
   private static final FeedScopedId LEG_GROUP1 = id("leg-group1");
   private static final int ID = 100;

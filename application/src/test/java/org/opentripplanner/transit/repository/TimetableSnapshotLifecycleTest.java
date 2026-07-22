@@ -13,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -31,14 +31,14 @@ class TimetableSnapshotLifecycleTest {
   private static final LocalDate TOMORROW = TODAY.plusDays(1);
   private static final LocalDate YESTERDAY = TODAY.minusDays(1);
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
-  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
     "pattern",
-    TimetableRepositoryForTest.route("r1").build()
+    TransitRepositoryForTest.route("r1").build()
   )
     .withStopPattern(
-      TimetableRepositoryForTest.stopPattern(
+      TransitRepositoryForTest.stopPattern(
         TEST_MODEL.stop("1").build(),
         TEST_MODEL.stop("2").build()
       )
@@ -46,7 +46,7 @@ class TimetableSnapshotLifecycleTest {
     .build();
   private static final TripTimes TRIP_TIMES = ScheduledTripTimes.of()
     .withArrivalTimes("00:00 00:01")
-    .withTrip(TimetableRepositoryForTest.trip("trip").build())
+    .withTrip(TransitRepositoryForTest.trip("trip").build())
     .build();
 
   enum SameAssert {

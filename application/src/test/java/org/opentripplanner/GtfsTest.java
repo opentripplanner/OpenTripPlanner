@@ -48,7 +48,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
@@ -64,7 +64,7 @@ public abstract class GtfsTest {
   protected static final String FEED_ID = "FEED";
 
   public Graph graph;
-  public TimetableRepository timetableRepository;
+  public TransitRepository transitRepository;
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
@@ -197,35 +197,35 @@ public abstract class GtfsTest {
 
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     graph = new Graph();
-    timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.initUpdaterManager(
+    transitRepository = new TransitRepository(new SiteRepository());
+    transitRepository.initUpdaterManager(
       new GraphUpdaterManager(GraphWriterService.NOOP, RunnableUtils.NOOP, List.of())
     );
     TransferRepository transferRepository = TransferServiceTestFactory.defaultTransferRepository();
 
     GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
-      timetableRepository,
+      transitRepository,
       graph,
       LocalDateRange.ofUnbounded()
     );
 
     gtfsGraphBuilderImpl.buildGraph();
-    timetableRepository.index();
+    transitRepository.index();
     graph.index();
 
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
-      timetableRepository,
+      transitRepository,
       transferRepository
     );
-    timetableRepository.initRaptorTransitData(scheduledRaptorData);
+    transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry =
       org.opentripplanner.framework.transaction.internal.TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new org.opentripplanner.transit.model.timetable.TimetableSnapshot(
       new RaptorTransitData(scheduledRaptorData),
-      timetableRepository.copyTripCalendarForRealTimeUpdates()
+      transitRepository.copyTripCalendarForRealTimeUpdates()
     );
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -243,11 +243,11 @@ public abstract class GtfsTest {
       );
 
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
+      transitRepository,
       new Deduplicator(),
       LocalDate::now
     );
-    alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
+    alertPatchServiceImpl = new TransitAlertServiceImpl(transitRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(FEED_ID);
 
@@ -280,7 +280,7 @@ public abstract class GtfsTest {
     }
     serverContext = TestServerContext.createServerContext(
       graph,
-      timetableRepository,
+      transitRepository,
       transferRepository,
       new DefaultFareService(),
       timetableHandle,

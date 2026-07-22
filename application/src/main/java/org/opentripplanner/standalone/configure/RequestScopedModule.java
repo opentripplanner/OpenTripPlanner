@@ -43,7 +43,7 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -63,12 +63,12 @@ public class RequestScopedModule {
   @Provides
   @HttpRequestScoped
   static TransitService transitService(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
     TransactionScope transactionScope
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
-    return new DefaultTransitService(timetableRepository, timetableSnapshot);
+    return new DefaultTransitService(transitRepository, timetableSnapshot);
   }
 
   @Provides

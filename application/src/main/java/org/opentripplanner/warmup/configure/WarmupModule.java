@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.api.WarmupParameters;
 
@@ -32,12 +32,12 @@ public class WarmupModule {
   static WarmupLauncher provideWarmupLauncher(
     @Nullable WarmupParameters parameters,
     RequestScopedFactory.Builder requestScopedComponentBuilder,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     return new WarmupLauncher(
       parameters,
       () -> requestScopedComponentBuilder.build().createServerContext(),
-      timetableRepository
+      transitRepository
     );
   }
 }

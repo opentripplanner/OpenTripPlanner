@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
@@ -16,7 +16,7 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
  */
 public class GtfsRealTimeTripUpdateAdapter {
 
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final Supplier<LocalDate> localDateNow;
   private final TripPatternCache tripPatternCache;
   private final TripTimesUpdater tripTimesUpdater;
@@ -26,14 +26,14 @@ public class GtfsRealTimeTripUpdateAdapter {
    * Constructor to allow tests to provide their own clock, not using system time.
    */
   public GtfsRealTimeTripUpdateAdapter(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DeduplicatorService deduplicator,
     Supplier<LocalDate> localDateNow
   ) {
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.localDateNow = localDateNow;
     this.tripPatternCache = new TripPatternCache(new TripPatternIdGenerator());
-    this.tripTimesUpdater = new TripTimesUpdater(timetableRepository.getTimeZone(), deduplicator);
+    this.tripTimesUpdater = new TripTimesUpdater(transitRepository.getTimeZone(), deduplicator);
     this.deduplicator = deduplicator;
   }
 
@@ -44,7 +44,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * additions.
    */
   public GtfsRealTimeUpdateHandler forUpdate(MutableTimetableSnapshot buffer) {
-    var editorService = new DefaultTransitService(timetableRepository, buffer);
+    var editorService = new DefaultTransitService(transitRepository, buffer);
     return new GtfsRealTimeUpdateHandler(
       buffer,
       localDateNow,

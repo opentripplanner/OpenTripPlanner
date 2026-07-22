@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
- * This is a replica of public transportation data already present in TimetableRepository, but rearranged
+ * This is a replica of public transportation data already present in TransitRepository, but rearranged
  * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
  * by days, retaining only the services actually running on any particular day.
  *
