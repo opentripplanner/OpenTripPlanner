@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.siri;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -122,8 +123,7 @@ class EstimatedVehicleJourneyWrapperTest {
     Optional<String> datedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(
       journey
     ).datedVehicleJourneyRef();
-    assertTrue(datedVehicleJourneyRef.isPresent());
-    assertEquals("DSJ:1", datedVehicleJourneyRef.get());
+    assertThat(datedVehicleJourneyRef).hasValue("DSJ:1");
   }
 
   @Test
@@ -160,15 +160,14 @@ class EstimatedVehicleJourneyWrapperTest {
     var journey = builder().withVehicleRef("VEHICLE:1").buildEstimatedVehicleJourney();
 
     var vehicleRef = EstimatedVehicleJourneyWrapper.of(journey).vehicleRef();
-    assertTrue(vehicleRef.isPresent());
-    assertEquals("VEHICLE:1", vehicleRef.get());
+    assertThat(vehicleRef).hasValue("VEHICLE:1");
   }
 
   @Test
-  void vehicleRefIsNullWhenAbsent() {
+  void vehicleRefIsEmptyWhenAbsent() {
     var journey = builder().buildEstimatedVehicleJourney();
 
-    assertTrue(EstimatedVehicleJourneyWrapper.of(journey).vehicleRef().isEmpty());
+    assertThat(EstimatedVehicleJourneyWrapper.of(journey).vehicleRef()).isEmpty();
   }
 
   /* Replaced trips */
@@ -180,8 +179,7 @@ class EstimatedVehicleJourneyWrapperTest {
     var replacedDatedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(
       journey
     ).replacedDatedVehicleJourneyRef();
-    assertTrue(replacedDatedVehicleJourneyRef.isPresent());
-    assertEquals("REPLACED:1", replacedDatedVehicleJourneyRef.get());
+    assertThat(replacedDatedVehicleJourneyRef).hasValue("REPLACED:1");
   }
 
   @Test
@@ -210,8 +208,7 @@ class EstimatedVehicleJourneyWrapperTest {
     var journey = builder().withExternalLineRef("LINE:ext").buildEstimatedVehicleJourney();
 
     var externalLineRef = EstimatedVehicleJourneyWrapper.of(journey).externalLineRef();
-    assertTrue(externalLineRef.isPresent());
-    assertEquals("LINE:ext", externalLineRef.get());
+    assertThat(externalLineRef).hasValue("LINE:ext");
   }
 
   /* Line, operator and mode */
@@ -225,10 +222,8 @@ class EstimatedVehicleJourneyWrapperTest {
 
     var wrapper = EstimatedVehicleJourneyWrapper.of(journey);
 
-    assertTrue(wrapper.lineRef().isPresent());
-    assertEquals("LINE:1", wrapper.lineRef().get());
-    assertTrue(wrapper.operatorRef().isPresent());
-    assertEquals("OPERATOR:1", wrapper.operatorRef().get());
+    assertThat(wrapper.lineRef()).hasValue("LINE:1");
+    assertThat(wrapper.operatorRef()).hasValue("OPERATOR:1");
   }
 
   @Test
@@ -260,10 +255,8 @@ class EstimatedVehicleJourneyWrapperTest {
 
     assertEquals("Line 1", wrapper.publishedLineName());
     assertEquals("Central Station", wrapper.destinationName());
-    assertTrue(wrapper.occupancy().isPresent());
-    assertEquals(OccupancyStatus.FULL, wrapper.occupancy().get());
-    assertTrue(wrapper.dataSource().isPresent());
-    assertEquals("DATASOURCE", wrapper.dataSource().get());
+    assertThat(wrapper.occupancy()).hasValue(OccupancyStatus.FULL);
+    assertThat(wrapper.dataSource()).hasValue("DATASOURCE");
   }
 
   /* Null-safety of optional references */
@@ -272,16 +265,16 @@ class EstimatedVehicleJourneyWrapperTest {
   void accessorsAreNullSafeOnMinimalJourney() {
     var wrapper = EstimatedVehicleJourneyWrapper.of(builder().buildEstimatedVehicleJourney());
 
-    assertTrue(wrapper.lineRef().isEmpty());
-    assertTrue(wrapper.operatorRef().isEmpty());
-    assertTrue(wrapper.datedVehicleJourneyRef().isEmpty());
-    assertTrue(wrapper.code().isEmpty());
-    assertTrue(wrapper.vehicleJourneyIdAndServiceDate().isEmpty());
-    assertTrue(wrapper.vehicleRef().isEmpty());
-    assertTrue(wrapper.replacedDatedVehicleJourneyRef().isEmpty());
-    assertTrue(wrapper.externalLineRef().isEmpty());
-    assertTrue(wrapper.occupancy().isEmpty());
-    // Natural-language accessors default to an empty string rather than null.
+    assertThat(wrapper.lineRef()).isEmpty();
+    assertThat(wrapper.operatorRef()).isEmpty();
+    assertThat(wrapper.datedVehicleJourneyRef()).isEmpty();
+    assertThat(wrapper.code()).isEmpty();
+    assertThat(wrapper.vehicleJourneyIdAndServiceDate()).isEmpty();
+    assertThat(wrapper.vehicleRef()).isEmpty();
+    assertThat(wrapper.replacedDatedVehicleJourneyRef()).isEmpty();
+    assertThat(wrapper.externalLineRef()).isEmpty();
+    assertThat(wrapper.occupancy()).isEmpty();
+    // Natural-language accessors default to an empty string rather than empty.
     assertEquals("", wrapper.publishedLineName());
     assertEquals("", wrapper.destinationName());
     assertTrue(wrapper.calls().isEmpty());

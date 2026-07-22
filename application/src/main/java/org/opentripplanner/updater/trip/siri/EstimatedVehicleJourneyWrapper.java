@@ -133,8 +133,8 @@ final class EstimatedVehicleJourneyWrapper {
    */
   Optional<String> vehicleRef() {
     return Optional.ofNullable(journey.getVehicleRef())
-      .filter(v -> !v.getValue().isBlank())
-      .map(VehicleRef::getValue);
+      .map(VehicleRef::getValue)
+      .filter(v -> !v.isBlank());
   }
 
   /* Replaced trips */
