@@ -21,26 +21,7 @@ public class GbfsFeedLoader
   extends GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoader.GBFSFeedV23Details> {
 
   /**
-   * Fetches the auto-configuration file from the given url and sets up updaters for the feeds
-   * listed in it.
-   */
-  public static GbfsFeedLoader create(
-    String url,
-    HttpHeaders httpHeaders,
-    String languageCode,
-    OtpHttpClient otpHttpClient
-  ) {
-    return create(
-      GbfsAutoConfiguration.fetch(url, httpHeaders, otpHttpClient),
-      httpHeaders,
-      languageCode,
-      otpHttpClient
-    );
-  }
-
-  /**
-   * Sets up updaters for the feeds listed in an already fetched auto-configuration file, avoiding
-   * a second fetch of that file.
+   * Sets up updaters for the feeds listed in the auto-configuration file.
    */
   public static GbfsFeedLoader create(
     GbfsAutoConfiguration autoConfiguration,

@@ -16,6 +16,7 @@ import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -32,7 +33,11 @@ class GbfsFeedLoaderTest {
   @Test
   void getV30Feed() {
     GbfsFeedLoader loader = GbfsFeedLoader.create(
-      "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
+      GbfsAutoConfiguration.fetch(
+        "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
+        HttpHeaders.empty(),
+        OTP_HTTP_CLIENT
+      ),
       HttpHeaders.empty(),
       OTP_HTTP_CLIENT
     );

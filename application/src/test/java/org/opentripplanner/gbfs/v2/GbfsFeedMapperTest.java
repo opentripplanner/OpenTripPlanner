@@ -15,6 +15,7 @@ import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.io.TestHttpClientFactory;
+import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -46,7 +47,7 @@ class GbfsFeedMapperTest {
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
     var loader = GbfsFeedLoader.create(
-      params.url(),
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
@@ -257,7 +258,7 @@ class GbfsFeedMapperTest {
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
     var loader = GbfsFeedLoader.create(
-      params.url(),
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
@@ -320,7 +321,7 @@ class GbfsFeedMapperTest {
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
     var loader = GbfsFeedLoader.create(
-      params.url(),
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
@@ -351,7 +352,7 @@ class GbfsFeedMapperTest {
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
     var loader = GbfsFeedLoader.create(
-      params.url(),
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
