@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The GBFS auto-configuration file (gbfs.json) of a GBFS system, together with the url it was
- * fetched from. The file is kept as a raw JSON tree so that the GBFS version can be determined
- * before mapping it onto the version-specific model classes. Some servers throttle repeated
- * requests for the same resource, so the file must be fetched only once during setup.
+ * fetched from. It declares the GBFS version of the system and lists its feeds.
  */
 public class GbfsAutoConfiguration {
 
