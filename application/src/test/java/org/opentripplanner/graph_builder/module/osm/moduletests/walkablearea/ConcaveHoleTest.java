@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
@@ -11,8 +10,7 @@ import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.RelationBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
  * Checks that concave areas of inner rings/holes in multipolygons are connected to the outer ring.
@@ -58,6 +56,7 @@ class ConcaveHoleTest {
     var holeId = 1001;
 
     var relation = RelationBuilder.ofMultiPolygon()
+      .withTag("highway", "pedestrian")
       .withWayMember(outerRingId, "outer")
       .withWayMember(holeId, "inner")
       .build();
@@ -71,18 +70,57 @@ class ConcaveHoleTest {
       .build();
 
     var graph = new Graph();
-    var osmModule = OsmModuleTestFactory.of(provider)
+
+    OsmModuleTestFactory.of(provider)
       .withGraph(graph)
       .builder()
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
-      .build();
+      .build()
+      .buildGraph();
 
-    osmModule.buildGraph();
+    var summarizer = new GraphSummarizer(graph);
 
-    assertEquals(28, graph.getEdgesOfType(AreaEdge.class).size(), "Incorrect number of edges");
-
-    var vertex = graph.getVertex(VertexLabel.osm(visibilityNodeId));
-    assertThat(vertex.getOutgoing()).hasSize(4);
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
+      .that(summarizer.summarizeEdges())
+      .containsExactly(
+        // connecting ways from outside into two outer-ring corners
+        "(0,0) → (-1,0) PEDESTRIAN ♿✅",
+        "(-1,0) → (0,0) PEDESTRIAN ♿✅",
+        "(5,5) → (6,5) PEDESTRIAN ♿✅",
+        "(6,5) → (5,5) PEDESTRIAN ♿✅",
+        // outer ring (4 sides × 2 directions)
+        "(0,0) → (5,0) PEDESTRIAN ♿✅",
+        "(5,0) → (0,0) PEDESTRIAN ♿✅",
+        "(0,0) → (0,5) PEDESTRIAN ♿✅",
+        "(0,5) → (0,0) PEDESTRIAN ♿✅",
+        "(0,5) → (5,5) PEDESTRIAN ♿✅",
+        "(5,5) → (0,5) PEDESTRIAN ♿✅",
+        "(5,5) → (5,0) PEDESTRIAN ♿✅",
+        "(5,0) → (5,5) PEDESTRIAN ♿✅",
+        // concave (comb-shaped) hole ring (8 sides × 2 directions)
+        "(1,1) → (4,1) PEDESTRIAN ♿✅",
+        "(4,1) → (1,1) PEDESTRIAN ♿✅",
+        "(1,1) → (1,4) PEDESTRIAN ♿✅",
+        "(1,4) → (1,1) PEDESTRIAN ♿✅",
+        "(1,4) → (4,4) PEDESTRIAN ♿✅",
+        "(4,4) → (1,4) PEDESTRIAN ♿✅",
+        "(4,4) → (4,3) PEDESTRIAN ♿✅",
+        "(4,3) → (4,4) PEDESTRIAN ♿✅",
+        "(4,3) → (3,3) PEDESTRIAN ♿✅",
+        "(3,3) → (4,3) PEDESTRIAN ♿✅",
+        "(3,3) → (3,2) PEDESTRIAN ♿✅",
+        "(3,2) → (3,3) PEDESTRIAN ♿✅",
+        "(3,2) → (4,2) PEDESTRIAN ♿✅",
+        "(4,2) → (3,2) PEDESTRIAN ♿✅",
+        "(4,2) → (4,1) PEDESTRIAN ♿✅",
+        "(4,1) → (4,2) PEDESTRIAN ♿✅",
+        // visibility edges linking the concave hole node (4,1) to the outer ring corners,
+        // so you can route out of the concave part of the inner ring
+        "(0,0) → (4,1) PEDESTRIAN ♿✅",
+        "(4,1) → (0,0) PEDESTRIAN ♿✅",
+        "(5,5) → (4,1) PEDESTRIAN ♿✅",
+        "(4,1) → (5,5) PEDESTRIAN ♿✅"
+      );
   }
 }

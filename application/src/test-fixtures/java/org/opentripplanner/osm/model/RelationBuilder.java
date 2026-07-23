@@ -5,10 +5,7 @@ public class RelationBuilder {
   private final OsmRelationBuilder builder = OsmRelation.of();
 
   public static RelationBuilder ofMultiPolygon() {
-    var builder = new RelationBuilder();
-    builder.withTag("type", "multipolygon");
-    builder.withTag("highway", "pedestrian");
-    return builder;
+    return ofType("multipolygon");
   }
 
   public static RelationBuilder ofTurnRestriction(String restrictionType) {
@@ -32,6 +29,14 @@ public class RelationBuilder {
 
   public RelationBuilder withWayMember(long id, String role) {
     return withMember(id, role, OsmMemberType.WAY);
+  }
+
+  public RelationBuilder withOuterWay(long id) {
+    return withWayMember(id, "outer");
+  }
+
+  public RelationBuilder withInnerWay(long id) {
+    return withWayMember(id, "inner");
   }
 
   public RelationBuilder withNodeMember(long id) {
