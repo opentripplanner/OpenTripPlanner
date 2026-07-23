@@ -32,7 +32,7 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
   @Override
   public void setup() {
     try {
-      loaderAndMapper = new GbfsFeedLoaderAndMapper(params, otpHttpClientFactory);
+      loaderAndMapper = GbfsFeedLoaderAndMapper.create(params, otpHttpClientFactory);
     } catch (Exception e) {
       throw new UpdaterConstructionException(e);
     }
