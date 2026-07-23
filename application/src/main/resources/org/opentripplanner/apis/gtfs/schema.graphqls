@@ -2938,6 +2938,8 @@ type TripOnServiceDate {
   stopCalls: [StopCall!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
+  "The ID of the vehicle serving this trip, if provided by the real-time feed."
+  vehicleId: String
 }
 
 """

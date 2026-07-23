@@ -13,6 +13,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.ReplacementForRelation;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -124,6 +125,21 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<Trip> trip() {
     return this::getTrip;
+  }
+
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return environment -> {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
+        return null;
+      }
+      var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
+      if (tripTimes instanceof RealTimeTripTimes realTimeTripTimes) {
+        return realTimeTripTimes.getVehicleId().orElse(null);
+      }
+      return null;
+    };
   }
 
   @Nullable
