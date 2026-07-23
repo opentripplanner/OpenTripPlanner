@@ -35,7 +35,7 @@ import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.TraverseDirection;
-import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
+import org.opentripplanner.osm.wayproperty.BidirectionalWayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -338,15 +338,17 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     /* build the street segment graph from OSM ways */
     long wayCount = osmdb.getWays().size();
-    ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
-    LOG.info(progress.startMessage());
     var escalatorProcessor = new EscalatorProcessor(issueStore);
     var inclinedEdgeLevelInfoProcessor = params.includeInclinedEdgeLevelInfo()
       ? new DefaultInclinedEdgeLevelInfoProcessor(issueStore, streetDetailsRepository, osmdb)
       : new NoopInclinedEdgeLevelInfoProcessor();
 
+    var wayPropertiesIndex = BidirectionalWayPropertiesIndex.of(osmdb.getWays());
+
+    ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
+    LOG.info(progress.startMessage());
     WAY: for (OsmWay way : osmdb.getWays()) {
-      WayPropertiesPair wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
+      BidirectionalWayProperties wayData = wayPropertiesIndex.forWay(way.getId());
 
       var forwardPermission = wayData.forward().getPermission();
       var backwardPermission = wayData.backward().getPermission();
