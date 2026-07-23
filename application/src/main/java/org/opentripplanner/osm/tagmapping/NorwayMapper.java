@@ -14,6 +14,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.Condition;
+import org.opentripplanner.osm.wayproperty.specifier.Condition.Not;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 
@@ -239,9 +240,11 @@ class NorwayMapper extends OsmTagMapper {
     // Discourage cycling along tram tracks
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.OneOf("embedded_rails", "tram", "light_rail", "disused")
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "rail", "disused", "yes"),
+        new Not(new Condition.Equals("cycleway", "lane")),
+        new Not(new Condition.Equals("cycleway:both", "lane"))
       ),
-      ofBicycleSafety(1.2)
+      ofBicycleSafety(2)
     );
 
     // Discourage cycling and walking in road tunnels
