@@ -63,7 +63,7 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.4</geotools.version>
         <google.dagger.version>2.60.1</google.dagger.version>
-        <jackson.version>2.22.0</jackson.version>
+        <jackson.version>2.22.1</jackson.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jersey.version>3.1.12</jersey.version>
         <junit.version>6.1.2</junit.version>
@@ -488,7 +488,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.85.0</version>
+                <version>26.85.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
