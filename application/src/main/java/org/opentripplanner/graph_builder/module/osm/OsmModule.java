@@ -506,6 +506,7 @@ public class OsmModule implements GraphBuilderModule {
             fromVertex,
             toVertex,
             way,
+            wayData,
             i,
             forwardPermission,
             backwardPermission,
@@ -652,6 +653,7 @@ public class OsmModule implements GraphBuilderModule {
     IntersectionVertex fromVertex,
     IntersectionVertex toVertex,
     OsmWay way,
+    BidirectionalWayProperties properties,
     int index,
     StreetTraversalPermission forwardPermission,
     StreetTraversalPermission backwardPermission,
@@ -674,6 +676,7 @@ public class OsmModule implements GraphBuilderModule {
         way,
         index,
         length,
+        properties.forwardCarSpeed(),
         forwardPermission,
         geometry,
         FORWARD
@@ -686,6 +689,7 @@ public class OsmModule implements GraphBuilderModule {
         way,
         index,
         length,
+        properties.backwardCarSpeed(),
         backwardPermission,
         backGeometry,
         BACKWARD
@@ -703,6 +707,7 @@ public class OsmModule implements GraphBuilderModule {
     OsmWay way,
     int index,
     double length,
+    float carSpeed,
     StreetTraversalPermission permissions,
     LineString geometry,
     TraverseDirection direction
@@ -721,11 +726,6 @@ public class OsmModule implements GraphBuilderModule {
         label = label.intern();
         return I18NString.of(label);
       });
-
-    float carSpeed = way
-      .getOsmProvider()
-      .getOsmTagMapper()
-      .getCarSpeedForWay(way, direction, issueStore);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(fromVertex)

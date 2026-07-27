@@ -118,7 +118,9 @@ public class WayPropertySet {
   public BidirectionalWayProperties getDataForWay(OsmWay way) {
     return new BidirectionalWayProperties(
       getDataForEntity(way, FORWARD),
-      getDataForEntity(way, BACKWARD)
+      getDataForEntity(way, BACKWARD),
+      getCarSpeedForWay(way, FORWARD),
+      getCarSpeedForWay(way, BACKWARD)
     );
   }
 

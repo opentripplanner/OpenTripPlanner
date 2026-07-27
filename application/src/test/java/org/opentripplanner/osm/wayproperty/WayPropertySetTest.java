@@ -119,7 +119,10 @@ class WayPropertySetTest {
     builder.addProperties(lane_and_footway, safer_and_peds);
     wayPropertySet = builder.build();
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(new BidirectionalWayProperties(safer_and_peds, safer_and_peds), dataForWay);
+    assertEquals(
+      new BidirectionalWayProperties(safer_and_peds, safer_and_peds, 100, 100),
+      dataForWay
+    );
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
