@@ -651,24 +651,21 @@ class WalkableAreaBuilder {
       // No intersections - not really possible
       return Set.of();
     }
-    final String forwardLabel = String.format(
-      LABEL_TEMPLATE,
-      parent.getId(),
-      vertex1.getLabel(),
-      vertex2.getLabel()
-    );
+    final long parentId = parent.getId();
 
     float carSpeed = parent
       .getOsmProvider()
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
-    I18NString name = namer.getName(parent).orElseGet(() -> I18NString.of(forwardLabel));
+    var forwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex2, vertex1, parentId));
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
       .withGeometry(line)
-      .withName(name)
+      .withName(forwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(false)
@@ -678,18 +675,14 @@ class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    final String backwardLabel = String.format(
-      LABEL_TEMPLATE,
-      parent.getId(),
-      vertex2.getLabel(),
-      vertex1.getLabel()
-    );
-    name = namer.getName(parent).orElseGet(() -> I18NString.of(backwardLabel));
+    var backwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex1, vertex2, parentId));
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
       .withGeometry(line.reverse())
-      .withName(name)
+      .withName(backwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(true)
@@ -782,6 +775,16 @@ class WalkableAreaBuilder {
     }
     alreadyAddedEdges.add(edge);
     return false;
+  }
+
+  private static I18NString fallbackName(
+    IntersectionVertex vertex1,
+    IntersectionVertex vertex2,
+    long parentId
+  ) {
+    return I18NString.of(
+      String.format(LABEL_TEMPLATE, parentId, vertex2.getLabel(), vertex1.getLabel())
+    );
   }
 
   // ---- Inner types -------------------------------------------------------------------
