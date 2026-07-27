@@ -246,6 +246,52 @@ class ApiTransitServiceTest {
     assertThat(service.findCanceledStopCalls(STOP_B, insideRange)).hasSize(1);
   }
 
+  @Test
+  void findTripOnServiceDateSynthesizesWhenTripRuns() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+    var trip = env.tripData(TRIP_1_ID).trip();
+
+    var result = service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+
+    assertThat(result).isPresent();
+    assertEquals(trip, result.get().getTrip());
+    assertEquals(SERVICE_DATE, result.get().getServiceDate());
+    // No real TripOnServiceDate exists, so a synthetic one keyed by the trip id is returned.
+    assertEquals(trip.getId(), result.get().getId());
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsEmptyWhenTripDoesNotRunOnDate() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+
+    assertThat(service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1))).isEmpty();
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsEmptyWhenTripDoesNotExist() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+
+    assertThat(service.findTripOnServiceDate(id("unknown"), SERVICE_DATE)).isEmpty();
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsRealTripOnServiceDate() {
+    var tripInput = TRIP1_INPUT.withWithTripOnServiceDate("DSJ1");
+    var env = envBuilder.addTrip(tripInput).build();
+    var service = new ApiTransitService(env.transitService());
+    var trip = env.tripData(TRIP_1_ID).trip();
+
+    var result = service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+
+    assertThat(result).isPresent();
+    // The real TripOnServiceDate (keyed by its own id) is preferred over a synthetic one.
+    assertEquals("DSJ1", result.get().getId().getId());
+    assertEquals(trip, result.get().getTrip());
+  }
+
   private static GtfsRealtime.TripUpdate skipSecondStop(TripUpdateBuilder builder) {
     return builder.addSkippedStop(1).build();
   }
