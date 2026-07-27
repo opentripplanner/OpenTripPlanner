@@ -32,11 +32,14 @@ jobs:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: mvn -DskipTests --batch-mode install -P prettierSkip,checkstyleSkip
 
-      - name: Archive jar
+      - name: Package build output
+        run: tar -czf build-output.tar.gz application/target otp-shaded/target
+
+      - name: Archive build output
         uses: actions/upload-artifact@v7
         with:
-          name: otp-shaded-jar
-          path: otp-shaded/target/otp-shaded-*-SNAPSHOT.jar
+          name: otp-build-output
+          path: build-output.tar.gz
           retention-days: 1
 
   perf-test:
@@ -111,12 +114,15 @@ jobs:
         with:
           maven-version: 3.9.12
 
-      - name: Download jar
+      - name: Download build output
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/download-artifact@v7
         with:
-          name: otp-shaded-jar
-          path: otp-shaded/target/
+          name: otp-build-output
+
+      - name: Extract build output
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
+        run: tar -xzf build-output.tar.gz
 
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
