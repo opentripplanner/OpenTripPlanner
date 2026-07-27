@@ -68,7 +68,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final HashGridSpatialIndex<OsmVertex> platformLinkingPointsIndex;
+  private final HashGridSpatialIndex<OsmVertex> streetStubPointIndex;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -135,15 +135,15 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformLinkingPointsIndex = new HashGridSpatialIndex<>();
+    this.streetStubPointIndex = new HashGridSpatialIndex<>();
     if (platformEntriesLinking) {
       graph
         .getVertices()
         .stream()
         .filter(OsmVertex.class::isInstance)
         .map(OsmVertex.class::cast)
-        .filter(this::isPlatformLinkingPoint)
-        .forEach(v -> platformLinkingPointsIndex.insert(new Envelope(v.getCoordinate()), v));
+        .filter(this::isSingleEntryStreetStub)
+        .forEach(v -> streetStubPointIndex.insert(new Envelope(v.getCoordinate()), v));
     }
   }
 
@@ -303,7 +303,7 @@ class WalkableAreaBuilder {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
             Envelope ringEnvelope = outerRing.jtsPolygon.getEnvelopeInternal();
-            List<OsmVertex> verticesWithin = platformLinkingPointsIndex
+            List<OsmVertex> verticesWithin = streetStubPointIndex
               .query(ringEnvelope)
               .stream()
               .filter(t ->
@@ -739,7 +739,24 @@ class WalkableAreaBuilder {
     }
   }
 
-  private boolean isPlatformLinkingPoint(OsmVertex osmVertex) {
+  /**
+   * Tests whether {@code osmVertex} is a candidate single-entry stub into the street network:
+   * exactly one non-motorized edge (permission {@link StreetTraversalPermission#PEDESTRIAN},
+   * {@link StreetTraversalPermission#BICYCLE} or
+   * {@link StreetTraversalPermission#PEDESTRIAN_AND_BICYCLE}) connects it to one other vertex,
+   * and every other non-{@link AreaEdge} edge at this vertex leads back to that same vertex.
+   *
+   * <p>This is a pure edge-topology check — it knows nothing about area polygons, and runs once,
+   * up front, over every {@link OsmVertex} in the graph, before any platform's visibility graph
+   * exists. A vertex that passes is only a <em>candidate</em> platform-linking point; whether it
+   * actually lies inside a given platform is decided later, per ring, via
+   * {@code outerRing.jtsPolygon.contains(...)} in {@link #buildAllRingEdges}. Because that
+   * geometric test happens separately, a candidate can sit anywhere relative to a platform's
+   * boundary, including its interior — for example a stairway landing under a platform.
+   *
+   * @return {@code true} if the vertex is a single-entry, non-motorized street stub
+   */
+  private boolean isSingleEntryStreetStub(OsmVertex osmVertex) {
     boolean isCandidate = false;
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {
