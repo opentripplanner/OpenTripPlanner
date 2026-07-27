@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -34,6 +35,7 @@ import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.geometry.LineStringShrinker;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
@@ -66,7 +68,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final List<OsmVertex> platformLinkingPoints;
+  private final HashGridSpatialIndex<OsmVertex> platformLinkingPointsIndex;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -133,15 +135,16 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformLinkingPoints = platformEntriesLinking
-      ? graph
-          .getVertices()
-          .stream()
-          .filter(OsmVertex.class::isInstance)
-          .map(OsmVertex.class::cast)
-          .filter(this::isPlatformLinkingPoint)
-          .collect(Collectors.toList())
-      : List.of();
+    this.platformLinkingPointsIndex = new HashGridSpatialIndex<>();
+    if (platformEntriesLinking) {
+      graph
+        .getVertices()
+        .stream()
+        .filter(OsmVertex.class::isInstance)
+        .map(OsmVertex.class::cast)
+        .filter(this::isPlatformLinkingPoint)
+        .forEach(v -> platformLinkingPointsIndex.insert(new Envelope(v.getCoordinate()), v));
+    }
   }
 
   /**
@@ -299,7 +302,9 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            List<OsmVertex> verticesWithin = platformLinkingPoints
+            Envelope ringEnvelope = outerRing.jtsPolygon.getEnvelopeInternal();
+            List<OsmVertex> verticesWithin = platformLinkingPointsIndex
+              .query(ringEnvelope)
               .stream()
               .filter(t ->
                 outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
