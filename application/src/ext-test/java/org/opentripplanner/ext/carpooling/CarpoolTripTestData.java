@@ -8,6 +8,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutedCarpoolTrip;
+import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
@@ -254,6 +257,17 @@ public class CarpoolTripTestData {
       .withOnboardCount(1)
       .withDeviationBudget(deviationBudget)
       .build();
+  }
+
+  /** A graph-free stand-in for the routed baseline: each leg's beeline duration. */
+  public static RoutedCarpoolTrip beelineRoutedTrip(CarpoolTripWithVertices tripWithVertices) {
+    var estimator = new BeelineEstimator();
+    var points = tripWithVertices.vertexCoordinates();
+    var durations = new Duration[points.size() - 1];
+    for (int i = 0; i < durations.length; i++) {
+      durations[i] = estimator.estimateDuration(points.get(i), points.get(i + 1));
+    }
+    return new RoutedCarpoolTrip(tripWithVertices, durations);
   }
 
   private static CarpoolTrip buildTrip(

@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
-import java.util.List;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
@@ -68,25 +67,5 @@ public class BeelineEstimator {
     );
     double seconds = beelineDistance / speed;
     return Duration.ofSeconds((long) seconds);
-  }
-
-  /**
-   * Calculates cumulative travel times to each point in a route, including stop duration
-   * at each intermediate point.
-   *
-   * @param points Route points in order
-   * @param stopDuration Duration added at each intermediate stop (not at the first point)
-   * @return Array of cumulative durations (first element is always Duration.ZERO)
-   */
-  public Duration[] calculateCumulativeTimes(List<WgsCoordinate> points, Duration stopDuration) {
-    if (points.isEmpty()) {
-      return new Duration[0];
-    }
-
-    Duration[] segmentDurations = new Duration[points.size() - 1];
-    for (int i = 0; i < segmentDurations.length; i++) {
-      segmentDurations[i] = estimateDuration(points.get(i), points.get(i + 1));
-    }
-    return GraphPathUtils.calculateCumulativeDurations(segmentDurations, stopDuration);
   }
 }

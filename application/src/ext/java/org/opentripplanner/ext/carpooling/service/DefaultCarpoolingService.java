@@ -29,6 +29,7 @@ import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
 import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
+import org.opentripplanner.ext.carpooling.routing.RoutedCarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
@@ -282,15 +283,27 @@ public class DefaultCarpoolingService implements CarpoolingService {
         .stream()
         .map(tripWithVertices -> {
           var trip = tripWithVertices.trip();
+
+          // The delay heuristic measures each detour against the routed baseline, resolved here.
+          var baselineLegDurations = resolveLegDurations(tripWithVertices, router);
+          if (baselineLegDurations == null) {
+            LOG.debug("Baseline for trip {} is unroutable; skipping", trip.getId());
+            return null;
+          }
+          var routedTrip = new RoutedCarpoolTrip(tripWithVertices, baselineLegDurations);
+
           List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-            trip,
+            routedTrip,
             snappedPickup,
             snappedDropoff,
             stopDuration
           );
 
           if (viablePositions.isEmpty()) {
-            LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
+            LOG.debug(
+              "No viable positions found for trip {} (avoided per-position routing)",
+              trip.getId()
+            );
             return null;
           }
 
@@ -301,7 +314,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
           );
 
           return insertionEvaluator.findBestInsertion(
-            tripWithVertices,
+            routedTrip,
             viablePositions,
             new PassengerSnap(
               pickupSnap.vertex(),
@@ -498,19 +511,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
         }
       }
 
-      // Sizes each leg's tree from OTP's own routed leg durations (cached per trip) and re-routes
-      // any baseline leg the tree misses — see resolveLegDurations and the InsertionEvaluator
-      // fallback below.
+      // Computes only the per-leg durations that size each trip's trees; the geometry comes from
+      // those trees.
       var baselineRouter = new CarpoolStreetRouter(streetLimitationParametersService);
 
       // Each waypoint's tree only has to span its own leg plus the feasible insertion detour —
       // see driverLegTreeLimits.
-      var routableTrips = new ArrayList<CarpoolTripWithVertices>(candidateTrips.size());
+      var routableTrips = new ArrayList<RoutedCarpoolTrip>(candidateTrips.size());
       var passengerTreeLimit = Duration.ZERO;
       for (var tripWithVertices : candidateTrips) {
         var legDurations = resolveLegDurations(tripWithVertices, baselineRouter);
-        // A trip whose baseline cannot be routed within the carpool bound cannot carry a passenger:
-        // skip it before sizing and building trees its baseline would fail to route in anyway.
+        // A trip whose baseline cannot be routed cannot carry a passenger.
         if (legDurations == null) {
           continue;
         }
@@ -529,7 +540,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
           );
           passengerTreeLimit = max(passengerTreeLimit, legLimits[leg]);
         }
-        routableTrips.add(tripWithVertices);
+        routableTrips.add(new RoutedCarpoolTrip(tripWithVertices, legDurations));
       }
       // Every passenger segment lies on a single leg of some candidate trip, so the largest leg
       // limit bounds them all. A smaller cap would silently drop feasible insertions: route()
@@ -542,15 +553,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var stopDuration = request.preferences().car().pickupTime();
 
-      var insertionEvaluator = new InsertionEvaluator(
-        carpoolTreeVertexRouter,
-        baselineRouter,
-        stopDuration
-      );
+      var insertionEvaluator = new InsertionEvaluator(carpoolTreeVertexRouter, stopDuration);
+
+      // The snapped coordinates are the same for every candidate trip, so wrap them once rather
+      // than once per (trip, stop) pair.
+      var passengerCoordinate = passengerSnap.vertex().toWgsCoordinate();
+      var stopCoordinates = new HashMap<NearbyStop, WgsCoordinate>();
+      stopSnaps.forEach((stop, snap) -> stopCoordinates.put(stop, snap.vertex().toWgsCoordinate()));
 
       var candidateTripsWithViableStopsAndPositions = routableTrips
         .stream()
-        .map(tripWithVertices -> {
+        .map(routedTrip -> {
           var viableSegmentInsertions = stopSnaps
             .entrySet()
             .stream()
@@ -559,11 +572,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
               var stopSnap = entry.getValue();
               var pickupSide = accessOrEgress.isAccess() ? passengerSnap : stopSnap;
               var dropoffSide = accessOrEgress.isAccess() ? stopSnap : passengerSnap;
+              var stopCoordinate = stopCoordinates.get(nearbyStop);
 
               var viablePositions = positionFinder.findViablePositions(
-                tripWithVertices.trip(),
-                new WgsCoordinate(pickupSide.vertex().getCoordinate()),
-                new WgsCoordinate(dropoffSide.vertex().getCoordinate()),
+                routedTrip,
+                accessOrEgress.isAccess() ? passengerCoordinate : stopCoordinate,
+                accessOrEgress.isAccess() ? stopCoordinate : passengerCoordinate,
                 stopDuration
               );
               return new ViableAccessEgress(
@@ -578,7 +592,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
             })
             .filter(it -> !it.insertionPositions().isEmpty())
             .toList();
-          return new TripWithViableAccessEgress(tripWithVertices, viableSegmentInsertions);
+          return new TripWithViableAccessEgress(routedTrip, viableSegmentInsertions);
         })
         .toList();
 
@@ -697,19 +711,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
     CarpoolTripWithVertices tripWithVertices,
     CarpoolRouter baselineRouter
   ) {
-    var vertices = tripWithVertices.vertices();
-    var durations = new Duration[vertices.size() - 1];
-    for (int leg = 0; leg < durations.length; leg++) {
-      var path = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
-      if (path == null) {
-        LOG.debug(
-          "OTP could not route baseline leg {} of trip {} within the carpool bound; skipping it",
-          leg,
-          tripWithVertices.trip().getId()
-        );
-        return null;
-      }
-      durations[leg] = GraphPathUtils.durationOrZero(path);
+    var durations = baselineRouter.routeLegDurations(tripWithVertices.vertices());
+    if (durations == null) {
+      LOG.debug(
+        "OTP could not route the baseline of trip {} within the carpool bound; skipping it",
+        tripWithVertices.trip().getId()
+      );
     }
     return durations;
   }

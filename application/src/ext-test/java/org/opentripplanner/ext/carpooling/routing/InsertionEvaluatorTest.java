@@ -14,6 +14,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NOR
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.beelineRoutedTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithDeviationBudget;
@@ -76,12 +77,10 @@ class InsertionEvaluatorTest {
   }
 
   private WgsCoordinate getCoordinate(Vertex vertex) {
-    return new WgsCoordinate(vertex.getCoordinate().y, vertex.getCoordinate().x);
+    return vertex.toWgsCoordinate();
   }
 
-  /**
-   * Runs position finding followed by evaluation and returns the best insertion.
-   */
+  /** Runs position finding followed by evaluation. */
   private InsertionCandidate findOptimalInsertion(
     CarpoolTrip trip,
     WgsCoordinate passengerPickup,
@@ -89,8 +88,15 @@ class InsertionEvaluatorTest {
     CarpoolRouter carpoolRouter
   ) {
     var tripWithVertices = createTripWithVertices(trip);
+    // A trip whose baseline cannot be routed cannot carry a passenger. The same durations feed the
+    // finder and the evaluator.
+    var legDurations = carpoolRouter.routeLegDurations(tripWithVertices.vertices());
+    if (legDurations == null) {
+      return null;
+    }
+    var routedTrip = new RoutedCarpoolTrip(tripWithVertices, legDurations);
     List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-      trip,
+      routedTrip,
       passengerPickup,
       passengerDropoff,
       Duration.ZERO
@@ -102,7 +108,7 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
-      tripWithVertices,
+      routedTrip,
       viablePositions,
       new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
@@ -296,7 +302,10 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
-      tripWithVertices,
+      new RoutedCarpoolTrip(
+        tripWithVertices,
+        routingFunction.routeLegDurations(tripWithVertices.vertices())
+      ),
       viablePositions,
       new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );
