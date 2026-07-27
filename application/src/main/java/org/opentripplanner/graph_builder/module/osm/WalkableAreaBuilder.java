@@ -651,7 +651,7 @@ class WalkableAreaBuilder {
       // No intersections - not really possible
       return Set.of();
     }
-    String label = String.format(
+    final String forwardLabel = String.format(
       LABEL_TEMPLATE,
       parent.getId(),
       vertex1.getLabel(),
@@ -663,7 +663,7 @@ class WalkableAreaBuilder {
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
-    I18NString name = namer.getName(parent, label);
+    I18NString name = namer.getName(parent).orElseGet(() -> I18NString.of(forwardLabel));
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
@@ -678,8 +678,13 @@ class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    label = String.format(LABEL_TEMPLATE, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
-    name = namer.getName(parent, label);
+    final String backwardLabel = String.format(
+      LABEL_TEMPLATE,
+      parent.getId(),
+      vertex2.getLabel(),
+      vertex1.getLabel()
+    );
+    name = namer.getName(parent).orElseGet(() -> I18NString.of(backwardLabel));
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
@@ -712,8 +717,9 @@ class WalkableAreaBuilder {
       Area namedArea = new Area();
       OsmEntity areaEntity = area.parent;
 
-      String id = "way (area) " + areaEntity.getId();
-      I18NString name = namer.getName(areaEntity, id);
+      I18NString name = namer
+        .getName(areaEntity)
+        .orElseGet(() -> I18NString.of("way (area) " + areaEntity.getId()));
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);

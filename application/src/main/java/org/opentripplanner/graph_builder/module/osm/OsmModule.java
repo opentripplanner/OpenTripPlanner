@@ -594,7 +594,14 @@ public class OsmModule implements GraphBuilderModule {
     var geometry = geometryFactory.createLineString(nodes);
 
     return Optional.of(
-      new Platform(params.edgeNamer().getName(way, "platform " + way.getId()), geometry, references)
+      new Platform(
+        params
+          .edgeNamer()
+          .getName(way)
+          .orElseGet(() -> I18NString.of("platform " + way.getId())),
+        geometry,
+        references
+      )
     );
   }
 
@@ -706,9 +713,15 @@ public class OsmModule implements GraphBuilderModule {
       );
     }
 
-    String label = "way " + way.getId() + " from " + index;
-    label = label.intern();
-    I18NString name = params.edgeNamer().getName(way, label);
+    I18NString name = params
+      .edgeNamer()
+      .getName(way)
+      .orElseGet(() -> {
+        String label = "way " + way.getId() + " from " + index;
+        label = label.intern();
+        return I18NString.of(label);
+      });
+
     float carSpeed = way
       .getOsmProvider()
       .getOsmTagMapper()
