@@ -3,7 +3,7 @@ package org.opentripplanner.osm.wayproperty;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
+import org.opentripplanner.graph_builder.module.osm.model.StreetTraversalPermissionPair;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 

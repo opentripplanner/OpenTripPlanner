@@ -17,6 +17,7 @@ import org.opentripplanner.graph_builder.issues.CouldNotApplyMultiLevelInfoToEle
 import org.opentripplanner.graph_builder.issues.FewerThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.issues.MoreThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.issues.OnlyOneConnectionToElevatorNode;
+import org.opentripplanner.graph_builder.module.osm.model.OsmElevatorKey;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmLevelSource;

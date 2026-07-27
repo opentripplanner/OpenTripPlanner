@@ -4,6 +4,7 @@ import static org.opentripplanner.street.search.intersection_model.AbstractInter
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.graph_builder.module.osm.model.TurnRestrictionTag;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;

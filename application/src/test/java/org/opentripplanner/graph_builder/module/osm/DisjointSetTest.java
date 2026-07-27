@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.model.DisjointSet;
 
 public class DisjointSetTest {
 

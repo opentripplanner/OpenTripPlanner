@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -21,6 +21,10 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
+import org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType;
+import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmElevatorKey;
+import org.opentripplanner.graph_builder.module.osm.model.Ring;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;

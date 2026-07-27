@@ -1,8 +1,9 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.issues;
 
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
 
 public record UnconnectedArea(OsmAreaGroup areaGroup) implements DataImportIssue {
   private static final String FMT = "Area %s has no connection to street network";

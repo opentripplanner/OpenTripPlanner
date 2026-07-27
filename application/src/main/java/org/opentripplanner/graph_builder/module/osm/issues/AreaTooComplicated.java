@@ -1,7 +1,8 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.issues;
 
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
 import org.opentripplanner.osm.model.OsmEntity;
 
 public record AreaTooComplicated(OsmAreaGroup areaGroup, int nbNodes, int maxAreaNodes) implements

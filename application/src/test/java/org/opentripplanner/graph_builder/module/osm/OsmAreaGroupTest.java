@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelSource;

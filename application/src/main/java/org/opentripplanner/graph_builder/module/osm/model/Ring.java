@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import gnu.trove.list.TLongList;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.street.geometry.CoordinateArrayListSequence;
 import org.opentripplanner.street.geometry.GeometryUtils;
 
-class Ring {
+public class Ring {
 
   private final LinearRing shell;
   private final List<Ring> holes = new ArrayList<>();
@@ -70,7 +70,7 @@ class Ring {
   /**
    * Checks whether the ith node in the ring is convex (has an angle of over 180 degrees).
    */
-  boolean isNodeConvex(int i) {
+  public boolean isNodeConvex(int i) {
     int n = nodes.size() - 1;
     OsmNode cur = nodes.get(i);
     OsmNode prev = nodes.get((i + n - 1) % n);

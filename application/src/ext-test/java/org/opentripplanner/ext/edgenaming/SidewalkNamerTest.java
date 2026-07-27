@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
-import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
+import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmWay;

@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
 import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;

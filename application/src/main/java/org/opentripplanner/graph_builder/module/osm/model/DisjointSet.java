@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -12,7 +12,7 @@ import java.util.Set;
 import org.opentripplanner.framework.collection.TroveUtils;
 
 /** Basic union-find data structure with path compression */
-class DisjointSet<T> {
+public class DisjointSet<T> {
 
   TIntList sets = new TIntArrayList();
 

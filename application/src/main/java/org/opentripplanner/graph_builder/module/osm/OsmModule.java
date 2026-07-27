@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.NORMAL;
+import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
@@ -29,6 +29,11 @@ import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.cache.KeyValueCache;
 import org.opentripplanner.graph_builder.module.osm.edgelevelinfo.DefaultInclinedEdgeLevelInfoProcessor;
 import org.opentripplanner.graph_builder.module.osm.edgelevelinfo.NoopInclinedEdgeLevelInfoProcessor;
+import org.opentripplanner.graph_builder.module.osm.model.EscalatorEdgePair;
+import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
+import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;
+import org.opentripplanner.graph_builder.module.osm.model.TurnRestrictionTag;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;

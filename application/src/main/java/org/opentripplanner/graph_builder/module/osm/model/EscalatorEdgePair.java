@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.edge.EscalatorEdge;

@@ -1,6 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
-enum LinearBarrierNodeType {
+public enum LinearBarrierNodeType {
   /**
    * Create a split vertex for the node on the linear barrier. Used when the barrier runs along
    * an area.

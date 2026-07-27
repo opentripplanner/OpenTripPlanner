@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -18,7 +18,7 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
+import org.opentripplanner.graph_builder.module.osm.model.Ring.RingConstructionException;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
@@ -30,19 +30,19 @@ import org.slf4j.LoggerFactory;
 /**
  * A group of possibly-contiguous areas sharing the same level
  */
-class OsmAreaGroup {
+public class OsmAreaGroup {
 
   private static final Logger LOG = LoggerFactory.getLogger(OsmAreaGroup.class);
 
   /*
    * The list of underlying areas, used when generating edges out of the visibility graph
    */
-  Collection<OsmArea> areas;
+  public Collection<OsmArea> areas;
 
   /**
    * The joined outermost rings of the areas (with inner rings for holes as necessary).
    */
-  List<Ring> outermostRings = new ArrayList<>();
+  public List<Ring> outermostRings = new ArrayList<>();
 
   public final Geometry union;
 

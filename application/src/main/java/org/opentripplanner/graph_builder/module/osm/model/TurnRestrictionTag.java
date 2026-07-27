@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,18 +10,23 @@ import org.opentripplanner.street.search.TraverseModeSet;
  * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
  * objects
  */
-class TurnRestrictionTag {
+public class TurnRestrictionTag {
 
-  long via;
+  public long via;
   //Used only for issues so that it can be visualized in a map
-  long relationOsmID;
-  TurnRestrictionType type;
-  Direction direction;
+  public long relationOsmID;
+  public TurnRestrictionType type;
+  public Direction direction;
   public List<StreetEdge> possibleFrom = new ArrayList<>();
   public List<StreetEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;
 
-  TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOsmID) {
+  public TurnRestrictionTag(
+    long via,
+    TurnRestrictionType type,
+    Direction direction,
+    long relationOsmID
+  ) {
     this.via = via;
     this.type = type;
     this.direction = direction;
@@ -33,7 +38,7 @@ class TurnRestrictionTag {
     return String.format("%s turn restriction via node %d", direction, via);
   }
 
-  enum Direction {
+  public enum Direction {
     LEFT,
     RIGHT,
     U,

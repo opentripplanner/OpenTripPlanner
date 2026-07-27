@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import com.google.common.collect.ArrayListMultimap;
 import gnu.trove.list.TLongList;
@@ -25,14 +25,14 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally done in a
  * quick/dirty way.
  */
-class OsmArea {
+public class OsmArea {
 
-  final List<Ring> outermostRings;
+  public final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  final OsmEntity parent;
-  final PreparedPolygon jtsMultiPolygon;
+  public final OsmEntity parent;
+  public final PreparedPolygon jtsMultiPolygon;
 
-  OsmArea(
+  public OsmArea(
     OsmEntity parent,
     List<OsmWay> outerRingWays,
     List<OsmWay> innerRingWays,

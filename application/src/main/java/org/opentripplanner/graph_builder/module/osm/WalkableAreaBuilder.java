@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +22,11 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.KeyValueCache;
+import org.opentripplanner.graph_builder.module.osm.issues.AreaTooComplicated;
+import org.opentripplanner.graph_builder.module.osm.issues.UnconnectedArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
+import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
+import org.opentripplanner.graph_builder.module.osm.model.Ring;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;

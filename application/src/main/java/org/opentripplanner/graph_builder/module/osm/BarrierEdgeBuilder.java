@@ -15,11 +15,11 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
-public class BarrierEdgeBuilder {
+class BarrierEdgeBuilder {
 
   private final EdgeNamer edgeNamer;
 
-  public BarrierEdgeBuilder(EdgeNamer edgeNamer) {
+  BarrierEdgeBuilder(EdgeNamer edgeNamer) {
     this.edgeNamer = edgeNamer;
   }
 
