@@ -7,7 +7,6 @@ package org.opentripplanner.apis.gtfs.model;
 public record RealTimeTripStateModel(
   boolean added,
   boolean canceled,
-  boolean deleted,
   boolean timesModified,
   boolean tripPatternModified,
   boolean updated

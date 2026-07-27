@@ -1,7 +1,9 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
@@ -12,11 +14,11 @@ import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
@@ -51,7 +53,7 @@ class TripOnServiceDateImplTest {
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     var state = SUBJECT.realTimeTripState().get(dfEnv);
-    assertEquals(new RealTimeTripStateModel(false, false, false, false, false, false), state);
+    assertEquals(new RealTimeTripStateModel(false, false, false, false, false), state);
   }
 
   @Test
@@ -70,12 +72,11 @@ class TripOnServiceDateImplTest {
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     var state = SUBJECT.realTimeTripState().get(dfEnv);
-    assertEquals(true, state.canceled());
-    assertEquals(true, state.updated());
-    assertEquals(false, state.added());
-    assertEquals(false, state.deleted());
-    assertEquals(false, state.timesModified());
-    assertEquals(false, state.tripPatternModified());
+    assertTrue(state.canceled());
+    assertTrue(state.updated());
+    assertFalse(state.added());
+    assertFalse(state.timesModified());
+    assertFalse(state.tripPatternModified());
   }
 
   @Test
@@ -94,20 +95,21 @@ class TripOnServiceDateImplTest {
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     var state = SUBJECT.realTimeTripState().get(dfEnv);
-    assertEquals(true, state.timesModified());
-    assertEquals(true, state.updated());
-    assertEquals(false, state.canceled());
-    assertEquals(false, state.added());
-    assertEquals(false, state.deleted());
-    assertEquals(false, state.tripPatternModified());
+    assertTrue(state.timesModified());
+    assertTrue(state.updated());
+    assertFalse(state.canceled());
+    assertFalse(state.added());
+    assertFalse(state.tripPatternModified());
   }
 
   @Test
   void tripWithNoMatchingPattern_returnsNull() throws Exception {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var transitService = env.transitService();
-    // A TripOnServiceDate whose trip is unknown to the transit service → no pattern found
-    var unknownTrip = TimetableRepositoryForTest.trip("unknown").build();
+    // A TripOnServiceDate whose trip is unknown to the transit service → no pattern found.
+    // The trip is built standalone (not added via addTrip), so it is not registered with any
+    // pattern and findPattern returns null.
+    var unknownTrip = Trip.of(id("unknown")).withRoute(envBuilder.route("Runknown")).build();
     var tosd = TripOnServiceDate.of(id("unknown-tosd"))
       .withTrip(unknownTrip)
       .withServiceDate(SERVICE_DATE)

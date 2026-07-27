@@ -90,7 +90,6 @@
         realTimeTripState {
           added
           canceled
-          deleted
           timesModified
           tripPatternModified
           updated

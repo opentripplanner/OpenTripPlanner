@@ -1083,11 +1083,9 @@ type QueryType {
 type RealTimeJourneyState {
   "Has this journey been cancelled?"
   cancellation: Boolean!
-  "Has this journey been deleted from the real-time feed? Deleted journeys should not be shown to travellers."
-  deleted: Boolean!
   "Has this journey been added via real-time updates? (extra journey not in the planned data)"
   extraJourney: Boolean!
-  "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location."
+  "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location. False if the journey was cancelled"
   journeyPatternModified: Boolean!
   "Have any stop arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!

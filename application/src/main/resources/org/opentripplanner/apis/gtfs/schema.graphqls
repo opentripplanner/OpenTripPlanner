@@ -2129,8 +2129,6 @@ type RealTimeTripState {
   added: Boolean!
   "Has the trip been canceled?"
   canceled: Boolean!
-  "Has the trip been deleted?"
-  deleted: Boolean!
   "Have any stop arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!
   """

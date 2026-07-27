@@ -40,16 +40,6 @@ public class RealTimeTripStateType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("deleted")
-          .description(
-            "Has this journey been deleted from the real-time feed? Deleted journeys should not be shown to travellers."
-          )
-          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).deleted())
-          .build()
-      )
-      .field(
-        GraphQLFieldDefinition.newFieldDefinition()
           .name("timesModified")
           .description(
             "Have any stop arrival or departure times been modified from the scheduled times?"
@@ -62,7 +52,7 @@ public class RealTimeTripStateType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPatternModified")
           .description(
-            "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location."
+            "Has the stop sequence changed from the planned journey pattern? True if stops were added, removed, reordered, or reassigned to a different stop location. False if the journey was cancelled"
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(env ->

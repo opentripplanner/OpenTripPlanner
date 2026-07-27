@@ -454,7 +454,7 @@ public interface TransitService {
 
   /**
    * @return the current (real-time if available, otherwise scheduled) trip times
-   *         for the given trip on the given service date, or {@code null} if the
+   *         for the given trip on the given service date, or empty if the
    *         trip does not run on that date.
    */
   Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);

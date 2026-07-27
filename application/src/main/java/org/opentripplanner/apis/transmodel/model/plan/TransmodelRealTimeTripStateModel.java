@@ -7,7 +7,6 @@ package org.opentripplanner.apis.transmodel.model.plan;
 public record TransmodelRealTimeTripStateModel(
   boolean extraJourney,
   boolean cancellation,
-  boolean deleted,
   boolean timesModified,
   boolean journeyPatternModified,
   boolean updated

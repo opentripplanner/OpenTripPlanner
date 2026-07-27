@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import graphql.AssertException;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
@@ -57,16 +58,20 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
       var tripOnServiceDate = getSource(environment);
       return transitService
         .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
-        .map(tripTimes ->
-          new RealTimeTripStateModel(
+        .map(tripTimes -> {
+          if (tripTimes.isDeleted()) {
+            throw new AssertException(
+              "Trip has been deleted. this should not be exposed to the API and is probably a bug"
+            );
+          }
+          return new RealTimeTripStateModel(
             tripTimes.isAdded(),
             tripTimes.isCanceled(),
-            tripTimes.isDeleted(),
             tripTimes.isTimesModified(),
             tripTimes.isTripPatternModified(),
             tripTimes.hasAnyUpdates()
-          )
-        )
+          );
+        })
         .orElse(null);
     };
   }

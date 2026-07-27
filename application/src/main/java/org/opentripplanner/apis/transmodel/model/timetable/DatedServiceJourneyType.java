@@ -203,16 +203,20 @@ public class DatedServiceJourneyType {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return transitService
               .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
-              .map(tripTimes ->
-                new TransmodelRealTimeTripStateModel(
+              .map(tripTimes -> {
+                if (tripTimes.isDeleted()) {
+                  throw new AssertException(
+                    "Trip has been deleted. this should not be exposed to the API and is probably a bug"
+                  );
+                }
+                return new TransmodelRealTimeTripStateModel(
                   tripTimes.isAdded(),
                   tripTimes.isCanceled(),
-                  tripTimes.isDeleted(),
                   tripTimes.isTimesModified(),
                   tripTimes.isTripPatternModified(),
                   tripTimes.hasAnyUpdates()
-                )
-              )
+                );
+              })
               .orElse(null);
           })
           .build()
