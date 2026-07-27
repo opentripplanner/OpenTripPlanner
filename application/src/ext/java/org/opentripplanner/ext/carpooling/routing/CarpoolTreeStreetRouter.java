@@ -6,11 +6,10 @@ import java.util.Map;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.ext.carpooling.util.CarpoolStreetSearch;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.Pair;
@@ -66,9 +65,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     boolean reverse,
     Duration searchLimit
   ) {
-    var streetSearchRequest = reverse
-      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
-      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
+    var streetSearchRequest = CarpoolStreetSearch.carRequest(reverse);
     var builder = StreetSearchBuilder.of()
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())

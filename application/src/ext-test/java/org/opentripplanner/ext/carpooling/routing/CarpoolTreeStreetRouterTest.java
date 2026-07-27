@@ -10,6 +10,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -196,6 +197,23 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
     var farPath = router.route(vertexA, vertexD);
     assertNull(farPath, "Should not find far vertex D within short search limit");
+  }
+
+  /**
+   * The search limit is inclusive, so a tree sized to exactly the leg's routed duration still spans
+   * it — the floor case of {@code DefaultCarpoolingService.driverLegTreeLimits}.
+   */
+  @Test
+  void treeSizedToTheRoutedDurationStillSpansTheLeg() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    var routed = GraphPathUtils.durationOrZero(router.route(vertexA, vertexD));
+
+    var exactlySizedRouter = new CarpoolTreeStreetRouter();
+    exactlySizedRouter.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, routed);
+
+    var path = exactlySizedRouter.route(vertexA, vertexD);
+    assertNotNull(path, "a tree sized to the routed duration must still reach the leg's end");
+    assertEquals(routed, GraphPathUtils.durationOrZero(path));
   }
 
   @Test
