@@ -1168,6 +1168,7 @@ type Pattern implements Node {
     "Return trips of the pattern active on this date. Format: YYYYMMDD"
     serviceDate: String
   ): [Trip!] @deprecated(reason : "Use `tripsOnServiceDate`")
+  "Instances of `TripOnServiceDates` which run on the specified date."
   tripsOnServiceDate(serviceDate: LocalDate): [TripOnServiceDate!]!
   "Real-time updated position of vehicles that are serving this pattern."
   vehiclePositions: [VehiclePosition!]
