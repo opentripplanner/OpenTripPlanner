@@ -116,7 +116,7 @@ jobs:
 
       - name: Download build output
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: otp-build-output
 
