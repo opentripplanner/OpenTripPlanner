@@ -1947,7 +1947,10 @@ type QueryType {
     access, egress and transfers.
     """
     modes: PlanModesInput,
-    "The origin where the search starts. Usually coordinates but can also be a stop location."
+    """
+    The origin where the search starts. Usually coordinates, but can also be a stop location or a
+    position on board a specific dated transit trip.
+    """
     origin: PlanLabeledLocationInput!,
     "Preferences that affect what itineraries are returned. Preferences are split into categories."
     preferences: PlanPreferencesInput,
@@ -4052,6 +4055,11 @@ enum RoutingErrorCode {
   """
   OUTSIDE_SERVICE_PERIOD
   """
+  The on-board trip location could not be resolved because the trip visits the specified stop more
+  than once and no scheduled departure time was provided to disambiguate the visit.
+  """
+  TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME
+  """
   Transit connections were requested and found but because it is easier to just walk all the way
   to the destination they were removed.
     
@@ -4827,9 +4835,9 @@ input PlanLabeledLocationInput {
   location: PlanLocationInput!
 }
 
-"Plan location. Either a coordinate or a stop location should be defined."
+"Plan location. Exactly one location type should be defined."
 input PlanLocationInput @oneOf {
-  "Coordinate of the location. Note, either a coordinate or a stop location should be defined."
+  "Coordinate of the location."
   coordinate: PlanCoordinateInput
   """
   Stop, station, a group of stop places or multimodal stop place that should be used as
@@ -4839,6 +4847,13 @@ input PlanLocationInput @oneOf {
   sense for the journey is picked as the location within the station or group of stop places.
   """
   stopLocation: PlanStopLocationInput
+  """
+  A position on board a specific dated transit trip. This is only supported for the origin of a
+  search. The search starts on board the vehicle at the specified stop with no access leg or
+  boarding cost. The request dateTime is ignored because the departure time is resolved from the
+  trip's timetable.
+  """
+  tripLocation: PlanTripLocationInput
 }
 
 "Mode selections for the plan search."
@@ -4980,6 +4995,21 @@ input PlanTransitModesInput {
   in the field.
   """
   transit: [PlanTransitModePreferenceInput!]
+}
+
+"A position on board a specific dated GTFS trip."
+input PlanTripLocationInput {
+  """
+  Scheduled departure time at the stop. This disambiguates trips that visit the same stop more
+  than once, such as circular routes. If provided, it must match the timetable exactly.
+  """
+  scheduledDepartureTime: OffsetDateTime
+  "The GTFS service date on which the trip runs."
+  serviceDate: LocalDate!
+  "ID of the stop at which the rider is considered to be on board, including its feed scope."
+  stopLocationId: String!
+  "GTFS trip ID, including its feed scope."
+  tripId: String!
 }
 
 """

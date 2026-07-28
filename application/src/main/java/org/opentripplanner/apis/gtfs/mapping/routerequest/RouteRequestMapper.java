@@ -19,6 +19,8 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
+import org.opentripplanner.routing.api.request.TripLocation;
+import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -179,24 +181,45 @@ public class RouteRequestMapper {
   private static GenericLocation parseGenericLocation(
     GraphQLTypes.GraphQLPlanLabeledLocationInput locationInput
   ) {
-    var stopLocation = locationInput.getGraphQLLocation().getGraphQLStopLocation();
+    var location = locationInput.getGraphQLLocation();
+    var label = locationInput.getGraphQLLabel();
+
+    var tripLocation = location.getGraphQLTripLocation();
+    if (tripLocation.getGraphQLTripId() != null) {
+      return GenericLocation.fromTripLocation(mapTripLocation(tripLocation), label);
+    }
+
+    var stopLocation = location.getGraphQLStopLocation();
     if (stopLocation.getGraphQLStopLocationId() != null) {
       var stopId = stopLocation.getGraphQLStopLocationId();
       return FeedScopedId.parseOptional(stopId)
-        .map(feedScopedId ->
-          GenericLocation.fromStopId(feedScopedId, locationInput.getGraphQLLabel())
-        )
+        .map(feedScopedId -> GenericLocation.fromStopId(feedScopedId, label))
         .orElseThrow(() ->
           new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
         );
     }
 
-    var coordinate = locationInput.getGraphQLLocation().getGraphQLCoordinate();
+    var coordinate = location.getGraphQLCoordinate();
     return GenericLocation.fromCoordinate(
       coordinate.getGraphQLLatitude(),
       coordinate.getGraphQLLongitude(),
-      locationInput.getGraphQLLabel()
+      label
     );
+  }
+
+  private static TripLocation mapTripLocation(
+    GraphQLTypes.GraphQLPlanTripLocationInput tripLocation
+  ) {
+    var tripOnDateReference = TripOnDateReference.ofTripIdAndServiceDate(
+      FeedScopedId.parseStrict(tripLocation.getGraphQLTripId()),
+      tripLocation.getGraphQLServiceDate()
+    );
+    var stopLocationId = FeedScopedId.parseStrict(tripLocation.getGraphQLStopLocationId());
+    var scheduledDepartureTime = tripLocation.getGraphQLScheduledDepartureTime();
+
+    return scheduledDepartureTime == null
+      ? TripLocation.of(tripOnDateReference, stopLocationId)
+      : TripLocation.of(tripOnDateReference, stopLocationId, scheduledDepartureTime.toInstant());
   }
 
   static void mapViaPoints(RouteRequestBuilder request, List<Map<String, Object>> via) {

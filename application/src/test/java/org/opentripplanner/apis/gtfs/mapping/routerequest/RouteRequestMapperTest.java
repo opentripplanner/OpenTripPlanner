@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.TripLocation;
+import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 
 class RouteRequestMapperTest {
@@ -142,6 +144,57 @@ class RouteRequestMapperTest {
     assertEquals(originLabel, routeRequest.from().label());
     assertEquals(FeedScopedId.parseStrict(stopB), routeRequest.to().stopId());
     assertEquals(destinationLabel, routeRequest.to().label());
+  }
+
+  @Test
+  void testOnBoardTripLocation() {
+    var serviceDate = LocalDate.of(2026, 7, 28);
+    var scheduledDepartureTime = OffsetDateTime.of(
+      serviceDate,
+      LocalTime.of(12, 34),
+      ZoneOffset.UTC
+    );
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "label",
+        "On board route 10",
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of(
+            "tripId",
+            "F:trip-10",
+            "serviceDate",
+            serviceDate,
+            "stopLocationId",
+            "F:stop-3",
+            "scheduledDepartureTime",
+            scheduledDepartureTime
+          )
+        )
+      )
+    );
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+    var location = request.from();
+
+    assertEquals("On board route 10", location.label());
+    assertEquals(
+      TripLocation.of(
+        TripOnDateReference.ofTripIdAndServiceDate(
+          FeedScopedId.parseStrict("F:trip-10"),
+          serviceDate
+        ),
+        FeedScopedId.parseStrict("F:stop-3"),
+        scheduledDepartureTime.toInstant()
+      ),
+      location.tripLocation()
+    );
   }
 
   @Test

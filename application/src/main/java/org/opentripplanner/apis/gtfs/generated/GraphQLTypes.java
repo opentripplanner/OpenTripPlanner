@@ -2187,6 +2187,7 @@ public class GraphQLTypes {
 
     private GraphQLPlanCoordinateInput coordinate;
     private GraphQLPlanStopLocationInput stopLocation;
+    private GraphQLPlanTripLocationInput tripLocation;
 
     public GraphQLPlanLocationInput(Map<String, Object> args) {
       if (args != null) {
@@ -2195,6 +2196,9 @@ public class GraphQLTypes {
         );
         this.stopLocation = new GraphQLPlanStopLocationInput(
           (Map<String, Object>) args.get("stopLocation")
+        );
+        this.tripLocation = new GraphQLPlanTripLocationInput(
+          (Map<String, Object>) args.get("tripLocation")
         );
       }
     }
@@ -2207,12 +2211,20 @@ public class GraphQLTypes {
       return this.stopLocation;
     }
 
+    public GraphQLPlanTripLocationInput getGraphQLTripLocation() {
+      return this.tripLocation;
+    }
+
     public void setGraphQLCoordinate(GraphQLPlanCoordinateInput coordinate) {
       this.coordinate = coordinate;
     }
 
     public void setGraphQLStopLocation(GraphQLPlanStopLocationInput stopLocation) {
       this.stopLocation = stopLocation;
+    }
+
+    public void setGraphQLTripLocation(GraphQLPlanTripLocationInput tripLocation) {
+      this.tripLocation = tripLocation;
     }
   }
 
@@ -2550,6 +2562,55 @@ public class GraphQLTypes {
 
     public void setGraphQLTransit(List<GraphQLPlanTransitModePreferenceInput> transit) {
       this.transit = transit;
+    }
+  }
+
+  public static class GraphQLPlanTripLocationInput {
+
+    private java.time.OffsetDateTime scheduledDepartureTime;
+    private java.time.LocalDate serviceDate;
+    private String stopLocationId;
+    private String tripId;
+
+    public GraphQLPlanTripLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.scheduledDepartureTime = (java.time.OffsetDateTime) args.get("scheduledDepartureTime");
+        this.serviceDate = (java.time.LocalDate) args.get("serviceDate");
+        this.stopLocationId = (String) args.get("stopLocationId");
+        this.tripId = (String) args.get("tripId");
+      }
+    }
+
+    public java.time.OffsetDateTime getGraphQLScheduledDepartureTime() {
+      return this.scheduledDepartureTime;
+    }
+
+    public java.time.LocalDate getGraphQLServiceDate() {
+      return this.serviceDate;
+    }
+
+    public String getGraphQLStopLocationId() {
+      return this.stopLocationId;
+    }
+
+    public String getGraphQLTripId() {
+      return this.tripId;
+    }
+
+    public void setGraphQLScheduledDepartureTime(java.time.OffsetDateTime scheduledDepartureTime) {
+      this.scheduledDepartureTime = scheduledDepartureTime;
+    }
+
+    public void setGraphQLServiceDate(java.time.LocalDate serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+
+    public void setGraphQLStopLocationId(String stopLocationId) {
+      this.stopLocationId = stopLocationId;
+    }
+
+    public void setGraphQLTripId(String tripId) {
+      this.tripId = tripId;
     }
   }
 
@@ -4918,6 +4979,7 @@ public class GraphQLTypes {
     NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
     OUTSIDE_BOUNDS,
     OUTSIDE_SERVICE_PERIOD,
+    TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
     WALKING_BETTER_THAN_TRANSIT,
   }
 
