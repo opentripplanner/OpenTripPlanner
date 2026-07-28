@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -209,10 +210,48 @@ class RouteRequestMapperTest {
     args.put("origin", Map.of("location", Map.of("stopLocation", Map.of("stopLocationId", "foo"))));
     var env = testCtx.executionContext(args);
 
-    var exception = assertThrows(IllegalArgumentException.class, () ->
+    var exception = assertThrows(InvalidInputException.class, () ->
       RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
-    assertEquals("Stop id foo is not of valid format.", exception.getMessage());
+    assertEquals(
+      "'foo' is not a valid value for 'stopLocationId', the expected format is '<feed id>:<entity id>'.",
+      exception.getMessage()
+    );
+  }
+
+  /**
+   * A malformed id inside a trip location names the offending field, so that a client can tell
+   * which of the two ids it got wrong.
+   */
+  @Test
+  void testInvalidTripLocationTripId() {
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of(
+            "tripId",
+            "foo",
+            "serviceDate",
+            LocalDate.of(2026, 7, 28),
+            "stopLocationId",
+            ON_BOARD_STOP_ID
+          )
+        )
+      )
+    );
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "'foo' is not a valid value for 'tripId', the expected format is '<feed id>:<entity id>'.",
+      exception.getMessage()
+    );
   }
 
   private static Map<String, Object> onBoardOrigin(

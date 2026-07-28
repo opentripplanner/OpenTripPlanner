@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
@@ -191,12 +192,8 @@ public class RouteRequestMapper {
 
     var stopLocation = location.getGraphQLStopLocation();
     if (stopLocation.getGraphQLStopLocationId() != null) {
-      var stopId = stopLocation.getGraphQLStopLocationId();
-      return FeedScopedId.parseOptional(stopId)
-        .map(feedScopedId -> GenericLocation.fromStopId(feedScopedId, label))
-        .orElseThrow(() ->
-          new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
-        );
+      var stopId = parseClientId("stopLocationId", stopLocation.getGraphQLStopLocationId());
+      return GenericLocation.fromStopId(stopId, label);
     }
 
     var coordinate = location.getGraphQLCoordinate();
@@ -211,15 +208,30 @@ public class RouteRequestMapper {
     GraphQLTypes.GraphQLPlanTripLocationInput tripLocation
   ) {
     var tripOnDateReference = TripOnDateReference.ofTripIdAndServiceDate(
-      FeedScopedId.parseStrict(tripLocation.getGraphQLTripId()),
+      parseClientId("tripId", tripLocation.getGraphQLTripId()),
       tripLocation.getGraphQLServiceDate()
     );
-    var stopLocationId = FeedScopedId.parseStrict(tripLocation.getGraphQLStopLocationId());
+    var stopLocationId = parseClientId("stopLocationId", tripLocation.getGraphQLStopLocationId());
     var scheduledDepartureTime = tripLocation.getGraphQLScheduledDepartureTime();
 
     return scheduledDepartureTime == null
       ? TripLocation.of(tripOnDateReference, stopLocationId)
       : TripLocation.of(tripOnDateReference, stopLocationId, scheduledDepartureTime.toInstant());
+  }
+
+  /**
+   * Parses a feed-scoped id supplied by the client. A malformed id is a client mistake, so it is
+   * reported as a bad request naming the offending field rather than surfacing as a server error.
+   */
+  private static FeedScopedId parseClientId(String fieldName, String id) {
+    return FeedScopedId.parseOptional(id).orElseThrow(() ->
+      new InvalidInputException(
+        "'%s' is not a valid value for '%s', the expected format is '<feed id>:<entity id>'.".formatted(
+          id,
+          fieldName
+        )
+      )
+    );
   }
 
   static void mapViaPoints(RouteRequestBuilder request, List<Map<String, Object>> via) {
