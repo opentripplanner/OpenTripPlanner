@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarAccessDirection;
@@ -32,12 +33,18 @@ public class CarpoolTripVertexResolver {
   private final VertexCreationService vertexCreationService;
   private final CarAccessibleVertexSnapper carVertexSnapper;
 
+  /**
+   * @throws NullPointerException if any parameter is null
+   */
   public CarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
     CarAccessibleVertexSnapper carVertexSnapper
   ) {
-    this.vertexCreationService = vertexCreationService;
-    this.carVertexSnapper = carVertexSnapper;
+    this.vertexCreationService = Objects.requireNonNull(
+      vertexCreationService,
+      "vertexCreationService"
+    );
+    this.carVertexSnapper = Objects.requireNonNull(carVertexSnapper, "carVertexSnapper");
   }
 
   /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */

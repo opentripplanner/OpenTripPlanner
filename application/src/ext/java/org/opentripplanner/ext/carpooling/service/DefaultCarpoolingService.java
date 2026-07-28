@@ -154,16 +154,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
     VertexCreationService vertexCreationService,
     CarAccessibleVertexSnapper carVertexSnapper
   ) {
-    this.repository = repository;
-    this.streetLimitationParametersService = streetLimitationParametersService;
+    this.repository = Objects.requireNonNull(repository, "repository");
+    this.streetLimitationParametersService = Objects.requireNonNull(
+      streetLimitationParametersService,
+      "streetLimitationParametersService"
+    );
     this.preFilters = TripPreFilters.defaults();
     this.postFilters = ItineraryPostFilters.defaults();
     this.itineraryMapper = new CarpoolItineraryMapper();
     this.positionFinder = new InsertionPositionFinder(
       new BeelineEstimator(streetLimitationParametersService.maxCarSpeed())
     );
-    this.vertexCreationService = vertexCreationService;
-    this.carVertexSnapper = carVertexSnapper;
+    this.vertexCreationService = Objects.requireNonNull(
+      vertexCreationService,
+      "vertexCreationService"
+    );
+    this.carVertexSnapper = Objects.requireNonNull(carVertexSnapper, "carVertexSnapper");
   }
 
   /**

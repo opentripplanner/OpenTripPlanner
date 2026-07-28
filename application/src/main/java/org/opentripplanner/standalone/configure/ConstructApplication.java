@@ -278,10 +278,12 @@ public class ConstructApplication {
     return factory.transferRepository();
   }
 
+  @Nullable
   public CarpoolingRepository carpoolingRepository() {
     return factory.carpoolingRepository();
   }
 
+  @Nullable
   public CarpoolTripVertexResolver carpoolTripVertexResolver() {
     return factory.carpoolTripVertexResolver();
   }

@@ -60,8 +60,15 @@ public class UpdaterConfigurator {
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
+
+  /** {@code null} when {@link OTPFeature#CarPooling} is off. */
+  @Nullable
   private final CarpoolingRepository carpoolingRepository;
+
+  /** {@code null} when {@link OTPFeature#CarPooling} is off. */
+  @Nullable
   private final CarpoolTripVertexResolver carpoolTripVertexResolver;
+
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager updateManager;
   private final RepositoryHandle<
@@ -80,8 +87,8 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
-    CarpoolingRepository carpoolingRepository,
-    CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable CarpoolingRepository carpoolingRepository,
+    @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
     RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
@@ -108,8 +115,8 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
-    CarpoolingRepository carpoolingRepository,
-    CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable CarpoolingRepository carpoolingRepository,
+    @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
     RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
