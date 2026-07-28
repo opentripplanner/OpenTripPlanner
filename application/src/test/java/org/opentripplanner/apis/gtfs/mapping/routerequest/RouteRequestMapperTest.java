@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
@@ -27,6 +28,9 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugPr
 class RouteRequestMapperTest {
 
   private static final Locale LOCALE = Locale.GERMAN;
+  private static final String ON_BOARD_TRIP_ID = "F:trip-10";
+  private static final String ON_BOARD_STOP_ID = "F:stop-3";
+  private static final String ON_BOARD_LABEL = "On board route 10";
   private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(LOCALE);
 
   @Test
@@ -156,27 +160,7 @@ class RouteRequestMapperTest {
       ZoneOffset.UTC
     );
     var args = testCtx.basicRequest();
-    args.put(
-      "origin",
-      Map.of(
-        "label",
-        "On board route 10",
-        "location",
-        Map.of(
-          "tripLocation",
-          Map.of(
-            "tripId",
-            "F:trip-10",
-            "serviceDate",
-            serviceDate,
-            "stopLocationId",
-            "F:stop-3",
-            "scheduledDepartureTime",
-            scheduledDepartureTime
-          )
-        )
-      )
-    );
+    args.put("origin", onBoardOrigin(serviceDate, scheduledDepartureTime));
 
     var request = RouteRequestMapper.toRouteRequest(
       testCtx.executionContext(args),
@@ -184,30 +168,15 @@ class RouteRequestMapperTest {
     );
     var location = request.from();
 
-    assertEquals("On board route 10", location.label());
+    assertEquals(ON_BOARD_LABEL, location.label());
     assertEquals(
       TripLocation.of(
-        TripOnDateReference.ofTripIdAndServiceDate(
-          FeedScopedId.parseStrict("F:trip-10"),
-          serviceDate
-        ),
-        FeedScopedId.parseStrict("F:stop-3"),
+        onBoardTripReference(serviceDate),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID),
         scheduledDepartureTime.toInstant()
       ),
       location.tripLocation()
     );
-  }
-
-  @Test
-  void testInvalidStopLocationId() {
-    Map<String, Object> args = testCtx.basicRequest();
-    args.put("origin", Map.of("location", Map.of("stopLocation", Map.of("stopLocationId", "foo"))));
-    var env = testCtx.executionContext(args);
-
-    var exception = assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, testCtx.context())
-    );
-    assertEquals("Stop id foo is not of valid format.", exception.getMessage());
   }
 
   /**
@@ -218,18 +187,7 @@ class RouteRequestMapperTest {
   void testOnBoardTripLocationWithoutScheduledDepartureTime() {
     var serviceDate = LocalDate.of(2026, 7, 28);
     var args = testCtx.basicRequest();
-    args.put(
-      "origin",
-      Map.of(
-        "label",
-        "On board route 10",
-        "location",
-        Map.of(
-          "tripLocation",
-          Map.of("tripId", "F:trip-10", "serviceDate", serviceDate, "stopLocationId", "F:stop-3")
-        )
-      )
-    );
+    args.put("origin", onBoardOrigin(serviceDate, null));
 
     var request = RouteRequestMapper.toRouteRequest(
       testCtx.executionContext(args),
@@ -238,13 +196,46 @@ class RouteRequestMapperTest {
 
     assertEquals(
       TripLocation.of(
-        TripOnDateReference.ofTripIdAndServiceDate(
-          FeedScopedId.parseStrict("F:trip-10"),
-          serviceDate
-        ),
-        FeedScopedId.parseStrict("F:stop-3")
+        onBoardTripReference(serviceDate),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID)
       ),
       request.from().tripLocation()
+    );
+  }
+
+  @Test
+  void testInvalidStopLocationId() {
+    var args = testCtx.basicRequest();
+    args.put("origin", Map.of("location", Map.of("stopLocation", Map.of("stopLocationId", "foo"))));
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(IllegalArgumentException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals("Stop id foo is not of valid format.", exception.getMessage());
+  }
+
+  private static Map<String, Object> onBoardOrigin(
+    LocalDate serviceDate,
+    @Nullable OffsetDateTime scheduledDepartureTime
+  ) {
+    var tripLocation = new HashMap<String, Object>();
+    tripLocation.put("tripId", ON_BOARD_TRIP_ID);
+    tripLocation.put("serviceDate", serviceDate);
+    tripLocation.put("stopLocationId", ON_BOARD_STOP_ID);
+    if (scheduledDepartureTime != null) {
+      tripLocation.put("scheduledDepartureTime", scheduledDepartureTime);
+    }
+    return Map.ofEntries(
+      entry("label", ON_BOARD_LABEL),
+      entry("location", Map.of("tripLocation", tripLocation))
+    );
+  }
+
+  private static TripOnDateReference onBoardTripReference(LocalDate serviceDate) {
+    return TripOnDateReference.ofTripIdAndServiceDate(
+      FeedScopedId.parseStrict(ON_BOARD_TRIP_ID),
+      serviceDate
     );
   }
 
