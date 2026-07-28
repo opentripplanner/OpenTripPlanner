@@ -4850,9 +4850,10 @@ input PlanLocationInput @oneOf {
   """
   A position on board a specific dated transit trip. This is only supported for the origin of a
   search. The search starts on board the vehicle at the specified stop with no access leg or
-  boarding cost. The request dateTime is ignored because the departure time is resolved from the
-  trip's timetable. Paging is not supported: the search is pinned to the boarding time, so the
-  plan connection contains no page cursors and the `before` and `after` arguments must be omitted.
+  boarding cost. The request `dateTime` and `searchWindow` are ignored because the search is
+  pinned to the departure resolved from the trip's timetable, and an arrive-by search (a
+  `latestArrival` dateTime) is not supported. Paging is not supported either: the plan connection
+  contains no page cursors and the `before` and `after` arguments must be omitted.
   """
   tripLocation: PlanTripLocationInput
 }
@@ -4998,19 +4999,36 @@ input PlanTransitModesInput {
   transit: [PlanTransitModePreferenceInput!]
 }
 
-"A position on board a specific dated GTFS trip."
+"Identifies a trip by GTFS trip ID and the service date on which it runs."
+input PlanTripIdOnServiceDateInput {
+  "The GTFS service date on which the trip runs."
+  serviceDate: LocalDate!
+  "GTFS trip ID, including its feed scope."
+  tripId: String!
+}
+
+"A position on board a specific dated transit trip."
 input PlanTripLocationInput {
   """
   Scheduled departure time at the stop. This disambiguates trips that visit the same stop more
   than once, such as circular routes. If provided, it must match the timetable exactly.
   """
   scheduledDepartureTime: OffsetDateTime
-  "The GTFS service date on which the trip runs."
-  serviceDate: LocalDate!
   "ID of the stop at which the rider is considered to be on board, including its feed scope."
   stopLocationId: String!
-  "GTFS trip ID, including its feed scope."
-  tripId: String!
+  "Reference identifying the dated trip the rider is on board."
+  tripReference: PlanTripOnDateReferenceInput!
+}
+
+"Identifies a trip on a service date. Exactly one reference type should be defined."
+input PlanTripOnDateReferenceInput @oneOf {
+  "A GTFS trip ID combined with the service date on which the trip runs."
+  tripIdOnServiceDate: PlanTripIdOnServiceDateInput
+  """
+  The unique ID of a dated trip, including its feed scope. This can be used with data sources,
+  such as NeTEx, where a trip on a specific date is uniquely identified by its own ID.
+  """
+  tripOnDateId: String
 }
 
 """

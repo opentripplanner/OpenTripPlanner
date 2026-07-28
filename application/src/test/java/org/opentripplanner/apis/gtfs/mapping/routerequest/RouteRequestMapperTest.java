@@ -221,7 +221,7 @@ class RouteRequestMapperTest {
 
   /**
    * A malformed id inside a trip location names the offending field, so that a client can tell
-   * which of the two ids it got wrong.
+   * which of the ids it got wrong.
    */
   @Test
   void testInvalidTripLocationTripId() {
@@ -233,10 +233,11 @@ class RouteRequestMapperTest {
         Map.of(
           "tripLocation",
           Map.of(
-            "tripId",
-            "foo",
-            "serviceDate",
-            LocalDate.of(2026, 7, 28),
+            "tripReference",
+            Map.of(
+              "tripIdOnServiceDate",
+              Map.of("tripId", "foo", "serviceDate", LocalDate.of(2026, 7, 28))
+            ),
             "stopLocationId",
             ON_BOARD_STOP_ID
           )
@@ -250,6 +251,69 @@ class RouteRequestMapperTest {
     );
     assertEquals(
       "'foo' is not a valid value for 'tripId', the expected format is '<feed id>:<entity id>'.",
+      exception.getMessage()
+    );
+  }
+
+  /**
+   * A dated trip may also be referenced directly by its own unique id, used with data sources
+   * such as NeTEx where a trip on a specific date has its own identifier.
+   */
+  @Test
+  void testOnBoardTripLocationWithTripOnDateId() {
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of(
+            "tripReference",
+            Map.of("tripOnDateId", "F:dated-trip-10"),
+            "stopLocationId",
+            ON_BOARD_STOP_ID
+          )
+        )
+      )
+    );
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+
+    assertEquals(
+      TripLocation.of(
+        TripOnDateReference.ofTripOnServiceDateId(FeedScopedId.parseStrict("F:dated-trip-10")),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID)
+      ),
+      request.from().tripLocation()
+    );
+  }
+
+  /**
+   * Arriving on board by a given time is not supported, so an arrive-by search with an on-board
+   * origin is rejected.
+   */
+  @Test
+  void testOnBoardTripLocationRejectsArriveBy() {
+    var args = testCtx.basicRequest();
+    args.put("origin", onBoardOrigin(LocalDate.of(2026, 7, 28), null));
+    args.put(
+      "dateTime",
+      Map.of(
+        "latestArrival",
+        OffsetDateTime.of(LocalDate.of(2026, 7, 28), LocalTime.of(15, 0), ZoneOffset.UTC)
+      )
+    );
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "An arrive-by search is not supported for a search starting on board a trip; omit 'latestArrival'.",
       exception.getMessage()
     );
   }
@@ -281,8 +345,10 @@ class RouteRequestMapperTest {
     @Nullable OffsetDateTime scheduledDepartureTime
   ) {
     var tripLocation = new HashMap<String, Object>();
-    tripLocation.put("tripId", ON_BOARD_TRIP_ID);
-    tripLocation.put("serviceDate", serviceDate);
+    tripLocation.put(
+      "tripReference",
+      Map.of("tripIdOnServiceDate", Map.of("tripId", ON_BOARD_TRIP_ID, "serviceDate", serviceDate))
+    );
     tripLocation.put("stopLocationId", ON_BOARD_STOP_ID);
     if (scheduledDepartureTime != null) {
       tripLocation.put("scheduledDepartureTime", scheduledDepartureTime);

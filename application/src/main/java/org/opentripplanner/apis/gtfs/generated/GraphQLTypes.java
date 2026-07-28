@@ -2565,19 +2565,48 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPlanTripIdOnServiceDateInput {
+
+    private java.time.LocalDate serviceDate;
+    private String tripId;
+
+    public GraphQLPlanTripIdOnServiceDateInput(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (java.time.LocalDate) args.get("serviceDate");
+        this.tripId = (String) args.get("tripId");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLServiceDate() {
+      return this.serviceDate;
+    }
+
+    public String getGraphQLTripId() {
+      return this.tripId;
+    }
+
+    public void setGraphQLServiceDate(java.time.LocalDate serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+
+    public void setGraphQLTripId(String tripId) {
+      this.tripId = tripId;
+    }
+  }
+
   public static class GraphQLPlanTripLocationInput {
 
     private java.time.OffsetDateTime scheduledDepartureTime;
-    private java.time.LocalDate serviceDate;
     private String stopLocationId;
-    private String tripId;
+    private GraphQLPlanTripOnDateReferenceInput tripReference;
 
     public GraphQLPlanTripLocationInput(Map<String, Object> args) {
       if (args != null) {
         this.scheduledDepartureTime = (java.time.OffsetDateTime) args.get("scheduledDepartureTime");
-        this.serviceDate = (java.time.LocalDate) args.get("serviceDate");
         this.stopLocationId = (String) args.get("stopLocationId");
-        this.tripId = (String) args.get("tripId");
+        this.tripReference = new GraphQLPlanTripOnDateReferenceInput(
+          (Map<String, Object>) args.get("tripReference")
+        );
       }
     }
 
@@ -2585,32 +2614,57 @@ public class GraphQLTypes {
       return this.scheduledDepartureTime;
     }
 
-    public java.time.LocalDate getGraphQLServiceDate() {
-      return this.serviceDate;
-    }
-
     public String getGraphQLStopLocationId() {
       return this.stopLocationId;
     }
 
-    public String getGraphQLTripId() {
-      return this.tripId;
+    public GraphQLPlanTripOnDateReferenceInput getGraphQLTripReference() {
+      return this.tripReference;
     }
 
     public void setGraphQLScheduledDepartureTime(java.time.OffsetDateTime scheduledDepartureTime) {
       this.scheduledDepartureTime = scheduledDepartureTime;
     }
 
-    public void setGraphQLServiceDate(java.time.LocalDate serviceDate) {
-      this.serviceDate = serviceDate;
-    }
-
     public void setGraphQLStopLocationId(String stopLocationId) {
       this.stopLocationId = stopLocationId;
     }
 
-    public void setGraphQLTripId(String tripId) {
-      this.tripId = tripId;
+    public void setGraphQLTripReference(GraphQLPlanTripOnDateReferenceInput tripReference) {
+      this.tripReference = tripReference;
+    }
+  }
+
+  public static class GraphQLPlanTripOnDateReferenceInput {
+
+    private GraphQLPlanTripIdOnServiceDateInput tripIdOnServiceDate;
+    private String tripOnDateId;
+
+    public GraphQLPlanTripOnDateReferenceInput(Map<String, Object> args) {
+      if (args != null) {
+        this.tripIdOnServiceDate = new GraphQLPlanTripIdOnServiceDateInput(
+          (Map<String, Object>) args.get("tripIdOnServiceDate")
+        );
+        this.tripOnDateId = (String) args.get("tripOnDateId");
+      }
+    }
+
+    public GraphQLPlanTripIdOnServiceDateInput getGraphQLTripIdOnServiceDate() {
+      return this.tripIdOnServiceDate;
+    }
+
+    public String getGraphQLTripOnDateId() {
+      return this.tripOnDateId;
+    }
+
+    public void setGraphQLTripIdOnServiceDate(
+      GraphQLPlanTripIdOnServiceDateInput tripIdOnServiceDate
+    ) {
+      this.tripIdOnServiceDate = tripIdOnServiceDate;
+    }
+
+    public void setGraphQLTripOnDateId(String tripOnDateId) {
+      this.tripOnDateId = tripOnDateId;
     }
   }
 

@@ -59,15 +59,20 @@ public class RouteRequestMapper {
         : null
     );
 
-    // A start-on-board search is pinned to the boarding time of a single dated trip, so there are
-    // no other pages and the plan connection contains no page cursors to pass back.
-    if (
-      request.from().isOnBoard() &&
-      (args.getGraphQLBefore() != null || args.getGraphQLAfter() != null)
-    ) {
-      throw new InvalidInputException(
-        "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'."
-      );
+    // A start-on-board search is pinned to the boarding time of a single dated trip. Arriving by
+    // a given time is not supported, and there are no other pages to navigate to, so the plan
+    // connection contains no page cursors to pass back.
+    if (request.from().isOnBoard()) {
+      if (dateTime.getGraphQLLatestArrival() != null) {
+        throw new InvalidInputException(
+          "An arrive-by search is not supported for a search starting on board a trip; omit 'latestArrival'."
+        );
+      }
+      if (args.getGraphQLBefore() != null || args.getGraphQLAfter() != null) {
+        throw new InvalidInputException(
+          "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'."
+        );
+      }
     }
 
     if (args.getGraphQLBefore() != null) {
@@ -197,7 +202,7 @@ public class RouteRequestMapper {
     var label = locationInput.getGraphQLLabel();
 
     var tripLocation = location.getGraphQLTripLocation();
-    if (tripLocation.getGraphQLTripId() != null) {
+    if (tripLocation.getGraphQLStopLocationId() != null) {
       return GenericLocation.fromTripLocation(mapTripLocation(tripLocation), label);
     }
 
@@ -218,16 +223,28 @@ public class RouteRequestMapper {
   private static TripLocation mapTripLocation(
     GraphQLTypes.GraphQLPlanTripLocationInput tripLocation
   ) {
-    var tripOnDateReference = TripOnDateReference.ofTripIdAndServiceDate(
-      parseClientId("tripId", tripLocation.getGraphQLTripId()),
-      tripLocation.getGraphQLServiceDate()
-    );
+    var tripOnDateReference = mapTripOnDateReference(tripLocation.getGraphQLTripReference());
     var stopLocationId = parseClientId("stopLocationId", tripLocation.getGraphQLStopLocationId());
     var scheduledDepartureTime = tripLocation.getGraphQLScheduledDepartureTime();
 
     return scheduledDepartureTime == null
       ? TripLocation.of(tripOnDateReference, stopLocationId)
       : TripLocation.of(tripOnDateReference, stopLocationId, scheduledDepartureTime.toInstant());
+  }
+
+  private static TripOnDateReference mapTripOnDateReference(
+    GraphQLTypes.GraphQLPlanTripOnDateReferenceInput tripReference
+  ) {
+    if (tripReference.getGraphQLTripOnDateId() != null) {
+      return TripOnDateReference.ofTripOnServiceDateId(
+        parseClientId("tripOnDateId", tripReference.getGraphQLTripOnDateId())
+      );
+    }
+    var tripIdOnServiceDate = tripReference.getGraphQLTripIdOnServiceDate();
+    return TripOnDateReference.ofTripIdAndServiceDate(
+      parseClientId("tripId", tripIdOnServiceDate.getGraphQLTripId()),
+      tripIdOnServiceDate.getGraphQLServiceDate()
+    );
   }
 
   /**
