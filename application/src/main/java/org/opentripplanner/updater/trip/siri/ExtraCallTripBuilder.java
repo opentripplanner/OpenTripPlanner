@@ -59,15 +59,15 @@ class ExtraCallTripBuilder {
 
     this.deduplicator = deduplicator;
     // DataSource of added trip
-    dataSource = journey.dataSource();
+    dataSource = journey.dataSource().orElse(null);
 
     serviceDate = entityResolver.resolveServiceDate(journey);
 
     isJourneyPredictionInaccurate = journey.isPredictionInaccurate();
-    occupancy = journey.occupancy();
+    occupancy = journey.occupancy().orElse(null);
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
-    vehicleRef = journey.vehicleRef();
+    vehicleRef = journey.vehicleRef().orElse(null);
 
     this.calls = journey.calls();
 
