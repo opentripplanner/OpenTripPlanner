@@ -341,7 +341,30 @@ public class BuildConfig implements OtpDataStoreConfig {
     platformEntriesLinking = root
       .of("platformEntriesLinking")
       .since(V2_0)
-      .summary("Link unconnected entries to public transport platforms.")
+      .summary(
+        "Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area."
+      )
+      .description(
+        """
+        Public transport platforms in OSM are usually mapped as an area, but the stairway,
+        elevator or ramp that actually leads onto the platform is frequently mapped as a separate
+        way whose nodes are not shared with the platform's outline - it merely happens to end
+        somewhere geometrically inside of it. Without this option such entries stay disconnected from
+        the platform and can end up unreachable, or force a long detour around the platform
+        boundary to reach.
+
+        When enabled, OTP looks for street vertices that have exactly one non-motorized
+        connection to the rest of the street network - a "stub", such as the top of a staircase.
+        For every platform, it then checks which of these stubs fall inside that platform's
+        outline - not just on its boundary, but anywhere inside it - and links them into the
+        platform's walking area, so people can be routed from the platform to the entrance and
+        back even though OSM never connected them directly.
+
+        Turn this on if platform entrances in your OSM data are commonly mapped this way; leave
+        it off if entrances always share nodes with the platform outline, since the extra
+        street-vertex scan adds a small amount of processing time during graph build.
+        """
+      )
       .asBoolean(false);
     staticParkAndRide = root
       .of("staticParkAndRide")

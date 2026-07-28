@@ -13,10 +13,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
+import org.locationtech.jts.index.SpatialIndex;
+import org.locationtech.jts.index.strtree.STRtree;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -66,7 +69,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final List<OsmVertex> platformLinkingPoints;
+  private final SpatialIndex platformEntranceCandidatesIndex;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -133,15 +136,16 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformLinkingPoints = platformEntriesLinking
-      ? graph
-          .getVertices()
-          .stream()
-          .filter(OsmVertex.class::isInstance)
-          .map(OsmVertex.class::cast)
-          .filter(this::isPlatformLinkingPoint)
-          .collect(Collectors.toList())
-      : List.of();
+    this.platformEntranceCandidatesIndex = new STRtree();
+    if (platformEntriesLinking) {
+      graph
+        .getVertices()
+        .stream()
+        .filter(OsmVertex.class::isInstance)
+        .map(OsmVertex.class::cast)
+        .filter(this::isPlatformEntranceCandidate)
+        .forEach(v -> platformEntranceCandidatesIndex.insert(new Envelope(v.getCoordinate()), v));
+    }
   }
 
   /**
@@ -299,7 +303,10 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            List<OsmVertex> verticesWithin = platformLinkingPoints
+            Envelope ringEnvelope = outerRing.jtsPolygon.getEnvelopeInternal();
+            @SuppressWarnings("unchecked")
+            List<OsmVertex> candidates = platformEntranceCandidatesIndex.query(ringEnvelope);
+            var verticesWithin = candidates
               .stream()
               .filter(t ->
                 outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
@@ -734,7 +741,23 @@ class WalkableAreaBuilder {
     }
   }
 
-  private boolean isPlatformLinkingPoint(OsmVertex osmVertex) {
+  /**
+   * Tests whether {@code osmVertex} is a candidate single-entry stub into the street network:
+   * exactly one non-motorized edge (permission {@link StreetTraversalPermission#PEDESTRIAN},
+   * {@link StreetTraversalPermission#BICYCLE} or
+   * {@link StreetTraversalPermission#PEDESTRIAN_AND_BICYCLE}) connects it to one other vertex,
+   * and every other non-{@link AreaEdge} edge at this vertex leads back to that same vertex.
+   *
+   * <p>This is a pure edge-topology check — it knows nothing about area polygons, and runs once,
+   * up front, over every {@link OsmVertex} in the graph, before any platform's visibility graph
+   * exists. A vertex that passes is only a <em>candidate</em> platform-linking point; whether it
+   * actually lies inside a given platform is decided later, per ring, {@link #buildAllRingEdges}.
+   * Because that geometric test happens separately, a candidate can sit anywhere relative to a
+   * platform's boundary, including its interior — for example a stairway landing under a platform.
+   *
+   * @return {@code true} if the vertex is a single-entry, non-motorized street stub
+   */
+  private boolean isPlatformEntranceCandidate(OsmVertex osmVertex) {
     boolean isCandidate = false;
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {

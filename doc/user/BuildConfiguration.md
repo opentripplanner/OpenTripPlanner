@@ -36,7 +36,7 @@ Sections follow that describe particular settings in more depth.
 | [multiThreadElevationCalculations](#multiThreadElevationCalculations)                       |       `boolean`      | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                                     |       `boolean`      | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
 | [osmNaming](#osmNaming)                                                                     |        `enum`        | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
-| platformEntriesLinking                                                                      |       `boolean`      | Link unconnected entries to public transport platforms.                                                                                                        | *Optional* | `false`                           |  2.0  |
+| [platformEntriesLinking](#platformEntriesLinking)                                           |       `boolean`      | Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area.                                           | *Optional* | `false`                           |  2.0  |
 | staticBikeParkAndRide                                                                       |       `boolean`      | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
 | staticParkAndRide                                                                           |       `boolean`      | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
 | stopConsolidationFile                                                                       |         `uri`        | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
@@ -542,6 +542,32 @@ data, and to `false` to read the stream from the source each time.
 **Enum values:** `default` | `portland` | `sidewalks` | `sidewalks-crosswalks`
 
 A custom OSM namer to use.
+
+<h3 id="platformEntriesLinking">platformEntriesLinking</h3>
+
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** / 
+
+Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area.
+
+Public transport platforms in OSM are usually mapped as an area, but the stairway,
+elevator or ramp that actually leads onto the platform is frequently mapped as a separate
+way whose nodes are not shared with the platform's outline - it merely happens to end
+somewhere geometrically inside of it. Without this option such entries stay disconnected from
+the platform and can end up unreachable, or force a long detour around the platform
+boundary to reach.
+
+When enabled, OTP looks for street vertices that have exactly one non-motorized
+connection to the rest of the street network - a "stub", such as the top of a staircase.
+For every platform, it then checks which of these stubs fall inside that platform's
+outline - not just on its boundary, but anywhere inside it - and links them into the
+platform's walking area, so people can be routed from the platform to the entrance and
+back even though OSM never connected them directly.
+
+Turn this on if platform entrances in your OSM data are commonly mapped this way; leave
+it off if entrances always share nodes with the platform outline, since the extra
+street-vertex scan adds a small amount of processing time during graph build.
+
 
 <h3 id="streetGraph">streetGraph</h3>
 
