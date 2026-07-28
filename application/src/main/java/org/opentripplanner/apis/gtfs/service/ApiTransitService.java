@@ -141,8 +141,7 @@ public class ApiTransitService {
     }
     boolean runsOnDate = transitService
       .getTripCalendars()
-      .listServiceDates(trip.getServiceId())
-      .contains(serviceDate);
+      .isActiveOn(trip.getServiceId(), serviceDate);
     if (!runsOnDate) {
       return Optional.empty();
     }
