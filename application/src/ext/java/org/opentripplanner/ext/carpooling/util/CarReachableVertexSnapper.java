@@ -37,12 +37,13 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * the cheapest car-reachable vertex within {@code maxWalk} and returns the walk path bridging the
  * gap, or {@code null} if none is reachable.
  * <p>
- * "Car-reachable" is checked for a {@link CarReachabilityDirection} in two stages: a cheap local
- * pre-filter (a car-permitting street edge in the required direction) then a bounded
- * {@link StreetMode#CAR} probe that a car can drive at least {@link #DEFAULT_MIN_CAR_ESCAPE_METERS}
- * to or from the vertex. The probe catches car edges that permit cars "on paper" but are stranded
- * on a one-way stub, barrier pocket, or disconnected island. Verdicts are cached per vertex and
- * direction.
+ * "Car-reachable" means a car can both reach the vertex and leave it, since a carpool pickup or
+ * dropoff is a mid-route insertion the driver has to arrive at and continue from. Each direction is
+ * checked in two stages: a cheap local pre-filter (a car-permitting street edge in that direction)
+ * then a bounded {@link StreetMode#CAR} probe that a car can drive at least
+ * {@link #DEFAULT_MIN_CAR_ESCAPE_METERS} in it. The probe catches car edges that permit cars "on
+ * paper" but are stranded on a one-way stub, barrier pocket, or disconnected island. Verdicts are
+ * cached per vertex.
  * <p>
  * {@link #snapPickup}/{@link #snapDropoff} walk from/to {@code vertexToSnap};
  * {@link #snapToPermanentVertex} accepts only permanent vertices.
@@ -50,9 +51,9 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
 public final class CarReachableVertexSnapper {
 
   /**
-   * A candidate is accepted only if a car can drive at least this far (straight-line, metres) to or
-   * from it: large enough to clear a connected vertex, small enough to reject a stranded stub or
-   * island. Also caps the probe's exploration.
+   * A candidate is accepted only if a car can drive at least this far (straight-line, metres) both
+   * to and from it: large enough to clear a connected vertex, small enough to reject a stranded stub
+   * or island. Also caps the probe's exploration.
    */
   private static final double DEFAULT_MIN_CAR_ESCAPE_METERS = 500;
 
@@ -66,14 +67,11 @@ public final class CarReachableVertexSnapper {
   private final double minCarEscapeMeters;
 
   /**
-   * Cached reachability verdicts per permanent vertex — whether a car can depart it
-   * ({@code canDepartCache}) or reach it ({@code canArriveCache}), cached separately because in
-   * some circumstances they may differ. Temporary vertices are never cached (they never recur).
-   * Verdicts depend only on the static graph and escape distance, so they stay valid across
-   * requests.
+   * Cached reachability verdicts per permanent vertex. Temporary vertices are never cached (they
+   * never recur). Verdicts depend only on the static graph and escape distance, so they stay valid
+   * across requests.
    */
-  private final Map<Vertex, Boolean> canDepartCache = new ConcurrentHashMap<>();
-  private final Map<Vertex, Boolean> canArriveCache = new ConcurrentHashMap<>();
+  private final Map<Vertex, Boolean> carReachableCache = new ConcurrentHashMap<>();
 
   /**
    * @param minCarEscapeMeters distance a car must be able to drive to/from a candidate for it to be
@@ -104,7 +102,7 @@ public final class CarReachableVertexSnapper {
     Vertex vertexToSnap,
     Duration maxWalk
   ) {
-    return snap(baseRequest, vertexToSnap, maxWalk, false, false, CarReachabilityDirection.THROUGH);
+    return snap(baseRequest, vertexToSnap, maxWalk, false, false);
   }
 
   /**
@@ -117,25 +115,21 @@ public final class CarReachableVertexSnapper {
     Vertex vertexToSnap,
     Duration maxWalk
   ) {
-    return snap(baseRequest, vertexToSnap, maxWalk, true, false, CarReachabilityDirection.THROUGH);
+    return snap(baseRequest, vertexToSnap, maxWalk, true, false);
   }
 
   /**
    * Like {@link #snapPickup} but accepts only permanent vertices, so the result may outlive the
-   * temporary linking. Pass {@link CarReachabilityDirection#DEPART} for a departure-only endpoint
-   * and {@link CarReachabilityDirection#ARRIVE} for an arrival-only one; the walk search runs
-   * backward for {@code ARRIVE}, forward otherwise. Permanent boundary vertices of the input's own
-   * linking are tried before any walk search.
+   * temporary linking. Permanent boundary vertices of the input's own linking are tried before any
+   * walk search.
    */
   @Nullable
   public SnapResult snapToPermanentVertex(
     StreetSearchRequest baseRequest,
     Vertex vertexToSnap,
-    Duration maxWalk,
-    CarReachabilityDirection reachability
+    Duration maxWalk
   ) {
-    boolean arriveBy = reachability == CarReachabilityDirection.ARRIVE;
-    return snap(baseRequest, vertexToSnap, maxWalk, arriveBy, true, reachability);
+    return snap(baseRequest, vertexToSnap, maxWalk, false, true);
   }
 
   /**
@@ -146,8 +140,6 @@ public final class CarReachableVertexSnapper {
    * @param maxWalk walk budget for reaching a car-reachable vertex.
    * @param arriveBy {@code false} for a pickup, {@code true} for a dropoff.
    * @param permanentOnly reject temporary vertices.
-   * @param reachability car-travel direction(s) the snapped vertex must support; independent of
-   *        {@code arriveBy}.
    * @return the snap result, or {@code null} if none is reachable within {@code maxWalk}.
    */
   @Nullable
@@ -156,19 +148,18 @@ public final class CarReachableVertexSnapper {
     Vertex vertexToSnap,
     Duration maxWalk,
     boolean arriveBy,
-    boolean permanentOnly,
-    CarReachabilityDirection reachability
+    boolean permanentOnly
   ) {
     // Confine temporary-edge traversal to this search's own linking (see isForeignTempEdge).
     var ownTempVertices = ownLinking(vertexToSnap);
 
-    if (isAcceptableTarget(vertexToSnap, permanentOnly, reachability, ownTempVertices)) {
+    if (isAcceptableTarget(vertexToSnap, permanentOnly, ownTempVertices)) {
       return new SnapResult(vertexToSnap, null);
     }
 
     if (permanentOnly) {
       for (var candidate : permanentBoundary(vertexToSnap, ownTempVertices)) {
-        if (isCarReachable(candidate, reachability)) {
+        if (isCarReachable(candidate)) {
           return new SnapResult(candidate, null);
         }
       }
@@ -179,7 +170,7 @@ public final class CarReachableVertexSnapper {
     // winning state is stashed in foundRef.
     State[] foundRef = new State[1];
     SearchTerminationStrategy<State> terminator = state -> {
-      if (isAcceptableTarget(state.getVertex(), permanentOnly, reachability, ownTempVertices)) {
+      if (isAcceptableTarget(state.getVertex(), permanentOnly, ownTempVertices)) {
         foundRef[0] = state;
         return true;
       }
@@ -225,68 +216,54 @@ public final class CarReachableVertexSnapper {
   private boolean isAcceptableTarget(
     Vertex vertex,
     boolean permanentOnly,
-    CarReachabilityDirection reachability,
     Set<Vertex> ownTempVertices
   ) {
     if (permanentOnly && vertex instanceof TemporaryVertex) {
       return false;
     }
-    return isCarReachable(vertex, reachability, ownTempVertices);
+    return isCarReachable(vertex, ownTempVertices);
   }
 
   /**
-   * Whether {@code vertex} is car-reachable for {@code reachability} on the static street graph
-   * alone (temporary edges ignored).
+   * Whether {@code vertex} is car-reachable on the static street graph alone (temporary edges
+   * ignored).
    */
-  public boolean isCarReachable(Vertex vertex, CarReachabilityDirection reachability) {
-    return isCarReachable(vertex, reachability, Set.of());
+  public boolean isCarReachable(Vertex vertex) {
+    return isCarReachable(vertex, Set.of());
   }
 
   /**
-   * Car-reachable when the local pre-filter (a car-permitting edge in the required direction) and
-   * the reachability probe both pass. The pre-filter runs first, rejecting most vertices without
-   * routing.
+   * Permanent-vertex verdicts are cached; temporary vertices are computed uncached and may cross
+   * their own linking's temporary edges, never a foreign one.
    *
    * @param ownTempVertices temporary vertices the probe may cross; empty for a static-graph check.
    */
-  private boolean isCarReachable(
-    Vertex vertex,
-    CarReachabilityDirection reachability,
-    Set<Vertex> ownTempVertices
-  ) {
-    if (reachability.requiresDeparture() && !anyStreetEdgeAllowsCar(vertex.getOutgoing())) {
-      return false;
-    }
-    if (reachability.requiresArrival() && !anyStreetEdgeAllowsCar(vertex.getIncoming())) {
-      return false;
-    }
-    if (reachability.requiresDeparture() && !canEscape(vertex, false, ownTempVertices)) {
-      return false;
-    }
-    if (reachability.requiresArrival() && !canEscape(vertex, true, ownTempVertices)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Whether a car can escape {@code vertex} — leave it when {@code arriveBy} is {@code false}, reach
-   * it when {@code true}. Permanent-vertex verdicts are cached; temporary vertices are probed
-   * uncached and may cross their own linking's temporary edges, never a foreign one.
-   */
-  private boolean canEscape(Vertex vertex, boolean arriveBy, Set<Vertex> ownTempVertices) {
+  private boolean isCarReachable(Vertex vertex, Set<Vertex> ownTempVertices) {
     if (vertex instanceof TemporaryVertex) {
-      return probeEscapes(vertex, arriveBy, ownTempVertices);
+      return computeCarReachable(vertex, ownTempVertices);
     }
-    var cache = arriveBy ? canArriveCache : canDepartCache;
-    Boolean cached = cache.get(vertex);
+    Boolean cached = carReachableCache.get(vertex);
     if (cached != null) {
       return cached;
     }
     // Probe is too slow to hold a bin lock (as computeIfAbsent would); a duplicate probe is harmless.
-    boolean verdict = probeEscapes(vertex, arriveBy, Set.of());
-    cache.putIfAbsent(vertex, verdict);
+    boolean verdict = computeCarReachable(vertex, Set.of());
+    carReachableCache.putIfAbsent(vertex, verdict);
     return verdict;
+  }
+
+  /**
+   * Car-reachable when, in both directions, the local pre-filter (a car-permitting edge in that
+   * direction) and the reachability probe pass. Both pre-filters run first, rejecting most vertices
+   * without routing.
+   */
+  private boolean computeCarReachable(Vertex vertex, Set<Vertex> ownTempVertices) {
+    return (
+      anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
+      anyStreetEdgeAllowsCar(vertex.getIncoming()) &&
+      probeEscapes(vertex, false, ownTempVertices) &&
+      probeEscapes(vertex, true, ownTempVertices)
+    );
   }
 
   /**

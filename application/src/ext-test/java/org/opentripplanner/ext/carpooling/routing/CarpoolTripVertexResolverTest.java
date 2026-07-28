@@ -80,15 +80,16 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   }
 
   /**
-   * One-way endpoints resolve in their own direction: a depart-only origin and an arrive-only
-   * destination both resolve, where a bidirectional check would reject both. Graph (one-way car
-   * forward, reverse pedestrian):
+   * A route point whose own linking offers no car-reachable vertex falls back to the walk search and
+   * relocates onto the drivable network. Both ends of a one-way corridor are car-permitting but
+   * neither can be both arrived at and departed from, so both points walk ~56 m to M, the only
+   * vertex that can. Graph (one-way car forward, reverse pedestrian):
    * <pre>
    *   O --(car, ~56 m)--> M --(car, ~56 m)--> D
    * </pre>
    */
   @Test
-  void oneWayEndpointsResolveInTheirOwnDirection() {
+  void routePointWalksOutWhenItsLinkingIsNotCarReachable() {
     var v = new IntersectionVertex[3];
     var model = modelOf(
       new GraphRoutingTest.Builder() {
@@ -119,8 +120,16 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
     var resolved = resolverFor(model).resolve(trip);
 
     assertNotNull(resolved);
-    assertEquals(v[0], resolved.vertices().get(0), "The depart-only origin must resolve to O");
-    assertEquals(v[2], resolved.vertices().get(1), "The arrive-only destination must resolve to D");
+    assertEquals(
+      v[1],
+      resolved.vertices().get(0),
+      "The origin O cannot be arrived at, so it must walk out to M"
+    );
+    assertEquals(
+      v[1],
+      resolved.vertices().get(1),
+      "The destination D cannot be departed from, so it must walk back to M"
+    );
   }
 
   private static CarpoolTripVertexResolver resolverFor(TestOtpModel model) {
