@@ -1172,7 +1172,7 @@ type Pattern implements Node {
   Instances of `TripOnServiceDates` which run on the specified date. If no trips run on this date
   then this returns an empty list.
   """
-  tripsOnServiceDate(serviceDate: LocalDate): [TripOnServiceDate!]!
+  tripsOnServiceDate(serviceDate: LocalDate!): [TripOnServiceDate!]!
   "Real-time updated position of vehicles that are serving this pattern."
   vehiclePositions: [VehiclePosition!]
 }
@@ -2828,7 +2828,7 @@ type Trip implements Node {
   """
   occupancy: TripOccupancy
   "Return the trip on a specific service date or `null` if the trip does not run on it."
-  onServiceDate(date: LocalDate): TripOnServiceDate
+  onServiceDate(date: LocalDate!): TripOnServiceDate
   "The pattern the trip is running on"
   pattern: Pattern
   """

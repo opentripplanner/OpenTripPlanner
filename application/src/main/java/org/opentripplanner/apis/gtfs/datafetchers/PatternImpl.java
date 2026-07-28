@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsOnServiceDateArgs;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.apis.support.SemanticHash;
@@ -232,7 +233,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate() {
     return env -> {
-      var serviceDate = new GraphQLTypes.GraphQLPatternTripsOnServiceDateArgs(
+      var serviceDate = new GraphQLPatternTripsOnServiceDateArgs(
         env.getArguments()
       ).getGraphQLServiceDate();
 

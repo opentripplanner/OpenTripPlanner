@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
@@ -125,6 +126,8 @@ public class ApiTransitService {
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
+    Objects.requireNonNull(tripId);
+    Objects.requireNonNull(serviceDate);
     var tripOnServiceDate = transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(tripId, serviceDate)
     );
