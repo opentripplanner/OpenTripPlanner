@@ -252,7 +252,7 @@ class ApiTransitServiceTest {
     var service = new ApiTransitService(env.transitService());
     var trip = env.tripData(TRIP_1_ID).trip();
 
-    var result = service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+    var result = service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
 
     assertThat(result).isPresent();
     assertEquals(trip, result.get().getTrip());
@@ -266,7 +266,9 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.transitService());
 
-    assertThat(service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1))).isEmpty();
+    assertThat(
+      service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1))
+    ).isEmpty();
   }
 
   @Test
@@ -274,7 +276,7 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.transitService());
 
-    assertThat(service.findTripOnServiceDate(id("unknown"), SERVICE_DATE)).isEmpty();
+    assertThat(service.findOrCreateTripOnServiceDate(id("unknown"), SERVICE_DATE)).isEmpty();
   }
 
   @Test
@@ -284,7 +286,7 @@ class ApiTransitServiceTest {
     var service = new ApiTransitService(env.transitService());
     var trip = env.tripData(TRIP_1_ID).trip();
 
-    var result = service.findTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+    var result = service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
 
     assertThat(result).isPresent();
     // The real TripOnServiceDate (keyed by its own id) is preferred over a synthetic one.

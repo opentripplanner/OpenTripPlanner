@@ -281,7 +281,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       LocalDate serviceDate = args.getGraphQLDate();
 
       return new ApiTransitService(getTransitService(environment))
-        .findTripOnServiceDate(trip.getId(), serviceDate)
+        .findOrCreateTripOnServiceDate(trip.getId(), serviceDate)
         .orElse(null);
     };
   }

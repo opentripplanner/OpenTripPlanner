@@ -122,7 +122,7 @@ public class ApiTransitService {
    * dated service journey or a real-time added trip) is preferred if it exists. Otherwise one is
    * synthesized from the scheduled trip, but only if the trip actually runs on the given date.
    */
-  public Optional<TripOnServiceDate> findTripOnServiceDate(
+  public Optional<TripOnServiceDate> findOrCreateTripOnServiceDate(
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {

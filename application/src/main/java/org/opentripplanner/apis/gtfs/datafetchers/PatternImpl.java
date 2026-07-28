@@ -241,7 +241,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       var apiService = new ApiTransitService(getTransitService(env));
       var trips = getTrips(env)
         .stream()
-        .flatMap(t -> apiService.findTripOnServiceDate(t.getId(), serviceDate).stream());
+        .flatMap(t -> apiService.findOrCreateTripOnServiceDate(t.getId(), serviceDate).stream());
       return IterableUtils.of(trips);
     };
   }
