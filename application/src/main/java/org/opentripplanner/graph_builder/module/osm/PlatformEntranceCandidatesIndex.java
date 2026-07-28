@@ -48,7 +48,7 @@ class PlatformEntranceCandidatesIndex {
   }
 
   /// Return the candidates that lie within `polygon`.
-  List<OsmVertex> verticesWithin(Polygon polygon) {
+  List<OsmVertex> findVerticesWithin(Polygon polygon) {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     return query(polygon.getEnvelopeInternal())
       .stream()
