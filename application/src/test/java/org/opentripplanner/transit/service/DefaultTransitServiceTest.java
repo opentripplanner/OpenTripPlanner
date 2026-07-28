@@ -11,6 +11,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -428,5 +430,42 @@ class DefaultTransitServiceTest {
   void groupOfStationsChildIds() {
     var res = service.findStopOrChildIds(GO_STATIONS.getId());
     assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
+  }
+
+  private static Instant startOfService(LocalDate serviceDate) {
+    return ServiceDateUtils.asStartOfService(serviceDate, service.getTimeZone()).toInstant();
+  }
+
+  @Test
+  void findTripTimesOnDateForPatternAtStop() {
+    var tripTimes = service.findTripTimesOnDate(
+      STOP_A,
+      REAL_TIME_PATTERN,
+      startOfService(SERVICE_DATE),
+      Duration.ofMinutes(3),
+      10,
+      ArrivalDeparture.DEPARTURES,
+      false
+    );
+
+    assertThat(tripTimes.stream().map(TripTimeOnDate::getTrip).toList()).containsExactly(
+      TRIP,
+      ADDED_TRIP
+    );
+    assertThat(tripTimes.stream().map(TripTimeOnDate::getStop).toList()).containsExactly(
+      STOP_A,
+      STOP_A
+    );
+    assertThat(
+      tripTimes.stream().map(TripTimeOnDate::getRealtimeDeparture).toList()
+    ).containsExactly(DELAY, 10);
+  }
+
+  @Test
+  void findRegularStopsByBoundingBox() {
+    var stops = service.findRegularStopsByBoundingBox(new Envelope(9.9, 10.1, 59.9, 60.1));
+
+    assertThat(stops).containsAtLeast(STOP_A, STOP_B, STOP_C, STOP_ONE);
+    assertThat(service.findRegularStopsByBoundingBox(new Envelope(170, 180, 80, 90))).isEmpty();
   }
 }
