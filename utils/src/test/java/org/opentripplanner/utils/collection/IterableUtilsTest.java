@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 class IterableUtilsTest {
 
   @Test
-  void ofStream() {
-    var iterable = IterableUtils.ofStream(Stream.of("A", "C", "B"));
+  void of() {
+    var iterable = IterableUtils.of(Stream.of("A", "C", "B"));
     assertThat(iterable).containsExactly("A", "C", "B").inOrder();
   }
 }
