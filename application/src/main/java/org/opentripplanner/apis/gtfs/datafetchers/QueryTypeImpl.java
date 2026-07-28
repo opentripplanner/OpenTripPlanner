@@ -38,6 +38,7 @@ import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
@@ -58,11 +59,14 @@ import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.error.InvalidRoutingInputException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -1014,12 +1018,35 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {
-    RoutingResponse res = context.routingService().route(request);
+    RoutingResponse res = getRoutingResponse(context, request);
     res.getDebugTimingAggregator().finishedRendering();
     return DataFetcherResult.<RoutingResponse>newResult()
       .data(res)
       .localContext(Map.of("locale", request.preferences().locale()))
       .build();
+  }
+
+  /**
+   * Route the request, translating routing failures the same way as the Transmodel API: invalid
+   * input detected while resolving the request — such as an on-board trip location referencing an
+   * unknown trip — is reported as a client error, and validation failures are returned as routing
+   * errors in an otherwise empty plan instead of surfacing as data fetching exceptions.
+   */
+  static RoutingResponse getRoutingResponse(GraphQLRequestContext context, RouteRequest request) {
+    try {
+      return context.routingService().route(request);
+    } catch (InvalidRoutingInputException e) {
+      throw new InvalidInputException(e.getMessage());
+    } catch (RoutingValidationException e) {
+      return new RoutingResponse(
+        TripPlanMapper.mapTripPlan(request, List.of()),
+        null,
+        null,
+        null,
+        e.getRoutingErrors(),
+        new DebugTimingAggregator()
+      );
+    }
   }
 
   protected static List<TransitAlert> filterAlerts(
