@@ -751,10 +751,9 @@ class WalkableAreaBuilder {
    * <p>This is a pure edge-topology check — it knows nothing about area polygons, and runs once,
    * up front, over every {@link OsmVertex} in the graph, before any platform's visibility graph
    * exists. A vertex that passes is only a <em>candidate</em> platform-linking point; whether it
-   * actually lies inside a given platform is decided later, per ring, via
-   * {@code outerRing.jtsPolygon.contains(...)} in {@link #buildAllRingEdges}. Because that
-   * geometric test happens separately, a candidate can sit anywhere relative to a platform's
-   * boundary, including its interior — for example a stairway landing under a platform.
+   * actually lies inside a given platform is decided later, per ring, {@link #buildAllRingEdges}.
+   * Because that geometric test happens separately, a candidate can sit anywhere relative to a
+   * platform's boundary, including its interior — for example a stairway landing under a platform.
    *
    * @return {@code true} if the vertex is a single-entry, non-motorized street stub
    */
