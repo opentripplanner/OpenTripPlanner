@@ -18,6 +18,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
+import org.locationtech.jts.index.SpatialIndex;
+import org.locationtech.jts.index.strtree.STRtree;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -35,7 +37,6 @@ import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.geometry.LineStringShrinker;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
@@ -68,7 +69,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final HashGridSpatialIndex<OsmVertex> streetStubPointIndex;
+  private final SpatialIndex platformEntranceCandidatesIndex;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -135,15 +136,15 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.streetStubPointIndex = new HashGridSpatialIndex<>();
+    this.platformEntranceCandidatesIndex = new STRtree();
     if (platformEntriesLinking) {
       graph
         .getVertices()
         .stream()
         .filter(OsmVertex.class::isInstance)
         .map(OsmVertex.class::cast)
-        .filter(this::isSingleEntryStreetStub)
-        .forEach(v -> streetStubPointIndex.insert(new Envelope(v.getCoordinate()), v));
+        .filter(this::isPlatformEntranceCandidate)
+        .forEach(v -> platformEntranceCandidatesIndex.insert(new Envelope(v.getCoordinate()), v));
     }
   }
 
@@ -303,8 +304,9 @@ class WalkableAreaBuilder {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
             Envelope ringEnvelope = outerRing.jtsPolygon.getEnvelopeInternal();
-            List<OsmVertex> verticesWithin = streetStubPointIndex
-              .query(ringEnvelope)
+            @SuppressWarnings("unchecked")
+            List<OsmVertex> candidates = platformEntranceCandidatesIndex.query(ringEnvelope);
+            var verticesWithin = candidates
               .stream()
               .filter(t ->
                 outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
@@ -756,7 +758,7 @@ class WalkableAreaBuilder {
    *
    * @return {@code true} if the vertex is a single-entry, non-motorized street stub
    */
-  private boolean isSingleEntryStreetStub(OsmVertex osmVertex) {
+  private boolean isPlatformEntranceCandidate(OsmVertex osmVertex) {
     boolean isCandidate = false;
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {
