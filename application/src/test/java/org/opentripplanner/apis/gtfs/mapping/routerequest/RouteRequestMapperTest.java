@@ -254,6 +254,28 @@ class RouteRequestMapperTest {
     );
   }
 
+  /**
+   * A start-on-board search is pinned to the boarding time of a single dated trip, so there are
+   * no other pages and paging arguments are rejected.
+   */
+  @Test
+  void testOnBoardTripLocationRejectsPaging() {
+    for (var pagingArgument : List.of("before", "after")) {
+      var args = testCtx.basicRequest();
+      args.put("origin", onBoardOrigin(LocalDate.of(2026, 7, 28), null));
+      args.put(pagingArgument, "cursor");
+      var env = testCtx.executionContext(args);
+
+      var exception = assertThrows(InvalidInputException.class, () ->
+        RouteRequestMapper.toRouteRequest(env, testCtx.context())
+      );
+      assertEquals(
+        "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'.",
+        exception.getMessage()
+      );
+    }
+  }
+
   private static Map<String, Object> onBoardOrigin(
     LocalDate serviceDate,
     @Nullable OffsetDateTime scheduledDepartureTime

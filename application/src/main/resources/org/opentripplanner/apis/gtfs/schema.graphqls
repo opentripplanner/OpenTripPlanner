@@ -4851,7 +4851,8 @@ input PlanLocationInput @oneOf {
   A position on board a specific dated transit trip. This is only supported for the origin of a
   search. The search starts on board the vehicle at the specified stop with no access leg or
   boarding cost. The request dateTime is ignored because the departure time is resolved from the
-  trip's timetable.
+  trip's timetable. Paging is not supported: the search is pinned to the boarding time, so the
+  plan connection contains no page cursors and the `before` and `after` arguments must be omitted.
   """
   tripLocation: PlanTripLocationInput
 }

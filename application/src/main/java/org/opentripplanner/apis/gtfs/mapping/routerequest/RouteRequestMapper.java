@@ -59,6 +59,17 @@ public class RouteRequestMapper {
         : null
     );
 
+    // A start-on-board search is pinned to the boarding time of a single dated trip, so there are
+    // no other pages and the plan connection contains no page cursors to pass back.
+    if (
+      request.from().isOnBoard() &&
+      (args.getGraphQLBefore() != null || args.getGraphQLAfter() != null)
+    ) {
+      throw new InvalidInputException(
+        "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'."
+      );
+    }
+
     if (args.getGraphQLBefore() != null) {
       request.withPageCursorFromEncoded(args.getGraphQLBefore());
       if (args.getGraphQLLast() != null) {

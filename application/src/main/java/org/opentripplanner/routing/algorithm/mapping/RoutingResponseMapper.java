@@ -39,9 +39,14 @@ public class RoutingResponseMapper {
     // Create response
     var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
-    // Paging
-    PageCursor nextPageCursor = pagingService.nextPageCursor();
-    PageCursor prevPageCursor = pagingService.previousPageCursor();
+    // Paging. A start-on-board search is pinned to the boarding time of a single dated trip, so
+    // there are no other pages to navigate to and no page cursors are returned.
+    PageCursor nextPageCursor = null;
+    PageCursor prevPageCursor = null;
+    if (!request.isStartOnBoardAccessRequest()) {
+      nextPageCursor = pagingService.nextPageCursor();
+      prevPageCursor = pagingService.previousPageCursor();
+    }
 
     if (LOG.isDebugEnabled()) {
       logPagingInformation(request.pageCursor(), prevPageCursor, nextPageCursor, routingErrors);
