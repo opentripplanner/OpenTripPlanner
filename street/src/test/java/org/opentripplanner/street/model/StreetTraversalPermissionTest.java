@@ -65,6 +65,18 @@ public class StreetTraversalPermissionTest {
   }
 
   @Test
+  public void testDisallowsCars() {
+    assertFalse(StreetTraversalPermission.NONE.disallowsCars());
+    assertTrue(StreetTraversalPermission.PEDESTRIAN.disallowsCars());
+    assertTrue(StreetTraversalPermission.BICYCLE.disallowsCars());
+    assertTrue(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE.disallowsCars());
+    assertFalse(StreetTraversalPermission.CAR.disallowsCars());
+    assertFalse(StreetTraversalPermission.PEDESTRIAN_AND_CAR.disallowsCars());
+    assertFalse(StreetTraversalPermission.BICYCLE_AND_CAR.disallowsCars());
+    assertFalse(StreetTraversalPermission.ALL.disallowsCars());
+  }
+
+  @Test
   public void testIntersect() {
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
     StreetTraversalPermission bike_walk = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
