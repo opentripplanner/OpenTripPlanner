@@ -36,6 +36,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.IterableUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
@@ -238,11 +239,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       ).getGraphQLServiceDate();
 
       var apiService = new ApiTransitService(getTransitService(env));
-      return () ->
-        getTrips(env)
-          .stream()
-          .flatMap(t -> apiService.findTripOnServiceDate(t.getId(), serviceDate).stream())
-          .iterator();
+      var trips = getTrips(env)
+        .stream()
+        .flatMap(t -> apiService.findTripOnServiceDate(t.getId(), serviceDate).stream());
+      return IterableUtils.ofStream(trips);
     };
   }
 
