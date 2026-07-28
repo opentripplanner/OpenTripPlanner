@@ -1169,7 +1169,6 @@ type Pattern implements Node {
     serviceDate: String
   ): [Trip!] @deprecated(reason : "Use `tripsOnServiceDate`")
   """
-  "
   Instances of `TripOnServiceDates` which run on the specified date. If no trips run on this date
   then this returns an empty list.
   """
@@ -2571,7 +2570,8 @@ from a specific stop location.
 This may contain real-time information, if available.
 """
 type StopCall {
-  notices: [Notice!]!
+  "Notices of this call which are known ahead of time."
+  notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time estimates for arrival and departure times for this stop location."
   realTime: CallRealTime
   "Scheduled arrival and departure times for this stop location."
