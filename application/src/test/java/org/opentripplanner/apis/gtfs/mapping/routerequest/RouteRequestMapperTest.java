@@ -4,6 +4,7 @@ import static graphql.Assert.assertTrue;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -194,6 +195,56 @@ class RouteRequestMapperTest {
         scheduledDepartureTime.toInstant()
       ),
       location.tripLocation()
+    );
+  }
+
+  @Test
+  void testInvalidStopLocationId() {
+    Map<String, Object> args = testCtx.basicRequest();
+    args.put("origin", Map.of("location", Map.of("stopLocation", Map.of("stopLocationId", "foo"))));
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(IllegalArgumentException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals("Stop id foo is not of valid format.", exception.getMessage());
+  }
+
+  /**
+   * The scheduled departure time is optional; it is only needed to disambiguate patterns which
+   * visit the same stop more than once.
+   */
+  @Test
+  void testOnBoardTripLocationWithoutScheduledDepartureTime() {
+    var serviceDate = LocalDate.of(2026, 7, 28);
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "label",
+        "On board route 10",
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of("tripId", "F:trip-10", "serviceDate", serviceDate, "stopLocationId", "F:stop-3")
+        )
+      )
+    );
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+
+    assertEquals(
+      TripLocation.of(
+        TripOnDateReference.ofTripIdAndServiceDate(
+          FeedScopedId.parseStrict("F:trip-10"),
+          serviceDate
+        ),
+        FeedScopedId.parseStrict("F:stop-3")
+      ),
+      request.from().tripLocation()
     );
   }
 
