@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.CarAccessDirection;
-import org.opentripplanner.ext.carpooling.util.CarAccessibleVertexSnapper;
+import org.opentripplanner.ext.carpooling.util.CarReachabilityDirection;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -18,8 +18,9 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  * Resolves each of a {@link CarpoolTrip}'s route points to a permanent, car-reachable street
  * vertex, producing a {@link CarpoolTripWithVertices}. Each point is linked to a temporary vertex
  * via {@link StreetVertexUtils#createDriverWaypointVertex}, then snapped to a permanent one by
- * {@link CarAccessibleVertexSnapper#snapToPermanentVertex} for its {@link CarAccessDirection} (see
- * {@link #accessFor}). {@link #resolve} returns {@code null} if any point cannot be resolved.
+ * {@link CarReachableVertexSnapper#snapToPermanentVertex} for its
+ * {@link CarReachabilityDirection} (see {@link #reachabilityFor}). {@link #resolve} returns
+ * {@code null} if any point cannot be resolved.
  */
 public class CarpoolTripVertexResolver {
 
@@ -31,20 +32,23 @@ public class CarpoolTripVertexResolver {
   private static final Duration MAX_SNAP_SEARCH = Duration.ofMinutes(5);
 
   private final VertexCreationService vertexCreationService;
-  private final CarAccessibleVertexSnapper carVertexSnapper;
+  private final CarReachableVertexSnapper carReachableVertexSnapper;
 
   /**
    * @throws NullPointerException if any parameter is null
    */
   public CarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
-    CarAccessibleVertexSnapper carVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
       "vertexCreationService"
     );
-    this.carVertexSnapper = Objects.requireNonNull(carVertexSnapper, "carVertexSnapper");
+    this.carReachableVertexSnapper = Objects.requireNonNull(
+      carReachableVertexSnapper,
+      "carReachableVertexSnapper"
+    );
   }
 
   /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
@@ -60,7 +64,7 @@ public class CarpoolTripVertexResolver {
       for (int i = 0; i < routePoints.size(); i++) {
         var vertex = resolveRoutePoint(
           routePoints.get(i),
-          accessFor(i, routePoints.size()),
+          reachabilityFor(i, routePoints.size()),
           streetVertexUtils
         );
         if (vertex == null) {
@@ -73,31 +77,31 @@ public class CarpoolTripVertexResolver {
   }
 
   /** First point departs, last arrives, the rest are passed through. */
-  private static CarAccessDirection accessFor(int index, int count) {
+  private static CarReachabilityDirection reachabilityFor(int index, int count) {
     if (index == 0) {
-      return CarAccessDirection.DEPART;
+      return CarReachabilityDirection.DEPART;
     }
     if (index == count - 1) {
-      return CarAccessDirection.ARRIVE;
+      return CarReachabilityDirection.ARRIVE;
     }
-    return CarAccessDirection.THROUGH;
+    return CarReachabilityDirection.THROUGH;
   }
 
   @Nullable
   private Vertex resolveRoutePoint(
     WgsCoordinate point,
-    CarAccessDirection access,
+    CarReachabilityDirection reachability,
     StreetVertexUtils streetVertexUtils
   ) {
     var linked = streetVertexUtils.createDriverWaypointVertex(point);
     if (linked == null) {
       return null;
     }
-    var snap = carVertexSnapper.snapToPermanentVertex(
+    var snap = carReachableVertexSnapper.snapToPermanentVertex(
       StreetSearchRequest.DEFAULT,
       linked,
       MAX_SNAP_SEARCH,
-      access
+      reachability
     );
     return snap == null ? null : snap.vertex();
   }

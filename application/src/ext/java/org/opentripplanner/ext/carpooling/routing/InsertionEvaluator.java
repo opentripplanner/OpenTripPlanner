@@ -179,7 +179,7 @@ public class InsertionEvaluator {
    *
    * @param tripWithVertices The carpool trip with resolved vertices
    * @param viablePositions Positions that passed heuristic checks (from InsertionPositionFinder)
-   * @param snap Pickup/dropoff vertices (already snapped to car-accessible vertices by the
+   * @param snap Pickup/dropoff vertices (already snapped to car-reachable vertices by the
    *        caller) and the optional walk paths bracketing the carpool ride
    * @return The best insertion candidate, or null if none are viable after routing
    */

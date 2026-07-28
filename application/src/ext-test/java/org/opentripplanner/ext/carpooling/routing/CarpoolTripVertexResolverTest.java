@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.util.CarAccessibleVertexSnapper;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -18,7 +18,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 class CarpoolTripVertexResolverTest extends GraphRoutingTest {
 
   /** Escape distance matched to the ~100 m test streets: 50 m escapes; a ~35 m island cannot. */
-  private static final CarAccessibleVertexSnapper SNAPPER = new CarAccessibleVertexSnapper(50);
+  private static final CarReachableVertexSnapper SNAPPER = new CarReachableVertexSnapper(50);
 
   /**
    * A mid-edge route point resolves to the nearer edge endpoint, one vertex per point in order.

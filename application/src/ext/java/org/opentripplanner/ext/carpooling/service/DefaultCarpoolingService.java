@@ -32,7 +32,7 @@ import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
-import org.opentripplanner.ext.carpooling.util.CarAccessibleVertexSnapper;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
@@ -130,7 +130,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Snaps passenger origin/destination and transit stops onto vertices a car can genuinely reach
    * and leave.
    */
-  private final CarAccessibleVertexSnapper carVertexSnapper;
+  private final CarReachableVertexSnapper carReachableVertexSnapper;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -144,15 +144,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *        speed limits, must not be null
    * @param vertexCreationService creates request-scoped, bidirectionally-linked temporary vertices
    *        from coordinates, must not be null
-   * @param carVertexSnapper snaps passenger-side locations onto car-reachable vertices, must not
-   *        be null
+   * @param carReachableVertexSnapper snaps passenger-side locations onto car-reachable vertices,
+   *        must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
     CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
-    CarAccessibleVertexSnapper carVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
     this.streetLimitationParametersService = Objects.requireNonNull(
@@ -169,7 +169,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
       vertexCreationService,
       "vertexCreationService"
     );
-    this.carVertexSnapper = Objects.requireNonNull(carVertexSnapper, "carVertexSnapper");
+    this.carReachableVertexSnapper = Objects.requireNonNull(
+      carReachableVertexSnapper,
+      "carReachableVertexSnapper"
+    );
   }
 
   /**
@@ -252,19 +255,19 @@ public class DefaultCarpoolingService implements CarpoolingService {
         return List.of();
       }
 
-      var pickupSnap = carVertexSnapper.snapPickup(
+      var pickupSnap = carReachableVertexSnapper.snapPickup(
         streetSearchRequest,
         passengerPickupVertex,
         maxWalkToCarpool
       );
-      var dropoffSnap = carVertexSnapper.snapDropoff(
+      var dropoffSnap = carReachableVertexSnapper.snapDropoff(
         streetSearchRequest,
         passengerDropoffVertex,
         maxWalkToCarpool
       );
       if (pickupSnap == null || dropoffSnap == null) {
         LOG.debug(
-          "No car-accessible pickup/dropoff reachable within {} from passenger origin/destination",
+          "No car-reachable pickup/dropoff reachable within {} from passenger origin/destination",
           maxWalkToCarpool
         );
         return List.of();
@@ -415,19 +418,19 @@ public class DefaultCarpoolingService implements CarpoolingService {
       }
 
       var passengerSnap = accessOrEgress.isEgress()
-        ? carVertexSnapper.snapDropoff(
+        ? carReachableVertexSnapper.snapDropoff(
             streetSearchRequest,
             passengerAccessEgressVertex,
             maxWalkToCarpool
           )
-        : carVertexSnapper.snapPickup(
+        : carReachableVertexSnapper.snapPickup(
             streetSearchRequest,
             passengerAccessEgressVertex,
             maxWalkToCarpool
           );
       if (passengerSnap == null) {
         LOG.debug(
-          "No car-accessible vertex reachable within {} from passenger coords {}",
+          "No car-reachable vertex reachable within {} from passenger coords {}",
           maxWalkToCarpool,
           passengerCoordinates
         );
@@ -477,15 +480,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
         }
         byStopId.putIfAbsent(stop.stopId, stop);
       }
-      var stopSnaps = new HashMap<NearbyStop, CarAccessibleVertexSnapper.SnapResult>();
+      var stopSnaps = new HashMap<NearbyStop, CarReachableVertexSnapper.SnapResult>();
       for (var stop : byStopId.values()) {
         var snap = accessOrEgress.isAccess()
-          ? carVertexSnapper.snapDropoff(
+          ? carReachableVertexSnapper.snapDropoff(
               streetSearchRequest,
               stop.state.getVertex(),
               maxWalkToCarpool
             )
-          : carVertexSnapper.snapPickup(
+          : carReachableVertexSnapper.snapPickup(
               streetSearchRequest,
               stop.state.getVertex(),
               maxWalkToCarpool

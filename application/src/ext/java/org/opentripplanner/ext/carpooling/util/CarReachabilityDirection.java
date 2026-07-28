@@ -5,9 +5,9 @@ package org.opentripplanner.ext.carpooling.util;
  * both reachable and leavable; a one-directional endpoint (e.g. the mouth of a one-way street) need
  * only support its own direction.
  *
- * @see CarAccessibleVertexSnapper#isCarAccessible(org.opentripplanner.street.model.vertex.Vertex, CarAccessDirection)
+ * @see CarReachableVertexSnapper
  */
-public enum CarAccessDirection {
+public enum CarReachabilityDirection {
   /** A car must be able to drive <em>away</em> from the vertex. */
   DEPART(true, false),
   /** A car must be able to drive <em>to</em> the vertex. */
@@ -18,7 +18,7 @@ public enum CarAccessDirection {
   private final boolean requiresDeparture;
   private final boolean requiresArrival;
 
-  CarAccessDirection(boolean requiresDeparture, boolean requiresArrival) {
+  CarReachabilityDirection(boolean requiresDeparture, boolean requiresArrival) {
     this.requiresDeparture = requiresDeparture;
     this.requiresArrival = requiresArrival;
   }

@@ -20,7 +20,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
+class CarReachableVertexSnapperTest extends GraphRoutingTest {
 
   private IntersectionVertex A;
   private IntersectionVertex B;
@@ -31,13 +31,13 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
    * Small escape distance so these compact test graphs (car edges tens of metres) pass the
    * reachability check; the reachability-specific tests build their own snapper.
    */
-  private final CarAccessibleVertexSnapper snapper = new CarAccessibleVertexSnapper(20);
+  private final CarReachableVertexSnapper snapper = new CarReachableVertexSnapper(20);
 
   /**
    * <pre>
    *   A --(pedestrian)-- B --(pedestrian)-- C --(all modes)-- D
    * </pre>
-   * C and D are car-accessible via CD; A and B are pedestrian-only.
+   * C and D are car-reachable via CD; A and B are pedestrian-only.
    */
   @BeforeEach
   void setUp() {
@@ -71,7 +71,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
   }
 
   @Test
-  void alreadyCarAccessibleVertex_returnsSameVertexWithoutWalk() {
+  void alreadyCarReachableVertex_returnsSameVertexWithoutWalk() {
     var result = snapper.snapPickup(StreetSearchRequest.DEFAULT, D, Duration.ofMinutes(10));
     assertNotNull(result);
     assertEquals(D, result.vertex());
@@ -79,7 +79,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
   }
 
   @Test
-  void pedestrianOnlyVertex_withinBudget_snapsToNearestCarAccessible() {
+  void pedestrianOnlyVertex_withinBudget_snapsToNearestCarReachable() {
     var result = snapper.snapPickup(StreetSearchRequest.DEFAULT, A, Duration.ofMinutes(10));
     assertNotNull(result);
     assertEquals(C, result.vertex());
@@ -99,7 +99,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
     assertNotNull(result);
     assertEquals(C, result.vertex());
     assertNotNull(result.walkPath());
-    // Walk path must be chronological: starts at C (the car-accessible vertex) and ends at A.
+    // Walk path must be chronological: starts at C (the car-reachable vertex) and ends at A.
     assertEquals(C, result.walkPath().states.getFirst().getVertex());
     assertEquals(A, result.walkPath().states.getLast().getVertex());
     assertTrue(result.walkPath().getDuration() > 0);
@@ -108,10 +108,10 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
   /**
    * A vertex with car edges in only one direction is rejected (a through pickup needs both). Graph:
    * {@code S --(ped)-- V --(one-way CAR forward)--> W --(ped only)-- X --(two-way CAR)-- Y}. V has
-   * outgoing CAR only, W incoming CAR only; X is the first fully car-accessible vertex.
+   * outgoing CAR only, W incoming CAR only; X is the first fully car-reachable vertex.
    */
   @Test
-  void halfCarAccessibleVertexIsRejected() {
+  void halfCarReachableVertexIsRejected() {
     var holder = new IntersectionVertex[5];
     modelOf(
       new GraphRoutingTest.Builder() {
@@ -146,7 +146,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
             StreetTraversalPermission.PEDESTRIAN,
             StreetTraversalPermission.PEDESTRIAN
           );
-          // X↔Y bidirectional car: X gets in- and out-CAR, so it is car-accessible.
+          // X↔Y bidirectional car: X gets in- and out-CAR, so it is car-reachable.
           street(
             holder[3],
             holder[4],
@@ -164,7 +164,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
     assertEquals(
       holder[3],
       result.vertex(),
-      "Should skip half-car-accessible V and W and snap to X"
+      "Should skip half-car-reachable V and W and snap to X"
     );
   }
 
@@ -191,7 +191,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
           holder[3] = intersection("X", 60.0000, 10.0006);
           holder[4] = intersection("Xc", 60.0000, 10.0012);
 
-          // Yc ↔ Y gives Y bidirectional CAR access, making it car-accessible.
+          // Yc ↔ Y gives Y bidirectional CAR access, making it car-reachable.
           street(
             holder[0],
             holder[1],
@@ -219,7 +219,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
           );
           sx.forEach(e -> e.setWalkSafetyFactor(10.0f));
 
-          // X ↔ Xc gives X bidirectional CAR access, making it car-accessible.
+          // X ↔ Xc gives X bidirectional CAR access, making it car-reachable.
           street(
             holder[3],
             holder[4],
@@ -300,7 +300,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
       }
     );
 
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(100);
+    var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
       StreetSearchRequest.DEFAULT,
       v[0],
@@ -354,7 +354,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
       }
     );
 
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(100);
+    var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
       StreetSearchRequest.DEFAULT,
       v[5],
@@ -428,7 +428,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
       }
     );
 
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(100);
+    var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
       StreetSearchRequest.DEFAULT,
       v[1],
@@ -449,7 +449,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   M3 --(car)-- M2 --(car)-- M1 ==temp== hub ==temp== Isl --(car)-- IslC
    * </pre>
-   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-accessible; {@code Isl↔IslC} spans only
+   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-reachable; {@code Isl↔IslC} spans only
    * ~33 m, so the island's sole escape is the temporary bridge — which the probe ignores, keeping
    * Isl rejected.
    */
@@ -478,14 +478,14 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
       }
     );
 
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(100);
+    var reachabilitySnapper = new CarReachableVertexSnapper(100);
 
     assertTrue(
-      reachabilitySnapper.isCarAccessible(v[2], CarAccessDirection.THROUGH),
-      "The mainland vertex M1 is genuinely car-accessible"
+      reachabilitySnapper.isCarReachable(v[2], CarReachabilityDirection.THROUGH),
+      "The mainland vertex M1 is genuinely car-reachable"
     );
     assertFalse(
-      reachabilitySnapper.isCarAccessible(v[3], CarAccessDirection.THROUGH),
+      reachabilitySnapper.isCarReachable(v[3], CarReachabilityDirection.THROUGH),
       "The island must stay rejected: its only way out is the mode-blind temporary bridge"
     );
   }
@@ -539,7 +539,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(100);
+    var reachabilitySnapper = new CarReachableVertexSnapper(100);
 
     try (var container = new TemporaryVerticesContainer()) {
       var passenger = new StreetVertexUtils(vertexCreationService, container).createPassengerVertex(
@@ -564,15 +564,16 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
 
   /**
    * A one-way street's mouth can be departed from but never arrived at, and its end vice versa; the
-   * directional predicate accepts each in its own direction while {@link CarAccessDirection#THROUGH}
-   * rejects both. Graph (one-way car forward, reverse pedestrian):
+   * directional predicate accepts each in its own direction while
+   * {@link CarReachabilityDirection#THROUGH} rejects both. Graph (one-way car forward, reverse
+   * pedestrian):
    * <pre>
    *   O --(car, ~56 m)--> A --(car, ~56 m)--> B
    * </pre>
    * A car escapes 50 m forward from O and backward to B along the ~111 m corridor.
    */
   @Test
-  void oneWayEndpoints_areCarAccessibleOnlyInTheirOwnDirection() {
+  void oneWayEndpoints_areCarReachableOnlyInTheirOwnDirection() {
     var v = new IntersectionVertex[3];
     modelOf(
       new GraphRoutingTest.Builder() {
@@ -599,40 +600,40 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
       }
     );
 
-    var directionalSnapper = new CarAccessibleVertexSnapper(50);
+    var directionalSnapper = new CarReachableVertexSnapper(50);
 
     assertTrue(
-      directionalSnapper.isCarAccessible(v[0], CarAccessDirection.DEPART),
+      directionalSnapper.isCarReachable(v[0], CarReachabilityDirection.DEPART),
       "A car can drive away from the one-way street's mouth"
     );
     assertFalse(
-      directionalSnapper.isCarAccessible(v[0], CarAccessDirection.ARRIVE),
+      directionalSnapper.isCarReachable(v[0], CarReachabilityDirection.ARRIVE),
       "No car can arrive at the one-way street's mouth"
     );
     assertFalse(
-      directionalSnapper.isCarAccessible(v[0], CarAccessDirection.THROUGH),
+      directionalSnapper.isCarReachable(v[0], CarReachabilityDirection.THROUGH),
       "The mouth is not passable through in both directions"
     );
 
     assertTrue(
-      directionalSnapper.isCarAccessible(v[2], CarAccessDirection.ARRIVE),
+      directionalSnapper.isCarReachable(v[2], CarReachabilityDirection.ARRIVE),
       "A car can arrive at the one-way street's end"
     );
     assertFalse(
-      directionalSnapper.isCarAccessible(v[2], CarAccessDirection.DEPART),
+      directionalSnapper.isCarReachable(v[2], CarReachabilityDirection.DEPART),
       "No car can drive away from the one-way street's end"
     );
     assertFalse(
-      directionalSnapper.isCarAccessible(v[2], CarAccessDirection.THROUGH),
+      directionalSnapper.isCarReachable(v[2], CarReachabilityDirection.THROUGH),
       "The end is not passable through in both directions"
     );
   }
 
   /**
    * {@code snapToPermanentVertex} never accepts a temporary vertex, even when it is the cheapest
-   * car-accessible one, while the plain snap does. A coordinate linked mid-edge on
+   * car-reachable one, while the plain snap does. A coordinate linked mid-edge on
    * {@code A --(100 m)-- B} produces exactly that: the splitter vertices are the nearest
-   * car-accessible ones but are temporary, so only an edge endpoint may be stored.
+   * car-reachable ones but are temporary, so only an edge endpoint may be stored.
    */
   @Test
   void snapToPermanentVertex_skipsTemporaryVertices() {
@@ -650,7 +651,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
-    var reachabilitySnapper = new CarAccessibleVertexSnapper(50);
+    var reachabilitySnapper = new CarReachableVertexSnapper(50);
 
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var linked = new StreetVertexUtils(
@@ -668,7 +669,7 @@ class CarAccessibleVertexSnapperTest extends GraphRoutingTest {
         StreetSearchRequest.DEFAULT,
         linked,
         Duration.ofMinutes(10),
-        CarAccessDirection.THROUGH
+        CarReachabilityDirection.THROUGH
       );
 
       assertNotNull(plain);
