@@ -63,7 +63,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final PlatformEntranceCandidatesIndex platformEntranceCandidatesIndex;
+  private final PlatformEntranceFinder platformEntranceFinder;
 
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
@@ -131,9 +131,9 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformEntranceCandidatesIndex = platformEntriesLinking
-      ? PlatformEntranceCandidatesIndex.of(graph.getVertices())
-      : PlatformEntranceCandidatesIndex.empty();
+    this.platformEntranceFinder = platformEntriesLinking
+      ? PlatformEntranceFinder.of(graph.getVertices())
+      : PlatformEntranceFinder.empty();
   }
 
   /**
@@ -290,7 +290,7 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            var verticesWithin = platformEntranceCandidatesIndex.findVerticesWithin(
+            var verticesWithin = platformEntranceFinder.findPlatformEntranceFinder(
               outerRing.jtsPolygon
             );
             platformLinkingVertices.addAll(verticesWithin);
