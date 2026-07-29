@@ -101,7 +101,7 @@ public enum StreetTraversalPermission {
    * Returns true if this permission allows at least one non-motorized mode (pedestrians and/or
    * bicycles) and does not allow cars.
    */
-  public boolean disallowsCars() {
+  public boolean allowsOnlyNonMotorizedModes() {
     return allowsAnything() && !allows(CAR);
   }
 }
