@@ -40,10 +40,10 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * "Car-reachable" means a car can both reach the vertex and leave it, since a carpool pickup or
  * dropoff is a mid-route insertion the driver has to arrive at and continue from. Each direction is
  * checked in two stages: a cheap local pre-filter (a car-permitting street edge in that direction)
- * then a bounded {@link StreetMode#CAR} probe that a car can drive at least
- * {@link #DEFAULT_MIN_CAR_ESCAPE_METERS} in it. The probe catches car edges that permit cars "on
- * paper" but are stranded on a one-way stub, barrier pocket, or disconnected island. Verdicts are
- * cached per vertex.
+ * then a bounded {@link StreetMode#CAR} probe that a car can drive at least the minimum escape
+ * distance in it (set per instance — see the constructor and {@link #createDefault()}). The probe
+ * catches car edges that permit cars "on paper" but are stranded on a one-way stub, barrier pocket,
+ * or disconnected island. Verdicts are cached per vertex.
  * <p>
  * {@link #snapPickup}/{@link #snapDropoff} walk from/to {@code vertexToSnap};
  * {@link #snapToPermanentVertex} accepts only permanent vertices.
@@ -51,9 +51,8 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
 public final class CarReachableVertexSnapper {
 
   /**
-   * A candidate is accepted only if a car can drive at least this far (straight-line, metres) both
-   * to and from it: large enough to clear a connected vertex, small enough to reject a stranded stub
-   * or island. Also caps the probe's exploration.
+   * Default escape distance: large enough to clear a connected vertex, small enough to reject a
+   * stranded stub or island.
    */
   private static final double DEFAULT_MIN_CAR_ESCAPE_METERS = 500;
 
@@ -74,8 +73,8 @@ public final class CarReachableVertexSnapper {
   private final Map<Vertex, Boolean> carReachableCache = new ConcurrentHashMap<>();
 
   /**
-   * @param minCarEscapeMeters distance a car must be able to drive to/from a candidate for it to be
-   *        accepted; also caps the probe's exploration.
+   * @param minCarEscapeMeters straight-line distance, in metres, a car must be able to drive both
+   *        to and from a candidate for it to be accepted; also caps the probe's exploration.
    */
   public CarReachableVertexSnapper(double minCarEscapeMeters) {
     this.minCarEscapeMeters = minCarEscapeMeters;
@@ -136,9 +135,10 @@ public final class CarReachableVertexSnapper {
    * @param baseRequest walk preferences for the walk A*; mode is forced to {@link StreetMode#WALK}
    *        and {@code arriveBy} overridden. The reachability probe ignores it (always plain
    *        {@link StreetMode#CAR}).
-   * @param vertexToSnap the vertex to snap; returned unchanged when already acceptable.
+   * @param vertexToSnap the vertex to snap; returned unchanged when it can already be snapped to.
    * @param maxWalk walk budget for reaching a car-reachable vertex.
-   * @param arriveBy {@code false} for a pickup, {@code true} for a dropoff.
+   * @param arriveBy {@code false} to walk forward from {@code vertexToSnap}, {@code true} to walk
+   *        backward to it.
    * @param permanentOnly reject temporary vertices.
    * @return the snap result, or {@code null} if none is reachable within {@code maxWalk}.
    */
@@ -153,7 +153,7 @@ public final class CarReachableVertexSnapper {
     // Confine temporary-edge traversal to this search's own linking (see isForeignTempEdge).
     var ownTempVertices = ownLinking(vertexToSnap);
 
-    if (isAcceptableTarget(vertexToSnap, permanentOnly, ownTempVertices)) {
+    if (canSnapTo(vertexToSnap, permanentOnly, ownTempVertices)) {
       return new SnapResult(vertexToSnap, null);
     }
 
@@ -170,7 +170,7 @@ public final class CarReachableVertexSnapper {
     // winning state is stashed in foundRef.
     State[] foundRef = new State[1];
     SearchTerminationStrategy<State> terminator = state -> {
-      if (isAcceptableTarget(state.getVertex(), permanentOnly, ownTempVertices)) {
+      if (canSnapTo(state.getVertex(), permanentOnly, ownTempVertices)) {
         foundRef[0] = state;
         return true;
       }
@@ -213,11 +213,11 @@ public final class CarReachableVertexSnapper {
     return new SnapResult(best.getVertex(), path);
   }
 
-  private boolean isAcceptableTarget(
-    Vertex vertex,
-    boolean permanentOnly,
-    Set<Vertex> ownTempVertices
-  ) {
+  /**
+   * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when
+   * the caller asked for {@code permanentOnly}.
+   */
+  private boolean canSnapTo(Vertex vertex, boolean permanentOnly, Set<Vertex> ownTempVertices) {
     if (permanentOnly && vertex instanceof TemporaryVertex) {
       return false;
     }
@@ -246,7 +246,6 @@ public final class CarReachableVertexSnapper {
     if (cached != null) {
       return cached;
     }
-    // Probe is too slow to hold a bin lock (as computeIfAbsent would); a duplicate probe is harmless.
     boolean verdict = computeCarReachable(vertex, Set.of());
     carReachableCache.putIfAbsent(vertex, verdict);
     return verdict;
@@ -289,6 +288,8 @@ public final class CarReachableVertexSnapper {
       return false;
     };
 
+    // The Euclidean heuristic is not appropriate without a fixed destination, and a purpose-built
+    // one is out of scope for now, so this runs as plain Dijkstra (f = g).
     var builder = StreetSearchBuilder.of()
       .withRequest(arriveBy ? CAR_ARRIVE : CAR_DEPART)
       .withSkipEdgeStrategy(new ForeignTempEdgeSkipStrategy(ownTempVertices))
