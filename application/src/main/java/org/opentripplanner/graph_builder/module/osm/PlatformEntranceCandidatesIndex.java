@@ -33,13 +33,15 @@ class PlatformEntranceCandidatesIndex {
 
   /// Build the index of platform entrance candidates among `vertices`.
   static PlatformEntranceCandidatesIndex of(Collection<Vertex> vertices) {
-    SpatialIndex index = new STRtree();
+    var index = new STRtree();
     vertices
       .stream()
       .filter(OsmVertex.class::isInstance)
       .map(OsmVertex.class::cast)
       .filter(PlatformEntranceCandidatesIndex::isPlatformEntranceCandidate)
       .forEach(v -> index.insert(new Envelope(v.getCoordinate()), v));
+    // make index immutable
+    index.build();
     return new PlatformEntranceCandidatesIndex(index);
   }
 
@@ -64,7 +66,7 @@ class PlatformEntranceCandidatesIndex {
   /**
    * Tests whether {@code osmVertex} is a candidate single-entry stub into the street network:
    * exactly one non-motorized edge (see {@link
-   * org.opentripplanner.street.model.StreetTraversalPermission#disallowsCars}) connects it to one
+   * org.opentripplanner.street.model.StreetTraversalPermission#allowsOnlyNonMotorizedModes}) connects it to one
    * other vertex, and every other non-{@link AreaEdge} edge at this vertex leads back to that same
    * vertex.
    *
@@ -75,7 +77,7 @@ class PlatformEntranceCandidatesIndex {
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {
       if (e instanceof StreetEdge se && !(e instanceof AreaEdge)) {
-        if (se.getPermission().disallowsCars()) {
+        if (se.getPermission().allowsOnlyNonMotorizedModes()) {
           isCandidate = true;
           start = se.getFromVertex();
           break;
