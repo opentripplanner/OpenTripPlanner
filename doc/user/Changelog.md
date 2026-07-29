@@ -99,6 +99,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Map GTFS notice assignments on trip segments to individual stop times [#7809](https://github.com/opentripplanner/OpenTripPlanner/pull/7809)
 - Parallelize and deduplicate way property computation [#7823](https://github.com/opentripplanner/OpenTripPlanner/pull/7823)
 - Penalize cycling on streets with embedded tram tracks [#7816](https://github.com/opentripplanner/OpenTripPlanner/pull/7816)
+- fix(transmodel): skip flex-window stops in intermediate estimated calls [#7850](https://github.com/opentripplanner/OpenTripPlanner/pull/7850)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
