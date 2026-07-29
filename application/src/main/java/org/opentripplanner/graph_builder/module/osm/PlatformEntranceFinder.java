@@ -14,7 +14,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
-/// Efficient lookup class of the [OsmVertex]es in a graph that are candidate platform-linking points:
+/// Efficient lookup class of the spatial index of [OsmVertex]es in a graph that are candidate
+/// platform-linking points:
 /// single-entry, non-motorized street stubs that a nearby platform's visibility graph may want to
 /// link into (for example a stairway landing under a platform).
 ///
@@ -47,8 +48,8 @@ class PlatformEntranceFinder {
     return new PlatformEntranceFinder(new STRtree());
   }
 
-  /// Return the platform entrance candidates that lie within `polygon`.
-  List<OsmVertex> findCandidates(Polygon polygon) {
+  /// Return the platform entrance vertices that lie within `polygon`.
+  List<OsmVertex> findPlatformVerticesWithin(Polygon polygon) {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     return query(polygon.getEnvelopeInternal())
       .stream()
@@ -85,8 +86,7 @@ class PlatformEntranceFinder {
       boolean isLinkingPoint = true;
       for (Edge e : osmVertex.getOutgoing()) {
         if (
-          !e.getToVertex().getCoordinate().equals(start.getCoordinate()) &&
-          !(e instanceof AreaEdge)
+          !e.getToVertex().getCoordinate().equals(start.getCoordinate()) && !(e instanceof AreaEdge)
         ) {
           isLinkingPoint = false;
         }

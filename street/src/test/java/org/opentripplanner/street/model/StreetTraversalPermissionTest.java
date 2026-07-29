@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 
- class StreetTraversalPermissionTest {
+class StreetTraversalPermissionTest {
 
   @Test
   void testGetCode() {
