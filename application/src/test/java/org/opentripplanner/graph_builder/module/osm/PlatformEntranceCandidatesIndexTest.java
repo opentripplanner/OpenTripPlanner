@@ -29,6 +29,6 @@ class PlatformEntranceCandidatesIndexTest {
     env.expandToInclude(Coordinates.BERLIN);
     env.expandBy(0.001);
     var polygon = JTS.toGeometry(env);
-    assertThat(index.findPlatformEntranceFinder(polygon)).contains(v1);
+    assertThat(index.findCandidates(polygon)).contains(v1);
   }
 }

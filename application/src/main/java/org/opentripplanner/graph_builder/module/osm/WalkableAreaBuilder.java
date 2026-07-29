@@ -290,7 +290,7 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            var verticesWithin = platformEntranceFinder.findPlatformEntranceFinder(
+            var verticesWithin = platformEntranceFinder.findCandidates(
               outerRing.jtsPolygon
             );
             platformLinkingVertices.addAll(verticesWithin);
