@@ -1,13 +1,7 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -20,8 +14,6 @@ import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.TemporaryEdge;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
@@ -150,15 +142,15 @@ public final class CarReachableVertexSnapper {
     boolean arriveBy,
     boolean permanentOnly
   ) {
-    // Confine temporary-edge traversal to this search's own linking (see isForeignTempEdge).
-    var ownTempVertices = ownLinking(vertexToSnap);
+    // Confine traversal to this search's own linking, never a foreign one (see TraversalScope).
+    var scope = TraversalScope.withOwnLinkingOf(vertexToSnap);
 
-    if (canSnapTo(vertexToSnap, permanentOnly, ownTempVertices)) {
+    if (canSnapTo(vertexToSnap, permanentOnly, scope)) {
       return new SnapResult(vertexToSnap, null);
     }
 
     if (permanentOnly) {
-      for (var candidate : permanentBoundary(vertexToSnap, ownTempVertices)) {
+      for (var candidate : scope.permanentBoundary(vertexToSnap)) {
         if (isCarReachable(candidate)) {
           return new SnapResult(candidate, null);
         }
@@ -170,7 +162,7 @@ public final class CarReachableVertexSnapper {
     // winning state is stashed in foundRef.
     State[] foundRef = new State[1];
     SearchTerminationStrategy<State> terminator = state -> {
-      if (canSnapTo(state.getVertex(), permanentOnly, ownTempVertices)) {
+      if (canSnapTo(state.getVertex(), permanentOnly, scope)) {
         foundRef[0] = state;
         return true;
       }
@@ -185,10 +177,7 @@ public final class CarReachableVertexSnapper {
     var builder = StreetSearchBuilder.of()
       .withRequest(request)
       .withSkipEdgeStrategy(
-        new ComposingSkipEdgeStrategy<>(
-          new ForeignTempEdgeSkipStrategy(ownTempVertices),
-          new DurationSkipEdgeStrategy<>(maxWalk)
-        )
+        new ComposingSkipEdgeStrategy<>(scope, new DurationSkipEdgeStrategy<>(maxWalk))
       )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
@@ -214,39 +203,30 @@ public final class CarReachableVertexSnapper {
   }
 
   /**
-   * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when
-   * the caller asked for {@code permanentOnly}.
+   * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when the
+   * caller asked for {@code permanentOnly}.
+   * <p>
+   * A permanent vertex's verdict rests on the static graph alone, so it is cached and shared across
+   * requests. A temporary vertex's rests on {@code scope}, which is specific to one linking, so it is
+   * computed fresh and never stored.
    */
-  private boolean canSnapTo(Vertex vertex, boolean permanentOnly, Set<Vertex> ownTempVertices) {
-    if (permanentOnly && vertex instanceof TemporaryVertex) {
-      return false;
+  private boolean canSnapTo(Vertex vertex, boolean permanentOnly, TraversalScope scope) {
+    if (TraversalScope.isPermanent(vertex)) {
+      return isCarReachable(vertex);
     }
-    return isCarReachable(vertex, ownTempVertices);
+    return !permanentOnly && computeCarReachable(vertex, scope);
   }
 
   /**
-   * Whether {@code vertex} is car-reachable on the static street graph alone (temporary edges
-   * ignored).
+   * Whether {@code vertex} is car-reachable on the static street graph alone. Verdicts are cached,
+   * since they cannot change while the graph stands.
    */
   public boolean isCarReachable(Vertex vertex) {
-    return isCarReachable(vertex, Set.of());
-  }
-
-  /**
-   * Permanent-vertex verdicts are cached; temporary vertices are computed uncached and may cross
-   * their own linking's temporary edges, never a foreign one.
-   *
-   * @param ownTempVertices temporary vertices the probe may cross; empty for a static-graph check.
-   */
-  private boolean isCarReachable(Vertex vertex, Set<Vertex> ownTempVertices) {
-    if (vertex instanceof TemporaryVertex) {
-      return computeCarReachable(vertex, ownTempVertices);
-    }
     Boolean cached = carReachableCache.get(vertex);
     if (cached != null) {
       return cached;
     }
-    boolean verdict = computeCarReachable(vertex, Set.of());
+    boolean verdict = computeCarReachable(vertex, TraversalScope.STATIC_GRAPH);
     carReachableCache.putIfAbsent(vertex, verdict);
     return verdict;
   }
@@ -255,13 +235,15 @@ public final class CarReachableVertexSnapper {
    * Car-reachable when, in both directions, the local pre-filter (a car-permitting edge in that
    * direction) and the reachability probe pass. Both pre-filters run first, rejecting most vertices
    * without routing.
+   *
+   * @param skipEdges confines the probe to the caller's traversal scope.
    */
-  private boolean computeCarReachable(Vertex vertex, Set<Vertex> ownTempVertices) {
+  private boolean computeCarReachable(Vertex vertex, SkipEdgeStrategy<State, Edge> skipEdges) {
     return (
       anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
       anyStreetEdgeAllowsCar(vertex.getIncoming()) &&
-      probeEscapes(vertex, false, ownTempVertices) &&
-      probeEscapes(vertex, true, ownTempVertices)
+      probeEscapes(vertex, false, skipEdges) &&
+      probeEscapes(vertex, true, skipEdges)
     );
   }
 
@@ -270,8 +252,14 @@ public final class CarReachableVertexSnapper {
    * {@link #minCarEscapeMeters} away — outward when {@code arriveBy} is {@code false}, inward when
    * {@code true}. Terminates as soon as one is far enough; a stranded vertex only exhausts its small
    * pocket.
+   *
+   * @param skipEdges confines the search to the caller's traversal scope.
    */
-  private boolean probeEscapes(Vertex origin, boolean arriveBy, Set<Vertex> ownTempVertices) {
+  private boolean probeEscapes(
+    Vertex origin,
+    boolean arriveBy,
+    SkipEdgeStrategy<State, Edge> skipEdges
+  ) {
     Coordinate originCoordinate = origin.getCoordinate();
     boolean[] escaped = new boolean[1];
     SearchTerminationStrategy<State> terminator = state -> {
@@ -292,7 +280,7 @@ public final class CarReachableVertexSnapper {
     // one is out of scope for now, so this runs as plain Dijkstra (f = g).
     var builder = StreetSearchBuilder.of()
       .withRequest(arriveBy ? CAR_ARRIVE : CAR_DEPART)
-      .withSkipEdgeStrategy(new ForeignTempEdgeSkipStrategy(ownTempVertices))
+      .withSkipEdgeStrategy(skipEdges)
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withTerminationStrategy(terminator);
     if (arriveBy) {
@@ -312,80 +300,5 @@ public final class CarReachableVertexSnapper {
       }
     }
     return false;
-  }
-
-  /**
-   * The temporary vertices of {@code start}'s own linking — every temporary vertex reachable without
-   * crossing a permanent one. Empty when {@code start} is permanent. Foreign linkings attach only to
-   * the permanent graph, so this never crosses into another request's subgraph.
-   */
-  private static Set<Vertex> ownLinking(Vertex start) {
-    if (!(start instanceof TemporaryVertex)) {
-      return Set.of();
-    }
-    var own = new HashSet<Vertex>();
-    var queue = new ArrayDeque<Vertex>();
-    own.add(start);
-    queue.add(start);
-    while (!queue.isEmpty()) {
-      var current = queue.poll();
-      for (var edges : List.of(current.getOutgoing(), current.getIncoming())) {
-        for (Edge edge : edges) {
-          for (var neighbor : List.of(edge.getFromVertex(), edge.getToVertex())) {
-            if (neighbor instanceof TemporaryVertex && own.add(neighbor)) {
-              queue.add(neighbor);
-            }
-          }
-        }
-      }
-    }
-    return own;
-  }
-
-  /**
-   * A temporary edge is foreign when neither endpoint is in {@code ownTempVertices}.
-   */
-  private static boolean isForeignTempEdge(Edge edge, Set<Vertex> ownTempVertices) {
-    return (
-      edge instanceof TemporaryEdge &&
-      !ownTempVertices.contains(edge.getFromVertex()) &&
-      !ownTempVertices.contains(edge.getToVertex())
-    );
-  }
-
-  /** Skips foreign temporary edges (see {@link #isForeignTempEdge}). */
-  private record ForeignTempEdgeSkipStrategy(Set<Vertex> ownTempVertices) implements
-    SkipEdgeStrategy<State, Edge> {
-    @Override
-    public boolean shouldSkipEdge(State current, Edge edge) {
-      return isForeignTempEdge(edge, ownTempVertices);
-    }
-  }
-
-  /**
-   * The permanent vertices bordering the input's own linking (split-edge endpoints or
-   * directly-linked graph vertices), ordered by distance from {@code origin}.
-   */
-  private static List<Vertex> permanentBoundary(Vertex origin, Set<Vertex> ownTempVertices) {
-    var seen = new HashSet<>(ownTempVertices);
-    var boundary = new ArrayList<Vertex>();
-    for (var temp : ownTempVertices) {
-      for (var edges : List.of(temp.getOutgoing(), temp.getIncoming())) {
-        for (Edge edge : edges) {
-          for (var neighbor : List.of(edge.getFromVertex(), edge.getToVertex())) {
-            if (seen.add(neighbor)) {
-              boundary.add(neighbor);
-            }
-          }
-        }
-      }
-    }
-    Coordinate originCoordinate = origin.getCoordinate();
-    boundary.sort(
-      Comparator.comparingDouble(v ->
-        SphericalDistanceLibrary.fastDistance(originCoordinate, v.getCoordinate())
-      )
-    );
-    return boundary;
   }
 }
