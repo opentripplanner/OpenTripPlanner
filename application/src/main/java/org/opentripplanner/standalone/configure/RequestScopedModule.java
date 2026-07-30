@@ -26,8 +26,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -86,8 +86,8 @@ public class RequestScopedModule {
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
     RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
+      DefaultRealtimeVehicleRepositorySnapshot,
+      DefaultRealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,

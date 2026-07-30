@@ -35,9 +35,8 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -222,8 +221,8 @@ class RequestScopedFactoryTest {
       @BindsInstance
       Builder realtimeVehicleRepositoryHandle(
         RepositoryHandle<
-          RealtimeVehicleRepositorySnapshot,
-          RealtimeVehicleRepository
+          DefaultRealtimeVehicleRepositorySnapshot,
+          DefaultRealtimeVehicleRepository
         > realtimeVehicleRepositoryHandle
       );
 

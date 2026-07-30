@@ -14,8 +14,8 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -58,8 +58,8 @@ public class UpdaterConfigurator {
   private final TimetableRepository timetableRepository;
   private final UpdatersParameters updatersParameters;
   private final RepositoryHandle<
-    RealtimeVehicleRepositorySnapshot,
-    RealtimeVehicleRepository
+    DefaultRealtimeVehicleRepositorySnapshot,
+    DefaultRealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final CarpoolingRepository carpoolingRepository;
@@ -78,8 +78,8 @@ public class UpdaterConfigurator {
     DeduplicatorService deduplicator,
     VertexLinker linker,
     RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
+      DefaultRealtimeVehicleRepositorySnapshot,
+      DefaultRealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
@@ -107,8 +107,8 @@ public class UpdaterConfigurator {
     DeduplicatorService deduplicator,
     VertexLinker linker,
     RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
+      DefaultRealtimeVehicleRepositorySnapshot,
+      DefaultRealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,

@@ -90,7 +90,7 @@ class DefaultRealtimeVehicleRepositoryTest implements RealtimeTestConstants {
   @Test
   void snapshotIsNotAffectedByLaterWrites() {
     repository.setRealtimeVehiclesForFeed(feedId, ImmutableListMultimap.of(pattern, VEHICLE));
-    var snapshot = repository.createSnapshot();
+    var snapshot = repository.freeze();
 
     repository.setRealtimeVehiclesForFeed(feedId, ImmutableListMultimap.of());
 
@@ -125,6 +125,6 @@ class DefaultRealtimeVehicleRepositoryTest implements RealtimeTestConstants {
   }
 
   private List<RealtimeVehicle> vehicles(TripPattern pattern) {
-    return repository.createSnapshot().getRealtimeVehicles(pattern);
+    return repository.freeze().getRealtimeVehicles(pattern);
   }
 }
