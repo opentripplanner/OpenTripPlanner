@@ -1,5 +1,6 @@
 package org.opentripplanner.street.graph;
 
+import java.util.stream.StreamSupport;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 
@@ -12,9 +13,8 @@ public class GraphFetcher {
   }
 
   public OsmVertex getVertexForOsmNode(OsmNode node) {
-    return graph
-      .getVerticesOfType(OsmVertex.class)
-      .stream()
+    var vertices = graph.getVerticesOfType(OsmVertex.class);
+    return StreamSupport.stream(vertices.spliterator(), false)
       .filter(v -> v.nodeId() == node.getId())
       .findFirst()
       .orElseThrow();
