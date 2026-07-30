@@ -1,21 +1,25 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLArrivalDeparture;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
 class ArrivalDepartureMapperTest {
 
-  @ParameterizedTest
-  @EnumSource(GraphQLArrivalDeparture.class)
-  void mapAllValues(GraphQLArrivalDeparture graphQLValue) {
-    assertThat(ArrivalDepartureMapper.map(graphQLValue)).isEqualTo(
-      ArrivalDeparture.valueOf(graphQLValue.name())
+  @Test
+  void mapAllValues() {
+    assertEquals(
+      ArrivalDeparture.ARRIVALS,
+      ArrivalDepartureMapper.map(GraphQLArrivalDeparture.ARRIVALS)
     );
+    assertEquals(
+      ArrivalDeparture.DEPARTURES,
+      ArrivalDepartureMapper.map(GraphQLArrivalDeparture.DEPARTURES)
+    );
+    assertEquals(ArrivalDeparture.BOTH, ArrivalDepartureMapper.map(GraphQLArrivalDeparture.EITHER));
   }
 
   @Test
