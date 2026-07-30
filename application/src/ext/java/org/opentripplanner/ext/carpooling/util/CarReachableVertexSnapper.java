@@ -235,8 +235,6 @@ public final class CarReachableVertexSnapper {
    * Car-reachable when, in both directions, the local pre-filter (a car-permitting edge in that
    * direction) and the reachability probe pass. Both pre-filters run first, rejecting most vertices
    * without routing.
-   *
-   * @param skipEdges confines the probe to the caller's traversal scope.
    */
   private boolean computeCarReachable(Vertex vertex, SkipEdgeStrategy<State, Edge> skipEdges) {
     return (
@@ -252,8 +250,6 @@ public final class CarReachableVertexSnapper {
    * {@link #minCarEscapeMeters} away — outward when {@code arriveBy} is {@code false}, inward when
    * {@code true}. Terminates as soon as one is far enough; a stranded vertex only exhausts its small
    * pocket.
-   *
-   * @param skipEdges confines the search to the caller's traversal scope.
    */
   private boolean probeEscapes(
     Vertex origin,
