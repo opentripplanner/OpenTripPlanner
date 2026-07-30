@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
 
-public class EscalatorPruningTest {
+class EscalatorPruningTest {
 
   @Test
-  public void streetEdgesBetweenEscalatorEdgesRetained() {
+  void streetEdgesBetweenEscalatorEdgesRetained() {
     var graph = buildOsmGraph(
       ResourceLoader.of(EscalatorPruningTest.class).file("matinkyla-escalator.pbf"),
       IslandPruningParameters.DEFAULTS

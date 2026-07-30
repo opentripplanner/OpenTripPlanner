@@ -17,6 +17,10 @@ public record IslandPruningParameters(
     250
   );
 
+  public static IslandPruningParametersBuilder of() {
+    return new IslandPruningParametersBuilder();
+  }
+
   IslandPruningParameters(IslandPruningParametersBuilder builder) {
     this(
       builder.pruningThresholdIslandWithoutStops(),
@@ -24,13 +28,5 @@ public record IslandPruningParameters(
       builder.adaptivePruningFactor(),
       builder.adaptivePruningDistance()
     );
-  }
-
-  public static IslandPruningParametersBuilder of() {
-    return new IslandPruningParametersBuilder();
-  }
-
-  public IslandPruningParametersBuilder copyOf() {
-    return new IslandPruningParametersBuilder(this);
   }
 }

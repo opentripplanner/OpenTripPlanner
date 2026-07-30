@@ -16,7 +16,7 @@ import org.opentripplanner.test.support.ResourceLoader;
  * Adaptive pruning retains the distant island but removes the closer one which appears to be
  * disconnected part of the main graph.
  */
-public class AdaptivePruningTest {
+class AdaptivePruningTest {
 
   private static Graph graph;
 
@@ -34,7 +34,7 @@ public class AdaptivePruningTest {
   }
 
   @Test
-  public void distantIslandIsRetained() {
+  void distantIslandIsRetained() {
     assertTrue(
       graph
         .getStreetEdges()
@@ -46,7 +46,7 @@ public class AdaptivePruningTest {
   }
 
   @Test
-  public void nearIslandIsRemoved() {
+  void nearIslandIsRemoved() {
     Assertions.assertFalse(
       graph
         .getStreetEdges()
@@ -58,7 +58,7 @@ public class AdaptivePruningTest {
   }
 
   @Test
-  public void mainGraphIsNotRemoved() {
+  void mainGraphIsNotRemoved() {
     assertTrue(
       graph
         .getStreetEdges()

@@ -205,7 +205,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static IslandPruningModule providePruneIslands(
+  static IslandPruningModule provideIslandPruningModule(
     BuildConfig config,
     Graph graph,
     VehicleParkingRepository parkingRepository,
