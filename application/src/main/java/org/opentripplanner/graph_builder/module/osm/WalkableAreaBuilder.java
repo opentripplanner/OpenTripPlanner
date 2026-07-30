@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,13 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
-import org.locationtech.jts.index.SpatialIndex;
-import org.locationtech.jts.index.strtree.STRtree;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -36,7 +31,6 @@ import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
-import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.LineStringShrinker;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
@@ -69,7 +63,8 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final SpatialIndex platformEntranceCandidatesIndex;
+  private final PlatformEntranceFinder platformEntranceFinder;
+
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -136,16 +131,9 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformEntranceCandidatesIndex = new STRtree();
-    if (platformEntriesLinking) {
-      graph
-        .getVertices()
-        .stream()
-        .filter(OsmVertex.class::isInstance)
-        .map(OsmVertex.class::cast)
-        .filter(this::isPlatformEntranceCandidate)
-        .forEach(v -> platformEntranceCandidatesIndex.insert(new Envelope(v.getCoordinate()), v));
-    }
+    this.platformEntranceFinder = platformEntriesLinking
+      ? PlatformEntranceFinder.of(graph.getVertices())
+      : PlatformEntranceFinder.empty();
   }
 
   /**
@@ -275,7 +263,6 @@ class WalkableAreaBuilder {
     Map<IntersectionVertex, AreaGroup> vertexToAreaGroup = new HashMap<>();
     List<PerRingData> perRingData = new ArrayList<>();
 
-    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
       AreaGroup areaGroup = new AreaGroup(polygon);
@@ -303,15 +290,9 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            Envelope ringEnvelope = outerRing.jtsPolygon.getEnvelopeInternal();
-            @SuppressWarnings("unchecked")
-            List<OsmVertex> candidates = platformEntranceCandidatesIndex.query(ringEnvelope);
-            var verticesWithin = candidates
-              .stream()
-              .filter(t ->
-                outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
-              )
-              .toList();
+            var verticesWithin = platformEntranceFinder.findPlatformVerticesWithin(
+              outerRing.jtsPolygon
+            );
             platformLinkingVertices.addAll(verticesWithin);
             for (OsmVertex v : verticesWithin) {
               startingVertices.add(v);
@@ -739,50 +720,6 @@ class WalkableAreaBuilder {
         }
       }
     }
-  }
-
-  /**
-   * Tests whether {@code osmVertex} is a candidate single-entry stub into the street network:
-   * exactly one non-motorized edge (permission {@link StreetTraversalPermission#PEDESTRIAN},
-   * {@link StreetTraversalPermission#BICYCLE} or
-   * {@link StreetTraversalPermission#PEDESTRIAN_AND_BICYCLE}) connects it to one other vertex,
-   * and every other non-{@link AreaEdge} edge at this vertex leads back to that same vertex.
-   *
-   * <p>This is a pure edge-topology check — it knows nothing about area polygons, and runs once,
-   * up front, over every {@link OsmVertex} in the graph, before any platform's visibility graph
-   * exists. A vertex that passes is only a <em>candidate</em> platform-linking point; whether it
-   * actually lies inside a given platform is decided later, per ring, {@link #buildAllRingEdges}.
-   * Because that geometric test happens separately, a candidate can sit anywhere relative to a
-   * platform's boundary, including its interior — for example a stairway landing under a platform.
-   *
-   * @return {@code true} if the vertex is a single-entry, non-motorized street stub
-   */
-  private boolean isPlatformEntranceCandidate(OsmVertex osmVertex) {
-    boolean isCandidate = false;
-    Vertex start = null;
-    for (Edge e : osmVertex.getIncoming()) {
-      if (e instanceof StreetEdge se && !(e instanceof AreaEdge)) {
-        if (Arrays.asList(1, 2, 3).contains(se.getPermission().code)) {
-          isCandidate = true;
-          start = se.getFromVertex();
-          break;
-        }
-      }
-    }
-
-    if (isCandidate && start != null) {
-      boolean isLinkingPoint = true;
-      for (Edge se : osmVertex.getOutgoing()) {
-        if (
-          !se.getToVertex().getCoordinate().equals(start.getCoordinate()) &&
-          !(se instanceof AreaEdge)
-        ) {
-          isLinkingPoint = false;
-        }
-      }
-      return isLinkingPoint;
-    }
-    return false;
   }
 
   private boolean shouldSkipEdge(
