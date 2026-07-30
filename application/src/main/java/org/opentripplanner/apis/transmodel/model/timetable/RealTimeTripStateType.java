@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model.timetable;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;

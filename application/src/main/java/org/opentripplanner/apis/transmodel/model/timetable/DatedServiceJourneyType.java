@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.transmodel.model.timetable;
 
-import graphql.AssertException;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -17,7 +16,6 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
-import org.opentripplanner.apis.transmodel.model.plan.TransmodelRealTimeTripStateModel;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -160,11 +158,13 @@ public class DatedServiceJourneyType {
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
-              throw new AssertException("Both first and last can't be defined simultaneously.");
+              throw new IllegalArgumentException(
+                "Both first and last can't be defined simultaneously."
+              );
             }
 
             if ((first != null && first < 0) || (last != null && last < 0)) {
-              throw new AssertException("first and last must be positive integers.");
+              throw new IllegalArgumentException("first and last must be positive integers.");
             }
 
             if (first != null && first < stops.size()) {
@@ -205,7 +205,7 @@ public class DatedServiceJourneyType {
               .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
               .map(tripTimes -> {
                 if (tripTimes.isDeleted()) {
-                  throw new AssertException(
+                  throw new RuntimeException(
                     "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                   );
                 }

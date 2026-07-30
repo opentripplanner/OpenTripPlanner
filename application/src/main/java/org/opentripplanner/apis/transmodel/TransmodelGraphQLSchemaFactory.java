@@ -82,7 +82,6 @@ import org.opentripplanner.apis.transmodel.model.plan.ElevationProfileStepType;
 import org.opentripplanner.apis.transmodel.model.plan.LegType;
 import org.opentripplanner.apis.transmodel.model.plan.PathGuidanceType;
 import org.opentripplanner.apis.transmodel.model.plan.PlanPlaceType;
-import org.opentripplanner.apis.transmodel.model.plan.RealTimeTripStateType;
 import org.opentripplanner.apis.transmodel.model.plan.RefetchTripPatternQuery;
 import org.opentripplanner.apis.transmodel.model.plan.RoutingErrorType;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternTimePenaltyType;
@@ -112,6 +111,7 @@ import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQu
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
+import org.opentripplanner.apis.transmodel.model.timetable.RealTimeTripStateType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacedByRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;

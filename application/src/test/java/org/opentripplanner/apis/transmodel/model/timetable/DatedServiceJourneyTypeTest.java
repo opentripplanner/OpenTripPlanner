@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
-import org.opentripplanner.apis.transmodel.model.plan.RealTimeTripStateType;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;

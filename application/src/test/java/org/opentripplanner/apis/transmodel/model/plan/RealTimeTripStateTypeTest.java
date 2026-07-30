@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import graphql.ExecutionInput;
 import graphql.GraphQL;
@@ -8,7 +9,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.transmodel.model.timetable.RealTimeTripStateType;
+import org.opentripplanner.apis.transmodel.model.timetable.TransmodelRealTimeTripStateModel;
 
 class RealTimeTripStateTypeTest {
 
@@ -24,21 +28,21 @@ class RealTimeTripStateTypeTest {
   @Test
   void allFlagsAreFalse_whenNoUpdatesPresent() {
     var result = execute(ALL_FALSE);
-    assertEquals(false, result.get("extraJourney"));
-    assertEquals(false, result.get("cancellation"));
-    assertEquals(false, result.get("timesModified"));
-    assertEquals(false, result.get("journeyPatternModified"));
-    assertEquals(false, result.get("updated"));
+    assertFalse(flag(result, "extraJourney"));
+    assertFalse(flag(result, "cancellation"));
+    assertFalse(flag(result, "timesModified"));
+    assertFalse(flag(result, "journeyPatternModified"));
+    assertFalse(flag(result, "updated"));
   }
 
   @Test
   void allFlagsAreTrue_whenAllUpdatesPresent() {
     var result = execute(ALL_TRUE);
-    assertEquals(true, result.get("extraJourney"));
-    assertEquals(true, result.get("cancellation"));
-    assertEquals(true, result.get("timesModified"));
-    assertEquals(true, result.get("journeyPatternModified"));
-    assertEquals(true, result.get("updated"));
+    assertTrue(flag(result, "extraJourney"));
+    assertTrue(flag(result, "cancellation"));
+    assertTrue(flag(result, "timesModified"));
+    assertTrue(flag(result, "journeyPatternModified"));
+    assertTrue(flag(result, "updated"));
   }
 
   // Individual flag tests guard against copy-paste errors in the six nearly-identical
@@ -48,49 +52,53 @@ class RealTimeTripStateTypeTest {
   void extraJourneyFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(true, false, false, false, false);
     var result = execute(model);
-    assertEquals(true, result.get("extraJourney"));
-    assertEquals(false, result.get("cancellation"));
-    assertEquals(false, result.get("timesModified"));
-    assertEquals(false, result.get("journeyPatternModified"));
-    assertEquals(false, result.get("updated"));
+    assertTrue(flag(result, "extraJourney"));
+    assertFalse(flag(result, "cancellation"));
+    assertFalse(flag(result, "timesModified"));
+    assertFalse(flag(result, "journeyPatternModified"));
+    assertFalse(flag(result, "updated"));
   }
 
   @Test
   void cancellationFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, true, false, false, false);
     var result = execute(model);
-    assertEquals(false, result.get("extraJourney"));
-    assertEquals(true, result.get("cancellation"));
+    assertFalse(flag(result, "extraJourney"));
+    assertTrue(flag(result, "cancellation"));
   }
 
   @Test
   void timesModifiedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, true, false, false);
     var result = execute(model);
-    assertEquals(true, result.get("timesModified"));
-    assertEquals(false, result.get("journeyPatternModified"));
+    assertTrue(flag(result, "timesModified"));
+    assertFalse(flag(result, "journeyPatternModified"));
   }
 
   @Test
   void journeyPatternModifiedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, false, true, false);
     var result = execute(model);
-    assertEquals(false, result.get("timesModified"));
-    assertEquals(true, result.get("journeyPatternModified"));
-    assertEquals(false, result.get("updated"));
+    assertFalse(flag(result, "timesModified"));
+    assertTrue(flag(result, "journeyPatternModified"));
+    assertFalse(flag(result, "updated"));
   }
 
   @Test
   void updatedFlagIsIsolated() {
     var model = new TransmodelRealTimeTripStateModel(false, false, false, false, true);
     var result = execute(model);
-    assertEquals(false, result.get("journeyPatternModified"));
-    assertEquals(true, result.get("updated"));
+    assertFalse(flag(result, "journeyPatternModified"));
+    assertTrue(flag(result, "updated"));
   }
 
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+
+  private static boolean flag(Map<String, Object> state, String name) {
+    return (boolean) state.get(name);
+  }
 
   @SuppressWarnings("unchecked")
   private static java.util.Map<String, Object> execute(TransmodelRealTimeTripStateModel model) {

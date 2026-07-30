@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import graphql.AssertException;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
@@ -60,7 +59,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
         .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
         .map(tripTimes -> {
           if (tripTimes.isDeleted()) {
-            throw new AssertException(
+            throw new RuntimeException(
               "Trip has been deleted. this should not be exposed to the API and is probably a bug"
             );
           }
