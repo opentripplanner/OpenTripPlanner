@@ -1,15 +1,12 @@
 package org.opentripplanner.graph_builder.module.islandpruning.moduletests;
 
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildStreetGraph;
-import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.prune;
-import static org.opentripplanner.osm.model.NodeBuilder.node;
+import static org.opentripplanner.street.model.StreetModelForTest.bidirectional;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningEnvironment;
 import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
-import org.opentripplanner.osm.TestOsmProvider;
-import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
  * A disconnected street network is only pruned if its size, measured in street vertices, is
@@ -22,38 +19,32 @@ class IslandAboveThresholdRetainedTest {
   void islandAtThresholdIsRetained() {
     // Main street network: a small square of four intersections, large enough to never be
     // considered for pruning.
-    var a = node(0, new WgsCoordinate(0, 0));
-    var b = node(1, new WgsCoordinate(0, 1));
-    var c = node(2, new WgsCoordinate(1, 1));
-    var d = node(3, new WgsCoordinate(1, 0));
+    var a = intersectionVertex(0, 0);
+    var b = intersectionVertex(0, 1);
+    var c = intersectionVertex(1, 1);
+    var d = intersectionVertex(1, 0);
 
     // Disconnected island of exactly three street vertices: at the pruning threshold, so it is
     // retained.
-    var i0 = node(4, new WgsCoordinate(10, 10));
-    var i1 = node(5, new WgsCoordinate(10, 11));
-    var i2 = node(6, new WgsCoordinate(10, 12));
+    var i0 = intersectionVertex(10, 10);
+    var i1 = intersectionVertex(10, 11);
+    var i2 = intersectionVertex(10, 12);
 
-    var provider = TestOsmProvider.of()
-      .addWayFromNodes(a, b)
-      .addWayFromNodes(b, c)
-      .addWayFromNodes(c, d)
-      .addWayFromNodes(d, a)
-      .addWayFromNodes(i0, i1)
-      .addWayFromNodes(i1, i2)
-      .build();
+    bidirectional(a, b);
+    bidirectional(b, c);
+    bidirectional(c, d);
+    bidirectional(d, a);
+    bidirectional(i0, i1);
+    bidirectional(i1, i2);
 
-    var graph = buildStreetGraph(provider);
     // Islands without stops smaller than 3 street vertices are pruned; this island has exactly 3.
-    prune(
-      graph,
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, i2).prune(
       IslandPruningParameters.of()
         .withPruningThresholdIslandWithoutStops(3)
         .withPruningThresholdIslandWithStops(3)
         .withAdaptivePruningFactor(1)
         .build()
     );
-
-    var summarizer = new GraphSummarizer(graph);
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())

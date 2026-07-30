@@ -1,15 +1,14 @@
 package org.opentripplanner.graph_builder.module.islandpruning.moduletests;
 
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildStreetGraph;
-import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.prune;
-import static org.opentripplanner.osm.model.NodeBuilder.node;
+import static org.opentripplanner.street.model.StreetModelForTest.bidirectional;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model.StreetModelForTest.streetEdgeBuilder;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningEnvironment;
 import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
-import org.opentripplanner.osm.TestOsmProvider;
-import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
  * A dead-end street network that is too small to stand on its own, but is reachable from the main
@@ -23,37 +22,34 @@ class DeadEndBecomesNoThruTest {
   void deadEndConnectedViaDestinationOnlyWayBecomesNoThru() {
     // Main street network: a small square of four intersections, large enough to never be
     // considered for pruning.
-    var a = node(0, new WgsCoordinate(0, 0));
-    var b = node(1, new WgsCoordinate(0, 1));
-    var c = node(2, new WgsCoordinate(1, 1));
-    var d = node(3, new WgsCoordinate(1, 0));
+    var a = intersectionVertex(0, 0);
+    var b = intersectionVertex(0, 1);
+    var c = intersectionVertex(1, 1);
+    var d = intersectionVertex(1, 0);
 
     // Dead-end tail, reachable only via a destination-only ("no thru traffic") connector from
     // the main square.
-    var e = node(4, new WgsCoordinate(2, 0));
-    var f = node(5, new WgsCoordinate(3, 0));
+    var e = intersectionVertex(2, 0);
+    var f = intersectionVertex(3, 0);
 
-    var provider = TestOsmProvider.of()
-      .addWayFromNodes(a, b)
-      .addWayFromNodes(b, c)
-      .addWayFromNodes(c, d)
-      .addWayFromNodes(d, a)
-      .addWayFromNodes(way -> way.withTag("foot", "destination"), d, e)
-      .addWayFromNodes(e, f)
-      .build();
+    bidirectional(a, b);
+    bidirectional(b, c);
+    bidirectional(c, d);
+    bidirectional(d, a);
+    bidirectional(e, f);
 
-    var graph = buildStreetGraph(provider);
+    // Connector: already destination-only, e.g. tagged `foot=destination` in OSM.
+    streetEdgeBuilder(d, e, 1, PEDESTRIAN).withWalkNoThruTraffic(true).buildAndConnect();
+    streetEdgeBuilder(e, d, 1, PEDESTRIAN).withWalkNoThruTraffic(true).buildAndConnect();
+
     // Dead end has 2 street vertices (e, f), which is below the threshold of 3.
-    prune(
-      graph,
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f).prune(
       IslandPruningParameters.of()
         .withPruningThresholdIslandWithoutStops(3)
         .withPruningThresholdIslandWithStops(3)
         .withAdaptivePruningFactor(1)
         .build()
     );
-
-    var summarizer = new GraphSummarizer(graph);
 
     assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
       .that(summarizer.summarizeEdges())
@@ -67,7 +63,7 @@ class DeadEndBecomesNoThruTest {
         "(1,0) → (1,1) PEDESTRIAN ♿✅",
         "(1,0) → (0,0) PEDESTRIAN ♿✅",
         "(0,0) → (1,0) PEDESTRIAN ♿✅",
-        // connector: already destination-only from the OSM tag
+        // connector: already destination-only
         "(1,0) → (2,0) PEDESTRIAN ♿✅ noThru=WALK",
         "(2,0) → (1,0) PEDESTRIAN ♿✅ noThru=WALK",
         // dead-end edge: converted to no-thru-traffic by the pruning module, not removed
