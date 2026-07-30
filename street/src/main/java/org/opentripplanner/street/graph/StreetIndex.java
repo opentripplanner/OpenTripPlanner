@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -166,9 +167,9 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    return graph
-      .getVerticesOfType(StationCentroidVertex.class)
-      .stream()
-      .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
+    var vertices = graph.getVerticesOfType(StationCentroidVertex.class);
+    return StreamSupport.stream(vertices.spliterator(), false).collect(
+      Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v)
+    );
   }
 }
