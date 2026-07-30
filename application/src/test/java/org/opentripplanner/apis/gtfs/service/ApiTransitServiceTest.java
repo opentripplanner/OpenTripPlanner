@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.service;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -188,9 +189,7 @@ class ApiTransitServiceTest {
       )
     ).isEmpty();
 
-    var update = rt
-      .tripUpdate(TRIP_1_ID, GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED)
-      .build();
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
     var service = new ApiTransitService(env.transitService());
@@ -237,9 +236,7 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdate(TRIP_1_ID, GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED)
-      .build();
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
     var service = new ApiTransitService(env.transitService());
@@ -270,9 +267,7 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdate("TestTrip3", GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED)
-      .build();
+    var update = rt.tripUpdate("TestTrip3", CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
     var service = new ApiTransitService(env.transitService());

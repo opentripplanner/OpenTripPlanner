@@ -190,6 +190,13 @@ public class GraphQLTypes {
     }
   }
 
+  /** Enum for limiting the returned calls depending on pickup/drop off status on a stop. */
+  public enum GraphQLArrivalDeparture {
+    ARRIVALS,
+    DEPARTURES,
+    EITHER,
+  }
+
   public static class GraphQLBicycleParkingPreferencesInput {
 
     private List<GraphQLParkingFilterInput> filters;
@@ -5093,12 +5100,18 @@ public class GraphQLTypes {
 
   public static class GraphQLStopCanceledCallsArgs {
 
-    private Boolean omitNonPickups;
+    private GraphQLArrivalDeparture arrivalDeparture;
     private List<GraphQLLocalDateRangeInput> serviceDateRanges;
 
     public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
       if (args != null) {
-        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+        if (args.get("arrivalDeparture") instanceof GraphQLArrivalDeparture) {
+          this.arrivalDeparture = (GraphQLArrivalDeparture) args.get("arrivalDeparture");
+        } else if (args.get("arrivalDeparture") != null) {
+          this.arrivalDeparture = GraphQLArrivalDeparture.valueOf(
+            (String) args.get("arrivalDeparture")
+          );
+        }
         if (args.get("serviceDateRanges") != null) {
           this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
               "serviceDateRanges"
@@ -5109,16 +5122,16 @@ public class GraphQLTypes {
       }
     }
 
-    public Boolean getGraphQLOmitNonPickups() {
-      return this.omitNonPickups;
+    public GraphQLArrivalDeparture getGraphQLArrivalDeparture() {
+      return this.arrivalDeparture;
     }
 
     public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
       return this.serviceDateRanges;
     }
 
-    public void setGraphQLOmitNonPickups(Boolean omitNonPickups) {
-      this.omitNonPickups = omitNonPickups;
+    public void setGraphQLArrivalDeparture(GraphQLArrivalDeparture arrivalDeparture) {
+      this.arrivalDeparture = arrivalDeparture;
     }
 
     public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {

@@ -2401,8 +2401,11 @@ type Stop implements Node & PlaceInterface {
   Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   canceledCalls(
-    "If true, only those departures which allow boarding are returned"
-    omitNonPickups: Boolean = false,
+    """
+    Selects if only calls where boarding is allowed, only calls where alighting is allowed, or calls
+    where either boarding or alighting is possible.
+    """
+    arrivalDeparture: ArrivalDeparture = EITHER,
     """
     Only include canceled calls whose trip's service date is within any of these date ranges.
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire
@@ -3375,6 +3378,16 @@ enum AlertSeverityLevelType {
   with irregular schedules.
   """
   WARNING
+}
+
+"Enum for limiting the returned calls depending on pickup/drop off status on a stop."
+enum ArrivalDeparture {
+  "Only include calls where alighting from the vehicle is allowed."
+  ARRIVALS
+  "Only include calls where boarding the vehicle is allowed."
+  DEPARTURES
+  "Include calls where either boarding or alighting is allowed."
+  EITHER
 }
 
 enum BikesAllowed {
