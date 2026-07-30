@@ -15,7 +15,9 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -64,7 +66,11 @@ class VehicleRentalUpdaterTest {
   static class MockManager extends GraphUpdaterManager {
 
     public MockManager(VehicleRentalUpdater updater) {
-      super(WriteToGraphCallback.noop(), RunnableUtils.NOOP, List.of(updater));
+      super(
+        new WriteToGraphCallbacks().with(WriteDomain.STREET, WriteToGraphCallback.noop()),
+        RunnableUtils.NOOP,
+        List.of(updater)
+      );
     }
   }
 

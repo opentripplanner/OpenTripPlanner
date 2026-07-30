@@ -21,7 +21,9 @@ import org.opentripplanner.updater.DefaultStreetRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
 class VehicleParkingAvailabilityUpdaterTest {
@@ -121,7 +123,7 @@ class VehicleParkingAvailabilityUpdaterTest {
       return CompletableFuture.completedFuture(null);
     };
     var graphUpdaterManager = new GraphUpdaterManager(
-      callback,
+      new WriteToGraphCallbacks().with(WriteDomain.STREET, callback),
       RunnableUtils.NOOP,
       List.of(updater)
     );

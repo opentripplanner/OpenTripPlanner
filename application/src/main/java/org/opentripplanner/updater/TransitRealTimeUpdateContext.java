@@ -7,9 +7,7 @@ import org.opentripplanner.updater.trip.siri.EntityResolver;
 
 /**
  * Give access to the transit data in the context of a real-time update task in the transit write
- * domain. The services exposed must be used only from the transit domain's writer thread. The
- * street model is deliberately absent: it is owned by the street write domain (see
- * {@link StreetRealTimeUpdateContext}).
+ * domain. The services exposed must be used only from the transit domain's writer thread.
  */
 public interface TransitRealTimeUpdateContext {
   /**

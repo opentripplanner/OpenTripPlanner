@@ -8,8 +8,8 @@ package org.opentripplanner.updater;
  * the request-threads always see a consistent view of the graph while planning.
  *
  * @param <C> the update context of the updater's write domain — {@link
- *            TransitRealTimeUpdateContext} or {@link StreetRealTimeUpdateContext}. The type
- *            guarantees at compile time that a task only accesses data owned by its domain.
+ *            TransitRealTimeUpdateContext} or {@link StreetRealTimeUpdateContext}. The context
+ *            exposes only the data owned by that domain.
  * @see GraphUpdaterManager
  */
 public interface GraphWriterRunnable<C> {

@@ -74,22 +74,6 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   }
 
   /**
-   * Convenience constructor that routes every write domain to the same callback — the behavior
-   * before the write-domain split, still useful in tests.
-   */
-  public GraphUpdaterManager(
-    WriteToGraphCallback<?> writeToGraphCallback,
-    Runnable shutdownGraphWriter,
-    List<GraphUpdater<?>> updaters
-  ) {
-    this(
-      WriteToGraphCallbacks.sameForAllDomains(writeToGraphCallback),
-      shutdownGraphWriter,
-      updaters
-    );
-  }
-
-  /**
    * Pair an updater with the callback of its write domain.
    */
   private static <C> void setup(GraphUpdater<C> updater, WriteToGraphCallbacks callbacks) {
