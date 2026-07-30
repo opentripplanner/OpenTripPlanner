@@ -190,7 +190,10 @@ public class GraphQLTypes {
     }
   }
 
-  /** Enum for limiting the returned calls depending on pickup/drop off status on a stop. */
+  /**
+   * Enum for limiting the returned calls depending on pickup/drop off status on a stop
+   * based on the original schedules.
+   */
   public enum GraphQLArrivalDeparture {
     ARRIVALS,
     DEPARTURES,
