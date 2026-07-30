@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +32,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +70,8 @@ public class IslandPruningModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    LOG.info("Pruning islands and areas isolated by nothru edges in street network");
+    Instant start = Instant.now();
+
     LOG.info(
       "Threshold with stops {}, without stops {}, adaptive coeff {} and distance {}",
       pruningThresholdWithStops,
@@ -113,6 +117,11 @@ public class IslandPruningModule implements GraphBuilderModule {
       removed += 1;
     }
     LOG.info("Removed {} edgeless street vertices", removed);
+
+    LOG.info(
+      "Island pruning completed in {}",
+      DurationUtils.durationToStr(Duration.between(start, Instant.now()))
+    );
   }
 
   /**
