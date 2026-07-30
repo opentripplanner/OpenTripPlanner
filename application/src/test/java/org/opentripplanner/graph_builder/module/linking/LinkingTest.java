@@ -1,10 +1,12 @@
 package org.opentripplanner.graph_builder.module.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.graph_builder.module.linking.TestGraph.addExtraStops;
 import static org.opentripplanner.graph_builder.module.linking.TestGraph.addRegularStopGrid;
 import static org.opentripplanner.graph_builder.module.linking.TestGraph.link;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -44,8 +46,8 @@ public class LinkingTest {
     addRegularStopGrid(g2);
     link(g2, timetableRepository2);
 
-    var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
-    assertEquals(966, transitStopVertices.size());
+    var transitStopVertices = ImmutableList.copyOf(g1.getVerticesOfType(TransitStopVertex.class));
+    assertThat(transitStopVertices).hasSize(966);
 
     // Count unlinked stops, these are stops that are more than ~150 meters from the road network
     int unlinkedStopsCounter = 0;

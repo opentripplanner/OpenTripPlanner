@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -223,11 +224,11 @@ class VehicleParkingUpdaterTest {
   }
 
   private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
-    var parkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
+    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).hasSize(
+      vehicleParkingNumber
+    );
 
-    assertEquals(vehicleParkingNumber, parkingVertices.size());
-
-    for (var parkingVertex : parkingVertices) {
+    for (var parkingVertex : graph.getVerticesOfType(VehicleParkingEntranceVertex.class)) {
       assertEquals(2, parkingVertex.getIncoming().size());
       assertEquals(2, parkingVertex.getOutgoing().size());
 
@@ -278,7 +279,7 @@ class VehicleParkingUpdaterTest {
   }
 
   private void assertVehicleParkingNotLinked() {
-    assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
+    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).isEmpty();
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
     assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
   }

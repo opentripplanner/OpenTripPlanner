@@ -168,12 +168,8 @@ public class Graph implements Serializable {
     return this.vertices.values();
   }
 
-  public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
-    return this.getVertices()
-      .stream()
-      .filter(cls::isInstance)
-      .map(cls::cast)
-      .collect(Collectors.toList());
+  public <T extends Vertex> Iterable<T> getVerticesOfType(Class<T> cls) {
+    return this.getVertices().stream().filter(cls::isInstance).map(cls::cast)::iterator;
   }
 
   /**

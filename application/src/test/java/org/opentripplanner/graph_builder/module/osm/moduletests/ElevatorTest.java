@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -383,10 +384,10 @@ class ElevatorTest {
 
     var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(4);
-    var elevatorHopVertices = graph
-      .getVerticesOfType(ElevatorHopVertex.class)
-      .stream()
-      .map(vertex -> vertex.getLabelString());
+    var elevatorHopVertices = StreamSupport.stream(
+      graph.getVerticesOfType(ElevatorHopVertex.class).spliterator(),
+      false
+    ).map(vertex -> vertex.getLabelString());
     assertThat(elevatorHopVertices).containsNoDuplicates();
   }
 

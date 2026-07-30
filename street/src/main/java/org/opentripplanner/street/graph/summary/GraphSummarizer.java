@@ -1,8 +1,10 @@
 package org.opentripplanner.street.graph.summary;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -47,7 +49,7 @@ public class GraphSummarizer {
   }
 
   public List<TransitStopVertex> listStopVertices() {
-    return graph.getVerticesOfType(TransitStopVertex.class);
+    return ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
   }
 
   /**
@@ -73,9 +75,8 @@ public class GraphSummarizer {
   }
 
   public Collection<String> summarizeSplitVertices() {
-    return graph
-      .getVerticesOfType(SplitterVertex.class)
-      .stream()
+    var vertices = graph.getVerticesOfType(SplitterVertex.class);
+    return StreamSupport.stream(vertices.spliterator(), false)
       .map(StreetSummarizer::summarizeVertex)
       .toList();
   }

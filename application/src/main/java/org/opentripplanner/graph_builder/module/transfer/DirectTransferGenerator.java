@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.transfer;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // The linker will use streets if they are available, or straight-line distance otherwise.
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
 
-    List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
+    var stops = ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
     Set<StopLocation> carsAllowedStops =
       timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =

@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.stopconnectivity;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -36,14 +37,10 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    var progress = ProgressTracker.track(
-      "Stop connectivity analysis",
-      5000,
-      graph.getVerticesOfType(TransitStopVertex.class).size()
-    );
+    var stops = ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
+    var progress = ProgressTracker.track("Stop connectivity analysis", 5000, stops.size());
     LOG.info(progress.startMessage());
-    var issues = graph
-      .getVerticesOfType(TransitStopVertex.class)
+    var issues = stops
       .parallelStream()
       .map(stop -> {
         if (stop.isFerryStop()) {

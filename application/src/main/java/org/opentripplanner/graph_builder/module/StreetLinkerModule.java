@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -87,7 +88,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   public void linkTransitStops(Graph graph, TimetableRepository timetableRepository) {
-    List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
 

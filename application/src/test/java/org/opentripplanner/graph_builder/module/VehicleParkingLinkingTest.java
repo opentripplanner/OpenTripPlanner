@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
@@ -146,7 +147,7 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
-    assertEquals(1, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
+    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).hasSize(1);
 
     assertEquals(1, graph.getEdgesOfType(VehicleParkingEdge.class).size());
     assertEquals(2, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
@@ -173,7 +174,7 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, vehicleParkingService, timetableRepository);
 
-    assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
+    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).isEmpty();
 
     assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
