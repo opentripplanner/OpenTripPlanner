@@ -2401,6 +2401,8 @@ type Stop implements Node & PlaceInterface {
   Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   canceledCalls(
+    "If true, only those departures which allow boarding are returned"
+    omitNonPickups: Boolean = false,
     """
     Only include canceled calls whose trip's service date is within any of these date ranges.
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire

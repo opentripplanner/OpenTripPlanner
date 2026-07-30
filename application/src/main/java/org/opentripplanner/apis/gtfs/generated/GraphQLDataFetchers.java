@@ -549,6 +549,12 @@ public class GraphQLDataFetchers {
     }
   }
 
+  /**
+   * A textual message about a transit entity that is already known at planning time.
+   *
+   * It is not intended to convey real-time or emergency updates of the transit system but information that
+   * is known well ahead of time.
+   */
   public interface GraphQLNotice {
     public DataFetcher<String> text();
   }

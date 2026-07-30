@@ -142,15 +142,20 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       var serviceDateRanges = rawRanges == null
         ? List.of(LocalDateRange.ofUnbounded())
         : LocalDateRangeUtil.mapRanges(rawRanges);
+      var arrivalDeparture = args.getGraphQLOmitNonPickups()
+        ? ArrivalDeparture.DEPARTURES
+        : ArrivalDeparture.BOTH;
       var service = new ApiTransitService(getTransitService(environment));
       return getValue(
         environment,
-        stop -> service.findCanceledStopCalls(stop, serviceDateRanges),
+        stop -> service.findCanceledStopCalls(stop, serviceDateRanges, arrivalDeparture),
         station ->
           station
             .getChildStops()
             .stream()
-            .flatMap(stop -> service.findCanceledStopCalls(stop, serviceDateRanges).stream())
+            .flatMap(stop ->
+              service.findCanceledStopCalls(stop, serviceDateRanges, arrivalDeparture).stream()
+            )
             .collect(Collectors.toList())
       );
     };

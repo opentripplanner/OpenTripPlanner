@@ -5093,10 +5093,12 @@ public class GraphQLTypes {
 
   public static class GraphQLStopCanceledCallsArgs {
 
+    private Boolean omitNonPickups;
     private List<GraphQLLocalDateRangeInput> serviceDateRanges;
 
     public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
       if (args != null) {
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
         if (args.get("serviceDateRanges") != null) {
           this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
               "serviceDateRanges"
@@ -5107,8 +5109,16 @@ public class GraphQLTypes {
       }
     }
 
+    public Boolean getGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
+
     public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
       return this.serviceDateRanges;
+    }
+
+    public void setGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
     }
 
     public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {
