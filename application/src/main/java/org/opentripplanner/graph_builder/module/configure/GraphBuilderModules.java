@@ -26,7 +26,7 @@ import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidat
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
-import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningModule;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -204,7 +204,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static PruneIslands providePruneIslands(
+  static IslandPruningModule providePruneIslands(
     BuildConfig config,
     Graph graph,
     VehicleParkingRepository parkingRepository,
@@ -212,7 +212,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
-    PruneIslands pruneIslands = new PruneIslands(
+    IslandPruningModule pruneIslands = new IslandPruningModule(
       graph,
       timetableRepository,
       issueStore,

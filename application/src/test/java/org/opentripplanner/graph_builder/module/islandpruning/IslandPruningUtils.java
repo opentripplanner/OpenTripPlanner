@@ -35,7 +35,7 @@ class IslandPruningUtils {
       graph.index();
 
       // Prune floating islands and set noThru where necessary
-      PruneIslands pruneIslands = new PruneIslands(
+      IslandPruningModule pruneIslands = new IslandPruningModule(
         graph,
         timetableRepository,
         DataImportIssueStore.NOOP,

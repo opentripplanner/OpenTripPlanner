@@ -34,15 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * this module is part of the  {@link GraphBuilderModule}
- * process. It extends the functionality of PruneFloatingIslands by considering also through traffic
- * limitations. It is quite common that no thru edges break connectivity of the graph, creating
- * islands. The quality of the graph can be improved by converting such islands to nothru state so
- * that routing can start / end from such an island.
+ * This module is part of the {@link GraphBuilderModule} process. It extends the functionality of
+ * PruneFloatingIslands by considering also through traffic limitations. It is quite common that no
+ * thru edges break connectivity of the graph, creating islands. The quality of the graph can be
+ * improved by converting such islands to nothru state so that routing can start / end from such an
+ * island.
  */
-public class PruneIslands implements GraphBuilderModule {
+public class IslandPruningModule implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PruneIslands.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IslandPruningModule.class);
 
   private final Graph graph;
   private final TimetableRepository timetableRepository;
@@ -53,7 +53,7 @@ public class PruneIslands implements GraphBuilderModule {
   private int adaptivePruningDistance;
   private double adaptivePruningFactor;
 
-  public PruneIslands(
+  public IslandPruningModule(
     Graph graph,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
@@ -116,42 +116,53 @@ public class PruneIslands implements GraphBuilderModule {
   }
 
   /**
-   * island without stops and with less than this number of street vertices will be pruned
+   * Island without stops and with less than this number of street vertices will be pruned.
+   *
+   * @param pruningThresholdIslandWithoutStops the street vertex count threshold
    */
   public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
     this.pruningThresholdWithoutStops = pruningThresholdIslandWithoutStops;
   }
 
   /**
-   * island with stops and with less than this number of street vertices will be pruned
+   * Island with stops and with less than this number of street vertices will be pruned.
+   *
+   * @param pruningThresholdIslandWithStops the street vertex count threshold
    */
   public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
     this.pruningThresholdWithStops = pruningThresholdIslandWithStops;
   }
 
   /**
-   * search radius as meters when looking for island neighbours
+   * Search radius in meters when looking for island neighbours.
+   *
+   * @param adaptivePruningDistance the search radius, in meters
    */
   public void setAdaptivePruningDistance(int adaptivePruningDistance) {
     this.adaptivePruningDistance = adaptivePruningDistance;
   }
 
   /**
-   * coefficient how much larger islands (compared to threshold values defined above) get pruned if they are close enough
+   * Coefficient for how much larger islands (compared to the threshold values defined above) get
+   * pruned if they are close enough.
+   *
+   * @param adaptivePruningFactor the pruning coefficient
    */
   public void setAdaptivePruningFactor(double adaptivePruningFactor) {
     this.adaptivePruningFactor = adaptivePruningFactor;
   }
 
-  /* Island pruning strategy:
-       1. Extract islands without using noThruTraffic edges at all
-       2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across original islands!
-          Note: these expanded islands can overlap.
-       3  Relax connectivity even more: generate islands by allowing jumps between islands. Find out unreachable edges of small islands.
-       4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via noThruTraffic edges
-          to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Remove unconnected edges.
-     */
-
+  /**
+   * Island pruning strategy:
+   * 1. Extract islands without using noThruTraffic edges at all.
+   * 2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across
+   *    original islands! Note: these expanded islands can overlap.
+   * 3. Relax connectivity even more: generate islands by allowing jumps between islands. Find out
+   *    unreachable edges of small islands.
+   * 4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via
+   *    noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
+   *    unreachable edges. Remove unconnected edges.
+   */
   private void pruneIslands(TraverseMode traverseMode) {
     LOG.debug("nothru pruning");
     Map<Vertex, Subgraph> subgraphs = new HashMap<>();
