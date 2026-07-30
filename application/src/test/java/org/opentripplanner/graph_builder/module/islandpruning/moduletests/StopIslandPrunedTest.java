@@ -7,6 +7,7 @@ import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruni
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
@@ -55,7 +56,14 @@ class StopIslandPrunedTest {
     StreetTransitStopLink.createStreetTransitStopLink(stopVertex, streetVertex);
 
     // Islands with stops smaller than 3 street vertices are pruned; this island has 2.
-    prune(graph, 3, 3, 1, 250);
+    prune(
+      graph,
+      IslandPruningParameters.of()
+        .withPruningThresholdIslandWithoutStops(3)
+        .withPruningThresholdIslandWithStops(3)
+        .withAdaptivePruningFactor(1)
+        .build()
+    );
 
     var summarizer = new GraphSummarizer(graph);
 

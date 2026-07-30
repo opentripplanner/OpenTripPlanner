@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningModule;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -212,21 +213,21 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
-    IslandPruningModule pruneIslands = new IslandPruningModule(
+    var parameters = IslandPruningParameters.of()
+      .withPruningThresholdIslandWithoutStops(
+        config.islandPruning.pruningThresholdIslandWithoutStops
+      )
+      .withPruningThresholdIslandWithStops(config.islandPruning.pruningThresholdIslandWithStops)
+      .withAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor)
+      .withAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance)
+      .build();
+    return new IslandPruningModule(
       graph,
       timetableRepository,
       issueStore,
-      new StreetLinkerModule(graph, linker, parkingRepository, timetableRepository, issueStore)
+      new StreetLinkerModule(graph, linker, parkingRepository, timetableRepository, issueStore),
+      parameters
     );
-    pruneIslands.setPruningThresholdIslandWithoutStops(
-      config.islandPruning.pruningThresholdIslandWithoutStops
-    );
-    pruneIslands.setPruningThresholdIslandWithStops(
-      config.islandPruning.pruningThresholdIslandWithStops
-    );
-    pruneIslands.setAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor);
-    pruneIslands.setAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance);
-    return pruneIslands;
   }
 
   @Provides

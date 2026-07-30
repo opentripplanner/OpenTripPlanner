@@ -22,10 +22,7 @@ public class PruneNoThruIslandsTest {
       ResourceLoader.of(PruneNoThruIslandsTest.class).file(
         "herrenberg-island-prune-nothru.osm.pbf"
       ),
-      10,
-      2,
-      50,
-      250
+      IslandPruningParameters.DEFAULTS
     );
   }
 

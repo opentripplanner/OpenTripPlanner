@@ -11,13 +11,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class IslandPruningUtils {
 
-  public static Graph buildOsmGraph(
-    File osmFile,
-    int thresholdIslandWithoutStops,
-    int thresholdIslandWithStops,
-    double adaptivePruningFactor,
-    int adaptivePruningDistance
-  ) {
+  public static Graph buildOsmGraph(File osmFile, IslandPruningParameters parameters) {
     try {
       var graph = new Graph();
       var osmProvider = new DefaultOsmProvider(osmFile, true);
@@ -30,13 +24,7 @@ public class IslandPruningUtils {
 
       osmModule.buildGraph();
 
-      prune(
-        graph,
-        thresholdIslandWithoutStops,
-        thresholdIslandWithStops,
-        adaptivePruningFactor,
-        adaptivePruningDistance
-      );
+      prune(graph, parameters);
 
       return graph;
     } catch (Exception e) {
@@ -59,13 +47,7 @@ public class IslandPruningUtils {
   /**
    * Runs {@link IslandPruningModule} against an already-built graph.
    */
-  public static void prune(
-    Graph graph,
-    int thresholdIslandWithoutStops,
-    int thresholdIslandWithStops,
-    double adaptivePruningFactor,
-    int adaptivePruningDistance
-  ) {
+  public static void prune(Graph graph, IslandPruningParameters parameters) {
     var timetableRepository = new TimetableRepository(new SiteRepository());
     timetableRepository.index();
     graph.index();
@@ -74,12 +56,9 @@ public class IslandPruningUtils {
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
-      null
+      null,
+      parameters
     );
-    pruneIslands.setPruningThresholdIslandWithoutStops(thresholdIslandWithoutStops);
-    pruneIslands.setPruningThresholdIslandWithStops(thresholdIslandWithStops);
-    pruneIslands.setAdaptivePruningFactor(adaptivePruningFactor);
-    pruneIslands.setAdaptivePruningDistance(adaptivePruningDistance);
     pruneIslands.buildGraph();
   }
 }

@@ -51,21 +51,20 @@ public class IslandPruningModule implements GraphBuilderModule {
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
-  private int pruningThresholdWithoutStops;
-  private int pruningThresholdWithStops;
-  private int adaptivePruningDistance;
-  private double adaptivePruningFactor;
+  private final IslandPruningParameters parameters;
 
   public IslandPruningModule(
     Graph graph,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
-    StreetLinkerModule streetLinkerModule
+    StreetLinkerModule streetLinkerModule,
+    IslandPruningParameters parameters
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.streetLinkerModule = streetLinkerModule;
+    this.parameters = parameters;
   }
 
   @Override
@@ -74,10 +73,10 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     LOG.info(
       "Threshold with stops {}, without stops {}, adaptive coeff {} and distance {}",
-      pruningThresholdWithStops,
-      pruningThresholdWithoutStops,
-      adaptivePruningFactor,
-      adaptivePruningDistance
+      parameters.pruningThresholdIslandWithStops(),
+      parameters.pruningThresholdIslandWithoutStops(),
+      parameters.adaptivePruningFactor(),
+      parameters.adaptivePruningDistance()
     );
 
     pruneIslands(TraverseMode.BICYCLE);
@@ -122,43 +121,6 @@ public class IslandPruningModule implements GraphBuilderModule {
       "Island pruning completed in {}",
       DurationUtils.durationToStr(Duration.between(start, Instant.now()))
     );
-  }
-
-  /**
-   * Island without stops and with less than this number of street vertices will be pruned.
-   *
-   * @param pruningThresholdIslandWithoutStops the street vertex count threshold
-   */
-  public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
-    this.pruningThresholdWithoutStops = pruningThresholdIslandWithoutStops;
-  }
-
-  /**
-   * Island with stops and with less than this number of street vertices will be pruned.
-   *
-   * @param pruningThresholdIslandWithStops the street vertex count threshold
-   */
-  public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
-    this.pruningThresholdWithStops = pruningThresholdIslandWithStops;
-  }
-
-  /**
-   * Search radius in meters when looking for island neighbours.
-   *
-   * @param adaptivePruningDistance the search radius, in meters
-   */
-  public void setAdaptivePruningDistance(int adaptivePruningDistance) {
-    this.adaptivePruningDistance = adaptivePruningDistance;
-  }
-
-  /**
-   * Coefficient for how much larger islands (compared to the threshold values defined above) get
-   * pruned if they are close enough.
-   *
-   * @param adaptivePruningFactor the pruning coefficient
-   */
-  public void setAdaptivePruningFactor(double adaptivePruningFactor) {
-    this.adaptivePruningFactor = adaptivePruningFactor;
   }
 
   /**
@@ -244,6 +206,9 @@ public class IslandPruningModule implements GraphBuilderModule {
       }
     }
 
+    double adaptivePruningFactor = parameters.adaptivePruningFactor();
+    int adaptivePruningDistance = parameters.adaptivePruningDistance();
+
     int count = 0;
     int islandsWithStops = 0;
     int islandsWithStopsChanged = 0;
@@ -255,6 +220,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         //for islands with stops
         islandsWithStops++;
         boolean onlyFerry = island.hasOnlyFerryStops();
+        int pruningThresholdWithStops = parameters.pruningThresholdIslandWithStops();
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
@@ -271,6 +237,7 @@ public class IslandPruningModule implements GraphBuilderModule {
         }
       } else {
         //for islands without stops
+        int pruningThresholdWithoutStops = parameters.pruningThresholdIslandWithoutStops();
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /

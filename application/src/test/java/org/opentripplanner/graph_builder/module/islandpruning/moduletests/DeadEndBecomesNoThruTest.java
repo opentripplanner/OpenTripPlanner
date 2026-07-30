@@ -6,6 +6,7 @@ import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruni
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
@@ -43,7 +44,14 @@ class DeadEndBecomesNoThruTest {
 
     var graph = buildStreetGraph(provider);
     // Dead end has 2 street vertices (e, f), which is below the threshold of 3.
-    prune(graph, 3, 3, 1, 250);
+    prune(
+      graph,
+      IslandPruningParameters.of()
+        .withPruningThresholdIslandWithoutStops(3)
+        .withPruningThresholdIslandWithStops(3)
+        .withAdaptivePruningFactor(1)
+        .build()
+    );
 
     var summarizer = new GraphSummarizer(graph);
 

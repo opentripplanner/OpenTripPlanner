@@ -13,10 +13,7 @@ public class EscalatorPruningTest {
   public void streetEdgesBetweenEscalatorEdgesRetained() {
     var graph = buildOsmGraph(
       ResourceLoader.of(EscalatorPruningTest.class).file("matinkyla-escalator.pbf"),
-      10,
-      2,
-      50,
-      250
+      IslandPruningParameters.DEFAULTS
     );
     assertTrue(
       graph

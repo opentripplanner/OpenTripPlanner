@@ -24,10 +24,12 @@ public class AdaptivePruningTest {
   static void setup() {
     graph = buildOsmGraph(
       ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"),
-      5,
-      0,
-      20,
-      30
+      IslandPruningParameters.of()
+        .withPruningThresholdIslandWithoutStops(5)
+        .withPruningThresholdIslandWithStops(0)
+        .withAdaptivePruningFactor(20)
+        .withAdaptivePruningDistance(30)
+        .build()
     );
   }
 
