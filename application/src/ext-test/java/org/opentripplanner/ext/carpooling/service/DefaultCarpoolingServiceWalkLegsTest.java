@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.model.GenericLocation;
@@ -30,7 +29,7 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Integration tests that exercise the walk-to/from-carpool behavior added to
  * {@link DefaultCarpoolingService}. The graph places the passenger's origin and destination on
- * pedestrian-only edges, so the snapper must find a nearby car-accessible vertex and the
+ * pedestrian-only edges, so the snapper must find a nearby car-reachable vertex and the
  * resulting itinerary must contain leading and trailing WALK {@link StreetLeg}s around the
  * carpool leg.
  *
@@ -45,10 +44,10 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  *   <li>{@code A} — carpool trip origin (where the driver starts).
  *   <li>{@code D} — carpool trip destination (where the driver ends).
  *   <li>{@code B} — drivable mid-route intersection nearest to the passenger's origin; the snapper
- *       resolves it as the car-accessible pickup vertex because {@code P} sits on a
+ *       resolves it as the car-reachable pickup vertex because {@code P} sits on a
  *       pedestrian-only side branch the car cannot enter.
  *   <li>{@code C} — drivable mid-route intersection nearest to the passenger's destination; the
- *       snapper resolves it as the car-accessible dropoff vertex for the same reason.
+ *       snapper resolves it as the car-reachable dropoff vertex for the same reason.
  *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch
  *       from B.
  *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side
@@ -73,7 +72,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
   );
 
   private DefaultCarpoolingService service;
-  private CarpoolingRepository repository;
+  private CarpoolingServiceTestContext context;
 
   @BeforeEach
   void setUp() {
@@ -111,9 +110,8 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       }
     );
 
-    var context = CarpoolingServiceTestContext.of(model);
+    context = CarpoolingServiceTestContext.of(model);
     service = context.service();
-    repository = context.repository();
   }
 
   private RouteRequest buildDirectCarpoolRequest(ZonedDateTime dateTime) {
@@ -139,7 +137,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
   void passengerOnPedestrianOnlyEdge_emitsWalkLegsAroundCarpoolLeg() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(TRIP_START, TRIP_END, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(SEARCH_TIME);
     var results = service.routeDirect(request);
@@ -278,7 +276,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
         ContactInfo.of().withBookingUrl("https://book.example.com").build()
       )
       .build();
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var results = service.routeDirect(buildDirectCarpoolRequest(SEARCH_TIME));
     assertFalse(results.isEmpty());

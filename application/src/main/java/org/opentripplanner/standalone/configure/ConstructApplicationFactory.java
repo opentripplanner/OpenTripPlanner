@@ -13,6 +13,7 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionServiceModule;
@@ -133,6 +134,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   CarpoolingRepository carpoolingRepository();
+
+  @Nullable
+  CarpoolTripVertexResolver carpoolTripVertexResolver();
 
   @Nullable
   EmissionRepository emissionRepository();

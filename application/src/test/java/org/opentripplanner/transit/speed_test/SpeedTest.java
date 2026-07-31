@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
@@ -153,7 +152,10 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
-      new DefaultCarpoolingRepository(),
+      // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
+      // repository nor a resolver.
+      null,
+      null,
       updateManager,
       timetableHandle,
       routerConfig.updaterConfig()

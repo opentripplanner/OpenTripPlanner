@@ -6,24 +6,32 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
 
 /**
  * Repository for managing carpooling trip ({@link CarpoolTrip}) data.
  * <p>
- * This repository maintains an in-memory index of driver trips.
+ * This repository maintains an in-memory index of driver trips, each paired with the permanent
+ * street vertices its route points resolve to ({@link CarpoolTripWithVertices}).
  *
  * @see CarpoolTrip for trip data model
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for real-time updates
  */
 public interface CarpoolingRepository {
   /**
-   * Returns all currently carpooling trips.
+   * Returns all current carpooling trips with their resolved street vertices.
    * <p>
    * The returned collection includes all driver trips that have been added via {@link #upsertCarpoolTrip}
-   * and not yet removed or expired. The collection is typically used by the routing service to find
-   * compatible trips for passengers.
+   * and not yet removed or expired.
    */
-  Collection<CarpoolTrip> getCarpoolTrips();
+  Collection<CarpoolTripWithVertices> getCarpoolTrips();
+
+  /**
+   * Returns the trip with the given id together with its resolved street vertices, or {@code null}
+   * when no such trip exists.
+   */
+  @Nullable
+  CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id);
 
   /**
    * Inserts a new carpooling trip or updates an existing trip with the same ID.
@@ -35,14 +43,15 @@ public interface CarpoolingRepository {
    * <h3>Validation</h3>
    * <p>
    * The method does not validate trip data beyond basic null checks. It is the caller's
-   * responsibility to ensure the trip is valid (has stops, positive capacity, etc.). Invalid
-   * trips may cause routing failures later.
+   * responsibility to ensure the trip is valid (has stops, positive capacity, etc.) and that the
+   * vertices are the resolution of the trip's current route points. Invalid trips may cause
+   * routing failures later.
    *
-   * @param trip the carpool trip to insert or update, must not be null. If a trip with the same
-   *        ID exists, it will be completely replaced.
+   * @param trip the carpool trip with its resolved vertices to insert or update, must not be null.
+   *        If a trip with the same ID exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
    */
-  void upsertCarpoolTrip(CarpoolTrip trip);
+  void upsertCarpoolTrip(CarpoolTripWithVertices trip);
 
   /**
    * Removes the carpool trip with the given id. No-op if no trip with this id exists.

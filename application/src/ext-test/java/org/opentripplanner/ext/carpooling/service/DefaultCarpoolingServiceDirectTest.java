@@ -15,7 +15,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.filter.DistanceTripFilter;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter;
@@ -66,7 +65,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   );
 
   private DefaultCarpoolingService service;
-  private CarpoolingRepository repository;
+  private CarpoolingServiceTestContext context;
 
   private WgsCoordinate coordB;
   private WgsCoordinate coordC;
@@ -131,9 +130,8 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
       }
     );
 
-    var context = CarpoolingServiceTestContext.of(model);
+    context = CarpoolingServiceTestContext.of(model);
     service = context.service();
-    repository = context.repository();
   }
 
   private RouteRequest buildDirectCarpoolRequest(
@@ -179,7 +177,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   void returnsEmptyWhenTripsFailTimeFilter() {
     var pastTime = SEARCH_TIME.minusDays(30);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, pastTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -192,7 +190,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   void findsDirectResultsForCompatibleTrip() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -213,7 +211,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   void returnsEmptyWhenDropoffExceedsMaxDistance() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, farAwayDropoff, SEARCH_TIME);
 
@@ -233,8 +231,8 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
     var trip1 = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime1);
     var trip2 = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime2);
 
-    repository.upsertCarpoolTrip(trip1);
-    repository.upsertCarpoolTrip(trip2);
+    context.upsertTrip(trip1);
+    context.upsertTrip(trip2);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -261,7 +259,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
       )
     );
 
-    repository.upsertCarpoolTrip(tripWithStops);
+    context.upsertTrip(tripWithStops);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -292,7 +290,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
       )
     );
 
-    repository.upsertCarpoolTrip(tripWithStops);
+    context.upsertTrip(tripWithStops);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -341,7 +339,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
     // EDT. TimeItineraryFilter rejects that itinerary because startTime < EDT.
     var departureTime = SEARCH_TIME.minusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
@@ -354,7 +352,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   void resultItinerariesHaveValidStartAndEndTimes() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     // The carpool is forced to route via the pickup, so we sum the two segments it actually
     // drives (tripStart -> pickup, then pickup -> dropoff) rather than routing tripStart -> dropoff
@@ -426,7 +424,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
         ContactInfo.of().withBookingUrl("https://book.example.com").build()
       )
       .build();
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
     var results = service.routeDirect(request);
@@ -450,7 +448,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   void directItinerary_withoutPublicContact_hasNullPickupBookingInfo() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
     var results = service.routeDirect(request);
