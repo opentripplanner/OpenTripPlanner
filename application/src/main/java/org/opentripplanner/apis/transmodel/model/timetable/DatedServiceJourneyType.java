@@ -13,6 +13,7 @@ import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
@@ -158,13 +159,13 @@ public class DatedServiceJourneyType {
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
-              throw new IllegalArgumentException(
+              throw new InvalidInputException(
                 "Both first and last can't be defined simultaneously."
               );
             }
 
             if ((first != null && first < 0) || (last != null && last < 0)) {
-              throw new IllegalArgumentException("first and last must be positive integers.");
+              throw new InvalidInputException("first and last must be positive integers.");
             }
 
             if (first != null && first < stops.size()) {
