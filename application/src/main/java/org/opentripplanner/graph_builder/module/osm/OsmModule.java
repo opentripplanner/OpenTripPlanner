@@ -348,14 +348,11 @@ public class OsmModule implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
     WAY: for (OsmWay way : osmdb.getWays()) {
-      BidirectionalWayProperties wayData = wayPropertiesIndex.forWay(way.getId());
-
-      var forwardPermission = wayData.forward().getPermission();
-      var backwardPermission = wayData.backward().getPermission();
+      BidirectionalWayProperties props = wayPropertiesIndex.forWay(way.getId());
 
       if (
         !way.isRoutable() ||
-        (forwardPermission.allowsNothing() && backwardPermission.allowsNothing())
+        (props.forward().getPermission().allowsNothing() && props.backward().getPermission().allowsNothing())
       ) {
         continue;
       }
@@ -506,10 +503,8 @@ public class OsmModule implements GraphBuilderModule {
             fromVertex,
             toVertex,
             way,
-            wayData,
+            props,
             i,
-            forwardPermission,
-            backwardPermission,
             geometry
           );
 
@@ -520,8 +515,8 @@ public class OsmModule implements GraphBuilderModule {
           safetyValueApplier.applyWayProperties(
             street,
             backStreet,
-            wayData.forward(),
-            wayData.backward(),
+            props.forward(),
+            props.backward(),
             way
           );
 
@@ -655,12 +650,10 @@ public class OsmModule implements GraphBuilderModule {
     OsmWay way,
     BidirectionalWayProperties properties,
     int index,
-    StreetTraversalPermission forwardPermission,
-    StreetTraversalPermission backwardPermission,
     LineString geometry
   ) {
     // No point in returning edges that can't be traversed by anyone.
-    if (forwardPermission.allowsNothing() && backwardPermission.allowsNothing()) {
+    if (properties.forward().getPermission().allowsNothing() && properties.backward().getPermission().allowsNothing()) {
       return new StreetEdgePair(null, null);
     }
 
@@ -669,7 +662,7 @@ public class OsmModule implements GraphBuilderModule {
     StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
-    if (forwardPermission.allowsAnything()) {
+    if (properties.forward().getPermission().allowsAnything()) {
       street = getEdgeForStreet(
         fromVertex,
         toVertex,
@@ -677,12 +670,12 @@ public class OsmModule implements GraphBuilderModule {
         index,
         length,
         properties.forwardCarSpeed(),
-        forwardPermission,
+        properties.forward().getPermission(),
         geometry,
         FORWARD
       );
     }
-    if (backwardPermission.allowsAnything()) {
+    if (properties.backward().getPermission().allowsAnything()) {
       backStreet = getEdgeForStreet(
         toVertex,
         fromVertex,
@@ -690,7 +683,7 @@ public class OsmModule implements GraphBuilderModule {
         index,
         length,
         properties.backwardCarSpeed(),
-        backwardPermission,
+        properties.backward().getPermission(),
         backGeometry,
         BACKWARD
       );
