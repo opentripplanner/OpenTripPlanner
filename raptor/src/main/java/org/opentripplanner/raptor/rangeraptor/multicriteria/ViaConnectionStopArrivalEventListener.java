@@ -23,6 +23,9 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
+import org.opentripplanner.utils.time.TimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to listen for stop arrivals in one Raptor state and then copy
@@ -43,6 +46,10 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  */
 public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
   implements ParetoSetEventListener<ArrivalView<T>> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(
+    ViaConnectionStopArrivalEventListener.class
+  );
 
   private final McStopArrivalFactory<T> stopArrivalFactory;
   private final List<ViaConnection> connections;
@@ -154,24 +161,44 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     }
     var transitPath = alightArrival.transitPath();
     T trip = transitPath.trip();
-    var info = tripInfoProvider.apply(trip);
 
-    var arrivalAtBoardStop = alightArrival.previous();
+    var boardStopArrival = alightArrival.previous();
     int boardingStopPos = trip.findDepartureStopPosition(
-      arrivalAtBoardStop.arrivalTime(),
-      transitPath.boardStop()
+      boardStopArrival.arrivalTime(),
+      boardStopArrival.stop()
     );
+    if (boardingStopPos == -1) {
+      // In case of a constrained transfer, the boarding arrivalTime could be after the trip
+      // departure time, which is valid. We use the first depature time of the boarded trip
+      // here to find a valid boarding. This is slightly incorrect and may fail to find the
+      // correct departure for circular lines. There is not a good simple fix for this. A fix would
+      // need to look up the constrained transfers and apply the logic done by the routing algorithm.
+      // This logic is fragmented, so a larger refactoring is needed.
+      boardingStopPos = trip.findDepartureStopPosition(trip.departure(0), boardStopArrival.stop());
+      if (boardingStopPos == -1) {
+        logUnexpectedStopPosition("board", trip, boardStopArrival);
+        return;
+      }
+    }
+
     int startRoutingAtStopPosition = trip.findArrivalStopPosition(
       alightArrival.arrivalTime(),
       alightArrival.stop()
     );
+
+    if (startRoutingAtStopPosition == -1) {
+      logUnexpectedStopPosition("alight", trip, alightArrival);
+      return;
+    }
+
+    var info = tripInfoProvider.apply(trip);
     var boardingConstraint = new RaptorTripScheduleStopPosition(
       info.routeIndex(),
       info.tripScheduleIndex(),
       boardingStopPos
     );
     next.addOnBoardTripArrival(
-      arrivalAtBoardStop,
+      boardStopArrival,
       alightArrival.stop(),
       startRoutingAtStopPosition,
       boardingConstraint
@@ -203,5 +230,19 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
     int arrivalTime = from.arrivalTime() + via.durationInSeconds();
     var to = stopArrivalFactory.createTransferStopArrival(from, via.transfer(), arrivalTime);
     transfersCache.add(to);
+  }
+
+  private static void logUnexpectedStopPosition(
+    String event,
+    RaptorTripSchedule trip,
+    ArrivalView<?> stopArrival
+  ) {
+    LOG.warn(
+      "Unexpected {} stop position missing for trip {} at stop {} after {}.",
+      event,
+      trip.pattern().debugInfo(),
+      stopArrival.stop(),
+      TimeUtils.timeToStrLong(stopArrival.arrivalTime())
+    );
   }
 }

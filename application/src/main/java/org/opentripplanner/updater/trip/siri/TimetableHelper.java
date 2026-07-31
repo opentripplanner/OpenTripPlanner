@@ -5,11 +5,9 @@ import static java.lang.Boolean.TRUE;
 import java.time.ZonedDateTime;
 import java.util.function.Supplier;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
-import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 class TimetableHelper {
 
@@ -38,7 +36,7 @@ class TimetableHelper {
     boolean isLastStop,
     boolean isJourneyPredictionInaccurate,
     CallWrapper call,
-    OccupancyEnumeration journeyOccupancy
+    OccupancyStatus journeyOccupancy
   ) {
     tripTimesBuilder.withHasArrived(index, call.hasArrived());
     tripTimesBuilder.withHasDeparted(index, call.hasDeparted());
@@ -88,23 +86,17 @@ class TimetableHelper {
       tripTimesBuilder.withExtraCall(index, true);
     }
 
-    OccupancyEnumeration callOccupancy = call.getOccupancy() != null
+    OccupancyStatus callOccupancy = call.getOccupancy() != null
       ? call.getOccupancy()
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimesBuilder.withOccupancyStatus(
-        index,
-        OccupancyMapper.mapOccupancyStatus(callOccupancy)
-      );
+      tripTimesBuilder.withOccupancyStatus(index, callOccupancy);
     }
 
-    if (call.getDestinationDisplays() != null && !call.getDestinationDisplays().isEmpty()) {
-      NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplays().get(0);
-      tripTimesBuilder.withStopHeadsign(
-        index,
-        new NonLocalizedString(destinationDisplay.getValue())
-      );
+    var destinationDisplay = call.destinationDisplay();
+    if (!destinationDisplay.isEmpty()) {
+      tripTimesBuilder.withStopHeadsign(index, new NonLocalizedString(destinationDisplay));
     }
   }
 }

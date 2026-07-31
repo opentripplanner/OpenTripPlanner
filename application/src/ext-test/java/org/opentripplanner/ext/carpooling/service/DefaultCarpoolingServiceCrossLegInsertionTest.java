@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
@@ -88,7 +87,7 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
   private static final Duration BUDGET = Duration.ofMinutes(10);
 
   private DefaultCarpoolingService service;
-  private CarpoolingRepository repository;
+  private CarpoolingServiceTestContext context;
   private TransitServiceResolver transitServiceResolver;
 
   private TransitStopVertex stopS;
@@ -140,16 +139,15 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
       }
     );
 
-    var context = CarpoolingServiceTestContext.of(model);
+    context = CarpoolingServiceTestContext.of(model);
     service = context.service();
-    repository = context.repository();
     transitServiceResolver = context.transitServiceResolver();
   }
 
   @Test
   void findsCrossLegInsertionWithPassengerSegmentLongerThanNearbyStopRadius() {
     var tripStart = SEARCH_TIME.plusMinutes(30);
-    repository.upsertCarpoolTrip(trip(tripStart));
+    context.upsertTrip(trip(tripStart));
 
     var request = RouteRequest.of()
       .withFrom(GenericLocation.fromCoordinate(coordP.latitude(), coordP.longitude()))

@@ -88,7 +88,6 @@ public class FlexIntegrationTest {
       transferRepository,
       model.fareServiceFactory().makeFareService(),
       null,
-      null,
       FLEX_PARAMETERS
     ).routingService();
   }

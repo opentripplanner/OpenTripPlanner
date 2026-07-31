@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.updater.spi.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TOO_FEW_STOPS;
@@ -25,6 +24,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -36,7 +36,6 @@ import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 class AddedTripBuilder {
 
@@ -56,13 +55,16 @@ class AddedTripBuilder {
   private final String transitSubMode;
   private final List<CallWrapper> calls;
   private final boolean isJourneyPredictionInaccurate;
-  private final OccupancyEnumeration occupancy;
+  private final OccupancyStatus occupancy;
   private final boolean cancellation;
   private final String shortName;
   private final String headsign;
   private final List<TripOnServiceDate> replacedTrips;
   private final StopTimesMapper stopTimesMapper;
   private final DeduplicatorService deduplicator;
+
+  @Nullable
+  private final String vehicleRef;
 
   AddedTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
@@ -74,36 +76,39 @@ class AddedTripBuilder {
     this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
     // Added ServiceJourneyId
-    String estimatedVehicleJourneyCode = journey.estimatedVehicleJourneyCode();
-    Objects.requireNonNull(estimatedVehicleJourneyCode, "EstimatedVehicleJourneyCode is required");
-    var codeAdapter = new EstimatedVehicleJourneyCodeAdapter(estimatedVehicleJourneyCode);
-    tripId = entityResolver.resolveId(codeAdapter.getServiceJourneyId());
-    tripOnServiceDateId = entityResolver.resolveId(codeAdapter.getDatedServiceJourneyId());
+    EstimatedVehicleJourneyCode code = journey
+      .code()
+      .orElseThrow(() -> new NullPointerException("EstimatedVehicleJourneyCode is required"));
+    tripId = entityResolver.resolveId(code.asServiceJourneyId());
+    tripOnServiceDateId = entityResolver.resolveId(code.asDatedServiceJourneyId());
 
     // OperatorRef of added trip
-    String operatorRef = Objects.requireNonNull(journey.operatorRef(), "OperatorRef is required");
+    String operatorRef = journey
+      .operatorRef()
+      .orElseThrow(() -> new NullPointerException("OperatorRef is required"));
     operator = entityResolver.resolveOperator(operatorRef);
 
     // DataSource of added trip
-    dataSource = journey.dataSource();
+    dataSource = journey.dataSource().orElse(null);
 
     // LineRef of added trip
-    lineRef = Objects.requireNonNull(journey.lineRef(), "LineRef is required");
+    lineRef = journey.lineRef().orElseThrow(() -> new NullPointerException("LineRef is required"));
 
-    String externalLineRef = Objects.requireNonNullElse(journey.externalLineRef(), lineRef);
+    String externalLineRef = journey.externalLineRef().orElse(lineRef);
     replacedRoute = entityResolver.resolveRoute(externalLineRef);
 
     serviceDate = entityResolver.resolveServiceDate(journey);
 
     shortName = journey.publishedLineName();
 
-    transitMode = mapTransitMainMode(journey.vehicleModes());
+    transitMode = journey.transitMode();
     transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
 
     isJourneyPredictionInaccurate = journey.isPredictionInaccurate();
-    occupancy = journey.occupancy();
+    occupancy = journey.occupancy().orElse(null);
     cancellation = journey.isCancellation();
     headsign = journey.destinationName();
+    vehicleRef = journey.vehicleRef().orElse(null);
 
     this.calls = journey.calls();
 
@@ -131,12 +136,13 @@ class AddedTripBuilder {
     String transitSubMode,
     List<CallWrapper> calls,
     boolean isJourneyPredictionInaccurate,
-    OccupancyEnumeration occupancy,
+    OccupancyStatus occupancy,
     boolean cancellation,
     String shortName,
     String headsign,
     List<TripOnServiceDate> replacedTrips,
-    String dataSource
+    String dataSource,
+    @Nullable String vehicleRef
   ) {
     this.transitService = transitService;
     this.deduplicator = deduplicator;
@@ -159,6 +165,7 @@ class AddedTripBuilder {
     this.headsign = headsign;
     this.replacedTrips = replacedTrips;
     this.dataSource = dataSource;
+    this.vehicleRef = vehicleRef;
     stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
   }
 
@@ -248,6 +255,7 @@ class AddedTripBuilder {
       );
     }
 
+    builder.withVehicleId(vehicleRef);
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }
@@ -362,15 +370,10 @@ class AddedTripBuilder {
   ) {
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
-    String replacedDatedVehicleJourneyRef = journey.replacedDatedVehicleJourneyRef();
-    if (replacedDatedVehicleJourneyRef != null) {
-      var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
-        replacedDatedVehicleJourneyRef
-      );
-      if (replacedDatedServiceJourney != null) {
-        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
-      }
-    }
+    journey
+      .replacedDatedVehicleJourneyRef()
+      .map(entityResolver::resolveTripOnServiceDate)
+      .ifPresent(listOfReplacedVehicleJourneys::add);
 
     // Add additional replaced service journeys if present.
     journey

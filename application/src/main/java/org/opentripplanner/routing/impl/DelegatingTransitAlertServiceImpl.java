@@ -11,8 +11,8 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.spi.GraphUpdater;
 
 /**
  * This class is used to combine alerts from multiple {@link TransitAlertService}s. Each
@@ -35,16 +35,11 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
    * This implies that these instances are expected to remain in use indefinitely (not be replaced
    * with new instances or taken out of service over time).
    */
-  public DelegatingTransitAlertServiceImpl(TimetableRepository timetableRepository) {
-    if (timetableRepository.getUpdaterManager() != null) {
-      timetableRepository
-        .getUpdaterManager()
-        .getUpdaterList()
-        .stream()
-        .filter(TransitAlertProvider.class::isInstance)
-        .map(TransitAlertProvider.class::cast)
-        .map(TransitAlertProvider::getTransitAlertService)
-        .forEach(transitAlertServices::add);
+  public DelegatingTransitAlertServiceImpl(Iterable<GraphUpdater> updaters) {
+    for (GraphUpdater updater : updaters) {
+      if (updater instanceof TransitAlertProvider alertProvider) {
+        transitAlertServices.add(alertProvider.getTransitAlertService());
+      }
     }
   }
 

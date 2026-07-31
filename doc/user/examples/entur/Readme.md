@@ -19,8 +19,8 @@ At Entur we run OTP with the latest NeTEx data we have. You may download it from
 
 https://developer.entur.org/stops-and-timetable-data
 
-We use
-the [Entire Norway](https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip)
+We use the
+[Entire Norway](https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip)
 file.
 
 In the past the file did not contain the stops, so they needed to be downloaded separably (Entire
@@ -32,8 +32,7 @@ the same directory and start OTP with it as the base directory.
 We also build with elevation data, which is not available on the internet without transformation.
 Send us a request, and we will find a way to share it.
 
-We download the OSM data
-file [norway-latest.osm.pbf](https://download.geofabrik.de/europe/norway.html) every night and build
-a street-graph with OSM and elevation data. We also use some custom OSM files for areas outside
+We download the OSM data file
+[norway-latest.osm.pbf](https://download.geofabrik.de/europe/norway.html) every night and build a
+street-graph with OSM and elevation data. We also use some custom OSM files for areas outside
 Norway, but they in most cases insignificant. If requested, we can provide them.
- 

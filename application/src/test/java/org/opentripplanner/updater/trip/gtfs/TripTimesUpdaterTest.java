@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,6 +36,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -1090,6 +1092,42 @@ public class TripTimesUpdaterTest {
       setEmptyEvent.accept(stopTime, emptyEvent);
       return stopTime.build();
     }
+  }
+
+  @Test
+  public void vehicleIdIsPopulatedFromGtfsRt() {
+    var rawTripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+      .addDelayedStopTime(1, 0)
+      .withVehicleId("BUS-42")
+      .build();
+
+    var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+      timetable,
+      new TripUpdate(feedId, rawTripUpdate, NOW),
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertInstanceOf(RealTimeTripTimes.class, p.tripTimes());
+    assertTrue(p.tripTimes().getVehicleId().isPresent());
+    assertEquals("BUS-42", p.tripTimes().getVehicleId().get());
+  }
+
+  @Test
+  public void vehicleIdIsNullWhenAbsentInGtfsRt() {
+    var rawTripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+      .addDelayedStopTime(1, 0)
+      .build();
+
+    var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+      timetable,
+      new TripUpdate(feedId, rawTripUpdate, NOW),
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertInstanceOf(RealTimeTripTimes.class, p.tripTimes());
+    assertTrue(p.tripTimes().getVehicleId().isEmpty());
   }
 
   private static TripDescriptor.Builder tripDescriptorBuilder() {

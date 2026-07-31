@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.street.model.StreetMode.NOT_SET;
 import static org.opentripplanner.street.model.StreetMode.WALK;
 
@@ -24,14 +23,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
-import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -46,19 +46,17 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
+import org.opentripplanner.utils.lang.RunnableUtils;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
@@ -200,15 +198,8 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     graph = new Graph();
     timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.setUpdaterManager(
-      new GraphUpdaterManager(
-        new DefaultRealTimeUpdateContext(
-          new Graph(),
-          timetableRepository,
-          new TimetableSnapshot(new DefaultTripCalendars())
-        ),
-        List.of()
-      )
+    timetableRepository.initUpdaterManager(
+      new GraphUpdaterManager(GraphWriterService.NOOP, RunnableUtils.NOOP, List.of())
     );
     TransferRepository transferRepository = TransferServiceTestFactory.defaultTransferRepository();
 
@@ -223,22 +214,37 @@ public abstract class GtfsTest {
     timetableRepository.index();
     graph.index();
 
-    createRaptorTransitData(
+    TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
+    var scheduledRaptorData = RaptorTransitDataMapper.map(
+      tuningParameters,
       timetableRepository,
-      transferRepository,
-      RouterConfig.DEFAULT.transitTuningConfig()
+      transferRepository
     );
+    timetableRepository.initRaptorTransitData(scheduledRaptorData);
+    var registry =
+      org.opentripplanner.framework.transaction.internal.TransactionFactory.createRepositoryRegistry();
+    var timetableSnapshot = new org.opentripplanner.transit.model.timetable.TimetableSnapshot(
+      new RaptorTransitData(scheduledRaptorData),
+      timetableRepository.copyTripCalendarForRealTimeUpdates()
+    );
+    var timetableHandle = registry.registerRepositorySnapshot(
+      timetableSnapshot,
+      new org.opentripplanner.transit.repository.TimetableSnapshotLifecycle(
+        timetableSnapshot,
+        false,
+        LocalDate::now
+      )
+    );
+    var updateManager =
+      org.opentripplanner.framework.transaction.internal.TransactionFactory.createUpdateManagerWithAtomicCommits(
+        "test",
+        registry,
+        java.util.concurrent.Executors.defaultThreadFactory()
+      );
 
-    var snapshotManager = new TimetableSnapshotManager(
-      (DefaultTripCalendars) timetableRepository.getTripCalendar(),
-      new RealTimeRaptorTransitDataUpdater(timetableRepository),
-      TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-      LocalDate::now
-    );
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       new Deduplicator(),
-      snapshotManager,
       LocalDate::now
     );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
@@ -253,22 +259,32 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      tripUpdateAdapter.applyTripUpdates(
-        null,
-        ForwardsDelayPropagationType.DEFAULT,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-        UpdateIncrementality.DIFFERENTIAL,
-        updates,
-        FEED_ID
-      );
+      updateManager
+        .submit(ctx -> {
+          var buffer = ctx.repository(timetableHandle);
+          tripUpdateAdapter
+            .forUpdate(buffer)
+            .applyTripUpdates(
+              null,
+              ForwardsDelayPropagationType.DEFAULT,
+              BackwardsDelayPropagationType.REQUIRED_NO_DATA,
+              UpdateIncrementality.DIFFERENTIAL,
+              updates,
+              FEED_ID
+            );
+        })
+        .get();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (FileNotFoundException _) {}
+    } catch (FileNotFoundException _) {} catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     serverContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
       transferRepository,
       new DefaultFareService(),
-      snapshotManager,
+      timetableHandle,
+      registry,
       null,
       null
     );

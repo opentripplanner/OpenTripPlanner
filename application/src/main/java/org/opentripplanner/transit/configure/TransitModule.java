@@ -5,55 +5,58 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.time.LocalDate;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
-import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.configure.RequestScopedFactory;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 @Module
 public abstract class TransitModule {
 
+  /**
+   * Binds the app-singleton, no-real-time-data {@link TransitService} used by consumers that live
+   * outside any HTTP request (e.g. {@code DefaultRealtimeVehicleService}). The request-scoped,
+   * snapshot-consistent {@link TransitService} is a distinct binding inside {@link
+   * RequestScopedFactory} — do not retarget this one.
+   */
   @Binds
-  @HttpRequestScoped
+  @StaticTransitService
   abstract TransitService bind(DefaultTransitService service);
 
   @Provides
   @Singleton
-  public static TimetableSnapshotManager timetableSnapshotManager(
-    RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
-    ConfigModel config,
-    TimetableRepository timetableRepository
-  ) {
-    return new TimetableSnapshotManager(
-      timetableRepository.copyTripCalendarForRealTimeUpdates(),
-      realtimeRaptorTransitDataUpdater,
-      config.routerConfig().updaterConfig().timetableSnapshotParameters(),
-      () -> LocalDate.now(timetableRepository.getTimeZone())
-    );
+  public static TimetableSnapshotParameters timetableSnapshotParameters(ConfigModel config) {
+    return config.routerConfig().updaterConfig().timetableSnapshotParameters();
   }
 
-  /**
-   * Create a single instance of the transit layer updater which holds the incremental caches for
-   * the updates that need to applied to the {@link RaptorTransitData}.
-   */
   @Provides
   @Singleton
-  public static RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater(
-    TimetableRepository timetableRepository
+  public static RepositoryHandle<
+    ReadOnlyTimetableSnapshot,
+    MutableTimetableSnapshot
+  > timetableRepositoryHandle(
+    TimetableSnapshotParameters parameters,
+    TimetableRepository timetableRepository,
+    RepositoryRegistry repositoryRegistry,
+    RaptorTransitData scheduledRaptorTransitData,
+    DefaultTripCalendars tripCalendars
   ) {
-    return new RealTimeRaptorTransitDataUpdater(timetableRepository);
-  }
-
-  /**
-   * Provides the currently published, immutable {@link TimetableSnapshot}.
-   */
-  @Provides
-  public static TimetableSnapshot timetableSnapshot(TimetableSnapshotManager manager) {
-    return manager.getTimetableSnapshot();
+    var mutableBuffer = new TimetableSnapshot(scheduledRaptorTransitData, tripCalendars);
+    var timetableSnapshotLifecycle = new TimetableSnapshotLifecycle(
+      mutableBuffer,
+      parameters.purgeExpiredData(),
+      () -> LocalDate.now(timetableRepository.getTimeZone())
+    );
+    return repositoryRegistry.registerRepository(mutableBuffer, timetableSnapshotLifecycle);
   }
 }

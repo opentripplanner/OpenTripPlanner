@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.configure;
 
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdater;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
@@ -11,6 +12,7 @@ import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
@@ -34,9 +36,15 @@ public class SiriUpdaterModule {
 
   public static SiriSXUpdater createSiriSXUpdater(
     SiriSXUpdater.Parameters params,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
-    return new SiriSXUpdater(params, timetableRepository, createLoader(params));
+    return new SiriSXUpdater(
+      params,
+      timetableRepository,
+      siriFuzzyTripMatcherCache,
+      createLoader(params)
+    );
   }
 
   private static EstimatedTimetableSource createSource(SiriETUpdaterParameters params) {

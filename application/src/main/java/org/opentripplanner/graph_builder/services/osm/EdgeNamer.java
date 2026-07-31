@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.services.osm;
 
+import java.util.Optional;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -33,15 +33,9 @@ public interface EdgeNamer {
    * Get the edge name.
    *
    * @param entity relation or way from which to get the name
-   * @param id when a name can not be created from an OSM entity, this is used
    */
-  default I18NString getName(OsmEntity entity, String id) {
-    var name = name(entity);
-
-    if (name == null) {
-      name = new NonLocalizedString(id);
-    }
-    return name;
+  default Optional<I18NString> getName(OsmEntity entity) {
+    return Optional.ofNullable(name(entity));
   }
 
   enum EdgeNamerType {

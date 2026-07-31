@@ -38,6 +38,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,9 +134,14 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   public static SiriAzureUpdater createSXUpdater(
     SiriAzureSXUpdaterParameters config,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
-    var messageHandler = new SiriAzureSXUpdater(config, timetableRepository);
+    var messageHandler = new SiriAzureSXUpdater(
+      config,
+      timetableRepository,
+      siriFuzzyTripMatcherCache
+    );
     return new SxWrapper(config, messageHandler);
   }
 

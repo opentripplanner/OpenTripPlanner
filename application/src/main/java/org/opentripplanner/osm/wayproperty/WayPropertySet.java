@@ -115,8 +115,11 @@ public class WayPropertySet {
    * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties
    * that are mixins will have their safety values applied if they match at all.
    */
-  public WayPropertiesPair getDataForWay(OsmWay way) {
-    return new WayPropertiesPair(getDataForEntity(way, FORWARD), getDataForEntity(way, BACKWARD));
+  public BidirectionalWayProperties getDataForWay(OsmWay way) {
+    return new BidirectionalWayProperties(
+      getDataForEntity(way, FORWARD),
+      getDataForEntity(way, BACKWARD)
+    );
   }
 
   /**

@@ -31,4 +31,5 @@ The score is only computed when you search for wheelchair-accessible routes.
 
 ## Changelog
 
-- Create initial implementation [#4221](https://github.com/opentripplanner/OpenTripPlanner/pull/4221)
+- Create initial implementation
+  [#4221](https://github.com/opentripplanner/OpenTripPlanner/pull/4221)

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
@@ -21,6 +22,8 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.alert.siri.mapping.AffectsMapper;
 import org.opentripplanner.updater.alert.siri.mapping.SiriSeverityMapper;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.DefaultedTextStructure;
@@ -54,17 +57,22 @@ public class SiriAlertsUpdateHandler {
   private final TransitAlertService transitAlertService;
   private final Duration earlyStart;
 
+  @Nullable
+  private final SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
+
   /**
    * @param earlyStart display the alerts to users this long before their activePeriod begins
    */
   public SiriAlertsUpdateHandler(
     String feedId,
     TransitAlertService transitAlertService,
-    Duration earlyStart
+    Duration earlyStart,
+    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     this.feedId = feedId;
     this.transitAlertService = transitAlertService;
     this.earlyStart = earlyStart;
+    this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
   }
 
   public void update(ServiceDelivery delivery, RealTimeUpdateContext context) {
@@ -181,12 +189,13 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
+    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
+      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
+      : null;
     alert.addEntites(
-      new AffectsMapper(
-        feedId,
-        context.siriFuzzyTripMatcher(),
-        context.transitService()
-      ).mapAffects(situation.getAffects())
+      new AffectsMapper(feedId, fuzzyTripMatcher, context.transitService()).mapAffects(
+        situation.getAffects()
+      )
     );
 
     if (alert.entities().isEmpty()) {

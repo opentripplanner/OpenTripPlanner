@@ -9,9 +9,9 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
-import org.opentripplanner.street.graph.DisposableEdgeDataFetcher;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.graph.GraphDataFetcher;
+import org.opentripplanner.street.graph.summary.DisposableEdgeDataFetcher;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
@@ -27,7 +27,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
  */
 public class LinkingEnvironment {
 
-  private final GraphDataFetcher graphFetcher;
+  private final GraphSummarizer graphFetcher;
   private final VertexLinker linker;
 
   @Nullable
@@ -39,7 +39,7 @@ public class LinkingEnvironment {
       graph.addVertex(v);
     }
     graph.index();
-    graphFetcher = new GraphDataFetcher(graph);
+    graphFetcher = new GraphSummarizer(graph);
     linker = new VertexLinker(
       graph,
       GeofencingZoneService.EMPTY,
@@ -99,7 +99,7 @@ public class LinkingEnvironment {
     return new DisposableEdgeDataFetcher(t);
   }
 
-  public GraphDataFetcher graph() {
+  public GraphSummarizer graph() {
     return graphFetcher;
   }
 

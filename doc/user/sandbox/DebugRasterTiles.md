@@ -1,4 +1,4 @@
-# Debug raster tiles 
+# Debug raster tiles
 
 <b>These are only meant to be used when using vector tiles is not an option (mainly JOSM).</b>
 
@@ -22,7 +22,6 @@ The available layers are:
 
 - 2025-02-13: Moved raster tiles from core code into sandbox.
 - 2025-05-16: Changed API path slightly.
-
 
 ### Configuration
 

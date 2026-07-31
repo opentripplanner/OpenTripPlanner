@@ -16,6 +16,7 @@ import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.gbfs.GbfsAutoConfiguration;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -47,7 +48,11 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var loader = GbfsFeedLoader.create(
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
+      params.httpHeaders(),
+      otpHttpClient
+    );
     var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
@@ -219,7 +224,11 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var loader = GbfsFeedLoader.create(
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
+      params.httpHeaders(),
+      otpHttpClient
+    );
     var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
@@ -245,7 +254,11 @@ class GbfsFeedMapperTest {
     var otpHttpClient = new OtpHttpClientFactory().create(
       LoggerFactory.getLogger(GbfsFeedMapperTest.class)
     );
-    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var loader = GbfsFeedLoader.create(
+      GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), otpHttpClient),
+      params.httpHeaders(),
+      otpHttpClient
+    );
     var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());

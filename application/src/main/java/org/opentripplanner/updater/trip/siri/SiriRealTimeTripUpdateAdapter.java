@@ -1,46 +1,19 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static org.opentripplanner.updater.spi.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
-import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
-import org.opentripplanner.transit.model.timetable.Timetable;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
-import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.spi.UpdateException;
-import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
-import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
- * Adapts from SIRI-ET EstimatedTimetables to OTP's internal real-time data model.
+ * Application-scoped factory for SIRI-ET estimated timetable processing. Holds stable,
+ * application-lifetime state and produces a per-task {@link SiriRealTimeUpdateHandler} via
+ * {@link #forUpdate(MutableTimetableSnapshot)}.
  */
 public class SiriRealTimeTripUpdateAdapter {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SiriRealTimeTripUpdateAdapter.class);
 
   /**
    * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
@@ -53,341 +26,40 @@ public class SiriRealTimeTripUpdateAdapter {
    */
   private final TripPatternCache tripPatternCache;
 
-  /**
-   * Long-lived transit editor service that has access to the timetable snapshot buffer.
-   * This differs from the usual use case where the transit service refers to the latest published
-   * timetable snapshot.
-   */
-  private final TransitEditorService transitEditorService;
-
   private final DeduplicatorService deduplicator;
-  private final TimetableSnapshotManager snapshotManager;
+  private final TimetableRepository timetableRepository;
+
+  @Nullable
+  private final SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
 
   public SiriRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     DeduplicatorService deduplicator,
-    TimetableSnapshotManager snapshotManager
+    @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     this.deduplicator = deduplicator;
-    this.snapshotManager = snapshotManager;
-    this.transitEditorService = new DefaultTransitService(
-      timetableRepository,
-      snapshotManager.getTimetableSnapshotBuffer()
-    );
-    this.tripPatternCache = new TripPatternCache(
-      tripPatternIdGenerator,
-      transitEditorService::findPattern
-    );
+    this.timetableRepository = timetableRepository;
+    this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
+    this.tripPatternCache = new TripPatternCache(tripPatternIdGenerator);
   }
 
   /**
-   * Method to apply estimated timetables to the most recent version of the timetable snapshot.
-   *
-   * @param incrementality  the incrementality of the update, for example if updates represent all
-   *                        updates that are active right now, i.e. all previous updates should be
-   *                        disregarded
-   * @param updates    SIRI EstimatedTimetable deliveries that should be applied atomically.
+   * Create an update-scoped task for applying SIRI-ET estimated timetables. The task holds a
+   * {@link org.opentripplanner.transit.service.TransitEditorService} constructed from the given
+   * buffer, so all pattern and trip lookups within the task see in-progress real-time additions.
    */
-  public UpdateResult applyEstimatedTimetable(
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
-    EntityResolver entityResolver,
-    String feedId,
-    UpdateIncrementality incrementality,
-    List<EstimatedTimetableDeliveryStructure> updates
-  ) {
-    if (updates == null) {
-      LOG.warn("updates is null");
-      return UpdateResult.empty();
-    }
-
-    List<UpdateSuccess> successes = new ArrayList<>();
-    List<UpdateError> errors = new ArrayList<>();
-
-    if (incrementality == FULL_DATASET) {
-      // Remove all updates from the buffer
-      snapshotManager.clearBuffer(feedId);
-    }
-
-    for (var etDelivery : updates) {
-      for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
-        var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
-        LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
-        for (EstimatedVehicleJourney journey : journeys) {
-          try {
-            successes.add(apply(journey, transitEditorService, fuzzyTripMatcher, entityResolver));
-          } catch (UpdateException e) {
-            errors.add(
-              e
-                .withTripReference(DebugString.tripReference(journey))
-                .toError(journey.getDataSource())
-            );
-          }
-        }
-      }
-    }
-
-    LOG.debug("message contains {} trip updates", updates.size());
-
-    return UpdateResult.of(successes, errors);
-  }
-
-  private UpdateSuccess apply(
-    EstimatedVehicleJourney journey,
-    TransitEditorService transitService,
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
-    EntityResolver entityResolver
-  ) throws UpdateException {
-    var journeyWrapper = EstimatedVehicleJourneyWrapper.of(journey);
-    SiriUpdateType siriUpdateType = null;
-    try {
-      siriUpdateType = updateType(journeyWrapper, entityResolver);
-      TripUpdate result = switch (siriUpdateType) {
-        case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
-          journeyWrapper,
-          transitService,
-          deduplicator,
-          entityResolver,
-          tripPatternIdGenerator::generateUniqueTripPatternId
-        ).build();
-        case EXTRA_CALL -> handleExtraCall(fuzzyTripMatcher, entityResolver, journeyWrapper);
-        case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journeyWrapper);
-      };
-
-      /* commit */
-      return addTripToGraphAndBuffer(result);
-    } catch (UpdateException e) {
-      throw e;
-    } catch (DataValidationException e) {
-      throw DataValidationExceptionMapper.map(e);
-    } catch (Exception e) {
-      LOG.warn("{} EstimatedJourney {} failed.", siriUpdateType, journeyWrapper.debugString(), e);
-      throw UpdateException.noTripId(UNKNOWN);
-    }
-  }
-
-  /**
-   * Determines the type of SIRI-ET update carried by {@code vehicleJourney}.
-   *
-   * <h2>Why ExtraJourney and Cancellation are never both true in the same message</h2>
-   *
-   * In the SIRI 2.0/2.1 XSD (and in the Nordic SIRI profile), the {@code ExtraJourney} and
-   * {@code Cancellation} elements of {@code EstimatedVehicleJourney} are enclosed in an
-   * {@code <xsd:choice>} group:
-   *
-   * <pre>{@code
-   * <xsd:choice>
-   *   <xsd:element name="ExtraJourney"  type="xsd:boolean" minOccurs="0"/>
-   *   <xsd:element name="Cancellation" type="xsd:boolean" minOccurs="0"/>
-   * </xsd:choice>
-   * }</pre>
-   *
-   * This means a single {@code EstimatedVehicleJourney} is schema-invalid if it contains both
-   * elements. Cancelling a previously-added extra journey therefore always arrives as a second,
-   * separate {@code ServiceDelivery} that carries only {@code Cancellation=true} (and no
-   * {@code ExtraJourney} element). That second message is routed here as {@code TRIP_UPDATE}
-   * (because {@code isExtraJourney()} is {@code null}/false), and {@code ModifiedTripBuilder}
-   * handles the cancellation.
-   *
-   * <p>This is why the {@link RealTimeTripTimesBuilder} never needs to hold both
-   * {@code added=true} and {@code canceled=true} at the same time for a SIRI source.
-   */
-  private SiriUpdateType updateType(
-    EstimatedVehicleJourneyWrapper journey,
-    EntityResolver entityResolver
-  ) {
-    // Extra call if at least one of the call is an extra call
-    if (journey.hasExtraCall()) {
-      return SiriUpdateType.EXTRA_CALL;
-    }
-
-    // Replacement departure if the trip is marked as extra journey, and it has not been added before
-    if (journey.isExtraJourney() && entityResolver.resolveTrip(journey) == null) {
-      return SiriUpdateType.REPLACEMENT_DEPARTURE;
-    }
-
-    // otherwise this is a trip update
-    return SiriUpdateType.TRIP_UPDATE;
-  }
-
-  /**
-   * Get the latest timetable for TripPattern for a given service date.
-   * <p>
-   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
-   */
-  private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    return snapshotManager.resolve(tripPattern, serviceDate);
-  }
-
-  private TripUpdate handleModifiedTrip(
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
-    EntityResolver entityResolver,
-    EstimatedVehicleJourneyWrapper journey
-  ) throws UpdateException {
-    Trip trip = entityResolver.resolveTrip(journey);
-
-    LocalDate serviceDate = entityResolver.resolveServiceDate(journey);
-
-    if (serviceDate == null) {
-      throw UpdateException.of(trip != null ? trip.getId() : null, NO_START_DATE);
-    }
-
-    TripPattern pattern;
-
-    if (trip != null) {
-      // Found exact match
-      pattern = transitEditorService.findPattern(trip);
-    } else if (fuzzyTripMatcher != null) {
-      // No exact match found - search for trips based on arrival-times/stop-patterns
-      var tripAndPattern = fuzzyTripMatcher.match(
-        journey,
-        entityResolver,
-        this::getCurrentTimetable,
-        snapshotManager::getNewTripPatternForModifiedTrip
-      );
-      trip = tripAndPattern.trip();
-      pattern = tripAndPattern.tripPattern();
-    } else {
-      throw UpdateException.of(null, TRIP_NOT_FOUND);
-    }
-
-    Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-    TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
-    if (existingTripTimes == null) {
-      LOG.debug("tripId {} not found in pattern.", trip.getId());
-      throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
-    }
-    var tripUpdate = new ModifiedTripBuilder(
-      existingTripTimes,
-      pattern,
-      journey,
-      serviceDate,
-      transitEditorService.getTimeZone(),
-      entityResolver
-    ).build();
-
-    TripPattern deleteFrom = !tripUpdate.stopPattern().equals(pattern.getStopPattern())
-      ? pattern
+  public SiriRealTimeUpdateHandler forUpdate(MutableTimetableSnapshot buffer) {
+    var transitService = new DefaultTransitService(timetableRepository, buffer);
+    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
+      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, transitService)
       : null;
-
-    return tripUpdate.withHideTripInScheduledPattern(deleteFrom);
-  }
-
-  private TripUpdate handleExtraCall(
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
-    EntityResolver entityResolver,
-    EstimatedVehicleJourneyWrapper journey
-  ) throws UpdateException {
-    Trip trip = entityResolver.resolveTrip(journey);
-
-    LocalDate serviceDate = entityResolver.resolveServiceDate(journey);
-
-    if (serviceDate == null) {
-      throw UpdateException.of(trip != null ? trip.getId() : null, NO_START_DATE);
-    }
-
-    TripPattern pattern;
-
-    if (trip != null) {
-      // Found exact match
-      pattern = transitEditorService.findPattern(trip);
-    } else if (fuzzyTripMatcher != null) {
-      // No exact match found - search for trips based on arrival-times/stop-patterns
-      var tripAndPattern = fuzzyTripMatcher.match(
-        journey,
-        entityResolver,
-        this::getCurrentTimetable,
-        snapshotManager::getNewTripPatternForModifiedTrip
-      );
-
-      trip = tripAndPattern.trip();
-      pattern = tripAndPattern.tripPattern();
-    } else {
-      throw UpdateException.of(null, TRIP_NOT_FOUND);
-    }
-
-    Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-    TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
-    if (existingTripTimes == null) {
-      LOG.debug("tripId {} not found in pattern.", trip.getId());
-      throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
-    }
-    var tripUpdate = new ExtraCallTripBuilder(
-      journey,
-      transitEditorService,
+    return new SiriRealTimeUpdateHandler(
+      transitService,
+      buffer,
+      fuzzyTripMatcher,
+      tripPatternCache,
       deduplicator,
-      entityResolver,
-      tripPatternIdGenerator::generateUniqueTripPatternId,
-      trip
-    ).build();
-
-    TripPattern deleteFrom = !tripUpdate.stopPattern().equals(pattern.getStopPattern())
-      ? pattern
-      : null;
-
-    return tripUpdate.withHideTripInScheduledPattern(deleteFrom);
-  }
-
-  /**
-   * Add a (new) trip to the timetableRepository and the buffer
-   */
-  private UpdateSuccess addTripToGraphAndBuffer(TripUpdate tripUpdate) {
-    Trip trip = tripUpdate.tripTimes().getTrip();
-    LocalDate serviceDate = tripUpdate.serviceDate();
-
-    final TripPattern pattern;
-    if (tripUpdate.tripPatternCreation()) {
-      pattern = tripUpdate.addedTripPattern();
-    } else {
-      // Get cached trip pattern or create one if it doesn't exist yet
-      pattern = tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip);
-    }
-
-    // Revert for TRIP_UPDATE and EXTRA_CALL, but NOT for REPLACEMENT_DEPARTURE (new trips)
-    boolean revertPreviousRealTimeUpdates = !tripUpdate.tripCreation();
-
-    // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
-    RealTimeTripUpdate realTimeTripUpdate = RealTimeTripUpdate.of(
-      pattern,
-      tripUpdate.tripTimes(),
-      serviceDate
-    )
-      .withAddedTripOnServiceDate(tripUpdate.addedTripOnServiceDate())
-      .withTripCreation(tripUpdate.tripCreation())
-      .withRouteCreation(tripUpdate.routeCreation())
-      .withProducer(tripUpdate.dataSource())
-      .withRevertPreviousRealTimeUpdates(revertPreviousRealTimeUpdates)
-      .withHideTripInScheduledPattern(tripUpdate.hideTripInScheduledPattern())
-      .build();
-    var result = snapshotManager.updateBuffer(realTimeTripUpdate);
-    LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
-    return result;
-  }
-
-  /**
-   * Types of SIRI update messages.
-   */
-  private enum SiriUpdateType {
-    /**
-     * Update of an existing trip.
-     * This can be either a trip defined in planned data or a replacement departure
-     * that was previously added by a real-time message.
-     * The update can consist in updated passing times and/or cancellation of some stops.
-     * A stop can be substituted by another if they belong to the same station.
-     * The whole trip can also be marked as cancelled.
-     */
-    TRIP_UPDATE,
-
-    /**
-     * Addition of a new trip, not currently present in the system.
-     * The new trip has a new unique id.
-     * The trip can replace one or more existing trips, another SIRI message should handle the
-     * cancellation of the replaced trips.
-     */
-    REPLACEMENT_DEPARTURE,
-
-    /**
-     * Addition of one or more stops in an existing trip.
-     */
-    EXTRA_CALL,
+      tripPatternIdGenerator
+    );
   }
 }

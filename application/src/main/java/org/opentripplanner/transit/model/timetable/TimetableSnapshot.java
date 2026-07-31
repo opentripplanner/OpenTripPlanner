@@ -26,11 +26,17 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternForDateMapper;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +81,7 @@ import org.slf4j.LoggerFactory;
  * guarantee of safe-publication without synchronization.
  * (see <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field Semantics</a>)
  */
-public class TimetableSnapshot {
+public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTimetableSnapshot {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
 
@@ -148,6 +154,13 @@ public class TimetableSnapshot {
     TripOnServiceDate
   > realTimeAddedTripOnServiceDateForTripAndDay;
   private final DefaultTripCalendars tripCalendars;
+  private RaptorTransitData realtimeRaptorTransitData;
+
+  /**
+   * Mapper to update raptor data. The mapper has a cache and is therefore stateful, so it has to be
+   * injected into subsequent snapshot instances.
+   */
+  private final TimetableUpdateMapper timetableUpdateMapper;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
@@ -161,7 +174,10 @@ public class TimetableSnapshot {
    */
   private boolean dirty = false;
 
-  public TimetableSnapshot(DefaultTripCalendars tripCalendars) {
+  public TimetableSnapshot(
+    RaptorTransitData raptorTransitData,
+    DefaultTripCalendars tripCalendars
+  ) {
     this(
       new HashMap<>(),
       new HashMap<>(),
@@ -174,7 +190,9 @@ public class TimetableSnapshot {
       new HashMap<>(),
       HashMultimap.create(),
       tripCalendars,
-      false
+      raptorTransitData,
+      false,
+      new TimetableUpdateMapper()
     );
   }
 
@@ -190,7 +208,9 @@ public class TimetableSnapshot {
     Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay,
     SetMultimap<StopLocation, TripPattern> patternsForStop,
     DefaultTripCalendars tripCalendars,
-    boolean readOnly
+    RaptorTransitData realtimeRaptorTransitData,
+    boolean readOnly,
+    TimetableUpdateMapper timetableUpdateMapper
   ) {
     this.timetables = timetables;
     this.realTimeNewTripPatternsForModifiedTrips = realTimeNewTripPatternsForModifiedTrips;
@@ -204,6 +224,8 @@ public class TimetableSnapshot {
     this.realTimeAddedTripOnServiceDateForTripAndDay = realTimeAddedTripOnServiceDateForTripAndDay;
     this.patternsForStop = patternsForStop;
     this.tripCalendars = tripCalendars;
+    this.realtimeRaptorTransitData = realtimeRaptorTransitData;
+    this.timetableUpdateMapper = timetableUpdateMapper;
     this.readOnly = readOnly;
   }
 
@@ -380,23 +402,35 @@ public class TimetableSnapshot {
    * re-indexing when receiving multiple updates for the same timetable in rapid succession. This
    * compromise is expressed by the maxSnapshotFrequency property of StoptimeUpdater. The indexing
    * could be made much more efficient as well.
+   * <p>
+   * Updating the raptor data is now also part of the commit. Previously this was done after the
+   * commit. The amount of work triggered by each commit stayed the same.
    *
    * @return an immutable copy of this TimetableSnapshot with all updates applied
    */
   public TimetableSnapshot commit() {
-    return commit(null, false);
+    return commit(false);
   }
 
-  public TimetableSnapshot commit(
-    @Nullable TimetableSnapshotUpdateListener updatesEventListener,
-    boolean force
-  ) {
+  public TimetableSnapshot commit(boolean force) {
     validateNotReadOnly();
 
     if (!force && !this.isDirty()) {
       return null;
     }
-    TimetableSnapshot ret = new TimetableSnapshot(
+
+    return createReadOnlySnapshot();
+  }
+
+  public @NonNull TimetableSnapshot createReadOnlySnapshot() {
+    RaptorTransitData updatedRaptorData = timetableUpdateMapper.map(
+      realtimeRaptorTransitData,
+      dirtyTimetables.values(),
+      timetables::get,
+      new TripPatternForDateMapper(tripCalendars.getServiceCodesRunningForDate())
+    );
+
+    var timetableSnapshot = new TimetableSnapshot(
       Map.copyOf(timetables),
       Map.copyOf(realTimeNewTripPatternsForModifiedTrips),
       Map.copyOf(realtimeAddedRoutes),
@@ -408,17 +442,17 @@ public class TimetableSnapshot {
       Map.copyOf(realTimeAddedTripOnServiceDateForTripAndDay),
       ImmutableSetMultimap.copyOf(patternsForStop),
       tripCalendars,
-      true
+      updatedRaptorData,
+      true,
+      timetableUpdateMapper
     );
 
-    if (updatesEventListener != null) {
-      updatesEventListener.update(dirtyTimetables.values(), timetables::get);
-    }
+    realtimeRaptorTransitData = updatedRaptorData;
 
     dirtyTimetables.clear();
     dirty = false;
 
-    return ret;
+    return timetableSnapshot;
   }
 
   /**
@@ -586,6 +620,10 @@ public class TimetableSnapshot {
       realTimeAddedReplacedByTripOnServiceDateById.isEmpty() &&
       realTimeAddedTripOnServiceDateForTripAndDay.isEmpty()
     );
+  }
+
+  public RaptorTransitData getRealtimeRaptorTransitData() {
+    return realtimeRaptorTransitData;
   }
 
   /**

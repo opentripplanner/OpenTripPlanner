@@ -151,7 +151,7 @@ class OverridePermissionsTest {
   }
 
   private StreetTraversalPermissionPair getWayProperties(OsmWay way) {
-    WayPropertiesPair wayData = WAY_PROPERTY_SET.getDataForWay(way);
+    BidirectionalWayProperties wayData = WAY_PROPERTY_SET.getDataForWay(way);
 
     return new StreetTraversalPermissionPair(
       wayData.forward().getPermission(),

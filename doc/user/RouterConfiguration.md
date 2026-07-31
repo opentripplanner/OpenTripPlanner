@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /doc/user 
+   - Generated directory is: /doc/user
 -->
 
 # Router configuration
@@ -12,9 +12,9 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 ## Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See
-the `CommandLineParameters` class
-for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the
+`CommandLineParameters` class for
+[a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
 .
 
 ## Routing defaults
@@ -24,7 +24,6 @@ exposed via the API. You may want to change the default value for some of these 
 value which will be applied unless it is overridden in a web API request.
 
 A full list of them can be found in the [RouteRequest](RouteRequest.md).
-
 
 ## Parameter Summary
 
@@ -89,7 +88,6 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |       lon                                                                                 |        `double`       | Longitude of the destination.                                                                                                                                                                                        | *Required* |                |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
-
 
 ## Parameter Details
 
@@ -636,7 +634,6 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
 
 
 <!-- PARAMETERS-DETAILS END -->
-
 
 ## Router Config Example
 

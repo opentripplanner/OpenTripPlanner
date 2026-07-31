@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -20,17 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is attached to the graph:
- *
- * <pre>
- * GraphUpdaterManager updaterManager = graph.getUpdaterManager();
- * </pre>
+ * Manages the lifecycle of all {@link GraphUpdater} instances: starts each updater on its own
+ * thread, shuts them down cleanly, and tracks readiness.
  * <p>
- * Each updater will run in its own thread. When changes to the graph have to be made by these
- * updaters, this should be done via the execute method of this manager to prevent race conditions
- * between graph write operations.
+ * Write tasks submitted by updaters are serialised by the {@link WriteToGraphCallback} passed at
+ * construction — currently a {@link GraphWriterService}, which will be replaced by the new
+ * {@link org.opentripplanner.framework.transaction.UpdateManager} framework.
  */
-public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterStatus {
+public class GraphUpdaterManager implements GraphUpdaterStatus {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
   /**
@@ -38,22 +34,11 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   private static final int MIN_POLLING_UPDATER_THREADS = 6;
 
-  /**
-   * OTP's multi-version concurrency control model for graph updating allows simultaneous reads, but
-   * never simultaneous writes. We ensure this policy is respected by having a single writer thread,
-   * which sequentially executes all graph updater tasks. Each task is a runnable that is scheduled
-   * with the ExecutorService to run at regular intervals.
-   * FIXME: In reality we're not using scheduleAtFixedInterval.
-   *        We're scheduling for immediate execution from separate threads that sleep in a loop.
-   *        We should perhaps switch to having polling GraphUpdaters call scheduleAtFixedInterval.
-   */
-  private final ScheduledExecutorService scheduler;
-
   private final ScheduledExecutorService pollingUpdaterPool;
 
   /**
-   * A pool of threads on which the non-polling updaters will run. This creates a pool that will auto-scale up
-   * to any size (maximum pool size is MAX_INT).
+   * A pool of threads on which the non-polling updaters will run. This creates a pool that will
+   * auto-scale up to any size (maximum pool size is MAX_INT).
    */
   private final ExecutorService nonPollingUpdaterPool;
 
@@ -62,30 +47,24 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   private final List<GraphUpdater> updaterList = new ArrayList<>();
 
-  /**
-   * The Graph that will be updated.
-   */
-  private final RealTimeUpdateContext realtimeUpdateContext;
+  private final Runnable shutdownGraphWriter;
 
-  /**
-   * Constructor.
-   *
-   */
-  public GraphUpdaterManager(RealTimeUpdateContext context, List<GraphUpdater> updaters) {
-    this.realtimeUpdateContext = context;
-    // Thread factories used to create new threads, giving them more human-readable names.
-    var graphWriterThreadFactory = new ThreadFactoryBuilder().setNameFormat("graph-writer").build();
-    this.scheduler = Executors.newSingleThreadScheduledExecutor(graphWriterThreadFactory);
+  public GraphUpdaterManager(
+    WriteToGraphCallback writeToGraphCallback,
+    Runnable shutdownGraphWriter,
+    List<GraphUpdater> updaters
+  ) {
     var updaterThreadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
     this.pollingUpdaterPool = Executors.newScheduledThreadPool(
       Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
       updaterThreadFactory
     );
     this.nonPollingUpdaterPool = Executors.newCachedThreadPool(updaterThreadFactory);
+    this.shutdownGraphWriter = shutdownGraphWriter;
 
     for (GraphUpdater updater : updaters) {
       updaterList.add(updater);
-      updater.setup(this);
+      updater.setup(writeToGraphCallback);
     }
   }
 
@@ -139,7 +118,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
   public void stop(boolean cancelRunningTasks) {
     // TODO: find a better way to stop these threads
     LOG.info("Stopping updater manager with {} updaters.", numberOfUpdaters());
-    // Shutdown updaters
     if (cancelRunningTasks) {
       pollingUpdaterPool.shutdownNow();
       nonPollingUpdaterPool.shutdownNow();
@@ -155,40 +133,16 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
       if (!ok) {
         LOG.warn("Timeout waiting for updaters to finish.");
       }
+      shutdownGraphWriter.run();
     } catch (InterruptedException e) {
-      // This should not happen
       LOG.warn("Interrupted while waiting for updaters to finish.");
     }
 
-    // Clean up updaters
     for (GraphUpdater updater : updaterList) {
       updater.teardown();
     }
     updaterList.clear();
-
-    // Shutdown scheduler
-    scheduler.shutdownNow();
-    try {
-      boolean ok = scheduler.awaitTermination(30, TimeUnit.SECONDS);
-      if (!ok) {
-        LOG.warn("Timeout waiting for scheduled task to finish.");
-      }
-    } catch (InterruptedException e) {
-      // This should not happen
-      LOG.warn("Interrupted while waiting for scheduled task to finish.");
-    }
     LOG.info("Stopped updater manager");
-  }
-
-  @Override
-  public Future<?> execute(GraphWriterRunnable runnable) {
-    return scheduler.submit(() -> {
-      try {
-        runnable.run(realtimeUpdateContext);
-      } catch (Exception e) {
-        LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
-      }
-    });
   }
 
   @Override
@@ -210,10 +164,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
       .collect(Collectors.toList());
   }
 
-  /**
-   * Just an example of fetching status information from the graph updater manager to expose it in a
-   * web service. More useful stuff should be added later.
-   */
   @Override
   public Map<Integer, String> getUpdaterDescriptions() {
     Map<Integer, String> ret = new TreeMap<>();
@@ -224,10 +174,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     return ret;
   }
 
-  /**
-   * Just an example of fetching status information from the graph updater manager to expose it in a
-   * web service. More useful stuff should be added later.
-   */
   public GraphUpdater getUpdater(int id) {
     if (id >= updaterList.size()) {
       return null;
@@ -235,6 +181,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     return updaterList.get(id);
   }
 
+  @Override
   public Class<?> getUpdaterClass(int id) {
     GraphUpdater updater = getUpdater(id);
     return updater == null ? null : updater.getClass();
@@ -250,10 +197,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
 
   public ExecutorService getNonPollingUpdaterPool() {
     return nonPollingUpdaterPool;
-  }
-
-  public ScheduledExecutorService getScheduler() {
-    return scheduler;
   }
 
   /**

@@ -77,12 +77,6 @@ public class MetricsLogging {
         "nonPollingGraphUpdaters",
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
       ).bindTo(Metrics.globalRegistry);
-
-      new ExecutorServiceMetrics(
-        timetableRepository.getUpdaterManager().getScheduler(),
-        "graphUpdateScheduler",
-        List.of(Tag.of("pool", "graphUpdateScheduler"))
-      ).bindTo(Metrics.globalRegistry);
     }
 
     if (raptorConfig.isMultiThreaded()) {

@@ -1,19 +1,20 @@
 package org.opentripplanner.updater.trip.siri;
 
+import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateException;
+import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.lang.StringUtils;
-import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri21.CallStatusEnumeration;
-import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
-import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.RecordedCall;
 import uk.org.siri.siri21.StopPointRefStructure;
 
@@ -23,6 +24,9 @@ import uk.org.siri.siri21.StopPointRefStructure;
  * <p>
  * Instances are created via the {@link #of(EstimatedVehicleJourney)} factory which validates and
  * sorts calls during parsing, making invalid {@code CallWrapper} instances unrepresentable.
+ * <p>
+ * The SIRI/JAXB enumerations of the underlying call are not exposed; the wrapper maps them to the
+ * corresponding OTP types ({@link OccupancyStatus}, {@link PickDrop}).
  */
 public interface CallWrapper {
   /**
@@ -103,31 +107,42 @@ public interface CallWrapper {
   Boolean isCancellation();
   Boolean isPredictionInaccurate();
   boolean isExtraCall();
-  OccupancyEnumeration getOccupancy();
-  List<NaturalLanguageStringStructure> getDestinationDisplays();
+
+  /**
+   * The occupancy of this call, or {@code null} when not set.
+   */
+  OccupancyStatus getOccupancy();
+
+  /**
+   * The destination display (headsign) of this call, or an empty string if not set.
+   */
+  String destinationDisplay();
+
   ZonedDateTime getAimedArrivalTime();
   ZonedDateTime getExpectedArrivalTime();
   ZonedDateTime getActualArrivalTime();
-  CallStatusEnumeration getArrivalStatus();
-  ArrivalBoardingActivityEnumeration getArrivalBoardingActivity();
   ZonedDateTime getAimedDepartureTime();
   ZonedDateTime getExpectedDepartureTime();
   ZonedDateTime getActualDepartureTime();
-  CallStatusEnumeration getDepartureStatus();
-  DepartureBoardingActivityEnumeration getDepartureBoardingActivity();
+
+  /**
+   * The drop-off (arrival) change of this call, to be resolved against the scheduled value.
+   */
+  PickDropChange dropOff();
+
+  /**
+   * The pick-up (departure) change of this call, to be resolved against the scheduled value.
+   */
+  PickDropChange pickUp();
 
   /// Whether the call is a RecordedCall or not
   boolean isRecorded();
 
   /// Whether the vehicle has arrived at the stop.
-  default boolean hasArrived() {
-    return isRecorded() || getArrivalStatus() == CallStatusEnumeration.ARRIVED;
-  }
+  boolean hasArrived();
 
   /// Whether the vehicle has departed from the stop.
-  default boolean hasDeparted() {
-    return isRecorded() && getActualDepartureTime() != null;
-  }
+  boolean hasDeparted();
 
   final class EstimatedCallWrapper implements CallWrapper {
 
@@ -165,13 +180,15 @@ public interface CallWrapper {
     }
 
     @Override
-    public OccupancyEnumeration getOccupancy() {
-      return call.getOccupancy();
+    public OccupancyStatus getOccupancy() {
+      return call.getOccupancy() == null
+        ? null
+        : OccupancyMapper.mapOccupancyStatus(call.getOccupancy());
     }
 
     @Override
-    public List<NaturalLanguageStringStructure> getDestinationDisplays() {
-      return call.getDestinationDisplaies();
+    public String destinationDisplay() {
+      return getFirstStringFromList(call.getDestinationDisplaies());
     }
 
     @Override
@@ -190,16 +207,6 @@ public interface CallWrapper {
     }
 
     @Override
-    public CallStatusEnumeration getArrivalStatus() {
-      return call.getArrivalStatus();
-    }
-
-    @Override
-    public ArrivalBoardingActivityEnumeration getArrivalBoardingActivity() {
-      return call.getArrivalBoardingActivity();
-    }
-
-    @Override
     public ZonedDateTime getAimedDepartureTime() {
       return call.getAimedDepartureTime();
     }
@@ -215,17 +222,35 @@ public interface CallWrapper {
     }
 
     @Override
-    public CallStatusEnumeration getDepartureStatus() {
-      return call.getDepartureStatus();
+    public PickDropChange dropOff() {
+      return PickDropChange.ofArrival(
+        isCancellation(),
+        call.getArrivalStatus(),
+        call.getArrivalBoardingActivity()
+      );
     }
 
     @Override
-    public DepartureBoardingActivityEnumeration getDepartureBoardingActivity() {
-      return call.getDepartureBoardingActivity();
+    public PickDropChange pickUp() {
+      return PickDropChange.ofDeparture(
+        isCancellation(),
+        call.getDepartureStatus(),
+        call.getDepartureBoardingActivity()
+      );
     }
 
     @Override
     public boolean isRecorded() {
+      return false;
+    }
+
+    @Override
+    public boolean hasArrived() {
+      return call.getArrivalStatus() == CallStatusEnumeration.ARRIVED;
+    }
+
+    @Override
+    public boolean hasDeparted() {
       return false;
     }
 
@@ -279,13 +304,15 @@ public interface CallWrapper {
     }
 
     @Override
-    public OccupancyEnumeration getOccupancy() {
-      return call.getOccupancy();
+    public OccupancyStatus getOccupancy() {
+      return call.getOccupancy() == null
+        ? null
+        : OccupancyMapper.mapOccupancyStatus(call.getOccupancy());
     }
 
     @Override
-    public List<NaturalLanguageStringStructure> getDestinationDisplays() {
-      return call.getDestinationDisplaies();
+    public String destinationDisplay() {
+      return getFirstStringFromList(call.getDestinationDisplaies());
     }
 
     @Override
@@ -304,16 +331,6 @@ public interface CallWrapper {
     }
 
     @Override
-    public CallStatusEnumeration getArrivalStatus() {
-      return null;
-    }
-
-    @Override
-    public ArrivalBoardingActivityEnumeration getArrivalBoardingActivity() {
-      return null;
-    }
-
-    @Override
     public ZonedDateTime getAimedDepartureTime() {
       return call.getAimedDepartureTime();
     }
@@ -329,18 +346,28 @@ public interface CallWrapper {
     }
 
     @Override
-    public CallStatusEnumeration getDepartureStatus() {
-      return null;
+    public PickDropChange dropOff() {
+      return PickDropChange.ofArrival(isCancellation(), null, null);
     }
 
     @Override
-    public DepartureBoardingActivityEnumeration getDepartureBoardingActivity() {
-      return null;
+    public PickDropChange pickUp() {
+      return PickDropChange.ofDeparture(isCancellation(), null, null);
     }
 
     @Override
     public boolean isRecorded() {
       return true;
+    }
+
+    @Override
+    public boolean hasArrived() {
+      return true;
+    }
+
+    @Override
+    public boolean hasDeparted() {
+      return call.getActualDepartureTime() != null;
     }
 
     @Override

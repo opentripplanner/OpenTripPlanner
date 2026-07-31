@@ -2,14 +2,14 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /doc/user 
+   - Generated directory is: /doc/user
 -->
 
 # Debug UI configuration
 
-The Debug UI is the standard interface that is bundled with OTP and available by visiting 
-[`http://localhost:8080`](http://localhost:8080). This page lists the configuration options available
-by placing a file `debug-ui-config.json` into OTP's working directory.
+The Debug UI is the standard interface that is bundled with OTP and available by visiting
+[`http://localhost:8080`](http://localhost:8080). This page lists the configuration options
+available by placing a file `debug-ui-config.json` into OTP's working directory.
 
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -23,7 +23,6 @@ by placing a file `debug-ui-config.json` into OTP's working directory.
 |       tileSize                                            |  `integer` | Size of the tile in pixels.                                                                                                                                                                  | *Optional* | `256`                 |  2.7  |
 
 <!-- PARAMETERS-TABLE END -->
-
 
 ## Parameter Details
 

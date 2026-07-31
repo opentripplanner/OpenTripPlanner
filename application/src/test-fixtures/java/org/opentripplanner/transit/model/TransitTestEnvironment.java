@@ -2,25 +2,29 @@ package org.opentripplanner.transit.model;
 
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -32,7 +36,12 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
-  private final TimetableSnapshotManager snapshotManager;
+  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryHandle<
+    ReadOnlyTimetableSnapshot,
+    MutableTimetableSnapshot
+  > timetableHandle;
+  private final UpdateManager updateManager;
   private final LocalDate defaultServiceDate;
 
   public static TransitTestEnvironmentBuilder of() {
@@ -53,25 +62,32 @@ public final class TransitTestEnvironment {
     LocalDate defaultServiceDate
   ) {
     this.timetableRepository = timetableRepository;
+    this.defaultServiceDate = defaultServiceDate;
 
     this.timetableRepository.index();
-    this.timetableRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(
-        new TestTransitTuningParameters(),
-        timetableRepository,
-        transferRepository
-      )
+    var scheduledRaptorData = RaptorTransitDataMapper.map(
+      new TestTransitTuningParameters(),
+      timetableRepository,
+      transferRepository
     );
-    this.timetableRepository.setRealtimeRaptorTransitData(
-      new RaptorTransitData(timetableRepository.getRaptorTransitData())
+    this.timetableRepository.initRaptorTransitData(scheduledRaptorData);
+
+    this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
+    var timetableSnapshot = new TimetableSnapshot(
+      new RaptorTransitData(timetableRepository.getRaptorTransitData()),
+      timetableRepository.copyTripCalendarForRealTimeUpdates()
     );
-    this.snapshotManager = new TimetableSnapshotManager(
-      (DefaultTripCalendars) timetableRepository.getTripCalendar(),
-      new RealTimeRaptorTransitDataUpdater(timetableRepository),
-      TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-      () -> defaultServiceDate
+    this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
+      timetableSnapshot,
+      new TimetableSnapshotLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
-    this.defaultServiceDate = defaultServiceDate;
+    var threadFactory = new ThreadFactoryBuilder().setNameFormat("test-commit").build();
+    // Use atomic commits (commit immediately after each task) so test assertions see results right away
+    this.updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
+      "test",
+      repositoryRegistry,
+      threadFactory
+    );
   }
 
   /**
@@ -90,10 +106,10 @@ public final class TransitTestEnvironment {
   }
 
   /**
-   * Returns a new fresh TransitService
+   * Returns a new fresh TransitService backed by the current snapshot.
    */
   public TransitService transitService() {
-    return new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot());
+    return new DefaultTransitService(timetableRepository, timetableSnapshot());
   }
 
   public String feedId() {
@@ -104,12 +120,16 @@ public final class TransitTestEnvironment {
     return timetableRepository;
   }
 
-  public TimetableSnapshotManager timetableSnapshotManager() {
-    return snapshotManager;
+  public RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle() {
+    return timetableHandle;
   }
 
-  public TimetableSnapshot timetableSnapshot() {
-    return snapshotManager.getTimetableSnapshot();
+  public UpdateManager updateManager() {
+    return updateManager;
+  }
+
+  public ReadOnlyTimetableSnapshot timetableSnapshot() {
+    return timetableHandle.repositorySnapshot(repositoryRegistry.scope());
   }
 
   /**

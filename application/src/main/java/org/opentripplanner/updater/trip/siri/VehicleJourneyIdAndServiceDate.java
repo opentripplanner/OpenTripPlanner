@@ -1,6 +1,9 @@
 package org.opentripplanner.updater.trip.siri;
 
+import java.time.LocalDate;
 import javax.annotation.Nullable;
+import org.opentripplanner.utils.time.ServiceDateUtils;
+import uk.org.siri.siri21.DataFrameRefStructure;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 
 /**
@@ -8,17 +11,28 @@ import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
  */
 record VehicleJourneyIdAndServiceDate(
   @Nullable String vehicleJourneyId,
-  @Nullable String serviceDate
+  @Nullable LocalDate serviceDate
 ) {
   @Nullable
   static VehicleJourneyIdAndServiceDate of(@Nullable FramedVehicleJourneyRefStructure ref) {
     if (ref == null) {
       return null;
     }
-    var dataFrameRef = ref.getDataFrameRef();
     return new VehicleJourneyIdAndServiceDate(
       ref.getDatedVehicleJourneyRef(),
-      dataFrameRef != null ? dataFrameRef.getValue() : null
+      parseServiceDate(ref.getDataFrameRef())
     );
+  }
+
+  /**
+   * The Nordic SIRI profile requires the DataFrameRef to contain the service date. A value that is
+   * not a valid date is treated as a missing service date.
+   */
+  @Nullable
+  private static LocalDate parseServiceDate(@Nullable DataFrameRefStructure dataFrameRef) {
+    if (dataFrameRef == null || dataFrameRef.getValue() == null) {
+      return null;
+    }
+    return ServiceDateUtils.parseStringToOptional(dataFrameRef.getValue()).orElse(null);
   }
 }

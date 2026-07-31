@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
@@ -19,13 +20,13 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 class ExtraCallTripBuilder {
 
@@ -37,11 +38,14 @@ class ExtraCallTripBuilder {
   private final LocalDate serviceDate;
   private final List<CallWrapper> calls;
   private final boolean isJourneyPredictionInaccurate;
-  private final OccupancyEnumeration occupancy;
+  private final OccupancyStatus occupancy;
   private final boolean cancellation;
   private final boolean added;
   private final StopTimesMapper stopTimesMapper;
   private final DeduplicatorService deduplicator;
+
+  @Nullable
+  private final String vehicleRef;
 
   ExtraCallTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
@@ -55,14 +59,15 @@ class ExtraCallTripBuilder {
 
     this.deduplicator = deduplicator;
     // DataSource of added trip
-    dataSource = journey.dataSource();
+    dataSource = journey.dataSource().orElse(null);
 
     serviceDate = entityResolver.resolveServiceDate(journey);
 
     isJourneyPredictionInaccurate = journey.isPredictionInaccurate();
-    occupancy = journey.occupancy();
+    occupancy = journey.occupancy().orElse(null);
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
+    vehicleRef = journey.vehicleRef().orElse(null);
 
     this.calls = journey.calls();
 
@@ -169,6 +174,7 @@ class ExtraCallTripBuilder {
       );
     }
 
+    builder.withVehicleId(vehicleRef);
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }

@@ -31,7 +31,7 @@ class MalformedStartDateTest implements RealtimeTestConstants {
 
     var update = rt
       .tripUpdateScheduled(TRIP_1_ID)
-      .withServiceDate("January 24th 2026")
+      .withStartDate("January 24th 2026")
       .addDelayedStopTime(0, 60)
       .build();
 

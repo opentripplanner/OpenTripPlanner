@@ -20,7 +20,7 @@ import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.graph.GraphDataFetcher;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
@@ -398,7 +398,7 @@ public class PlatformLinkingTest {
     );
   }
 
-  private GraphDataFetcher prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
+  private GraphSummarizer prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var graph = new Graph();
 
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
@@ -463,10 +463,10 @@ public class PlatformLinkingTest {
 
     graph.index();
 
-    return new GraphDataFetcher(graph);
+    return new GraphSummarizer(graph);
   }
 
-  private void linkStops(GraphDataFetcher graph, int maxAreaNodes, boolean permanent) {
+  private void linkStops(GraphSummarizer graph, int maxAreaNodes, boolean permanent) {
     var linker = new VertexLinker(
       graph.graph(),
       GeofencingZoneService.EMPTY,

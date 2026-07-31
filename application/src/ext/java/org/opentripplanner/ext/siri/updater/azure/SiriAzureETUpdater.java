@@ -22,7 +22,6 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
 
   private final SiriRealTimeTripUpdateAdapter adapter;
   private final Consumer<UpdateResult> recordMetrics;
-  private final boolean fuzzyTripMatching;
   private final String feedId;
 
   private WriteToGraphCallback writeToGraphCallback;
@@ -33,7 +32,6 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   ) {
     this.adapter = adapter;
     this.recordMetrics = TripUpdateMetrics.streaming(config);
-    this.fuzzyTripMatching = config.isFuzzyTripMatching();
     this.feedId = Objects.requireNonNull(config.feedId(), "feedId must not be null");
   }
 
@@ -56,13 +54,14 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
 
   private Future<?> processMessage(List<EstimatedTimetableDeliveryStructure> updates) {
     return writeToGraphCallback.execute(context -> {
-      var result = adapter.applyEstimatedTimetable(
-        fuzzyTripMatching ? context.siriFuzzyTripMatcher() : null,
-        context.entityResolver(feedId),
-        feedId,
-        UpdateIncrementality.DIFFERENTIAL,
-        updates
-      );
+      var result = adapter
+        .forUpdate(context.mutableSnapshot())
+        .applyEstimatedTimetable(
+          context.entityResolver(feedId),
+          feedId,
+          UpdateIncrementality.DIFFERENTIAL,
+          updates
+        );
       ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
       recordMetrics.accept(result);
     });

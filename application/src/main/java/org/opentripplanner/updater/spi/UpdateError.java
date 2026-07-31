@@ -10,7 +10,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 public record UpdateError(
   @Nullable FeedScopedId tripId,
   UpdateErrorType errorType,
-  @Nullable Integer stopIndex,
+  @Nullable Integer stopPosition,
   @Nullable String producer,
   /**
    * A best-effort, human-readable trip identifier used for logging when the trip could not be
@@ -24,10 +24,10 @@ public record UpdateError(
     var id = tripId != null ? tripId.toString() : tripReference;
     if (id == null) {
       return "no trip id";
-    } else if (stopIndex == null) {
+    } else if (stopPosition == null) {
       return id;
     } else {
-      return "%s{stopIndex=%s}".formatted(id, stopIndex);
+      return "%s{stopPosition=%s}".formatted(id, stopPosition);
     }
   }
 }

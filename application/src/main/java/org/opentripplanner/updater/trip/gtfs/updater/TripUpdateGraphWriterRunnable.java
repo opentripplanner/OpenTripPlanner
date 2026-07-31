@@ -52,14 +52,16 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
   @Override
   public void run(RealTimeUpdateContext context) {
-    var result = adapter.applyTripUpdates(
-      fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
-      forwardsDelayPropagationType,
-      backwardsDelayPropagationType,
-      updateIncrementality,
-      updates,
-      feedId
-    );
+    var result = adapter
+      .forUpdate(context.mutableSnapshot())
+      .applyTripUpdates(
+        fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
+        forwardsDelayPropagationType,
+        backwardsDelayPropagationType,
+        updateIncrementality,
+        updates,
+        feedId
+      );
     sendMetrics.accept(result);
   }
 }

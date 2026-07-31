@@ -146,3 +146,4 @@ config:
     CanceledTripsSummary: org.opentripplanner.apis.gtfs.model.CanceledTripsSummary#CanceledTripsSummary
     CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
+    Notice: org.opentripplanner.transit.model.basic.Notice

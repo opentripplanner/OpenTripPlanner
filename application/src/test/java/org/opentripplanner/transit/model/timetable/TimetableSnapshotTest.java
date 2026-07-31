@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -15,14 +14,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -30,6 +25,8 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -72,7 +69,10 @@ public class TimetableSnapshotTest {
 
   @Test
   void testUniqueDirtyTimetablesAfterMultipleUpdates() {
-    TimetableSnapshot snapshot = new TimetableSnapshot(new DefaultTripCalendars());
+    TimetableSnapshot snapshot = new TimetableSnapshot(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
 
@@ -81,23 +81,6 @@ public class TimetableSnapshotTest {
     snapshot.update(realTimeTripUpdate);
     snapshot.update(realTimeTripUpdate);
     assertTrue(snapshot.isDirty());
-
-    AtomicBoolean updateIsCalled = new AtomicBoolean();
-
-    var updateListener = new TimetableSnapshotUpdateListener() {
-      @Override
-      public void update(
-        Collection<Timetable> updatedTimetables,
-        Function<FeedScopedId, SortedSet<Timetable>> timetableProvider
-      ) {
-        updateIsCalled.set(true);
-        assertThat(updatedTimetables).hasSize(1);
-      }
-    };
-
-    snapshot.commit(updateListener, true);
-
-    assertTrue(updateIsCalled.get());
   }
 
   @Test
@@ -119,7 +102,7 @@ public class TimetableSnapshotTest {
   @Test
   void testCannotCommitReadOnlyTimetableSnapshot() {
     TimetableSnapshot committedSnapshot = createCommittedSnapshot();
-    assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.commit(null, true));
+    assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.commit(true));
   }
 
   @Test
@@ -146,7 +129,10 @@ public class TimetableSnapshotTest {
 
   @Test
   void testClear() {
-    TimetableSnapshot snapshot = new TimetableSnapshot(new DefaultTripCalendars());
+    TimetableSnapshot snapshot = new TimetableSnapshot(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
 
@@ -232,7 +218,9 @@ public class TimetableSnapshotTest {
       new HashMap<>(Map.of(tripIdAndServiceDate, tripOnServiceDate)),
       patternsForStop,
       new DefaultTripCalendars(),
-      false
+      RaptorTransitDataTestFactory.empty(),
+      false,
+      new TimetableUpdateMapper()
     );
     assertFalse(snapshot.isEmpty());
     snapshot.clear(id.getFeedId());
@@ -255,7 +243,10 @@ public class TimetableSnapshotTest {
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(new DefaultTripCalendars());
-    return timetableSnapshot.commit(null, true);
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
+    return timetableSnapshot.commit(true);
   }
 }

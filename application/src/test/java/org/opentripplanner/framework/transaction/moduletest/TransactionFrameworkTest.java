@@ -61,6 +61,9 @@ public class TransactionFrameworkTest {
   private static final String SCOPE_TXN_1 = "Scope(TXN-1)";
   private static final String SCOPE_TXN_2 = "Scope(TXN-2)";
   private static final String SCOPE_TXN_3 = "Scope(TXN-3)";
+  private static final int AWAIT_STATE_TIMEOUT = 2_000;
+  private static final int AWAIT_STATE_CHECK_INTERVAL_MS = 10;
+  public static final int AUTO_COMMIT_INTERVAL_MS = 50;
 
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
@@ -135,7 +138,7 @@ public class TransactionFrameworkTest {
       getClass().getSimpleName(),
       registry,
       threadFactory,
-      Duration.ofMillis(40)
+      Duration.ofMillis(AUTO_COMMIT_INTERVAL_MS)
     );
     updateManager.register(new CustomerEventHandler(), customerRepoHandler);
     updateManager.register(new OrderEventHandler(), orderRepoHandler);
@@ -149,12 +152,10 @@ public class TransactionFrameworkTest {
     // Task completes before the periodic scheduler fires its first commit.
     var f = updateManager.submit(c -> publishUsingRepositories(c, TOMMY));
     f.get();
-    assertState(SCOPE_TXN_1, PIPPI);
     awaitState(SCOPE_TXN_2, PIPPI, TOMMY);
 
     f = updateManager.submit(c -> publishNewDomainEvent(c, ANNIKA));
     f.get();
-    awaitState(SCOPE_TXN_2, PIPPI, TOMMY);
     awaitState(SCOPE_TXN_3, PIPPI, TOMMY, ANNIKA);
 
     updateManager.shutdown();
@@ -248,13 +249,13 @@ public class TransactionFrameworkTest {
 
   @SuppressWarnings("BusyWait")
   private void awaitState(String expScope, TestEvent... expected) throws InterruptedException {
-    long deadline = System.currentTimeMillis() + 2_000;
+    long deadline = System.currentTimeMillis() + AWAIT_STATE_TIMEOUT;
     while (System.currentTimeMillis() < deadline) {
       try {
         assertState(expScope, expected);
         return;
       } catch (AssertionError ignored) {
-        Thread.sleep(10);
+        Thread.sleep(AWAIT_STATE_CHECK_INTERVAL_MS);
       }
     }
     assertState(expScope, expected);

@@ -82,10 +82,6 @@ class TripMapper {
     org.opentripplanner.transit.model.network.Route route = resolveRoute(serviceJourney);
 
     if (route == null) {
-      LOG.warn(
-        "Unable to map ServiceJourney, missing serviceId. SJ id: {}",
-        serviceJourney.getId()
-      );
       return null;
     }
 
@@ -173,6 +169,7 @@ class TripMapper {
     return null;
   }
 
+  @Nullable
   private org.opentripplanner.transit.model.network.Route resolveRoute(
     ServiceJourney serviceJourney
   ) {
@@ -195,8 +192,9 @@ class TripMapper {
     );
 
     if (route == null) {
-      LOG.warn(
-        "Unable to link ServiceJourney to Route. ServiceJourney id: {}, Line ref: {}",
+      issueStore.add(
+        "InvalidLineRef",
+        "Unable to map ServiceJourney. SJ id: %s, LineRef: %s",
         serviceJourney.getId(),
         lineRef
       );

@@ -33,7 +33,6 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -99,13 +98,6 @@ public class TimetableRepository implements Serializable {
    * scheduled (non-realtime) contents.
    */
   private transient RaptorTransitData raptorTransitData;
-
-  /**
-   * An optionally present second RaptorTransitData representing the contents of this TimetableRepository plus
-   * the results of realtime updates in the latest TimetableSnapshot.
-   */
-  private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData =
-    new ConcurrentPublished<>();
 
   private final DefaultTripCalendars tripCalendar = new DefaultTripCalendars();
 
@@ -178,31 +170,6 @@ public class TimetableRepository implements Serializable {
     //      Currently there is tests which violates this.
     assertModificationsAllowed();
     this.raptorTransitData = raptorTransitData;
-  }
-
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
-  @Nullable
-  public RaptorTransitData getRealtimeRaptorTransitData() {
-    return realtimeRaptorTransitData.get();
-  }
-
-  /**
-   * Publish the latest snapshot of the real-time transit layer.
-   * Should be called only when creating a new RaptorTransitData, from the graph writer thread.
-   * @deprecated TODO This should be moved to the TimetableSnapshot for now
-   */
-  @Deprecated
-  public void setRealtimeRaptorTransitData(RaptorTransitData realtimeRaptorTransitData) {
-    this.realtimeRaptorTransitData.publish(realtimeRaptorTransitData);
-  }
-
-  /**
-   * Return true if a real-time transit layer is present.
-   * The real-time transit layer is optional,
-   * it is present only when real-time updaters are configured.
-   */
-  public boolean hasRealtimeRaptorTransitData() {
-    return realtimeRaptorTransitData != null;
   }
 
   public ConstrainedTransferService getConstrainedTransferService() {
@@ -391,11 +358,13 @@ public class TimetableRepository implements Serializable {
 
   /**
    * Returns the alert service. If no updaters are configured an empty instance is returned.
-   * See  {@link TimetableRepository#setUpdaterManager(GraphUpdaterManager)}.
+   * See  {@link TimetableRepository#initUpdaterManager(GraphUpdaterManager)}.
    */
   public TransitAlertService getTransitAlertService() {
     if (transitAlertService == null) {
-      transitAlertService = new DelegatingTransitAlertServiceImpl(this);
+      transitAlertService = new DelegatingTransitAlertServiceImpl(
+        this.updaterManager == null ? List.of() : this.updaterManager.getUpdaterList()
+      );
     }
     return transitAlertService;
   }
@@ -476,11 +445,31 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
+   * Sets the updater manager for this repository and makes sure the configured updaters
+   * are correctly applied to {@code transitAlertService}.
+   * <p>
+   * Note: before this method is called an empty {@code transitAlertService} is returned instead.
+   * <p>
+   * TODO: This logic is unfortunate and quite brittle. We would like to improve it in the future.
+   *       The UpdateManager should live in a DI context(Dagger), not here.
+   */
+  public void initUpdaterManager(GraphUpdaterManager updaterManager) {
+    this.updaterManager = ObjectUtils.requireNotInitialized(
+      "updaterManager",
+      this.updaterManager,
+      updaterManager
+    );
+    this.transitAlertService = null;
+  }
+
+  /**
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
-   * graph updaters defined in the configuration.
+   * graph updaters defined in the configuration. This is {@code null} if no updaters are
+   * configured or not yet initialized.
    *
    * @see UpdaterConfigurator
    */
+  @Nullable
   public GraphUpdaterManager getUpdaterManager() {
     return updaterManager;
   }
@@ -514,20 +503,6 @@ public class TimetableRepository implements Serializable {
     assertModificationsAllowed();
     invalidateIndex();
     flexTripsById.put(id, flexTrip);
-  }
-
-  /**
-   * Sets the updater manager for this repository and makes sure the configured updaters
-   * are correctly applied to {@code transitAlertService}.
-   * <p>
-   * Note: before this method is called an empty {@code transitAlertService} is returned instead.
-   * <p>
-   * This logic is unfortunate and quite brittle. We would like to improve it in the future.
-   */
-  public void setUpdaterManager(GraphUpdaterManager updaterManager) {
-    assertModificationsAllowed();
-    this.updaterManager = updaterManager;
-    this.transitAlertService = null;
   }
 
   /**

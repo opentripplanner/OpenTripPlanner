@@ -1,12 +1,12 @@
 # Container image
 
-The CI pipeline deploys container images for runtimes like Docker, Kubernetes or Podman to 
+The CI pipeline deploys container images for runtimes like Docker, Kubernetes or Podman to
 [Dockerhub](https://hub.docker.com/r/opentripplanner/opentripplanner/tags).
 
-The image assumes you use a volume to mount the input data (GTFS/NeTEx, OSM) and config files into 
-`/var/opentripplanner/`. When serving a graph it's also expected to be in this directory. If a logback
-extensions file needs to be used, it should be mounted to the root location `/logback-include-extensions.xml`
-instead of the `/var/opentripplanner/` directory.
+The image assumes you use a volume to mount the input data (GTFS/NeTEx, OSM) and config files into
+`/var/opentripplanner/`. When serving a graph it's also expected to be in this directory. If a
+logback extensions file needs to be used, it should be mounted to the root location
+`/logback-include-extensions.xml` instead of the `/var/opentripplanner/` directory.
 
 ## Quick start
 
@@ -16,7 +16,7 @@ Let's use the image to build a graph in Berlin.
 # create directory for data and config
 mkdir berlin
 # download OSM
-curl -L https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -o berlin/osm.pbf  
+curl -L https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -o berlin/osm.pbf
 # download GTFS
 curl -L https://vbb.de/vbbgtfs -o berlin/vbb-gtfs.zip
 # build graph and save it onto the host system via the volume
@@ -34,7 +34,9 @@ docker run -it --rm -p 8080:8080 \
 Now open [http://localhost:8080](http://localhost:8080) to see your running OTP instance.
 
 ## Additional notes
-Make sure to include the word "gtfs" when naming the gtfs files that you want to use for OTP. Otherwise, graph build will fail.
 
-If you want to set JVM options you can use the environment variable `JAVA_TOOL_OPTIONS`, so
-a full example to add to your docker command is `-e JAVA_TOOL_OPTIONS='-Xmx4g'`. 
+Make sure to include the word "gtfs" when naming the gtfs files that you want to use for OTP.
+Otherwise, graph build will fail.
+
+If you want to set JVM options you can use the environment variable `JAVA_TOOL_OPTIONS`, so a full
+example to add to your docker command is `-e JAVA_TOOL_OPTIONS='-Xmx4g'`.

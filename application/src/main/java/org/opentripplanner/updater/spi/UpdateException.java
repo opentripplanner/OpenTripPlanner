@@ -13,7 +13,7 @@ public class UpdateException extends RuntimeException {
   private final FeedScopedId tripId;
 
   @Nullable
-  private final Integer stopIndex;
+  private final Integer stopPosition;
 
   /// A best-effort trip identifier used for logging when no resolved [FeedScopedId] is available.
   @Nullable
@@ -22,12 +22,12 @@ public class UpdateException extends RuntimeException {
   private UpdateException(
     @Nullable FeedScopedId tripId,
     UpdateErrorType errorType,
-    @Nullable Integer stopIndex,
+    @Nullable Integer stopPosition,
     @Nullable String tripReference
   ) {
     this.tripId = tripId;
     this.errorType = errorType;
-    this.stopIndex = stopIndex;
+    this.stopPosition = stopPosition;
     this.tripReference = tripReference;
   }
 
@@ -35,8 +35,8 @@ public class UpdateException extends RuntimeException {
     return new UpdateException(tripId, errorType, null, null);
   }
 
-  public static UpdateException ofStopIndex(UpdateErrorType updateErrorType, int stopIndex) {
-    return new UpdateException(null, updateErrorType, stopIndex, null);
+  public static UpdateException ofStopPosition(UpdateErrorType updateErrorType, int stopPosition) {
+    return new UpdateException(null, updateErrorType, stopPosition, null);
   }
 
   public static UpdateException noTripId(UpdateErrorType errorType) {
@@ -50,27 +50,27 @@ public class UpdateException extends RuntimeException {
   public static UpdateException of(
     FeedScopedId tripId,
     UpdateErrorType updateErrorType,
-    int stopIndex
+    int stopPosition
   ) {
-    return new UpdateException(tripId, updateErrorType, stopIndex, null);
+    return new UpdateException(tripId, updateErrorType, stopPosition, null);
   }
 
   /// Gives an updated exception with the specified tripId
   public UpdateException withTripId(FeedScopedId tripId) {
-    return new UpdateException(tripId, this.errorType, this.stopIndex, this.tripReference);
+    return new UpdateException(tripId, this.errorType, this.stopPosition, this.tripReference);
   }
 
   /// Gives an updated exception with a best-effort trip identifier for logging, used when the trip
   /// could not be resolved to a [FeedScopedId].
   public UpdateException withTripReference(@Nullable String tripReference) {
-    return new UpdateException(this.tripId, this.errorType, this.stopIndex, tripReference);
+    return new UpdateException(this.tripId, this.errorType, this.stopPosition, tripReference);
   }
 
-  /// The index of the GTFS-RT stop time update or SIRI call in the list of updates, which
+  /// The position of the GTFS-RT stop time update or SIRI call in the list of updates, which
   /// does not necessarily correspond to the stop position in pattern.
   @Nullable
-  public Integer stopIndex() {
-    return stopIndex;
+  public Integer stopPosition() {
+    return stopPosition;
   }
 
   public UpdateErrorType errorType() {
@@ -78,10 +78,10 @@ public class UpdateException extends RuntimeException {
   }
 
   public UpdateError toError() {
-    return new UpdateError(tripId, errorType, stopIndex, null, tripReference);
+    return new UpdateError(tripId, errorType, stopPosition, null, tripReference);
   }
 
   public UpdateError toError(String producer) {
-    return new UpdateError(tripId, errorType, stopIndex, producer, tripReference);
+    return new UpdateError(tripId, errorType, stopPosition, producer, tripReference);
   }
 }

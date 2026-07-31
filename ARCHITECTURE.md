@@ -1,49 +1,48 @@
 # OTP Architecture
 
-OTP has been in development for more than 15 years, and most of the design documentation is in the code as
-comments and JavaDoc. Over the years the complexity has increased, and the natural developer
+OTP has been in development for more than 15 years, and most of the design documentation is in the
+code as comments and JavaDoc. Over the years the complexity has increased, and the natural developer
 turnover creates a demand for more architecture and design documentation. The new OTP2 documentation
 is put together with the source; hopefully making it easier to maintain. Instead of documenting
 modules in old style _package-info.java_ files we use _package.md_ files. This document should serve
 as an index to all existing top-level documented components.
 
-This document is far from complete. Hopefully it can evolve over time and become a good
-introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
-detailed discussions on many design decisions.
+This document is far from complete. Hopefully it can evolve over time and become a good introduction
+to OTP architecture. The OTP project GitHub issues are a good place to look for detailed discussions
+on many design decisions.
 
-We document [Decision Records](DEVELOPMENT_DECISION_RECORDS.md) in a log. Make sure you as a developer are familiar 
-with the decisions and follow them. Reviewers should use them actively when reviewing code and may
-use them to ask for changes.
+We document [Decision Records](DEVELOPMENT_DECISION_RECORDS.md) in a log. Make sure you as a
+developer are familiar with the decisions and follow them. Reviewers should use them actively when
+reviewing code and may use them to ask for changes.
 
 Be sure to also read the [developer documentation](doc/user/Developers-Guide.md).
 
 ## Modules/Components
 
-The diagram shows a simplified/generic version on how we want to model the OTP components with 2 
-examples. The Transit model is more complex than the VehiclePosition model.   
+The diagram shows a simplified/generic version on how we want to model the OTP components with 2
+examples. The Transit model is more complex than the VehiclePosition model.
 
 ![MainModelOverview](doc/dev/images/ServiceModelOverview.png)
 
- - `Use Case Service` A service which combines the functionality in many `Domain Services` to fulfill
-   a use-case or set of features. It may have an api with request/response classes. These are 
-   usually stateless; Hence the `Use Case Service` does not normally have a model. The implementing
-   class has the same name as the interface with prefix `Default`.
- - `Domain Model` A model which encapsulate a business area. In the drawing two examples are shown,
-   the `transit` and `vehicleposition` domain model. The transit model is more complex so the 
-   implementation has a separate `Service` and `Repository`. Almost all http endpoints are 
-   read-only so the `Service` can focus on serving the http API endpoints, while the repository
-   is used to maintain the model by the updaters. 
+- `Use Case Service` A service which combines the functionality in many `Domain Services` to fulfill
+  a use-case or set of features. It may have an api with request/response classes. These are usually
+  stateless; Hence the `Use Case Service` does not normally have a model. The implementing class has
+  the same name as the interface with prefix `Default`.
+- `Domain Model` A model which encapsulate a business area. In the drawing two examples are shown,
+  the `transit` and `vehicleposition` domain model. The transit model is more complex so the
+  implementation has a separate `Service` and `Repository`. Almost all http endpoints are read-only
+  so the `Service` can focus on serving the http API endpoints, while the repository is used to
+  maintain the model by the updaters.
 
 > **Note!** The above is the goal, the current package structure needs cleanup.
-
 
 Below is a list of documented components in OTP. Not every component is documented at a high level,
 but this is a start and we would like to expand this list in the future.
 
 ### [OTP Configuration Design](application/src/main/java/org/opentripplanner/standalone/config/package.md)
 
-The Configuration module is responsible for loading and parsing OTP configuration files and mapping them
-into Plain Old Java Objects (POJOs). These POJOs are injected into the other components.
+The Configuration module is responsible for loading and parsing OTP configuration files and mapping
+them into Plain Old Java Objects (POJOs). These POJOs are injected into the other components.
 
 ### [GTFS Import Module](application/src/main/java/org/opentripplanner/gtfs/package.md)
 
@@ -63,40 +62,42 @@ developer - just to understand how the transit routing works.
 
 The Raptor functionality is quite complex, so we want to isolate it from the remaining code.
 Therefore, the raptor component is designed to have as few dependencies as possible. In fact there
-are _no_
-dependencies from Raptor to other parts of OTP code, only to utility classes not found in the JDK.
-Also, the code follows a stricter object-oriented design than most other parts of OTP. The Raptor
-implementation is highly critical code, hence we set the bar higher with respect to code quality.
+are _no_ dependencies from Raptor to other parts of OTP code, only to utility classes not found in
+the JDK. Also, the code follows a stricter object-oriented design than most other parts of OTP. The
+Raptor implementation is highly critical code, hence we set the bar higher with respect to code
+quality.
 
-OTP provides transit data to Raptor by implementing the _raptor/spi_. The 
+OTP provides transit data to Raptor by implementing the _raptor/spi_. The
 [RoutingService](application/src/main/java/org/opentripplanner/routing/service/DefaultRoutingService.java)
 is responsible for mapping from the OTP context to a
-[RaptorRequest](raptor/src/main/java/org/opentripplanner/raptor/api/request/RaptorRequest.java)
-and then mapping the
-result, [Raptor Path](raptor/src/main/java/org/opentripplanner/raptor/api/path/RaptorPath.java), back to
-the OTP internal domain. This might seem like a lot of unnecessary mapping, but mapping is simple -
+[RaptorRequest](raptor/src/main/java/org/opentripplanner/raptor/api/request/RaptorRequest.java) and
+then mapping the result,
+[Raptor Path](raptor/src/main/java/org/opentripplanner/raptor/api/path/RaptorPath.java), back to the
+OTP internal domain. This might seem like a lot of unnecessary mapping, but mapping is simple -
 routing is not.
 
 The performance of Raptor is important, and we care about every millisecond. All changes to the
 existing Raptor code should be tested with the
-[SpeedTest](application/src/test/java/org/opentripplanner/transit/speed_test/package.md) and compared
-with an earlier version of the code to make sure the performance is NOT degraded.
+[SpeedTest](application/src/test/java/org/opentripplanner/transit/speed_test/package.md) and
+compared with an earlier version of the code to make sure the performance is NOT degraded.
 
 #### [Transfer Path Optimization](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
 
 Describes the transfer functionality, the design and the implementation. The logic for finding the
-best transfer is distributed to the Raptor and
-the [OptimizeTransferService](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/OptimizeTransferService.java)
+best transfer is distributed to the Raptor and the
+[OptimizeTransferService](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/OptimizeTransferService.java)
 .
 
 #### [Itinerary List Filter Chain](application/src/main/java/org/opentripplanner/routing/algorithm/filterchain/package.md)
 
 Describes the itinerary list filter chain, used to post-process the itineraries returned from the
-routers in [RoutingWorker](application/src/main/java/org/opentripplanner/routing/algorithm/RoutingWorker.java),
+routers in
+[RoutingWorker](application/src/main/java/org/opentripplanner/routing/algorithm/RoutingWorker.java),
 in order to sort and reduce the number of returned itineraries. It can also be used to decorate the
 returned itineraries, especially if it requires more complex calculations, which would be unfeasible
 to do during the routing process.
 
 ### [Service](application/src/main/java/org/opentripplanner/service/package.md)
-The service package contains small services usually specific to one or a few use-cases. In contrast 
-to a domain model they may use one or many domain models and other services. 
+
+The service package contains small services usually specific to one or a few use-cases. In contrast
+to a domain model they may use one or many domain models and other services.

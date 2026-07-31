@@ -1,8 +1,8 @@
 # SIRI Azure Updater
 
-This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch SIRI ET & SX messages 
-through *Azure Service Bus*.
-It also enables OTP to download historical data from en HTTP endpoint on startup.
+This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch SIRI ET & SX
+messages through _Azure Service Bus_. It also enables OTP to download historical data from en HTTP
+endpoint on startup.
 
 ## Contact Info
 
@@ -26,6 +26,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 <!-- INSERT: siri-azure-sx-updater -->
 
 ## Changelog
+
 - Added configuration for turning off stop arrival time match feature.
 - Initial version (April 2022)
 - Minor changes in logging (November 2022)

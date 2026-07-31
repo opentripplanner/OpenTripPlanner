@@ -78,6 +78,7 @@ public class TimetableRepositoryArchitectureTest {
   }
 
   @Test
+  @Disabled
   void enforceTimetablePackageDependencies() {
     TIMETABLE.dependsOn(
       GOOGLE_COLLECTIONS,

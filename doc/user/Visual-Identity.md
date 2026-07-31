@@ -10,7 +10,7 @@ XML source code:
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
     x="0px" y="0px" width="512px" height="512px" viewBox="0 0 125.333 125.334" xml:space="preserve">
 <path fill="#2179BF" d="M62.668,0C33.83,0,9.559,19.483,2.258,46l72.681-0.003c4.729-0.011,8.555-3.837,8.561-8.568
 	c-0.006-4.729-3.831-8.555-8.561-8.559c-4.731,0.004-8.557,3.83-8.564,8.559v4.592h-13.7v-4.592
@@ -23,7 +23,9 @@ XML source code:
 </svg>
 ```
 
-The version of this logo with a white background is used exclusively in the documentation for a consistent appearance across both dark and light modes. It is also available as a [downloadable file](images/otp-logo-white-bg.svg)
+The version of this logo with a white background is used exclusively in the documentation for a
+consistent appearance across both dark and light modes. It is also available as a
+[downloadable file](images/otp-logo-white-bg.svg)
 
 This concept behind this logo design was "infinite roads". Besides the clear references to movement
 and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T
@@ -35,9 +37,8 @@ The color of the logo in the RGB colorspace is `#2179BF`.
 
 The name of the OpenTripPlanner project is written in CamelCase: capital letters at the beginning of
 each word, with no spaces between the words. For the logotype we do not strictly adhere to a
-standard typeface. The OTP website just uses the CSS
-declarations `font: 30pt helvetica, sans-serif; font-weight: bold;`.
+standard typeface. The OTP website just uses the CSS declarations
+`font: 30pt helvetica, sans-serif; font-weight: bold;`.
 
-The OpenTripPlanner logo was created by Brooklyn-based cartographer and graphic
-designer [Kate Chanba](https://kchanba.com/), who has also done extensive work on transit system
-maps.
+The OpenTripPlanner logo was created by Brooklyn-based cartographer and graphic designer
+[Kate Chanba](https://kchanba.com/), who has also done extensive work on transit system maps.

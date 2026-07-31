@@ -6,8 +6,8 @@ import static org.opentripplanner.updater.trip.gtfs.model.GtfsRealtimeMapper.map
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
-import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -18,6 +18,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.updater.spi.UpdateException;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * A real-time update for trip, which may contain updated stop times and trip properties.
@@ -29,7 +30,7 @@ public final class TripUpdate {
   private final com.google.transit.realtime.GtfsRealtime.TripUpdate tripUpdate;
   private final TripDescriptor tripDescriptor;
   private final Supplier<LocalDate> localDateNow;
-  private LocalDate serviceDate;
+  private LocalDate startDate;
 
   public TripUpdate(
     String feedId,
@@ -74,20 +75,14 @@ public final class TripUpdate {
       );
   }
 
-  public LocalDate serviceDate() {
-    if (serviceDate != null) {
-      return serviceDate;
+  public LocalDate startDate() {
+    if (startDate != null) {
+      return startDate;
     }
-    try {
-      // TODO: figure out the correct service date. For the special case that a trip
-      // starts for example at 40:00, yesterday would probably be a better guess.
-      serviceDate = tripDescriptor.startDate().orElse(localDateNow.get());
-      return serviceDate;
-    } catch (ParseException e) {
-      throw new RuntimeException(
-        "TripDescription does not have a valid startDate: call validate() first."
-      );
-    }
+    // TODO: figure out the correct service date. For the special case that a trip
+    // starts for example at 40:00, yesterday would probably be a better guess.
+    startDate = tripDescriptor.startDate().orElse(localDateNow.get());
+    return startDate;
   }
 
   public ScheduleRelationship scheduleRelationship() {
@@ -112,11 +107,8 @@ public final class TripUpdate {
       throw UpdateException.noTripId(INVALID_INPUT_STRUCTURE);
     }
 
-    try {
-      tripDescriptor.startDate();
-    } catch (ParseException e) {
-      throw UpdateException.of(tripId(), INVALID_INPUT_STRUCTURE);
-    }
+    // exercise the getter, would throw an UpdateException if start date is malformed
+    tripDescriptor.startDate();
 
     var lastStopSequence = -1;
     for (StopTimeUpdate update : stopTimeUpdates()) {
@@ -135,6 +127,17 @@ public final class TripUpdate {
     }
   }
 
+  /// Validates the requirement for the schedule relationship DUPLICATED.
+  public void validateDuplicated() throws DataValidationException {
+    if (tripDescriptor.startDate().isEmpty() || tripDescriptor.startTime().isEmpty()) {
+      throw UpdateException.of(tripId(), INVALID_INPUT_STRUCTURE);
+    }
+  }
+
+  public Optional<LocalTime> startTime() {
+    return tripDescriptor.startTime();
+  }
+
   public Optional<FeedScopedId> routeId() {
     return tripDescriptor.routeId().map(id -> new FeedScopedId(feedId, id));
   }
@@ -147,5 +150,11 @@ public final class TripUpdate {
 
   public Optional<GtfsRealtime.VehicleDescriptor> vehicle() {
     return tripUpdate.hasVehicle() ? Optional.of(tripUpdate.getVehicle()) : Optional.empty();
+  }
+
+  public Optional<String> vehicleId() {
+    return vehicle()
+      .filter(v -> StringUtils.hasValue(v.getId()))
+      .map(GtfsRealtime.VehicleDescriptor::getId);
   }
 }

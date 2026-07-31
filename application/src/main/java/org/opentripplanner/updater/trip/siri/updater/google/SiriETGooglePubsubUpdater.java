@@ -38,11 +38,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       config.topicName()
     );
 
-    estimatedTimetableHandler = new EstimatedTimetableHandler(
-      adapter,
-      config.fuzzyTripMatching(),
-      config.feedId()
-    );
+    estimatedTimetableHandler = new EstimatedTimetableHandler(adapter, config.feedId());
 
     updateResultConsumer = TripUpdateMetrics.streaming(config);
   }

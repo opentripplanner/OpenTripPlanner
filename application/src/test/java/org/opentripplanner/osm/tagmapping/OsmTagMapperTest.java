@@ -19,11 +19,11 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmTestEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class OsmTagMapperTest {
 
@@ -471,6 +471,17 @@ class OsmTagMapperTest {
 
     var indoor = WayTestData.southeastLaBonitaWay().copy().withTag("indoor", "yes").build();
     assertTrue(WPS.getSlopeOverride(indoor));
+  }
+
+  @Test
+  void embeddedRails() {
+    assertEquals(2.0, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
+  }
+
+  @Test
+  void embeddedRailsWithBikeLane() {
+    var way = WayTestData.embeddedRails().copy().withTag("cycleway", "lane").build();
+    assertEquals(0.87, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
   }
 
   /**

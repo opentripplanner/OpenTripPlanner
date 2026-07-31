@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
@@ -25,6 +26,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -161,7 +163,8 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     );
 
     assertFailure(UpdateErrorType.TOO_FEW_STOPS, result::build);
@@ -198,7 +201,8 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
@@ -237,7 +241,8 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
@@ -282,11 +287,12 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     );
 
     var updateError = assertFailure(UpdateErrorType.NEGATIVE_DWELL_TIME, tripUpdate::build);
-    assertEquals(1, updateError.stopIndex());
+    assertEquals(1, updateError.stopPosition());
   }
 
   /**
@@ -324,7 +330,8 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     ).build();
 
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
@@ -369,7 +376,8 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE",
-      false
+      false,
+      null
     ).build();
 
     StopPattern stopPattern = tripUpdate.stopPattern();
@@ -511,6 +519,85 @@ class ModifiedTripBuilderTest {
 
     assertEquals(PickDrop.SCHEDULED, newPattern.getAlightType(2));
     assertEquals(PickDrop.SCHEDULED, newPattern.getBoardType(2));
+  }
+
+  @Test
+  void vehicleRefIsSetOnTripTimes() {
+    var tripUpdate = new ModifiedTripBuilder(
+      TRIP_TIMES,
+      PATTERN,
+      SERVICE_DATE,
+      timetableRepository.getTimeZone(),
+      entityResolver,
+      List.of(
+        TestCall.of()
+          .withStopPointRef(STOP_A_1.getId().getId())
+          .withAimedDepartureTime(zonedDateTime(10, 0))
+          .withExpectedDepartureTime(zonedDateTime(10, 1))
+          .build(),
+        TestCall.of()
+          .withStopPointRef(STOP_B_1.getId().getId())
+          .withAimedArrivalTime(zonedDateTime(10, 10))
+          .withExpectedArrivalTime(zonedDateTime(10, 11))
+          .withAimedDepartureTime(zonedDateTime(10, 12))
+          .withExpectedDepartureTime(zonedDateTime(10, 13))
+          .build(),
+        TestCall.of()
+          .withStopPointRef(STOP_C_1.getId().getId())
+          .withAimedArrivalTime(zonedDateTime(10, 20))
+          .withExpectedArrivalTime(zonedDateTime(10, 22))
+          .build()
+      ),
+      false,
+      null,
+      false,
+      "DATASOURCE",
+      false,
+      "BUS-42"
+    ).build();
+
+    var realTimeTimes = assertInstanceOf(RealTimeTripTimes.class, tripUpdate.tripTimes());
+    assertTrue(realTimeTimes.getVehicleId().isPresent());
+    assertEquals("BUS-42", realTimeTimes.getVehicleId().get());
+  }
+
+  @Test
+  void vehicleRefIsNullWhenAbsent() {
+    var tripUpdate = new ModifiedTripBuilder(
+      TRIP_TIMES,
+      PATTERN,
+      SERVICE_DATE,
+      timetableRepository.getTimeZone(),
+      entityResolver,
+      List.of(
+        TestCall.of()
+          .withStopPointRef(STOP_A_1.getId().getId())
+          .withAimedDepartureTime(zonedDateTime(10, 0))
+          .withExpectedDepartureTime(zonedDateTime(10, 1))
+          .build(),
+        TestCall.of()
+          .withStopPointRef(STOP_B_1.getId().getId())
+          .withAimedArrivalTime(zonedDateTime(10, 10))
+          .withExpectedArrivalTime(zonedDateTime(10, 11))
+          .withAimedDepartureTime(zonedDateTime(10, 12))
+          .withExpectedDepartureTime(zonedDateTime(10, 13))
+          .build(),
+        TestCall.of()
+          .withStopPointRef(STOP_C_1.getId().getId())
+          .withAimedArrivalTime(zonedDateTime(10, 20))
+          .withExpectedArrivalTime(zonedDateTime(10, 22))
+          .build()
+      ),
+      false,
+      null,
+      false,
+      "DATASOURCE",
+      false,
+      null
+    ).build();
+
+    var realTimeTimes = assertInstanceOf(RealTimeTripTimes.class, tripUpdate.tripTimes());
+    assertTrue(realTimeTimes.getVehicleId().isEmpty());
   }
 
   private static ZonedDateTime zonedDateTime(int hour, int minute) {

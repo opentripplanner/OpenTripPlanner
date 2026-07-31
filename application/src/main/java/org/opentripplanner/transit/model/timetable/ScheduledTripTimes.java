@@ -101,7 +101,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     return new ScheduledTripTimesBuilder(deduplicator);
   }
 
-  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
+  public ScheduledTripTimesBuilder copyOf(DeduplicatorService deduplicator) {
     return new ScheduledTripTimesBuilder(
       timeShift,
       serviceCode,

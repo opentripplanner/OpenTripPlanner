@@ -25,7 +25,7 @@ To enable this you need to add the feature `ActuatorAPI`.
 ```json
 // otp-config.json
 {
-  "otpFeatures" : {
+  "otpFeatures": {
     "ActuatorAPI": true
   }
 }
@@ -49,8 +49,9 @@ if the GraphQL endpoints are enabled.
 
 To enable tracing tags, configure them for the
 [Transmodel API](../RouterConfiguration.md#transmodelApi_tracingHeaderTags) or
-[GTFS API](../RouterConfiguration.md#gtfsApi_tracingTags).
-If configured correctly, the tracing tags appear in the Prometheus metrics, for example:
+[GTFS API](../RouterConfiguration.md#gtfsApi_tracingTags). If configured correctly, the tracing tags
+appear in the Prometheus metrics, for example:
+
 ```
 ...
 graphql_timer_resolver_seconds_count{example-header-or-query-parameter-name="value",operationName="__UNKNOWN__",parent="QueryType"} 9

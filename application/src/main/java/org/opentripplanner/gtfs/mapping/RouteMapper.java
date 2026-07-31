@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -103,5 +105,12 @@ class RouteMapper {
     } else {
       return List.of(idFactory.createId(rhs.getNetworkId(), "route's network"));
     }
+  }
+
+  Map<FeedScopedId, Route> mappedRoutes() {
+    return mappedRoutes
+      .values()
+      .stream()
+      .collect(Collectors.toMap(Route::getId, Function.identity()));
   }
 }

@@ -21,7 +21,7 @@ import org.opentripplanner.apis.APIEndpoints;
 import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsFilter;
 import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsParameters;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
@@ -34,8 +34,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public class OTPWebApplication extends Application {
 
-  /* This object groups together all the modules for a single running OTP server. */
-  private final Supplier<OtpServerRequestContext> contextProvider;
+  /* Builds one Dagger RequestScopedFactory per actual HTTP request, see issue #7441. */
+  private final Supplier<RequestScopedFactory> requestScopedFactoryProvider;
 
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
   private final HttpResponseTimeMetricsParameters httpResponseTimeMetricsParameters;
@@ -50,9 +50,9 @@ public class OTPWebApplication extends Application {
 
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
-    Supplier<OtpServerRequestContext> contextProvider
+    Supplier<RequestScopedFactory> requestScopedComponentProvider
   ) {
-    this.contextProvider = contextProvider;
+    this.requestScopedFactoryProvider = requestScopedComponentProvider;
     this.customFilters = createCustomFilters(parameters.traceParameters());
     this.httpResponseTimeMetricsParameters = parameters.httpResponseTimeMetricsParameters();
   }
@@ -103,8 +103,8 @@ public class OTPWebApplication extends Application {
         new OTPExceptionMapper(),
         // Enable Jackson JSON response serialization
         new JacksonJsonProvider(),
-        // Allow injecting the OTP server object into Jersey resource classes
-        makeBinder(contextProvider),
+        // Inject the OTP request-scoped services (e.g. TransitService) per HTTP request
+        new DaggerToJerseyBridge(requestScopedFactoryProvider),
         // Add performance instrumentation of Jersey requests to micrometer
         getMetricsApplicationEventListener()
       )
@@ -140,25 +140,6 @@ public class OTPWebApplication extends Application {
     return Map.of(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
   }
 
-  /**
-   * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
-   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
-   * a singleton. Jersey forces us to use injection to get application context into HTTP method
-   * handlers, but in OTP we always just inject this OTP server context and grab anything else we
-   * need (graph and other application components) from this single object.
-   * <p>
-   * More on custom injection in Jersey 2:
-   * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
-   */
-  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
-    return new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bindFactory(contextProvider).to(OtpServerRequestContext.class);
-      }
-    };
-  }
-
   private MetricsApplicationEventListener getMetricsApplicationEventListener() {
     return new MetricsApplicationEventListener(
       Metrics.globalRegistry,
@@ -171,7 +152,7 @@ public class OTPWebApplication extends Application {
   /**
    * Instantiate and add the prometheus micrometer registry to the global composite registry.
    *
-   * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
+   * @return An AbstractBinder, which can be used to inject the registry into the Actuator API calls
    */
   private Binder getBoundPrometheusRegistry() {
     PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(

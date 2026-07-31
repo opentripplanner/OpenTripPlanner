@@ -61,11 +61,11 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Timetable;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
 import org.opentripplanner.utils.collection.SetUtils;
@@ -92,7 +92,7 @@ public class DefaultTransitService implements TransitEditorService {
    * instance does not contain any real-time information.
    */
   @Nullable
-  private final TimetableSnapshot timetableSnapshot;
+  private final ReadOnlyTimetableSnapshot timetableSnapshot;
 
   /**
    * Helper for fetching stop times for APIs.
@@ -103,15 +103,17 @@ public class DefaultTransitService implements TransitEditorService {
 
   /**
    * Create a service without a real-time snapshot (and therefore without any real-time data).
+   * This is the constructor used by Dagger injection. Use the {@link TransitService} via the
+   * {@link org.opentripplanner.standalone.api.OtpServerRequestContext} if real-time data is needed.
    */
+  @Inject
   public DefaultTransitService(TimetableRepository timetableRepository) {
     this(timetableRepository, null);
   }
 
-  @Inject
   public DefaultTransitService(
     TimetableRepository timetableRepository,
-    @Nullable TimetableSnapshot timetableSnapshot
+    @Nullable ReadOnlyTimetableSnapshot timetableSnapshot
   ) {
     this.timetableRepository = timetableRepository;
     this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
@@ -658,7 +660,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public RaptorTransitData getRealtimeRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepository.getRealtimeRaptorTransitData();
+    return timetableSnapshot != null ? timetableSnapshot.getRealtimeRaptorTransitData() : null;
   }
 
   @Override

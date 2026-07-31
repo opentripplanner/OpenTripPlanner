@@ -3,6 +3,9 @@ package org.opentripplanner.ext.carpooling.updater;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.cancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 
@@ -12,8 +15,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
@@ -43,8 +47,12 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   @BeforeEach
   void setUp() {
     repository = new DefaultCarpoolingRepository();
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository);
+    var resolver = mock(CarpoolTripVertexResolver.class);
+    when(resolver.resolve(any())).thenAnswer(invocation ->
+      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    );
+    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
+    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
   }
 
   @Test
@@ -65,7 +73,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     Set<FeedScopedId> ids = repository
       .getCarpoolTrips()
       .stream()
-      .map(CarpoolTrip::getId)
+      .map(t -> t.trip().getId())
       .collect(Collectors.toSet());
 
     assertEquals(Set.of(idA, idB), ids);
@@ -97,14 +105,15 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     var feedPrefixes = repository
       .getCarpoolTrips()
       .stream()
-      .map(t -> t.getId().getFeedId())
+      .map(t -> t.trip().getId().getFeedId())
       .collect(Collectors.toSet());
 
     assertEquals(Set.of(FEED_A, FEED_B), feedPrefixes);
 
     // Every stop on every trip must inherit the trip's feed prefix — guards against
     // a half-finished refactor where the trip id is parameterised but stop ids are not.
-    for (var trip : repository.getCarpoolTrips()) {
+    for (var tripWithVertices : repository.getCarpoolTrips()) {
+      var trip = tripWithVertices.trip();
       var expectedFeed = trip.getId().getFeedId();
       for (var stop : trip.stops()) {
         assertEquals(
@@ -140,6 +149,6 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     return repository
       .getCarpoolTrips()
       .stream()
-      .anyMatch(t -> t.getId().equals(id));
+      .anyMatch(t -> t.trip().getId().equals(id));
   }
 }

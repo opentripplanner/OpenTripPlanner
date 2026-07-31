@@ -18,6 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          # explicitly check out the base branch: this workflow must never run fork PR code
+          ref: ${{ github.event.pull_request.base.ref }}
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
       - name: Configure git user
@@ -65,6 +67,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          # explicitly check out the base branch: this workflow must never run fork PR code
+          ref: ${{ github.event.pull_request.base.ref }}
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
       - name: Bump serialization version

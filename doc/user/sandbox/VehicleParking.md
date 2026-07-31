@@ -3,8 +3,8 @@
 ## Contact Info
 
 - For Liipi updater: Digitransit team, HSL, Helsinki, Finland
-- For Bikely, Bikeep and SIRI-FM updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
-
+- For Bikely, Bikeep and SIRI-FM updater: Leonard Ehrenfried,
+  [mail@leonard.io](mailto:mail@leonard.io)
 
 ## Documentation
 
@@ -20,8 +20,8 @@ Currently contains the following updaters:
 
 ### Configuration
 
-These sandboxed vehicle parking updaters can be enabled by editing the `updaters` section in
-the `router-config.json` according to the following examples.
+These sandboxed vehicle parking updaters can be enabled by editing the `updaters` section in the
+`router-config.json` according to the following examples.
 
 All updaters have the following parameters in common:
 
@@ -99,7 +99,7 @@ Used for converting abstract opening hours into concrete points in time.
 
 <!-- liipi END -->
 
-## ParkAPI 
+## ParkAPI
 
 <!-- park-api BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -314,11 +314,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 ## SIRI-FM
 
-The SIRI-FM updater works slightly differently from the others in that it only updates the availability
-of parking but does not create new lots in real-time.
+The SIRI-FM updater works slightly differently from the others in that it only updates the
+availability of parking but does not create new lots in real-time.
 
-The data source must conform to the [Italian SIRI-FM](https://github.com/5Tsrl/siri-italian-profile) profile
-which requires SIRI 2.1.
+The data source must conform to the [Italian SIRI-FM](https://github.com/5Tsrl/siri-italian-profile)
+profile which requires SIRI 2.1.
 
 <!-- siri-fm BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -395,7 +395,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 ## Changelog
 
-- Create initial sandbox implementation (January 2022, [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))
-- Add timeZone parameter to Liipi updater (September 2022, [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
-- Added support for Liipi parking hubs (October 2022, [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))
-- Add Bikely updater (November 2022, [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589))
+- Create initial sandbox implementation (January 2022,
+  [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))
+- Add timeZone parameter to Liipi updater (September 2022,
+  [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
+- Added support for Liipi parking hubs (October 2022,
+  [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))
+- Add Bikely updater (November 2022,
+  [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589))

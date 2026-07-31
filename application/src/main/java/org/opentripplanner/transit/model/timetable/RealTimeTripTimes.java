@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -43,6 +44,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   private final RealTimeTripState state;
 
+  @Nullable
+  private final String vehicleId;
+
   RealTimeTripTimes(RealTimeTripTimesBuilder builder) {
     scheduledTripTimes = builder.scheduledTripTimes();
     arrivalTimes = builder.arrivalTimes();
@@ -56,6 +60,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     hasArrived = builder.hasArrived();
     hasDeparted = builder.hasDeparted();
     state = builder.state();
+    vehicleId = builder.vehicleId();
     validateNonIncreasingTimes();
   }
 
@@ -75,6 +80,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.hasArrived = original.hasArrived;
     this.hasDeparted = original.hasDeparted;
     this.state = original.state;
+    this.vehicleId = original.vehicleId;
   }
 
   /**
@@ -96,6 +102,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.hasArrived = original.hasArrived;
     this.hasDeparted = original.hasDeparted;
     this.state = original.state;
+    this.vehicleId = original.vehicleId;
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -137,6 +144,14 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   @Override
   public I18NString getTripHeadsign() {
     return tripHeadsign;
+  }
+
+  /**
+   * @return the id of the vehicle operating this trip, as supplied by real-time updates. Empty if no
+   * vehicle has been assigned or reported yet.
+   */
+  public Optional<String> getVehicleId() {
+    return Optional.ofNullable(vehicleId);
   }
 
   /**

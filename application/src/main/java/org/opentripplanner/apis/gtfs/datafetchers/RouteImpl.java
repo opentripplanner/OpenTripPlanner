@@ -19,6 +19,7 @@ import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -183,6 +184,11 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   @Override
   public DataFetcher<GraphQLTransitMode> mode() {
     return environment -> TransitModeMapper.map(getSource(environment).getMode());
+  }
+
+  @Override
+  public DataFetcher<Iterable<Notice>> notices() {
+    return env -> getTransitService(env).findNotices(getSource(env));
   }
 
   @Override

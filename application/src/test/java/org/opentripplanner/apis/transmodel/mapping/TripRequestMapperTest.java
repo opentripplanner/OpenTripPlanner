@@ -133,7 +133,6 @@ public class TripRequestMapperTest implements PlanTestConstants {
       TIMETABLE_REPOSITORY,
       TRANSFER_REPOSITORY,
       new DefaultFareService(),
-      null,
       defaultRequest,
       null
     );

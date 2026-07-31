@@ -4,7 +4,6 @@ The OTP configuration model is responsible for loading the config from the file 
 modules should not depend on the configuration, but instead define interfaces for the needed config.
 The config model can then implement these interfaces and Dagger can inject them.
 
-
 ## Design Goals
 
 The design goals are:
@@ -22,18 +21,16 @@ The design goals are:
   type-safety and provides a consistent way to document needed configuration for each module.
 - For Sandbox modules the configuration loading should be put in the
   `org.opentripplanner.standalone.config.sandbox` package. This keeps all the configuration loading
-  in one place, avoiding fragmentation and makes it easier to get an overview. The interface with 
+  in one place, avoiding fragmentation and makes it easier to get an overview. The interface with
   the Sandbox parameters should be declared in the Sandbox module.
-
 
 ## Implementation
 
 The configuration loader uses jackson and parses the config into a JSON node tree. Java objects are
-mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The `NodeAdapter` decorates the 
-`JsonNode` to provide type-safe getters for rich basic types like `Enum`, `List`(type-safe), 
-`Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with validation and providing a 
+mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The `NodeAdapter` decorates the
+`JsonNode` to provide type-safe getters for rich basic types like `Enum`, `List`(type-safe),
+`Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with validation and providing a
 list of unused parameters.
-
 
 ### Config Injection
 
@@ -44,46 +41,46 @@ JavaDoc. It can be done using an interface or a simple plain-old-java-object(POJ
 /** <Summary doc goes here> */
 interface <ModuleNnnnParameters> {
 
-   /** 
-    * <Parameter doc goes here>  
+   /**
+    * <Parameter doc goes here>
     *
     * This is an optional parameter, if not set the default is to ....
     */
    @Nullable
-   LocalDateTime  firstDayOfService() = null; 
+   LocalDateTime  firstDayOfService() = null;
 }
 
-or 
+or
 
 /** <Summary doc goes here> */
 public class <ModuleNnnnParameters> {
     <fields>
 
-   /** 
-    * <Parameter doc goes here>  
+   /**
+    * <Parameter doc goes here>
     *
     * This is an optional parameter, if not set the default is to ....
     */
    @Nullable
-   LocalDateTime  firstDayOfService() { ... } 
+   LocalDateTime  firstDayOfService() { ... }
 }
 ```
 
 In the `org.opentripplanner.standalone.config` package there will be a class called
 `ModuleNnnnConfig` that either extends the interface above or instantiates the POJO. The config
-class should map from JSON using the `NodeAdapter` into itself(extending the interface)
-or into the POJO.
+class should map from JSON using the `NodeAdapter` into itself(extending the interface) or into the
+POJO.
 
 The 2 approaches are almost identical, but the interface is a bit more "pure" with respect to the
 responsibilities, while the POJO approach saves a few lines of code.
 
 ## Default values - in code, config and APIs
 
-We prefer optional parameters using default values over required parameters in APIs and in the 
-configuration. Most API request parameters have default values defined in config. So, lets 
+We prefer optional parameters using default values over required parameters in APIs and in the
+configuration. Most API request parameters have default values defined in config. So, lets
 illustrate the prefered way of doing this.
 
-We define a parameter for a feature inside the domain module. This is also where we define the 
+We define a parameter for a feature inside the domain module. This is also where we define the
 static "global" default value. This makes the default value available, not only to the domain,
 configuration and APIs - but in tests as well.
 
@@ -93,7 +90,7 @@ package o.o.mydomain.mysubdomain;
 class MyComponentParameters(foo : String = "BAR")
 ```
 
-Then, in the configuration we used the default for documentation and to set the configuration 
+Then, in the configuration we used the default for documentation and to set the configuration
 "default".
 
 ```Java
@@ -108,8 +105,8 @@ class MyComponentConfig {
     :
 ```
 
-Last, we use the configured value in the API - both for documentation and as the default value 
-for the api input parameter:
+Last, we use the configured value in the API - both for documentation and as the default value for
+the api input parameter:
 
 ```Java
 var dft = [injected configuration object];
@@ -118,11 +115,10 @@ GraphQLArgument.newArgument().name("foo").defaultValue(dft.foo())
 ```
 
 This show how the API gets the default value from the configured value, and how we fall back to a
-static value set in code, if no configuration is available. There are some cases with are more 
-complicated than this, but this is the general pattern for doing it. This also makes the default 
-value available in the configuration and API documentation. An important note is that in the 
-API we show the configured value as the default.
-
+static value set in code, if no configuration is available. There are some cases with are more
+complicated than this, but this is the general pattern for doing it. This also makes the default
+value available in the configuration and API documentation. An important note is that in the API we
+show the configured value as the default.
 
 ## Examples
 

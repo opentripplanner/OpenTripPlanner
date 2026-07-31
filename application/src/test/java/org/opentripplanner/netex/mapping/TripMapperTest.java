@@ -2,16 +2,20 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 import jakarta.xml.bind.JAXBElement;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -29,7 +33,7 @@ import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
-public class TripMapperTest {
+class TripMapperTest {
 
   private static final String ROUTE_ID = "RUT:Route:1";
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
@@ -43,7 +47,7 @@ public class TripMapperTest {
   );
 
   @Test
-  public void mapTripWithWheelchairAccess() {
+  void mapTripWithWheelchairAccess() {
     var serviceJourney = createExampleServiceJourney();
     var wheelchairLimitation = LimitationStatusEnumeration.TRUE;
     var limitation = new AccessibilityLimitation();
@@ -78,7 +82,7 @@ public class TripMapperTest {
   }
 
   @Test
-  public void mapTrip() {
+  void mapTrip() {
     TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       ISSUE_STORE
@@ -105,7 +109,7 @@ public class TripMapperTest {
   }
 
   @Test
-  public void mapTripWithRouteRefViaJourneyPattern() {
+  void mapTripWithRouteRefViaJourneyPattern() {
     TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       ISSUE_STORE
@@ -143,6 +147,35 @@ public class TripMapperTest {
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId("RUT:ServiceJourney:1"));
+  }
+
+  @Test
+  void mapTripWithInvalidLineRefAddsIssue() {
+    var issueStore = new DefaultDataImportIssueStore();
+    var transitBuilder = new TransitDataImportBuilder(new SiteRepository(), issueStore);
+
+    TripMapper tripMapper = new TripMapper(
+      ID_FACTORY,
+      issueStore,
+      transitBuilder.getOperatorsById(),
+      transitBuilder.getRoutes(),
+      new HierarchicalMapById<>(),
+      new HierarchicalMap<>(),
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
+    );
+
+    ServiceJourney serviceJourney = createExampleServiceJourney();
+    serviceJourney.setLineRef(
+      MappingSupport.createWrappedRef("RUT:Line:NONEXISTENT", LineRefStructure.class)
+    );
+
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
+
+    assertNull(trip, "trip must be null when lineRef is invalid");
+
+    List<DataImportIssue> issues = issueStore.listIssues();
+    assertEquals(1, issues.size());
+    assertEquals("InvalidLineRef", issues.getFirst().getType());
   }
 
   private ServiceJourney createExampleServiceJourney() {

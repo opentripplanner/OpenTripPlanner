@@ -34,14 +34,14 @@ class UpdateErrorTest {
   }
 
   @Test
-  void stopIndexIsAppendedToResolvedTripId() {
+  void stopPositionIsAppendedToResolvedTripId() {
     var error = new UpdateError(TRIP_ID, UpdateErrorType.INVALID_ARRIVAL_TIME, 3, null, null);
-    assertEquals("F:Trip1{stopIndex=3}", error.debugId());
+    assertEquals("F:Trip1{stopPosition=3}", error.debugId());
   }
 
   @Test
-  void stopIndexIsAppendedToTripReference() {
+  void stopPositionIsAppendedToTripReference() {
     var error = new UpdateError(null, UpdateErrorType.INVALID_ARRIVAL_TIME, 3, null, "SJ:1");
-    assertEquals("SJ:1{stopIndex=3}", error.debugId());
+    assertEquals("SJ:1{stopPosition=3}", error.debugId());
   }
 }

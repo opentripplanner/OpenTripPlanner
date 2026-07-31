@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.patterncache;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -41,35 +41,33 @@ public class TripPatternCache {
 
   private final TripPatternIdGenerator tripPatternIdGenerator;
 
-  private final Function<Trip, TripPattern> getPatternForTrip;
-
-  /**
-   * @param getPatternForTrip TripPatternCache needs only this one feature of TransitService, so we retain
-   *                          only this function reference to effectively narrow the interface. This should also facilitate
-   *                          testing.
-   */
-  public TripPatternCache(
-    TripPatternIdGenerator tripPatternIdGenerator,
-    Function<Trip, TripPattern> getPatternForTrip
-  ) {
+  public TripPatternCache(TripPatternIdGenerator tripPatternIdGenerator) {
     this.tripPatternIdGenerator = tripPatternIdGenerator;
-    this.getPatternForTrip = getPatternForTrip;
   }
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet.
+   * <p>
+   * If {@code originalTripPattern} is non-null and its stop pattern matches {@code stopPattern},
+   * the original pattern is returned as-is — no new RT pattern is created. Otherwise the cache is
+   * checked by stop pattern; if no entry exists, a new realtime-modified pattern is created,
+   * stored, and returned.
+   * <p>
+   * The caller is responsible for resolving {@code originalTripPattern} before calling this method.
    *
-   * @param stopPattern stop pattern to retrieve/create trip pattern
-   * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
-   *                    created
-   * @return cached or newly created trip pattern
+   * @param stopPattern         stop pattern to retrieve/create a trip pattern for
+   * @param trip                trip whose route, mode, and submode are copied when a new pattern is
+   *                            created; also used to generate the new pattern's id
+   * @param originalTripPattern the current pattern for {@code trip} — either the static scheduled
+   *                            pattern, or a previously RT-modified pattern if the trip was already
+   *                            updated. {@code null} for genuinely new added trips.
+   * @return the original, cached, or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
     final StopPattern stopPattern,
-    final Trip trip
+    final Trip trip,
+    @Nullable final TripPattern originalTripPattern
   ) {
-    TripPattern originalTripPattern = getPatternForTrip.apply(trip);
-
     if (originalTripPattern != null && originalTripPattern.getStopPattern().equals(stopPattern)) {
       return originalTripPattern;
     }

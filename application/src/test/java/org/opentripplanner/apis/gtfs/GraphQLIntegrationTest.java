@@ -74,10 +74,12 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
@@ -301,7 +303,10 @@ class GraphQLIntegrationTest {
     timetableRepository.updateCalendarServiceData(calendarServiceData);
     timetableRepository.index();
 
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(new DefaultTripCalendars());
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
     timetableSnapshot.update(
       RealTimeTripUpdate.of(
         pattern,
@@ -518,7 +523,11 @@ class GraphQLIntegrationTest {
     var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
-    var realtimeVehicleService = new DefaultRealtimeVehicleService(transitService);
+    var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
+    var realtimeVehicleService = new DefaultRealtimeVehicleService(
+      realtimeVehicleRepository,
+      transitService
+    );
     var occypancyVehicle = RealtimeVehicle.builder()
       .withTrip(trip)
       .withTime(SERVICE_DATE.atStartOfDay(BERLIN).plusHours(16).toInstant())
@@ -536,7 +545,7 @@ class GraphQLIntegrationTest {
       .withStop(pattern.getStop(0))
       .withStopStatus(IN_TRANSIT_TO)
       .build();
-    realtimeVehicleService.setRealtimeVehiclesForFeed(
+    realtimeVehicleRepository.setRealtimeVehiclesForFeed(
       pattern.getId().getFeedId(),
       new ImmutableListMultimap.Builder()
         .putAll(pattern, List.of(occypancyVehicle, positionVehicle))

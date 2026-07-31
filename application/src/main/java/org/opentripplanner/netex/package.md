@@ -5,9 +5,10 @@ model. The XML parser support the entire NeTEx specification and is not limited 
 profile, but not every part of it is mapped into OTP. Only a small subset of the entities are
 supported. When loading NeTEx data OTP should print warnings for all NeTEx data types not loaded.
 
-OTP is tested with data from Entur which uses
-the [Nordic NeTEx profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic+NeTEx+Profile) 
-and Data from HVV which uses the [EPIP NeTEx Profile](http://www.normes-donnees-tc.org/wp-content/uploads/2019/11/WI00278457-TS16614-4-FV-e-Latest-Draft-sent-to-CEN.pdf). 
+OTP is tested with data from Entur which uses the
+[Nordic NeTEx profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic+NeTEx+Profile)
+and Data from HVV which uses the
+[EPIP NeTEx Profile](http://www.normes-donnees-tc.org/wp-content/uploads/2019/11/WI00278457-TS16614-4-FV-e-Latest-Draft-sent-to-CEN.pdf).
 If you find that some part of your import is not imported/supported by OTP you will need to add
 support for it in this model. NeTEx is huge, and ONLY data relevant for travel planning should be
 imported.
@@ -30,9 +31,9 @@ data, allowing the rest to be imported.
 
 ## Design
 
-The 2 main classes are the [`NetexModule`](NetexModule.java) and
-the [`NetexBundle`](NetexBundle.java). The `NetexModule` is a `GraphBuilderModule` and responsible
-for building all bundles, while a bundle is responsible for importing a Netex bundle, normally a
+The 2 main classes are the [`NetexModule`](NetexModule.java) and the
+[`NetexBundle`](NetexBundle.java). The `NetexModule` is a `GraphBuilderModule` and responsible for
+building all bundles, while a bundle is responsible for importing a Netex bundle, normally a
 zip-file with a Netex data set. You may start OTP with as many bundles as you like, and you may mix
 GTFS and NeTEx bundles in the same build.
 
@@ -48,7 +49,7 @@ As seen above the _netex-file-bundle_ is organized in a hierarchy. This is done 
 large data set, and to avoid keeping XML DOM entities in memory. Also, the hierarchy prevent
 references from different files at the same level to reference each other. The hierarchy allow OTP
 to go through the steps of parsing xml data into Netex POJOs, validating the relationships and
-mapping these POJOs into OTPs internal data model for *each set/group of files*.
+mapping these POJOs into OTPs internal data model for _each set/group of files_.
 
 The general rule is that entities referencing other entities, should be in the same file or placed
 at a lover level in the hierarchy, so the referenced object already exist when mapping an entity.
@@ -75,10 +76,10 @@ expressions in the _build-config.json_.
 
 For each level in the hierarchy and each group of files OTP perform the same steps:
 
-1. Load XML entities (NeTEx XML DOM POJOs).
-   See [`NetexDataSourceHierarchy`](loader/NetexDataSourceHierarchy.java)
-1. Parse xml file and insert XML POJOs into the index.
-   See [`NetexXmlParser`](loader/NetexXmlParser.java)
+1. Load XML entities (NeTEx XML DOM POJOs). See
+   [`NetexDataSourceHierarchy`](loader/NetexDataSourceHierarchy.java)
+1. Parse xml file and insert XML POJOs into the index. See
+   [`NetexXmlParser`](loader/NetexXmlParser.java)
 1. Validate relationships. See [`Validator`](validation/Validator.java)
 1. Map XML entities to OPT internal model. See [`NetexMapper`](mapping/NetexMapper.java)
 
@@ -97,15 +98,15 @@ level:
 1. Validate loaded entities
 1. Map _shared-data-entries_
 1. For each group:
-    1. Load _group-shared-files_ into index
-    1. Validate loaded entities
-    1. Map _group-shared-entries_
-    1. For each leaf group-file file:
-        1. Load _group-file_ into index
-        1. Validate loaded entities
-        1. Map _group-entries_
-        1. Clear leaf data from index
-    1. Remove group data from index
+   1. Load _group-shared-files_ into index
+   1. Validate loaded entities
+   1. Map _group-shared-entries_
+   1. For each leaf group-file file:
+      1. Load _group-file_ into index
+      1. Validate loaded entities
+      1. Map _group-entries_
+      1. Clear leaf data from index
+   1. Remove group data from index
 
 The [`NetexBundele`](NetexBundle.java) repeat the exact same steps for each group/set of files. To
 emulate navigation in the hierarchy both the [`NetexEntityDataIndex`](index/NetexEntityIndex.java)
@@ -118,4 +119,3 @@ scoped entities, but it is only possible to add entities at the local scope.
 ## Package dependencies
 
 ![Package dependencies](images/PackageDependencies.png)
-

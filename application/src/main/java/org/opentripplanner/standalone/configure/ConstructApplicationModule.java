@@ -2,125 +2,12 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import graphql.schema.GraphQLSchema;
-import io.micrometer.core.instrument.Metrics;
 import jakarta.inject.Singleton;
-import java.util.List;
-import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
-import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
-import org.opentripplanner.ext.carpooling.CarpoolingService;
-import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
-import org.opentripplanner.ext.geocoder.LuceneIndex;
-import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
-import org.opentripplanner.service.streetdetails.StreetDetailsService;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.DebugUiConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
-import org.opentripplanner.transit.service.TransitService;
 
-@Module
+@Module(subcomponents = RequestScopedFactory.class)
 public class ConstructApplicationModule {
-
-  @Provides
-  OtpServerRequestContext providesServerContext(
-    RouterConfig routerConfig,
-    DebugUiConfig debugUiConfig,
-    RaptorConfig<TripSchedule> raptorConfig,
-    Graph graph,
-    LinkingContextFactory linkingContextFactory,
-    VertexLinker vertexLinker,
-    TransitService transitService,
-    RegularTransferService transferService,
-    WorldEnvelopeService worldEnvelopeService,
-    RealtimeVehicleService realtimeVehicleService,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    List<RideHailingService> rideHailingServices,
-    ViaCoordinateTransferFactory viaTransferResolver,
-    @Nullable CarpoolingService carpoolingService,
-    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
-    @Nullable StopConsolidationService stopConsolidationService,
-    StreetLimitationParametersService streetLimitationParametersService,
-    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    StreetDetailsService streetDetailsService,
-    @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
-    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
-    @Nullable EmpiricalDelayService empiricalDelayService,
-    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    LauncherRequestDecorator launcherRequestDecorator,
-    @Nullable LuceneIndex luceneIndex,
-    FareService fareService
-  ) {
-    var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
-
-    var transitRoutingConfig = routerConfig.transitTuningConfig();
-    var triasApiParameters = routerConfig.triasApiParameters();
-    var ojpApiParameters = routerConfig.ojpApiParameters();
-    var gtfsApiConfig = routerConfig.gtfsApiParameters();
-    var vectorTileConfig = routerConfig.vectorTileConfig();
-    var flexParameters = routerConfig.flexParameters();
-    var transmodelAPIParameters = routerConfig.transmodelApi();
-
-    return new DefaultServerRequestContext(
-      debugUiConfig,
-      fareService,
-      flexParameters,
-      graph,
-      linkingContextFactory,
-      Metrics.globalRegistry,
-      ojpApiParameters,
-      raptorConfig,
-      realtimeVehicleService,
-      rideHailingServices,
-      defaultRequest,
-      streetLimitationParametersService,
-      transferService,
-      transitRoutingConfig,
-      transitService,
-      triasApiParameters,
-      gtfsApiConfig,
-      vectorTileConfig,
-      vehicleParkingService,
-      vehicleRentalService,
-      vertexLinker,
-      viaTransferResolver,
-      worldEnvelopeService,
-      // Optional Sandbox services
-      carpoolingService,
-      dataOverlayParameterBindings,
-      emissionItineraryDecorator,
-      streetDetailsService,
-      empiricalDelayService,
-      luceneIndex,
-      gtfsSchema,
-      transmodelSchema,
-      sorlandsbanenService,
-      stopConsolidationService,
-      transmodelAPIParameters
-    );
-  }
 
   @Singleton
   @Provides

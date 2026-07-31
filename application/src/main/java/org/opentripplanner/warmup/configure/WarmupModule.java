@@ -4,8 +4,8 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.api.WarmupParameters;
@@ -31,9 +31,13 @@ public class WarmupModule {
   @Singleton
   static WarmupLauncher provideWarmupLauncher(
     @Nullable WarmupParameters parameters,
-    OtpServerRequestContext serverContext,
+    RequestScopedFactory.Builder requestScopedComponentBuilder,
     TimetableRepository timetableRepository
   ) {
-    return new WarmupLauncher(parameters, serverContext, timetableRepository);
+    return new WarmupLauncher(
+      parameters,
+      () -> requestScopedComponentBuilder.build().createServerContext(),
+      timetableRepository
+    );
   }
 }

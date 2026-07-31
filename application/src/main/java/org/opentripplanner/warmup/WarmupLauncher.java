@@ -1,5 +1,6 @@
 package org.opentripplanner.warmup;
 
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -23,16 +24,16 @@ public class WarmupLauncher {
   @Nullable
   private final WarmupParameters parameters;
 
-  private final OtpServerRequestContext serverContext;
+  private final Supplier<OtpServerRequestContext> serverContextSupplier;
   private final TimetableRepository timetableRepository;
 
   public WarmupLauncher(
     @Nullable WarmupParameters parameters,
-    OtpServerRequestContext serverContext,
+    Supplier<OtpServerRequestContext> serverContextSupplier,
     TimetableRepository timetableRepository
   ) {
     this.parameters = parameters;
-    this.serverContext = serverContext;
+    this.serverContextSupplier = serverContextSupplier;
     this.timetableRepository = timetableRepository;
   }
 
@@ -52,6 +53,7 @@ public class WarmupLauncher {
       LOG.info("Application warmup configured but no updaters found. Skipping warmup.");
       return;
     }
+    var serverContext = serverContextSupplier.get();
     var schema = switch (parameters.api()) {
       case TRANSMODEL -> serverContext.transmodelSchema();
       case GTFS -> serverContext.gtfsSchema();

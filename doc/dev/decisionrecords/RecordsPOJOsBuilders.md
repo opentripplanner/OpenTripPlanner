@@ -6,7 +6,7 @@ try to init them once and throw an exception if set again. Example:
 
 ```java
 Builder initStop(Stop stop) {
-   this.stop = requireNotInitialized(this.stop, stop);
+  this.stop = requireNotInitialized(this.stop, stop);
 }
 ```
 
@@ -32,7 +32,7 @@ OTP used a simple builder pattern in many places, especially when creating immut
 - Use factory methods to create builder—either `of` or `copyOf`. The `copyOf` uses an existing
   instance as its base. The `of` creates a builder with all default values set. All constructors
   should be private (or package-local) to enforce use of the factory methods.
-- If the class has more than 5 fields, then avoid using an inner class builder. Instead, create a 
+- If the class has more than 5 fields, then avoid using an inner class builder. Instead, create a
   builder in the same package.
 - Make all fields in the main class final to enforce immutability.
 - Consider using utility methods for parameter checking, like `Objects#requireNonNull` and
@@ -98,13 +98,13 @@ public class A {
     }
 
     public Builder withName(String name) { this.names.add(name); return this; }
-    
+
     public int age()                     { return age; }
     public Builder withAge(int age)      { this.age = age; return this; }
-    
-    private B nested() { return nested==null ? original.nested() : nested.build(); } 
+
+    private B nested() { return nested==null ? original.nested() : nested.build(); }
     public Builder withB(Consumer<B.Builder> body) {
-      if(nested == null) { nested = original.nested.copyOf(); } 
+      if(nested == null) { nested = original.nested.copyOf(); }
       body.accept(nested);
       return this;
     }

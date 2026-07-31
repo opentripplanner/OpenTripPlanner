@@ -3,10 +3,9 @@ package org.opentripplanner.updater.vehicle_parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.Futures;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,9 +25,9 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.DataSource;
-import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.utils.lang.RunnableUtils;
 
 class VehicleParkingUpdaterTest {
 
@@ -265,20 +264,15 @@ class VehicleParkingUpdaterTest {
   }
 
   private void runUpdaterOnce() {
-    class GraphUpdaterMock extends GraphUpdaterManager {
-
-      public GraphUpdaterMock(List<GraphUpdater> updaters) {
-        super(realTimeUpdateContext, updaters);
-      }
-
-      @Override
-      public Future<?> execute(GraphWriterRunnable runnable) {
-        runnable.run(realTimeUpdateContext);
-        return Futures.immediateVoidFuture();
-      }
-    }
-
-    var graphUpdaterManager = new GraphUpdaterMock(List.of(vehicleParkingUpdater));
+    WriteToGraphCallback callback = runnable -> {
+      runnable.run(realTimeUpdateContext);
+      return CompletableFuture.completedFuture(null);
+    };
+    var graphUpdaterManager = new GraphUpdaterManager(
+      callback,
+      RunnableUtils.NOOP,
+      List.of(vehicleParkingUpdater)
+    );
     graphUpdaterManager.startUpdaters();
     graphUpdaterManager.stop(false);
   }

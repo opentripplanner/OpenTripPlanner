@@ -11,18 +11,18 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
-import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.OccupancyEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -38,9 +38,12 @@ class ModifiedTripBuilder {
   private final List<CallWrapper> calls;
   private final boolean cancellation;
   private final boolean added;
-  private final OccupancyEnumeration occupancy;
+  private final OccupancyStatus occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
+
+  @Nullable
+  private final String vehicleRef;
 
   public ModifiedTripBuilder(
     TripTimes existingTripTimes,
@@ -60,8 +63,9 @@ class ModifiedTripBuilder {
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
     predictionInaccurate = journey.isPredictionInaccurate();
-    occupancy = journey.occupancy();
-    dataSource = journey.dataSource();
+    occupancy = journey.occupancy().orElse(null);
+    dataSource = journey.dataSource().orElse(null);
+    vehicleRef = journey.vehicleRef().orElse(null);
   }
 
   /**
@@ -75,10 +79,11 @@ class ModifiedTripBuilder {
     EntityResolver entityResolver,
     List<CallWrapper> calls,
     boolean cancellation,
-    OccupancyEnumeration occupancy,
+    OccupancyStatus occupancy,
     boolean predictionInaccurate,
     String dataSource,
-    boolean added
+    boolean added,
+    @Nullable String vehicleRef
   ) {
     this.existingTripTimes = existingTripTimes;
     this.pattern = pattern;
@@ -91,6 +96,7 @@ class ModifiedTripBuilder {
     this.predictionInaccurate = predictionInaccurate;
     this.dataSource = dataSource;
     this.added = added;
+    this.vehicleRef = vehicleRef;
   }
 
   /**
@@ -99,6 +105,7 @@ class ModifiedTripBuilder {
    */
   public TripUpdate build() throws UpdateException {
     RealTimeTripTimesBuilder builder = existingTripTimes.createRealTimeFromScheduledTimes();
+    builder.withVehicleId(vehicleRef);
 
     if (added) {
       builder.withAdded();
@@ -234,7 +241,7 @@ class ModifiedTripBuilder {
         //Current stop is being updated
         var callStop = entityResolver.resolveQuay(call.getStopPointRef());
         if (callStop == null) {
-          throw UpdateException.ofStopIndex(UNKNOWN_STOP, i);
+          throw UpdateException.ofStopPosition(UNKNOWN_STOP, i);
         }
 
         if (!stop.equals(callStop) && !stop.isPartOfSameStationAs(callStop)) {
@@ -246,19 +253,21 @@ class ModifiedTripBuilder {
         final int stopIndex = i;
         builder.stops.with(stopIndex, callStop);
 
-        PickDropMapper.mapPickUpType(call, builder.pickups.original(stopIndex)).ifPresent(value ->
-          builder.pickups.with(stopIndex, value)
-        );
+        call
+          .pickUp()
+          .applyTo(builder.pickups.original(stopIndex))
+          .ifPresent(value -> builder.pickups.with(stopIndex, value));
 
-        PickDropMapper.mapDropOffType(call, builder.dropoffs.original(stopIndex)).ifPresent(value ->
-          builder.dropoffs.with(stopIndex, value)
-        );
+        call
+          .dropOff()
+          .applyTo(builder.dropoffs.original(stopIndex))
+          .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
 
         alreadyVisited.add(call);
         break;
       }
       if (!matchFound) {
-        throw UpdateException.ofStopIndex(STOP_MISMATCH, i);
+        throw UpdateException.ofStopPosition(STOP_MISMATCH, i);
       }
     }
     var newStopPattern = builder.build();

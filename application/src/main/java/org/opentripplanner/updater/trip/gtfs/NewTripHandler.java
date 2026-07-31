@@ -18,10 +18,11 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 
@@ -33,18 +34,18 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 class NewTripHandler {
 
   private final TransitEditorService transitEditorService;
-  private final TimetableSnapshotManager snapshotManager;
+  private final MutableTimetableSnapshot buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
 
   NewTripHandler(
     TransitEditorService transitEditorService,
-    TimetableSnapshotManager snapshotManager,
+    MutableTimetableSnapshot buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache
   ) {
     this.transitEditorService = transitEditorService;
-    this.snapshotManager = snapshotManager;
+    this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
   }
@@ -56,7 +57,7 @@ class NewTripHandler {
     if (transitEditorService.getScheduledTrip(tripUpdate.tripId()) != null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_ALREADY_EXISTS);
     }
-    var serviceId = transitEditorService.getOrCreateServiceIdForDate(tripUpdate.serviceDate());
+    var serviceId = transitEditorService.getOrCreateServiceIdForDate(tripUpdate.startDate());
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }
@@ -88,7 +89,7 @@ class NewTripHandler {
 
     final Set<FeedScopedId> serviceIds = transitEditorService
       .getTripCalendars()
-      .listServiceIdsOnServiceDate(tripUpdate.serviceDate());
+      .listServiceIdsOnServiceDate(tripUpdate.startDate());
     if (!serviceIds.contains(trip.getServiceId())) {
       // TODO: should we support this and change service id of trip?
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
@@ -131,7 +132,7 @@ class NewTripHandler {
 
     return addNewOrReplacementTripToSnapshot(
       value,
-      tripUpdate.serviceDate(),
+      tripUpdate.startDate(),
       added,
       modified,
       hasANewRouteBeenCreated
@@ -152,7 +153,11 @@ class NewTripHandler {
     Trip trip = tripTimes.getTrip();
 
     final StopPattern stopPattern = tripTimesWithStopPattern.stopPattern();
-    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
+    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
+      stopPattern,
+      trip,
+      transitEditorService.findPattern(trip)
+    );
 
     TripPattern hideTripInScheduledPattern = null;
     if (modified) {
@@ -170,7 +175,7 @@ class NewTripHandler {
         )
         .withTripCreation(true);
     }
-    return snapshotManager.updateBuffer(builder.build());
+    return TripUpdateApplier.apply(buffer, builder.build());
   }
 
   /**

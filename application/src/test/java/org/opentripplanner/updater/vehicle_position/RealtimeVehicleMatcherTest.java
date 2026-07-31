@@ -29,7 +29,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -88,7 +88,7 @@ public class RealtimeVehicleMatcherTest {
   @ParameterizedTest
   @ValueSource(booleans = { true, false })
   void tripNotFoundInPattern(boolean hasStopTimes) {
-    var service = new DefaultRealtimeVehicleService(null);
+    var repository = new DefaultRealtimeVehicleRepository();
 
     final String secondTripId = "trip2";
 
@@ -107,7 +107,7 @@ public class RealtimeVehicleMatcherTest {
       ignored -> pattern,
       (id, time) -> pattern,
       ignored -> Set.of(),
-      service,
+      repository,
       zoneId,
       null,
       FEATURES
@@ -124,7 +124,7 @@ public class RealtimeVehicleMatcherTest {
 
   @Test
   public void sequenceId() {
-    var service = new DefaultRealtimeVehicleService(null);
+    var repository = new DefaultRealtimeVehicleRepository();
 
     var tripId = "trip1";
     var scopedTripId = FeedScopedIdForTestFactory.id(tripId);
@@ -147,7 +147,7 @@ public class RealtimeVehicleMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       ignored -> null,
-      service,
+      repository,
       zoneId,
       null,
       FEATURES
@@ -164,8 +164,8 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
-    var nextStop = service.getRealtimeVehicles(pattern1).get(0).stop();
+    assertEquals(1, repository.getRealtimeVehicles(pattern1).size());
+    var nextStop = repository.getRealtimeVehicles(pattern1).get(0).stop();
     assertEquals("F:stop-20", nextStop.get().stop().getId().toString());
   }
 
@@ -182,7 +182,7 @@ public class RealtimeVehicleMatcherTest {
   }
 
   private void testVehiclePositions(VehiclePosition pos) {
-    var service = new DefaultRealtimeVehicleService(null);
+    var repository = new DefaultRealtimeVehicleRepository();
     var trip = TimetableRepositoryForTest.trip(tripId).build();
     var stopTimes = List.of(
       testModel.stopTime(trip, 0),
@@ -196,7 +196,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, service.getRealtimeVehicles(pattern).size());
+    assertEquals(0, repository.getRealtimeVehicles(pattern).size());
 
     // Map positions to trips in feed
     var matcher = new RealtimeVehiclePatternMatcher(
@@ -205,7 +205,7 @@ public class RealtimeVehicleMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       ignored -> null,
-      service,
+      repository,
       zoneId,
       null,
       FEATURES
@@ -217,7 +217,7 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    var realtimeVehicles = service.getRealtimeVehicles(pattern);
+    var realtimeVehicles = repository.getRealtimeVehicles(pattern);
     assertEquals(1, realtimeVehicles.size());
 
     var parsedVehicle = realtimeVehicles.get(0);
@@ -227,11 +227,11 @@ public class RealtimeVehicleMatcherTest {
 
     // if we have an empty list of updates then clear the positions from the previous update
     matcher.applyRealtimeVehicleUpdates(List.of());
-    assertEquals(0, service.getRealtimeVehicles(pattern).size());
+    assertEquals(0, repository.getRealtimeVehicles(pattern).size());
   }
 
   private void testVehiclePositionOccupancy(VehiclePosition pos) {
-    var service = new DefaultRealtimeVehicleService(null);
+    var repository = new DefaultRealtimeVehicleRepository();
     var trip = TimetableRepositoryForTest.trip(tripId).build();
     var stopTimes = List.of(
       testModel.stopTime(trip, 0),
@@ -245,7 +245,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, service.getRealtimeVehicles(pattern).size());
+    assertEquals(0, repository.getRealtimeVehicles(pattern).size());
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
@@ -254,7 +254,7 @@ public class RealtimeVehicleMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       ignored -> null,
-      service,
+      repository,
       zoneId,
       null,
       FEATURES
@@ -266,13 +266,17 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // Check that occupancy for the trip is as set in original position
-    var occupancy = service.getOccupancyStatus(trip.getId(), pattern);
-    assertEquals(OccupancyStatus.FEW_SEATS_AVAILABLE, occupancy);
+    var vehicles = repository.getRealtimeVehicles(pattern);
+    assertEquals(1, vehicles.size());
+    assertEquals(
+      OccupancyStatus.FEW_SEATS_AVAILABLE,
+      vehicles.get(0).occupancyStatus().orElseThrow()
+    );
   }
 
   @Test
   public void clearOldTrips() {
-    var service = new DefaultRealtimeVehicleService(null);
+    var repository = new DefaultRealtimeVehicleRepository();
 
     var tripId1 = "trip1";
     var tripId2 = "trip2";
@@ -302,7 +306,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip1, pattern1, trip2, pattern2);
 
     // an untouched pattern has no vehicles
-    assertEquals(0, service.getRealtimeVehicles(pattern1).size());
+    assertEquals(0, repository.getRealtimeVehicles(pattern1).size());
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
@@ -311,7 +315,7 @@ public class RealtimeVehicleMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       ignored -> null,
-      service,
+      repository,
       zoneId,
       null,
       FEATURES
@@ -327,13 +331,13 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
-    assertEquals(1, service.getRealtimeVehicles(pattern2).size());
+    assertEquals(1, repository.getRealtimeVehicles(pattern1).size());
+    assertEquals(1, repository.getRealtimeVehicles(pattern2).size());
 
     matcher.applyRealtimeVehicleUpdates(List.of(pos1));
-    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
+    assertEquals(1, repository.getRealtimeVehicles(pattern1).size());
     // because there are no more updates for pattern2 we remove all positions
-    assertEquals(0, service.getRealtimeVehicles(pattern2).size());
+    assertEquals(0, repository.getRealtimeVehicles(pattern2).size());
   }
 
   static Stream<Arguments> inferenceTestCases() {

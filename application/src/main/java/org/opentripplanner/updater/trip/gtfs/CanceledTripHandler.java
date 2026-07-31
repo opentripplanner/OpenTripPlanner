@@ -7,10 +7,11 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
@@ -22,14 +23,11 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 class CanceledTripHandler {
 
   private final TransitEditorService transitEditorService;
-  private final TimetableSnapshotManager snapshotManager;
+  private final MutableTimetableSnapshot buffer;
 
-  CanceledTripHandler(
-    TransitEditorService transitEditorService,
-    TimetableSnapshotManager snapshotManager
-  ) {
+  CanceledTripHandler(TransitEditorService transitEditorService, MutableTimetableSnapshot buffer) {
     this.transitEditorService = transitEditorService;
-    this.snapshotManager = snapshotManager;
+    this.buffer = buffer;
   }
 
   UpdateSuccess cancel(TripUpdate tripUpdate, UpdateIncrementality incrementality)
@@ -49,12 +47,12 @@ class CanceledTripHandler {
   ) throws UpdateException {
     // For DIFFERENTIAL updates, try to cancel a previously added trip
     if (incrementality != FULL_DATASET) {
-      var addedPattern = snapshotManager.getNewTripPatternForModifiedTrip(
+      var addedPattern = buffer.getNewTripPatternForModifiedTrip(
         tripUpdate.tripId(),
-        tripUpdate.serviceDate()
+        tripUpdate.startDate()
       );
       if (addedPattern != null) {
-        var timetable = snapshotManager.resolve(addedPattern, tripUpdate.serviceDate());
+        var timetable = buffer.resolve(addedPattern, tripUpdate.startDate());
         if (timetable != null) {
           var tripTimes = timetable.getTripTimes(tripUpdate.tripId());
           if (tripTimes != null && tripTimes.isAdded()) {
@@ -63,8 +61,9 @@ class CanceledTripHandler {
               case CANCEL -> builder.withCanceled();
               case DELETE -> builder.withDeleted();
             }
-            return snapshotManager.updateBuffer(
-              RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.serviceDate()).build()
+            return TripUpdateApplier.apply(
+              buffer,
+              RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.startDate()).build()
             );
           }
         }
@@ -87,8 +86,9 @@ class CanceledTripHandler {
       case CANCEL -> builder.withCanceled();
       case DELETE -> builder.withDeleted();
     }
-    return snapshotManager.updateBuffer(
-      RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.serviceDate())
+    return TripUpdateApplier.apply(
+      buffer,
+      RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.startDate())
         .withRevertPreviousRealTimeUpdates(true)
         .build()
     );

@@ -2,13 +2,14 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /doc/user 
+   - Generated directory is: /doc/user
 -->
 
 # Route Request
 
-The RouteRequest is the type for the [routingDefaults in router-config.json](RouterConfiguration.md#routingDefaults) 
-and in the [transferRequests in build-config.json](BuildConfiguration.md#transferRequests).
+The RouteRequest is the type for the
+[routingDefaults in router-config.json](RouterConfiguration.md#routingDefaults) and in the
+[transferRequests in build-config.json](BuildConfiguration.md#transferRequests).
 
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -193,7 +194,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       unknownCost                                                                                            |        `integer`       | The cost to add when traversing an entity with unknown accessibility information.                                                                        | *Optional* | `600`            |  2.2  |
 
 <!-- PARAMETERS-TABLE END -->
-
 
 ## Parameter Details
 

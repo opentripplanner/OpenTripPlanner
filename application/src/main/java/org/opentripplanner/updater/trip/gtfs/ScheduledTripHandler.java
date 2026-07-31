@@ -12,10 +12,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
@@ -29,18 +30,18 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 class ScheduledTripHandler {
 
   private final TransitEditorService transitEditorService;
-  private final TimetableSnapshotManager snapshotManager;
+  private final MutableTimetableSnapshot buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
 
   ScheduledTripHandler(
     TransitEditorService transitEditorService,
-    TimetableSnapshotManager snapshotManager,
+    MutableTimetableSnapshot buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache
   ) {
     this.transitEditorService = transitEditorService;
-    this.snapshotManager = snapshotManager;
+    this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
   }
@@ -62,7 +63,7 @@ class ScheduledTripHandler {
 
     var serviceId = transitEditorService.getTrip(tripUpdate.tripId()).getServiceId();
     var serviceDates = transitEditorService.getTripCalendars().listServiceDates(serviceId);
-    if (!serviceDates.contains(tripUpdate.serviceDate())) {
+    if (!serviceDates.contains(tripUpdate.startDate())) {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
 
@@ -98,17 +99,23 @@ class ScheduledTripHandler {
         .build();
 
       final Trip trip = transitEditorService.getTrip(tripUpdate.tripId());
-      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(newStopPattern, trip);
+      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
+        newStopPattern,
+        trip,
+        pattern
+      );
 
-      return snapshotManager.updateBuffer(
-        RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.serviceDate())
+      return TripUpdateApplier.apply(
+        buffer,
+        RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .withHideTripInScheduledPattern(pattern)
           .build()
       );
     } else {
-      return snapshotManager.updateBuffer(
-        RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.serviceDate())
+      return TripUpdateApplier.apply(
+        buffer,
+        RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.startDate())
           .withRevertPreviousRealTimeUpdates(true)
           .build()
       );

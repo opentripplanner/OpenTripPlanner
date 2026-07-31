@@ -146,6 +146,7 @@ public class LegacyRouteRequestMapper {
         );
         callWith.argument("unpreferred.unpreferredCost", tr::withUnpreferredCostString);
         callWith.argument("ignoreRealtimeUpdates", tr::withIgnoreRealtimeUpdates);
+        callWith.argument("omitCanceled", (Boolean b) -> tr.withIncludeRealtimeCancellations(!b));
         callWith.argument("modeWeight", (Map<String, Object> modeWeights) ->
           tr.withReluctanceForMode(
             modeWeights

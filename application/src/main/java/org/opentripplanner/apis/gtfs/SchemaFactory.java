@@ -40,6 +40,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.LocationGroupImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LocationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.MoneyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.NodeTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.NoticeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PatternImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlaceImpl;
@@ -218,6 +219,7 @@ public class SchemaFactory {
         .type(typeWiring.build(StairsUseImpl.class))
         .type(typeWiring.build(ElevatorUseImpl.class))
         .type(typeWiring.build(RiderCategoryImpl.class))
+        .type(typeWiring.build(NoticeImpl.class))
         .build();
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();

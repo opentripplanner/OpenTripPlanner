@@ -13,6 +13,7 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionServiceModule;
@@ -26,8 +27,12 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -36,9 +41,7 @@ import org.opentripplanner.routing.linking.configure.LinkingServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
-import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.configure.StreetDetailsServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -51,7 +54,6 @@ import org.opentripplanner.service.vehiclerental.configure.VehicleRentalServiceM
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeServiceModule;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.config.configure.DeduplicatorServiceModule;
@@ -62,10 +64,13 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
+import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
 
@@ -87,7 +92,6 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     InteractiveLauncherModule.class,
     StreetDetailsServiceModule.class,
     LinkingServiceModule.class,
-    RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
     SchemaModule.class,
@@ -103,6 +107,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ViaModule.class,
     WarmupModule.class,
     WorldEnvelopeServiceModule.class,
+    TransactionModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -116,12 +121,12 @@ public interface ConstructApplicationFactory {
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RealtimeVehicleRepository realtimeVehicleRepository();
-  RealtimeVehicleService realtimeVehicleService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   VehicleParkingRepository vehicleParkingRepository();
   VehicleParkingService vehicleParkingService();
-  TimetableSnapshotManager timetableSnapshotManager();
+  UpdateManager updateManager();
+  RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -131,6 +136,9 @@ public interface ConstructApplicationFactory {
   CarpoolingRepository carpoolingRepository();
 
   @Nullable
+  CarpoolTripVertexResolver carpoolTripVertexResolver();
+
+  @Nullable
   EmissionRepository emissionRepository();
 
   StreetDetailsRepository streetDetailsRepository();
@@ -138,9 +146,10 @@ public interface ConstructApplicationFactory {
   @Nullable
   EmpiricalDelayRepository empiricalDelayRepository();
 
+  @StaticTransitService
   TransitService transitService();
 
-  OtpServerRequestContext createServerContext();
+  RequestScopedFactory.Builder requestScopedFactoryBuilder();
 
   MetricsLogging metricsLogging();
 
@@ -216,6 +225,12 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder fareServiceFactory(FareServiceFactory fareService);
+
+    @BindsInstance
+    Builder scheduledRaptorTransitData(RaptorTransitData scheduledRaptorTransitData);
+
+    @BindsInstance
+    Builder scheduledTripCalendars(DefaultTripCalendars tripCalendars);
 
     ConstructApplicationFactory build();
   }

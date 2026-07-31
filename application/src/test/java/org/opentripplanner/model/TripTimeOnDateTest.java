@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
@@ -185,7 +186,10 @@ class TripTimeOnDateTest {
       .build();
     timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     timetableRepository.index();
-    var timetableSnapshot = new TimetableSnapshot(new DefaultTripCalendars());
+    var timetableSnapshot = new TimetableSnapshot(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
     timetableSnapshot.commit();
     var serviceDate = LocalDate.of(2025, 1, 1);
     // Construct a timetable which definitely does not contain this trip, because it is empty.
