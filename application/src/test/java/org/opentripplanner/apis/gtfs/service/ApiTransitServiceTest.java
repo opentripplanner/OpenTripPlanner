@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.service;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -16,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
@@ -180,16 +182,18 @@ class ApiTransitServiceTest {
     var rt = GtfsRtTestHelper.of(env);
 
     assertThat(
-      new ApiTransitService(env.transitService()).findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES)
+      new ApiTransitService(env.transitService()).findCanceledStopCalls(
+        STOP_B,
+        SERVICE_DATE_RANGES,
+        ArrivalDeparture.BOTH
+      )
     ).isEmpty();
 
-    var update = rt
-      .tripUpdate(TRIP_1_ID, GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED)
-      .build();
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
     var service = new ApiTransitService(env.transitService());
-    var calls = service.findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES);
+    var calls = service.findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH);
     assertThat(calls).hasSize(1);
     var call = calls.getFirst();
     assertEquals(TRIP_1_ID, call.stopCall().getTrip().getId().getId());
@@ -211,14 +215,20 @@ class ApiTransitServiceTest {
     var service = new ApiTransitService(env.transitService());
 
     // The skipped visit at STOP_B is returned
-    var skippedCalls = service.findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES);
+    var skippedCalls = service.findCanceledStopCalls(
+      STOP_B,
+      SERVICE_DATE_RANGES,
+      ArrivalDeparture.BOTH
+    );
     assertThat(skippedCalls).hasSize(1);
     var call = skippedCalls.getFirst();
     assertEquals(TRIP_1_ID, call.stopCall().getTrip().getId().getId());
     assertThat(call.stopCall().isCancelledStop()).isTrue();
 
     // Stops that are not skipped and whose trip is not canceled are not returned
-    assertThat(service.findCanceledStopCalls(STOP_A, SERVICE_DATE_RANGES)).isEmpty();
+    assertThat(
+      service.findCanceledStopCalls(STOP_A, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH)
+    ).isEmpty();
   }
 
   @Test
@@ -226,9 +236,7 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdate(TRIP_1_ID, GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED)
-      .build();
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
     var service = new ApiTransitService(env.transitService());
@@ -237,13 +245,41 @@ class ApiTransitServiceTest {
     var outsideRange = List.of(
       LocalDateRange.ofExclusiveEnd(SERVICE_DATE.plusDays(1), SERVICE_DATE.plusDays(2))
     );
-    assertThat(service.findCanceledStopCalls(STOP_B, outsideRange)).isEmpty();
+    assertThat(
+      service.findCanceledStopCalls(STOP_B, outsideRange, ArrivalDeparture.BOTH)
+    ).isEmpty();
 
     // Range that includes the service date returns the canceled call
     var insideRange = List.of(
       LocalDateRange.ofExclusiveEnd(SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    assertThat(service.findCanceledStopCalls(STOP_B, insideRange)).hasSize(1);
+    assertThat(service.findCanceledStopCalls(STOP_B, insideRange, ArrivalDeparture.BOTH)).hasSize(
+      1
+    );
+  }
+
+  @Test
+  void canceledStopCallsOmitNonPickups() {
+    // TRIP_3 stops at STOP_C for drop-off only (no boarding/pickup allowed).
+    var tripInput = TripInput.of("TestTrip3")
+      .addStop(STOP_A, "12:00:00", "12:00:00", PickDrop.SCHEDULED, PickDrop.SCHEDULED)
+      .addStop(STOP_C, "12:30:00", "12:30:00", PickDrop.NONE, PickDrop.SCHEDULED);
+    var env = envBuilder.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var update = rt.tripUpdate("TestTrip3", CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
+
+    var service = new ApiTransitService(env.transitService());
+
+    // The drop-off-only visit at STOP_C is returned with BOTH but omitted when only departures
+    // (pickups) are requested.
+    assertThat(
+      service.findCanceledStopCalls(STOP_C, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH)
+    ).hasSize(1);
+    assertThat(
+      service.findCanceledStopCalls(STOP_C, SERVICE_DATE_RANGES, ArrivalDeparture.DEPARTURES)
+    ).isEmpty();
   }
 
   @Test
