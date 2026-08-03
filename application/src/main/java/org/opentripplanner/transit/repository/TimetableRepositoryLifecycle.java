@@ -4,6 +4,12 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
+/**
+ * Copy-on-write / freeze lifecycle for the realtime-timetable repository. The repository is a
+ * single long-lived buffer shared by all transactions: {@link #copyOnWrite} hands out the same
+ * buffer instance, and {@link #freeze} publishes an immutable snapshot of it (after optionally
+ * purging expired data).
+ */
 public class TimetableRepositoryLifecycle
   implements RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository> {
 
