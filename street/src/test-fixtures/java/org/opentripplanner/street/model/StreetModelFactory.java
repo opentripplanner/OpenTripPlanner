@@ -19,6 +19,7 @@ import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
+import org.opentripplanner.street.model.edge.TestAreaGroupBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -44,6 +45,10 @@ public class StreetModelFactory {
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
     return new LabelledIntersectionVertex(label, lon, lat, false, false);
+  }
+
+  public static TestAreaGroupBuilder areaGroup(IntersectionVertex... boundaryVertices) {
+    return new TestAreaGroupBuilder(boundaryVertices);
   }
 
   public static TransitEntranceVertex transitEntranceVertex(String id, double lat, double lon) {

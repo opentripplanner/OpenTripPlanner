@@ -33,6 +33,10 @@ public class LinkingEnvironment {
   @Nullable
   private DisposableEdgeCollection disposable;
 
+  public static LinkingEnvironmentBuilder of() {
+    return new LinkingEnvironmentBuilder();
+  }
+
   public LinkingEnvironment(Vertex... vertices) {
     var graph = new Graph();
     for (var v : vertices) {
