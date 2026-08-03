@@ -42,10 +42,10 @@ import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
@@ -123,14 +123,14 @@ public class SpeedTest {
 
     var parameters = TimetableSnapshotParameters.DEFAULT;
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       transitRepository.copyTripCalendarForRealTimeUpdates()
     );
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle =
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(
         timetableSnapshot,
-        new TimetableSnapshotLifecycle(
+        new TimetableRepositoryLifecycle(
           timetableSnapshot,
           parameters.purgeExpiredData(),
           LocalDate::now

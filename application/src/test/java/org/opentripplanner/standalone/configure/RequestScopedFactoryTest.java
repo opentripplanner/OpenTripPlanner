@@ -55,10 +55,10 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -77,13 +77,13 @@ class RequestScopedFactoryTest {
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
     var transitRepository = new TransitRepository();
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
     var timetableRepositoryHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
-      new TimetableSnapshotLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
     );
 
     var routerConfig = RouterConfig.DEFAULT;
@@ -183,10 +183,7 @@ class RequestScopedFactoryTest {
 
       @BindsInstance
       Builder timetableRepositoryHandle(
-        RepositoryHandle<
-          ReadOnlyTimetableSnapshot,
-          MutableTimetableSnapshot
-        > timetableRepositoryHandle
+        RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle
       );
 
       @BindsInstance

@@ -22,8 +22,8 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
@@ -72,8 +72,8 @@ public class UpdaterConfigurator {
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager updateManager;
   private final RepositoryHandle<
-    ReadOnlyTimetableSnapshot,
-    MutableTimetableSnapshot
+    TimetableRepositorySnapshot,
+    TimetableRepository
   > timetableRepositoryHandle;
 
   @Nullable
@@ -90,7 +90,7 @@ public class UpdaterConfigurator {
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -118,7 +118,7 @@ public class UpdaterConfigurator {
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(

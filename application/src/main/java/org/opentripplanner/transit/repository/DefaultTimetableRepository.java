@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.timetable;
+package org.opentripplanner.transit.repository;
 
 import static org.opentripplanner.utils.collection.CollectionUtils.getByNullableKey;
 
@@ -35,32 +35,40 @@ import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableBuilder;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A TimetableSnapshot holds a set of realtime-updated Timetables frozen at a moment in time. It
+ * The default implementation of both {@link TimetableRepository} and
+ * {@link TimetableRepositorySnapshot}: a mutable instance serves as the repository (write
+ * buffer), and committing it produces a read-only instance of the same class which serves as the
+ * published snapshot. It holds a set of realtime-updated Timetables frozen at a moment in time. It
  * can return a Timetable for any TripPattern in the public transit network considering all
  * accumulated realtime updates, falling back on the scheduled Timetable if no updates have been
  * applied for a given TripPattern.
  * <p>
  * This is a central part of managing concurrency when many routing searches may be happening, but
  * realtime updates are also streaming in which change the vehicle arrival and departure times.
- * Any given request will only see one unchanging TimetableSnapshot over the course of its search.
+ * Any given request will only see one unchanging snapshot over the course of its search.
  * <p>
- * An instance of TimetableSnapshot first serves as a buffer to accumulate a batch of incoming
- * updates on top of any already known updates to the base schedules. From time to time such a batch
- * of updates is committed (like a database transaction). At this point the TimetableSnapshot is
- * treated as immutable and becomes available for use by new incoming routing requests.
+ * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top of
+ * any already known updates to the base schedules. From time to time such a batch of updates is
+ * committed (like a database transaction). At this point an immutable copy is created and becomes
+ * available for use by new incoming routing requests.
  * <p>
  * All updates to a snapshot must be completed before it is handed off to any searches. A single
  * snapshot should be used for an entire search, and should remain unchanged for that duration to
  * provide a consistent view not only of trips that have been boarded, but of relative arrival and
  * departure times of other trips that have not necessarily been boarded.
  * <p>
- * A TimetableSnapshot instance may only be modified by a single thread. This makes it easier to
+ * An instance may only be modified by a single thread. This makes it easier to
  * reason about how the snapshot is built up and used. Write operations are applied one by one, in
  * order, with no concurrent access. Read operations are then allowed concurrently by many threads
  * after writing is forbidden.
@@ -81,18 +89,18 @@ import org.slf4j.LoggerFactory;
  * guarantee of safe-publication without synchronization.
  * (see <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field Semantics</a>)
  */
-public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTimetableSnapshot {
+public class DefaultTimetableRepository implements TimetableRepository {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTimetableRepository.class);
 
   /**
-   * During the construction phase of the TimetableSnapshot, before it is considered immutable and
+   * During the construction phase of an instance, before it is considered immutable and
    * used in routing, this Map holds all timetables that have been modified and are waiting to be
    * indexed.
    * A real-time timetable overrides the scheduled timetable of a TripPattern for only a single
    * service date. There can be only one overriding timetable per TripPattern and per service date.
    * This is enforced by indexing the map with a pair (TripPattern, service date).
-   * This map is cleared when the TimetableSnapshot becomes read-only.
+   * This map is cleared when the instance becomes read-only.
    */
   private final Map<TripPatternAndServiceDate, Timetable> dirtyTimetables = new HashMap<>();
 
@@ -106,7 +114,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
-   * TimetableSnapshots still in circulation which reference that same Timetable instance. <p>
+   * snapshots still in circulation which reference that same Timetable instance. <p>
    * Alternative implementations: A. This could be an array indexed using the integer pattern
    * indexes. B. It could be made into a flat hashtable with compound keys (TripPattern, LocalDate).
    * The compound key approach better reflects the fact that there should be only one Timetable per
@@ -174,7 +182,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
    */
   private boolean dirty = false;
 
-  public TimetableSnapshot(
+  public DefaultTimetableRepository(
     RaptorTransitData raptorTransitData,
     DefaultTripCalendars tripCalendars
   ) {
@@ -196,7 +204,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
     );
   }
 
-  TimetableSnapshot(
+  DefaultTimetableRepository(
     Map<FeedScopedId, SortedSet<Timetable>> timetables,
     Map<TripIdAndServiceDate, TripPattern> realTimeNewTripPatternsForModifiedTrips,
     Map<FeedScopedId, Route> realtimeAddedRoutes,
@@ -406,23 +414,23 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
    * Updating the raptor data is now also part of the commit. Previously this was done after the
    * commit. The amount of work triggered by each commit stayed the same.
    *
-   * @return an immutable copy of this TimetableSnapshot with all updates applied
+   * @return an immutable copy of this repository with all updates applied
    */
-  public TimetableSnapshot commit() {
+  public DefaultTimetableRepository commit() {
     return commit(false);
   }
 
-  public TimetableSnapshot commit(boolean force) {
+  public DefaultTimetableRepository commit(boolean force) {
     validateNotReadOnly();
 
     if (!force && !this.isDirty()) {
       return null;
     }
 
-    return createReadOnlySnapshot();
+    return createSnapshot();
   }
 
-  public @NonNull TimetableSnapshot createReadOnlySnapshot() {
+  public @NonNull DefaultTimetableRepository createSnapshot() {
     RaptorTransitData updatedRaptorData = timetableUpdateMapper.map(
       realtimeRaptorTransitData,
       dirtyTimetables.values(),
@@ -430,7 +438,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
       new TripPatternForDateMapper(tripCalendars.getServiceCodesRunningForDate())
     );
 
-    var timetableSnapshot = new TimetableSnapshot(
+    var snapshot = new DefaultTimetableRepository(
       Map.copyOf(timetables),
       Map.copyOf(realTimeNewTripPatternsForModifiedTrips),
       Map.copyOf(realtimeAddedRoutes),
@@ -452,7 +460,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
     dirtyTimetables.clear();
     dirty = false;
 
-    return timetableSnapshot;
+    return snapshot;
   }
 
   /**
@@ -756,7 +764,7 @@ public class TimetableSnapshot implements ReadOnlyTimetableSnapshot, MutableTime
 
   private void validateNotReadOnly() {
     if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+      throw new ConcurrentModificationException("This DefaultTimetableRepository is read-only.");
     }
   }
 

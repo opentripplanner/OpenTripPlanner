@@ -13,19 +13,19 @@ import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Abstr
  */
 public class OrderRepository
   extends AbstractRepository<Order>
-  implements RepositoryLifecycle<OrderSnapshot, OrderRepository> {
+  implements RepositoryLifecycle<OrderRepositorySnapshot, OrderRepository> {
 
   public OrderRepository() {
     super(new HashMap<>());
   }
 
   @Override
-  public OrderRepository copyOnWrite(OrderSnapshot readOnlySnapshot) {
+  public OrderRepository copyOnWrite(OrderRepositorySnapshot readOnlySnapshot) {
     return this;
   }
 
   @Override
-  public OrderSnapshot freeze(OrderRepository mutableSnapshot) {
-    return new OrderSnapshot(copyOfEntitiesById());
+  public OrderRepositorySnapshot freeze(OrderRepository repository) {
+    return new OrderRepositorySnapshot(copyOfEntitiesById());
   }
 }

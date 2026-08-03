@@ -65,7 +65,7 @@ public interface CarpoolingRepository {
    * {@code now.minus(expiry)}. Removing such trips bounds the memory use of instances that run for a
    * long time without restarting, since the SIRI source is not guaranteed to send an explicit
    * cancellation for a journey once it has completed. This mirrors how real-time timetable data is
-   * purged once its service date has passed (see {@code TimetableSnapshot#purgeExpiredData}), with
+   * purged once its service date has passed (see {@code TimetableRepository#purgeExpiredData}), with
    * the difference that carpool trips carry a concrete instant rather than a service date.
    * <p>
    * The scan is throttled so that it runs at most once per sweep interval no matter how often it is

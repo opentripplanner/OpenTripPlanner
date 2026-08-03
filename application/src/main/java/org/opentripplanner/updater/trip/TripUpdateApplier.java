@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class TripUpdateApplier {
 
   private TripUpdateApplier() {}
 
-  public static UpdateSuccess apply(MutableTimetableSnapshot buffer, RealTimeTripUpdate update) {
+  public static UpdateSuccess apply(TimetableRepository buffer, RealTimeTripUpdate update) {
     var trip = update.updatedTripTimes().getTrip();
     var serviceDate = update.serviceDate();
 

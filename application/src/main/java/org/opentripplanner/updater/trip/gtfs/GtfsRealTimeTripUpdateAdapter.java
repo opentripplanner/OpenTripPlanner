@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -12,7 +12,7 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
- * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via {@link #forUpdate(MutableTimetableSnapshot)}.
+ * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via {@link #forUpdate(TimetableRepository)}.
  */
 public class GtfsRealTimeTripUpdateAdapter {
 
@@ -43,7 +43,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * the given buffer, so all pattern and trip lookups within the task see in-progress real-time
    * additions.
    */
-  public GtfsRealTimeUpdateHandler forUpdate(MutableTimetableSnapshot buffer) {
+  public GtfsRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     var editorService = new DefaultTransitService(transitRepository, buffer);
     return new GtfsRealTimeUpdateHandler(
       buffer,

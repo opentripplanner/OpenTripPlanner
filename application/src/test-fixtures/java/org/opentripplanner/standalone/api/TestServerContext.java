@@ -52,10 +52,10 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -109,14 +109,14 @@ public class TestServerContext {
     transitRepository.initRaptorTransitData(scheduledRaptorData);
 
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       transitRepository.copyTripCalendarForRealTimeUpdates()
     );
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle =
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(
         timetableSnapshot,
-        new TimetableSnapshotLifecycle(timetableSnapshot, false, LocalDate::now)
+        new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
       );
 
     return buildContext(
@@ -141,7 +141,7 @@ public class TestServerContext {
     TransitRepository transitRepository,
     TransferRepository transferRepository,
     FareService fareService,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
     org.opentripplanner.framework.transaction.RepositoryRegistry registry,
     @Nullable RouteRequest request,
     @Nullable FlexParameters flexParameters
@@ -175,7 +175,7 @@ public class TestServerContext {
     FlexParameters flexParameters,
     RouterConfig routerConfig,
     org.opentripplanner.framework.transaction.RepositoryRegistry registry,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle
   ) {
     var transactionScope = registry.scope();
     var transitService = new DefaultTransitService(

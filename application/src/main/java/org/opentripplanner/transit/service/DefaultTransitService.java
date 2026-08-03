@@ -65,7 +65,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
 import org.opentripplanner.utils.collection.SetUtils;
@@ -74,7 +74,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * Default implementation of the Transit Service and Transit Editor Service.
  * A new instance of this class should be created for each request.
- * This ensures that the same TimetableSnapshot is used for the
+ * This ensures that the same TimetableRepositorySnapshot is used for the
  * duration of the request (which may involve several method calls).
  */
 public class DefaultTransitService implements TransitEditorService {
@@ -92,7 +92,7 @@ public class DefaultTransitService implements TransitEditorService {
    * instance does not contain any real-time information.
    */
   @Nullable
-  private final ReadOnlyTimetableSnapshot timetableSnapshot;
+  private final TimetableRepositorySnapshot timetableSnapshot;
 
   /**
    * Helper for fetching stop times for APIs.
@@ -113,7 +113,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   public DefaultTransitService(
     TransitRepository transitRepository,
-    @Nullable ReadOnlyTimetableSnapshot timetableSnapshot
+    @Nullable TimetableRepositorySnapshot timetableSnapshot
   ) {
     this.transitRepository = transitRepository;
     this.transitRepositoryIndex = transitRepository.getTransitRepositoryIndex();
@@ -499,7 +499,7 @@ public class DefaultTransitService implements TransitEditorService {
    * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
    * added by realtime updates are added to the collection.
    * A set is used here because trip patterns
-   * that were updated by realtime data is both part of the TransitRepositoryIndex and the TimetableSnapshot
+   * that were updated by realtime data is both part of the TransitRepositoryIndex and the TimetableRepositorySnapshot
    */
   @Override
   public Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates) {

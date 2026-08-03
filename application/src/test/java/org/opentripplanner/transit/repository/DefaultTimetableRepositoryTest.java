@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.timetable;
+package org.opentripplanner.transit.repository;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,9 +35,17 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.TestStopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitRepository;
 
-public class TimetableSnapshotTest {
+public class DefaultTimetableRepositoryTest {
 
   private static final ZoneId TIME_ZONE = ZoneIds.GMT;
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
@@ -64,12 +72,12 @@ public class TimetableSnapshotTest {
     Timetable orig = Timetable.of().build();
     Timetable a = orig.copyOf().withServiceDate(LocalDate.now(TIME_ZONE).minusDays(1)).build();
     Timetable b = orig.copyOf().withServiceDate(LocalDate.now(TIME_ZONE)).build();
-    assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
+    assertTrue(new DefaultTimetableRepository.SortedTimetableComparator().compare(a, b) < 0);
   }
 
   @Test
   void testUniqueDirtyTimetablesAfterMultipleUpdates() {
-    TimetableSnapshot snapshot = new TimetableSnapshot(
+    DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -84,8 +92,8 @@ public class TimetableSnapshotTest {
   }
 
   @Test
-  void testCannotUpdateReadOnlyTimetableSnapshot() {
-    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+  void testCannotUpdateTimetableRepositorySnapshot() {
+    DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
     LocalDate today = LocalDate.now(TIME_ZONE);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
@@ -100,28 +108,28 @@ public class TimetableSnapshotTest {
   }
 
   @Test
-  void testCannotCommitReadOnlyTimetableSnapshot() {
-    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+  void testCannotCommitTimetableRepositorySnapshot() {
+    DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
     assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.commit(true));
   }
 
   @Test
-  void testCannotClearReadOnlyTimetableSnapshot() {
-    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+  void testCannotClearTimetableRepositorySnapshot() {
+    DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
     assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.clear(null));
   }
 
   @Test
-  void testCannotPurgeReadOnlyTimetableSnapshot() {
-    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+  void testCannotPurgeTimetableRepositorySnapshot() {
+    DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
     assertThrows(ConcurrentModificationException.class, () ->
       committedSnapshot.purgeExpiredData(null)
     );
   }
 
   @Test
-  void testCannotRevertReadOnlyTimetableSnapshot() {
-    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+  void testCannotRevertTimetableRepositorySnapshot() {
+    DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
     assertThrows(ConcurrentModificationException.class, () ->
       committedSnapshot.revertTripToScheduledTripPattern(null, null)
     );
@@ -129,7 +137,7 @@ public class TimetableSnapshotTest {
 
   @Test
   void testClear() {
-    TimetableSnapshot snapshot = new TimetableSnapshot(
+    DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -206,7 +214,7 @@ public class TimetableSnapshotTest {
     patternsForStop.put(testStopLocation, tripPattern);
 
     // The entries do not necessarily make sense, they are only for testing the clear method.
-    TimetableSnapshot snapshot = new TimetableSnapshot(
+    DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       new HashMap<>(Map.of(id, ImmutableSortedSet.of())),
       new HashMap<>(Map.of(tripIdAndServiceDate, tripPattern)),
       new HashMap<>(Map.of(id, route)),
@@ -242,8 +250,8 @@ public class TimetableSnapshotTest {
       .build();
   }
 
-  private static TimetableSnapshot createCommittedSnapshot() {
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(
+  private static DefaultTimetableRepository createCommittedSnapshot() {
+    DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );

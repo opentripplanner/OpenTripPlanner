@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 
-public interface MutableTimetableSnapshot extends ReadOnlyTimetableSnapshot {
+public interface TimetableRepository extends TimetableRepositorySnapshot {
   void update(RealTimeTripUpdate realTimeTripUpdate);
 
-  ReadOnlyTimetableSnapshot createReadOnlySnapshot();
+  TimetableRepositorySnapshot createSnapshot();
 
   void clear(String feedId);
 

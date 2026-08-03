@@ -46,10 +46,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class DefaultTransitServiceTest {
@@ -198,7 +198,7 @@ class DefaultTransitServiceTest {
 
     transitRepository.index();
 
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(
+    DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );

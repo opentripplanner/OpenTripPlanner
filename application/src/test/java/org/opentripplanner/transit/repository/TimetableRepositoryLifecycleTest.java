@@ -2,8 +2,8 @@ package org.opentripplanner.transit.repository;
 
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.opentripplanner.transit.repository.TimetableSnapshotLifecycleTest.SameAssert.NotSame;
-import static org.opentripplanner.transit.repository.TimetableSnapshotLifecycleTest.SameAssert.Same;
+import static org.opentripplanner.transit.repository.TimetableRepositoryLifecycleTest.SameAssert.NotSame;
+import static org.opentripplanner.transit.repository.TimetableRepositoryLifecycleTest.SameAssert.Same;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -18,14 +18,13 @@ import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
- * Tests for {@link TimetableSnapshotLifecycle}, specifically the purge-expired-data behavior
- * triggered during {@link TimetableSnapshotLifecycle#freeze(MutableTimetableSnapshot)}.
+ * Tests for {@link TimetableRepositoryLifecycle}, specifically the purge-expired-data behavior
+ * triggered during {@link TimetableRepositoryLifecycle#freeze(TimetableRepository)}.
  */
-class TimetableSnapshotLifecycleTest {
+class TimetableRepositoryLifecycleTest {
 
   private static final LocalDate TODAY = LocalDate.of(2024, Month.MAY, 30);
   private static final LocalDate TOMORROW = TODAY.plusDays(1);
@@ -85,11 +84,11 @@ class TimetableSnapshotLifecycleTest {
   ) {
     final AtomicReference<LocalDate> clock = new AtomicReference<>(YESTERDAY);
 
-    var buffer = new TimetableSnapshot(
+    var buffer = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
-    var lifecycle = new TimetableSnapshotLifecycle(buffer, purgeExpiredData, clock::get);
+    var lifecycle = new TimetableRepositoryLifecycle(buffer, purgeExpiredData, clock::get);
 
     // Add data for YESTERDAY, freeze to produce snapshot A
     buffer.update(RealTimeTripUpdate.of(PATTERN, TRIP_TIMES, YESTERDAY).build());

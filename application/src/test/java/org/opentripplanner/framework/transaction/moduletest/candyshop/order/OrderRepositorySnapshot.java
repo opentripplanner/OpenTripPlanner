@@ -3,9 +3,9 @@ package org.opentripplanner.framework.transaction.moduletest.candyshop.order;
 import java.util.Map;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.base.AbstractRepository;
 
-public class OrderSnapshot extends AbstractRepository<Order> {
+public class OrderRepositorySnapshot extends AbstractRepository<Order> {
 
-  public OrderSnapshot(Map<Integer, Order> aById) {
+  public OrderRepositorySnapshot(Map<Integer, Order> aById) {
     super(aById);
   }
 

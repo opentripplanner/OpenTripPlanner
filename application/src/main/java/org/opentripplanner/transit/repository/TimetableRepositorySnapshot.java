@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
-public interface ReadOnlyTimetableSnapshot {
+public interface TimetableRepositorySnapshot {
   Timetable resolve(TripPattern pattern, @Nullable LocalDate serviceDate);
 
   @Nullable

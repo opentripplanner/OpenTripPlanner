@@ -122,7 +122,7 @@ public class TransitRepository implements Serializable {
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
   /// Updates are not allowed after the repository is frozen. All realtime updates should be
-  /// applied to the TimetableSnapshot. The repository is modifiable during graph build then
+  /// applied to the TimetableRepository. The repository is modifiable during graph build then
   /// frozen when the server is started.
   private boolean frozen = false;
 
@@ -153,7 +153,7 @@ public class TransitRepository implements Serializable {
 
   /**
    * Make the Timetable repository immutable when the otp server is started. After this point,
-   * all modifications should be done to the TimetableSnapshot.
+   * all modifications should be done to the TimetableRepository.
    */
   public void freeze() {
     index();

@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -45,7 +45,7 @@ public class SiriRealTimeUpdateHandler {
   private static final Logger LOG = LoggerFactory.getLogger(SiriRealTimeUpdateHandler.class);
 
   private final TransitEditorService transitEditorService;
-  private final MutableTimetableSnapshot buffer;
+  private final TimetableRepository buffer;
 
   @Nullable
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
@@ -56,7 +56,7 @@ public class SiriRealTimeUpdateHandler {
 
   SiriRealTimeUpdateHandler(
     TransitEditorService transitEditorService,
-    MutableTimetableSnapshot buffer,
+    TimetableRepository buffer,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
     DeduplicatorService deduplicator,

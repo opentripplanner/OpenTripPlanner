@@ -19,8 +19,8 @@ import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -186,7 +186,7 @@ class TripTimeOnDateTest {
       .build();
     transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
     transitRepository.index();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );

@@ -4,16 +4,16 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
-public class TimetableSnapshotLifecycle
-  implements RepositoryLifecycle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> {
+public class TimetableRepositoryLifecycle
+  implements RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository> {
 
-  private final MutableTimetableSnapshot buffer;
+  private final TimetableRepository buffer;
   private final boolean purgeExpiredData;
   private final Supplier<LocalDate> localDateNow;
   private LocalDate lastPurgeDate = null;
 
-  public TimetableSnapshotLifecycle(
-    MutableTimetableSnapshot buffer,
+  public TimetableRepositoryLifecycle(
+    TimetableRepository buffer,
     boolean purgeExpiredData,
     Supplier<LocalDate> localDateNow
   ) {
@@ -23,12 +23,12 @@ public class TimetableSnapshotLifecycle
   }
 
   @Override
-  public MutableTimetableSnapshot copyOnWrite(ReadOnlyTimetableSnapshot readOnlySnapshot) {
+  public TimetableRepository copyOnWrite(TimetableRepositorySnapshot snapshot) {
     return buffer;
   }
 
   @Override
-  public ReadOnlyTimetableSnapshot freeze(MutableTimetableSnapshot mutableSnapshot) {
+  public TimetableRepositorySnapshot freeze(TimetableRepository repository) {
     if (purgeExpiredData) {
       final LocalDate today = localDateNow.get();
       // Keep data for today and the previous day; purge anything older
@@ -38,6 +38,6 @@ public class TimetableSnapshotLifecycle
         buffer.purgeExpiredData(previously);
       }
     }
-    return buffer.createReadOnlySnapshot();
+    return buffer.createSnapshot();
   }
 }

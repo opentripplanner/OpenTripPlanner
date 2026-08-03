@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.network.ReplacementForRelation;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 
 /**
  * <p>Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
@@ -35,12 +35,12 @@ public class ReplacementHelper {
   private final TransitRepository transitRepository;
 
   @Nullable
-  private final ReadOnlyTimetableSnapshot timetableSnapshot;
+  private final TimetableRepositorySnapshot timetableSnapshot;
 
   public ReplacementHelper(
     TransitService transitService,
     TransitRepository transitRepository,
-    @Nullable ReadOnlyTimetableSnapshot timetableSnapshot
+    @Nullable TimetableRepositorySnapshot timetableSnapshot
   ) {
     this.transitService = transitService;
     this.transitRepository = transitRepository;

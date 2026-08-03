@@ -223,13 +223,13 @@ public abstract class GtfsTest {
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry =
       org.opentripplanner.framework.transaction.internal.TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new org.opentripplanner.transit.model.timetable.TimetableSnapshot(
+    var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
       transitRepository.copyTripCalendarForRealTimeUpdates()
     );
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,
-      new org.opentripplanner.transit.repository.TimetableSnapshotLifecycle(
+      new org.opentripplanner.transit.repository.TimetableRepositoryLifecycle(
         timetableSnapshot,
         false,
         LocalDate::now

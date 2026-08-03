@@ -16,8 +16,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 
 /**
  * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was
@@ -72,8 +72,11 @@ class TripUpdateApplierTest {
     .withRealTimeStopPatternModified()
     .build();
 
-  private static TimetableSnapshot createBuffer() {
-    return new TimetableSnapshot(RaptorTransitDataTestFactory.empty(), new DefaultTripCalendars());
+  private static DefaultTimetableRepository createBuffer() {
+    return new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      new DefaultTripCalendars()
+    );
   }
 
   /**
