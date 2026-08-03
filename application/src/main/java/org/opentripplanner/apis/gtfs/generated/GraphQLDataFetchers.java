@@ -485,6 +485,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<StopArrival> to();
     public DataFetcher<Boolean> transitLeg();
     public DataFetcher<Trip> trip();
+    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
     public DataFetcher<Boolean> walkingBike();
   }
 
@@ -754,7 +755,6 @@ public class GraphQLDataFetchers {
   public interface GraphQLRealTimeTripState {
     public DataFetcher<Boolean> added();
     public DataFetcher<Boolean> canceled();
-    public DataFetcher<Boolean> deleted();
     public DataFetcher<Boolean> timesModified();
     public DataFetcher<Boolean> tripPatternModified();
     public DataFetcher<Boolean> updated();

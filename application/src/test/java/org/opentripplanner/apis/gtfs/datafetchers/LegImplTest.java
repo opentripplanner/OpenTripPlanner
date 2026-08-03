@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,6 +28,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 class LegImplTest implements PlanTestConstants {
 
@@ -64,6 +66,21 @@ class LegImplTest implements PlanTestConstants {
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(4)
     .withTripPattern(PATTERN)
+    .build();
+  private static final TripOnServiceDate TRIP_ON_SERVICE_DATE = TripOnServiceDate.of(id("tosd1"))
+    .withTrip(TRIP)
+    .withServiceDate(TIME.toLocalDate())
+    .build();
+  private static final ScheduledTransitLeg LEG_WITH_TOSD = new ScheduledTransitLegBuilder<>()
+    .withStartTime(TIME)
+    .withEndTime(TIME)
+    .withZoneId(TIME.getZone())
+    .withServiceDate(TIME.toLocalDate())
+    .withTripTimes(TRIP_TIMES)
+    .withBoardStopIndexInPattern(0)
+    .withAlightStopIndexInPattern(4)
+    .withTripPattern(PATTERN)
+    .withTripOnServiceDate(TRIP_ON_SERVICE_DATE)
     .build();
   private static final LegImpl IMPL = new LegImpl();
   private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
@@ -117,6 +134,25 @@ class LegImplTest implements PlanTestConstants {
   void walkLegWithFilter() throws Exception {
     var env = dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
     assertNull(IMPL.intermediateStops().get(env));
+  }
+
+  @Test
+  void tripOnServiceDate() throws Exception {
+    var env = dataFetchingEnvironment(LEG_WITH_TOSD);
+    assertThat(IMPL.tripOnServiceDate().get(env)).isEqualTo(TRIP_ON_SERVICE_DATE);
+  }
+
+  @Test
+  void tripOnServiceDateNullWhenAbsent() throws Exception {
+    // The transit leg above was built without a TripOnServiceDate, so it is not populated.
+    var env = dataFetchingEnvironment(LEG);
+    assertNull(IMPL.tripOnServiceDate().get(env));
+  }
+
+  @Test
+  void tripOnServiceDateNullForWalkLeg() throws Exception {
+    var env = dataFetchingEnvironment(WALK_LEG);
+    assertNull(IMPL.tripOnServiceDate().get(env));
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {

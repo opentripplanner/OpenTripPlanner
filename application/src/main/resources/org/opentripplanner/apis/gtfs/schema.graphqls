@@ -970,6 +970,8 @@ type Leg {
   transitLeg: Boolean
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
+  "For transit legs, the trip on service date. For non-transit legs, `null`."
+  tripOnServiceDate: TripOnServiceDate
   "Whether this leg is walking with a bike."
   walkingBike: Boolean
 }
