@@ -54,7 +54,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
     assertEquals(
-      "U | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
+      "P U | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
       env.tripData(TRIP_2_ID).showTimetable()
     );
   }
@@ -83,7 +83,7 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
-    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[U]");
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
 
     // Create update to the same trip but now the skipped stop is no longer skipped
     var scheduledBuilder = rt
@@ -141,7 +141,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertNewTripTimesIsUpdated(env, tripId);
 
     assertEquals(
-      "U | A [ND] 0:01 0:01:01 | B [C] 0:01:10 0:01:11 | C [ND] 0:01:20 0:01:21",
+      "P U | A [ND] 0:01 0:01:01 | B [C] 0:01:10 0:01:11 | C [ND] 0:01:20 0:01:21",
       env.tripData(tripId).showTimetable()
     );
   }

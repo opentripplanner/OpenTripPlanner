@@ -4,10 +4,7 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -74,33 +71,25 @@ class ScheduledTripHandler {
       backwardsDelayPropagationType
     );
 
-    var updatedPickup = tripTimesPatch.updatedPickup();
-    var updatedDropoff = tripTimesPatch.updatedDropoff();
-    var replacedStopIndices = tripTimesPatch.replacedStopIndices();
-    var updatedTripTimes = tripTimesPatch.tripTimes();
-
-    Map<Integer, StopLocation> newStops = new HashMap<>();
-    for (var entry : replacedStopIndices.entrySet()) {
-      var stop = transitEditorService.getRegularStop(
-        new FeedScopedId(tripUpdate.tripId().getFeedId(), entry.getValue())
-      );
-      if (stop != null) {
-        newStops.put(entry.getKey(), stop);
-      }
+    // A pickup / drop-off override or a resolvable stop replacement moves the trip onto a pattern
+    // differing from the scheduled one. The trip is then reported as MODIFIED.
+    var feedId = tripUpdate.tripId().getFeedId();
+    var modifiedStopPattern = tripTimesPatch
+      .stopPatternChanges()
+      .deriveStopPattern(pattern, stopId -> resolveStop(feedId, stopId));
+    var patternModified = modifiedStopPattern.isPresent();
+    if (patternModified) {
+      tripTimesPatch.withModifiedTripPattern();
     }
 
-    // If there are stops with different pickup / drop off, or replaced stops, we need to change the pattern from the scheduled one
-    if (!updatedPickup.isEmpty() || !updatedDropoff.isEmpty() || !newStops.isEmpty()) {
-      StopPattern newStopPattern = pattern
-        .copyPlannedStopPattern()
-        .updatePickups(updatedPickup)
-        .updateDropoffs(updatedDropoff)
-        .replaceStops(newStops)
-        .build();
+    // Materialize and validate the trip times before touching the pattern cache, so that an
+    // invalid update does not leave an orphan real-time pattern behind.
+    var updatedTripTimes = tripTimesPatch.tripTimes();
 
+    if (patternModified) {
       final Trip trip = transitEditorService.getTrip(tripUpdate.tripId());
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
-        newStopPattern,
+        modifiedStopPattern.get(),
         trip,
         pattern
       );
@@ -120,6 +109,10 @@ class ScheduledTripHandler {
           .build()
       );
     }
+  }
+
+  private StopLocation resolveStop(String feedId, String stopId) {
+    return transitEditorService.getRegularStop(new FeedScopedId(feedId, stopId));
   }
 
   private TripPattern getPatternForTripId(FeedScopedId tripId) {

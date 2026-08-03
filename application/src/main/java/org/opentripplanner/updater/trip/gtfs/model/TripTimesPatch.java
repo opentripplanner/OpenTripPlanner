@@ -1,46 +1,50 @@
 package org.opentripplanner.updater.trip.gtfs.model;
 
-import java.util.Map;
-import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
+import org.opentripplanner.updater.spi.UpdateException;
 
 /**
- * Contains a {@link TripTimes} and array of stop indices of a stop pattern that are skipped with a
- * realtime update.
+ * The real-time changes computed from a GTFS-RT trip update, ready to be materialized into
+ * {@link RealTimeTripTimes}. Besides the not-yet-built trip times it carries the
+ * {@link StopPatternChanges}, which the caller uses to decide whether the trip must be moved onto a
+ * modified trip pattern.
  */
 public final class TripTimesPatch {
 
-  private final RealTimeTripTimes tripTimes;
-  private final Map<Integer, PickDrop> updatedPickup;
-  private final Map<Integer, PickDrop> updatedDropoff;
-  private final Map<Integer, String> replacedStopIndices;
+  private final RealTimeTripTimesBuilder builder;
+  private final StopPatternChanges stopPatternChanges;
 
-  public TripTimesPatch(
-    RealTimeTripTimes tripTimes,
-    Map<Integer, PickDrop> updatedPickup,
-    Map<Integer, PickDrop> updatedDropoff,
-    Map<Integer, String> replacedStopIndices
-  ) {
-    this.tripTimes = tripTimes;
-    this.updatedPickup = updatedPickup;
-    this.updatedDropoff = updatedDropoff;
-    this.replacedStopIndices = replacedStopIndices;
+  public TripTimesPatch(RealTimeTripTimesBuilder builder, StopPatternChanges stopPatternChanges) {
+    this.builder = builder;
+    this.stopPatternChanges = stopPatternChanges;
   }
 
-  public RealTimeTripTimes tripTimes() {
-    return tripTimes;
+  public StopPatternChanges stopPatternChanges() {
+    return stopPatternChanges;
   }
 
-  public Map<Integer, PickDrop> updatedPickup() {
-    return updatedPickup;
+  /**
+   * Flag the resulting trip times as running on a modified trip pattern, so the API reports the
+   * trip as {@code MODIFIED}. The caller marks the patch once it has determined, from
+   * {@link #stopPatternChanges()}, that the update moves the trip onto a real-time pattern that
+   * differs from the planned one.
+   */
+  public TripTimesPatch withModifiedTripPattern() {
+    builder.withModifiedTripPattern();
+    return this;
   }
 
-  public Map<Integer, PickDrop> updatedDropoff() {
-    return updatedDropoff;
-  }
-
-  public Map<Integer, String> replacedStopIndices() {
-    return replacedStopIndices;
+  /**
+   * Materialize the updated trip times.
+   */
+  public RealTimeTripTimes tripTimes() throws UpdateException {
+    try {
+      return builder.build();
+    } catch (DataValidationException e) {
+      throw DataValidationExceptionMapper.map(e);
+    }
   }
 }

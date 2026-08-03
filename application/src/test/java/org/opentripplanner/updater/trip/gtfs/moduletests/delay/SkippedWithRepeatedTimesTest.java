@@ -43,7 +43,7 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     assertEquals(
-      "U | A 10:00 10:00 | B [C] 10:00 10:00 | C 10:01 10:01",
+      "P U | A 10:00 10:00 | B [C] 10:00 10:00 | C 10:01 10:01",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }

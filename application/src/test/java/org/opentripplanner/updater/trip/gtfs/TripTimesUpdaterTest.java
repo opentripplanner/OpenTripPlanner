@@ -129,7 +129,7 @@ public class TripTimesUpdaterTest {
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      )
+      ).tripTimes()
     );
   }
 
@@ -316,7 +316,7 @@ public class TripTimesUpdaterTest {
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      )
+      ).tripTimes()
     );
   }
 
@@ -338,7 +338,7 @@ public class TripTimesUpdaterTest {
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.NONE,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      )
+      ).tripTimes()
     );
   }
 
@@ -389,10 +389,15 @@ public class TripTimesUpdaterTest {
     assertTrue(updatedTripTimes.isCanceledStop(1));
     assertFalse(updatedTripTimes.isCanceledStop(2));
     assertTrue(updatedTripTimes.isNoDataStop(2));
-    var updatedPickup = p.updatedPickup();
-    var updatedDropoff = p.updatedDropoff();
-    assertIterableEquals(Map.of(1, PickDrop.CANCELLED).entrySet(), updatedPickup.entrySet());
-    assertIterableEquals(Map.of(1, PickDrop.CANCELLED).entrySet(), updatedDropoff.entrySet());
+    var changes = p.stopPatternChanges();
+    assertIterableEquals(
+      Map.of(1, PickDrop.CANCELLED).entrySet(),
+      changes.updatedPickups().entrySet()
+    );
+    assertIterableEquals(
+      Map.of(1, PickDrop.CANCELLED).entrySet(),
+      changes.updatedDropoffs().entrySet()
+    );
   }
 
   @Test
@@ -432,9 +437,10 @@ public class TripTimesUpdaterTest {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
-    assertTrue(p.updatedDropoff().isEmpty(), "dropoffs are not modified");
-    assertTrue(p.updatedPickup().isEmpty(), "pickups are not modified");
-    assertTrue(p.replacedStopIndices().isEmpty(), "stop indices are not modified");
+    var changes = p.stopPatternChanges();
+    assertTrue(changes.updatedDropoffs().isEmpty(), "dropoffs are not modified");
+    assertTrue(changes.updatedPickups().isEmpty(), "pickups are not modified");
+    assertTrue(changes.replacedStopIds().isEmpty(), "stop indices are not modified");
     assertEquals("foo", p.tripTimes().getHeadsign(0).toString(), "headsigns [1] are not modified");
     assertEquals("foo", p.tripTimes().getHeadsign(1).toString(), "headsigns [2] are not modified");
     assertEquals("foo", p.tripTimes().getHeadsign(2).toString(), "headsigns [3] are not modified");
@@ -485,10 +491,12 @@ public class TripTimesUpdaterTest {
     assertEquals(I18NString.of("new stop headsign"), updatedTripTimes.getHeadsign(0));
     assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(1));
     assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(2));
-    var updatedPickup = p.updatedPickup();
-    var updatedDropoff = p.updatedDropoff();
-    assertEquals(Map.of(1, PickDrop.CANCELLED, 2, PickDrop.NONE), updatedPickup);
-    assertEquals(Map.of(1, PickDrop.CANCELLED, 2, PickDrop.COORDINATE_WITH_DRIVER), updatedDropoff);
+    var changes = p.stopPatternChanges();
+    assertEquals(Map.of(1, PickDrop.CANCELLED, 2, PickDrop.NONE), changes.updatedPickups());
+    assertEquals(
+      Map.of(1, PickDrop.CANCELLED, 2, PickDrop.COORDINATE_WITH_DRIVER),
+      changes.updatedDropoffs()
+    );
   }
 
   @Test
@@ -594,7 +602,7 @@ public class TripTimesUpdaterTest {
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
         BackwardsDelayPropagationType.NONE
-      )
+      ).tripTimes()
     );
   }
 
@@ -845,7 +853,7 @@ public class TripTimesUpdaterTest {
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      )
+      ).tripTimes()
     );
   }
 

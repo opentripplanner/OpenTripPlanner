@@ -14,7 +14,6 @@ import java.util.Objects;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
@@ -22,12 +21,12 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayInterpolator;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayInterpolator;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.model.StopPatternChanges;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
@@ -59,9 +58,9 @@ class TripTimesUpdater {
    * @param tripUpdate     GTFS-RT trip update
    * @param backwardsDelay Defines when delays are propagated to previous stops and if these stops
    *                       are given the NO_DATA flag
-   * @return {@link TripTimesPatch} contains a new copy of updated TripTimes after TripUpdate has
-   * been applied on TripTimes of trip with the id specified in the trip descriptor of the
-   * TripUpdate and a list of stop indices that have been skipped with the realtime update.
+   * @return {@link TripTimesPatch} holding the not-yet-materialized updated TripTimes for the trip
+   * with the id specified in the trip descriptor of the TripUpdate, together with the pickup/drop-off
+   * changes and stop replacements that determine whether the trip moves onto a modified pattern.
    * @throws UpdateException if there are any problems with the data
    */
   public TripTimesPatch createUpdatedTripTimesFromGtfsRt(
@@ -150,13 +149,11 @@ class TripTimesUpdater {
     tripUpdate.vehicleId().ifPresent(builder::withVehicleId);
 
     builder.withRealTimeUpdated();
-    // Validate for non-increasing times. Log error if present.
-    try {
-      var result = builder.build();
-      return new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices);
-    } catch (DataValidationException e) {
-      throw DataValidationExceptionMapper.map(e);
-    }
+
+    return new TripTimesPatch(
+      builder,
+      new StopPatternChanges(updatedPickups, updatedDropoffs, replacedStopIndices)
+    );
   }
 
   /**
