@@ -17,6 +17,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
+import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -78,8 +79,24 @@ public class RealtimeStopsLayerTest {
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
+      .withSeverity(AlertSeverity.WARNING)
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    var infoAlert = TransitAlert.of(stop.getId())
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withEffect(AlertEffect.MODIFIED_SERVICE)
+      .withSeverity(AlertSeverity.INFO)
+      .build();
+
+    var expiredStartDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(3).toEpochSecond();
+    var expiredEndDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(2).toEpochSecond();
+    var expiredAlert = TransitAlert.of(stop.getId())
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(expiredStartDate, expiredEndDate))
+      .withEffect(AlertEffect.DETOUR)
+      .withSeverity(AlertSeverity.SEVERE)
+      .build();
+    transitService.getTransitAlertService().setAlerts(List.of(alert, infoAlert, expiredAlert));
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
@@ -97,6 +114,8 @@ public class RealtimeStopsLayerTest {
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
     assertEquals(true, map.get("closedByServiceAlert"));
+    assertEquals("WARNING", map.get("alertSeverityLevel"));
+    assertEquals("NO_SERVICE", map.get("alertEffects"));
     assertEquals(false, map.get("servicesRunningOnServiceDate"));
   }
 }
