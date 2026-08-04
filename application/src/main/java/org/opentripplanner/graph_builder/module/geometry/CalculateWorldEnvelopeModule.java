@@ -8,7 +8,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,24 +28,24 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
   private static final int LOG_EVERY_N_COORDINATE = 1_000_000;
 
   private final Graph graph;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final WorldEnvelopeRepository worldEnvelopeRepository;
 
   @Inject
   public CalculateWorldEnvelopeModule(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     WorldEnvelopeRepository worldEnvelopeRepository
   ) {
     this.graph = graph;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
   }
 
   @Override
   public void buildGraph() {
     var vertices = graph.getVertices();
-    var stops = timetableRepository.getSiteRepository().listStopLocations();
+    var stops = transitRepository.getSiteRepository().listStopLocations();
     WorldEnvelope envelope = build(vertices, stops);
     worldEnvelopeRepository.saveEnvelope(envelope);
   }

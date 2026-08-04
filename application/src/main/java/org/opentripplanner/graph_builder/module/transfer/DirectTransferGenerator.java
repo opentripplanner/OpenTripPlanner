@@ -32,7 +32,7 @@ import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final List<RouteRequest> transferRequests;
   private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final TransferRepository transferRepository;
   private final DataImportIssueStore issueStore;
 
@@ -63,14 +63,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    */
   public DirectTransferGenerator(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
     List<RouteRequest> transferRequests
   ) {
     this.graph = graph;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
@@ -80,13 +80,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   public DirectTransferGenerator(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     RegularTransferParameters parameters
   ) {
     this.graph = graph;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = parameters.maxDuration();
     this.transferRequests = parameters.requests();
@@ -97,16 +97,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     // Initialize transit model index which is needed by the nearby stop finder.
-    timetableRepository.index();
+    transitRepository.index();
 
     // The linker will use streets if they are available, or straight-line distance otherwise.
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
     Set<StopLocation> carsAllowedStops =
-      timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
-      timetableRepository.getStopLocationsUsedForBikesAllowedTrips();
+      transitRepository.getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -136,8 +136,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Parse the transfer configuration from the parameters given in the build config.
     TransferConfiguration transferConfiguration = parseTransferParameters(nearbyStopFinder);
 
-    var transitService = new DefaultTransitService(timetableRepository);
-    var emptyStops = timetableRepository
+    var transitService = new DefaultTransitService(transitRepository);
+    var emptyStops = transitRepository
       .getSiteRepository()
       .listStopLocations()
       .stream()
@@ -161,7 +161,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
          * Use map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
         RegularStop stop = Objects.requireNonNull(
-          timetableRepository.getSiteRepository().getRegularStop(ts0.getId())
+          transitRepository.getSiteRepository().getRegularStop(ts0.getId())
         );
 
         if (stop.transfersNotAllowed()) {
@@ -234,7 +234,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * enabled.
    */
   private NearbyStopFinder createNearbyStopFinder(Duration radiusAsDuration) {
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(transitRepository);
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(
@@ -388,7 +388,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .defaultNearbyStopFinderForMode()
         .get(mode)
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
-      var repository = timetableRepository.getSiteRepository();
+      var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
         var nearbyStop = repository.getStopLocation(sd.stopId);
@@ -418,7 +418,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), true);
       // This code is for finding transfers from AreaStops to Stops, transfers
       // from Stops to AreaStops and between Stops are already covered above.
-      var repository = timetableRepository.getSiteRepository();
+      var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
         var nearbyStop = repository.getStopLocation(sd.stopId);
@@ -494,7 +494,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     var nearbyStops = nearbyStopFinder
       .get(mode)
       .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer().mode(), false);
-    var repository = timetableRepository.getSiteRepository();
+    var repository = transitRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
       var nearbyStop = repository.getStopLocation(sd.stopId);
       // Skip the origin stop, loop transfers are not needed.

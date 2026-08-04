@@ -9,10 +9,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class DigitransitStationPropertyMapperTest {
 
@@ -20,9 +20,9 @@ public class DigitransitStationPropertyMapperTest {
 
   @Test
   void map() {
-    var timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.index();
-    var transitService = new TestTransitService(timetableRepository);
+    var transitRepository = new TransitRepository(new SiteRepository());
+    transitRepository.index();
+    var transitService = new TestTransitService(transitRepository);
 
     var mapper = DigitransitStationPropertyMapper.create(transitService, Locale.US);
 
@@ -32,7 +32,7 @@ public class DigitransitStationPropertyMapperTest {
       .withName(I18NString.of("A station"))
       .build();
 
-    TimetableRepositoryForTest.of().stop("stop-1").withParentStation(station).build();
+    TransitRepositoryForTest.of().stop("stop-1").withParentStation(station).build();
 
     Map<String, Object> map = new HashMap<>();
     mapper.map(station).forEach(o -> map.put(o.key(), o.value()));

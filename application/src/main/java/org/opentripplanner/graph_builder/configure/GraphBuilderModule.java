@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
 public class GraphBuilderModule {
@@ -19,7 +19,7 @@ public class GraphBuilderModule {
   static GraphBuilder provideGraphBuilder(
     Graph baseGraph,
     DeduplicatorService deduplicator,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     GraphBuilderDataSources closeDataSourcesHandle,
     GraphBuildCacheManager cacheManager
@@ -27,7 +27,7 @@ public class GraphBuilderModule {
     return new GraphBuilder(
       baseGraph,
       deduplicator,
-      timetableRepository,
+      transitRepository,
       issueStore,
       closeDataSourcesHandle,
       cacheManager

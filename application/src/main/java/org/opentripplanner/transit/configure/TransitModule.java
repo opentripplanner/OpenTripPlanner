@@ -12,12 +12,12 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 @Module
@@ -42,21 +42,19 @@ public abstract class TransitModule {
   @Provides
   @Singleton
   public static RepositoryHandle<
-    ReadOnlyTimetableSnapshot,
-    MutableTimetableSnapshot
+    TimetableRepositorySnapshot,
+    TimetableRepository
   > timetableRepositoryHandle(
     TimetableSnapshotParameters parameters,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     RepositoryRegistry repositoryRegistry,
     RaptorTransitData scheduledRaptorTransitData,
     DefaultTripCalendars tripCalendars
   ) {
-    var mutableBuffer = new TimetableSnapshot(scheduledRaptorTransitData, tripCalendars);
-    var timetableSnapshotLifecycle = new TimetableSnapshotLifecycle(
-      mutableBuffer,
-      parameters.purgeExpiredData(),
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+    var buffer = new DefaultTimetableRepository(scheduledRaptorTransitData, tripCalendars);
+    var lifecycle = new TimetableRepositoryLifecycle(buffer, parameters.purgeExpiredData(), () ->
+      LocalDate.now(transitRepository.getTimeZone())
     );
-    return repositoryRegistry.registerRepository(mutableBuffer, timetableSnapshotLifecycle);
+    return repositoryRegistry.registerRepository(buffer, lifecycle);
   }
 }

@@ -18,7 +18,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class LinkingTest {
 
@@ -33,16 +33,16 @@ public class LinkingTest {
     // build the graph without the added stops
     TestOtpModel model = buildGraphNoTransit();
     Graph g1 = model.graph();
-    TimetableRepository timetableRepository1 = model.timetableRepository();
+    TransitRepository transitRepository1 = model.transitRepository();
     addRegularStopGrid(g1);
-    link(g1, timetableRepository1);
+    link(g1, transitRepository1);
 
     TestOtpModel model2 = buildGraphNoTransit();
     Graph g2 = model2.graph();
-    TimetableRepository timetableRepository2 = model2.timetableRepository();
+    TransitRepository transitRepository2 = model2.transitRepository();
     addExtraStops(g2);
     addRegularStopGrid(g2);
-    link(g2, timetableRepository2);
+    link(g2, transitRepository2);
 
     var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
     assertEquals(966, transitStopVertices.size());
@@ -75,7 +75,7 @@ public class LinkingTest {
   public static TestOtpModel buildGraphNoTransit() {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepository);
+    var transitRepository = new TransitRepository(siteRepository);
     var file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
 
@@ -83,7 +83,7 @@ public class LinkingTest {
 
     return new TestOtpModel(
       graph,
-      timetableRepository,
+      transitRepository,
       TransferServiceTestFactory.defaultTransferRepository()
     );
   }

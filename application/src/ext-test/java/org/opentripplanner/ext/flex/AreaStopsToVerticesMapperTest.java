@@ -20,14 +20,14 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class AreaStopsToVerticesMapperTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL.areaStop("berlin")
     .withGeometry(Polygons.BERLIN)
@@ -36,7 +36,7 @@ class AreaStopsToVerticesMapperTest {
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 
-  public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(SITE_REPOSITORY);
+  public static final TransitRepository TRANSIT_MODEL = new TransitRepository(SITE_REPOSITORY);
 
   static List<TestCase> testCases() {
     return List.of(

@@ -5,8 +5,8 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_10;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.route;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.tripPattern;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -25,11 +25,11 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class PlaceFinderTraverseVisitorTest {
 
-  static TimetableRepositoryForTest model = TimetableRepositoryForTest.of();
+  static TransitRepositoryForTest model = TransitRepositoryForTest.of();
   static final Station STATION1 = Station.of(id("S1"))
     .withName(new NonLocalizedString("Station 1"))
     .withCoordinate(1.1, 1.1)
@@ -55,7 +55,7 @@ public class PlaceFinderTraverseVisitorTest {
 
   static final Route R = route("r").build();
 
-  static final TimetableRepository TIMETABLE_REPO = new TimetableRepository(
+  static final TransitRepository TIMETABLE_REPO = new TransitRepository(
     model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build()
   );
 

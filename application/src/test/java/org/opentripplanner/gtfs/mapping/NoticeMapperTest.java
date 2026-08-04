@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.onebusaway.gtfs.model.AgencyAndIdFactory.obaId;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import org.junit.jupiter.api.Test;
 

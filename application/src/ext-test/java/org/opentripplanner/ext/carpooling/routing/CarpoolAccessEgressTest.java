@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class CarpoolAccessEgressTest {
 
@@ -148,7 +148,7 @@ class CarpoolAccessEgressTest {
   void getFinalStateForAccessReturnsStateAtTransitStopChainEnd() {
     var walkToPickup = createGraphPath(Duration.ofSeconds(80));
     var walkFromDropoff = createGraphPath(Duration.ofSeconds(40));
-    var stop = TimetableRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
+    var stop = TransitRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
 
     var access = newAccessEgress(
       1_000,
@@ -171,7 +171,7 @@ class CarpoolAccessEgressTest {
   void getFinalStateForEgressReturnsStateAtTransitStopChainStart() {
     var walkToPickup = createGraphPath(Duration.ofSeconds(80));
     var walkFromDropoff = createGraphPath(Duration.ofSeconds(40));
-    var stop = TimetableRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
+    var stop = TransitRepositoryForTest.of().stop("Central Station", 59.91, 10.74).build();
 
     var egress = newAccessEgress(
       1_000,
@@ -199,7 +199,7 @@ class CarpoolAccessEgressTest {
       null,
       1.0,
       EndpointLabel.EMPTY,
-      EndpointLabel.forStop(TimetableRepositoryForTest.of().stop("Stop", 59.91, 10.74).build())
+      EndpointLabel.forStop(TransitRepositoryForTest.of().stop("Stop", 59.91, 10.74).build())
     );
 
     assertEquals(access.sharedSegments().getLast().states.getLast(), access.getFinalState());

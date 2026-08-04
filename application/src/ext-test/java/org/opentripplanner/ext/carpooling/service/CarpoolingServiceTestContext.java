@@ -50,7 +50,7 @@ record CarpoolingServiceTestContext(
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
-    TransitService transitService = new DefaultTransitService(model.timetableRepository());
+    TransitService transitService = new DefaultTransitService(model.transitRepository());
     var repository = new DefaultCarpoolingRepository();
     var carReachableVertexSnapper = CarReachableVertexSnapper.createDefault();
     var resolver = new CarpoolTripVertexResolver(vertexCreationService, carReachableVertexSnapper);

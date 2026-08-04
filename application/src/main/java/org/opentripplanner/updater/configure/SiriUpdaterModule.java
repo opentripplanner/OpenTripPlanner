@@ -2,7 +2,7 @@ package org.opentripplanner.updater.configure;
 
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdater;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriLiteHttpLoader;
@@ -36,12 +36,12 @@ public class SiriUpdaterModule {
 
   public static SiriSXUpdater createSiriSXUpdater(
     SiriSXUpdater.Parameters params,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     return new SiriSXUpdater(
       params,
-      timetableRepository,
+      transitRepository,
       siriFuzzyTripMatcherCache,
       createLoader(params)
     );

@@ -30,12 +30,12 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.utils.collection.ListSection;
 
 class PageCursorTest implements PlanTestConstants {
 
-  public static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  public static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   public static final Place A = Place.forStop(
     TEST_MODEL.stop("A").withCoordinate(5.0, 8.0).build()
   );

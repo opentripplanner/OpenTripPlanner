@@ -111,7 +111,7 @@ public class TransferIndexGenerator {
 
   /**
    * The cache is valid if it is not null, not dirty and no other component created new patterns.
-   * In theory all real-time pattern creations should be done through the TimetableSnapshot and would
+   * In theory all real-time pattern creations should be done through the TimetableRepository and would
    * be detected by the dirty flag.
    * But since the TripPattern builder is publicly accessible, there is no strong guarantee about this.
    * The risk is IndexOutOfBoundsException: The cached ConstrainedTransfersForPatterns wraps arrays

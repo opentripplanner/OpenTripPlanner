@@ -61,7 +61,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  * @deprecated This has been deprecated in favour of {@link TransitTestEnvironment}
  */
 @Deprecated
-public class TimetableRepositoryForTest {
+public class TransitRepositoryForTest {
 
   public static final String FEED_ID = "F";
   public static final String TIME_ZONE_ID = "Europe/Paris";
@@ -99,12 +99,12 @@ public class TimetableRepositoryForTest {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  public TimetableRepositoryForTest(SiteRepositoryBuilder siteRepositoryBuilder) {
+  public TransitRepositoryForTest(SiteRepositoryBuilder siteRepositoryBuilder) {
     this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
-  public static TimetableRepositoryForTest of() {
-    return new TimetableRepositoryForTest(SiteRepository.of());
+  public static TransitRepositoryForTest of() {
+    return new TransitRepositoryForTest(SiteRepository.of());
   }
 
   public static Agency agency(String name) {

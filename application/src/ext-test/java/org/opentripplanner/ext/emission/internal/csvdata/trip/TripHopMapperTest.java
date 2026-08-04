@@ -11,7 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 class TripHopMapperTest {
@@ -36,7 +36,7 @@ class TripHopMapperTest {
   private static final Gram CO2_ANY = Gram.of(10.0);
 
   static {
-    var builder = TimetableRepositoryForTest.of();
+    var builder = TransitRepositoryForTest.of();
     STOP_A = builder.stop(STOP_ID_A).build();
     STOP_B = builder.stop(STOP_ID_B).build();
     STOP_C = builder.stop(STOP_ID_C).build();
