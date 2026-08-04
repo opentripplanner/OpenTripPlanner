@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -35,7 +36,8 @@ public class MetricsLogging {
   public MetricsLogging(
     TransitRepository transitRepository,
     RaptorConfig<TripSchedule> raptorConfig,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    UpdateManager updateManager
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -78,6 +80,12 @@ public class MetricsLogging {
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
       ).bindTo(Metrics.globalRegistry);
     }
+
+    new ExecutorServiceMetrics(
+      updateManager.writerThreadExecutor(),
+      "graphUpdateScheduler",
+      List.of(Tag.of("pool", "graphUpdateScheduler"))
+    ).bindTo(Metrics.globalRegistry);
 
     if (raptorConfig.isMultiThreaded()) {
       new ExecutorServiceMetrics(
