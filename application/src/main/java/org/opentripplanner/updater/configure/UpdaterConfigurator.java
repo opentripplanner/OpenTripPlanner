@@ -16,8 +16,8 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -60,8 +60,8 @@ public class UpdaterConfigurator {
   private final TransitRepository transitRepository;
   private final UpdatersParameters updatersParameters;
   private final RepositoryHandle<
-    DefaultRealtimeVehicleRepositorySnapshot,
-    DefaultRealtimeVehicleRepository
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle;
   private final VehicleRentalRepository vehicleRentalRepository;
 
@@ -88,8 +88,8 @@ public class UpdaterConfigurator {
     DeduplicatorService deduplicator,
     VertexLinker linker,
     RepositoryHandle<
-      DefaultRealtimeVehicleRepositorySnapshot,
-      DefaultRealtimeVehicleRepository
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
@@ -119,8 +119,8 @@ public class UpdaterConfigurator {
     DeduplicatorService deduplicator,
     VertexLinker linker,
     RepositoryHandle<
-      DefaultRealtimeVehicleRepositorySnapshot,
-      DefaultRealtimeVehicleRepository
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,

@@ -53,7 +53,10 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
       env.feedId(),
       ImmutableListMultimap.of(realtimePattern, vehicle)
     );
-    var service = new DefaultRealtimeVehicleService(repository.freeze(), env.transitService());
+    var service = new DefaultRealtimeVehicleService(
+      repository.createSnapshot(),
+      env.transitService()
+    );
 
     // the vehicle can be looked up with either the scheduled or the realtime pattern
     assertThat(service.getRealtimeVehicles(scheduledPattern)).containsExactly(vehicle);
@@ -73,7 +76,10 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
       env.feedId(),
       ImmutableListMultimap.of(pattern, earlier, pattern, latest)
     );
-    var service = new DefaultRealtimeVehicleService(repository.freeze(), env.transitService());
+    var service = new DefaultRealtimeVehicleService(
+      repository.createSnapshot(),
+      env.transitService()
+    );
 
     assertEquals(FEW_SEATS_AVAILABLE, service.getVehicleOccupancyStatus(trip));
   }
@@ -82,7 +88,10 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
   void occupancyStatusWhenNoVehicleExists() {
     var env = envBuilder.addTrip(tripInput).build();
     var trip = env.tripData(TRIP_1_ID).trip();
-    var service = new DefaultRealtimeVehicleService(repository.freeze(), env.transitService());
+    var service = new DefaultRealtimeVehicleService(
+      repository.createSnapshot(),
+      env.transitService()
+    );
 
     assertEquals(NO_DATA_AVAILABLE, service.getVehicleOccupancyStatus(trip));
   }
@@ -98,7 +107,10 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
       env.feedId(),
       ImmutableListMultimap.of(tripData.scheduledTripPattern(), vehicle)
     );
-    var service = new DefaultRealtimeVehicleService(repository.freeze(), env.transitService());
+    var service = new DefaultRealtimeVehicleService(
+      repository.createSnapshot(),
+      env.transitService()
+    );
 
     assertEquals(NO_DATA_AVAILABLE, service.getVehicleOccupancyStatus(trip));
   }
@@ -115,7 +127,10 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
       env.feedId(),
       ImmutableListMultimap.of(tripData.tripPattern(), vehicle)
     );
-    var service = new DefaultRealtimeVehicleService(repository.freeze(), env.transitService());
+    var service = new DefaultRealtimeVehicleService(
+      repository.createSnapshot(),
+      env.transitService()
+    );
 
     assertEquals(FEW_SEATS_AVAILABLE, service.getVehicleOccupancyStatus(trip));
   }

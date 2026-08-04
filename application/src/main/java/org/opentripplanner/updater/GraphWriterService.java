@@ -3,8 +3,8 @@ package org.opentripplanner.updater;
 import java.util.concurrent.Future;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -28,8 +28,8 @@ public class GraphWriterService implements WriteToGraphCallback {
   private final UpdateManager updateManager;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
   private final RepositoryHandle<
-    DefaultRealtimeVehicleRepositorySnapshot,
-    DefaultRealtimeVehicleRepository
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
   > realtimeVehicleHandle;
   private final Graph graph;
   private final TransitRepository transitRepository;
@@ -38,8 +38,8 @@ public class GraphWriterService implements WriteToGraphCallback {
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
     RepositoryHandle<
-      DefaultRealtimeVehicleRepositorySnapshot,
-      DefaultRealtimeVehicleRepository
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
     > realtimeVehicleHandle,
     Graph graph,
     TransitRepository transitRepository

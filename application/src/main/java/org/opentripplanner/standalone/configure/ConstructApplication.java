@@ -23,8 +23,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.util.EllipsoidUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -307,8 +307,8 @@ public class ConstructApplication {
   }
 
   public RepositoryHandle<
-    DefaultRealtimeVehicleRepositorySnapshot,
-    DefaultRealtimeVehicleRepository
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle() {
     return factory.realtimeVehicleRepositoryHandle();
   }

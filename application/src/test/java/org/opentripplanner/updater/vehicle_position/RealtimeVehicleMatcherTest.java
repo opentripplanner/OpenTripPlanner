@@ -29,8 +29,8 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
-import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -441,9 +441,9 @@ public class RealtimeVehicleMatcherTest {
 
   /** Look up the vehicles for the pattern in a fresh snapshot of the repository state. */
   private static List<RealtimeVehicle> vehicles(
-    DefaultRealtimeVehicleRepository repository,
+    RealtimeVehicleRepository repository,
     TripPattern pattern
   ) {
-    return new RealtimeVehicleRepositoryLifecycle().freeze(repository).getRealtimeVehicles(pattern);
+    return repository.createSnapshot().getRealtimeVehicles(pattern);
   }
 }

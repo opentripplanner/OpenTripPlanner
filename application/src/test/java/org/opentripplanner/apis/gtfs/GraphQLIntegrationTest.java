@@ -81,7 +81,6 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
@@ -549,7 +548,7 @@ class GraphQLIntegrationTest {
         .build()
     );
     var realtimeVehicleService = new DefaultRealtimeVehicleService(
-      new RealtimeVehicleRepositoryLifecycle().freeze(realtimeVehicleRepository),
+      realtimeVehicleRepository.createSnapshot(),
       transitService
     );
 
