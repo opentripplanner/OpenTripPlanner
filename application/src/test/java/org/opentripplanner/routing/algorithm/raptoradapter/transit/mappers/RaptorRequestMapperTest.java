@@ -31,14 +31,14 @@ import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 class RaptorRequestMapperTest {
 
   private static final GenericLocation TO = GenericLocation.fromCoordinate(60.0, 10.0);
   private static final GenericLocation FROM = GenericLocation.fromCoordinate(62.0, 12.0);
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final StopLocation STOP_A = TEST_MODEL.stop("Stop:A").build();
   private static final PassThroughViaLocation PASS_THROUGH_VIA_LOCATION =
     new PassThroughViaLocation("Via A", List.of(STOP_A.getId()));

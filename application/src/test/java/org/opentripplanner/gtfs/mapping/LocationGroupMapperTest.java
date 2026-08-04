@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.util.Set;
 import java.util.stream.Collectors;

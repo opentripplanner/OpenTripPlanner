@@ -56,7 +56,7 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   private Future<?> processMessage(List<EstimatedTimetableDeliveryStructure> updates) {
     return writeToGraphCallback.execute(context -> {
       var result = adapter
-        .forUpdate(context.mutableSnapshot())
+        .forUpdate(context.timetableRepository())
         .applyEstimatedTimetable(
           context.entityResolver(feedId),
           feedId,

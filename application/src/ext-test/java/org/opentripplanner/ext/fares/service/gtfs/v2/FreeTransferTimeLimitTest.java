@@ -15,13 +15,13 @@ import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.TimeLimitType;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
 class FreeTransferTimeLimitTest implements PlanTestConstants, FareTestConstants {
 
   private static final FeedScopedId LEG_GROUP = id("leg-group-a");
-  private static final Route R1 = TimetableRepositoryForTest.route("r1")
+  private static final Route R1 = TransitRepositoryForTest.route("r1")
     .withGroupOfRoutes(List.of(NETWORK_A))
     .build();
 

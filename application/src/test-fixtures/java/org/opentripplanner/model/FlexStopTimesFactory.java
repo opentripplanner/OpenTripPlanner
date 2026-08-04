@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -10,7 +10,7 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public class FlexStopTimesFactory {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final StopLocation AREA_STOP = TEST_MODEL.areaStop("area")
     .withGeometry(Polygons.BERLIN)
     .build();
@@ -23,7 +23,7 @@ public class FlexStopTimesFactory {
     REGULAR_STOP_3
   );
 
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("flex").build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip("flex").build();
 
   public static StopTime area(String startTime, String endTime) {
     return area(AREA_STOP, endTime, startTime);

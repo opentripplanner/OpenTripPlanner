@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.model.Gram;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 class EmissionAggregatorTest {
@@ -24,7 +24,7 @@ class EmissionAggregatorTest {
   private static final String STOP_C_ID;
 
   static {
-    var builder = TimetableRepositoryForTest.of();
+    var builder = TransitRepositoryForTest.of();
     STOP_A = builder.stop("A").build();
     STOP_B = builder.stop("B").build();
     STOP_C = builder.stop("C").build();

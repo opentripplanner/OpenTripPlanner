@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Timetable;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayInterpolator;
@@ -51,7 +51,7 @@ class TripTimesUpdater {
   /**
    * Apply the TripUpdate to the appropriate TripTimes from a Timetable. The existing TripTimes must
    * not be modified directly because they may be shared with the underlying scheduledTimetable, or
-   * other updated Timetables. The {@link TimetableSnapshot} performs the protective copying of this
+   * other updated Timetables. The {@link TimetableRepository} performs the protective copying of this
    * Timetable. It is not done in this update method to avoid repeatedly cloning the same Timetable
    * when several updates are applied to it at once. We assume here that all trips in a timetable
    * are from the same feed, which should always be the case.

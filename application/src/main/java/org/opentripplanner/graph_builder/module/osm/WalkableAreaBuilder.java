@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.opentripplanner.astar.model.GraphPath;
@@ -33,7 +31,6 @@ import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
-import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.LineStringShrinker;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
@@ -66,7 +63,8 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final List<OsmVertex> platformLinkingPoints;
+  private final PlatformEntranceFinder platformEntranceFinder;
+
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueApplier safetyValueApplier;
@@ -133,15 +131,9 @@ class WalkableAreaBuilder {
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.visibilityCache = visibilityCache;
-    this.platformLinkingPoints = platformEntriesLinking
-      ? graph
-          .getVertices()
-          .stream()
-          .filter(OsmVertex.class::isInstance)
-          .map(OsmVertex.class::cast)
-          .filter(this::isPlatformLinkingPoint)
-          .collect(Collectors.toList())
-      : List.of();
+    this.platformEntranceFinder = platformEntriesLinking
+      ? PlatformEntranceFinder.of(graph.getVertices())
+      : PlatformEntranceFinder.empty();
   }
 
   /**
@@ -271,7 +263,6 @@ class WalkableAreaBuilder {
     Map<IntersectionVertex, AreaGroup> vertexToAreaGroup = new HashMap<>();
     List<PerRingData> perRingData = new ArrayList<>();
 
-    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
       AreaGroup areaGroup = new AreaGroup(polygon);
@@ -299,12 +290,9 @@ class WalkableAreaBuilder {
         for (Ring outerRing : area.outermostRings) {
           boolean linkPointsAdded = !entrances.isEmpty();
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            List<OsmVertex> verticesWithin = platformLinkingPoints
-              .stream()
-              .filter(t ->
-                outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
-              )
-              .toList();
+            var verticesWithin = platformEntranceFinder.findPlatformVerticesWithin(
+              outerRing.jtsPolygon
+            );
             platformLinkingVertices.addAll(verticesWithin);
             for (OsmVertex v : verticesWithin) {
               startingVertices.add(v);
@@ -651,24 +639,21 @@ class WalkableAreaBuilder {
       // No intersections - not really possible
       return Set.of();
     }
-    String label = String.format(
-      LABEL_TEMPLATE,
-      parent.getId(),
-      vertex1.getLabel(),
-      vertex2.getLabel()
-    );
+    final long parentId = parent.getId();
 
     float carSpeed = parent
       .getOsmProvider()
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
-    I18NString name = namer.getName(parent, label);
+    var forwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex2, vertex1, parentId));
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
       .withGeometry(line)
-      .withName(name)
+      .withName(forwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(false)
@@ -678,13 +663,14 @@ class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    label = String.format(LABEL_TEMPLATE, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
-    name = namer.getName(parent, label);
+    var backwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex1, vertex2, parentId));
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
       .withGeometry(line.reverse())
-      .withName(name)
+      .withName(backwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(true)
@@ -712,8 +698,9 @@ class WalkableAreaBuilder {
       Area namedArea = new Area();
       OsmEntity areaEntity = area.parent;
 
-      String id = "way (area) " + areaEntity.getId();
-      I18NString name = namer.getName(areaEntity, id);
+      I18NString name = namer
+        .getName(areaEntity)
+        .orElseGet(() -> I18NString.of("way (area) " + areaEntity.getId()));
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
@@ -734,34 +721,6 @@ class WalkableAreaBuilder {
     }
   }
 
-  private boolean isPlatformLinkingPoint(OsmVertex osmVertex) {
-    boolean isCandidate = false;
-    Vertex start = null;
-    for (Edge e : osmVertex.getIncoming()) {
-      if (e instanceof StreetEdge se && !(e instanceof AreaEdge)) {
-        if (Arrays.asList(1, 2, 3).contains(se.getPermission().code)) {
-          isCandidate = true;
-          start = se.getFromVertex();
-          break;
-        }
-      }
-    }
-
-    if (isCandidate && start != null) {
-      boolean isLinkingPoint = true;
-      for (Edge se : osmVertex.getOutgoing()) {
-        if (
-          !se.getToVertex().getCoordinate().equals(start.getCoordinate()) &&
-          !(se instanceof AreaEdge)
-        ) {
-          isLinkingPoint = false;
-        }
-      }
-      return isLinkingPoint;
-    }
-    return false;
-  }
-
   private boolean shouldSkipEdge(
     IntersectionVertex v1,
     IntersectionVertex v2,
@@ -776,6 +735,16 @@ class WalkableAreaBuilder {
     }
     alreadyAddedEdges.add(edge);
     return false;
+  }
+
+  private static I18NString fallbackName(
+    IntersectionVertex vertex1,
+    IntersectionVertex vertex2,
+    long parentId
+  ) {
+    return I18NString.of(
+      String.format(LABEL_TEMPLATE, parentId, vertex2.getLabel(), vertex1.getLabel())
+    );
   }
 
   // ---- Inner types -------------------------------------------------------------------

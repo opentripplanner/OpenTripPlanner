@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;

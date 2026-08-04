@@ -1,6 +1,6 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
@@ -11,10 +11,10 @@ import org.opentripplanner.updater.trip.siri.EntityResolver;
  */
 public interface TransitRealTimeUpdateContext {
   /**
-   * Return the mutable timetable snapshot (write buffer) for this update task. Callers must only
-   * use this from the single writer thread.
+   * Return the mutable realtime-timetable repository (write buffer) for this update task. Callers
+   * must only use this from the single writer thread.
    */
-  MutableTimetableSnapshot mutableSnapshot();
+  TimetableRepository timetableRepository();
 
   /**
    * Return a transit service that can look up both scheduled and real-time data.

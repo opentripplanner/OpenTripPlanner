@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 class StopPatternTest {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   @Test
   void boardingAlightingConditions() {
@@ -27,7 +27,7 @@ class StopPatternTest {
 
     var areaStop = testModel.areaStop("area").build();
 
-    Trip t = TimetableRepositoryForTest.trip("trip").build();
+    Trip t = TransitRepositoryForTest.trip("trip").build();
 
     StopPattern stopPattern = new StopPattern(
       List.of(
@@ -56,7 +56,7 @@ class StopPatternTest {
     var s2 = testModel.stop("2", 61.0, 11.0).build();
     var s3 = testModel.stop("3", 62.0, 11.0).build();
 
-    Trip t = TimetableRepositoryForTest.trip("trip").build();
+    Trip t = TransitRepositoryForTest.trip("trip").build();
 
     StopPattern stopPattern = new StopPattern(
       List.of(
@@ -82,7 +82,7 @@ class StopPatternTest {
     var s3 = testModel.stop("3").build();
     var s4 = testModel.stop("4").build();
 
-    var pattern = TimetableRepositoryForTest.stopPattern(s1, s2, s3);
+    var pattern = TransitRepositoryForTest.stopPattern(s1, s2, s3);
 
     assertEquals(List.of(s1, s2, s3), pattern.getStops());
 
@@ -97,7 +97,7 @@ class StopPatternTest {
     var s3 = testModel.stop("3").build();
     var s4 = testModel.stop("4").build();
 
-    var pattern = TimetableRepositoryForTest.stopPattern(s1, s2, s3);
+    var pattern = TransitRepositoryForTest.stopPattern(s1, s2, s3);
 
     assertEquals(List.of(s1, s2, s3), pattern.getStops());
 
@@ -111,7 +111,7 @@ class StopPatternTest {
     var s2 = testModel.stop("2").build();
     var s3 = testModel.stop("3").build();
 
-    var pattern = TimetableRepositoryForTest.stopPattern(s1, s2, s3);
+    var pattern = TransitRepositoryForTest.stopPattern(s1, s2, s3);
 
     assertEquals(PickDrop.SCHEDULED, pattern.getPickup(0));
     assertEquals(PickDrop.SCHEDULED, pattern.getPickup(1));

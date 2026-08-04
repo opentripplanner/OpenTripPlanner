@@ -28,7 +28,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
@@ -92,7 +92,7 @@ class CarpoolItineraryMapperTest {
   private static final String UNNAMED_INTERSECTION = "unnamed";
 
   private final CarpoolItineraryMapper mapper = new CarpoolItineraryMapper();
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   @Test
   void nullContact_returnsNull() {

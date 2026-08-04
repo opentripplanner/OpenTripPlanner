@@ -23,7 +23,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -32,11 +32,11 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class LuceneIndexTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final Agency BVG = Agency.of(id("bvg"))
     .withName("BVG")
@@ -122,9 +122,9 @@ class LuceneIndexTest {
     List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION).forEach(
       siteRepository::withStation
     );
-    var timetableRepository = new TimetableRepository(siteRepository.build());
-    timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository) {
+    var transitRepository = new TransitRepository(siteRepository.build());
+    transitRepository.index();
+    var transitService = new DefaultTransitService(transitRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
           StopLocation,
           TransitMode
@@ -151,7 +151,7 @@ class LuceneIndexTest {
 
       @Override
       public Set<Route> findRoutes(StopLocation stop) {
-        return Set.of(TimetableRepositoryForTest.route("route1").withAgency(BVG).build());
+        return Set.of(TransitRepositoryForTest.route("route1").withAgency(BVG).build());
       }
 
       @Override
@@ -169,7 +169,7 @@ class LuceneIndexTest {
     };
     var stopConsolidationService = new DefaultStopConsolidationService(
       new DefaultStopConsolidationRepository(),
-      timetableRepository
+      transitRepository
     );
     index = new LuceneIndex(transitService, stopConsolidationService);
   }

@@ -23,7 +23,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,20 +47,20 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
   private final Graph graph;
   private final VertexLinker linker;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
   private final double radiusMeters;
 
   public DirectTransferAnalyzer(
     Graph graph,
     VertexLinker linker,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     double radiusMeters
   ) {
     this.graph = graph;
     this.linker = linker;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
     this.radiusMeters = radiusMeters;
   }
@@ -68,7 +68,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit index which is needed by the nearby stop finder. */
-    timetableRepository.index();
+    transitRepository.index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 
@@ -76,7 +76,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
     var straightLineNearbyStopFinder = new StraightLineNearbyStopFinder(
-      timetableRepository.getSiteRepository()::findRegularStops
+      transitRepository.getSiteRepository()::findRegularStops
     );
     var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
     var streetNearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
@@ -109,7 +109,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       } catch (Exception ignored) {}
 
       RegularStop originStop = Objects.requireNonNull(
-        timetableRepository.getSiteRepository().getRegularStop(originStopVertex.getId())
+        transitRepository.getSiteRepository().getRegularStop(originStopVertex.getId())
       );
 
       /* Get stops found by both street and euclidean search */
@@ -194,7 +194,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   }
 
   private RegularStop getRegularStop(FeedScopedId id) {
-    return timetableRepository.getSiteRepository().getRegularStop(id);
+    return transitRepository.getSiteRepository().getRegularStop(id);
   }
 
   private static class TransferInfo {

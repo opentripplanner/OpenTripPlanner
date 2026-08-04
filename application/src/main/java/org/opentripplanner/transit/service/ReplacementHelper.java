@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.network.ReplacementForRelation;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 
 /**
  * <p>Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
@@ -32,24 +32,24 @@ public class ReplacementHelper {
   );
 
   private final TransitService transitService;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   @Nullable
-  private final ReadOnlyTimetableSnapshot timetableSnapshot;
+  private final TimetableRepositorySnapshot timetableSnapshot;
 
   public ReplacementHelper(
     TransitService transitService,
-    TimetableRepository timetableRepository,
-    @Nullable ReadOnlyTimetableSnapshot timetableSnapshot
+    TransitRepository transitRepository,
+    @Nullable TimetableRepositorySnapshot timetableSnapshot
   ) {
     this.transitService = transitService;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.timetableSnapshot = timetableSnapshot;
   }
 
   public Collection<ReplacedByRelation> getReplacedBy(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
-    var replacedBy = timetableRepository.getReplacedByTripOnServiceDate(id);
+    var replacedBy = transitRepository.getReplacedByTripOnServiceDate(id);
     Stream<TripOnServiceDate> tripsOnServiceDate;
     if (timetableSnapshot != null) {
       tripsOnServiceDate = Stream.concat(
@@ -96,7 +96,7 @@ public class ReplacementHelper {
   private boolean hasReplacedByTripOnServiceDates(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
     return (
-      !timetableRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
+      !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
       (timetableSnapshot != null &&
         timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
     );

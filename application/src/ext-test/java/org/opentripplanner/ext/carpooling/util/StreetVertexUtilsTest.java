@@ -89,7 +89,7 @@ class StreetVertexUtilsTest {
       );
     assertTrue(
       foundBidirectionalCarSplitter,
-      "Passenger must be linked BIDIRECTIONALLY to a car-accessible splitter so carpool CAR " +
+      "Passenger must be linked BIDIRECTIONALLY to a car-reachable splitter so carpool CAR " +
         "routing works in both directions"
     );
   }

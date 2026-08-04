@@ -2,8 +2,8 @@ package org.opentripplanner.transit.model.filter.transit;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.agency;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.agency;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.route;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequestBuilder;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 
 class TripTimeOnDateMatcherFactoryTest {
 
-  private static final RegularStop STOP = TimetableRepositoryForTest.of().stop("1").build();
+  private static final RegularStop STOP = TransitRepositoryForTest.of().stop("1").build();
   private static final LocalDate DATE = LocalDate.of(2025, 3, 2);
 
   private static final Route ROUTE_1 = route("r1")
@@ -653,15 +653,15 @@ class TripTimeOnDateMatcherFactoryTest {
   }
 
   private static TripPattern pattern(Route route) {
-    return TimetableRepositoryForTest.tripPattern("p1", route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP, STOP))
+    return TransitRepositoryForTest.tripPattern("p1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP, STOP))
       .build();
   }
 
   private static TripTimeOnDate tripTimeOnDate(Route route1) {
     final TripPattern pattern = pattern(route1);
     var tripTimes = ScheduledTripTimes.of()
-      .withTrip(TimetableRepositoryForTest.trip("t1").withRoute(route1).build())
+      .withTrip(TransitRepositoryForTest.trip("t1").withRoute(route1).build())
       .withArrivalTimes("10:00 10:05")
       .withDepartureTimes("10:00 10:05")
       .build();

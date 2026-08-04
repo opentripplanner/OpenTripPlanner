@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling;
 
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -207,6 +208,22 @@ public class CarpoolEstimatedVehicleJourneyData {
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
     var firstDeparture = calls.getFirst().getAimedDepartureTime();
     calls.getLast().setAimedArrivalTime(firstDeparture.minusMinutes(45));
+    return journey;
+  }
+
+  /**
+   * Like {@link #minimalCompleteJourney()} but with the destination moved, giving a changed
+   * route-point geometry.
+   */
+  public static EstimatedVehicleJourney journeyWithMovedDestination() {
+    var journey = minimalCompleteJourney();
+    var calls = journey.getEstimatedCalls().getEstimatedCalls();
+    var original = calls.getLast();
+    var moved = forPoint(OSLO_WEST);
+    moved.setAimedDepartureTime(original.getAimedDepartureTime());
+    moved.setAimedArrivalTime(original.getAimedArrivalTime());
+    addStopName(moved, "Moved last stop");
+    calls.set(calls.size() - 1, moved);
     return journey;
   }
 

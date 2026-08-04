@@ -201,6 +201,7 @@ Trips are typically added via the SIRI-ET updater, but can also be added program
 
 ```java
 @Inject CarpoolingRepository repository;
+@Inject CarpoolTripVertexResolver tripVertexResolver;
 
 // Build a trip using the builder
 CarpoolTrip trip = CarpoolTrip.builder()
@@ -217,8 +218,12 @@ CarpoolTrip trip = CarpoolTrip.builder()
   ))
   .build();
 
-// Add to repository (makes immediately available for routing)
-repository.upsertCarpoolTrip(trip);
+// Resolve route points to street vertices and add to the repository. Resolution returns null
+// when a route point has no car-reachable street vertex; such a trip is not routable, so drop it.
+var resolved = tripVertexResolver.resolve(trip);
+if (resolved != null) {
+  repository.upsertCarpoolTrip(resolved);
+}
 ```
 
 ## Configuration
@@ -363,7 +368,9 @@ Test full routing flow with graph:
 void testCarpoolingRouting() {
   // Build test graph with carpool trips
   Graph graph = buildTestGraph();
-  repository.upsertCarpoolTrip(testTrip);
+  var resolved = tripVertexResolver.resolve(testTrip);
+  assertNotNull(resolved);  // a seeded test trip is expected to resolve on the test graph
+  repository.upsertCarpoolTrip(resolved);
 
   // Enable feature
   OTPFeature.enableFeatures(Map.of(OTPFeature.CarPooling, true));

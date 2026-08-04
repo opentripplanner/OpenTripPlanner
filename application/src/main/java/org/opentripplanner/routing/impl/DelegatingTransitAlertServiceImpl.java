@@ -30,7 +30,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
   /**
-   * Constructor which scans over all existing GraphUpdaters associated with a TimetableRepository
+   * Constructor which scans over all existing GraphUpdaters associated with a TransitRepository
    * instance and retains references to all their TransitAlertService instances.
    * This implies that these instances are expected to remain in use indefinitely (not be replaced
    * with new instances or taken out of service over time).

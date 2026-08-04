@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for managing the state and loading of complete GBFS version 2.2 and 2.3 datasets, and updating them according
- * to individual feed's TTL rules.
+ * Base class for managing the state and loading of complete GBFS datasets, and updating them
+ * according to individual feed's TTL rules.
  */
 public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
   implements GbfsFeedLoader {
@@ -97,20 +97,6 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
   protected abstract <T> N nameForClass(Class<T> feed);
 
   protected abstract <T> Class<T> classForName(N name);
-
-  protected static <T> T fetchFeed(
-    URI uri,
-    HttpHeaders httpHeaders,
-    OtpHttpClient otpHttpClient,
-    Class<T> clazz
-  ) {
-    try {
-      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders, OBJECT_MAPPER, clazz);
-    } catch (OtpHttpClientException e) {
-      LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
-      return null;
-    }
-  }
 
   /**
    * Fetches a feed with conditional request support (ETag/If-None-Match).

@@ -5,8 +5,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 public class UKMapperTest {
 

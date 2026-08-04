@@ -6,9 +6,9 @@ import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Serialises the graph write operations of one write domain by delegating to that domain's
  * {@link UpdateManager}, which owns the single-threaded executor. Each write task receives the
- * update context of its domain: transit tasks get access to the mutable timetable snapshot,
- * street tasks get access to the street model.
+ * update context of its domain: transit tasks get access to the mutable realtime-timetable
+ * repository, street tasks get access to the street model.
  * <p>
  * This class will eventually be removed once all updaters submit directly to {@link UpdateManager}.
  *
@@ -39,16 +39,16 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   }
 
   /**
-   * Create the bridge for the transit write domain. Each task checks out the mutable timetable
-   * snapshot for the current transaction.
+   * Create the bridge for the transit write domain. Each task checks out the mutable
+   * realtime-timetable repository for the current transaction.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle,
-    TimetableRepository timetableRepository
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
+    TransitRepository transitRepository
   ) {
     return new GraphWriterService<>(updateManager, ctx ->
-      new DefaultTransitRealTimeUpdateContext(timetableRepository, ctx.repository(timetableHandle))
+      new DefaultTransitRealTimeUpdateContext(transitRepository, ctx.repository(timetableHandle))
     );
   }
 

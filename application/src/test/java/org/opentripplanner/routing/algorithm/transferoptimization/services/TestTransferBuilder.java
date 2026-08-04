@@ -10,7 +10,7 @@ import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -154,7 +154,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TimetableRepositoryForTest.trip(
+    return TransitRepositoryForTest.trip(
       trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0))
     ).build();
   }

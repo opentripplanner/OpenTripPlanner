@@ -3,15 +3,15 @@ package org.opentripplanner.framework.event;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
- * A write-side event handler that receives a mutable repository snapshot at dispatch time.
+ * A write-side event handler that receives a mutable repository at dispatch time.
  *
  * <p>A {@code RepositoryEventHandler} is invoked inside an active {@link WriteContext}. The
- * context injects the mutable snapshot for the handler's repository as the second argument to
+ * context injects the mutable repository for the handler as the second argument to
  * {@link #handle(DomainEvent, Object)}, so the handler never holds a stored reference to anything
  * mutable.
  *
  * @param <E> the domain event type this handler responds to
- * @param <M> the mutable snapshot type this handler writes to
+ * @param <M> the mutable repository type this handler writes to
  */
 public interface EventHandler<E extends DomainEvent, M> {
   /**
@@ -20,11 +20,11 @@ public interface EventHandler<E extends DomainEvent, M> {
   Class<E> eventType();
 
   /**
-   * Handle the event, writing to the provided mutable snapshot.
+   * Handle the event, writing to the provided mutable repository.
    *
-   * @param event           the domain event
-   * @param mutableSnapshot the mutable snapshot for this handler's repository, injected by the
-   *                        {@link WriteContext}
+   * @param event      the domain event
+   * @param repository the mutable repository for this handler, injected by the
+   *                   {@link WriteContext}
    */
-  void handle(E event, M mutableSnapshot);
+  void handle(E event, M repository);
 }

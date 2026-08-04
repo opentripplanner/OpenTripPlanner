@@ -22,7 +22,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -37,20 +37,20 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
 class AddedTripBuilderTest {
 
-  private static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
+  private static final Agency AGENCY = TransitRepositoryForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
   private static final Operator OPERATOR = Operator.of(FeedScopedIdForTestFactory.id("OPERATOR_ID"))
     .withName("OPERATOR_NAME")
     .build();
-  private static final Route REPLACED_ROUTE = TimetableRepositoryForTest.route("REPLACED_ROUTE")
+  private static final Route REPLACED_ROUTE = TransitRepositoryForTest.route("REPLACED_ROUTE")
     .withAgency(AGENCY)
     .withOperator(OPERATOR)
     .build();
@@ -66,7 +66,7 @@ class AddedTripBuilderTest {
   private static final String HEADSIGN = "TEST TRIP TOWARDS TEST ISLAND";
 
   /* Transit model */
-  private static final TimetableRepositoryForTest MODEL_TEST = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest MODEL_TEST = TransitRepositoryForTest.of();
 
   private static final RegularStop STOP_A = MODEL_TEST.stop("A").build();
   private static final RegularStop STOP_B = MODEL_TEST.stop("B").build();
@@ -80,7 +80,7 @@ class AddedTripBuilderTest {
     .build();
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
-  private final TimetableRepository TRANSIT_MODEL = new TimetableRepository(SITE_REPOSITORY);
+  private final TransitRepository TRANSIT_MODEL = new TransitRepository(SITE_REPOSITORY);
   private TransitEditorService transitService;
   private EntityResolver ENTITY_RESOLVER;
 
@@ -88,11 +88,11 @@ class AddedTripBuilderTest {
   void setUp() {
     // Add entities to transit model for the entity resolver
     TRANSIT_MODEL.addAgency(AGENCY);
-    final TripPattern pattern = TimetableRepositoryForTest.tripPattern(
+    final TripPattern pattern = TransitRepositoryForTest.tripPattern(
       "REPLACED_ROUTE_PATTERN_ID",
       REPLACED_ROUTE
     )
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B))
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .build();
     TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
 
@@ -113,7 +113,7 @@ class AddedTripBuilderTest {
     // Create the entity resolver only after the model has been indexed
     ENTITY_RESOLVER = new EntityResolver(
       new DefaultTransitService(TRANSIT_MODEL),
-      TimetableRepositoryForTest.FEED_ID
+      TransitRepositoryForTest.FEED_ID
     );
   }
 

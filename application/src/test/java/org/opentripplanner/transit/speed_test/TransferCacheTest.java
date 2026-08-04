@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
@@ -27,23 +27,23 @@ public class TransferCacheTest {
       var routerConfig = new OtpConfigLoader(opts.rootDir()).loadRouterConfig();
       SetupHelper.loadOtpFeatures(opts);
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
-      var timetableRepository = model.timetableRepository();
+      var transitRepository = model.transitRepository();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
 
       var timer = new SpeedTestTimer();
       timer.setUp(false);
 
-      // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
+      // Creating transitLayerForRaptor should be integrated into the TransitRepository, but for now
       // we do it manually here
       TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
-      timetableRepository.initRaptorTransitData(
-        RaptorTransitDataMapper.map(tuningParameters, timetableRepository, transferRepository)
+      transitRepository.initRaptorTransitData(
+        RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
       );
 
-      assertTestDateHasData(timetableRepository, config, buildConfig);
+      assertTestDateHasData(transitRepository, config, buildConfig);
 
-      measureTransferCacheComputation(timer, timetableRepository);
+      measureTransferCacheComputation(timer, transitRepository);
 
       timer.finishUp();
     } catch (Exception e) {
@@ -58,14 +58,14 @@ public class TransferCacheTest {
    */
   private static void measureTransferCacheComputation(
     SpeedTestTimer timer,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     IntStream.range(1, 7).forEach(reluctance -> {
       var routeRequest = RouteRequest.of()
         .withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)))
         .buildDefault();
       timer.recordTimer("transfer_cache_computation", () ->
-        timetableRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
+        transitRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
       );
     });
   }

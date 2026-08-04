@@ -16,7 +16,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -145,7 +145,7 @@ public class StopMapperTest {
 
   @Test
   void testMapWithParentStation() {
-    TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+    TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
     Station parentStation = testModel.station("Parent").build();
 
     StopMapper mapperWithStation = new StopMapper(

@@ -26,13 +26,13 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the RaptorTransitData object from the TimetableRepository object. The ServiceDay hierarchy is reversed,
+ * Maps the RaptorTransitData object from the TransitRepository object. The ServiceDay hierarchy is reversed,
  * with service days at the top level, which contains TripPatternForDate objects that contain only
  * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
  * when doing Range Raptor searches.
@@ -51,22 +51,20 @@ public class RaptorTransitDataMapper {
   private final TransferRepository transferRepository;
 
   private RaptorTransitDataMapper(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository
   ) {
-    this.transitService = new DefaultTransitService(timetableRepository);
-    this.siteRepository = timetableRepository.getSiteRepository();
+    this.transitService = new DefaultTransitService(transitRepository);
+    this.siteRepository = transitRepository.getSiteRepository();
     this.transferRepository = transferRepository;
   }
 
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository
   ) {
-    return new RaptorTransitDataMapper(timetableRepository, transferRepository).map(
-      tuningParameters
-    );
+    return new RaptorTransitDataMapper(transitRepository, transferRepository).map(tuningParameters);
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {
@@ -74,7 +72,7 @@ public class RaptorTransitDataMapper {
     List<List<PathTransfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
-    LOG.info("Mapping raptorTransitData from TimetableRepository...");
+    LOG.info("Mapping raptorTransitData from TransitRepository...");
 
     Collection<TripPattern> allTripPatterns = transitService.listTripPatterns();
 

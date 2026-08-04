@@ -40,7 +40,7 @@ import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transit.StopResolver;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,19 +76,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final Map<Platform, OsmBoardingLocationVertex> existingBoardingLocationsAtAreas;
 
   /**
-   * @param timetableRepository This module requires the timetable repository because at the time
+   * @param transitRepository This module requires the timetable repository because at the time
    *                            of the instantiation the site repository is empty.
    */
   @Inject
   public OsmBoardingLocationsModule(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     VertexLinker linker,
     OsmInfoGraphBuildService osmInfoGraphBuildService
   ) {
     this.graph = graph;
     this.stopResolver = id ->
-      Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id));
+      Objects.requireNonNull(transitRepository.getSiteRepository().getRegularStop(id));
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.vertexFactory = new VertexFactory(graph);
     this.linker = linker;

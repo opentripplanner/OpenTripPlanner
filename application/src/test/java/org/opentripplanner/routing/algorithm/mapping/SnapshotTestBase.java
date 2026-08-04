@@ -89,7 +89,7 @@ public abstract class SnapshotTestBase {
       TestOtpModel model = getGraph();
       serverContext = TestServerContext.createServerContext(
         model.graph(),
-        model.timetableRepository(),
+        model.transitRepository(),
         model.transferRepository(),
         model.fareServiceFactory().makeFareService(),
         null,

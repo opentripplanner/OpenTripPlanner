@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopType;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.StopArrival;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 class StopArrivalByTypeFilterTest {
 
-  public static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  public static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   public static final RegularStop REGULAR = TEST_MODEL.stop("r").build();
   public static final AreaStop AREA = TEST_MODEL.areaStop("a").build();
   public static final GroupStop GROUP = TEST_MODEL.groupStop("g", REGULAR, REGULAR);

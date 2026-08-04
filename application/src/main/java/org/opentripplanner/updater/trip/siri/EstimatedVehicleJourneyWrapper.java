@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
 
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -17,6 +18,7 @@ import uk.org.siri.siri21.DatedVehicleJourneyRef;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.OperatorRefStructure;
+import uk.org.siri.siri21.VehicleJourneyRef;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 import uk.org.siri.siri21.VehicleRef;
 
@@ -100,40 +102,39 @@ final class EstimatedVehicleJourneyWrapper {
 
   /**
    * The EstimatedVehicleJourneyCode of an extra journey, used to identify the added trip. It can be
-   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code null} when
+   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code empty} when
    * the journey carries no code.
    */
-  @Nullable
-  EstimatedVehicleJourneyCode code() {
-    return code;
+  Optional<EstimatedVehicleJourneyCode> code() {
+    return Optional.ofNullable(code);
   }
 
   /**
    * The dated vehicle journey identified by unique id.
    */
-  @Nullable
-  String datedVehicleJourneyRef() {
-    return journey.getDatedVehicleJourneyRef() != null
-      ? journey.getDatedVehicleJourneyRef().getValue()
-      : null;
+  Optional<String> datedVehicleJourneyRef() {
+    return Optional.ofNullable(journey.getDatedVehicleJourneyRef()).map(
+      DatedVehicleJourneyRef::getValue
+    );
   }
 
   /**
    * The dated vehicle journey identified by the pair (service journey id, service date).
    */
-  @Nullable
-  VehicleJourneyIdAndServiceDate vehicleJourneyIdAndServiceDate() {
-    return VehicleJourneyIdAndServiceDate.of(journey.getFramedVehicleJourneyRef());
+  Optional<VehicleJourneyIdAndServiceDate> vehicleJourneyIdAndServiceDate() {
+    return Optional.ofNullable(
+      VehicleJourneyIdAndServiceDate.of(journey.getFramedVehicleJourneyRef())
+    );
   }
 
   /**
    * The reference to the vehicle operating this journey.
    * Also used for fuzzy matching
    */
-  @Nullable
-  String vehicleRef() {
-    VehicleRef vehicleRef = journey.getVehicleRef();
-    return vehicleRef != null && !vehicleRef.getValue().isBlank() ? vehicleRef.getValue() : null;
+  Optional<String> vehicleRef() {
+    return Optional.ofNullable(journey.getVehicleRef())
+      .map(VehicleRef::getValue)
+      .filter(v -> !v.isBlank());
   }
 
   /* Replaced trips */
@@ -141,11 +142,8 @@ final class EstimatedVehicleJourneyWrapper {
   /**
    * The dated vehicle journey this journey replaces.
    */
-  @Nullable
-  String replacedDatedVehicleJourneyRef() {
-    return journey.getVehicleJourneyRef() != null
-      ? journey.getVehicleJourneyRef().getValue()
-      : null;
+  Optional<String> replacedDatedVehicleJourneyRef() {
+    return Optional.ofNullable(journey.getVehicleJourneyRef()).map(VehicleJourneyRef::getValue);
   }
 
   /**
@@ -162,21 +160,17 @@ final class EstimatedVehicleJourneyWrapper {
   /**
    * In case of a replacement departure, the line of the replaced vehicle journey.
    */
-  @Nullable
-  String externalLineRef() {
-    return journey.getExternalLineRef() != null ? journey.getExternalLineRef().getValue() : null;
+  Optional<String> externalLineRef() {
+    return Optional.ofNullable(journey.getExternalLineRef()).map(LineRef::getValue);
   }
 
   /* Line, operator and mode */
-
-  @Nullable
-  String lineRef() {
-    return journey.getLineRef() != null ? journey.getLineRef().getValue() : null;
+  Optional<String> lineRef() {
+    return Optional.ofNullable(journey.getLineRef()).map(LineRef::getValue);
   }
 
-  @Nullable
-  String operatorRef() {
-    return journey.getOperatorRef() != null ? journey.getOperatorRef().getValue() : null;
+  Optional<String> operatorRef() {
+    return Optional.ofNullable(journey.getOperatorRef()).map(OperatorRefStructure::getValue);
   }
 
   /**
@@ -209,16 +203,12 @@ final class EstimatedVehicleJourneyWrapper {
     return getFirstStringFromList(journey.getDestinationNames());
   }
 
-  @Nullable
-  OccupancyStatus occupancy() {
-    return journey.getOccupancy() == null
-      ? null
-      : OccupancyMapper.mapOccupancyStatus(journey.getOccupancy());
+  Optional<OccupancyStatus> occupancy() {
+    return Optional.ofNullable(journey.getOccupancy()).map(OccupancyMapper::mapOccupancyStatus);
   }
 
-  @Nullable
-  String dataSource() {
-    return journey.getDataSource();
+  Optional<String> dataSource() {
+    return Optional.ofNullable(journey.getDataSource());
   }
 
   @Override

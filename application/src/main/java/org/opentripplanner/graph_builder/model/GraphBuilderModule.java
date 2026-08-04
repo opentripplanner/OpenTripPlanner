@@ -4,7 +4,7 @@ package org.opentripplanner.graph_builder.model;
 public interface GraphBuilderModule {
   /**
    * Process whatever inputs were supplied to this module and update the model objects(graph,
-   * timetableRepository and issueStore).
+   * transitRepository and issueStore).
    */
   void buildGraph();
 

@@ -41,10 +41,10 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -69,12 +69,12 @@ public class RequestScopedModule {
   @Provides
   @HttpRequestScoped
   static TransitService transitService(
-    TimetableRepository timetableRepository,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
+    TransitRepository transitRepository,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     TransactionScope transactionScope
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
-    return new DefaultTransitService(timetableRepository, timetableSnapshot);
+    return new DefaultTransitService(transitRepository, timetableSnapshot);
   }
 
   @Provides
