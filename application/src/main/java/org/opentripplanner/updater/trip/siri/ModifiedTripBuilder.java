@@ -63,9 +63,9 @@ class ModifiedTripBuilder {
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
     predictionInaccurate = journey.isPredictionInaccurate();
-    occupancy = journey.occupancy();
-    dataSource = journey.dataSource();
-    vehicleRef = journey.vehicleRef();
+    occupancy = journey.occupancy().orElse(null);
+    dataSource = journey.dataSource().orElse(null);
+    vehicleRef = journey.vehicleRef().orElse(null);
   }
 
   /**

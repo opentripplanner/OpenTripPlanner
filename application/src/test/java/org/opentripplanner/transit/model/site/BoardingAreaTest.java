@@ -11,14 +11,14 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class BoardingAreaTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final RegularStop PARENT_STOP = TimetableRepositoryForTest.of()
+  private static final RegularStop PARENT_STOP = TransitRepositoryForTest.of()
     .stop("stopId")
     .build();
 

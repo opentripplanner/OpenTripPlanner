@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -71,8 +72,8 @@ public class SiriFuzzyTripMatcher {
     }
 
     Set<Trip> trips = null;
-    if (journeyWrapper.vehicleRef() != null && journeyWrapper.isRail()) {
-      trips = cachedTripsByInternalPlanningCode(journeyWrapper.vehicleRef());
+    if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
+      trips = cachedTripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
     }
 
     if (trips == null || trips.isEmpty()) {
@@ -95,15 +96,12 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
-    String lineRef = journeyWrapper.lineRef();
-    if (lineRef != null) {
-      Route route = entityResolver.resolveRoute(lineRef);
-      if (route != null) {
-        trips = trips
-          .stream()
-          .filter(trip -> trip.getRoute().equals(route))
-          .collect(Collectors.toSet());
-      }
+    Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
+    if (route.isPresent()) {
+      trips = trips
+        .stream()
+        .filter(trip -> trip.getRoute().equals(route.get()))
+        .collect(Collectors.toSet());
     }
 
     return getTripAndPatternForJourney(

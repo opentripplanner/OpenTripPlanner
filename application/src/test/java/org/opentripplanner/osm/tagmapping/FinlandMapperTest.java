@@ -9,10 +9,10 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class FinlandMapperTest {
 

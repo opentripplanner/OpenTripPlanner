@@ -102,15 +102,28 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     public Builder addAreaFromNodes(long id, List<OsmNode> areaNodes) {
+      return addAreaFromNodes(way -> way.withTag("highway", "pedestrian"), id, areaNodes);
+    }
+
+    public Builder addAreaFromNodes(
+      Consumer<OsmWayBuilder> areaBuilderConsumer,
+      List<OsmNode> areaNodes
+    ) {
+      return addAreaFromNodes(areaBuilderConsumer, counter.incrementAndGet(), areaNodes);
+    }
+
+    public Builder addAreaFromNodes(
+      Consumer<OsmWayBuilder> areaBuilderConsumer,
+      long id,
+      List<OsmNode> areaNodes
+    ) {
       this.nodes.addAll(areaNodes);
       var nodeIds = areaNodes.stream().map(OsmEntity::getId).toList();
 
-      var areaBuilder = OsmWay.of()
-        .withId(id)
-        .withTag("area", "yes")
-        .withTag("highway", "pedestrian");
+      var areaBuilder = OsmWay.of().withId(id).withTag("area", "yes");
       nodeIds.forEach(areaBuilder::addNodeRef);
       areaBuilder.addNodeRef(nodeIds.getFirst());
+      areaBuilderConsumer.accept(areaBuilder);
       var area = areaBuilder.build();
 
       this.ways.add(area);

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -40,7 +40,7 @@ public class BoardingAreaMapperTest {
   private static final int VEHICLE_TYPE = 5;
 
   private static final int WHEELCHAIR_BOARDING = 1;
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final RegularStop PARENT_STOP = TEST_MODEL.stop(PARENT).build();
 

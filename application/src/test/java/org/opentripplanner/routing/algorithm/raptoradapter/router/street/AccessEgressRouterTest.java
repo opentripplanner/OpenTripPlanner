@@ -25,12 +25,12 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class AccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
-  private TimetableRepository timetableRepository;
+  private TransitRepository transitRepository;
 
   private TransitStopVertex stopForCentroidRoutingStation;
   private TransitStopVertex stopForNoCentroidRoutingStation;
@@ -81,7 +81,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       }
     );
     graph = otpModel.graph();
-    timetableRepository = otpModel.timetableRepository();
+    transitRepository = otpModel.transitRepository();
   }
 
   @Test
@@ -228,7 +228,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     if (nearbyStop.edges.isEmpty()) {
       return (
         "direct[" +
-        timetableRepository.getSiteRepository().getStopLocation(nearbyStop.stopId).getName() +
+        transitRepository.getSiteRepository().getStopLocation(nearbyStop.stopId).getName() +
         "]"
       );
     } else {
@@ -262,7 +262,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     try (var verticesContainer = new TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var vertexCreationService = new VertexCreationService(vertexLinker);
-      var transitService = new DefaultTransitService(timetableRepository);
+      var transitService = new DefaultTransitService(transitRepository);
       var linkingContextFactory = new LinkingContextFactory(
         graph,
         vertexCreationService,

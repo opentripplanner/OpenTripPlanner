@@ -14,7 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
@@ -23,7 +23,7 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 
 class TripTimeOnDateRequestBuilderTest {
 
-  private static final RegularStop STOP = TimetableRepositoryForTest.of().stop("1").build();
+  private static final RegularStop STOP = TransitRepositoryForTest.of().stop("1").build();
   private static final Instant TIME = Instant.parse("2025-03-02T10:00:00Z");
 
   @Test

@@ -24,6 +24,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
 import org.opentripplanner.apis.gtfs.mapping.CarsAllowedMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -39,6 +40,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -269,6 +271,19 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   @Override
   public DataFetcher<Iterable<Notice>> notices() {
     return env -> getTransitService(env).findNotices(getSource(env));
+  }
+
+  @Override
+  public DataFetcher<TripOnServiceDate> onServiceDate() {
+    return environment -> {
+      Trip trip = getSource(environment);
+      var args = new GraphQLTypes.GraphQLTripOnServiceDateArgs(environment.getArguments());
+      LocalDate serviceDate = args.getGraphQLDate();
+
+      return new ApiTransitService(getTransitService(environment))
+        .findOrCreateTripOnServiceDate(trip.getId(), serviceDate)
+        .orElse(null);
+    };
   }
 
   @Override

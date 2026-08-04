@@ -12,7 +12,7 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,14 +21,14 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   private static final Logger LOG = LoggerFactory.getLogger(DefaultStopConsolidationService.class);
 
   private final StopConsolidationRepository repo;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   public DefaultStopConsolidationService(
     StopConsolidationRepository repo,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     this.repo = Objects.requireNonNull(repo);
-    this.timetableRepository = Objects.requireNonNull(timetableRepository);
+    this.transitRepository = Objects.requireNonNull(transitRepository);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .groups()
       .stream()
       .flatMap(group -> {
-        var primaryStop = timetableRepository.getSiteRepository().getRegularStop(group.primary());
+        var primaryStop = transitRepository.getSiteRepository().getRegularStop(group.primary());
         if (primaryStop == null) {
           LOG.error(
             "Could not find primary stop with id {}. Ignoring stop group {}.",
@@ -107,7 +107,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .flatMap(g -> g.secondaries().stream())
       .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
       .findAny()
-      .map(id -> timetableRepository.getSiteRepository().getRegularStop(id));
+      .map(id -> transitRepository.getSiteRepository().getRegularStop(id));
   }
 
   @Override
@@ -119,6 +119,6 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .map(ConsolidatedStopGroup::primary)
       .findAny()
       .orElse(id);
-    return Optional.ofNullable(timetableRepository.getSiteRepository().getRegularStop(primaryId));
+    return Optional.ofNullable(transitRepository.getSiteRepository().getRegularStop(primaryId));
   }
 }

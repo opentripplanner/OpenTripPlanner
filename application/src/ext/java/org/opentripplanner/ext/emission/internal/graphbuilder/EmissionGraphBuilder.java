@@ -17,7 +17,7 @@ import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
   private final EmissionRepository emissionRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources;
   private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   private final DataImportIssueStore issueStore;
 
@@ -41,14 +41,14 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources,
     EmissionParameters parameters,
     EmissionRepository emissionRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
     this.gtfsDataSources = gtfsDataSources;
     this.emissionDataSources = emissionDataSources;
     this.parameters = parameters;
     this.emissionRepository = emissionRepository;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
   }
 
@@ -78,7 +78,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
     var map = new HashMap<FeedScopedId, List<StopLocation>>();
-    for (TripPattern pattern : timetableRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
     }
     return map;

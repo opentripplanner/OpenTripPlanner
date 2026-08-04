@@ -97,6 +97,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Snapshot framework [#7689](https://github.com/opentripplanner/OpenTripPlanner/pull/7689)
 - Add vehicle id via real-time updates [#7814](https://github.com/opentripplanner/OpenTripPlanner/pull/7814)
 - Map GTFS notice assignments on trip segments to individual stop times [#7809](https://github.com/opentripplanner/OpenTripPlanner/pull/7809)
+- Parallelize and deduplicate way property computation [#7823](https://github.com/opentripplanner/OpenTripPlanner/pull/7823)
+- Penalize cycling on streets with embedded tram tracks [#7816](https://github.com/opentripplanner/OpenTripPlanner/pull/7816)
+- fix(transmodel): skip flex-window stops in intermediate estimated calls [#7850](https://github.com/opentripplanner/OpenTripPlanner/pull/7850)
+- Expose `TripOnServiceDate` on trips and patterns, add notices [#7813](https://github.com/opentripplanner/OpenTripPlanner/pull/7813)
+- Add pickup/drop off filter to canceledCalls [#7858](https://github.com/opentripplanner/OpenTripPlanner/pull/7858)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)

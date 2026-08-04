@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class StopsLayerTest {
 
@@ -53,9 +53,9 @@ public class StopsLayerTest {
 
   @Test
   public void digitransitStopPropertyMapperTest() {
-    var timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.index();
-    var transitService = new TestTransitService(timetableRepository);
+    var transitRepository = new TransitRepository(new SiteRepository());
+    transitRepository.index();
+    var transitService = new TestTransitService(transitRepository);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,
@@ -74,9 +74,9 @@ public class StopsLayerTest {
 
   @Test
   public void digitransitStopPropertyMapperTranslationTest() {
-    var timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitRepository = new TransitRepository(new SiteRepository());
+    transitRepository.index();
+    var transitService = new DefaultTransitService(transitRepository);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,

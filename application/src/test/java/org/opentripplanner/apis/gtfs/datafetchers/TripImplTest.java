@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +12,7 @@ import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 class TripImplTest {
 
@@ -57,5 +60,62 @@ class TripImplTest {
 
     var activeDates = impl.activeDates().get(env);
     assertEquals(List.of("20230601", "20230603", "20230605"), activeDates);
+  }
+
+  @Test
+  void onServiceDateSynthesizesWhenTripRuns() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var trip = realtimeEnv.tripData(TRIP_ID).trip();
+
+    var impl = new TripImpl();
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      trip,
+      Map.of("date", SERVICE_DATE),
+      realtimeEnv.transitService()
+    );
+
+    TripOnServiceDate result = impl.onServiceDate().get(env);
+
+    assertNotNull(result);
+    assertEquals(trip, result.getTrip());
+    assertEquals(SERVICE_DATE, result.getServiceDate());
+    // No real TripOnServiceDate exists, so a synthetic one keyed by the trip id is returned.
+    assertEquals(trip.getId(), result.getId());
+  }
+
+  @Test
+  void onServiceDateReturnsNullWhenTripDoesNotRun() throws Exception {
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
+    var trip = realtimeEnv.tripData(TRIP_ID).trip();
+
+    var impl = new TripImpl();
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      trip,
+      Map.of("date", SERVICE_DATE.plusDays(1)),
+      realtimeEnv.transitService()
+    );
+
+    assertNull(impl.onServiceDate().get(env));
+  }
+
+  @Test
+  void onServiceDateReturnsRealTripOnServiceDate() throws Exception {
+    var tripInput = TRIP_INPUT.withWithTripOnServiceDate("DSJ1");
+    var realtimeEnv = envBuilder.addTrip(tripInput).build();
+    var trip = realtimeEnv.tripData(TRIP_ID).trip();
+
+    var impl = new TripImpl();
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      trip,
+      Map.of("date", SERVICE_DATE),
+      realtimeEnv.transitService()
+    );
+
+    TripOnServiceDate result = impl.onServiceDate().get(env);
+
+    assertNotNull(result);
+    // The real TripOnServiceDate (keyed by its own id) is preferred over a synthetic one.
+    assertEquals("DSJ1", result.getId().getId());
+    assertEquals(trip, result.getTrip());
   }
 }

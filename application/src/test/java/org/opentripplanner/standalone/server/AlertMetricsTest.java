@@ -13,7 +13,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class AlertMetricsTest {
 
@@ -32,7 +32,7 @@ class AlertMetricsTest {
   void registerMultiGauge() {
     var alert1 = alertBuilder("1").withSeverity(INFO).build();
     var alert2 = alertBuilder("2").withEffect(DETOUR).build();
-    var service = new TransitAlertServiceImpl(new TimetableRepository());
+    var service = new TransitAlertServiceImpl(new TransitRepository());
     service.setAlerts(List.of(alert1, alert2));
 
     var binder = new AlertMetrics(() -> service);

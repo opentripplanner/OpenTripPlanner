@@ -53,8 +53,8 @@ class TripAndServiceDateResolverTest {
       .withServiceDate(SERVICE_DATE)
       .withTripAlteration(TripAlteration.PLANNED)
       .build();
-    env.timetableRepository().addTripOnServiceDate(tripOnServiceDate);
-    env.timetableRepository().index();
+    env.transitRepository().addTripOnServiceDate(tripOnServiceDate);
+    env.transitRepository().index();
 
     var reference = TripOnDateReference.ofTripOnServiceDateId(id("TOSD-1"));
     var result = new TripAndServiceDateResolver(env.transitService()).resolve(reference);

@@ -549,6 +549,12 @@ public class GraphQLDataFetchers {
     }
   }
 
+  /**
+   * A textual message about a transit entity that is already known at planning time.
+   *
+   * It is not intended to convey real-time or emergency updates of the transit system but information that
+   * is known well ahead of time.
+   */
   public interface GraphQLNotice {
     public DataFetcher<String> text();
   }
@@ -587,6 +593,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Trip>> trips();
     public DataFetcher<Iterable<Trip>> tripsForDate();
+    public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate();
     public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions();
   }
 
@@ -926,6 +933,7 @@ public class GraphQLDataFetchers {
    * This may contain real-time information, if available.
    */
   public interface GraphQLStopCall {
+    public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<CallRealTime> realTime();
     public DataFetcher<CallSchedule> schedule();
     public DataFetcher<Object> stopLocation();
@@ -1039,6 +1047,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> isReplacement();
     public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<TripOccupancy> occupancy();
+    public DataFetcher<TripOnServiceDate> onServiceDate();
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Boolean> replacementsExist();
     public DataFetcher<Route> route();

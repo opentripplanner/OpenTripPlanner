@@ -10,7 +10,7 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +28,15 @@ public class StopConsolidationModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationModule.class);
 
   private final StopConsolidationRepository repository;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final Collection<ConsolidatedStopGroup> groups;
 
   public StopConsolidationModule(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StopConsolidationRepository repository,
     Collection<ConsolidatedStopGroup> groups
   ) {
-    this.timetableRepository = Objects.requireNonNull(timetableRepository);
+    this.transitRepository = Objects.requireNonNull(transitRepository);
     this.repository = Objects.requireNonNull(repository);
     this.groups = Objects.requireNonNull(groups);
   }
@@ -45,19 +45,19 @@ public class StopConsolidationModule implements GraphBuilderModule {
   public void buildGraph() {
     repository.addGroups(groups);
 
-    var service = new DefaultStopConsolidationService(repository, timetableRepository);
+    var service = new DefaultStopConsolidationService(repository, transitRepository);
 
     var stopsToReplace = service.secondaryStops();
     var replacements = service.replacements();
 
-    timetableRepository
+    transitRepository
       .getAllTripPatterns()
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {
         LOG.info("Replacing stop(s) in pattern {}", pattern);
         var modifiedPattern = modifyStopsInPattern(pattern, replacements);
-        timetableRepository.addTripPattern(modifiedPattern.getId(), modifiedPattern);
+        transitRepository.addTripPattern(modifiedPattern.getId(), modifiedPattern);
       });
   }
 
@@ -71,14 +71,14 @@ public class StopConsolidationModule implements GraphBuilderModule {
   }
 
   public static StopConsolidationModule of(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StopConsolidationRepository repo,
     DataSource ds
   ) {
     LOG.info("Reading stop consolidation information from '{}'", ds);
     try (var inputStream = ds.asInputStream()) {
       var groups = StopConsolidationParser.parseGroups(inputStream);
-      return new StopConsolidationModule(timetableRepository, repo, groups);
+      return new StopConsolidationModule(transitRepository, repo, groups);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

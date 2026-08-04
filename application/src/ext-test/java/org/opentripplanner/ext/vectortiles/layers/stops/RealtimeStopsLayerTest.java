@@ -22,12 +22,12 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class RealtimeStopsLayerTest {
 
@@ -56,11 +56,11 @@ public class RealtimeStopsLayerTest {
 
   @Test
   void realtimeStopLayer() {
-    var timetableRepository = new TimetableRepository(new SiteRepository());
-    timetableRepository.initTimeZone(ZoneIds.HELSINKI);
-    timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
+    var transitRepository = new TransitRepository(new SiteRepository());
+    transitRepository.initTimeZone(ZoneIds.HELSINKI);
+    transitRepository.index();
+    var transitService = new DefaultTransitService(transitRepository) {
+      final TransitAlertService alertService = new TransitAlertServiceImpl(transitRepository);
 
       @Override
       public TransitAlertService getTransitAlertService() {
@@ -68,7 +68,7 @@ public class RealtimeStopsLayerTest {
       }
     };
 
-    Route route = TimetableRepositoryForTest.route("route").build();
+    Route route = TransitRepositoryForTest.route("route").build();
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();

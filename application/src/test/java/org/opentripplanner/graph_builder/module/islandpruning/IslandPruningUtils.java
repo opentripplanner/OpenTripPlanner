@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class IslandPruningUtils {
 
@@ -19,7 +19,7 @@ class IslandPruningUtils {
   ) {
     try {
       var graph = new Graph();
-      var timetableRepository = new TimetableRepository(new SiteRepository());
+      var transitRepository = new TransitRepository(new SiteRepository());
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
 
@@ -31,13 +31,13 @@ class IslandPruningUtils {
 
       osmModule.buildGraph();
 
-      timetableRepository.index();
+      transitRepository.index();
       graph.index();
 
       // Prune floating islands and set noThru where necessary
       PruneIslands pruneIslands = new PruneIslands(
         graph,
-        timetableRepository,
+        transitRepository,
         DataImportIssueStore.NOOP,
         null
       );

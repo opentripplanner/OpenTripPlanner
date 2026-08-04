@@ -13,6 +13,7 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionServiceModule;
@@ -67,9 +68,9 @@ import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
@@ -116,7 +117,7 @@ public interface ConstructApplicationFactory {
   Graph graph();
   LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();
-  TimetableRepository timetableRepository();
+  TransitRepository transitRepository();
   TransferRepository transferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
@@ -129,7 +130,7 @@ public interface ConstructApplicationFactory {
   VehicleParkingRepository vehicleParkingRepository();
   VehicleParkingService vehicleParkingService();
   UpdateManager updateManager();
-  RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle();
+  RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -137,6 +138,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   CarpoolingRepository carpoolingRepository();
+
+  @Nullable
+  CarpoolTripVertexResolver carpoolTripVertexResolver();
 
   @Nullable
   EmissionRepository emissionRepository();
@@ -189,7 +193,7 @@ public interface ConstructApplicationFactory {
     Builder graph(Graph graph);
 
     @BindsInstance
-    Builder timetableRepository(TimetableRepository timetableRepository);
+    Builder transitRepository(TransitRepository transitRepository);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

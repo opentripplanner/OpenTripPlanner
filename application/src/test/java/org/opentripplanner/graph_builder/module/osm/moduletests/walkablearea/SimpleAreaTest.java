@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 class SimpleAreaTest {
 
@@ -35,17 +34,37 @@ class SimpleAreaTest {
       .build();
 
     var graph = new Graph();
-    var osmModule = OsmModuleTestFactory.of(provider)
+
+    OsmModuleTestFactory.of(provider)
       .withGraph(graph)
       .builder()
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
-      .build();
+      .build()
+      .buildGraph();
 
-    osmModule.buildGraph();
+    var summarizer = new GraphSummarizer(graph);
 
-    assertFalse(graph.getVertices().isEmpty());
-
-    assertEquals(10, graph.getEdgesOfType(AreaEdge.class).size(), "Incorrect number of edges");
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
+      .that(summarizer.summarizeEdges())
+      .containsExactly(
+        // connecting ways from outside into two opposite corners
+        "(0,0) → (-1,0) PEDESTRIAN ♿✅",
+        "(-1,0) → (0,0) PEDESTRIAN ♿✅",
+        "(5,5) → (6,5) PEDESTRIAN ♿✅",
+        "(6,5) → (5,5) PEDESTRIAN ♿✅",
+        // ring edges (boundary of the square)
+        "(0,0) → (5,0) PEDESTRIAN ♿✅",
+        "(5,0) → (0,0) PEDESTRIAN ♿✅",
+        "(5,0) → (5,5) PEDESTRIAN ♿✅",
+        "(5,5) → (5,0) PEDESTRIAN ♿✅",
+        "(5,5) → (0,5) PEDESTRIAN ♿✅",
+        "(0,5) → (5,5) PEDESTRIAN ♿✅",
+        "(0,5) → (0,0) PEDESTRIAN ♿✅",
+        "(0,0) → (0,5) PEDESTRIAN ♿✅",
+        // diagonal visibility edge between the two connected corners (shortest crossing)
+        "(0,0) → (5,5) PEDESTRIAN ♿✅",
+        "(5,5) → (0,0) PEDESTRIAN ♿✅"
+      );
   }
 }

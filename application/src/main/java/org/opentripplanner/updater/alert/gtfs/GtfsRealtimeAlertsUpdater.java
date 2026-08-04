@@ -8,7 +8,7 @@ import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -31,12 +31,12 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   public GtfsRealtimeAlertsUpdater(
     GtfsRealtimeAlertsUpdaterParameters config,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     super(config);
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
-    TransitAlertService transitAlertService = new TransitAlertServiceImpl(timetableRepository);
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitRepository);
 
     this.transitAlertService = transitAlertService;
 

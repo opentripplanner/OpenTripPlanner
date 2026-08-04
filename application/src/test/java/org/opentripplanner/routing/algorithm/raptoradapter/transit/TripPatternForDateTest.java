@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -25,11 +25,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TripPatternForDateTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
-  private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("1").build();
   private static final ScheduledTripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
-    TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
+    TransitRepositoryForTest.trip("1").withRoute(ROUTE).build(),
     List.of(new StopTime()),
     new Deduplicator()
   );

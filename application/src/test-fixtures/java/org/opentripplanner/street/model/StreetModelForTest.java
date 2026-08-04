@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -143,6 +144,10 @@ public class StreetModelForTest {
 
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
     return VehicleParking.of().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
+  }
+
+  public static OsmVertex osmVertex(Coordinate c, long nodeId) {
+    return new OsmVertex(c.x, c.y, nodeId);
   }
 
   static class GraphBuilder {

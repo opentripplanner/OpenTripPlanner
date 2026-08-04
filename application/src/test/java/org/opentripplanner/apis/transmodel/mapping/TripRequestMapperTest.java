@@ -45,28 +45,28 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class TripRequestMapperTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
   private static final Function<StopLocation, String> STOP_TO_ID = s -> s.getId().toString();
 
-  private static final Route ROUTE1 = TimetableRepositoryForTest.route("route1").build();
-  private static final Route ROUTE2 = TimetableRepositoryForTest.route("route2").build();
+  private static final Route ROUTE1 = TransitRepositoryForTest.route("route1").build();
+  private static final Route ROUTE2 = TransitRepositoryForTest.route("route2").build();
 
   private static final RegularStop STOP1 = TEST_MODEL.stop("ST:stop1", 1, 1).build();
   private static final RegularStop STOP2 = TEST_MODEL.stop("ST:stop2", 2, 1).build();
   private static final RegularStop STOP3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
 
   private static final Graph GRAPH = new Graph();
-  private static final TimetableRepository TIMETABLE_REPOSITORY;
+  private static final TransitRepository TIMETABLE_REPOSITORY;
   private static final TransferRepository TRANSFER_REPOSITORY;
   private static final Map.Entry<String, Object> ARGUMENT_FROM = entry(
     "from",
@@ -93,7 +93,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .build();
 
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
-    TIMETABLE_REPOSITORY = new TimetableRepository(siteRepository);
+    TIMETABLE_REPOSITORY = new TransitRepository(siteRepository);
     TIMETABLE_REPOSITORY.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();

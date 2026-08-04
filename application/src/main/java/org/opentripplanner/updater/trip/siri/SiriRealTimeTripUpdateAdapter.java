@@ -2,16 +2,16 @@ package org.opentripplanner.updater.trip.siri;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
 /**
  * Application-scoped factory for SIRI-ET estimated timetable processing. Holds stable,
  * application-lifetime state and produces a per-task {@link SiriRealTimeUpdateHandler} via
- * {@link #forUpdate(MutableTimetableSnapshot)}.
+ * {@link #forUpdate(TimetableRepository)}.
  */
 public class SiriRealTimeTripUpdateAdapter {
 
@@ -27,18 +27,18 @@ public class SiriRealTimeTripUpdateAdapter {
   private final TripPatternCache tripPatternCache;
 
   private final DeduplicatorService deduplicator;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   @Nullable
   private final SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
 
   public SiriRealTimeTripUpdateAdapter(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DeduplicatorService deduplicator,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     this.deduplicator = deduplicator;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
     this.tripPatternCache = new TripPatternCache(tripPatternIdGenerator);
   }
@@ -48,8 +48,8 @@ public class SiriRealTimeTripUpdateAdapter {
    * {@link org.opentripplanner.transit.service.TransitEditorService} constructed from the given
    * buffer, so all pattern and trip lookups within the task see in-progress real-time additions.
    */
-  public SiriRealTimeUpdateHandler forUpdate(MutableTimetableSnapshot buffer) {
-    var transitService = new DefaultTransitService(timetableRepository, buffer);
+  public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
+    var transitService = new DefaultTransitService(transitRepository, buffer);
     var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
       ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, transitService)
       : null;

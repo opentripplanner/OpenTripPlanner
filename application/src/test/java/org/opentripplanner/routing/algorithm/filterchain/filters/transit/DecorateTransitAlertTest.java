@@ -14,7 +14,7 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class DecorateTransitAlertTest implements PlanTestConstants {
 
@@ -62,7 +62,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
   @Test
   void testSkipsLegRebuildWhenNoAlertsMatch() {
     // Alert service with no alerts at all — nothing can match.
-    var transitAlertService = new TransitAlertServiceImpl(new TimetableRepository());
+    var transitAlertService = new TransitAlertServiceImpl(new TransitRepository());
     var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
     var i1 = newItinerary(A).bus(31, 0, 30, E).build();
@@ -81,7 +81,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
   }
 
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {
-    var transitAlertService = new TransitAlertServiceImpl(new TimetableRepository());
+    var transitAlertService = new TransitAlertServiceImpl(new TransitRepository());
     transitAlertService.setAlerts(
       List.of(builder.addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED)).build())
     );
