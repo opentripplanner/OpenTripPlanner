@@ -50,8 +50,11 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
     });
   }
 
-  @Override
-  public RealtimeVehicleRepositorySnapshot createSnapshot() {
+  /**
+   * Produce an immutable snapshot of the current state of this repository. Only the repository
+   * lifecycle publishes snapshots, so this is not part of the client-facing repository interface.
+   */
+  RealtimeVehicleRepositorySnapshot createSnapshot() {
     return new Snapshot(ImmutableListMultimap.copyOf(vehicles));
   }
 

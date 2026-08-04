@@ -20,6 +20,7 @@ public class RealtimeVehicleRepositoryLifecycle
 
   @Override
   public RealtimeVehicleRepositorySnapshot freeze(RealtimeVehicleRepository repository) {
-    return repository.createSnapshot();
+    // the cast is safe: all repositories are created by copyOnWrite() above or by the module
+    return ((DefaultRealtimeVehicleRepository) repository).createSnapshot();
   }
 }

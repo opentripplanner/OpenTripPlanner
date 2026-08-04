@@ -31,6 +31,7 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -444,6 +445,6 @@ public class RealtimeVehicleMatcherTest {
     RealtimeVehicleRepository repository,
     TripPattern pattern
   ) {
-    return repository.createSnapshot().getRealtimeVehicles(pattern);
+    return new RealtimeVehicleRepositoryLifecycle().freeze(repository).getRealtimeVehicles(pattern);
   }
 }
