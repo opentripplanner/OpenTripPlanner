@@ -11,7 +11,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class TransitAlertServiceImplTest {
 
@@ -34,7 +34,7 @@ class TransitAlertServiceImplTest {
     .withCoordinate(51.5306090, -0.1239491)
     .build();
 
-  private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
+  private static final TransitRepository TIMETABLE_REPOSITORY = new TransitRepository(
     getSiteRepository()
   );
 

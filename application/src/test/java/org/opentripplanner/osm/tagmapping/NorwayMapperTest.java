@@ -9,14 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
-public class NorwayMapperTest {
+class NorwayMapperTest {
 
+  private static final double EPSILON = 0.001;
   static final WayPropertySet WPS = new NorwayMapper().buildWayPropertySet();
 
   static int[] expectedMaxspeeds = { 90, 80, 70, 60, 50, 40, 30 };
@@ -87,21 +88,21 @@ public class NorwayMapperTest {
 
   @ParameterizedTest(name = "{0} should have a score of {1}")
   @MethodSource("createExpectedBicycleSafetyForMaxspeedCases")
-  public void testBicycleSafetyForMaxspeed(OsmEntity way, Double expected) {
+  void testBicycleSafetyForMaxspeed(OsmEntity way, Double expected) {
     var result = WPS.getDataForEntity(way).bicycleSafety();
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("createBicycleSafetyWithoutExplicitMaxspeed")
-  public void testBicycleSafetyWithoutMaxspeed(OsmEntity way, Double expected) {
+  void testBicycleSafetyWithoutMaxspeed(OsmEntity way, Double expected) {
     var result = WPS.getDataForEntity(way).bicycleSafety();
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("createLinkRoadLikeMainCases")
-  public void testBicycleSafetyLikeLinkRoad(OsmEntity mainRoad, OsmEntity linkRoad) {
+  void testBicycleSafetyLikeLinkRoad(OsmEntity mainRoad, OsmEntity linkRoad) {
     var resultMain = WPS.getDataForEntity(mainRoad).bicycleSafety();
     var resultLink = WPS.getDataForEntity(linkRoad).bicycleSafety();
 
@@ -109,14 +110,14 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testTrunkIsWalkable() {
+  void testTrunkIsWalkable() {
     var way = OsmWay.of().withTag("highway", "trunk").build();
 
     assertEquals(StreetTraversalPermission.ALL, WPS.getDataForEntity(way).getPermission());
   }
 
   @Test
-  public void testMtbScaleNone() {
+  void testMtbScaleNone() {
     // https://www.openstreetmap.org/way/302610220
     var way1 = OsmWay.of().withTag("highway", "path").withTag("mtb:scale", "3").build();
 
@@ -128,7 +129,7 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testMtbScalePedestrian() {
+  void testMtbScalePedestrian() {
     var way1 = OsmWay.of().withTag("highway", "path").withTag("mtb:scale", "1").build();
 
     assertEquals(StreetTraversalPermission.PEDESTRIAN, WPS.getDataForEntity(way1).getPermission());
@@ -139,7 +140,7 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testMotorroad() {
+  void testMotorroad() {
     var way1 = OsmWay.of().withTag("highway", "trunk").withTag("motorroad", "yes").build();
 
     assertEquals(StreetTraversalPermission.CAR, WPS.getDataForEntity(way1).getPermission());
@@ -150,7 +151,7 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testFootway() {
+  void testFootway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       WPS.getDataForEntity(WayTestData.footway()).getPermission()
@@ -158,7 +159,7 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testCycleway() {
+  void testCycleway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       WPS.getDataForEntity(WayTestData.cycleway()).getPermission()
@@ -166,10 +167,15 @@ public class NorwayMapperTest {
   }
 
   @Test
-  public void testBridleway() {
+  void testBridleway() {
     assertEquals(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       WPS.getDataForEntity(WayTestData.bridleway()).getPermission()
     );
+  }
+
+  @Test
+  void embeddedRails() {
+    assertEquals(6.86, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
   }
 }

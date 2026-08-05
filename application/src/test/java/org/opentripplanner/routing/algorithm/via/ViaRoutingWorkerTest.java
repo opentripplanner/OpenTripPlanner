@@ -20,7 +20,7 @@ import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -50,7 +50,7 @@ public class ViaRoutingWorkerTest {
   private static List<Itinerary> firstSearch;
   private static List<Itinerary> secondSearch;
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   private final Place fromA = testModel.place("A", 5.0, 8.0);
   private final Place viaC = testModel.place("C", 7.0, 9.0);

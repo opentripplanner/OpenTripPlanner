@@ -12,7 +12,7 @@ import static org.opentripplanner.transit.model.timetable.StopRealTimeState.NO_D
 import java.util.List;
 import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
@@ -21,11 +21,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class DefaultForwardsDelayInterpolatorTest {
 
-  static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
+  static final Trip TRIP = TransitRepositoryForTest.trip("TRIP_ID").build();
   static final int STOP_COUNT = 20;
   static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
-    TimetableRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
+    TransitRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
     new Deduplicator()
   );
 
@@ -141,8 +141,8 @@ class DefaultForwardsDelayInterpolatorTest {
     var builder = TripTimesFactory.tripTimes(
       TRIP,
       List.of(
-        TimetableRepositoryForTest.of().stopTime(TRIP, 0, 0),
-        TimetableRepositoryForTest.of().stopTime(TRIP, 1, 300, 600)
+        TransitRepositoryForTest.of().stopTime(TRIP, 0, 0),
+        TransitRepositoryForTest.of().stopTime(TRIP, 1, 300, 600)
       ),
       new Deduplicator()
     ).createRealTimeWithoutScheduledTimes();

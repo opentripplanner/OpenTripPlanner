@@ -30,6 +30,15 @@ public interface TripCalendars {
   Set<FeedScopedId> listServiceIdsOnServiceDate(LocalDate serviceDate);
 
   /**
+   * Determine whether the given service id is active on the specified service date.
+   *
+   * @param serviceId the target service id
+   * @param serviceDate the target service date
+   * @return {@code true} if the service id is active on the given service date
+   */
+  boolean isActiveOn(FeedScopedId serviceId, LocalDate serviceDate);
+
+  /**
    * Return the integer service code assigned to the given service id, or {@code null} if the
    * service id is not registered.
    * <p>

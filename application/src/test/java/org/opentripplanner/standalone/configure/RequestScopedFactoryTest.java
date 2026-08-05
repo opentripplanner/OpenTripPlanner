@@ -56,12 +56,12 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
@@ -76,15 +76,15 @@ class RequestScopedFactoryTest {
 
   @Test
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
-    var timetableRepository = new TimetableRepository();
+    var transitRepository = new TransitRepository();
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
     var timetableRepositoryHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
-      new TimetableSnapshotLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
     );
 
     var routerConfig = RouterConfig.DEFAULT;
@@ -92,10 +92,10 @@ class RequestScopedFactoryTest {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var transferRepository = new DefaultTransferRepository(new TransferIndex());
     // Only used to wire up the throwaway helper services below; not part of what's under test.
-    var placeholderTransitService = new DefaultTransitService(timetableRepository);
+    var placeholderTransitService = new DefaultTransitService(transitRepository);
 
     var factory = DaggerRequestScopedFactoryTest_TestFactory.builder()
-      .timetableRepository(timetableRepository)
+      .transitRepository(transitRepository)
       .repositoryRegistry(repositoryRegistry)
       .timetableRepositoryHandle(timetableRepositoryHandle)
       .routerConfig(routerConfig)
@@ -177,17 +177,14 @@ class RequestScopedFactoryTest {
     @Component.Builder
     interface Builder {
       @BindsInstance
-      Builder timetableRepository(TimetableRepository timetableRepository);
+      Builder transitRepository(TransitRepository transitRepository);
 
       @BindsInstance
       Builder repositoryRegistry(RepositoryRegistry repositoryRegistry);
 
       @BindsInstance
       Builder timetableRepositoryHandle(
-        RepositoryHandle<
-          ReadOnlyTimetableSnapshot,
-          MutableTimetableSnapshot
-        > timetableRepositoryHandle
+        RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle
       );
 
       @BindsInstance

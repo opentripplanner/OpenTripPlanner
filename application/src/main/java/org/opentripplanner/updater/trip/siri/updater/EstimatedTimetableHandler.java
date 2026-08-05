@@ -32,7 +32,7 @@ public class EstimatedTimetableHandler {
     RealTimeUpdateContext context
   ) {
     return adapter
-      .forUpdate(context.mutableSnapshot())
+      .forUpdate(context.timetableRepository())
       .applyEstimatedTimetable(
         context.entityResolver(feedId),
         feedId,

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
 public class StopConsolidationServiceModule {
@@ -17,7 +17,7 @@ public class StopConsolidationServiceModule {
   @Nullable
   StopConsolidationService service(
     @Nullable StopConsolidationRepository repo,
-    TimetableRepository tm
+    TransitRepository tm
   ) {
     if (repo == null) {
       return null;

@@ -5,8 +5,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
@@ -92,17 +95,19 @@ public class ApiTransitService {
   /**
    * Find the canceled stop calls at the given stop. A call is included if either the trip it
    * belongs to has been canceled, or the visit at this stop has been canceled (skipped). Only calls
-   * whose trip's service date is within any of the given service date ranges are returned. Each
+   * whose trip's service date is within any of the given service date ranges are returned. The
+   * {@code arrivalDeparture} parameter controls whether drop-off-only calls are included. Each
    * call is paired with the {@link TripOnServiceDate} it belongs to, which is synthesized when no
    * real one exists.
    */
   public List<StopCallOnTripOnServiceDate> findCanceledStopCalls(
     StopLocation stop,
-    List<LocalDateRange> serviceDateRanges
+    List<LocalDateRange> serviceDateRanges,
+    ArrivalDeparture arrivalDeparture
   ) {
     var request = TripTimeOnDateRequest.of(List.of(stop))
       .withServiceDateRanges(serviceDateRanges)
-      .withArrivalDeparture(ArrivalDeparture.BOTH)
+      .withArrivalDeparture(arrivalDeparture)
       .withNumberOfDepartures(Integer.MAX_VALUE)
       .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)
       .build();
@@ -112,6 +117,39 @@ public class ApiTransitService {
       .stream()
       .map(call -> new StopCallOnTripOnServiceDate(resolveTripOnServiceDate(call), call))
       .toList();
+  }
+
+  /**
+   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a NeTEx
+   * dated service journey or a real-time added trip) is preferred if it exists. Otherwise one is
+   * synthesized from the scheduled trip, but only if the trip actually runs on the given date.
+   */
+  public Optional<TripOnServiceDate> findOrCreateTripOnServiceDate(
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
+    Objects.requireNonNull(tripId);
+    Objects.requireNonNull(serviceDate);
+    var tripOnServiceDate = transitService.getTripOnServiceDate(
+      new TripIdAndServiceDate(tripId, serviceDate)
+    );
+    if (tripOnServiceDate != null) {
+      return Optional.of(tripOnServiceDate);
+    }
+
+    Trip trip = transitService.getTrip(tripId);
+    if (trip == null) {
+      return Optional.empty();
+    }
+    boolean runsOnDate = transitService
+      .getTripCalendars()
+      .isActiveOn(trip.getServiceId(), serviceDate);
+    if (!runsOnDate) {
+      return Optional.empty();
+    }
+    return Optional.of(
+      TripOnServiceDate.of(tripId).withTrip(trip).withServiceDate(serviceDate).build()
+    );
   }
 
   /**

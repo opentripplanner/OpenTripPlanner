@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p><b>Future improvement:</b> The per-date caches maintained here duplicate information that
  * would ideally come from a single authoritative datasource. However,
- * {@link org.opentripplanner.transit.model.timetable.TimetableSnapshot} only stores real-time
+ * {@link org.opentripplanner.transit.repository.TimetableRepository} only stores real-time
  * timetables, while these caches also cover scheduled trip patterns sourced from
  * {@link RaptorTransitData}. Once scheduled and real-time data live in the same structure, the
  * state tracked here could be derived directly from that structure on each call, making this

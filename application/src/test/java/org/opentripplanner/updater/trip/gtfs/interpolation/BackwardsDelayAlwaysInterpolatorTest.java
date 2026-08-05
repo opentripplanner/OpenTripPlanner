@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
@@ -16,11 +16,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class BackwardsDelayAlwaysInterpolatorTest {
 
-  static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
+  static final Trip TRIP = TransitRepositoryForTest.trip("TRIP_ID").build();
   static final int STOP_COUNT = 5;
   static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
-    TimetableRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
+    TransitRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
     new Deduplicator()
   );
 

@@ -10,15 +10,15 @@ import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class EntityResolverTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final RegularStop STOP_1 = TEST_MODEL.stop("stop-1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("stop-2").build();
   private static final SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
@@ -29,9 +29,9 @@ class EntityResolverTest {
 
   @Test
   void resolveScheduledStopPointId() {
-    var timetableRepository = new TimetableRepository();
-    timetableRepository.addScheduledStopPointMapping(Map.of(SSP_ID, STOP_1));
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitRepository = new TransitRepository();
+    transitRepository.addScheduledStopPointMapping(Map.of(SSP_ID, STOP_1));
+    var transitService = new DefaultTransitService(transitRepository);
     var resolver = new EntityResolver(transitService, FEED_ID);
     var stop = resolver.resolveQuay(SSP_ID.getId());
     assertEquals(STOP_1, stop);
@@ -39,8 +39,8 @@ class EntityResolverTest {
 
   @Test
   void resolveQuayId() {
-    var timetableRepository = new TimetableRepository(SITE_REPOSITORY);
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitRepository = new TransitRepository(SITE_REPOSITORY);
+    var transitService = new DefaultTransitService(transitRepository);
     var resolver = new EntityResolver(transitService, FEED_ID);
     var stop = resolver.resolveQuay(STOP_1.getId().getId());
     assertEquals(STOP_1, stop);
@@ -48,9 +48,9 @@ class EntityResolverTest {
 
   @Test
   void scheduledStopPointTakesPrecedence() {
-    var timetableRepository = new TimetableRepository(SITE_REPOSITORY);
-    var transitService = new DefaultTransitService(timetableRepository);
-    timetableRepository.addScheduledStopPointMapping(Map.of(SSP_ID, STOP_2));
+    var transitRepository = new TransitRepository(SITE_REPOSITORY);
+    var transitService = new DefaultTransitService(transitRepository);
+    transitRepository.addScheduledStopPointMapping(Map.of(SSP_ID, STOP_2));
     var resolver = new EntityResolver(transitService, FEED_ID);
     assertEquals(STOP_2, resolver.resolveQuay(SSP_ID.getId()));
     assertEquals(STOP_1, resolver.resolveQuay(STOP_1.getId().getId()));
@@ -104,7 +104,7 @@ class EntityResolverTest {
   }
 
   private static EntityResolver newResolver() {
-    var transitService = new DefaultTransitService(new TimetableRepository());
+    var transitService = new DefaultTransitService(new TransitRepository());
     return new EntityResolver(transitService, FEED_ID);
   }
 

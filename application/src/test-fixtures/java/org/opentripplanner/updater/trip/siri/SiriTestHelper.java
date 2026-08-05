@@ -18,7 +18,7 @@ public class SiriTestHelper {
 
   SiriTestHelper(TransitTestEnvironment transitTestEnvironment) {
     this.transitTestEnvironment = transitTestEnvironment;
-    var repo = transitTestEnvironment.timetableRepository();
+    var repo = transitTestEnvironment.transitRepository();
     this.siriAdapter = new SiriRealTimeTripUpdateAdapter(repo, DeduplicatorService.NOOP, null);
     var cache = new SiriFuzzyTripMatcherCache(repo);
     this.siriAdapterWithFuzzyMatching = new SiriRealTimeTripUpdateAdapter(
@@ -63,7 +63,7 @@ public class SiriTestHelper {
           var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
           var feedId = transitTestEnvironment.feedId();
           var transitService = new DefaultTransitService(
-            transitTestEnvironment.timetableRepository(),
+            transitTestEnvironment.transitRepository(),
             buffer
           );
           resultRef.set(

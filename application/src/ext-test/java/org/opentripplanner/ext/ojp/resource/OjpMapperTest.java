@@ -21,7 +21,7 @@ import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.ext.ojp.service.CallAtStop;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -37,14 +37,14 @@ class OjpMapperTest {
   private static final String ROUTE_ID = "r1";
   private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 2, 10);
   private static final SiteRepositoryBuilder SITE_REPOSITORY_BUILDER = SiteRepository.of();
-  private static final TimetableRepositoryForTest TEST_MODEL = new TimetableRepositoryForTest(
+  private static final TransitRepositoryForTest TEST_MODEL = new TransitRepositoryForTest(
     SITE_REPOSITORY_BUILDER
   );
   private static final RegularStop STOP_1 = TEST_MODEL.stop("s1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("s2").build();
-  private static final Route ROUTE = TimetableRepositoryForTest.route(id(ROUTE_ID)).build();
+  private static final Route ROUTE = TransitRepositoryForTest.route(id(ROUTE_ID)).build();
   private static final String TRIP_ID = "t1";
-  private static final Trip TRIP = TimetableRepositoryForTest.trip(TRIP_ID).build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip(TRIP_ID).build();
 
   private static final String START_TIME = "07:30:00";
   private static final TripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
@@ -52,11 +52,8 @@ class OjpMapperTest {
     TEST_MODEL.stopTimesEvery5Minutes(5, TRIP, START_TIME),
     new Deduplicator()
   );
-  private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest.tripPattern(
-    "tp1",
-    ROUTE
-  )
-    .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_1, STOP_2))
+  private static final TripPattern TRIP_PATTERN = TransitRepositoryForTest.tripPattern("tp1", ROUTE)
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_1, STOP_2))
     .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(TRIP_TIMES))
     .build();
   private static final TripTimeOnDate TRIP_TIMES_ON_DATE = new TripTimeOnDate(

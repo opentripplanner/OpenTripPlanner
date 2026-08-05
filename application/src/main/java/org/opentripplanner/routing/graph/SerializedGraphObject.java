@@ -41,7 +41,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class SerializedGraphObject implements Serializable {
   public final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
 
   public final StreetDetailsRepository streetDetailsRepository;
-  public final TimetableRepository timetableRepository;
+  public final TransitRepository transitRepository;
   public final TransferRepository transferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -103,7 +103,7 @@ public class SerializedGraphObject implements Serializable {
     @Nullable OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -121,7 +121,7 @@ public class SerializedGraphObject implements Serializable {
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
@@ -216,9 +216,9 @@ public class SerializedGraphObject implements Serializable {
       );
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
-      serObj.timetableRepository.getSiteRepository().reindexAfterDeserialization();
-      serObj.timetableRepository.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.timetableRepository);
+      serObj.transitRepository.getSiteRepository().reindexAfterDeserialization();
+      serObj.transitRepository.index();
+      logSerializationCompleteStatus(serObj.graph, serObj.transitRepository);
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -291,14 +291,14 @@ public class SerializedGraphObject implements Serializable {
 
   private static void logSerializationCompleteStatus(
     Graph graph,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
+    var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(
-      timetableRepository.getConstrainedTransferService().listAll().size()
+      transitRepository.getConstrainedTransferService().listAll().size()
     );
-    var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
+    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

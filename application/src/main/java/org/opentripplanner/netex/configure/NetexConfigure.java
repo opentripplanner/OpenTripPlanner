@@ -15,7 +15,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Responsible for dependency injection and creating main NeTEx module objects. This decouple the
@@ -38,7 +38,7 @@ public class NetexConfigure {
 
   public NetexModule createNetexModule(
     Iterable<ConfiguredCompositeDataSource<NetexFeedParameters>> netexSources,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     VehicleParkingRepository parkingRepository,
     StreetDetailsRepository streetDetailsRepository,
     Graph graph,
@@ -49,7 +49,7 @@ public class NetexConfigure {
 
     for (ConfiguredCompositeDataSource<NetexFeedParameters> it : netexSources) {
       var transitServiceBuilder = new TransitDataImportBuilder(
-        timetableRepository.getSiteRepository(),
+        transitRepository.getSiteRepository(),
         issueStore
       );
       netexBundles.add(netexBundle(transitServiceBuilder, it));
@@ -58,7 +58,7 @@ public class NetexConfigure {
     return new NetexModule(
       graph,
       deduplicator,
-      timetableRepository,
+      transitRepository,
       parkingRepository,
       streetDetailsRepository,
       issueStore,

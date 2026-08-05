@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -19,11 +19,11 @@ import org.opentripplanner.utils.collection.ListUtils;
 
 class NoDataBackwardsEarlinessInterpolatorTest {
 
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip("TRIP_ID").build();
   private static final int STOP_COUNT = 5;
   private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
-    TimetableRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
+    TransitRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),
     DeduplicatorService.NOOP
   );
   private static final int SIX_MINUTES_EARLY = -6 * 60;

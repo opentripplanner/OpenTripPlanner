@@ -104,7 +104,7 @@ import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
@@ -119,18 +119,18 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
@@ -149,10 +149,10 @@ class GraphQLIntegrationTest {
   private static final List<RegularStop> STOP_LOCATIONS = Stream.of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
     .toList();
-  private static final Route ROUTE = TimetableRepositoryForTest.route("a-route").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("a-route").build();
   private static final String ADDED_TRIP_ID = "ADDED_TRIP";
   private static final String REPLACEMENT_TRIP_ID = "REPLACEMENT_TRIP";
-  public static final String FEED_ID = TimetableRepositoryForTest.FEED_ID;
+  public static final String FEED_ID = TransitRepositoryForTest.FEED_ID;
 
   private static final VehicleRentalStation VEHICLE_RENTAL_STATION =
     new TestVehicleRentalStationBuilder()
@@ -190,7 +190,7 @@ class GraphQLIntegrationTest {
   private static final VehicleParkingRepository PARKING_REPOSITORY =
     new DefaultVehicleParkingRepository();
   private static final NearbyPlaceFinder PLACE_FINDER = (_, _, _, _, _, _, _, _, _, _, _, _) -> {
-    var stop = TimetableRepositoryForTest.of().stop("A").build();
+    var stop = TransitRepositoryForTest.of().stop("A").build();
     return List.of(
       new PlaceAtDistance(stop, 0),
       new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
@@ -215,16 +215,16 @@ class GraphQLIntegrationTest {
     STOP_LOCATIONS.forEach(siteRepositoryBuilder::withRegularStop);
     siteRepositoryBuilder.withStation(OMEGA);
     var siteRepository = siteRepositoryBuilder.build();
-    var timetableRepository = new TimetableRepository(siteRepository);
+    var transitRepository = new TransitRepository(siteRepository);
 
     var cal_id = FeedScopedIdForTestFactory.id("CAL_1");
-    var trip = TimetableRepositoryForTest.trip("123")
+    var trip = TransitRepositoryForTest.trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .withServiceId(cal_id)
       .build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
-    var trip2 = TimetableRepositoryForTest.trip("321Canceled")
+    var trip2 = TransitRepositoryForTest.trip("321Canceled")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .withServiceId(cal_id)
       .build();
@@ -235,7 +235,7 @@ class GraphQLIntegrationTest {
     // wrong, because currently there is no way to represent a BUS replacing a BUS in GTFS
     // data so that the replacement link exists, or is even implied by some attribute. We
     // still include the test in the hope that one day it becomes possible.
-    var tripToBeReplaced = TimetableRepositoryForTest.trip(REPLACEMENT_TRIP_ID)
+    var tripToBeReplaced = TransitRepositoryForTest.trip(REPLACEMENT_TRIP_ID)
       .withServiceId(cal_id)
       .build();
     final TripPattern pattern = TEST_MODEL.pattern(BUS)
@@ -253,11 +253,11 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    timetableRepository.addTripPattern(id("pattern-1"), pattern);
+    transitRepository.addTripPattern(id("pattern-1"), pattern);
 
     // A trip whose visit at stop B is canceled (skipped), while it still calls at stops A and D.
     // Stop B is part of the stops query, so its canceledCalls field returns this skipped call.
-    var canceledTrip = TimetableRepositoryForTest.trip("CanceledTrip")
+    var canceledTrip = TransitRepositoryForTest.trip("CanceledTrip")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .withServiceId(cal_id)
       .build();
@@ -271,26 +271,26 @@ class GraphQLIntegrationTest {
       canceledStopTimes,
       DEDUPLICATOR
     ).withServiceCode(SERVICE_CODE);
-    final TripPattern canceledPattern = TimetableRepositoryForTest.tripPattern(
+    final TripPattern canceledPattern = TransitRepositoryForTest.tripPattern(
       "canceled-pattern",
-      TimetableRepositoryForTest.route("canceled-route").withMode(BUS).build()
+      TransitRepositoryForTest.route("canceled-route").withMode(BUS).build()
     )
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, D.stop))
+      .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, D.stop))
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(canceledTripTimes))
       .build();
-    timetableRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
+    transitRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
 
     var feedInfo = FeedInfoTestFactory.dummyForTest(FEED_ID);
-    timetableRepository.addFeedInfo(feedInfo);
+    transitRepository.addFeedInfo(feedInfo);
 
     var agency = Agency.of(new FeedScopedId(FEED_ID, "agency-xx"))
       .withName("speedtransit")
       .withUrl("www.otp-foo.bar")
       .withTimezone("Europe/Berlin")
       .build();
-    timetableRepository.addAgency(agency);
+    transitRepository.addAgency(agency);
 
-    timetableRepository.initTimeZone(BERLIN);
+    transitRepository.initTimeZone(BERLIN);
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -300,11 +300,11 @@ class GraphQLIntegrationTest {
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
-    timetableRepository.getServiceCodes().put(cal_id, SERVICE_CODE);
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
-    timetableRepository.index();
+    transitRepository.getServiceCodes().put(cal_id, SERVICE_CODE);
+    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.index();
 
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot(
+    DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -327,7 +327,7 @@ class GraphQLIntegrationTest {
       Arrays.stream(TransitMode.values())
         .sorted(Comparator.comparing(Enum::name))
         .map(m ->
-          TimetableRepositoryForTest.route(m.name())
+          TransitRepositoryForTest.route(m.name())
             .withMode(m)
             .withLongName(I18NString.of("Long name for %s".formatted(m)))
             .withGtfsSortOrder(sortOrder(m))
@@ -335,7 +335,7 @@ class GraphQLIntegrationTest {
             .build()
         ),
       Stream.of(
-        TimetableRepositoryForTest.route("replacement")
+        TransitRepositoryForTest.route("replacement")
           .withMode(BUS)
           .withLongName(I18NString.of("Long name for replacement bus"))
           .withGtfsType(714)
@@ -363,7 +363,7 @@ class GraphQLIntegrationTest {
         RealTimeTripUpdate.of(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
-            .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
+            .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
             .withRealTimeStopPatternModified()
             .build(),
           realTimeTripTimes,
@@ -376,9 +376,9 @@ class GraphQLIntegrationTest {
 
     var snapshot = timetableSnapshot.commit();
 
-    TransitEditorService transitService = new DefaultTransitService(timetableRepository, snapshot) {
+    TransitEditorService transitService = new DefaultTransitService(transitRepository, snapshot) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(
-        timetableRepository
+        transitRepository
       );
 
       @Override

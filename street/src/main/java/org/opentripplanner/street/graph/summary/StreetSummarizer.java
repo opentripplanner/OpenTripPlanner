@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
@@ -46,6 +49,25 @@ class StreetSummarizer {
         "Parking %s → %s",
         summarizeVertex(p.getFromVertex()),
         summarizeVertex(p.getToVertex())
+      );
+      // Elevator vertices all share the elevator node's coordinate, so their labels (which encode
+      // the connected entity and level) identify them rather than the coordinate.
+      case ElevatorBoardEdge board -> String.format(
+        "%s → %s ELEVATOR board",
+        board.getFromVertex().getLabelString(),
+        board.getToVertex().getLabelString()
+      );
+      case ElevatorAlightEdge alight -> String.format(
+        "%s → %s ELEVATOR alight",
+        alight.getFromVertex().getLabelString(),
+        alight.getToVertex().getLabelString()
+      );
+      case ElevatorHopEdge hop -> String.format(
+        "%s → %s ELEVATOR hop levels=%s ♿%s",
+        hop.getFromVertex().getLabelString(),
+        hop.getToVertex().getLabelString(),
+        DECIMAL_FORMAT.format(hop.getLevels()),
+        summarizeBoolean(hop.isWheelchairAccessible())
       );
       default -> throw new NotImplementedException(
         "No summary for edge " + e.getClass().getSimpleName()

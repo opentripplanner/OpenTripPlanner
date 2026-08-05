@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs;
 
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.trip;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -51,11 +51,11 @@ class GenerateTripPatternsOperationTest {
 
   @BeforeAll
   static void setupClass() {
-    TimetableRepositoryForTest timetableRepositoryForTest = TimetableRepositoryForTest.of();
-    stopA = timetableRepositoryForTest.stop("stopA").build();
-    stopB = timetableRepositoryForTest.stop("stopB").build();
-    stopC = timetableRepositoryForTest.stop("stopC").build();
-    siteRepository = timetableRepositoryForTest
+    TransitRepositoryForTest transitRepositoryForTest = TransitRepositoryForTest.of();
+    stopA = transitRepositoryForTest.stop("stopA").build();
+    stopB = transitRepositoryForTest.stop("stopB").build();
+    stopC = transitRepositoryForTest.stop("stopC").build();
+    siteRepository = transitRepositoryForTest
       .siteRepositoryBuilder()
       .withRegularStop(stopA)
       .withRegularStop(stopB)

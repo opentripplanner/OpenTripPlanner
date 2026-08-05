@@ -1167,7 +1167,12 @@ type Pattern implements Node {
   tripsForDate(
     "Return trips of the pattern active on this date. Format: YYYYMMDD"
     serviceDate: String
-  ): [Trip!]
+  ): [Trip!] @deprecated(reason : "Use `tripsOnServiceDate`")
+  """
+  Instances of `TripOnServiceDates` which run on the specified date. If no trips run on this date
+  then this returns an empty list.
+  """
+  tripsOnServiceDate(serviceDate: LocalDate!): [TripOnServiceDate!]!
   "Real-time updated position of vehicles that are serving this pattern."
   vehiclePositions: [VehiclePosition!]
 }
@@ -2402,6 +2407,11 @@ type Stop implements Node & PlaceInterface {
   """
   canceledCalls(
     """
+    Selects if only calls where boarding is allowed, only calls where alighting is allowed, or calls
+    where either boarding or alighting is possible (according to the original schedule).
+    """
+    arrivalDeparture: ArrivalDeparture = EITHER,
+    """
     Only include canceled calls whose trip's service date is within any of these date ranges.
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire
     transit service period are returned. Defining a range is recommended.
@@ -2565,6 +2575,8 @@ from a specific stop location.
 This may contain real-time information, if available.
 """
 type StopCall {
+  "Notices of this call which are known ahead of time."
+  notices: [Notice!]! @deprecated(reason : "Experimental API that can be changed without notice.")
   "Real-time estimates for arrival and departure times for this stop location."
   realTime: CallRealTime
   "Scheduled arrival and departure times for this stop location."
@@ -2820,6 +2832,8 @@ type Trip implements Node {
   trip.
   """
   occupancy: TripOccupancy
+  "Return the trip on a specific service date or `null` if the trip does not run on it."
+  onServiceDate(date: LocalDate!): TripOnServiceDate
   "The pattern the trip is running on"
   pattern: Pattern
   """
@@ -2849,7 +2863,7 @@ type Trip implements Node {
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
-  ): [Stoptime]
+  ): [Stoptime] @deprecated(reason : "Use `onServiceDate` instead.")
   "Coordinates of the route of this trip in Google polyline encoded format"
   tripGeometry: Geometry
   "Headsign of the vehicle when running on this trip"
@@ -3373,6 +3387,19 @@ enum AlertSeverityLevelType {
   with irregular schedules.
   """
   WARNING
+}
+
+"""
+Enum for limiting the returned calls depending on pickup/drop off status on a stop
+based on the original schedules.
+"""
+enum ArrivalDeparture {
+  "Only include calls where alighting from the vehicle is allowed."
+  ARRIVALS
+  "Only include calls where boarding the vehicle is allowed."
+  DEPARTURES
+  "Include calls where either boarding or alighting is allowed."
+  EITHER
 }
 
 enum BikesAllowed {
