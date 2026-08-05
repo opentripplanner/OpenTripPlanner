@@ -28,9 +28,10 @@ import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -38,7 +39,7 @@ import org.opentripplanner.transit.service.TransitService;
  * Tests the {@code realTimeJourneyState} field on the {@link DatedServiceJourneyType}.
  * <p>
  * The real-time trip-times state is built directly from the scheduled trip times (via
- * {@code createRealTimeFromScheduledTimes()}) and injected into a {@link TimetableSnapshot}, so the
+ * {@code createRealTimeFromScheduledTimes()}) and injected into a {@link TimetableRepository}, so the
  * resolver is exercised against a live {@link TransitService} without depending on any feed-source
  * adapter (GTFS-RT/SIRI) to set the flags.
  */
@@ -143,8 +144,11 @@ class DatedServiceJourneyTypeTest {
     TransitTestEnvironment env,
     RealTimeTripUpdate update
   ) {
-    var repo = env.timetableRepository();
-    var snapshot = new TimetableSnapshot(repo.getRaptorTransitData(), new DefaultTripCalendars());
+    var repo = env.transitRepository();
+    var snapshot = new DefaultTimetableRepository(
+      repo.getRaptorTransitData(),
+      new DefaultTripCalendars()
+    );
     snapshot.update(update);
     return new DefaultTransitService(repo, snapshot.commit());
   }
