@@ -337,7 +337,16 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<TripOnServiceDate> tripOnServiceDate() {
-    return environment -> getSource(environment).tripOnServiceDate();
+    return environment -> {
+      Leg leg = getSource(environment);
+      Trip trip = leg.trip();
+      if (trip == null || leg.serviceDate() == null) {
+        return null;
+      }
+      return new ApiTransitService(transitService(environment))
+        .findOrCreateTripOnServiceDate(trip.getId(), leg.serviceDate())
+        .orElse(null);
+    };
   }
 
   @Override
