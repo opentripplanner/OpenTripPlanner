@@ -94,7 +94,7 @@ public class GbfsGeofencingGraphBuilder implements GraphBuilderModule {
     GbfsGeofencingFeedParameters feedParams,
     OtpHttpClientFactory httpClientFactory
   ) throws Exception {
-    var loaderAndMapper = new GbfsFeedLoaderAndMapper(feedParams, httpClientFactory);
+    var loaderAndMapper = GbfsFeedLoaderAndMapper.create(feedParams, httpClientFactory);
 
     if (!loaderAndMapper.update()) {
       LOG.warn("Failed to update GBFS feed: {}", feedParams.url());
