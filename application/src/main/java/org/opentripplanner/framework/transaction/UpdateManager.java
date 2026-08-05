@@ -1,5 +1,6 @@
 package org.opentripplanner.framework.transaction;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.event.DomainEvent;
@@ -60,6 +61,13 @@ public interface UpdateManager {
    * @return a {@link Future} that completes after the task (and commit, in atomic mode) has run
    */
   Future<Void> submit(Consumer<WriteContext> task);
+
+  /**
+   * The single-threaded executor running all submitted write tasks. Exposed for monitoring
+   * purposes only, e.g. to observe the length of the task queue on the writer thread. Never
+   * submit tasks directly to the executor — use {@link #submit(Consumer)}.
+   */
+  ExecutorService writerThreadExecutor();
 
   /**
    * Shut down the writer thread and (if configured) the periodic commit scheduler.
