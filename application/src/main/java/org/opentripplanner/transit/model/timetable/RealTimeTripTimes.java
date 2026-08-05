@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It is
+ * A TripTimes represents the arrival and departure times for a single trip in a Timetable. It is
  * carried along by States when routing to ensure that they have a consistent, fast view of the trip
  * when realtime updates have been applied. All times are expressed as seconds since midnight (as in
  * GTFS).
@@ -450,7 +450,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Objects.deepEquals(occupancyStatus, that.occupancyStatus) &&
       wheelchairAccessibility == that.wheelchairAccessibility &&
       Objects.equals(state, that.state) &&
-      Objects.equals(partialReplacedBys, that.partialReplacedBys)
+      Objects.equals(partialReplacedBys, that.partialReplacedBys) &&
+      Objects.equals(vehicleId, that.vehicleId)
     );
   }
 
@@ -466,7 +467,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Arrays.hashCode(occupancyStatus),
       wheelchairAccessibility,
       state,
-      partialReplacedBys
+      partialReplacedBys,
+      vehicleId
     );
   }
 }

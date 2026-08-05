@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,7 +211,27 @@ public class SiriEtBuilder {
   ) {
     return withPartialReplacement(
       fromStop.getId().getId(),
+      null,
       toStop.getId().getId(),
+      null,
+      replacementJourney,
+      serviceDate
+    );
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    RegularStop fromStop,
+    String startTime,
+    RegularStop toStop,
+    String endTime,
+    String replacementJourney,
+    LocalDate serviceDate
+  ) {
+    return withPartialReplacement(
+      fromStop.getId().getId(),
+      localTimeParser.zonedDateTime(startTime),
+      toStop.getId().getId(),
+      localTimeParser.zonedDateTime(endTime),
       replacementJourney,
       serviceDate
     );
@@ -218,7 +239,9 @@ public class SiriEtBuilder {
 
   public SiriEtBuilder withPartialReplacement(
     String fromStop,
+    @Nullable ZonedDateTime startTime,
     String toStop,
+    @Nullable ZonedDateTime endTime,
     String replacementJourney,
     LocalDate servicceDate
   ) {
@@ -235,6 +258,14 @@ public class SiriEtBuilder {
     var to = new StopPointRefStructure();
     to.setValue(toStop);
     part.setToStopPointRef(to);
+
+    if (startTime != null) {
+      part.setStartTime(startTime);
+    }
+    if (endTime != null) {
+      part.setEndTime(endTime);
+    }
+
     var parts = new RelatedJourney.JourneyParts();
     parts.getJourneyPartInfos().add(part);
 
