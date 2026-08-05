@@ -75,13 +75,19 @@ public class RealtimeStopsLayerTest {
       .build();
     var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
-    var alert = TransitAlert.of(stop.getId())
+    var alert = TransitAlert.of(new FeedScopedId("F", "alert-1"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
       .withSeverity(AlertSeverity.WARNING)
       .build();
-    var infoAlert = TransitAlert.of(stop.getId())
+    var severeAlert = TransitAlert.of(new FeedScopedId("F", "alert-2"))
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withEffect(AlertEffect.REDUCED_SERVICE)
+      .withSeverity(AlertSeverity.WARNING)
+      .build();
+    var infoAlert = TransitAlert.of(new FeedScopedId("F", "alert-3"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.MODIFIED_SERVICE)
@@ -90,13 +96,15 @@ public class RealtimeStopsLayerTest {
 
     var expiredStartDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(3).toEpochSecond();
     var expiredEndDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(2).toEpochSecond();
-    var expiredAlert = TransitAlert.of(stop.getId())
+    var expiredAlert = TransitAlert.of(new FeedScopedId("F", "alert-4"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(expiredStartDate, expiredEndDate))
       .withEffect(AlertEffect.DETOUR)
       .withSeverity(AlertSeverity.SEVERE)
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert, infoAlert, expiredAlert));
+    transitService
+      .getTransitAlertService()
+      .setAlerts(List.of(alert, severeAlert, infoAlert, expiredAlert));
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
@@ -114,8 +122,8 @@ public class RealtimeStopsLayerTest {
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
     assertEquals(true, map.get("closedByServiceAlert"));
-    assertEquals("WARNING", map.get("alertSeverityLevel"));
-    assertEquals("NO_SERVICE", map.get("alertEffects"));
+    assertEquals("WARNING", map.get("mostSevereAlertSeverityLevel"));
+    assertEquals("NO_SERVICE,REDUCED_SERVICE", map.get("mostSevereAlertEffects"));
     assertEquals(false, map.get("servicesRunningOnServiceDate"));
   }
 }

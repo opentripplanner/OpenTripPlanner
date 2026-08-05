@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.apis.gtfs.mapping.AlertEffectMapper;
-import org.opentripplanner.apis.gtfs.mapping.SeverityMapper;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
@@ -53,19 +51,19 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
     var mostSevereAlert = validAlerts
       .stream()
       .filter(alert -> alert.severity() != null)
-      .max(Comparator.comparing(TransitAlert::severity));
-    String alertSeverityLevel = mostSevereAlert
-      .map(alert -> SeverityMapper.getGraphQLSeverity(alert.severity()).name())
+      .max(Comparator.comparingInt(alert -> alert.severity().sortingIndex()));
+    String mostSevereAlertSeverityLevel = mostSevereAlert
+      .map(alert -> AlertSeverityToStringMapper.map(alert.severity()))
       .orElse(null);
 
-    List<String> alertEffects = mostSevereAlert
+    List<String> mostSevereAlertEffects = mostSevereAlert
       .map(TransitAlert::severity)
       .map(severity ->
         validAlerts
           .stream()
           .filter(alert -> severity.equals(alert.severity()))
           .filter(alert -> alert.effect() != null)
-          .map(alert -> AlertEffectMapper.getGraphQLEffect(alert.effect()).name())
+          .map(alert -> AlertEffectToStringMapper.map(alert.effect()))
           .distinct()
           .sorted()
           .toList()
@@ -84,8 +82,8 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       sharedKeyValues,
       List.of(
         new KeyValue("closedByServiceAlert", noServiceAlert),
-        new KeyValue("alertSeverityLevel", alertSeverityLevel),
-        kColl("alertEffects", alertEffects),
+        new KeyValue("mostSevereAlertSeverityLevel", mostSevereAlertSeverityLevel),
+        kColl("mostSevereAlertEffects", mostSevereAlertEffects),
         new KeyValue("servicesRunningOnServiceDate", stopTimesExist),
         new KeyValue("servicesRunningInFuture", inService)
       )
