@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private final EmpiricalDelayParameters parameters;
   private final EmpiricalDelayRepository repository;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   public EmpiricalDelayGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> dataSources,
@@ -41,14 +41,14 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     EmpiricalDelayParameters parameters,
     EmpiricalDelayRepository repository,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     this.dataSources = Objects.requireNonNull(dataSources);
     this.deduplicator = Objects.requireNonNull(deduplicator);
     this.issueStore = Objects.requireNonNull(issueStore);
     this.parameters = Objects.requireNonNull(parameters);
     this.repository = Objects.requireNonNull(repository);
-    this.timetableRepository = Objects.requireNonNull(timetableRepository);
+    this.transitRepository = Objects.requireNonNull(transitRepository);
   }
 
   public void buildGraph() {
@@ -58,7 +58,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
       return;
     }
     var mapper = new TripDelaysMapper(
-      createStopIdsByTripIdMap(timetableRepository.getAllTripPatterns()),
+      createStopIdsByTripIdMap(transitRepository.getAllTripPatterns()),
       issueStore,
       deduplicator
     );

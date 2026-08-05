@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -125,7 +125,7 @@ class FlexStopsMapperTest {
         .withValue("UnrestrictedPublicTransportAreas")
     );
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
   private final SiteRepositoryBuilder siteRepositoryBuilder = testModel.siteRepositoryBuilder();
 
   @Test

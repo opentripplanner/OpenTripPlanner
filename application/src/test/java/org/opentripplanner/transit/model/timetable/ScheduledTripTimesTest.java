@@ -12,13 +12,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class ScheduledTripTimesTest {
 
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("Trip-1").build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip("Trip-1").build();
 
   private static final List<FeedScopedId> STOP_IDS = List.of(id("A"), id("B"), id("C"));
   private static final int SERVICE_CODE = 5;

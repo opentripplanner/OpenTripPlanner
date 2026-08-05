@@ -15,13 +15,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 class NoticeAssignmentMapperTest {
 
-  private static final String FEED_ID = TimetableRepositoryForTest.FEED_ID;
+  private static final String FEED_ID = TransitRepositoryForTest.FEED_ID;
   private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
 
   private static final String NOTICE_ID = "N1";

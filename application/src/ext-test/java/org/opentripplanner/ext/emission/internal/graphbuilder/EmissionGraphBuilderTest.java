@@ -16,7 +16,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.model.plan.Emission;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class EmissionGraphBuilderTest implements EmissionTestData {
 
@@ -34,7 +34,7 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
       feedDataSources,
       EmissionParameters.DEFAULT,
       emissionRepository,
-      new TimetableRepository(),
+      new TransitRepository(),
       DataImportIssueStore.NOOP
     );
     subject.buildGraph();

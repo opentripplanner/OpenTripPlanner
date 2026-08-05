@@ -25,13 +25,13 @@ import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Entit
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.Customer;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositoryLifecycle;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerSnapshot;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerEventHandler;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerOrderDomainEvent;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.OrderEventHandler;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.order.Order;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderSnapshot;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepositorySnapshot;
 
 /**
  * This test demonstrates how the snapshot framework can be used with two repositories. The example
@@ -67,8 +67,8 @@ public class TransactionFrameworkTest {
 
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
-  private RepositoryHandle<CustomerSnapshot, CustomerRepository> customerRepoHandler;
-  private RepositoryHandle<OrderSnapshot, OrderRepository> orderRepoHandler;
+  private RepositoryHandle<CustomerRepositorySnapshot, CustomerRepository> customerRepoHandler;
+  private RepositoryHandle<OrderRepositorySnapshot, OrderRepository> orderRepoHandler;
   private final List<TestEvent> eventLog = new ArrayList<>();
 
   @BeforeEach

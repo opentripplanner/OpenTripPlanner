@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -23,12 +23,12 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 class DuplicatedTripHandler {
 
   private final TransitEditorService transitEditorService;
-  private final MutableTimetableSnapshot buffer;
+  private final TimetableRepository buffer;
   private final DeduplicatorService deduplicator;
 
   DuplicatedTripHandler(
     TransitEditorService transitEditorService,
-    MutableTimetableSnapshot buffer,
+    TimetableRepository buffer,
     DeduplicatorService deduplicator
   ) {
     this.transitEditorService = transitEditorService;

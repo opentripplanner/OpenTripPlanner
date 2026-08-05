@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -30,7 +30,7 @@ class GeometryProcessorTest {
 
   public static final FeedScopedId SHAPE_ID = id("s1");
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final RegularStop STOP_A = TEST_MODEL.stop("A").withCoordinate(0, 0).build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").withCoordinate(0.1, 0).build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").withCoordinate(0.2, 0).build();
@@ -271,7 +271,7 @@ class GeometryProcessorTest {
   void test(List<RegularStop> stops, List<ShapePoint> shapePoints, List<LineString> expected) {
     var builder = new TransitDataImportBuilder(REPO, NOOP);
 
-    var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
+    var trip = TransitRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
     var stopTimes = IntStream.range(0, stops.size())
       .mapToObj(index -> TEST_MODEL.stopTime(trip, index, stops.get(index)))
@@ -290,7 +290,7 @@ class GeometryProcessorTest {
   void testShapeDistance() {
     var builder = new TransitDataImportBuilder(REPO, NOOP);
 
-    var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
+    var trip = TransitRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
     var stopTimes = List.of(
       TEST_MODEL.stopTime(trip, 0, STOP_A),
@@ -329,7 +329,7 @@ class GeometryProcessorTest {
     var builder = new TransitDataImportBuilder(REPO, NOOP);
 
     // Trip with no shape_id at all
-    var trip = TimetableRepositoryForTest.trip("t").build();
+    var trip = TransitRepositoryForTest.trip("t").build();
     var stops = List.of(STOP_A, STOP_B, STOP_C);
     var stopTimes = IntStream.range(0, stops.size())
       .mapToObj(index -> TEST_MODEL.stopTime(trip, index, stops.get(index)))
@@ -354,7 +354,7 @@ class GeometryProcessorTest {
       .put(SHAPE_ID, List.of(new ShapePoint(0, 0, 0, 0.0), new ShapePoint(1, 1, 1, 1.0)));
 
     var invalidRef = id("unknown");
-    var trip = TimetableRepositoryForTest.trip("t").withShapeId(invalidRef).build();
+    var trip = TransitRepositoryForTest.trip("t").withShapeId(invalidRef).build();
 
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "8:00");
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);

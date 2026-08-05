@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class TestPagingModel {
@@ -61,7 +61,7 @@ class TestPagingModel {
 
   private static final Instant TRANSIT_START_TIME = TestItineraryBuilder.newTime(0).toInstant();
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
   private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
 

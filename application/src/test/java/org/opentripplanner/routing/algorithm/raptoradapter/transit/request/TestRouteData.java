@@ -17,7 +17,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -256,11 +256,9 @@ public class TestRouteData {
     }
 
     public TestRouteData build() {
-      var routeBuilder = TimetableRepositoryForTest.route(route)
-        .withMode(mode)
-        .withShortName(route);
+      var routeBuilder = TransitRepositoryForTest.route(route).withMode(mode).withShortName(route);
       if (agency != null) {
-        routeBuilder.withAgency(TimetableRepositoryForTest.agency(agency));
+        routeBuilder.withAgency(TransitRepositoryForTest.agency(agency));
       }
       if (submode != null) {
         routeBuilder.withNetexSubmode(submode);

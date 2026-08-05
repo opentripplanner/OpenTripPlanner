@@ -21,7 +21,7 @@ public class GtfsRtTestHelper {
   GtfsRtTestHelper(TransitTestEnvironment transitTestEnvironment) {
     this.transitTestEnvironment = transitTestEnvironment;
     this.gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
-      transitTestEnvironment.timetableRepository(),
+      transitTestEnvironment.transitRepository(),
       DeduplicatorService.NOOP,
       transitTestEnvironment::defaultServiceDate
     );

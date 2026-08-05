@@ -18,7 +18,7 @@ import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class InterlineProcessorTest implements PlanTestConstants {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   List<TripPattern> patterns = List.of(
     tripPattern("trip-1", "block-1", "service-1"),
@@ -151,7 +151,7 @@ class InterlineProcessorTest implements PlanTestConstants {
   }
 
   private static TripPattern tripPattern(String tripId, String blockId, String serviceId) {
-    var trip = TimetableRepositoryForTest.trip(tripId)
+    var trip = TransitRepositoryForTest.trip(tripId)
       .withGtfsBlockId(blockId)
       .withServiceId(new FeedScopedId("1", serviceId))
       .build();

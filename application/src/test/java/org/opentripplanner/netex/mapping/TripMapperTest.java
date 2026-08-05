@@ -19,7 +19,7 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.AccessibilityAssessment;
@@ -55,7 +55,7 @@ class TripMapperTest {
     var access = new AccessibilityAssessment();
 
     var transitBuilder = new TransitDataImportBuilder(new SiteRepository(), ISSUE_STORE);
-    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -87,7 +87,7 @@ class TripMapperTest {
       new SiteRepository(),
       ISSUE_STORE
     );
-    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -114,7 +114,7 @@ class TripMapperTest {
       new SiteRepository(),
       ISSUE_STORE
     );
-    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
     journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));

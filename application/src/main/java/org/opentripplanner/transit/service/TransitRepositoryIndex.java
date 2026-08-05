@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-class TimetableRepositoryIndex {
+class TransitRepositoryIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableRepositoryIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitRepositoryIndex.class);
 
   // TODO: consistently key on model object or id string
   private final Map<FeedScopedId, Agency> agencyForId = new HashMap<>();
@@ -55,18 +55,18 @@ class TimetableRepositoryIndex {
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  TimetableRepositoryIndex(TimetableRepository timetableRepository) {
+  TransitRepositoryIndex(TransitRepository transitRepository) {
     LOG.info("Timetable repository index init...");
 
-    for (Agency agency : timetableRepository.getAgencies()) {
+    for (Agency agency : transitRepository.getAgencies()) {
       this.agencyForId.put(agency.getId(), agency);
     }
 
-    for (Operator operator : timetableRepository.getOperators()) {
+    for (Operator operator : transitRepository.getOperators()) {
       this.operatorForId.put(operator.getId(), operator);
     }
 
-    for (TripPattern pattern : timetableRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
         .scheduledTripsAsStream()
@@ -88,7 +88,7 @@ class TimetableRepositoryIndex {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
 
-    for (TripOnServiceDate tripOnServiceDate : timetableRepository.getAllTripsOnServiceDates()) {
+    for (TripOnServiceDate tripOnServiceDate : transitRepository.getAllTripsOnServiceDates()) {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),
@@ -98,10 +98,10 @@ class TimetableRepositoryIndex {
       );
     }
 
-    initializeServiceData(timetableRepository.getTripCalendar());
+    initializeServiceData(transitRepository.getTripCalendar());
 
     if (OTPFeature.FlexRouting.isOn()) {
-      flexIndex = new FlexIndex(timetableRepository);
+      flexIndex = new FlexIndex(transitRepository);
       for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }

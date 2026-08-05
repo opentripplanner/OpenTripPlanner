@@ -22,9 +22,9 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
@@ -56,7 +56,7 @@ public class UpdaterConfigurator {
   private final Graph graph;
   private final DeduplicatorService deduplicator;
   private final VertexLinker linker;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
@@ -72,8 +72,8 @@ public class UpdaterConfigurator {
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager updateManager;
   private final RepositoryHandle<
-    ReadOnlyTimetableSnapshot,
-    MutableTimetableSnapshot
+    TimetableRepositorySnapshot,
+    TimetableRepository
   > timetableRepositoryHandle;
 
   @Nullable
@@ -86,11 +86,11 @@ public class UpdaterConfigurator {
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -98,7 +98,7 @@ public class UpdaterConfigurator {
     this.linker = linker;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.updateManager = updateManager;
@@ -114,11 +114,11 @@ public class UpdaterConfigurator {
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
-    RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableRepositoryHandle,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
@@ -128,7 +128,7 @@ public class UpdaterConfigurator {
       realtimeVehicleRepository,
       vehicleRentalRepository,
       parkingRepository,
-      timetableRepository,
+      transitRepository,
       carpoolingRepository,
       carpoolTripVertexResolver,
       updateManager,
@@ -153,7 +153,7 @@ public class UpdaterConfigurator {
       updateManager,
       timetableRepositoryHandle,
       graph,
-      timetableRepository
+      transitRepository
     );
     var updaterManager = new GraphUpdaterManager(
       graphWriterService,
@@ -169,12 +169,12 @@ public class UpdaterConfigurator {
     }
     // Otherwise add it to the graph
     else {
-      timetableRepository.initUpdaterManager(updaterManager);
+      transitRepository.initUpdaterManager(updaterManager);
     }
   }
 
-  public static void shutdownGraph(TimetableRepository timetableRepository) {
-    GraphUpdaterManager updaterManager = timetableRepository.getUpdaterManager();
+  public static void shutdownGraph(TransitRepository transitRepository) {
+    GraphUpdaterManager updaterManager = transitRepository.getUpdaterManager();
     if (updaterManager != null) {
       updaterManager.stop();
     }
@@ -219,7 +219,7 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
-      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, timetableRepository));
+      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitRepository));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
@@ -262,7 +262,7 @@ public class UpdaterConfigurator {
       updaters.add(
         SiriUpdaterModule.createSiriSXUpdater(
           configItem,
-          timetableRepository,
+          transitRepository,
           siriFuzzyTripMatcherCache()
         )
       );
@@ -271,7 +271,7 @@ public class UpdaterConfigurator {
       updaters.add(
         SiriUpdaterModule.createSiriSXUpdater(
           configItem,
-          timetableRepository,
+          transitRepository,
           siriFuzzyTripMatcherCache()
         )
       );
@@ -306,11 +306,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(
-        SiriAzureUpdater.createSXUpdater(
-          configItem,
-          timetableRepository,
-          siriFuzzyTripMatcherCache()
-        )
+        SiriAzureUpdater.createSXUpdater(configItem, transitRepository, siriFuzzyTripMatcherCache())
       );
     }
     for (var configItem : updatersParameters.getMqttSiriETUpdaterParameters()) {
@@ -324,19 +320,19 @@ public class UpdaterConfigurator {
 
   private SiriRealTimeTripUpdateAdapter provideSiriAdapter(boolean fuzzyTripMatching) {
     var cache = fuzzyTripMatching ? siriFuzzyTripMatcherCache() : null;
-    return new SiriRealTimeTripUpdateAdapter(timetableRepository, deduplicator, cache);
+    return new SiriRealTimeTripUpdateAdapter(transitRepository, deduplicator, cache);
   }
 
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache() {
     if (siriFuzzyTripMatcherCache == null) {
-      siriFuzzyTripMatcherCache = new SiriFuzzyTripMatcherCache(timetableRepository);
+      siriFuzzyTripMatcherCache = new SiriFuzzyTripMatcherCache(transitRepository);
     }
     return siriFuzzyTripMatcherCache;
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, deduplicator, () ->
-      LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(transitRepository, deduplicator, () ->
+      LocalDate.now(transitRepository.getTimeZone())
     );
   }
 }

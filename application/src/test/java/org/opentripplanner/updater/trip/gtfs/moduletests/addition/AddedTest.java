@@ -89,8 +89,8 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(TransitMode.RAIL, route.getMode());
 
     TransitService transitService = env.transitService();
-    var fromTimetableRepository = transitService.getRoute(route.getId());
-    assertEquals(fromTimetableRepository, route);
+    var fromTransitRepository = transitService.getRoute(route.getId());
+    assertEquals(fromTransitRepository, route);
     var patternsForRoute = transitService.findPatterns(route);
     assertEquals(1, patternsForRoute.size());
     assertEquals(pattern, patternsForRoute.stream().findFirst().orElseThrow());

@@ -36,7 +36,7 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -50,14 +50,14 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 class ScheduledDeviatedTripIntegrationTest {
 
   static Graph graph;
-  static TimetableRepository timetableRepository;
+  static TransitRepository transitRepository;
   static TransferRepository transferRepository;
 
   float delta = 0.01f;
 
   @Test
   void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = timetableRepository.getAllFlexTrips();
+    var flexTrips = transitRepository.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -94,11 +94,11 @@ class ScheduledDeviatedTripIntegrationTest {
    */
   @Test
   void flexTripInTransitMode() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
+    var feedId = transitRepository.getFeedIds().iterator().next();
 
     var serverContext = TestServerContext.createServerContext(
       graph,
-      timetableRepository,
+      transitRepository,
       transferRepository,
       new DefaultFareService()
     );
@@ -143,11 +143,11 @@ class ScheduledDeviatedTripIntegrationTest {
    */
   @Test
   void intermediateEstimatedCallsSkipFlexWindowStops() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
+    var feedId = transitRepository.getFeedIds().iterator().next();
 
     var serverContext = TestServerContext.createServerContext(
       graph,
-      timetableRepository,
+      transitRepository,
       transferRepository,
       new DefaultFareService()
     );
@@ -190,8 +190,8 @@ class ScheduledDeviatedTripIntegrationTest {
    */
   @Test
   void shouldNotInterpolateFlexTimes() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
-    var pattern = timetableRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
+    var feedId = transitRepository.getFeedIds().iterator().next();
+    var pattern = transitRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(4, pattern.numberOfStops());
 
@@ -205,7 +205,7 @@ class ScheduledDeviatedTripIntegrationTest {
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
-    timetableRepository = model.timetableRepository();
+    transitRepository = model.transitRepository();
     transferRepository = TransferServiceTestFactory.defaultTransferRepository();
   }
 
@@ -247,8 +247,8 @@ class ScheduledDeviatedTripIntegrationTest {
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
+    var feedId = transitRepository.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return timetableRepository.getFlexTrip(tripId);
+    return transitRepository.getFlexTrip(tripId);
   }
 }

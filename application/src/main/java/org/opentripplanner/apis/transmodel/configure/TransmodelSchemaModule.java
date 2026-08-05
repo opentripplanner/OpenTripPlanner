@@ -13,7 +13,7 @@ import org.opentripplanner.apis.transmodel.mapping.FixedFeedIdGenerator;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
 public class TransmodelSchemaModule {
@@ -24,12 +24,12 @@ public class TransmodelSchemaModule {
   @TransmodelSchema
   public GraphQLSchema provideTransmodelSchema(
     RouteRequest defaultRouteRequest,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     RouterConfig routerConfig
   ) {
     FeedScopedIdMapper feedIdMapper;
     if (routerConfig.transmodelApi().hideFeedId()) {
-      String fixedFeedId = FixedFeedIdGenerator.generate(timetableRepository.getAgencies());
+      String fixedFeedId = FixedFeedIdGenerator.generate(transitRepository.getAgencies());
       feedIdMapper = new HideFeedIdMapper(fixedFeedId);
     } else {
       feedIdMapper = new DefaultFeedIdMapper();
@@ -37,7 +37,7 @@ public class TransmodelSchemaModule {
 
     TransmodelGraphQLSchemaFactory factory = new TransmodelGraphQLSchemaFactory(
       defaultRouteRequest,
-      ZoneIdFallback.zoneId(timetableRepository.getTimeZone()),
+      ZoneIdFallback.zoneId(transitRepository.getTimeZone()),
       routerConfig.transitTuningConfig(),
       feedIdMapper,
       routerConfig.server().apiDocumentationProfile()
