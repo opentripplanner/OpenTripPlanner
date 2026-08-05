@@ -11,15 +11,15 @@ import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
 class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConstants {
 
-  private static final Route ROUTE_A = TimetableRepositoryForTest.route("A")
+  private static final Route ROUTE_A = TransitRepositoryForTest.route("A")
     .withGroupOfRoutes(List.of(NETWORK_A))
     .build();
-  private static final Route ROUTE_B = TimetableRepositoryForTest.route("B")
+  private static final Route ROUTE_B = TransitRepositoryForTest.route("B")
     .withGroupOfRoutes(List.of(NETWORK_B))
     .build();
 

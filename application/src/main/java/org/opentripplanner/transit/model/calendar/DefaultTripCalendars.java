@@ -75,6 +75,11 @@ public class DefaultTripCalendars implements TripCalendars, Serializable {
   }
 
   @Override
+  public boolean isActiveOn(FeedScopedId serviceId, LocalDate serviceDate) {
+    return calendarServiceData.getServiceIdsForDate(serviceDate).contains(serviceId);
+  }
+
+  @Override
   public Integer getServiceCode(FeedScopedId serviceId) {
     // TODO Change this to return an int, it there is no service code for the given serviceId,
     //      then it is an error.

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.stopconsolidation.internal;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class DefaultStopConsolidationServiceTest {
 
@@ -11,7 +11,7 @@ class DefaultStopConsolidationServiceTest {
   void isActive() {
     var service = new DefaultStopConsolidationService(
       new DefaultStopConsolidationRepository(),
-      new TimetableRepository()
+      new TransitRepository()
     );
     assertFalse(service.isActive());
   }

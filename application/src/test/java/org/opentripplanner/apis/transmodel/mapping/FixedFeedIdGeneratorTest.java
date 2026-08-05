@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.Agency;
 
 class FixedFeedIdGeneratorTest {
@@ -32,7 +32,7 @@ class FixedFeedIdGeneratorTest {
 
   Agency agency(String feedScope, int id) {
     // We use the test builder to make sure we get back an agency with all required fields
-    return TimetableRepositoryForTest.agency("Agency " + id)
+    return TransitRepositoryForTest.agency("Agency " + id)
       .copy()
       .withId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();

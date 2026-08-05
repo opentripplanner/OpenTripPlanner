@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class EmpiricalDelayGraphBuilderTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final RegularStop STOP_A = TEST_MODEL.stop("STOP-A", 1, 1).build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("STOP-B", 2, 1).build();
@@ -23,7 +23,7 @@ class EmpiricalDelayGraphBuilderTest {
 
   @Test
   void createStopIdsByTripIdMap() {
-    var trip = TimetableRepositoryForTest.trip("Trip-A").build();
+    var trip = TransitRepositoryForTest.trip("Trip-A").build();
 
     var stopTimes = List.of(
       TEST_MODEL.stopTime(trip, 0, STOP_A),

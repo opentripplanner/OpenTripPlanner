@@ -639,24 +639,21 @@ class WalkableAreaBuilder {
       // No intersections - not really possible
       return Set.of();
     }
-    String label = String.format(
-      LABEL_TEMPLATE,
-      parent.getId(),
-      vertex1.getLabel(),
-      vertex2.getLabel()
-    );
+    final long parentId = parent.getId();
 
     float carSpeed = parent
       .getOsmProvider()
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
-    I18NString name = namer.getName(parent, label);
+    var forwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex2, vertex1, parentId));
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
       .withGeometry(line)
-      .withName(name)
+      .withName(forwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(false)
@@ -666,13 +663,14 @@ class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    label = String.format(LABEL_TEMPLATE, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
-    name = namer.getName(parent, label);
+    var backwardName = namer
+      .getName(parent)
+      .orElseGet(() -> fallbackName(vertex1, vertex2, parentId));
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
       .withGeometry(line.reverse())
-      .withName(name)
+      .withName(backwardName)
       .withMeterLength(length)
       .withPermission(areaPermissions)
       .withBack(true)
@@ -700,8 +698,9 @@ class WalkableAreaBuilder {
       Area namedArea = new Area();
       OsmEntity areaEntity = area.parent;
 
-      String id = "way (area) " + areaEntity.getId();
-      I18NString name = namer.getName(areaEntity, id);
+      I18NString name = namer
+        .getName(areaEntity)
+        .orElseGet(() -> I18NString.of("way (area) " + areaEntity.getId()));
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
@@ -736,6 +735,16 @@ class WalkableAreaBuilder {
     }
     alreadyAddedEdges.add(edge);
     return false;
+  }
+
+  private static I18NString fallbackName(
+    IntersectionVertex vertex1,
+    IntersectionVertex vertex2,
+    long parentId
+  ) {
+    return I18NString.of(
+      String.format(LABEL_TEMPLATE, parentId, vertex2.getLabel(), vertex1.getLabel())
+    );
   }
 
   // ---- Inner types -------------------------------------------------------------------

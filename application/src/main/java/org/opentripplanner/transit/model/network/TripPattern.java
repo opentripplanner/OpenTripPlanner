@@ -75,8 +75,8 @@ public final class TripPattern
    * TripPatterns hold a reference to a Timetable (i.e. TripTimes for all Trips in the pattern) for
    * only scheduled trips from the GTFS or NeTEx data. If any trips were later updated in real time,
    * there will be another Timetable holding those updates and reading through to the scheduled one.
-   * That other realtime Timetable is retrieved from a TimetableSnapshot (see end of Javadoc on
-   * TimetableSnapshot for more details).
+   * That other realtime Timetable is retrieved from a TimetableRepositorySnapshot (see end of Javadoc on
+   * DefaultTimetableRepository for more details).
    * TODO RT_AB: The above system should be changed to integrate realtime and scheduled data more
    *   closely. The Timetable may become obsolete or change significantly when they are integrated.
    */

@@ -17,7 +17,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.spi.DataSource;
@@ -115,7 +115,7 @@ class VehicleParkingAvailabilityUpdaterTest {
   }
 
   private void runUpdaterOnce(VehicleParkingAvailabilityUpdater updater) {
-    var context = new DefaultRealTimeUpdateContext(new Graph(), new TimetableRepository());
+    var context = new DefaultRealTimeUpdateContext(new Graph(), new TransitRepository());
     WriteToGraphCallback callback = runnable -> {
       runnable.run(context);
       return CompletableFuture.completedFuture(null);

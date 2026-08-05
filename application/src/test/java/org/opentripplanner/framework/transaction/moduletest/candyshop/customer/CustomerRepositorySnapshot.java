@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.base.AbstractRepository;
 
-public class CustomerSnapshot extends AbstractRepository<Customer> {
+public class CustomerRepositorySnapshot extends AbstractRepository<Customer> {
 
-  CustomerSnapshot(Map<Integer, Customer> aById) {
+  CustomerRepositorySnapshot(Map<Integer, Customer> aById) {
     super(aById);
   }
 

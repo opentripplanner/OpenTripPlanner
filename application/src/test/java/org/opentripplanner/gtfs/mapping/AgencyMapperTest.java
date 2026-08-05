@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.Agency;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 public class AgencyMapperTest {
 
@@ -32,7 +32,7 @@ public class AgencyMapperTest {
   private static final String FARE_URL = "www.url.com/fare";
 
   private final AgencyMapper subject = new AgencyMapper(
-    new IdFactory(TimetableRepositoryForTest.FEED_ID)
+    new IdFactory(TransitRepositoryForTest.FEED_ID)
   );
 
   static {
@@ -58,7 +58,7 @@ public class AgencyMapperTest {
 
     result = subject.map(AGENCY);
 
-    assertEquals(TimetableRepositoryForTest.FEED_ID, result.getId().getFeedId());
+    assertEquals(TransitRepositoryForTest.FEED_ID, result.getId().getFeedId());
     assertEquals(ID, result.getId().getId());
     assertEquals(NAME, result.getName());
     assertEquals(LANG, result.getLang());

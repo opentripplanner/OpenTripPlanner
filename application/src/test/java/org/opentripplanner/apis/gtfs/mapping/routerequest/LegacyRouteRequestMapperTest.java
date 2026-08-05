@@ -50,9 +50,9 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
@@ -62,13 +62,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var testModel = TimetableRepositoryForTest.of();
+    var testModel = TransitRepositoryForTest.of();
     var stopModelBuilder = testModel
       .siteRepositoryBuilder()
       .withRegularStop(testModel.stop("stop1").build());
-    var timetableRepository = new TimetableRepository(stopModelBuilder.build());
-    timetableRepository.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
+    var transitRepository = new TransitRepository(stopModelBuilder.build());
+    transitRepository.initTimeZone(ZoneIds.BERLIN);
+    final DefaultTransitService transitService = new DefaultTransitService(transitRepository);
     var transferService = TransferServiceTestFactory.defaultTransferService();
     var routeRequest = RouteRequest.defaultValue();
     var vertexLinker = VertexLinkerTestFactory.of(graph);

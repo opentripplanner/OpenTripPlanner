@@ -31,7 +31,7 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,20 +48,20 @@ public class IslandPruningModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(IslandPruningModule.class);
 
   private final Graph graph;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
   private final IslandPruningParameters parameters;
 
   public IslandPruningModule(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     StreetLinkerModule streetLinkerModule,
     IslandPruningParameters parameters
   ) {
     this.graph = graph;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
     this.streetLinkerModule = streetLinkerModule;
     this.parameters = parameters;
@@ -86,7 +86,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
-      streetLinkerModule.linkTransitStops(graph, timetableRepository);
+      streetLinkerModule.linkTransitStops(graph, transitRepository);
     }
 
     // clean up pruned street vertices

@@ -156,8 +156,8 @@ modifications until the new buffer is in place, without introducing any further 
 
 Below is a high-level diagram of how the timetable snapshots are used to look up arrival and
 departure times for a particular TripPattern. Each Route is associated with N different TripPatterns
-(essentially, N different unique sequences of stops). The TimetableSnapshot is used to look up a
-Timetable for a given TripPattern. That Timetable provides an unchanging view of both
+(essentially, N different unique sequences of stops). The TimetableRepositorySnapshot is used to
+look up a Timetable for a given TripPattern. That Timetable provides an unchanging view of both
 realtime-updated and original scheduled arrival/departure times for all trips that match the given
 TripPattern. The arrays of arrival and departure times for all these trips are parallel to the array
 of stops for the TripPattern used to look them up. They have the same length, and a given index

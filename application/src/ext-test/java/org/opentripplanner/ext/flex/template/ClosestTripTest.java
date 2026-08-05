@@ -20,7 +20,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.api.request.TripRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -31,7 +31,7 @@ class ClosestTripTest {
 
   private static final UnscheduledTrip FLEX_TRIP = UnscheduledTrip.of(id("123"))
     .withStopTimes(List.of(area("10:00", "11:00"), area("10:00", "11:00")))
-    .withTrip(TimetableRepositoryForTest.trip("123").build())
+    .withTrip(TransitRepositoryForTest.trip("123").build())
     .build();
 
   private static final LocalDate DATE = LocalDate.of(2025, 2, 28);

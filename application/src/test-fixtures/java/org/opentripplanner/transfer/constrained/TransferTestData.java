@@ -6,7 +6,7 @@ import org.opentripplanner.transfer.constrained.model.StationTransferPoint;
 import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   public static final Station STATION = TEST_MODEL.station("Central Station").build();
 
@@ -36,20 +36,14 @@ public class TransferTestData {
     .build();
   public static final RegularStop ANY_STOP = TEST_MODEL.stop("any", 60.0, 11.0).build();
 
-  public static final Route ROUTE_1 = TimetableRepositoryForTest.route("1").build();
-  public static final Route ROUTE_2 = TimetableRepositoryForTest.route("2").build();
-  public static final Route ANY_ROUTE = TimetableRepositoryForTest.route("ANY").build();
+  public static final Route ROUTE_1 = TransitRepositoryForTest.route("1").build();
+  public static final Route ROUTE_2 = TransitRepositoryForTest.route("2").build();
+  public static final Route ANY_ROUTE = TransitRepositoryForTest.route("ANY").build();
 
-  public static final Trip TRIP_11 = TimetableRepositoryForTest.trip("11")
-    .withRoute(ROUTE_1)
-    .build();
-  public static final Trip TRIP_12 = TimetableRepositoryForTest.trip("12")
-    .withRoute(ROUTE_1)
-    .build();
-  public static final Trip TRIP_21 = TimetableRepositoryForTest.trip("21")
-    .withRoute(ROUTE_2)
-    .build();
-  public static final Trip ANY_TRIP = TimetableRepositoryForTest.trip("999")
+  public static final Trip TRIP_11 = TransitRepositoryForTest.trip("11").withRoute(ROUTE_1).build();
+  public static final Trip TRIP_12 = TransitRepositoryForTest.trip("12").withRoute(ROUTE_1).build();
+  public static final Trip TRIP_21 = TransitRepositoryForTest.trip("21").withRoute(ROUTE_2).build();
+  public static final Trip ANY_TRIP = TransitRepositoryForTest.trip("999")
     .withRoute(ANY_ROUTE)
     .build();
 

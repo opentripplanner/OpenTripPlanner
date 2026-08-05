@@ -100,6 +100,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Parallelize and deduplicate way property computation [#7823](https://github.com/opentripplanner/OpenTripPlanner/pull/7823)
 - Penalize cycling on streets with embedded tram tracks [#7816](https://github.com/opentripplanner/OpenTripPlanner/pull/7816)
 - fix(transmodel): skip flex-window stops in intermediate estimated calls [#7850](https://github.com/opentripplanner/OpenTripPlanner/pull/7850)
+- Expose `TripOnServiceDate` on trips and patterns, add notices [#7813](https://github.com/opentripplanner/OpenTripPlanner/pull/7813)
+- Add pickup/drop off filter to canceledCalls [#7858](https://github.com/opentripplanner/OpenTripPlanner/pull/7858)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)

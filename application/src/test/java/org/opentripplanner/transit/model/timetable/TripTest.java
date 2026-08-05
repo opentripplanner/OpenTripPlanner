@@ -9,7 +9,7 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -22,7 +22,7 @@ class TripTest {
   private static final String ID = "1";
   private static final String SHORT_NAME = "name";
   private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
-  public static final Route ROUTE = TimetableRepositoryForTest.route("routeId").build();
+  public static final Route ROUTE = TransitRepositoryForTest.route("routeId").build();
   private static final Direction DIRECTION = Direction.INBOUND;
   public static final NonLocalizedString HEAD_SIGN = new NonLocalizedString("head sign");
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
@@ -106,7 +106,7 @@ class TripTest {
     );
     assertFalse(
       SUBJECT.sameAs(
-        SUBJECT.copy().withRoute(TimetableRepositoryForTest.route("otherRouteId").build()).build()
+        SUBJECT.copy().withRoute(TransitRepositoryForTest.route("otherRouteId").build()).build()
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withDirection(Direction.OUTBOUND).build()));

@@ -2,9 +2,15 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
@@ -20,7 +26,9 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.ServiceDelivery;
 
 /**
- * Update OTP stop timetables from some a Siri-ET HTTP sources.
+ * Polls carpool driver trips from a SIRI-ET HTTP source and maintains them in the
+ * {@link CarpoolingRepository}. Each trip's route points are resolved to permanent, car-reachable
+ * street vertices before insertion.
  */
 public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
@@ -38,15 +46,26 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
+  private final CarpoolTripVertexResolver vertexResolver;
   private final CarpoolSiriMapper mapper;
+
+  /**
+   * Trips whose route-point geometry failed to resolve, keyed by trip id, so an unresolvable
+   * journey re-delivered with unchanged geometry skips re-linking, re-probing, and re-logging. The
+   * stored trip supplies the geometry to compare against and the end time that drives expiry (swept
+   * on the same expiry as stored trips).
+   */
+  private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new HashMap<>();
 
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
-    CarpoolingRepository repository
+    CarpoolingRepository repository,
+    CarpoolTripVertexResolver vertexResolver
   ) {
     super(config);
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
+    this.vertexResolver = vertexResolver;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
@@ -67,13 +86,16 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Asks the repository to purge trips that have ended more than {@link #TRIP_EXPIRY} ago, so
-   * completed trips are eventually removed even when the source stops sending updates for them. The
-   * repository throttles the actual scan and shares that throttle across every feed, so calling
-   * this on every poll is cheap.
+   * Purges trips that ended more than {@link #TRIP_EXPIRY} ago, so completed trips are removed even
+   * when the source stops updating them. Cached resolution failures are swept on the same expiry.
    */
   private void removeExpiredTrips() {
-    repository.removeExpiredTrips(Instant.now(), TRIP_EXPIRY);
+    var now = Instant.now();
+    repository.removeExpiredTrips(now, TRIP_EXPIRY);
+    var cutoff = now.minus(TRIP_EXPIRY);
+    failedResolutions
+      .values()
+      .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
   }
 
   /**
@@ -120,8 +142,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Maps a single estimated vehicle journey to a carpool trip and upserts it, or removes the
-   * trip when the journey is cancelled or has fewer than 2 non-cancelled calls.
+   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
+   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
+   * resolve.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
@@ -135,10 +158,53 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
         repository.removeCarpoolTrip(tripId);
         return;
       }
-      repository.upsertCarpoolTrip(carpoolTrip);
+      var tripWithVertices = resolveVertices(carpoolTrip);
+      if (tripWithVertices == null) {
+        repository.removeCarpoolTrip(tripId);
+        return;
+      }
+      repository.upsertCarpoolTrip(tripWithVertices);
     } catch (Exception e) {
-      LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
+      LOG.warn("Failed to process EstimatedVehicleJourney", e);
     }
+  }
+
+  /**
+   * Resolves the trip's route points to permanent vertices, or {@code null} if any cannot be
+   * resolved. Both outcomes are memoized on the route-point geometry: an unchanged geometry reuses
+   * the stored vertices or skips a known failure without re-resolving. A first failure is logged; a
+   * resolution that throws is memoized as failed too, with its stack trace.
+   */
+  @Nullable
+  private CarpoolTripWithVertices resolveVertices(CarpoolTrip trip) {
+    var existing = repository.getCarpoolTrip(trip.getId());
+    if (existing != null && existing.trip().routePoints().equals(trip.routePoints())) {
+      return new CarpoolTripWithVertices(trip, existing.vertices());
+    }
+    var failed = failedResolutions.get(trip.getId());
+    if (failed != null && failed.routePoints().equals(trip.routePoints())) {
+      LOG.debug(
+        "Skipping carpool trip {}: route-point geometry is unchanged since resolution failed",
+        trip.getId()
+      );
+      return null;
+    }
+    CarpoolTripWithVertices resolved;
+    try {
+      resolved = vertexResolver.resolve(trip);
+    } catch (RuntimeException e) {
+      LOG.warn("Dropping carpool trip {}: route-point resolution failed", trip.getId(), e);
+      failedResolutions.put(trip.getId(), trip);
+      return null;
+    }
+    if (resolved == null) {
+      LOG.warn(
+        "Dropping carpool trip {}: a route point has no car-reachable street vertex",
+        trip.getId()
+      );
+      failedResolutions.put(trip.getId(), trip);
+    }
+    return resolved;
   }
 
   @Override

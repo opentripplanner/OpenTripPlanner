@@ -32,7 +32,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -44,9 +44,9 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class RealtimeVehicleMatcherTest {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
-  private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("1").build();
   private static final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> FEATURES = Set.of(
     POSITION,
     STOP_POSITION,
@@ -92,8 +92,8 @@ public class RealtimeVehicleMatcherTest {
 
     final String secondTripId = "trip2";
 
-    var trip1 = TimetableRepositoryForTest.trip(tripId).build();
-    var trip2 = TimetableRepositoryForTest.trip(secondTripId).build();
+    var trip1 = TransitRepositoryForTest.trip(tripId).build();
+    var trip2 = TransitRepositoryForTest.trip(secondTripId).build();
 
     List<StopTime> stopTimes = hasStopTimes
       ? testModel.stopTimesEvery5Minutes(3, trip1, "11:00")
@@ -102,7 +102,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       ignored -> trip2,
       ignored -> pattern,
       (id, time) -> pattern,
@@ -128,7 +128,7 @@ public class RealtimeVehicleMatcherTest {
 
     var tripId = "trip1";
     var scopedTripId = FeedScopedIdForTestFactory.id(tripId);
-    var trip1 = TimetableRepositoryForTest.trip(tripId).build();
+    var trip1 = TransitRepositoryForTest.trip(tripId).build();
 
     var stopTimes = List.of(
       testModel.stopTime(trip1, 10),
@@ -142,7 +142,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -183,7 +183,7 @@ public class RealtimeVehicleMatcherTest {
 
   private void testVehiclePositions(VehiclePosition pos) {
     var repository = new DefaultRealtimeVehicleRepository();
-    var trip = TimetableRepositoryForTest.trip(tripId).build();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
     var stopTimes = List.of(
       testModel.stopTime(trip, 0),
       testModel.stopTime(trip, 1),
@@ -200,7 +200,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Map positions to trips in feed
     var matcher = new RealtimeVehiclePatternMatcher(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -232,7 +232,7 @@ public class RealtimeVehicleMatcherTest {
 
   private void testVehiclePositionOccupancy(VehiclePosition pos) {
     var repository = new DefaultRealtimeVehicleRepository();
-    var trip = TimetableRepositoryForTest.trip(tripId).build();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
     var stopTimes = List.of(
       testModel.stopTime(trip, 0),
       testModel.stopTime(trip, 1),
@@ -249,7 +249,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -283,8 +283,8 @@ public class RealtimeVehicleMatcherTest {
     var scopedTripId1 = FeedScopedIdForTestFactory.id(tripId1);
     var scopedTripId2 = FeedScopedIdForTestFactory.id(tripId2);
 
-    var trip1 = TimetableRepositoryForTest.trip(tripId1).build();
-    var trip2 = TimetableRepositoryForTest.trip(tripId2).build();
+    var trip1 = TransitRepositoryForTest.trip(tripId1).build();
+    var trip2 = TransitRepositoryForTest.trip(tripId2).build();
 
     var stopTimes1 = List.of(
       testModel.stopTime(trip1, 0),
@@ -310,7 +310,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -356,7 +356,7 @@ public class RealtimeVehicleMatcherTest {
   @ParameterizedTest(name = "{0} + serviceDates={1} should resolve to {2}")
   @MethodSource("inferenceTestCases")
   void inferServiceDayOfTripAt6(String time, Set<String> serviceDateStrings, String expectedDate) {
-    var trip = TimetableRepositoryForTest.trip(tripId).build();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
     var hasTripTimes = serviceDateStrings == null;
 
     ScheduledTripTimes tripTimes = null;
@@ -386,7 +386,7 @@ public class RealtimeVehicleMatcherTest {
 
   @Test
   void inferServiceDateCloseToMidnight() {
-    var trip = TimetableRepositoryForTest.trip(tripId).build();
+    var trip = TransitRepositoryForTest.trip(tripId).build();
 
     var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
     var fivePastMidnight = fiveToMidnight + (10 * 60);

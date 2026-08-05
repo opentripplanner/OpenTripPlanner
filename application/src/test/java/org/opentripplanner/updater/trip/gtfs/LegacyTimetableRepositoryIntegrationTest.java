@@ -29,8 +29,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
@@ -42,7 +42,7 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
  * feed from disk. It's also very hard to follow. All in all, I would say its usefulness is
  * questionable.
  */
-public class LegacyTimetableSnapshotIntegrationTest {
+public class LegacyTimetableRepositoryIntegrationTest {
 
   private static final ZoneId TIME_ZONE = ZoneIds.GMT;
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
@@ -52,12 +52,12 @@ public class LegacyTimetableSnapshotIntegrationTest {
   @BeforeAll
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    TimetableRepository timetableRepository = model.timetableRepository();
+    TransitRepository transitRepository = model.transitRepository();
 
-    feedId = timetableRepository.getFeedIds().iterator().next();
+    feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : timetableRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -70,7 +70,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate yesterday = today.minusDays(1);
     LocalDate tomorrow = today.plusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
-    TimetableSnapshot resolver = new TimetableSnapshot(
+    DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -121,7 +121,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate yesterday = today.minusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-    TimetableSnapshot resolver = new TimetableSnapshot(
+    DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -162,7 +162,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     assertNotSame(updatedNow, resolver.resolve(pattern, yesterday));
 
     // exception if we try to modify a snapshot
-    TimetableSnapshot snapshot = resolver.commit();
+    DefaultTimetableRepository snapshot = resolver.commit();
     assertThrows(ConcurrentModificationException.class, () -> {
       updateSnapshot(snapshot, pattern, tripUpdate, yesterday);
     });
@@ -175,13 +175,13 @@ public class LegacyTimetableSnapshotIntegrationTest {
       LocalDate yesterday = today.minusDays(1);
       TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-      TimetableSnapshot resolver = new TimetableSnapshot(
+      DefaultTimetableRepository resolver = new DefaultTimetableRepository(
         RaptorTransitDataTestFactory.empty(),
         new DefaultTripCalendars()
       );
 
       // only return a new snapshot if there are changes
-      TimetableSnapshot snapshot = resolver.commit();
+      DefaultTimetableRepository snapshot = resolver.commit();
       assertNull(snapshot);
 
       TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -255,7 +255,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    TimetableSnapshot resolver = new TimetableSnapshot(
+    DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
@@ -279,7 +279,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
   }
 
   private UpdateSuccess updateSnapshot(
-    TimetableSnapshot resolver,
+    DefaultTimetableRepository resolver,
     TripPattern pattern,
     GtfsRealtime.TripUpdate tripUpdate,
     LocalDate serviceDate

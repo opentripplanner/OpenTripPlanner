@@ -12,12 +12,12 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 class EmissionDataReaderTest implements EmissionTestData {
 
-  private TimetableRepositoryForTest data = TimetableRepositoryForTest.of();
+  private TransitRepositoryForTest data = TransitRepositoryForTest.of();
   private final EmissionRepository repository = new DefaultEmissionRepository();
   private DataImportIssueStore issueStore = new DefaultDataImportIssueStore();
 

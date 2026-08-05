@@ -33,9 +33,9 @@ class StopTimesHelperTest {
   @BeforeAll
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    TimetableRepository timetableRepository = model.timetableRepository();
-    transitService = new DefaultTransitService(timetableRepository);
-    feedId = timetableRepository.getFeedIds().iterator().next();
+    TransitRepository transitRepository = model.transitRepository();
+    transitService = new DefaultTransitService(transitRepository);
+    feedId = transitRepository.getFeedIds().iterator().next();
     stopId = new FeedScopedId(feedId, "J");
     var originalPattern = transitService.findPattern(
       transitService.getTrip(new FeedScopedId(feedId, "5.1"))
@@ -48,9 +48,9 @@ class StopTimesHelperTest {
       .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))
       .build();
     // replace the original pattern by the updated pattern in the transit model
-    timetableRepository.addTripPattern(pattern.getId(), pattern);
-    timetableRepository.index();
-    transitService = new DefaultTransitService(timetableRepository);
+    transitRepository.addTripPattern(pattern.getId(), pattern);
+    transitRepository.index();
+    transitService = new DefaultTransitService(transitRepository);
     stopTimesHelper = new StopTimesHelper(transitService);
   }
 
