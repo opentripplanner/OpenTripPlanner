@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.customer;
+package org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model;
 
 import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Entity;
 
