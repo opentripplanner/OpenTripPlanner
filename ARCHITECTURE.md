@@ -97,7 +97,17 @@ in order to sort and reduce the number of returned itineraries. It can also be u
 returned itineraries, especially if it requires more complex calculations, which would be unfeasible
 to do during the routing process.
 
+### [Transaction Framework](application/src/main/java/org/opentripplanner/framework/transaction/package.md)
+
+A generic, reusable copy-on-write concurrency mechanism for application-scoped repositories: any
+number of concurrent readers see a consistent, unchanging snapshot while a single writer thread
+applies and publishes changes, with no locking required on the read path. This is what backs the
+`Domain Model`/`Repository` split described above, generalizing the timetable-snapshot approach also
+documented in the
+[Realtime Updaters](application/src/main/java/org/opentripplanner/updater/package.md#realtime-concurrency)
+package.
+
 ### [Service](application/src/main/java/org/opentripplanner/service/package.md)
 
 The service package contains small services usually specific to one or a few use-cases. In contrast
-to a domain model they may use one or many domain models and other services.
+to a domain model, they may use one or many domain models and other services.

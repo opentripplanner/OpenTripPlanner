@@ -1,0 +1,76 @@
+<mxfile host="drawio-plugin" modified="2026-08-10T23:12:30.886Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" etag="vCI5uer3f3N6rH0Mu1t1" version="22.1.22" type="embed">
+  <diagram id="tx-framework-repo-model" name="tx-framework-repo-model">
+    <mxGraphModel dx="1470" dy="825" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="860" pageHeight="459" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="zservice" value="«interface»&lt;br&gt;MyService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="60" y="40" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="zrepo" value="«interface»&lt;br&gt;MyRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="574" y="40" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="zsnap" value="«interface»&lt;br&gt;MyRepositorySnapshot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="320" y="40" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="defservice" value="DefaultMyService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="60" y="214" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="defrepo" value="DefaultMyRepositorySnapshot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=0;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="320" y="214" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="6" target="defrepo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="copyOnWrite()" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="5">
+          <mxGeometry x="0.0169" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="reads using&lt;br&gt;&amp;nbsp;handle &amp;amp; trabsaction scope" style="html=1;endArrow=block;endFill=1;rounded=0;fontSize=11;entryX=0.25;entryY=1;entryDx=0;entryDy=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" source="defservice" target="zsnap" edge="1">
+          <mxGeometry x="0.2715" y="-11" relative="1" as="geometry">
+            <mxPoint x="170" y="290" as="sourcePoint" />
+            <mxPoint x="690" y="100" as="targetPoint" />
+            <Array as="points" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="8" target="zrepo" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="664" y="195" as="sourcePoint" />
+            <mxPoint x="824" y="195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="defrepo" target="zsnap" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="553" y="190" as="sourcePoint" />
+            <mxPoint x="694" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="defservice" target="zservice" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="575" y="230" as="sourcePoint" />
+            <mxPoint x="440" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" value="MyRepositoryLifecycle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=0;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" parent="1" vertex="1">
+          <mxGeometry x="455" y="360" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="DefaultMyRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=0;fontSize=12;arcSize=8;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="574" y="214" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="370" as="sourcePoint" />
+            <mxPoint x="440" y="294" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" value="freeze()" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="9">
+          <mxGeometry x="0.0179" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
