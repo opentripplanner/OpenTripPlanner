@@ -42,6 +42,8 @@ import org.rutebanken.netex.model.UicOperatingPeriod;
  */
 public class DayTypeAssignmentMapper {
 
+  private static final Set<DayOfWeek> EVERY_DAY_OF_WEEK = Set.of(DayOfWeek.values());
+
   // Input data
   private final DayType dayType;
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDays;
@@ -104,15 +106,28 @@ public class DayTypeAssignmentMapper {
     return dta.isIsAvailable();
   }
 
+  /**
+   * Resolve the days of the week an operating period assigned to the given {@code dayType} is
+   * restricted to.
+   * <p>
+   * The NeTEx profile makes both {@code properties} and {@code DaysOfWeek} optional.
+   * A day type which does not state any days of the week therefore constrains nothing and is valid
+   * for <em>every</em> day in the period.
+   * <p>
+   * */
   private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
+    if (dayType.getProperties() == null) {
+      return EVERY_DAY_OF_WEEK;
+    }
+    List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
+
+    if (propertyOfDays.stream().allMatch(p -> p.getDaysOfWeek().isEmpty())) {
+      return EVERY_DAY_OF_WEEK;
+    }
+
     Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
-
-    if (dayType.getProperties() != null) {
-      List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
-
-      for (PropertyOfDay p : propertyOfDays) {
-        result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
-      }
+    for (PropertyOfDay p : propertyOfDays) {
+      result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
     }
     return result;
   }
