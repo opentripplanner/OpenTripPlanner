@@ -1429,7 +1429,7 @@ type QueryType {
     severityLevel: [AlertSeverityLevelType!],
     "Only return alerts affecting these stops"
     stop: [String!]
-  ): [Alert] @timingData
+  ): [Alert] @deprecated(reason : "Use alertsConnection or alerts fields within specific types instead.") @timingData
   "Get all active alerts"
   alertsConnection(
     """
