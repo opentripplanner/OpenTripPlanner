@@ -125,8 +125,8 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Serial
   }
 
   @Override
-  public Set<GeofencingZone> zonesContaining(Coordinate coord) {
-    return repository.zonesContaining(coord);
+  public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
+    return repository.findZonesContaining(coord);
   }
 
   @Override

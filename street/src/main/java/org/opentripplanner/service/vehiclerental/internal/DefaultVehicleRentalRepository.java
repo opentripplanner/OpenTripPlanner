@@ -77,7 +77,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository, 
   }
 
   @Override
-  public Set<GeofencingZone> zonesContaining(Coordinate coord) {
+  public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
     return indexes()
       .values()
       .stream()
