@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module.configure;
 
-import static org.opentripplanner.datastore.api.FileType.DEM;
-
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
@@ -239,7 +237,7 @@ public class GraphBuilderModules {
       gridCoverageFactories.add(
         createNedElevationFactory(dataSources.getNedCacheDirectory(), config)
       );
-    } else if (dataSources.has(DEM)) {
+    } else if (dataSources.hasDem()) {
       gridCoverageFactories.addAll(
         createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );
