@@ -56,7 +56,7 @@ public class GraphWriterService implements WriteToGraphCallback {
     return updateManager.submit(ctx -> {
       var repository = ctx.repository(timetableHandle);
       // The vehicle repository is resolved lazily: only tasks that actually apply vehicle
-      // updates mark the vehicle repository as modified in the transaction.
+      // updates cause a new vehicle snapshot to be published at commit.
       var context = new DefaultRealTimeUpdateContext(graph, transitRepository, repository, () ->
         ctx.repository(realtimeVehicleHandle)
       );

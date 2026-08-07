@@ -17,8 +17,8 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
   private final TransitService transitService;
 
   /**
-   * Resolved lazily so that tasks that never touch the realtime vehicles do not mark the vehicle
-   * repository as modified in the current transaction.
+   * Resolved lazily so that tasks that never touch the realtime vehicles do not cause a needless
+   * vehicle snapshot to be created and published at commit.
    */
   private final Supplier<RealtimeVehicleRepository> realtimeVehicleRepository;
 

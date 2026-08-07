@@ -20,8 +20,9 @@ public interface RealTimeUpdateContext {
 
   /**
    * Return the mutable realtime-vehicle repository for this update task. Callers must only use
-   * this from the single writer thread. Accessing it marks the repository as modified in the
-   * current transaction, so only call it when there are vehicle updates to apply.
+   * this from the single writer thread. Accessing it causes the current transaction to publish a
+   * new vehicle snapshot at commit — even if nothing was written — so only call it when there are
+   * vehicle updates to apply.
    */
   RealtimeVehicleRepository realtimeVehicleRepository();
 
