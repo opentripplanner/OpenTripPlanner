@@ -23,7 +23,15 @@ public class SiriFuzzyTripMatcherCache {
   private final ImmutableSetMultimap<String, Trip> internalPlanningCodeCache;
   private final ImmutableSetMultimap<String, Trip> startStopTripCache;
 
-  public SiriFuzzyTripMatcherCache(TransitRepository transitRepository) {
+  private SiriFuzzyTripMatcherCache(
+    ImmutableSetMultimap<String, Trip> internalPlanningCodeCache,
+    ImmutableSetMultimap<String, Trip> startStopTripCache
+  ) {
+    this.internalPlanningCodeCache = internalPlanningCodeCache;
+    this.startStopTripCache = startStopTripCache;
+  }
+
+  public static SiriFuzzyTripMatcherCache create(TransitRepository transitRepository) {
     TransitService index = new DefaultTransitService(transitRepository, null);
     var internalPlanningCodes = ImmutableSetMultimap.<String, Trip>builder();
     var startStopTrips = ImmutableSetMultimap.<String, Trip>builder();
@@ -50,11 +58,17 @@ public class SiriFuzzyTripMatcherCache {
       }
     }
 
-    this.internalPlanningCodeCache = internalPlanningCodes.build();
-    this.startStopTripCache = startStopTrips.build();
+    var cache = new SiriFuzzyTripMatcherCache(
+      internalPlanningCodes.build(),
+      startStopTrips.build()
+    );
 
-    LOG.info("Built internalPlanningCode-cache [{}].", internalPlanningCodeCache.keySet().size());
-    LOG.info("Built start-stop-cache [{}].", startStopTripCache.keySet().size());
+    LOG.info(
+      "Built internalPlanningCode-cache [{}].",
+      cache.internalPlanningCodeCache.keySet().size()
+    );
+    LOG.info("Built start-stop-cache [{}].", cache.startStopTripCache.keySet().size());
+    return cache;
   }
 
   /**

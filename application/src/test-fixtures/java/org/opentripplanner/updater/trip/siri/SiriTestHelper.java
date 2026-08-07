@@ -20,7 +20,7 @@ public class SiriTestHelper {
     this.transitTestEnvironment = transitTestEnvironment;
     var repo = transitTestEnvironment.transitRepository();
     this.siriAdapter = new SiriRealTimeTripUpdateAdapter(repo, DeduplicatorService.NOOP, null);
-    var cache = new SiriFuzzyTripMatcherCache(repo);
+    var cache = SiriFuzzyTripMatcherCache.create(repo);
     this.siriAdapterWithFuzzyMatching = new SiriRealTimeTripUpdateAdapter(
       repo,
       DeduplicatorService.NOOP,
