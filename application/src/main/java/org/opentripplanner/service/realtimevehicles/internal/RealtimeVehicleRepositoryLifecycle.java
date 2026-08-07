@@ -15,7 +15,10 @@ public class RealtimeVehicleRepositoryLifecycle
 
   @Override
   public RealtimeVehicleRepository copyOnWrite(RealtimeVehicleRepositorySnapshot snapshot) {
-    return new DefaultRealtimeVehicleRepository(snapshot);
+    // the cast is safe: all snapshots are created by freeze() below
+    return new DefaultRealtimeVehicleRepository(
+      (DefaultRealtimeVehicleRepository.Snapshot) snapshot
+    );
   }
 
   @Override

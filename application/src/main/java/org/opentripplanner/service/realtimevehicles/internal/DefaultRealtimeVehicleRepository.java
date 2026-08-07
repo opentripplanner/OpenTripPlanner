@@ -26,9 +26,8 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
   }
 
   /** Create a repository initialized with the state of the given snapshot. */
-  public DefaultRealtimeVehicleRepository(RealtimeVehicleRepositorySnapshot snapshot) {
-    // the cast is safe: all snapshots are created by createSnapshot() below
-    this.vehicles = ArrayListMultimap.create(((Snapshot) snapshot).vehicles);
+  DefaultRealtimeVehicleRepository(Snapshot snapshot) {
+    this.vehicles = ArrayListMultimap.create(snapshot.vehicles);
   }
 
   @Override
@@ -59,7 +58,7 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
   }
 
   /** Immutable snapshot of the repository state, published at commit time. */
-  private static class Snapshot implements RealtimeVehicleRepositorySnapshot {
+  static class Snapshot implements RealtimeVehicleRepositorySnapshot {
 
     private final ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles;
 
