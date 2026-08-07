@@ -108,23 +108,6 @@ public class GraphBuilderDataSources implements Closeable {
     return outputGraph;
   }
 
-  /**
-   * @return {@code true} if and only if the data source exist, proper command line parameters is
-   * set and not disabled by the loaded configuration files.
-   */
-  private boolean has(FileType type) {
-    return inputData.containsKey(type);
-  }
-
-  private boolean hasOneOf(FileType... types) {
-    for (FileType type : types) {
-      if (has(type)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public boolean hasOsm() {
     return has(OSM);
   }
@@ -229,6 +212,23 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /* private methods */
+
+  /**
+   * @return {@code true} if and only if the data source exist, proper command line parameters is
+   * set and not disabled by the loaded configuration files.
+   */
+  private boolean has(FileType type) {
+    return inputData.containsKey(type);
+  }
+
+  private boolean hasOneOf(FileType... types) {
+    for (FileType type : types) {
+      if (has(type)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
     var p = buildConfig.osm.parameters
