@@ -63,28 +63,6 @@ public interface RaptorTripPattern {
 
   /**
    * Return the first occurrence of the stop position for the given stop index after the given
-   * startPosition(inclusive). Note that the returned value might not be the only occurrence if the
-   * pattern goes in a loop.
-   * <p>
-   * {@code -1} is returned if not found.
-   *
-   * @param startPos  the stop position in pattern to start the search (inclusive)
-   * @param stopIndex the stopIndex to find
-   *
-   * @deprecated
-   */
-  @Deprecated
-  default int findStopPositionAfter(int startPos, int stopIndex) {
-    for (int i = startPos; i < numberOfStopsInPattern(); ++i) {
-      if (stopIndex == stopIndex(i)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  /**
-   * Return the first occurrence of the stop position for the given stop index after the given
    * startPosition(exclusive) where alighting is possible.
    * <p>
    * {@code -1} is returned if not found.
