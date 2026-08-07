@@ -20,7 +20,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   private final RaptorSlackProvider slackProvider;
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorStopNameResolver stopNameResolver;
-  private final org.opentripplanner.raptor.rangeraptor.path.BoardAndAlightTimeSearch tripSearch;
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
 
   private int iterationDepartureTime = -1;
@@ -30,13 +29,11 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     RaptorCostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-    WorkerLifeCycle lifeCycle,
-    boolean useApproximateTripTimesSearch
+    WorkerLifeCycle lifeCycle
   ) {
     this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
     this.stopNameResolver = stopNameResolver;
-    this.tripSearch = TripTimesSearch::findTripForwardSearch;
     this.transferConstraintsSearch = transferConstraintsSearch;
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
   }
@@ -57,7 +54,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     while (arrival != null) {
       switch (arrival.arrivedBy()) {
         case TRANSIT -> {
-          var times = tripSearch.find(arrival);
+          var times = TripTimesSearch.findTripForwardSearch(arrival);
           pathBuilder.transit(arrival.transitPath().trip(), times);
         }
         case TRANSFER -> pathBuilder.transfer(arrival.transfer(), arrival.stop());
