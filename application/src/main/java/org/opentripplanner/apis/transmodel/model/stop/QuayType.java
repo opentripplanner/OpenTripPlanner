@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,7 +30,6 @@ import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScala
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -362,11 +360,7 @@ public class QuayType {
           .dataFetcher(env -> {
             var alertService = GqlUtil.getTransitAlertService(env);
             var quay = (StopLocation) env.getSource();
-            var alerts = new HashSet<TransitAlert>(alertService.getStopAlerts(quay.getId()));
-            if (quay.isPartOfStation()) {
-              alerts.addAll(alertService.getStopAlerts(quay.getParentStation().getId()));
-            }
-            return alerts;
+            return alertService.getStopLocationsAlerts(quay.getIdAndParentStationId());
           })
           .build()
       )

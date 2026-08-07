@@ -99,10 +99,9 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
               getSource(environment)
                 .getStops()
                 .forEach(stop -> {
-                  alerts.addAll(alertService.getStopAlerts(stop.getId()));
-                  if (stop.isPartOfStation()) {
-                    alerts.addAll(alertService.getStopAlerts(stop.getParentStation().getId()));
-                  }
+                  alerts.addAll(
+                    alertService.getStopLocationsAlerts(stop.getIdAndParentStationId())
+                  );
                 });
               break;
             case STOPS_ON_TRIPS:

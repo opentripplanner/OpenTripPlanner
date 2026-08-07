@@ -5,7 +5,6 @@ import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPr
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
@@ -36,10 +35,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
-    var stopAlerts = new HashSet<>(transitAlertService.getStopAlerts(stop.getId()));
-    if (stop.isPartOfStation()) {
-      stopAlerts.addAll(transitAlertService.getStopAlerts(stop.getParentStation().getId()));
-    }
+    var stopAlerts = transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId());
     boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
 
     var serviceDate = LocalDate.now(transitService.getTimeZone());

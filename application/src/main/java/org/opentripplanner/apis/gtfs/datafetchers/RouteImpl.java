@@ -91,12 +91,9 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
               );
               getStops(environment).forEach(stop -> {
                 StopLocation stopLocation = (StopLocation) stop;
-                alerts.addAll(alertService.getStopAlerts(stopLocation.getId()));
-                if (stopLocation.isPartOfStation()) {
-                  alerts.addAll(
-                    alertService.getStopAlerts(stopLocation.getParentStation().getId())
-                  );
-                }
+                alerts.addAll(
+                  alertService.getStopLocationsAlerts(stopLocation.getIdAndParentStationId())
+                );
               });
               break;
             case STOPS_ON_TRIPS:

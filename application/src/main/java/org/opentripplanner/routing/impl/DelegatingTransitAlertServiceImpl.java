@@ -78,6 +78,15 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
+  public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
+    return transitAlertServices
+      .stream()
+      .map(transitAlertService -> transitAlertService.getStopLocationsAlerts(stopLocationIds))
+      .flatMap(Collection::stream)
+      .collect(Collectors.toSet());
+  }
+
+  @Override
   public Collection<TransitAlert> getRouteAlerts(FeedScopedId route) {
     return transitAlertServices
       .stream()
