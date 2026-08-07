@@ -27,12 +27,12 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
     }
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      subject.findBoardStopPositionBefore(-1, 1)
+      subject.findBoardStopPositionAfter(-1, 1)
     );
     assertEquals("The 'startPos' is not in range[0, 8]: -1", ex.getMessage());
 
     ex = assertThrows(IllegalArgumentException.class, () ->
-      subject.findBoardStopPositionBefore(n, 1)
+      subject.findBoardStopPositionAfter(n, 1)
     );
     assertEquals("The 'startPos' is not in range[0, 8]: 9", ex.getMessage());
   }
