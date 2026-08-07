@@ -26,8 +26,8 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
   }
 
   /** Create a repository initialized with the state of the given snapshot. */
-  DefaultRealtimeVehicleRepository(Snapshot snapshot) {
-    this.vehicles = ArrayListMultimap.create(snapshot.vehicles);
+  DefaultRealtimeVehicleRepository(ListMultimap<TripPattern, RealtimeVehicle> vehicles) {
+    this.vehicles = ArrayListMultimap.create(vehicles);
   }
 
   @Override
@@ -50,25 +50,10 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
   }
 
   /**
-   * Produce an immutable snapshot of the current state of this repository. Only the repository
-   * lifecycle publishes snapshots, so this is not part of the client-facing repository interface.
+   * Produce an immutable copy of the state to be used in the repository life-cycle. Only
+   * the lifecycle should have access to this, hence the package local access.
    */
-  RealtimeVehicleRepositorySnapshot createSnapshot() {
-    return new Snapshot(ImmutableListMultimap.copyOf(vehicles));
-  }
-
-  /** Immutable snapshot of the repository state, published at commit time. */
-  static class Snapshot implements RealtimeVehicleRepositorySnapshot {
-
-    private final ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles;
-
-    private Snapshot(ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles) {
-      this.vehicles = vehicles;
-    }
-
-    @Override
-    public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
-      return vehicles.get(pattern);
-    }
+  RealtimeVehicleRepositorySnapshot freeze() {
+    return new DefaultRealtimeVehiclesRepositorySnapshot(ImmutableListMultimap.copyOf(vehicles));
   }
 }
