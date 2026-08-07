@@ -71,12 +71,12 @@ public class SiriFuzzyTripMatcher {
       throw UpdateException.of(INVALID_DEPARTURE_TIME);
     }
 
-    Set<Trip> trips = null;
+    Set<Trip> trips = Set.of();
     if (journeyWrapper.vehicleRef().isPresent() && journeyWrapper.isRail()) {
-      trips = cachedTripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
+      trips = cache.tripsByInternalPlanningCode(journeyWrapper.vehicleRef().get());
     }
 
-    if (trips == null || trips.isEmpty()) {
+    if (trips.isEmpty()) {
       CallWrapper lastCall = calls.getLast();
       // resolves a scheduled stop point id to a quay (regular stop) if necessary
       // quay ids also work
@@ -92,7 +92,7 @@ public class SiriFuzzyTripMatcher {
         trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
       }
     }
-    if (trips == null || trips.isEmpty()) {
+    if (trips.isEmpty()) {
       throw UpdateException.of(NO_FUZZY_TRIP_MATCH);
     }
 
@@ -121,7 +121,7 @@ public class SiriFuzzyTripMatcher {
     LocalDate serviceDate
   ) {
     List<FeedScopedId> matches = new ArrayList<>();
-    for (Trip trip : cachedTripsByInternalPlanningCode(internalPlanningCode)) {
+    for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
       Set<LocalDate> serviceDates = transitService
         .getTripCalendars()
         .listServiceDates(trip.getServiceId());
@@ -131,10 +131,6 @@ public class SiriFuzzyTripMatcher {
     }
 
     return matches;
-  }
-
-  private static String createStartStopKey(RegularStop stop, int lastStopArrivalTime) {
-    return stop.getId().getId() + ":" + lastStopArrivalTime;
   }
 
   private Set<Trip> getMatchingTripsOnStopOrSiblings(
@@ -152,17 +148,14 @@ public class SiriFuzzyTripMatcher {
       transitService.getTimeZone()
     );
 
-    Set<Trip> trips = cache.startStopTripCache.get(
-      createStartStopKey(lastStop, secondsSinceMidnight)
-    );
-    if (trips == null) {
+    String lastStopId = lastStop.getId().getId();
+    Set<Trip> trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnight);
+    if (trips.isEmpty()) {
       //Attempt to fetch trips that started yesterday - i.e. add 24 hours to arrival-time
-      trips = cache.startStopTripCache.get(
-        createStartStopKey(lastStop, secondsSinceMidnightYesterday)
-      );
+      trips = cache.tripsByLastStopArrival(lastStopId, secondsSinceMidnightYesterday);
     }
 
-    if (trips != null) {
+    if (!trips.isEmpty()) {
       return trips;
     }
 
@@ -171,24 +164,14 @@ public class SiriFuzzyTripMatcher {
       return Set.of();
     }
 
-    trips = new HashSet<>();
+    Set<Trip> tripsOnSiblingQuays = new HashSet<>();
     var allQuays = lastStop.getParentStation().getChildStops();
     for (var quay : allQuays) {
-      Set<Trip> tripSet = cache.startStopTripCache.get(
-        quay.getId().getId() + ":" + secondsSinceMidnight
+      tripsOnSiblingQuays.addAll(
+        cache.tripsByLastStopArrival(quay.getId().getId(), secondsSinceMidnight)
       );
-      if (tripSet != null) {
-        trips.addAll(tripSet);
-      }
     }
-    return trips;
-  }
-
-  private Set<Trip> cachedTripsByInternalPlanningCode(String internalPlanningCode) {
-    if (internalPlanningCode == null) {
-      return null;
-    }
-    return cache.internalPlanningCodeCache.getOrDefault(internalPlanningCode, new HashSet<>());
+    return tripsOnSiblingQuays;
   }
 
   /**
