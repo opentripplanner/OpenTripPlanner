@@ -19,11 +19,11 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
 
   @Test
   public void findBoardStopPositionAfter() {
-    int[] epected = { 0, 1, 5, 5, 5, 5, -1, -1, -1 };
-    assertNumberOfExpectedResultsMatchesPattern(epected, 0);
+    int[] expected = { 0, 1, 5, 5, 5, 5, -1, -1, -1 };
+    assertNumberOfExpectedResultsMatchesPattern(expected, 0);
 
-    for (int i = 0; i < epected.length; ++i) {
-      assertEquals(epected[i], subject.findBoardStopPositionAfter(i, 1), "i=" + i);
+    for (int i = 0; i < expected.length; ++i) {
+      assertEquals(expected[i], subject.findBoardStopPositionAfter(i, 1), "i=" + i);
     }
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -39,11 +39,11 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
 
   @Test
   public void findBoardStopPositionBefore() {
-    int[] epected = { -1, 0, 1, 1, 1, 1, 5, 5, 5 };
-    assertNumberOfExpectedResultsMatchesPattern(epected, 0);
+    int[] expected = { -1, 0, 1, 1, 1, 1, 5, 5, 5 };
+    assertNumberOfExpectedResultsMatchesPattern(expected, 0);
 
-    for (int i = 0; i < epected.length; ++i) {
-      assertEquals(epected[i], subject.findBoardStopPositionBefore(i, 1), "i=" + i);
+    for (int i = 0; i < expected.length; ++i) {
+      assertEquals(expected[i], subject.findBoardStopPositionBefore(i, 1), "i=" + i);
     }
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -59,11 +59,11 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
 
   @Test
   public void findAlightStopPositionAfter() {
-    int[] epected = { 3, 3, 3, 7, 7, 7, 7, 8, -1 };
-    assertNumberOfExpectedResultsMatchesPattern(epected, 0);
+    int[] expected = { 3, 3, 3, 7, 7, 7, 7, 8, -1 };
+    assertNumberOfExpectedResultsMatchesPattern(expected, 0);
 
-    for (int i = 0; i < epected.length; ++i) {
-      assertEquals(epected[i], subject.findAlightStopPositionAfter(i, 1), "i=" + i);
+    for (int i = 0; i < expected.length; ++i) {
+      assertEquals(expected[i], subject.findAlightStopPositionAfter(i, 1), "i=" + i);
     }
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -80,11 +80,11 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
   @Test
   public void findAlightStopPositionBefore() {
     int delta = 1;
-    int[] epected = { -1, -1, -1, -1, 3, 3, 3, 3, 7, 8 };
-    assertNumberOfExpectedResultsMatchesPattern(epected, delta);
+    int[] expected = { -1, -1, -1, -1, 3, 3, 3, 3, 7, 8 };
+    assertNumberOfExpectedResultsMatchesPattern(expected, delta);
 
-    for (int i = 0; i < epected.length; ++i) {
-      assertEquals(epected[i], subject.findAlightStopPositionBefore(i, 1), "i=" + i);
+    for (int i = 0; i < expected.length; ++i) {
+      assertEquals(expected[i], subject.findAlightStopPositionBefore(i, 1), "i=" + i);
     }
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -98,10 +98,10 @@ public class RaptorTripPatternTest implements RaptorTestConstants {
     assertEquals("The 'startPos' is not in range[0, 9]: 10", ex.getMessage());
   }
 
-  private void assertNumberOfExpectedResultsMatchesPattern(int[] epected, int delta) {
+  private void assertNumberOfExpectedResultsMatchesPattern(int[] expected, int delta) {
     assertEquals(
       subject.numberOfStopsInPattern() + delta,
-      epected.length,
+      expected.length,
       "Number of of expected results matches pattern"
     );
   }
