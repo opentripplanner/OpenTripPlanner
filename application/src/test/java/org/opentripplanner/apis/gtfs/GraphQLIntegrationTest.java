@@ -123,8 +123,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
@@ -375,7 +375,7 @@ class GraphQLIntegrationTest {
 
     var snapshot = timetableSnapshot.commit();
 
-    TransitEditorService transitService = new DefaultTransitService(transitRepository, snapshot) {
+    TransitService transitService = new DefaultTransitService(transitRepository, snapshot) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(
         transitRepository
       );

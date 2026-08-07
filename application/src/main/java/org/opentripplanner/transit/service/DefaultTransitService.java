@@ -77,7 +77,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * This ensures that the same TimetableRepositorySnapshot is used for the
  * duration of the request (which may involve several method calls).
  */
-public class DefaultTransitService implements TransitEditorService {
+public class DefaultTransitService implements TransitService {
 
   private static final TIntSet EMPTY_SERVICE_CODES = TCollections.unmodifiableSet(
     new TIntHashSet()
