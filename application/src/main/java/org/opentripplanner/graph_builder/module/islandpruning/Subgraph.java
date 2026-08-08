@@ -70,17 +70,40 @@ class Subgraph {
 
   // find minimal distance from a given vertex to vertices of this subgraph
   double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
-    double d1 = streetVertexSet
-      .stream()
-      .map(x -> SphericalDistanceLibrary.distance(x.getCoordinate(), v.getCoordinate()))
-      .min(Double::compareTo)
-      .orElse(searchRadius);
-    double d2 = stopsVertexSet
-      .stream()
-      .map(x -> SphericalDistanceLibrary.distance(x.getCoordinate(), v.getCoordinate()))
-      .min(Double::compareTo)
-      .orElse(searchRadius);
+    double d1 = computeDistance(v, searchRadius, streetVertexSet);
+    double d2 = computeDistance(v, searchRadius, stopsVertexSet);
     return Math.min(d1, d2);
+  }
+
+  private double computeDistance(
+    Vertex v,
+    double searchRadius,
+    Set<? extends Vertex> streetVertexSet1
+  ) {
+    double distance = Double.MAX_VALUE;
+    Vertex clostestVertex = null;
+    for (Vertex vertex : streetVertexSet1) {
+      var d = SphericalDistanceLibrary.fastDistance(
+        v.getLat(),
+        v.getLon(),
+        vertex.getLat(),
+        vertex.getLon()
+      );
+      if (d < distance) {
+        clostestVertex = vertex;
+        distance = d;
+      }
+    }
+    if (clostestVertex == null) {
+      return searchRadius;
+    } else {
+      return SphericalDistanceLibrary.distance(
+        clostestVertex.getLat(),
+        clostestVertex.getLon(),
+        v.getLat(),
+        v.getLon()
+      );
+    }
   }
 
   // Estimate distance of a subgraph from other parts of the graph.
