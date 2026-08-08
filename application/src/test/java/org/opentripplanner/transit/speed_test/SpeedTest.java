@@ -18,6 +18,7 @@ import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -158,7 +159,9 @@ public class SpeedTest {
       null,
       updateManager,
       timetableHandle,
-      routerConfig.updaterConfig()
+      routerConfig.updaterConfig(),
+      // The speed test does not use GBFS vehicle rental.
+      GbfsNetworkOverrides.none()
     );
     if (transitRepository.getUpdaterManager() != null) {
       transitRepository.getUpdaterManager().startUpdaters();

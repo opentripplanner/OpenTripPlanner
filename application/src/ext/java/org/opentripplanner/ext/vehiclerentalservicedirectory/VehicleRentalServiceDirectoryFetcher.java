@@ -1,24 +1,15 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSDataset;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
-import org.mobilitydata.gbfs.v3_0.manifest.GBFSVersion;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.HttpHeaders;
-import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
+import org.opentripplanner.gbfs.network.GeofencingZonePhase;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -40,9 +31,6 @@ public class VehicleRentalServiceDirectoryFetcher {
   );
   private static final Duration DEFAULT_FREQUENCY = Duration.ofSeconds(15);
   private static final Duration DEFAULT_STARTUP_RETRY_PERIOD = Duration.ZERO;
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-    .registerModule(new JavaTimeModule())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   private final VertexLinker vertexLinker;
   private final VehicleRentalRepository repository;
@@ -60,12 +48,13 @@ public class VehicleRentalServiceDirectoryFetcher {
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     VertexLinker vertexLinker,
     VehicleRentalRepository repository
   ) {
     LOG.info("Fetching GBFS v3 manifest from {}", parameters.getUrl());
 
-    var manifest = loadManifest(parameters);
+    var manifest = GbfsManifestLoader.loadManifest(parameters.getUrl(), parameters.getHeaders());
 
     if (
       manifest == null || manifest.getData() == null || manifest.getData().getDatasets() == null
@@ -82,76 +71,62 @@ public class VehicleRentalServiceDirectoryFetcher {
       repository,
       otpHttpClientFactory
     );
-    return serviceDirectory.createUpdatersFromManifest(parameters, manifest);
+    return serviceDirectory.createUpdatersFromManifest(parameters, overrides, manifest);
   }
 
   public List<GraphUpdater> createUpdatersFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     GBFSManifest manifest
   ) {
     return fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
-      buildListOfNetworksFromManifest(parameters, manifest)
+      buildListOfNetworksFromManifest(parameters, overrides, manifest)
     );
   }
 
   private static List<GbfsVehicleRentalDataSourceParameters> buildListOfNetworksFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     GBFSManifest manifest
   ) {
     List<GbfsVehicleRentalDataSourceParameters> dataSources = new ArrayList<>();
 
     for (GBFSDataset dataset : manifest.getData().getDatasets()) {
       String networkName = dataset.getSystemId();
-      Optional<String> gbfsUrl = selectBestVersion(dataset);
+      var gbfsUrl = GbfsManifestLoader.selectBestVersion(dataset);
 
       if (gbfsUrl.isEmpty()) {
         LOG.warn("No suitable GBFS version found for system {}", networkName);
         continue;
       }
 
-      var config = parameters.networkParameters(networkName);
+      var config = overrides.forNetwork(networkName);
 
-      if (config.isPresent()) {
-        var networkParams = config.get();
-        dataSources.add(
-          new GbfsVehicleRentalDataSourceParameters(
-            gbfsUrl.get(),
-            parameters.getLanguage(),
-            networkParams.allowKeepingAtDestination(),
-            parameters.getHeaders(),
-            networkName,
-            networkParams.geofencingZones(),
-            // geofencingBusinessAreaBorders - default to true
-            true,
-            // overloadingAllowed - not part of GBFS, not supported here
-            false,
-            // rentalPickupType not supported
-            RentalPickupType.ALL
-          )
-        );
-      } else {
+      if (config.isEmpty()) {
         LOG.warn("Network not configured in OTP: {}", networkName);
+        continue;
       }
+
+      var networkParams = config.get();
+      dataSources.add(
+        new GbfsVehicleRentalDataSourceParameters(
+          gbfsUrl.get(),
+          parameters.getLanguage(),
+          networkParams.allowKeepingVehicleAtDestination(),
+          parameters.getHeaders(),
+          networkName,
+          // Zones are only computed here when this network is in the realtime phase; the
+          // permanent phase is handled by the vehicle rental graph builder.
+          networkParams.geofencingZones() == GeofencingZonePhase.REALTIME,
+          networkParams.requireDropOffInsideBusinessArea(),
+          // overloadingAllowed - not part of GBFS, not supported here
+          false,
+          // rentalPickupType not supported
+          RentalPickupType.ALL
+        )
+      );
     }
     return dataSources;
-  }
-
-  /**
-   * Selects the best (newest) GBFS version from the available versions for a dataset.
-   * Prefers v3.0 over v2.x versions.
-   */
-  private static Optional<String> selectBestVersion(GBFSDataset dataset) {
-    if (dataset.getVersions() == null || dataset.getVersions().isEmpty()) {
-      return Optional.empty();
-    }
-
-    // Sort versions by version number (descending) to prefer newer versions
-    return dataset
-      .getVersions()
-      .stream()
-      .sorted(Comparator.comparing(GBFSVersion::getVersion).reversed())
-      .map(GBFSVersion::getUrl)
-      .findFirst();
   }
 
   private List<GraphUpdater> fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
@@ -182,33 +157,5 @@ public class VehicleRentalServiceDirectoryFetcher {
       otpHttpClientFactory
     );
     return new VehicleRentalUpdater(vehicleRentalParameters, dataSource, vertexLinker, repository);
-  }
-
-  private static GBFSManifest loadManifest(
-    VehicleRentalServiceDirectoryFetcherParameters parameters
-  ) {
-    URI url = parameters.getUrl();
-
-    try {
-      String manifestContent;
-
-      // Check if URL is a file path
-      if ("file".equals(url.getScheme())) {
-        Path filePath = Path.of(url.getPath());
-        manifestContent = Files.readString(filePath);
-        LOG.info("Loaded GBFS manifest from file: {}", filePath);
-      } else {
-        // Load from remote URL
-        var otpHttpClient = new OtpHttpClientFactory().create(LOG);
-        var jsonNode = otpHttpClient.getAndMapAsJsonNode(url, HttpHeaders.empty(), OBJECT_MAPPER);
-        manifestContent = OBJECT_MAPPER.writeValueAsString(jsonNode);
-        LOG.info("Loaded GBFS manifest from URL: {}", url);
-      }
-
-      return OBJECT_MAPPER.readValue(manifestContent, GBFSManifest.class);
-    } catch (OtpHttpClientException | IOException e) {
-      LOG.error("Error loading GBFS manifest from {}", url, e);
-      return null;
-    }
   }
 }

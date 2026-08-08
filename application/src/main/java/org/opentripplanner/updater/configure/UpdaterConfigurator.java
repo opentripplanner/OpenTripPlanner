@@ -16,6 +16,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -60,6 +61,7 @@ public class UpdaterConfigurator {
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
+  private final GbfsNetworkOverrides gbfsNetworkOverrides;
 
   /** {@code null} when {@link OTPFeature#CarPooling} is off. */
   @Nullable
@@ -91,7 +93,8 @@ public class UpdaterConfigurator {
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    UpdatersParameters updatersParameters
+    UpdatersParameters updatersParameters,
+    GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -105,6 +108,7 @@ public class UpdaterConfigurator {
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
+    this.gbfsNetworkOverrides = gbfsNetworkOverrides;
   }
 
   public static void configure(
@@ -119,7 +123,8 @@ public class UpdaterConfigurator {
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    UpdatersParameters updatersParameters
+    UpdatersParameters updatersParameters,
+    GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
     new UpdaterConfigurator(
       graph,
@@ -133,7 +138,8 @@ public class UpdaterConfigurator {
       carpoolTripVertexResolver,
       updateManager,
       timetableRepositoryHandle,
-      updatersParameters
+      updatersParameters,
+      gbfsNetworkOverrides
     ).configure();
   }
 
@@ -193,6 +199,7 @@ public class UpdaterConfigurator {
     }
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
+      gbfsNetworkOverrides,
       linker,
       vehicleRentalRepository
     );

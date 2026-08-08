@@ -30,8 +30,8 @@ import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.ext.gbfsgeofencing.config.GbfsGeofencingConfig;
-import org.opentripplanner.ext.gbfsgeofencing.parameters.GbfsGeofencingParameters;
+import org.opentripplanner.ext.vehiclerentalgraphbuilder.config.VehicleRentalGraphBuilderConfig;
+import org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters.VehicleRentalGraphBuilderParameters;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -176,7 +176,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
   public final EmpiricalDelayParameters empiricalDelay;
-  public final GbfsGeofencingParameters gbfsGeofencing;
+  public final VehicleRentalGraphBuilderParameters vehicleRentalGraphBuilder;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -599,7 +599,10 @@ public class BuildConfig implements OtpDataStoreConfig {
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
     empiricalDelay = EmpiricalDelayConfig.mapEmissionsConfig("empiricalDelay", root);
-    gbfsGeofencing = GbfsGeofencingConfig.mapConfig("gbfsGeofencing", root);
+    vehicleRentalGraphBuilder = VehicleRentalGraphBuilderConfig.mapConfig(
+      "vehicleRentalGraphBuilder",
+      root
+    );
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(

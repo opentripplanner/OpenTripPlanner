@@ -1,14 +1,9 @@
 {
   "vehicleRentalServiceDirectory": {
     "url": "https://example.com/gbfs/v3/manifest.json",
+    "language": "en",
     "headers": {
       "ET-Client-Name": "otp"
-    },
-    "networks": [
-      {
-        "network": "oslo-by-sykkel",
-        "geofencingZones": true
-      }
-    ]
+    }
   }
 }

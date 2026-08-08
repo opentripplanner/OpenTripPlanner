@@ -162,3 +162,183 @@ This is temporary and will be removed in a future version of OTP. Use this to sp
 ```
 
 <!-- vehicle-rental END -->
+
+## Shared network configuration
+
+Both the [vehicle rental service directory](sandbox/VehicleRentalServiceDirectory.md) and the
+`vehicleRentalGraphBuilder` discover their feeds from a GBFS manifest and need the same per-network
+settings. Those are configured once in the `gbfs` section of `otp-config.json`, keyed by the GBFS
+`system_id`.
+
+This section lives in `otp-config.json` because it is the only configuration file read both when the
+graph is built and when it is served. Note that it is _not_ embedded in the graph, so it must be
+present in the deployment directory in both phases.
+
+`defaults` is applied per field: a listed network overrides only the fields it names and inherits
+the rest. `includeUnlistedNetworks` is a separate switch so that adding defaults to avoid repetition
+cannot silently widen which networks OTP loads.
+
+`geofencingZones` names the phase that computes and applies a network's zones, so the two phases are
+mutually exclusive and zones cannot be applied twice.
+
+```JSON
+// otp-config.json
+{
+  "gbfs" : {
+    "defaults" : {
+      "geofencingZones" : "off",
+      "requireDropOffInsideBusinessArea" : true,
+      "allowKeepingVehicleAtDestination" : false
+    },
+    "includeUnlistedNetworks" : false,
+    "networks" : [
+      { "network" : "tier", "geofencingZones" : "permanent" },
+      { "network" : "voi", "geofencingZones" : "permanent", "requireDropOffInsideBusinessArea" : false },
+      { "network" : "oslobysykkel", "geofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true },
+      { "network" : "noisy-operator" }
+    ]
+  }
+}
+```
+
+Given a manifest listing `tier`, `voi`, `oslobysykkel`, `noisy-operator` and `ryde`:
+
+| Network          | Graph build                                      | Runtime                                         |
+| ---------------- | ------------------------------------------------ | ----------------------------------------------- |
+| `tier`           | zones applied, drop-off required inside the area | updater created, no zone computation            |
+| `voi`            | zones applied, no business area enforcement      | updater created, no zone computation            |
+| `oslobysykkel`   | skipped                                          | updater computes zones, may keep at destination |
+| `noisy-operator` | skipped (inherits `"off"`)                       | updater created, no zones                       |
+| `ryde`           | skipped, not listed                              | skipped with a warning                          |
+
+<!-- gbfs-networks BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                                                                            |    Type    | Summary                                                                        |  Req./Opt. | Default Value | Since |
+|---------------------------------------------------------------------------------------------|:----------:|--------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [includeUnlistedNetworks](#gbfs_includeUnlistedNetworks)                                    |  `boolean` | Whether networks in the GBFS manifest but absent from `networks` are loaded.   | *Optional* | `false`       |  2.10 |
+| [defaults](#gbfs_defaults)                                                                  |  `object`  | Values applied to every network that does not set them itself.                 | *Optional* |               |  2.10 |
+|    [allowKeepingVehicleAtDestination](#gbfs_defaults_allowKeepingVehicleAtDestination)      |  `boolean` | Whether a vehicle rented from a station may be kept at the destination.        | *Optional* | `false`       |  2.10 |
+|    [geofencingZones](#gbfs_defaults_geofencingZones)                                        |   `enum`   | Which phase computes and applies this network's geofencing zones.              | *Optional* | `"off"`       |  2.10 |
+|    [requireDropOffInsideBusinessArea](#gbfs_defaults_requireDropOffInsideBusinessArea)      |  `boolean` | Whether a rented vehicle must be dropped off before leaving the business area. | *Optional* | `true`        |  2.10 |
+| [networks](#gbfs_networks)                                                                  | `object[]` | Per-network overrides, keyed by the GBFS `system_id`.                          | *Optional* |               |  2.10 |
+|       [allowKeepingVehicleAtDestination](#gbfs_networks_0_allowKeepingVehicleAtDestination) |  `boolean` | Whether a vehicle rented from a station may be kept at the destination.        | *Optional* | `false`       |  2.10 |
+|       [geofencingZones](#gbfs_networks_0_geofencingZones)                                   |   `enum`   | Which phase computes and applies this network's geofencing zones.              | *Optional* | `"off"`       |  2.10 |
+|       network                                                                               |  `string`  | The GBFS `system_id` of the network these values apply to.                     | *Required* |               |  2.10 |
+|       [requireDropOffInsideBusinessArea](#gbfs_networks_0_requireDropOffInsideBusinessArea) |  `boolean` | Whether a rented vehicle must be dropped off before leaving the business area. | *Optional* | `true`        |  2.10 |
+
+
+##### Parameter details
+
+<h4 id="gbfs_includeUnlistedNetworks">includeUnlistedNetworks</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /gbfs 
+
+Whether networks in the GBFS manifest but absent from `networks` are loaded.
+
+When `false` such a network is skipped with a warning, so `networks` acts as a whitelist.
+When `true` it is loaded with `defaults` applied.
+
+
+<h4 id="gbfs_defaults">defaults</h4>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /gbfs 
+
+Values applied to every network that does not set them itself.
+
+A network listed in `networks` overrides only the fields it names and inherits the rest
+from here. Setting defaults does not by itself widen which networks are loaded - see
+`includeUnlistedNetworks`.
+
+
+<h4 id="gbfs_defaults_allowKeepingVehicleAtDestination">allowKeepingVehicleAtDestination</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /gbfs/defaults 
+
+Whether a vehicle rented from a station may be kept at the destination.
+
+See the regular [GBFS documentation](../GBFS-Config.md) for more information.
+
+<h4 id="gbfs_defaults_geofencingZones">geofencingZones</h4>
+
+**Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
+**Path:** /gbfs/defaults   
+**Enum values:** `permanent` | `realtime` | `off`
+
+Which phase computes and applies this network's geofencing zones.
+
+- `permanent` - the `vehicleRentalGraphBuilder` loads and applies the zones at graph
+  build time, so they are baked into the graph.
+- `realtime` - the vehicle rental updater loads and applies the zones at runtime.
+- `off` - the zones are not processed.
+
+The two phases are mutually exclusive, so zones cannot be applied twice for a network.
+
+
+<h4 id="gbfs_defaults_requireDropOffInsideBusinessArea">requireDropOffInsideBusinessArea</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /gbfs/defaults 
+
+Whether a rented vehicle must be dropped off before leaving the business area.
+
+A business area is inferred from geofencing zones whose ride and traversal rules are all
+permissive. When enabled, the router forces a drop-off at the border of that area,
+preventing itineraries that leave the operator's service area with a rented vehicle.
+
+Has no effect when `geofencingZones` is `off`.
+
+
+<h4 id="gbfs_networks">networks</h4>
+
+**Since version:** `2.10` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** /gbfs 
+
+Per-network overrides, keyed by the GBFS `system_id`.
+
+<h4 id="gbfs_networks_0_allowKeepingVehicleAtDestination">allowKeepingVehicleAtDestination</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /gbfs/networks/[0] 
+
+Whether a vehicle rented from a station may be kept at the destination.
+
+See the regular [GBFS documentation](../GBFS-Config.md) for more information.
+
+<h4 id="gbfs_networks_0_geofencingZones">geofencingZones</h4>
+
+**Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
+**Path:** /gbfs/networks/[0]   
+**Enum values:** `permanent` | `realtime` | `off`
+
+Which phase computes and applies this network's geofencing zones.
+
+- `permanent` - the `vehicleRentalGraphBuilder` loads and applies the zones at graph
+  build time, so they are baked into the graph.
+- `realtime` - the vehicle rental updater loads and applies the zones at runtime.
+- `off` - the zones are not processed.
+
+The two phases are mutually exclusive, so zones cannot be applied twice for a network.
+
+
+<h4 id="gbfs_networks_0_requireDropOffInsideBusinessArea">requireDropOffInsideBusinessArea</h4>
+
+**Since version:** `2.10` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /gbfs/networks/[0] 
+
+Whether a rented vehicle must be dropped off before leaving the business area.
+
+A business area is inferred from geofencing zones whose ride and traversal rules are all
+permissive. When enabled, the router forces a drop-off at the border of that area,
+preventing itineraries that leave the operator's service area with a rented vehicle.
+
+Has no effect when `geofencingZones` is `off`.
+
+
+
+
+
+<!-- gbfs-networks END -->

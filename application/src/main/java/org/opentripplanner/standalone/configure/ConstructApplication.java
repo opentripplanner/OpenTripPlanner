@@ -164,6 +164,7 @@ public class ConstructApplication {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
       buildConfig(),
+      otpConfig().gbfsNetworks,
       graphBuilderDataSources,
       graph(),
       osmInfoGraphBuildRepository,
@@ -221,7 +222,8 @@ public class ConstructApplication {
       carpoolTripVertexResolver(),
       factory.updateManager(),
       factory.timetableRepositoryHandle(),
-      routerConfig().updaterConfig()
+      routerConfig().updaterConfig(),
+      otpConfig().gbfsNetworks
     );
 
     // Start application warmup — runs routing queries to warm up the application

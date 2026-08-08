@@ -1,32 +1,30 @@
-package org.opentripplanner.ext.gbfsgeofencing.parameters;
+package org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 
 /**
- * Parameters for a single GBFS geofencing feed.
- * Implements {@link GbfsDataSourceParameters} so it can be passed directly to
+ * Parameters for loading one network's GBFS feed at graph build time. Constructed per dataset
+ * discovered in the manifest rather than mapped from configuration, so it can be handed to
  * {@link org.opentripplanner.gbfs.GbfsFeedLoaderAndMapper}.
+ * <p>
+ * Only geofencing zones are loaded at build time: vehicles and stations are runtime data supplied
+ * by the vehicle rental updater, so the rental-related flags are all off.
  */
-public record GbfsGeofencingFeedParameters(
+public record VehicleRentalNetworkDataSourceParameters(
   String url,
   @Nullable String network,
-  boolean applyBusinessAreas,
+  @Nullable String language,
   HttpHeaders httpHeaders
 ) implements GbfsDataSourceParameters {
-  public GbfsGeofencingFeedParameters {
+  public VehicleRentalNetworkDataSourceParameters {
     if (url == null || url.isBlank()) {
       throw new IllegalArgumentException("GBFS feed URL is required");
     }
     if (httpHeaders == null) {
       httpHeaders = HttpHeaders.empty();
     }
-  }
-
-  @Override
-  public String language() {
-    return "en";
   }
 
   @Override

@@ -60,7 +60,6 @@ Sections follow that describe particular settings in more depth.
 | [emission](sandbox/Emission.md)                                                             |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | empiricalDelay                                                                              |       `object`       | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
 | [fares](sandbox/Fares.md)                                                                   |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
-| [gbfsGeofencing](#gbfsGeofencing)                                                           |       `object`       | Load GBFS geofencing zones at graph build time.                                                                                                                | *Optional* |                                   |  2.10 |
 | gsConfig                                                                                    |       `object`       | Configuration for Google Cloud Storage                                                                                                                         | *Optional* |                                   |  2.8  |
 | gtfsDefaults                                                                                |       `object`       | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                                    |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
@@ -130,6 +129,7 @@ Sections follow that describe particular settings in more depth.
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle)                    |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
 | [transitRouteToStationCentroid](#transitRouteToStationCentroid)                             |  `feed-scoped-id[]`  | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
+| [vehicleRentalGraphBuilder](#vehicleRentalGraphBuilder)                                     |       `object`       | Load GBFS geofencing zones into the graph at build time.                                                                                                       | *Optional* |                                   |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -781,21 +781,6 @@ for the next graph build operation. You should add the `--cache <directory>` com
 to specify your NED tile cache location.
 
 
-<h3 id="gbfsGeofencing">gbfsGeofencing</h3>
-
-**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Load GBFS geofencing zones at graph build time.
-
-This sandbox feature allows loading GBFS geofencing zones during graph build instead of
-at runtime. This is useful when geofencing zones are relatively static and you want to
-avoid external dependencies at runtime.
-
-Note: If both build-time and runtime geofencing are enabled for the same network,
-zones will be applied twice.
-
-
 <h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>
 
 **Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
@@ -1313,6 +1298,28 @@ origin/destination. In this case the centroid will be used both for direct stree
 access/egress street search where the station is used as the start/end of the access/egress. But
 transit that starts/ends at the station will work as usual without any additional street leg from/to
 the centroid.
+
+
+<h3 id="vehicleRentalGraphBuilder">vehicleRentalGraphBuilder</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Load GBFS geofencing zones into the graph at build time.
+
+Discovers the networks a provider publishes from a GBFS v3 `manifest.json` and, for each
+network configured with `"geofencingZones": "permanent"` in the `gbfs` section of
+`otp-config.json`, loads its geofencing zones and applies them to the street graph during
+the graph build. This moves the cost of computing zone boundaries off the runtime path.
+
+A network is only loaded if its GBFS feed actually publishes a `geofencing_zones` feed;
+this is checked against the feed list in `gbfs.json` before the feed is fetched.
+
+Vehicles and stations remain runtime data, so a vehicle rental updater is still required.
+
+Note: a GBFS updater configured directly under `updaters` in `router-config.json` does not
+read the shared `gbfs` section. Enabling `geofencingZones` on such an updater for a network
+that is also built here applies the zones twice.
 
 
 

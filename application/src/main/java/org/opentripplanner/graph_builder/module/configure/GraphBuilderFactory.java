@@ -16,11 +16,12 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.configure.EmpiricalDelayGraphBuilderModule;
 import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDelayGraphBuilder;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
-import org.opentripplanner.ext.gbfsgeofencing.configure.GbfsGeofencingGraphBuilderModule;
-import org.opentripplanner.ext.gbfsgeofencing.internal.graphbuilder.GbfsGeofencingGraphBuilder;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.ext.vehiclerentalgraphbuilder.configure.VehicleRentalGraphBuilderModule;
+import org.opentripplanner.ext.vehiclerentalgraphbuilder.internal.graphbuilder.VehicleRentalGraphBuilder;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.configure.GraphBuilderModule;
@@ -62,7 +63,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
-    GbfsGeofencingGraphBuilderModule.class,
+    VehicleRentalGraphBuilderModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
@@ -100,7 +101,7 @@ public interface GraphBuilderFactory {
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
 
   @Nullable
-  GbfsGeofencingGraphBuilder gbfsGeofencingGraphBuilder();
+  VehicleRentalGraphBuilder vehicleRentalGraphBuilder();
 
   @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
@@ -116,6 +117,9 @@ public interface GraphBuilderFactory {
   interface Builder {
     @BindsInstance
     Builder config(BuildConfig config);
+
+    @BindsInstance
+    Builder gbfsNetworkOverrides(GbfsNetworkOverrides gbfsNetworkOverrides);
 
     @BindsInstance
     Builder graph(Graph graph);

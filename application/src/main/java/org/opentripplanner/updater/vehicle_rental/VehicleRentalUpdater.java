@@ -55,7 +55,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private final VehicleRentalDataSource source;
   private final String nameForLogging;
-  private final boolean applyBusinessAreas;
+  private final boolean requireDropOffInsideBusinessArea;
 
   private Set<Vertex> latestBoundaryVertices = Set.of();
   private GeofencingZoneIndex latestZoneIndex;
@@ -82,9 +82,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       parameters.sourceParameters().url()
     );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
-    this.applyBusinessAreas = parameters.sourceParameters() instanceof
+    this.requireDropOffInsideBusinessArea = parameters.sourceParameters() instanceof
         GbfsVehicleRentalDataSourceParameters gbfs
-      ? gbfs.geofencingBusinessAreaBorders()
+      ? gbfs.requireDropOffInsideBusinessArea()
       : true;
 
     // Creation of network linker library will not modify the graph
@@ -239,19 +239,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         var applier = new GeofencingZoneApplier(
           ls -> graph.findEdgesAlongLineStrings(ls, Scope.REQUEST),
           env -> graph.findEdges(env, Scope.REQUEST),
-          applyBusinessAreas
+          requireDropOffInsideBusinessArea
         );
         var result = applier.applyGeofencingZones(geofencingZones);
         latestBoundaryVertices = result.boundaryVertices();
         latestZoneIndex = result.zoneIndex();
         latestAppliedGeofencingZones = geofencingZones;
         service.setGeofencingZoneIndex(nameForLogging, latestZoneIndex);
-
-        GeofencingZoneApplier.preResolveVertexZones(
-          verticesByStation.values(),
-          latestZoneIndex,
-          applyBusinessAreas
-        );
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);
@@ -262,6 +256,15 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
           nameForLogging
         );
       }
+
+      // Seed the rental vertices from every registered data source, not just from the zones
+      // computed above. A network whose zones were applied at graph build time has none here,
+      // but its vertices are still created by this updater and must know which zones they are in.
+      GeofencingZoneApplier.preResolveVertexZones(
+        verticesByStation.values(),
+        service,
+        requireDropOffInsideBusinessArea
+      );
     }
   }
 
