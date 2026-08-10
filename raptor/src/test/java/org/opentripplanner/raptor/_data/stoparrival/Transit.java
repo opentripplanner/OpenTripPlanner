@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.api.view.TransitPathView;
 
 class Transit extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
 
+  private final int boardStopPosition;
   private final TestTripSchedule trip;
 
   Transit(
@@ -17,10 +18,12 @@ class Transit extends AbstractStopArrival implements TransitPathView<TestTripSch
     int arrivalTime,
     int c1,
     int c2,
+    int boardStopPosition,
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
     super(round, stop, arrivalTime, c1, c2, previous);
+    this.boardStopPosition = boardStopPosition;
     this.trip = trip;
   }
 
@@ -35,8 +38,8 @@ class Transit extends AbstractStopArrival implements TransitPathView<TestTripSch
   }
 
   @Override
-  public int boardStop() {
-    return previous().stop();
+  public int boardStopPosition() {
+    return boardStopPosition;
   }
 
   @Override

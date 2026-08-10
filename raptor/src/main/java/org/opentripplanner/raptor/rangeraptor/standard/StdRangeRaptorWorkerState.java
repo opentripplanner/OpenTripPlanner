@@ -167,7 +167,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
    * transitTime.
    */
   @Override
-  public void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
+  public void transitToStop(int stop, int arrivalTime, int boardStopPosition, T trip) {
     if (exceedsTimeLimit(arrivalTime)) {
       return;
     }
@@ -178,13 +178,12 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
       stopArrivalsState.setNewBestTransitTime(
         stop,
         arrivalTime,
+        boardStopPosition,
         trip,
-        boardStop,
-        boardTime,
         newOverallBestTime
       );
     } else {
-      stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
+      stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, boardStopPosition, trip);
     }
   }
 

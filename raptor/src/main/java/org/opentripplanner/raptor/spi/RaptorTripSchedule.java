@@ -25,36 +25,12 @@ public interface RaptorTripSchedule {
   int arrival(int stopPosInPattern);
 
   /**
-   * Search for the arrival time for the given stopIndex. This is not optimized for performance.
-   *
-   * @param startStopPos the stop position in pattern to start the search (inclusive).
-   * @param stopIndex    the stop index to find the arrival time for.
-   * @return the arrival time in seconds at the given stop
-   * @throws IndexOutOfBoundsException if {@code stopIndex} is not found
-   */
-  default int arrival(int startStopPos, int stopIndex) {
-    return arrival(pattern().findStopPositionAfter(startStopPos, stopIndex));
-  }
-
-  /**
    * The departure time at the given stop position in pattern.
    *
    * @param stopPosInPattern the stop position.
    * @return the departure time in seconds at the given stop
    */
   int departure(int stopPosInPattern);
-
-  /**
-   * Search for the departure time for the given stopIndex. This is not optimized for performance.
-   *
-   * @param startStopPos the stop position in pattern to start the search (inclusive).
-   * @param stopIndex    the stop index to find the departure time for.
-   * @return the departure time in seconds at the given stop
-   * @throws IndexOutOfBoundsException if stopIndex is not found
-   */
-  default int departure(int startStopPos, int stopIndex) {
-    return departure(pattern().findStopPositionAfter(startStopPos, stopIndex));
-  }
 
   /// The relative-travel-duration is a proxy for time spent on transit from the boarding stop to
   /// the alight stop. We do not know the alight stop, so it is impossible to calculate the
@@ -81,49 +57,53 @@ public interface RaptorTripSchedule {
   RaptorTripPattern pattern();
 
   /**
-   * Search for the arrival stop position for the given trip, latest arrival time, and stop index.
-   * We need the time in addition to the stop in cases where the trip pattern visits the same stop
-   * twice. Also, the time alone is not sufficient, since more than one stop could have the exact
+   * Search for the arrival stop position for the latest arrival time and stop index. We need the
+   * time in addition to the stop in cases where the trip pattern loops, visits the same stop
+   * twice. Also, the time alone is not enough, since more than one stop could have the exact
    * same arrival time.
    * <p>
-   * Raptor saves memory by NOT storing board/alight stop positions in the pattern; therefore, we
-   * need this method when mapping to an itinerary or Raptor path.
-   * <p>
-   * Avoid using this during routing, as it is not optimized for performance.
+   * Consider using position-based methods in {@link RaptorTripPattern} if possible.
    *
    * @return the stop position in the trip pattern if found; otherwise, -1
    */
   default int findArrivalStopPosition(int latestArrivalTime, int stop) {
-    RaptorTripPattern p = pattern();
+    var p = pattern();
+    int i = p.findAlightStopPositionBefore(p.numberOfStopsInPattern(), stop);
 
-    int end = p.numberOfStopsInPattern() - 1;
-    // Skip position 0 — cannot alight where the trip originates
-    for (int i = end; i > 0; i--) {
-      if (!p.alightingPossibleAt(i) || arrival(i) > latestArrivalTime) {
-        continue;
-      }
-      if (p.stopIndex(i) == stop) {
-        return i;
-      }
+    while (i != -1 && arrival(i) > latestArrivalTime) {
+      i = p.findAlightStopPositionBefore(i, stop);
     }
-    return -1;
+    return i;
   }
 
   /**
-   * Search for the departure stop position for the given trip, earliest departure time, and stop
-   * index. We need the time in addition to the stop in cases where the trip pattern visits the
-   * same stop twice. Also, the time alone is not sufficient, since more than one stop could have
-   * the exact same departure time.
-   * <p>
-   * Raptor saves memory by NOT storing board/alight stop positions in the pattern; therefore, we
-   * need this method when mapping to an itinerary or Raptor path.
-   * <p>
-   * Avoid using this during routing, as it is not optimized for performance.
-   *
-   * @return the stop position in the trip pattern if found; otherwise, -1
+   * Same as {@code #findDepartureStopPosition(0, earliestDepartureTime, stop)}.
+   * @see #findDepartureStopPosition(int, int, int)
    */
   default int findDepartureStopPosition(int earliestDepartureTime, int stop) {
     return findDepartureStopPosition(0, earliestDepartureTime, stop);
+  }
+
+  /**
+   * Find the departure stop position for a stop index after the given earliest departure time
+   * (inclusive), starting the search at the given start stop position. This method returns the
+   * first stop position found, or -1 if no stop position is found.
+   * <p>
+   * Consider using position-based methods in {@link RaptorTripPattern} if possible.
+   *
+   * @param startStopPos the start stop position to search from
+   * @param earliestDepartureTime the earliest departure time to search for (inclusive)
+   * @param stop the stop index to search for
+   * @return the stop position in the trip pattern if found; otherwise, -1
+   */
+  default int findDepartureStopPosition(int startStopPos, int earliestDepartureTime, int stop) {
+    var p = pattern();
+    int i = p.findBoardStopPositionAfter(startStopPos, stop);
+
+    while (i != -1 && departure(i) < earliestDepartureTime) {
+      i = p.findBoardStopPositionAfter(i + 1, stop);
+    }
+    return i;
   }
 
   /**
@@ -153,32 +133,5 @@ public interface RaptorTripSchedule {
       i = findDepartureStopPosition(i + 1, earliestDepartureTime, stop);
     } while (i != -1);
     return IntIterators.of(stops);
-  }
-
-  /**
-   * Find the departure stop position for a stop index after the given earliest departure time
-   * (inclusive), starting the search at the given start stop position. This method returns the
-   * first stop position found, or -1 if no stop position is found.
-   *
-   * @param startStopPos the start stop position to search from
-   * @param earliestDepartureTime the earliest departure time to search for (inclusive)
-   * @param stop the stop index to search for
-   * @return the stop position in the trip pattern if found; otherwise, -1
-   */
-  default int findDepartureStopPosition(int startStopPos, int earliestDepartureTime, int stop) {
-    var p = pattern();
-
-    // Skip last stop position — cannot board at the trip destination
-    final int end = p.numberOfStopsInPattern() - 1;
-
-    for (int i = startStopPos; i < end; i++) {
-      if (!p.boardingPossibleAt(i) || departure(i) < earliestDepartureTime) {
-        continue;
-      }
-      if (p.stopIndex(i) == stop) {
-        return i;
-      }
-    }
-    return -1;
   }
 }

@@ -53,9 +53,9 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
 
   int boardTime();
 
-  int boardStop();
+  int boardStopPosition();
 
-  void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip);
+  void arriveByTransit(int arrivalTime, int boardStopPosition, T trip);
 
   /* Transfer */
 
