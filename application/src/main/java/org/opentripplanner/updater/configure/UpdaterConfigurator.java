@@ -158,11 +158,11 @@ public class UpdaterConfigurator {
 
     // Register the alert service of each updater that provides one into the application-wide
     // aggregating alert service.
-    updaters
-      .stream()
-      .filter(TransitAlertProvider.class::isInstance)
-      .map(TransitAlertProvider.class::cast)
-      .forEach(provider -> transitAlertService.addDelegate(provider.getTransitAlertService()));
+    for (var it : updaters) {
+      if (it instanceof TransitAlertProvider provider) {
+        transitAlertService.addDelegate(provider.getTransitAlertService());
+      }
+    }
 
     var graphWriterService = new GraphWriterService(
       updateManager,
