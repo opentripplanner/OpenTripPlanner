@@ -36,7 +36,9 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -85,6 +87,10 @@ class RequestScopedFactoryTest {
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
     );
+    var realtimeVehicleRepositoryHandle = repositoryRegistry.registerRepository(
+      new DefaultRealtimeVehicleRepository(),
+      new RealtimeVehicleRepositoryLifecycle()
+    );
 
     var routerConfig = RouterConfig.DEFAULT;
     var graph = new Graph();
@@ -116,7 +122,7 @@ class RequestScopedFactoryTest {
       .vertexLinker(vertexLinker)
       .transferService(TransferServiceTestFactory.transferService(transferRepository))
       .worldEnvelopeService(TestServerContext.createWorldEnvelopeService())
-      .realtimeVehicleRepository(new DefaultRealtimeVehicleRepository())
+      .realtimeVehicleRepositoryHandle(realtimeVehicleRepositoryHandle)
       .vehicleRentalService(new DefaultVehicleRentalService())
       .vehicleParkingService(TestServerContext.createVehicleParkingService())
       .rideHailingServices(List.of())
@@ -211,7 +217,12 @@ class RequestScopedFactoryTest {
       Builder worldEnvelopeService(WorldEnvelopeService worldEnvelopeService);
 
       @BindsInstance
-      Builder realtimeVehicleRepository(RealtimeVehicleRepository realtimeVehicleRepository);
+      Builder realtimeVehicleRepositoryHandle(
+        RepositoryHandle<
+          RealtimeVehicleRepositorySnapshot,
+          RealtimeVehicleRepository
+        > realtimeVehicleRepositoryHandle
+      );
 
       @BindsInstance
       Builder vehicleRentalService(VehicleRentalService vehicleRentalService);

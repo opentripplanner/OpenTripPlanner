@@ -3,6 +3,8 @@ package org.opentripplanner.updater;
 import java.util.concurrent.Future;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -25,17 +27,26 @@ public class GraphWriterService implements WriteToGraphCallback {
 
   private final UpdateManager updateManager;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
+  private final RepositoryHandle<
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
+  > realtimeVehicleHandle;
   private final Graph graph;
   private final TransitRepository transitRepository;
 
   public GraphWriterService(
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleHandle,
     Graph graph,
     TransitRepository transitRepository
   ) {
     this.updateManager = updateManager;
     this.timetableHandle = timetableHandle;
+    this.realtimeVehicleHandle = realtimeVehicleHandle;
     this.graph = graph;
     this.transitRepository = transitRepository;
   }
@@ -44,7 +55,11 @@ public class GraphWriterService implements WriteToGraphCallback {
   public Future<Void> execute(GraphWriterRunnable runnable) {
     return updateManager.submit(ctx -> {
       var repository = ctx.repository(timetableHandle);
-      var context = new DefaultRealTimeUpdateContext(graph, transitRepository, repository);
+      // The vehicle repository is resolved lazily: only tasks that actually apply vehicle
+      // updates cause a new vehicle snapshot to be published at commit.
+      var context = new DefaultRealTimeUpdateContext(graph, transitRepository, repository, () ->
+        ctx.repository(realtimeVehicleHandle)
+      );
       try {
         runnable.run(context);
       } catch (Exception e) {

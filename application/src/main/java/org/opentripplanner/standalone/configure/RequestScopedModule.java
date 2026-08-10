@@ -27,6 +27,7 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -84,7 +85,10 @@ public class RequestScopedModule {
     TransitService transitService,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
-    RealtimeVehicleRepository realtimeVehicleRepository,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleRepositoryHandle,
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,
     List<RideHailingService> rideHailingServices,
@@ -113,6 +117,10 @@ public class RequestScopedModule {
     var flexParameters = routerConfig.flexParameters();
     var transmodelAPIParameters = routerConfig.transmodelApi();
 
+    var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
+      transactionScope
+    );
+
     return new DefaultServerRequestContext(
       debugUiConfig,
       fareService,
@@ -122,7 +130,7 @@ public class RequestScopedModule {
       Metrics.globalRegistry,
       ojpApiParameters,
       raptorConfig,
-      realtimeVehicleRepository,
+      realtimeVehicleSnapshot,
       rideHailingServices,
       defaultRequest,
       streetLimitationParametersService,

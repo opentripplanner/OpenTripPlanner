@@ -1,5 +1,7 @@
 package org.opentripplanner.updater;
 
+import java.util.function.Supplier;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -13,6 +15,12 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final TransitService transitService;
+
+  /**
+   * Resolved lazily so that tasks that never touch the realtime vehicles do not cause a needless
+   * vehicle snapshot to be created and published at commit.
+   */
+  private final Supplier<RealtimeVehicleRepository> realtimeVehicleRepository;
 
   /**
    * The context needs the mutable repository so that entity lookups (trips, routes, patterns) see
@@ -32,23 +40,34 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
   public DefaultRealTimeUpdateContext(
     Graph graph,
     TransitRepository transitRepository,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    Supplier<RealtimeVehicleRepository> realtimeVehicleRepository
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
     this.transitService = new DefaultTransitService(transitRepository, timetableRepository);
+    this.realtimeVehicleRepository = realtimeVehicleRepository;
   }
 
   /**
    * Constructor for unit tests only.
    */
   public DefaultRealTimeUpdateContext(Graph graph, TransitRepository transitRepository) {
-    this(graph, transitRepository, null);
+    this(graph, transitRepository, null, () -> {
+      throw new UnsupportedOperationException(
+        "The realtime-vehicle repository is not available in this test context"
+      );
+    });
   }
 
   @Override
   public TimetableRepository timetableRepository() {
     return timetableRepository;
+  }
+
+  @Override
+  public RealtimeVehicleRepository realtimeVehicleRepository() {
+    return realtimeVehicleRepository.get();
   }
 
   @Override
