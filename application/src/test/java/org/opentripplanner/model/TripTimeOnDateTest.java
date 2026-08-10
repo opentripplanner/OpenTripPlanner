@@ -217,17 +217,17 @@ class TripTimeOnDateTest {
 
   @Test
   void scheduledStop() {
-    var route = TimetableRepositoryForTest.route("R1").build();
+    var route = TransitRepositoryForTest.route("R1").build();
     var stopA = TEST_MODEL.stop("A").build();
     var scheduledStop = TEST_MODEL.stop("scheduled").build();
     var realTimeStop = TEST_MODEL.stop("realtime").build();
     var stopC = TEST_MODEL.stop("C").build();
 
-    var scheduledPattern = TimetableRepositoryForTest.tripPattern("P1", route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, scheduledStop, stopC))
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, scheduledStop, stopC))
       .build();
-    var realTimePattern = TimetableRepositoryForTest.tripPattern("P1", route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
       .build();
 
     var subject = new TripTimeOnDate(tripTimesFor(3), 1, realTimePattern);
@@ -239,16 +239,16 @@ class TripTimeOnDateTest {
   @Test
   void testScheduledStopForExtraCall() {
     // The scheduled stop should fall back to the same stop as realtime
-    var route = TimetableRepositoryForTest.route("R1").build();
+    var route = TransitRepositoryForTest.route("R1").build();
     var stopA = TEST_MODEL.stop("A").build();
     var realTimeStop = TEST_MODEL.stop("realtime").build();
     var stopC = TEST_MODEL.stop("C").build();
 
-    var shorterScheduledPattern = TimetableRepositoryForTest.tripPattern("P1", route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, stopC))
+    var shorterScheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopC))
       .build();
-    var realTimePattern = TimetableRepositoryForTest.tripPattern("P1", route)
-      .withStopPattern(TimetableRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
       .build();
     var tripTimes = tripTimesFor(3)
       .createRealTimeFromScheduledTimes()
@@ -265,7 +265,7 @@ class TripTimeOnDateTest {
   }
 
   private static TripTimes tripTimesFor(int stops) {
-    var trip = TimetableRepositoryForTest.trip("123").build();
+    var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
     return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
