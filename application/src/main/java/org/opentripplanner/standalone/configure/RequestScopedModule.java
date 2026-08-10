@@ -134,7 +134,6 @@ public class RequestScopedModule {
     @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
     @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
     FareService fareService
   ) {
