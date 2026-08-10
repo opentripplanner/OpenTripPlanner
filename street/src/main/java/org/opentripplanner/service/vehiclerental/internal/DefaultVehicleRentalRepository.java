@@ -22,7 +22,7 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
  * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
  *
  * <p>The spatial indices are {@code transient} — JTS {@code STRtree} / {@code PreparedGeometry}
- * caches don't survive Kryo. Raw zones registered via the build-time
+ * caches don't survive Kryo. Raw zones registered via the permanent-scope
  * {@link #setGeofencingZoneIndex(String, GeofencingZoneIndex, Collection)} overload are persisted
  * and used to rebuild the indices lazily on first access.
  */
@@ -31,7 +31,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository, 
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 
-  /** Raw zones for build-time data sources whose state must survive serialization. */
+  /** Raw zones for permanent-scope data sources whose state must survive serialization. */
   private final Map<String, Set<GeofencingZone>> serializedZones = new ConcurrentHashMap<>();
 
   /** Rebuilt lazily from {@link #serializedZones} via {@link #indexes()} after deserialization. */

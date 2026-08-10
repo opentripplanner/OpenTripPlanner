@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**
- * Configuration for the build-time vehicle rental graph builder.
+ * Configuration for the vehicle rental geofencing graph builder.
  * <p>
  * The networks to load are discovered from the GBFS manifest rather than listed here; their
  * per-network settings live in the shared {@code gbfs} section of {@code otp-config.json}.

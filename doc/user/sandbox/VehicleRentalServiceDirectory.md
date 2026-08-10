@@ -74,7 +74,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 {
   "vehicleRentalServiceDirectory" : {
     "url" : "https://example.com/gbfs/v3/manifest.json",
-    "language" : "en",
     "headers" : {
       "ET-Client-Name" : "otp"
     }

@@ -271,7 +271,7 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 Which phase computes and applies this network's geofencing zones.
 
 - `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
-  build time, so they are baked into the graph.
+  during graph build, so they are baked into the graph.
 - `realtime` - the vehicle rental updater loads and applies the zones at runtime.
 - `off` - the zones are not processed.
 
@@ -317,7 +317,7 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 Which phase computes and applies this network's geofencing zones.
 
 - `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
-  build time, so they are baked into the graph.
+  during graph build, so they are baked into the graph.
 - `realtime` - the vehicle rental updater loads and applies the zones at runtime.
 - `off` - the zones are not processed.
 

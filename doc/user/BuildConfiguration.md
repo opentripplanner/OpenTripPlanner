@@ -129,7 +129,7 @@ Sections follow that describe particular settings in more depth.
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle)                    |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
 | [transitRouteToStationCentroid](#transitRouteToStationCentroid)                             |  `feed-scoped-id[]`  | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
-| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                                         |       `object`       | Load GBFS geofencing zones into the graph at build time.                                                                                                       | *Optional* |                                   |  2.10 |
+| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                                         |       `object`       | Load GBFS geofencing zones into the graph during graph build.                                                                                                  | *Optional* |                                   |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -1305,7 +1305,7 @@ the centroid.
 **Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
-Load GBFS geofencing zones into the graph at build time.
+Load GBFS geofencing zones into the graph during graph build.
 
 Discovers the networks a provider publishes from a GBFS v3 `manifest.json` and, for each
 network configured with `"geofencingZones": "permanent"` in the `gbfs` section of

@@ -19,7 +19,7 @@ import org.opentripplanner.street.model.RentalFormFactor;
 
 /**
  * Rental vertices are created by the updater at runtime, so a network whose zones were applied at
- * graph build time has no updater-side zone index to pre-resolve against. Reading through the
+ * graph build has no updater-side zone index to pre-resolve against. Reading through the
  * repository instead - as {@code VertexLinker} already does for boundary markers - lets those
  * vertices be seeded from zones the updater never computed.
  */
@@ -35,7 +35,7 @@ class PreResolveVertexZonesTest {
   @Test
   void seedsVerticesFromZonesRegisteredByAnotherDataSource() {
     var repository = new DefaultVehicleRentalRepository();
-    // Registered the way the vehicle rental graph builder registers build-time zones.
+    // Registered the way the vehicle rental geofencing graph builder registers permanent zones.
     repository.setGeofencingZoneIndex(
       "permanent:" + NETWORK,
       new GeofencingZoneIndex(Set.of(NO_DROP_OFF)),

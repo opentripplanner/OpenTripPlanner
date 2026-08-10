@@ -18,7 +18,7 @@ public class VehicleRentalGeofencingConfig {
     var c = root
       .of(parameterName)
       .since(V2_10)
-      .summary("Load GBFS geofencing zones into the graph at build time.")
+      .summary("Load GBFS geofencing zones into the graph during graph build.")
       .description(
         """
         Discovers the networks a provider publishes from a GBFS v3 `manifest.json` and, for each

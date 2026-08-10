@@ -72,7 +72,7 @@ public class GeofencingZoneApplier {
    * repository.
    *
    * <p>Reads through {@link GeofencingZoneService} rather than a single index so that a vertex is
-   * seeded from every registered data source, including zones applied at graph build time by a
+   * seeded from every registered data source, including zones applied during graph build by a
    * network the updater itself does not compute zones for. This mirrors
    * {@code VertexLinker}, which resolves split-vertex boundaries the same way. Zones belonging to
    * other networks are harmless here: restrictions are resolved per network by

@@ -12,7 +12,7 @@ package org.opentripplanner.gbfs.network;
  * applied twice.
  */
 public enum GeofencingZonePhase {
-  /** Zones are loaded and applied by the vehicle rental graph builder at graph build time. */
+  /** Zones are loaded and applied by the vehicle rental geofencing graph builder. */
   PERMANENT,
   /** Zones are loaded and applied by the vehicle rental updater at runtime. */
   REALTIME,

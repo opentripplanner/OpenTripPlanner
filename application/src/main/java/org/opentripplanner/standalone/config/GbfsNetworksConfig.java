@@ -113,7 +113,7 @@ public class GbfsNetworksConfig {
         .description(
           """
           - `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
-            build time, so they are baked into the graph.
+            during graph build, so they are baked into the graph.
           - `realtime` - the vehicle rental updater loads and applies the zones at runtime.
           - `off` - the zones are not processed.
 

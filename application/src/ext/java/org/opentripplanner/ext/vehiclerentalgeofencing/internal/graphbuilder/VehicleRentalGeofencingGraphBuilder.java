@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Graph builder module that loads GBFS geofencing zones at build time and applies them to street
+ * Graph builder module that loads GBFS geofencing zones during graph build and applies them to
  * edges.
  * <p>
  * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the shared
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * enable it.
  *
  * <p>Computed zones and the spatial indices are registered on
- * {@link DefaultVehicleRentalRepository} via its build-time setter — the raw zones are persisted
+ * {@link DefaultVehicleRentalRepository} via the setter that keeps the raw zones — they are
  * via {@code SerializedGraphObject} so the runtime application sees them after deserialization.
  */
 public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
@@ -45,7 +45,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   /** The GBFS feed that must be published for a network to be worth loading here. */
   private static final String GEOFENCING_ZONES_FEED = "geofencing_zones";
 
-  /** Prefix of the repository key a network's build-time zone index is registered under. */
+  /** Prefix of the repository key a network's permanent zone index is registered under. */
   private static final String INDEX_KEY_PREFIX = "permanent:";
 
   private final VehicleRentalGeofencingParameters parameters;
@@ -67,7 +67,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    LOG.info("Loading GBFS geofencing zones at build time from manifest {}", parameters.url());
+    LOG.info("Loading GBFS geofencing zones from manifest {}", parameters.url());
 
     var manifest = GbfsManifestLoader.loadManifest(parameters.url(), parameters.headers());
     if (
@@ -113,7 +113,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       var parameters = override.get();
       if (parameters.geofencingZones() != GeofencingZonePhase.PERMANENT) {
         LOG.debug(
-          "Network {} does not build geofencing zones at graph build time ({}), skipping",
+          "Network {} is not in the permanent phase ({}), skipping",
           network,
           parameters.geofencingZones()
         );
@@ -199,7 +199,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     return loaderAndMapper.getGeofencingZones();
   }
 
-  /** The repository key a network's build-time zone index is registered under. */
+  /** The repository key a network's permanent zone index is registered under. */
   public static String indexKey(String network) {
     return INDEX_KEY_PREFIX + network;
   }

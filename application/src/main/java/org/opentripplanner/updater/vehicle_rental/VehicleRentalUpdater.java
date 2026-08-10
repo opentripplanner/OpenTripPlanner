@@ -258,7 +258,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       }
 
       // Seed the rental vertices from every registered data source, not just from the zones
-      // computed above. A network whose zones were applied at graph build time has none here,
+      // computed above. A network whose zones were applied during graph build has none here,
       // but its vertices are still created by this updater and must know which zones they are in.
       GeofencingZoneApplier.preResolveVertexZones(
         verticesByStation.values(),
