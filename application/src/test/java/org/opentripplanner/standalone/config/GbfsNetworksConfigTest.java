@@ -61,6 +61,38 @@ class GbfsNetworksConfigTest {
     ).isFalse();
   }
 
+  /**
+   * The shape a deployment uses to build zones for every system that publishes them: the phase is
+   * set once in the defaults and only the business-area exceptions are listed.
+   */
+  @Test
+  void listedNetworkInheritsThePhaseWhileOverridingBusinessAreas() {
+    var subject = map(
+      """
+      {
+        "gbfs" : {
+          "includeUnlistedNetworks" : true,
+          "defaults" : {
+            "geofencingZones" : "permanent",
+            "requireDropOffInsideBusinessArea" : false
+          },
+          "networks" : [
+            { "network" : "boltoslo", "requireDropOffInsideBusinessArea" : true }
+          ]
+        }
+      }
+      """
+    );
+
+    var listed = subject.forNetwork("boltoslo").orElseThrow();
+    assertThat(listed.geofencingZones()).isEqualTo(GeofencingZonePhase.PERMANENT);
+    assertThat(listed.requireDropOffInsideBusinessArea()).isTrue();
+
+    var unlisted = subject.forNetwork("voioslo").orElseThrow();
+    assertThat(unlisted.geofencingZones()).isEqualTo(GeofencingZonePhase.PERMANENT);
+    assertThat(unlisted.requireDropOffInsideBusinessArea()).isFalse();
+  }
+
   @Test
   void hardCodedDefaultsApplyWhenNoDefaultsBlockIsGiven() {
     var subject = map(
