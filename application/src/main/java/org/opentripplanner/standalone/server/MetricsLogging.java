@@ -86,8 +86,8 @@ public class MetricsLogging {
 
     new ExecutorServiceMetrics(
       transitUpdateManager.writerThreadExecutor(),
-      "graphUpdateScheduler",
-      List.of(Tag.of("pool", "graphUpdateScheduler"))
+      "transitUpdateScheduler",
+      List.of(Tag.of("pool", "transitUpdateScheduler"))
     ).bindTo(Metrics.globalRegistry);
 
     new ExecutorServiceMetrics(
