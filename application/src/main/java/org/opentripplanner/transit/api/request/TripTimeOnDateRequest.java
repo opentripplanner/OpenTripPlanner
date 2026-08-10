@@ -7,7 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -19,8 +21,12 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 public class TripTimeOnDateRequest {
 
   private final Set<StopLocation> stopLocations;
+
+  @Nullable
   private final Instant time;
-  private final boolean includeCancelledTrips;
+
+  private final List<LocalDateRange> serviceDateRanges;
+  private final CancellationPolicy cancellationPolicy;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
@@ -35,12 +41,13 @@ public class TripTimeOnDateRequest {
 
   public TripTimeOnDateRequest(
     Collection<StopLocation> stopLocations,
-    Instant time,
+    @Nullable Instant time,
+    List<LocalDateRange> serviceDateRanges,
     Duration timeWindow,
     ArrivalDeparture arrivalDeparture,
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
-    boolean includeCancelledTrips,
+    CancellationPolicy cancellationPolicy,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
@@ -50,12 +57,13 @@ public class TripTimeOnDateRequest {
     List<FilterRequest<TripTimeOnDateSelectRequest>> transitFilters
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
-    this.time = Objects.requireNonNull(time);
+    this.serviceDateRanges = List.copyOf(serviceDateRanges);
+    this.time = time;
     this.timeWindow = timeWindow;
     this.arrivalDeparture = arrivalDeparture;
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
-    this.includeCancelledTrips = includeCancelledTrips;
+    this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
@@ -63,6 +71,14 @@ public class TripTimeOnDateRequest {
     this.includeModes = includeModes;
     this.excludeModes = excludeModes;
     this.transitFilters = List.copyOf(transitFilters);
+
+    boolean usesTimeWindow = time != null;
+    boolean usesServiceDateRanges = !this.serviceDateRanges.isEmpty();
+    if (usesTimeWindow == usesServiceDateRanges) {
+      throw new IllegalArgumentException(
+        "Either 'time' or 'serviceDateRanges' must be set as the time limitation, but not both."
+      );
+    }
   }
 
   public static TripTimeOnDateRequestBuilder of(Collection<StopLocation> stopLocations) {
@@ -73,12 +89,25 @@ public class TripTimeOnDateRequest {
     return stopLocations;
   }
 
+  /**
+   * The start time for a time-window based search. Returns {@code null} when the search is limited
+   * by {@link #serviceDateRanges()} instead.
+   */
+  @Nullable
   public Instant time() {
     return time;
   }
 
-  public boolean includeCancelledTrips() {
-    return includeCancelledTrips;
+  /**
+   * The service date ranges to limit the search by, using each trip time's service date. When this
+   * is non-empty the search ignores {@link #time()} and {@link #timeWindow()}.
+   */
+  public List<LocalDateRange> serviceDateRanges() {
+    return serviceDateRanges;
+  }
+
+  public CancellationPolicy cancellationPolicy() {
+    return cancellationPolicy;
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {

@@ -361,16 +361,6 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   /**
-   * Whether we know or don't know the rental network (yet).
-   * <p>
-   * When doing a arriveBy search it is possible to be in a renting state without knowing which
-   * network it is.
-   */
-  public boolean unknownRentalNetwork() {
-    return stateData.vehicleRentalNetwork == null;
-  }
-
-  /**
    * Reverse the path implicit in the given state, the path will be reversed but will have the same
    * duration. This is the result of combining the functions from GraphPath optimize and reverse.
    *
@@ -580,17 +570,5 @@ public final class State implements AStarState<State, Edge, Vertex> {
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;
     return new State(this.vertex, getTime(), newStateData, reversedRequest);
-  }
-
-  /**
-   * This exception is thrown when an edge has a negative weight. Dijkstra's algorithm (and A*) don't
-   * work on graphs that have negative weights.  This exception almost always indicates a programming
-   * error, but could be caused by bad GTFS data.
-   */
-  private static class NegativeWeightException extends RuntimeException {
-
-    public NegativeWeightException(String message) {
-      super(message);
-    }
   }
 }

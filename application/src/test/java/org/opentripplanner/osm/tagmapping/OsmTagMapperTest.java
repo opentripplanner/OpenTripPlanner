@@ -19,11 +19,11 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmTestEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class OsmTagMapperTest {
 
@@ -96,6 +96,10 @@ class OsmTagMapperTest {
   void testFootway() {
     OsmWay footway = WayTestData.footway();
     assertEquals(PEDESTRIAN, WPS.getDataForEntity(footway).getPermission());
+    assertEquals(1.0, WPS.getDataForWay(footway).forward().walkSafety());
+
+    var footwayWithSidewalk = footway.copy().withTag("sidewalk", "both").build();
+    assertEquals(1.0, WPS.getDataForWay(footwayWithSidewalk).forward().walkSafety());
   }
 
   @Test
@@ -371,16 +375,16 @@ class OsmTagMapperTest {
     var regular = WayTestData.highwayTertiary();
     var props = WPS.getDataForWay(regular);
     assertEquals(ALL, props.forward().getPermission());
-    assertEquals(1, props.forward().walkSafety());
+    assertEquals(1.25, props.forward().walkSafety());
     assertEquals(ALL, props.backward().getPermission());
-    assertEquals(1, props.backward().walkSafety());
+    assertEquals(1.25, props.backward().walkSafety());
 
     var discouraged = WayTestData.highwayTertiary().copy().withTag("foot", "discouraged").build();
     var discouragedProps = WPS.getDataForWay(discouraged);
     assertEquals(ALL, discouragedProps.forward().getPermission());
-    assertEquals(3, discouragedProps.forward().walkSafety());
+    assertEquals(3.75, discouragedProps.forward().walkSafety());
     assertEquals(ALL, discouragedProps.backward().getPermission());
-    assertEquals(3, discouragedProps.backward().walkSafety());
+    assertEquals(3.75, discouragedProps.backward().walkSafety());
   }
 
   @Test
@@ -408,16 +412,16 @@ class OsmTagMapperTest {
     var regular = WayTestData.highwayTertiary();
     var props = WPS.getDataForWay(regular);
     assertEquals(ALL, props.forward().getPermission());
-    assertEquals(1, props.forward().walkSafety());
+    assertEquals(1.25, props.forward().walkSafety());
     assertEquals(ALL, props.backward().getPermission());
-    assertEquals(1, props.backward().walkSafety());
+    assertEquals(1.25, props.backward().walkSafety());
 
     var useSidepath = WayTestData.highwayTertiary().copy().withTag("foot", "use_sidepath").build();
     var useSidepathProps = WPS.getDataForWay(useSidepath);
     assertEquals(ALL, useSidepathProps.forward().getPermission());
-    assertEquals(5, useSidepathProps.forward().walkSafety());
+    assertEquals(6.25, useSidepathProps.forward().walkSafety());
     assertEquals(ALL, useSidepathProps.backward().getPermission());
-    assertEquals(5, useSidepathProps.backward().walkSafety());
+    assertEquals(6.25, useSidepathProps.backward().walkSafety());
   }
 
   @Test
@@ -467,6 +471,17 @@ class OsmTagMapperTest {
 
     var indoor = WayTestData.southeastLaBonitaWay().copy().withTag("indoor", "yes").build();
     assertTrue(WPS.getSlopeOverride(indoor));
+  }
+
+  @Test
+  void embeddedRails() {
+    assertEquals(2.0, WPS.getDataForEntity(WayTestData.embeddedRails()).bicycleSafety(), EPSILON);
+  }
+
+  @Test
+  void embeddedRailsWithBikeLane() {
+    var way = WayTestData.embeddedRails().copy().withTag("cycleway", "lane").build();
+    assertEquals(0.87, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
   }
 
   /**

@@ -48,7 +48,7 @@ class RightMenu extends Component<RightMenuProps, RightMenuState> {
             top: '20px',
           }}
         >
-          <img src={debugLayerIcon} alt="Debug layer" title="Debug layer" style={{ width: '25px', height: '25px' }} />
+          <img src={debugLayerIcon} alt="Debug layers" title="Debug layers" style={{ width: '25px', height: '25px' }} />
         </button>
 
         {/* Sidebar */}

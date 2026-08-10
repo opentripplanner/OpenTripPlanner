@@ -1,7 +1,7 @@
 # Goal - Why replace AStar with Raptor?
 
 We want to make the transit routing in OTP faster and at the same time better by changing from the
-existing A* (AStar) to a Raptor based algorithm. We want to keep all existing features or replace
+existing A\* (AStar) to a Raptor based algorithm. We want to keep all existing features or replace
 them with something at least as good. Some of the benefits are:
 
 - faster travel search (our goal is at least 10 times faster)
@@ -9,15 +9,14 @@ them with something at least as good. Some of the benefits are:
   time, transfers, travel duration, operator, weight/cost ...)
 
 Changing the algorithm also mean that we will create a new data structure representing transit
-service which is optimized for Raptor. The existing routing graph will be used for the _non_
-transit search, but transit data will be removed from that existing graph.
+service which is optimized for Raptor. The existing routing graph will be used for the _non_ transit
+search, but transit data will be removed from that existing graph.
 
 # Terminology
 
-The *Raptor* algorithm is described
-in [a paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/01/raptor_alenex.pdf)
-by Microsoft from 2012. We plan to use the _Range Raptor_ with _Multi-criteria pareto-optimal_
-search.
+The _Raptor_ algorithm is described in
+[a paper](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/01/raptor_alenex.pdf) by
+Microsoft from 2012. We plan to use the _Range Raptor_ with _Multi-criteria pareto-optimal_ search.
 
 ## Raptor
 
@@ -28,7 +27,7 @@ transfers from all stops reached are used to further reach new stops. This proce
 iteration of transit and transfers is called a _round_. For every _round_ a new list of
 _stop-arrivals_ are found. This new list of _stop-arrivals_ are used as input for the next round.
 The algorithm will terminate by itself (when all reachable stops are visited), or can be stopped
-when you have the desired results. The reason this is much faster than the current OTP A* is that
+when you have the desired results. The reason this is much faster than the current OTP A\* is that
 there is no need to maintain a priority queue of edges to explore. For each stop we keep the best
 _stop arrival_ which has a link to the previous _stop-arrival_ so we can compute the _path_ when the
 search is complete. The algorithm also operates largely on contiguous lists of numbers, with
@@ -39,8 +38,7 @@ rather than just theoretical asymptotic complexity.
 
 ## Range Raptor (RR)
 
-_The code for this is found in the `org.opentripplanner.raptor.rangeraptor.standard`
-package._
+_The code for this is found in the `org.opentripplanner.raptor.rangeraptor.standard` package._
 
 _Range Raptor_ finds results for many different departure times by iterating over a range of
 minutes. Let say you want to travel from A to B sometime between 12:00 and 13:00. Then _Range
@@ -57,14 +55,13 @@ leaving after 13:00 that is faster than the trips found.
 
 ## Multi-criteria Range Raptor (McRR)
 
-_The code for this is found in the `org.opentripplanner.raptor.rangeraptor.multicriteria`
-package._
+_The code for this is found in the `org.opentripplanner.raptor.rangeraptor.multicriteria` package._
 
 Raptor gives us the optimal trips considering all trade-offs between _arrival time_ and _number of
 transfers_. _Range Raptor_ also gives us the shortest travel duration (within its search-window).
 The OTP McRangeRaptor adds another criterion: `generalized-cost/c1`, which is a function of
-`travel-time`, `waiting-time`, `walking-distance`, `transfers` and so on. McRR search will return
-a *pareto-optimal* set of paths which simultaneously optimize at least these criteria:
+`travel-time`, `waiting-time`, `walking-distance`, `transfers` and so on. McRR search will return a
+_pareto-optimal_ set of paths which simultaneously optimize at least these criteria:
 
 - arrival time (seconds)
 - number of transfers (scalar)
@@ -73,27 +70,26 @@ a *pareto-optimal* set of paths which simultaneously optimize at least these cri
 
 We will also experiment with separating other criteria out from the _cost_, such as
 _walkingDistance_ or _operator_. The goal is to make this configurable so each deployment may tune
-this to their needs. Due to performance reasons it might not be 100% dynamic. The 
-`generalized-cost` value is computed to represent the "human" cost of traveling. In McRaptor state
-we store this value in `c1` (criteria-one). The criteria-one can in theory be used for anything and
-is not limited to the `generalized-cost`. The McRaptor also support storing a second criteria `c2`.
-The pareto-functions must be altered to support these criteria. Using independent pareto-criteria
-`c1` and `c2` like this `(left.c1 < right.c1 || left.c2 < right.c2)` will usually lead to poor
+this to their needs. Due to performance reasons it might not be 100% dynamic. The `generalized-cost`
+value is computed to represent the "human" cost of traveling. In McRaptor state we store this value
+in `c1` (criteria-one). The criteria-one can in theory be used for anything and is not limited to
+the `generalized-cost`. The McRaptor also support storing a second criteria `c2`. The
+pareto-functions must be altered to support these criteria. Using independent pareto-criteria `c1`
+and `c2` like this `(left.c1 < right.c1 || left.c2 < right.c2)` will usually lead to poor
 performance so another way to use `c2` is to alter the pareto-function when left.c2 dominates
-right.c2: `left.c1 < right.c1 + slack`. In the algorithm you will find variable `cost` and 
+right.c2: `left.c1 < right.c1 + slack`. In the algorithm you will find variable `cost` and
 `generalized-cost`, while in the state you will find `c1` and `c2`.
 
 Because plain _Raptor_ is much faster than _multi-criteria_ Raptor we will provide an option
-(request parameter) to run both _RR_  and _McRR_. We use a _single iteration Rator_ search as a
+(request parameter) to run both _RR_ and _McRR_. We use a _single iteration Rator_ search as a
 heuristic optimization, establishing travel time bounds that then feed into McRR. In a benchmark
 test(SpeedTest), RR may take 80ms while the McRR with the same configuration typically takes 400ms.
 If we add _walking distance_ as an extra criteria the average time increase to 1000ms. These times
 are examples to give you an idea of the exponential growth of adding criteria to Raptor search.
 
-
 ## Paths and Itineraries
 
-In this context, Path and Itineraries are almost the same. We use *Path* to talk about the minimal
+In this context, Path and Itineraries are almost the same. We use _Path_ to talk about the minimal
 set of data returned by Raptor. Those paths are decorated with information from the transit-layer
 and used to create the itineraries, which are returned from the routing code (to the end user). The
 `RaptorPath` implementation is moved into a separate top level package, since this is also used
@@ -101,7 +97,7 @@ outside of Raptor.
 
 ## Pareto optimal/efficiency set
 
-All paths that are considered *pareto optimal* for a set of criteria are returned by McRR. This can
+All paths that are considered _pareto optimal_ for a set of criteria are returned by McRR. This can
 be a large set (like 500 paths), so a filter-chain will be applied to the set of itineraries. The
 idea here is to have a configurable filter-chain with decorating, mapping, sorting and filtering
 capabilities.
@@ -115,12 +111,11 @@ into the set. This is because 7 < 9 (comparing the 1st criterion of element 1), 
 (comparing with the 2nd criterion of elements 2 and 3). `[6,7]` would not make it into the set
 because the existing element `[5,6]` is better than the new element for both criteria.
 
-
 ## Via-Location Search (chained-segments)
 
-Via-location search enables routing through one or more intermediate via points. The design
-composes multiple Raptor searches together, with one search per segment between consecutive via
-points. For example, a journey from A to C via B requires two segments: A→B and B→C.
+Via-location search enables routing through one or more intermediate via points. The design composes
+multiple Raptor searches together, with one search per segment between consecutive via points. For
+example, a journey from A to C via B requires two segments: A→B and B→C.
 
 When the search arrives at a via point stop, the arrival state is transferred to the next segment's
 search for that same stop using stop arrival events. This allows the subsequent segment to continue
@@ -132,28 +127,28 @@ inserted in the "correct" segment, and the result is collected from all segments
 can be reached from any segment (if egress contains the via points), not just the last one.
 
 The via-location implementation does not change the routing implementation, it just wires it up
-differently. This maintains the performance characteristics and optimizations of the
-underlying Raptor algorithm while extending it to support via-point routing.
+differently. This maintains the performance characteristics and optimizations of the underlying
+Raptor algorithm while extending it to support via-point routing.
 
 Important code for this is found in:
- - `RangeRaptorWorkerComposite` - chains Raptor searches together
- - `RouterResultPathAggregator` - aggregates results
- - `ViaConnectionStopArrivalEventListener` - copies stop arrivals from one segment to the next
 
+- `RangeRaptorWorkerComposite` - chains Raptor searches together
+- `RouterResultPathAggregator` - aggregates results
+- `ViaConnectionStopArrivalEventListener` - copies stop arrivals from one segment to the next
 
 # Features
 
 ## Algorithm implementation
 
 - Algorithms
-    - Raptor (Range Raptor with one iteration)
-    - Range Raptor
-    - Multi-criteria Range Raptor
-        - Arrival time
-        - Number of transfers
-        - Travel duration
-        - Generalized Cost
-    - Dynamic search-window
+  - Raptor (Range Raptor with one iteration)
+  - Range Raptor
+  - Multi-criteria Range Raptor
+    - Arrival time
+    - Number of transfers
+    - Travel duration
+    - Generalized Cost
+  - Dynamic search-window
 
 ## Filters
 
@@ -180,8 +175,8 @@ The debugger instrument the existing code for the given stops determined by the
 is injected or run; hence the performance overhead under normal execution is minimal. The main
 Raptor logic will post events to the [DebugHandler](rangeraptor/internalapi/DebugHandler.java)
 interface. There are one handler implementation for each event type(stop arrival, pattern ride, and
-path), all created by the [DebugHandlerFactory](rangeraptor/model/debug/DebugHandlerFactory.java). The
-handler implementations are called _Adapters_ because they take the internal Raptor event and
+path), all created by the [DebugHandlerFactory](rangeraptor/model/debug/DebugHandlerFactory.java).
+The handler implementations are called _Adapters_ because they take the internal Raptor event and
 convert it and passes it to the listeners passed in using the Raptor debug request.
 
 # Design
@@ -189,62 +184,57 @@ convert it and passes it to the listeners passed in using the Raptor debug reque
 The Raptor implementation is implemented as a Java library with its own API and has a single point
 of access, the`RaptorService`.
 
-- It is self contained and has no dependencies on any other library or code inside OTP. The only 
+- It is self contained and has no dependencies on any other library or code inside OTP. The only
   exception is the utility functions in framwork. See the `RaptorArchitectureTest` for details.
 - It is modular, with several pluggable components. The wiring is done in separate assembly classes
   (configure classes).
-- To provide Transit data for the algorithm you need to implement a _data provider_ in the `spi` 
+- To provide Transit data for the algorithm you need to implement a _data provider_ in the `spi`
   package.
 
 ## Components
+
 TODO - Add a package diagram here.
 
 The main point of entry is the `RaptorService`.
 
 ### API
 
-The Raptor API request and response classes. This package also contains some elements used by
-both the API and SPI, like the `o.o.raptor.api.model` package.
-
+The Raptor API request and response classes. This package also contains some elements used by both
+the API and SPI, like the `o.o.raptor.api.model` package.
 
 ### SPI
 
-The SPI has all the interfaces and data classes needed to provide Raptor with a transit model for 
-routing. Raptor does not hold onto any transit data, only the state needed to do a search. No state 
+The SPI has all the interfaces and data classes needed to provide Raptor with a transit model for
+routing. Raptor does not hold onto any transit data, only the state needed to do a search. No state
 is preserved in Raptor between routing calls.
-
 
 ### Configure
 
-The `RaptorConfig` is responsible for the "manual" dependency injection used to create a valid 
-set of Raptor components based on the configuration passed in. The api `RaptorProfile` lists all valid 
-combinations of router and state. The api `Optimization` is used to turn on/off optimizations, 
+The `RaptorConfig` is responsible for the "manual" dependency injection used to create a valid set
+of Raptor components based on the configuration passed in. The api `RaptorProfile` lists all valid
+combinations of router and state. The api `Optimization` is used to turn on/off optimizations,
 currently only the destination pruning is used.
-
 
 ### Service
 
-The service puts components together to be able to serve different use-cases. Its responsibility is 
+The service puts components together to be able to serve different use-cases. Its responsibility is
 to run and inject heuristics, manage threading and so on. It is mainly just orchestration using the
-`configure` to create components. 
-
+`configure` to create components.
 
 ### Range Raptor
 
 This is the algorithm implementation. There are two main versions, the multi-critera and the single-
-criteria range raptor. The multi-critera version has its own state implementation and can only do 
+criteria range raptor. The multi-critera version has its own state implementation and can only do
 forward (in time) routing. The single criteria router can search both forward and backward in time,
-and has different state implementation for keeping track of the result. For example, if you do not 
-need to produce result paths, only stop-arrivals information, then the faster "Best time" state 
-can be used. Some features like support for constrained transfers, need to look back to the 
-previous arrival while searching, so the service/configure module will automatically choose the 
-optimal state to use, based on the request/features enabled.
-
+and has different state implementation for keeping track of the result. For example, if you do not
+need to produce result paths, only stop-arrivals information, then the faster "Best time" state can
+be used. Some features like support for constrained transfers, need to look back to the previous
+arrival while searching, so the service/configure module will automatically choose the optimal state
+to use, based on the request/features enabled.
 
 ### Util
 
 Shared utility functions. The most important component is the pareto-set implementation.
-
 
 ## Optimizations
 
@@ -253,7 +243,7 @@ solution set.
 
 - A limit on `maxAdditionalNumberOfTransfers` not `maxNumberOfTransfers`. We want to change this to
   be relative to the trip with fewest transfers.
-- A limit on *destination pareto-set* (not just travel time to destination). Applying this limit the
+- A limit on _destination pareto-set_ (not just travel time to destination). Applying this limit the
   first time (not every time) we arrive at a stop might give the best performance.
 - Use _R_ or _RR_ as a "heuristic optimization", possibly bi-directional, computing a set of
   stops/routes that can be used as a filter for the _McRR_. _RR_ is super fast, more than 10x faster
@@ -270,8 +260,8 @@ There are three `RoutingStrategy` implementations:
    travel-duration, eliminating _wait-time_ (except board and alight slack). It supports both
    _forward_ and _reverse_ search, but only one Range Raptor iteration (no search window). The main
    usage for this is to compute heuristics used to improve the performance in the multi-criteria
-   search. It is used to compute various heuristics, like
-   _minimum-number-of-transfers_, _minimum-travel-time_ and _earliest-possible-arrival-time_.
+   search. It is used to compute various heuristics, like _minimum-number-of-transfers_,
+   _minimum-travel-time_ and _earliest-possible-arrival-time_.
 3. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not**
    support _reverse_ search - so far there has not been a need for it.
 
@@ -297,8 +287,7 @@ Some important notes on the diagram above:
 - There is no important timing point between the _transfer-slack_ and the _board-slack_, so the
   order does not matter. In the algorithm the _transfer-slack_ is eliminated and it is left to the
   internal Raptor `SlackProvider` to include the _transfer-slack_ in the _bord-slack_(forward
-  search)
-  or in the _alight_slack_(reverse-search).
+  search) or in the _alight_slack_(reverse-search).
 - It might look odd that the _board-slack_ comes before the _wait_ part, but this is just a small
   trick to be able to calculate the _earliest-board-time_. Remember that the parts between 2
   _stop-arrivals_ can technically be swapped around without any effect on the algorithm. Of cause
@@ -306,14 +295,14 @@ Some important notes on the diagram above:
 - The path(itinerary) mapping process should swap the parts between to _stop-arrivals_ into an  
   intuitive order seen from a user perspective, this may include time-shifting access or egress.
 - The _wait_ after the access and before the egress leg should be removed by the itinerary mapper.
-- In a _reverse-search_ the `RaptorWorker` code is the same - the exact same algorithm 
-  implementation is used. To be able to do this, a special _reverse_ `TransitCalculator`, 
+- In a _reverse-search_ the `RaptorWorker` code is the same - the exact same algorithm
+  implementation is used. To be able to do this, a special _reverse_ `TransitCalculator`,
   `SlackProvider` and `TripScheduleSearch` is injected into the `RaptorWorker`. The terminology in
-  the diagram above is  the terminology used in the algorithm. For example the  _board-time_ and 
-  _alight-time_  is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.
-    - So be aware that the `ReverseSearchTransitCalculator` have some awkward variable names -
-      depending on the point-of-view.
-    - The `TripScheduleAlightSearch` search the _alight-times_ and return it as a _board-time_.
+  the diagram above is the terminology used in the algorithm. For example the _board-time_ and
+  _alight-time_ is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.
+  - So be aware that the `ReverseSearchTransitCalculator` have some awkward variable names -
+    depending on the point-of-view.
+  - The `TripScheduleAlightSearch` search the _alight-times_ and return it as a _board-time_.
 
 ### The transfer-slack is added to the board-slack, why?
 
@@ -325,10 +314,10 @@ transfer for the following reasons:
   access/transfer or transit. So, because the _transfer-slack_ is constant we can safely remove it
   from transfer-arrivals at a particular stop and add it to all transit-legs leaving from the same
   stop.
-    - This is useful, because we do not have zero distance transfer-stop-arrivals in the state.
-      (The transit-arrival is used in the next round).
-    - This also allow using the stop-arrival(transit only) to continue onto the _egress-leg_ -
-      without any _transfer-slack_ added.
+  - This is useful, because we do not have zero distance transfer-stop-arrivals in the state. (The
+    transit-arrival is used in the next round).
+  - This also allow using the stop-arrival(transit only) to continue onto the _egress-leg_ - without
+    any _transfer-slack_ added.
 - It does not have any effect on the performance. Adding a constant to the dynamically calculated
   _board-slack_ does not have any significant influence on the performance.
 
@@ -343,4 +332,4 @@ There are 4 main ways Raptor is tested:
 - The `SpeedTest` is used to track Raptor performance. This test must be run manually and used the
   transit data model in OTP.
 - Various manual tests - With the module tests in palce we should try to minimize the need of other
-  high level testing.       
+  high level testing.

@@ -35,14 +35,14 @@ public abstract class LayerBuilder<T> {
    * Get a list of geometries in this layer inside the query envelope. The geometries should include
    * an object of type T as their userData.
    */
-  protected abstract List<Geometry> getGeometries(Envelope query);
+  protected abstract List<Geometry> findGeometries(Envelope query);
 
   final VectorTile.Tile.Layer build(Envelope envelope) {
     Envelope query = new Envelope(envelope);
     query.expandBy(envelope.getWidth() * expansionFactor, envelope.getHeight() * expansionFactor);
 
     TileGeomResult tileGeom = JtsAdapter.createTileGeom(
-      getGeometries(query),
+      findGeometries(query),
       envelope,
       query,
       GEOMETRY_FACTORY,

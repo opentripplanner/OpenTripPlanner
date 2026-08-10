@@ -32,6 +32,9 @@ public class RealTimeTripTimesBuilder {
   @Nullable
   private Accessibility wheelchairAccessibility;
 
+  @Nullable
+  private String vehicleId;
+
   private final RealTimeTripState.Builder stateBuilder = RealTimeTripState.of();
 
   /**
@@ -333,6 +336,16 @@ public class RealTimeTripTimesBuilder {
     Accessibility wheelchairAccessibility
   ) {
     this.wheelchairAccessibility = wheelchairAccessibility;
+    return this;
+  }
+
+  @Nullable
+  String vehicleId() {
+    return vehicleId;
+  }
+
+  public RealTimeTripTimesBuilder withVehicleId(@Nullable String vehicleId) {
+    this.vehicleId = vehicleId;
     return this;
   }
 

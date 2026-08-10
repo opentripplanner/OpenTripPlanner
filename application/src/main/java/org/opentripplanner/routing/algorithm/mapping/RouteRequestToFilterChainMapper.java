@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -103,11 +102,6 @@ public class RouteRequestToFilterChainMapper {
 
     if (!request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
       builder.withTransitGroupPriority();
-    }
-
-    var fareService = context.fareService();
-    if (fareService != null) {
-      builder.withFareDecorator(new DecorateWithFare(fareService));
     }
 
     if (!context.rideHailingServices().isEmpty()) {

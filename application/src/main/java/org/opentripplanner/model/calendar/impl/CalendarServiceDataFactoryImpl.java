@@ -111,8 +111,8 @@ public class CalendarServiceDataFactoryImpl {
   }
 
   private void addDatesFromCalendar(ServiceCalendar calendar, Set<LocalDate> activeDates) {
-    LocalDate startDate = calendar.getPeriod().getStart();
-    LocalDate endDate = calendar.getPeriod().getEnd();
+    LocalDate startDate = calendar.getPeriod().getStartInclusive();
+    LocalDate endDate = calendar.getPeriod().getEndInclusive();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       if (

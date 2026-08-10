@@ -9,9 +9,9 @@ import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.error.InvalidRoutingInputException;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -53,8 +53,8 @@ class TripAndServiceDateResolverTest {
       .withServiceDate(SERVICE_DATE)
       .withTripAlteration(TripAlteration.PLANNED)
       .build();
-    env.timetableRepository().addTripOnServiceDate(tripOnServiceDate);
-    env.timetableRepository().index();
+    env.transitRepository().addTripOnServiceDate(tripOnServiceDate);
+    env.transitRepository().index();
 
     var reference = TripOnDateReference.ofTripOnServiceDateId(id("TOSD-1"));
     var result = new TripAndServiceDateResolver(env.transitService()).resolve(reference);

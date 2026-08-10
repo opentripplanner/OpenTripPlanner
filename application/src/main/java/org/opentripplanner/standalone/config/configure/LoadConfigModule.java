@@ -5,7 +5,7 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.io.File;
 import org.opentripplanner.core.framework.di.TransitServicePeriod;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -46,7 +46,7 @@ public class LoadConfigModule {
 
   @Provides
   @TransitServicePeriod
-  static LocalDateInterval providesTransitServicePeriod(BuildConfig buildConfig) {
+  static LocalDateRange providesTransitServicePeriod(BuildConfig buildConfig) {
     return buildConfig.getTransitServicePeriod();
   }
 

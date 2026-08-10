@@ -2,10 +2,13 @@ package org.opentripplanner.updater.alert.siri.mapping;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -14,6 +17,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import uk.org.ifopt.siri21.StopPlaceRef;
 import uk.org.siri.siri21.AffectedLineStructure;
 import uk.org.siri.siri21.AffectedOperatorStructure;
@@ -22,6 +26,7 @@ import uk.org.siri.siri21.AffectedStopPlaceStructure;
 import uk.org.siri.siri21.AffectedStopPointStructure;
 import uk.org.siri.siri21.AffectedVehicleJourneyStructure;
 import uk.org.siri.siri21.AffectsScopeStructure;
+import uk.org.siri.siri21.DataFrameRefStructure;
 import uk.org.siri.siri21.DatedVehicleJourneyRef;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri21.LineRef;
@@ -116,9 +121,7 @@ public class AffectsMapper {
             tripIds.addAll(
               siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                 vehicleJourneyRef.getValue(),
-                entityResolver.resolveServiceDate(
-                  affectedVehicleJourney.getOriginAimedDepartureTime()
-                )
+                resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
               )
             );
           }
@@ -135,7 +138,7 @@ public class AffectsMapper {
           mapTripSelectors(
             affectedStops,
             affectedTripIds,
-            entityResolver.resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
+            resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
           )
         );
       }
@@ -147,7 +150,7 @@ public class AffectsMapper {
           mapTripSelectors(
             affectedStops,
             List.of(entityResolver.resolveId(framedVehicleJourneyRef.getDatedVehicleJourneyRef())),
-            entityResolver.resolveServiceDate(framedVehicleJourneyRef)
+            resolveServiceDate(framedVehicleJourneyRef)
           )
         );
       }
@@ -175,9 +178,7 @@ public class AffectsMapper {
               mapTripSelectors(
                 affectedStops,
                 List.of(entityResolver.resolveId(datedVehicleJourneyRef.getValue())),
-                entityResolver.resolveServiceDate(
-                  affectedVehicleJourney.getOriginAimedDepartureTime()
-                )
+                resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
               )
             );
           }
@@ -367,6 +368,33 @@ public class AffectsMapper {
     }
 
     return selectors;
+  }
+
+  /**
+   * Resolve serviceDate. For legacy reasons this is provided in originAimedDepartureTime - in lack
+   * of alternatives. Even though the field's name indicates that the timestamp represents the
+   * departure from the first stop, only the Date-part is actually used, and is defined to
+   * represent the actual serviceDate. The time and zone part is ignored.
+   */
+  @Nullable
+  private static LocalDate resolveServiceDate(@Nullable ZonedDateTime originAimedDepartureTime) {
+    if (originAimedDepartureTime == null) {
+      return null;
+    }
+    // This grabs the local-date from timestamp passed into OTP ignoring the time and zone
+    // information. An alternative is to use the transit model zone:
+    // 'originAimedDepartureTime.withZoneSameInstant(transitService.getTimeZone())'
+    return originAimedDepartureTime.toLocalDate();
+  }
+
+  @Nullable
+  private static LocalDate resolveServiceDate(
+    FramedVehicleJourneyRefStructure framedVehicleJourneyRef
+  ) {
+    return Optional.ofNullable(framedVehicleJourneyRef.getDataFrameRef())
+      .map(DataFrameRefStructure::getValue)
+      .flatMap(ServiceDateUtils::parseStringToOptional)
+      .orElse(null);
   }
 
   private static FeedScopedId getStop(

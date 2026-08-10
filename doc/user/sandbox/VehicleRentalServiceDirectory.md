@@ -1,29 +1,31 @@
 # Vehicle Rental Service Directory API support
 
 This adds support for the GBFS service directory endpoint component
-[Lamassu](https://github.com/entur/lamassu). 
-OTP uses the service directory to lookup and connects to all GBFS endpoints registered in the 
-directory. This simplifies the management of the GBFS endpoints, since multiple services/components 
-like OTP can connect to the directory and get the necessary configuration from it.
-
+[Lamassu](https://github.com/entur/lamassu). OTP uses the service directory to lookup and connects
+to all GBFS endpoints registered in the directory. This simplifies the management of the GBFS
+endpoints, since multiple services/components like OTP can connect to the directory and get the
+necessary configuration from it.
 
 ## Contact Info
 
 - Entur, Norway
 
-
 ## Changelog
 
 - Initial implementation of bike share updater API support
-- Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
-- Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
-- Enable `allowKeepingVehicleAtDestination` [#5944](https://github.com/opentripplanner/OpenTripPlanner/pull/5944)
-- Rewrite to use manifest.json from GBFS v3 as the service directory [#6900](https://github.com/opentripplanner/OpenTripPlanner/pull/6900)
+- Make json tag names configurable
+  [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
+- Enable GBFS geofencing with VehicleRentalServiceDirectory
+  [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
+- Enable `allowKeepingVehicleAtDestination`
+  [#5944](https://github.com/opentripplanner/OpenTripPlanner/pull/5944)
+- Rewrite to use manifest.json from GBFS v3 as the service directory
+  [#6900](https://github.com/opentripplanner/OpenTripPlanner/pull/6900)
 
 ## Configuration
 
-To enable this you need to specify a url for the `vehicleRentalServiceDirectory` in
-the `router-config.json`
+To enable this you need to specify a url for the `vehicleRentalServiceDirectory` in the
+`router-config.json`
 
 ### Parameter Summary
 
@@ -41,7 +43,6 @@ the `router-config.json`
 |       network                                                                                                        |     `string`    | The network name                                                                | *Required* |               |  2.4  |
 
 <!-- PARAMETERS-TABLE END -->
-
 
 ### Parameter Details
 
@@ -101,7 +102,6 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
 
 <!-- PARAMETERS-DETAILS END -->
-
 
 ### Example
 

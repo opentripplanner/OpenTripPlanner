@@ -137,7 +137,7 @@ public class CanceledTripsFilterMapper {
   }
 
   private static LocalDateRange mapLocalDateRange(Map<String, Object> rangeInput) {
-    return new LocalDateRange(
+    return LocalDateRange.ofExclusiveEnd(
       localDate(rangeInput.get("start"), "filters.*.serviceDateRanges.start"),
       localDate(rangeInput.get("end"), "filters.*.serviceDateRanges.end")
     );

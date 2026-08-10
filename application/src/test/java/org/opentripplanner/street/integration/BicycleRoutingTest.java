@@ -38,7 +38,7 @@ public class BicycleRoutingTest {
     );
     herrenbergGraph = model.graph();
 
-    model.timetableRepository().index();
+    model.transitRepository().index();
     herrenbergGraph.index();
   }
 

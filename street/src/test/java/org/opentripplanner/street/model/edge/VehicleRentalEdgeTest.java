@@ -29,6 +29,7 @@ import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationB
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
+import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetModelFactory;
@@ -316,6 +317,7 @@ class VehicleRentalEdgeTest {
       TestFreeFloatingRentalVehicleBuilder.NETWORK_1,
       "no-traverse"
     )
+      .withGeometry(Polygons.OSLO)
       .noTraversal()
       .build();
     vertex.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));

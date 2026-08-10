@@ -10,7 +10,7 @@ public final class OptimizationTypeMapper {
       case QUICK -> VehicleRoutingOptimizeType.SHORTEST_DURATION;
       case FLAT -> VehicleRoutingOptimizeType.FLAT_STREETS;
       case SAFE -> VehicleRoutingOptimizeType.SAFE_STREETS;
-      case GREENWAYS -> VehicleRoutingOptimizeType.SAFEST_STREETS;
+      case GREENWAYS -> VehicleRoutingOptimizeType.SAFE_STREETS;
       case TRIANGLE -> VehicleRoutingOptimizeType.TRIANGLE;
     };
   }

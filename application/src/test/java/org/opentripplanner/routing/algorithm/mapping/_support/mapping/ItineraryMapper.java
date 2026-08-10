@@ -12,11 +12,9 @@ import org.opentripplanner.routing.algorithm.mapping._support.model.ApiItinerary
 public class ItineraryMapper {
 
   private final LegMapper legMapper;
-  private final FareMapper fareMapper;
 
   public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
     this.legMapper = new LegMapper(locale, addIntermediateStops);
-    this.fareMapper = new FareMapper(locale);
   }
 
   public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
@@ -47,7 +45,6 @@ public class ItineraryMapper {
     api.transfers = domain.numberOfTransfers();
     api.tooSloped = domain.isTooSloped();
     api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
-    api.fare = fareMapper.mapFare(domain);
     api.legs = legMapper.mapLegs(domain.legs());
     api.accessibilityScore = domain.accessibilityScore();
 

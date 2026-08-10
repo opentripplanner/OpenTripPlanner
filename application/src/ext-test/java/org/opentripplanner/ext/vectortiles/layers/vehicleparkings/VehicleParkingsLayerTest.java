@@ -109,7 +109,7 @@ public class VehicleParkingsLayerTest {
       Locale.US
     );
 
-    List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
+    List<Geometry> geometries = builder.findGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 
     assertEquals("[POINT (1 2)]", geometries.toString());
     assertEquals(

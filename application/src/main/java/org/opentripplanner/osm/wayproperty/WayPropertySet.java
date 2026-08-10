@@ -34,7 +34,14 @@ public class WayPropertySet {
     Float,
     OsmEntity,
     Double
-  > DEFAULT_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
+  > DEFAULT_BICYCLE_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
+
+  public static final TriFunction<
+    StreetTraversalPermission,
+    Float,
+    OsmEntity,
+    Double
+  > DEFAULT_WALK_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.25);
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -108,8 +115,11 @@ public class WayPropertySet {
    * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties
    * that are mixins will have their safety values applied if they match at all.
    */
-  public WayPropertiesPair getDataForWay(OsmWay way) {
-    return new WayPropertiesPair(getDataForEntity(way, FORWARD), getDataForEntity(way, BACKWARD));
+  public BidirectionalWayProperties getDataForWay(OsmWay way) {
+    return new BidirectionalWayProperties(
+      getDataForEntity(way, FORWARD),
+      getDataForEntity(way, BACKWARD)
+    );
   }
 
   /**

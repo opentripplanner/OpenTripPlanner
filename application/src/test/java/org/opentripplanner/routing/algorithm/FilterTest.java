@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -27,15 +27,15 @@ public class FilterTest {
   static final String AGENCY_ID_2 = "RUT:Agency:2";
   static final String AGENCY_ID_3 = "RUT:Agency:3";
 
-  static final Agency AGENCY_1 = TimetableRepositoryForTest.agency("A")
+  static final Agency AGENCY_1 = TransitRepositoryForTest.agency("A")
     .copy()
     .withId(id(AGENCY_ID_1))
     .build();
-  static final Agency AGENCY_2 = TimetableRepositoryForTest.agency("B")
+  static final Agency AGENCY_2 = TransitRepositoryForTest.agency("B")
     .copy()
     .withId(id(AGENCY_ID_2))
     .build();
-  static final Agency AGENCY_3 = TimetableRepositoryForTest.agency("C")
+  static final Agency AGENCY_3 = TransitRepositoryForTest.agency("C")
     .copy()
     .withId(id(AGENCY_ID_3))
     .build();
@@ -50,7 +50,7 @@ public class FilterTest {
   static final String JOURNEY_PATTERN_ID_3 = "RUT:JourneyPattern:3";
   static final String JOURNEY_PATTERN_ID_4 = "RUT:JourneyPattern:4";
 
-  static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.of().stopPattern(2);
+  static final StopPattern STOP_PATTERN = TransitRepositoryForTest.of().stopPattern(2);
 
   private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
   private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCacheForever("nightBus");
@@ -58,10 +58,10 @@ public class FilterTest {
   final String GROUP_OF_Routes_ID_1 = "RUT:GroupOfLines:1";
   final String GROUP_OF_Routes_ID_2 = "RUT:GroupOfLines:2";
 
-  final GroupOfRoutes GROUP_OF_ROUTES_1 = TimetableRepositoryForTest.groupOfRoutes(
+  final GroupOfRoutes GROUP_OF_ROUTES_1 = TransitRepositoryForTest.groupOfRoutes(
     GROUP_OF_Routes_ID_1
   ).build();
-  final GroupOfRoutes GROUP_OF_ROUTES_2 = TimetableRepositoryForTest.groupOfRoutes(
+  final GroupOfRoutes GROUP_OF_ROUTES_2 = TransitRepositoryForTest.groupOfRoutes(
     GROUP_OF_Routes_ID_2
   ).build();
 
@@ -80,18 +80,18 @@ public class FilterTest {
     """
   )
   public void testOne() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -122,18 +122,18 @@ public class FilterTest {
     """
   )
   public void testTwo() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -163,29 +163,29 @@ public class FilterTest {
     """
   )
   public void testThree() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .withNetexSubmode("schoolBus")
       .build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withAgency(AGENCY_2)
       .withMode(TransitMode.RAIL)
       .withNetexSubmode("railShuttle")
       .build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3)
       .withAgency(AGENCY_3)
       .withMode(TransitMode.TRAM)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -229,18 +229,18 @@ public class FilterTest {
     """
   )
   public void testFour() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).build();
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -277,14 +277,14 @@ public class FilterTest {
     """
   )
   public void testFive() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -318,18 +318,18 @@ public class FilterTest {
     """
   )
   public void testSix() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_1).build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_1).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_1).build();
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_1).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -364,18 +364,18 @@ public class FilterTest {
     """
   )
   public void testSeven() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_2).build();
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build();
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build();
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -410,27 +410,27 @@ public class FilterTest {
     """
   )
   public void testEight() {
-    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    final Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
-    final Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    final Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withMode(TransitMode.RAIL)
       .withAgency(AGENCY_1)
       .build();
-    final Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
+    final Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_2)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -467,34 +467,34 @@ public class FilterTest {
     """
   )
   public void testNine() {
-    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .build();
-    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.RAIL)
       .build();
-    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
+    Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .build();
-    Route route4 = TimetableRepositoryForTest.route(ROUTE_ID_4)
+    Route route4 = TransitRepositoryForTest.route(ROUTE_ID_4)
       .withAgency(AGENCY_2)
       .withMode(TransitMode.BUS)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -533,31 +533,31 @@ public class FilterTest {
     """
   )
   public void testTen() {
-    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    final Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
-    final Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    final Route route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withMode(TransitMode.RAIL)
       .withAgency(AGENCY_1)
       .build();
-    final Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
+    final Route route3 = TransitRepositoryForTest.route(ROUTE_ID_3)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
-    final Route route4 = TimetableRepositoryForTest.route(ROUTE_ID_4).withAgency(AGENCY_2).build();
+    final Route route4 = TransitRepositoryForTest.route(ROUTE_ID_4).withAgency(AGENCY_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -581,17 +581,17 @@ public class FilterTest {
 
   @Test
   void testDifferentSubModesInRoute() {
-    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    final Route route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .withNetexSubmode(LOCAL_BUS)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route1)
         .withStopPattern(STOP_PATTERN)
         .withNetexSubmode(NIGHT_BUS)
         .build()
@@ -626,18 +626,18 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesSelectFunctionality() {
-    var route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    var route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
       .build();
-    var route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    var route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -658,18 +658,18 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesExcludeFunctionality() {
-    var route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
+    var route1 = TransitRepositoryForTest.route(ROUTE_ID_1)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
       .build();
-    var route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
+    var route2 = TransitRepositoryForTest.route(ROUTE_ID_2)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );

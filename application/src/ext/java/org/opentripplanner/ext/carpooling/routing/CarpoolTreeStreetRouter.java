@@ -133,11 +133,32 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       );
     }
     if (direction == Direction.FROM || direction == Direction.BOTH) {
-      forwardRegistrations.put(vertex, new VertexRegistration(vertex, searchLimit));
+      registerLargest(forwardRegistrations, vertex, searchLimit);
     }
     if (direction == Direction.TO || direction == Direction.BOTH) {
-      reverseRegistrations.put(vertex, new VertexRegistration(vertex, searchLimit));
+      registerLargest(reverseRegistrations, vertex, searchLimit);
     }
+  }
+
+  /**
+   * Registers {@code vertex} keeping the larger of any already-registered limit and
+   * {@code searchLimit}. Distinct
+   * {@link org.opentripplanner.street.model.vertex.TemporaryStreetLocation}s at the same
+   * coordinate compare equal, so two trips — or two legs of one trip — routing through the same
+   * point collapse to a single registration here. The shared tree must span the longest leg
+   * registered at that point, so the largest limit wins: a smaller limit would build a tree too
+   * short for a longer leg's baseline, making it unroutable. An over-large tree only widens the
+   * search — any insertion it would wrongly admit is rejected by the delay constraints — so taking
+   * the maximum is always safe.
+   */
+  private static void registerLargest(
+    Map<Vertex, VertexRegistration> registrations,
+    Vertex vertex,
+    Duration searchLimit
+  ) {
+    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit), (existing, added) ->
+      existing.searchLimit().compareTo(added.searchLimit()) >= 0 ? existing : added
+    );
   }
 
   /** Returns the total number of forward vertices (pending and computed). Package-private for testing. */

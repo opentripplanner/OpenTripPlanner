@@ -22,7 +22,7 @@ public class VertexLayerBuilder extends LayerBuilder<Vertex> {
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope env) {
+  protected List<Geometry> findGeometries(Envelope env) {
     return graph
       .findVertices(env)
       .stream()

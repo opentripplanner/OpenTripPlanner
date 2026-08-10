@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.opentripplanner.apis.vectortiles.Color;
+import org.opentripplanner.apis.vectortiles.Group;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.edge.Edge;
@@ -117,8 +119,8 @@ public class StyleBuilder {
    * Puts the layer into an arbitrarily defined group in the layer selector. This allows you
    * to switch the entire group on and off.
    */
-  public StyleBuilder group(String group) {
-    metadata.put("group", group);
+  public StyleBuilder group(Group group) {
+    metadata.put("group", group.label());
     return this;
   }
 
@@ -159,13 +161,17 @@ public class StyleBuilder {
     return this;
   }
 
+  public StyleBuilder circleColor(Color color) {
+    return circleColor(color.hex());
+  }
+
   public StyleBuilder circleColor(String color) {
     paint.put("circle-color", validateColor(color));
     return this;
   }
 
-  public StyleBuilder circleStroke(String color, ZoomDependentNumber width) {
-    paint.put("circle-stroke-color", validateColor(color));
+  public StyleBuilder circleStroke(Color color, ZoomDependentNumber width) {
+    paint.put("circle-stroke-color", validateColor(color.hex()));
     paint.put("circle-stroke-width", width.toJson());
     return this;
   }
@@ -181,8 +187,8 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder lineColor(String color) {
-    paint.put("line-color", validateColor(color));
+  public StyleBuilder lineColor(Color color) {
+    paint.put("line-color", validateColor(color.hex()));
     return this;
   }
 
@@ -229,14 +235,14 @@ public class StyleBuilder {
   public StyleBuilder lineColorMatch(
     String propertyName,
     Collection<String> values,
-    String defaultValue
+    Color defaultValue
   ) {
     paint.put(
       "line-color",
       ListUtils.combine(
         List.of("match", List.of("get", propertyName)),
         (Collection) values,
-        List.of(defaultValue)
+        List.of(defaultValue.hex())
       )
     );
     return this;
@@ -252,8 +258,8 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder fillColor(String color) {
-    paint.put("fill-color", validateColor(color));
+  public StyleBuilder fillColor(Color color) {
+    paint.put("fill-color", validateColor(color.hex()));
     return this;
   }
 
@@ -262,8 +268,8 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder fillOutlineColor(String color) {
-    paint.put("fill-outline-color", validateColor(color));
+  public StyleBuilder fillOutlineColor(Color color) {
+    paint.put("fill-outline-color", validateColor(color.hex()));
     return this;
   }
 

@@ -2,20 +2,23 @@ package org.opentripplanner.updater.trip.siri.moduletests.extracall;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 class ExtraCallTest implements RealtimeTestConstants {
@@ -259,6 +262,39 @@ class ExtraCallTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateErrorType.STOP_MISMATCH, result);
+  }
+
+  @Test
+  void vehicleRefIsSetOnTripTimes() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = builderWithExtraCall(siri)
+      .withVehicleRef("BUS-42")
+      .buildEstimatedTimetableDeliveries();
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+
+    var realTimeTimes = assertInstanceOf(
+      RealTimeTripTimes.class,
+      env.tripData(TRIP_1_ID).tripTimes()
+    );
+    assertTrue(realTimeTimes.getVehicleId().isPresent());
+    assertEquals("BUS-42", realTimeTimes.getVehicleId().get());
+  }
+
+  @Test
+  void vehicleRefIsNullWhenAbsent() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = updateWithExtraCall(siri);
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+
+    var realTimeTimes = assertInstanceOf(
+      RealTimeTripTimes.class,
+      env.tripData(TRIP_1_ID).tripTimes()
+    );
+    assertTrue(realTimeTimes.getVehicleId().isEmpty());
   }
 
   private List<EstimatedTimetableDeliveryStructure> updateWithExtraCall(SiriTestHelper siri) {

@@ -13,19 +13,19 @@ moving on to the next.
 
 ## Terminology
 
-- **search-window (sw)**  The search window is the minutes Raptor iterates over and the time-window
+- **search-window (sw)** The search window is the minutes Raptor iterates over and the time-window
   the itinerary must start within to be included in the result. The search-window may change from a
-  request to the next page.  **sw'** is the search window for the new next/previous page. The search
+  request to the next page. **sw'** is the search window for the new next/previous page. The search
   window may change between requests, so we need to account for it when computing the next/previous
   page cursors.
-- **earliest-departure-time (edt)**  The search-window start with the earliest-departure-time, which
+- **earliest-departure-time (edt)** The search-window start with the earliest-departure-time, which
   is the first possible time any itinerary may start. **edt'** is the calculated value for the new
   cursor.
-- **latest-arrival-time (lat)**  The latest time an itinerary can arrive to get accepted. The
+- **latest-arrival-time (lat)** The latest time an itinerary can arrive to get accepted. The
   latest-arrival-time is only used in _arrive-by_ search. **lat'** is the calculated value for the
   new cursor.
-- **next page >>**  The trip search constructed to retrieve itineraries BEFORE the original search.
-- **<< previous page**  The trip search constructed to retrieve itineraries AFTER the original
+- **next page >>** The trip search constructed to retrieve itineraries BEFORE the original search.
+- **<< previous page** The trip search constructed to retrieve itineraries AFTER the original
   search.
 - **crop-search-window** If the `maxNumOfItineraries` limit is reached in the
   `ItineraryFilterChain`, then one or more itineraries are removed. The filter removes itineraries
@@ -55,8 +55,8 @@ _previous-page_ must reverse the itinerary-filtering: `crop itineraries at START
 - In this case the `<< Previous page` is the same as in [sort-by-arrival](#sort-by-arrival) and not
   shown.
 - For the `Next page >>` we must adjust the `edt'`.
-- In rare cases we get duplicate itineraries. This happens if the `removed itinerary` departs before,
-  but arrives after the `duplicate`.
+- In rare cases we get duplicate itineraries. This happens if the `removed itinerary` departs
+  before, but arrives after the `duplicate`.
 
 ### sort-by-arrival, crop-search-window & original-prev-page
 
@@ -86,11 +86,11 @@ This is the basic `sort-by-departure` (arrive-by search) without removing itiner
   `ItineraryFilterChain` will follow the same logic that the `Original Search`. Note! the
   `latest-arrival-time` is kept the same as in the `Original Search`.
 - The `Next page >>` is a bit problematic, but a rare use-case.
-    - Itineraries which start in the original search-window, but arrive AFTER the
-      `latest-arrival-time` are not be found. Hopefully these cases are rare.
-    - The sort order and filtering is reversed in the `ItineraryFilterChain`
-      (`crop itineraries at START of list`).
-    - The `latest-arrival-time` can not be computed and is dropped.
+  - Itineraries which start in the original search-window, but arrive AFTER the
+    `latest-arrival-time` are not be found. Hopefully these cases are rare.
+  - The sort order and filtering is reversed in the `ItineraryFilterChain`
+    (`crop itineraries at START of list`).
+  - The `latest-arrival-time` can not be computed and is dropped.
 
 ### sort-by-departure & crop-search-window
 
@@ -108,6 +108,6 @@ The `Next page >>` is the same as the basic case [sort-by-departure](#sort-by-de
 ![sort-by-departure-crop-sw-next-page](images/sort-by-departure-crop-sw-next-page.svg)
 
 - The `<< Previous page` work the same as [sort-by-departure](#sort-by-departure)
-- The `Next page >>` need to be adjusted by setting the `edt'` to the `removed itinerary`
-  departure time.
-    - We might have duplicate results, and we might lose some optimal results.
+- The `Next page >>` need to be adjusted by setting the `edt'` to the `removed itinerary` departure
+  time.
+  - We might have duplicate results, and we might lose some optimal results.

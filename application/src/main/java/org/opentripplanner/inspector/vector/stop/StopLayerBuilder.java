@@ -35,7 +35,7 @@ public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopL
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> findGeometries(Envelope query) {
     return findStops
       .apply(query)
       .stream()

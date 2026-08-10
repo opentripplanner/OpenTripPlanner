@@ -1,8 +1,8 @@
 # Logging
 
-OTP uses [logback](http://logback.qos.ch/) and [slj4j](http://www.slf4j.org/) as a logging framework.
-Logging is configured in the `logback.xml` file inside the OTP jar file. See these frameworks for
-more documentation on log configuration.
+OTP uses [logback](http://logback.qos.ch/) and [slj4j](http://www.slf4j.org/) as a logging
+framework. Logging is configured in the `logback.xml` file inside the OTP jar file. See these
+frameworks for more documentation on log configuration.
 
 For developers, starting OTP using the `InteractiveOtpMain` is an easy way to configure debug
 logging.
@@ -15,12 +15,14 @@ Some loggers useful for debugging.
 
 ## Format
 
-By default, OTP logs in plain text to the console. However, it is possible to also log in JSON format.
+By default, OTP logs in plain text to the console. However, it is possible to also log in JSON
+format.
 
 To enable it, set the Java property `otp.logging.format` to one of these values:
 
 - `plain`: regular plain text logging (default, no need to configure it)
-- `json`: Logstash-encoded JSON format understood by many log ingestion tools (Datadog, Loggly, Loki...)
+- `json`: Logstash-encoded JSON format understood by many log ingestion tools (Datadog, Loggly,
+  Loki...)
 
 ### Complete example
 
@@ -30,8 +32,8 @@ java -Dotp.logging.format=json -jar otp.jar --load --serve data
 
 ### Further customization
 
-If you want to customize the exact log output even further you can use your own logback configuration 
-by starting OTP with the following parameter:
+If you want to customize the exact log output even further you can use your own logback
+configuration by starting OTP with the following parameter:
 
 ```
 java -Dlogback.configurationFile=/path/to/logback.xml -jar otp.jar --load --serve data

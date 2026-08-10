@@ -24,25 +24,27 @@ listed in the `build-config.json`. Both files must be provided together:
 - `empirical_delay_stop_times.txt` - Contains delay percentiles for each trip stop
 - `empirical_delay_calendar.txt` - Defines service calendars for the delay data
 
-The file names must include "empirical_delay" and the extension must be `.csv` or `.txt`. Both
-NeTEx and GTFS feeds are supported through the feedId configuration.
+The file names must include "empirical_delay" and the extension must be `.csv` or `.txt`. Both NeTEx
+and GTFS feeds are supported through the feedId configuration.
 
 ### Empirical Delay Stop Times Format
 
-This file contains the delay data for each stop on each trip, organized by service calendar periods (e.g., weekdays, weekends).
+This file contains the delay data for each stop on each trip, organized by service calendar periods
+(e.g., weekdays, weekends).
 
 CSV file columns:
 
-| CSV Header                     | Description                                                                                             |
-|:-------------------------------|:--------------------------------------------------------------------------------------------------------|
-| `empirical_delay_service_id`   | The service calendar identifier that determines when this delay data applies (references calendar file). |
-| `trip_id`                      | The GTFS trip id or NeTEx ServiceJourney id.                                                            |
-| `stop_id`                      | The GTFS stop id or NeTEx Quay id for this stop.                                                        |
-| `stop_sequence`                | The stop sequence number in the trip pattern. First stop is 1, not 0.                                   |
-| `p50`                          | The median (50th percentile) delay in seconds. Half of historical observations are better than this.    |
-| `p90`                          | The 90th percentile delay in seconds. 90% of observations are better, 10% are worse.                    |
+| CSV Header                   | Description                                                                                              |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------- |
+| `empirical_delay_service_id` | The service calendar identifier that determines when this delay data applies (references calendar file). |
+| `trip_id`                    | The GTFS trip id or NeTEx ServiceJourney id.                                                             |
+| `stop_id`                    | The GTFS stop id or NeTEx Quay id for this stop.                                                         |
+| `stop_sequence`              | The stop sequence number in the trip pattern. First stop is 1, not 0.                                    |
+| `p50`                        | The median (50th percentile) delay in seconds. Half of historical observations are better than this.     |
+| `p90`                        | The 90th percentile delay in seconds. 90% of observations are better, 10% are worse.                     |
 
 **Constraints:**
+
 - Percentile values (p50, p90) must be between 0 and 18000 seconds (5 hours)
 - Stop sequence must be between 0 and 10,000
 - If the stop_id does not match the transit feed, the row is dropped and an issue is added to the
@@ -60,6 +62,7 @@ Saturday,RUT:ServiceJourney:1,NSR:Quay:1002,2,45,120
 ```
 
 In this example:
+
 - On Fridays, stop 2 has a median delay of 2 minutes (120s) and is delayed by 4+ minutes 10% of the
   time
 - On Saturdays, the same stop has better performance with only 45 seconds median delay
@@ -71,18 +74,18 @@ GTFS calendar.txt format.
 
 CSV file columns:
 
-| CSV Header                     | Description                                                        |
-|:-------------------------------|:-------------------------------------------------------------------|
-| `empirical_delay_service_id`   | Unique identifier for this service calendar.                       |
-| `monday`                       | Boolean (0 or 1) - whether this calendar applies on Mondays.       |
-| `tuesday`                      | Boolean (0 or 1) - whether this calendar applies on Tuesdays.      |
-| `wednesday`                    | Boolean (0 or 1) - whether this calendar applies on Wednesdays.    |
-| `thursday`                     | Boolean (0 or 1) - whether this calendar applies on Thursdays.     |
-| `friday`                       | Boolean (0 or 1) - whether this calendar applies on Fridays.       |
-| `saturday`                     | Boolean (0 or 1) - whether this calendar applies on Saturdays.     |
-| `sunday`                       | Boolean (0 or 1) - whether this calendar applies on Sundays.       |
-| `start_date`                   | Start date in YYYY-MM-DD format (inclusive).                       |
-| `end_date`                     | End date in YYYY-MM-DD format (inclusive).                         |
+| CSV Header                   | Description                                                     |
+| :--------------------------- | :-------------------------------------------------------------- |
+| `empirical_delay_service_id` | Unique identifier for this service calendar.                    |
+| `monday`                     | Boolean (0 or 1) - whether this calendar applies on Mondays.    |
+| `tuesday`                    | Boolean (0 or 1) - whether this calendar applies on Tuesdays.   |
+| `wednesday`                  | Boolean (0 or 1) - whether this calendar applies on Wednesdays. |
+| `thursday`                   | Boolean (0 or 1) - whether this calendar applies on Thursdays.  |
+| `friday`                     | Boolean (0 or 1) - whether this calendar applies on Fridays.    |
+| `saturday`                   | Boolean (0 or 1) - whether this calendar applies on Saturdays.  |
+| `sunday`                     | Boolean (0 or 1) - whether this calendar applies on Sundays.    |
+| `start_date`                 | Start date in YYYY-MM-DD format (inclusive).                    |
+| `end_date`                   | End date in YYYY-MM-DD format (inclusive).                      |
 
 Example:
 
@@ -95,7 +98,7 @@ Friday,0,0,0,0,1,0,0,2025-01-01,2030-12-31
 
 ### Configuration
 
-To enable this functionality, you need to enable the "EmpiricalDelay" feature in the 
+To enable this functionality, you need to enable the "EmpiricalDelay" feature in the
 `otp-config.json` file:
 
 ```JSON
@@ -127,12 +130,14 @@ empirical delay data:
 ```
 
 Each feed configuration requires:
-- `feedId` (required): The feed ID to use for matching transit IDs in the empirical delay data. 
-  This must match the feed ID of the corresponding GTFS or NeTEx feed.
+
+- `feedId` (required): The feed ID to use for matching transit IDs in the empirical delay data. This
+  must match the feed ID of the corresponding GTFS or NeTEx feed.
 - `source` (required): URI pointing to the empirical delay data. Can be a local file, HTTP(S) URL,
   or cloud storage URI (e.g., gs://).
 
 The source can be:
+
 - A ZIP file containing both `empirical_delay_stop_times.txt` and `empirical_delay_calendar.txt`
 - A directory containing these files
 - Individual files (both must be provided)
@@ -183,12 +188,14 @@ If no empirical delay data is available for the specific combination, the field 
 ### Traveler Information
 
 Empirical delay data can be displayed to travelers to set realistic expectations:
+
 - "This service is typically 2-3 minutes late at this stop"
 - "90% of the time, this bus arrives within 5 minutes of schedule"
 
 ### Journey Planning
 
 Journey planners can use empirical delay to:
+
 - Add realistic buffer times when suggesting transfers
 - Rank alternatives based on historical reliability
 - Adjust arrival time predictions beyond real-time data
@@ -196,6 +203,7 @@ Journey planners can use empirical delay to:
 ### Service Quality Monitoring
 
 Transit operators can:
+
 - Identify consistently delayed services
 - Compare different time periods (weekday vs weekend)
 - Track improvement over time as new delay data is imported

@@ -12,6 +12,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
 @Module
@@ -40,7 +41,7 @@ public class LinkingServiceModule {
   @Provides
   static LinkingContextFactory provideLinkingContextFactory(
     Graph graph,
-    TransitService transitService,
+    @StaticTransitService TransitService transitService,
     VertexCreationService vertexCreationService
   ) {
     return new LinkingContextFactory(

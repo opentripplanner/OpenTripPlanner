@@ -28,7 +28,7 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class CalendarServiceDataFactoryImplTest {
@@ -120,7 +120,7 @@ public class CalendarServiceDataFactoryImplTest {
 
   private static GtfsContext createCtxBuilder() throws IOException {
     GtfsContextBuilder ctxBuilder = contextBuilder(
-      TimetableRepositoryForTest.FEED_ID,
+      TransitRepositoryForTest.FEED_ID,
       ConstantsForTests.SIMPLE_GTFS
     );
     TransitDataImportBuilder builder = ctxBuilder
@@ -129,9 +129,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(removeMondayFromAlldays());
-    builder
-      .getFeedInfos()
-      .add(FeedInfoTestFactory.dummyForTest(TimetableRepositoryForTest.FEED_ID));
+    builder.getFeedInfos().add(FeedInfoTestFactory.dummyForTest(TransitRepositoryForTest.FEED_ID));
 
     return ctxBuilder.build();
   }

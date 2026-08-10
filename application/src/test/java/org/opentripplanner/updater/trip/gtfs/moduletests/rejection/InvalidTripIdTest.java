@@ -8,8 +8,8 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 class InvalidTripIdTest {
 

@@ -4,19 +4,19 @@
 
 OpenTripPlanner is distributed as a single stand-alone runnable JAR file. We create a tag and
 release page on GitHub for each release version, and also deploy them to the Maven Central
-repository. You can go to
-the [release pages on GitHub](https://github.com/opentripplanner/OpenTripPlanner/releases)
-or [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/),
+repository. You can go to the
+[release pages on GitHub](https://github.com/opentripplanner/OpenTripPlanner/releases) or
+[the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/),
 navigate to the highest version number, and download the jar file `otp-shaded-VERSION.jar`.
 
 Note that version numbers like `v2.1.0-rc1` or `v2.8.1-SNAPSHOT` refer to development builds _
-before_ the release version `v2.8.1`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean
-that `vX.Y.Z` has been released yet.
+before_ the release version `v2.8.1`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean that
+`vX.Y.Z` has been released yet.
 
 We use the [Github Actions CI system](https://github.com/opentripplanner/OpenTripPlanner/actions) to
-build OTP every time a change is made. You can find the JARs resulting from those builds in
-the [Github Packages repository](https://github.com/opentripplanner/OpenTripPlanner/packages/562174)
-. It can be harder to find the specific version you're looking for here, so we recommend using the
+build OTP every time a change is made. You can find the JARs resulting from those builds in the
+[Github Packages repository](https://github.com/opentripplanner/OpenTripPlanner/packages/562174) .
+It can be harder to find the specific version you're looking for here, so we recommend using the
 release pages or Maven Central as described above.
 
 ## Building from Source
@@ -76,8 +76,8 @@ If you have just cloned OTP you will be working with the default "dev-2.x" branc
 development occurs. This is not the most stable or deployment-ready code available. To avoid newly
 minted bugs or undocumented behavior, you can use Git to check out a specific release (tag or
 branch) of OTP to work with. The Maven build also includes many time-consuming integration tests.
-When working with a stable release of OTP, you may want to turn them off by adding the
-switch: `-DskipTests`.
+When working with a stable release of OTP, you may want to turn them off by adding the switch:
+`-DskipTests`.
 
 For example, you could do the following:
 
@@ -90,7 +90,7 @@ mvn clean package -DskipTests
 
 Please note that the build process multiple jar files. The `otp-shaded-VERSION.jar` is much bigger
 because it contains copies of all the external libraries that OTP uses. It serves as a stand-alone
-runnable distribution of OTP. The other jar files are regular Java jar files. These JAR files are 
+runnable distribution of OTP. The other jar files are regular Java jar files. These JAR files are
 useful when OTP is included as a component in some other project, where we want the dependency
 management system to gather all the external libraries automatically.
 
@@ -103,11 +103,11 @@ file) to the Maven repository, from which it can be automatically included in ot
 
 This repository is machine-readable (by Maven or other build systems) and also provides human
 readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing
-the proper URL for the release you want. For example, release 2.8.1 will be found
-at `https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1-shaded.jar`.
+the proper URL for the release you want. For example, release 2.8.1 will be found at
+`https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1-shaded.jar`.
 
-To make use of OTP in another Maven project, you must specify it as a dependency in that
-project's `pom.xml`:
+To make use of OTP in another Maven project, you must specify it as a dependency in that project's
+`pom.xml`:
 
 ```XML
 <dependency>

@@ -8,9 +8,9 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class ConditionSpecificityTest {
 

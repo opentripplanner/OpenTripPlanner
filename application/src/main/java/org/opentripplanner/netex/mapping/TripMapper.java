@@ -82,10 +82,6 @@ class TripMapper {
     org.opentripplanner.transit.model.network.Route route = resolveRoute(serviceJourney);
 
     if (route == null) {
-      LOG.warn(
-        "Unable to map ServiceJourney, missing serviceId. SJ id: {}",
-        serviceJourney.getId()
-      );
       return null;
     }
 
@@ -144,7 +140,7 @@ class TripMapper {
     );
 
     // TODO RTM - Instead of getting the first headsign from the StopTime this could be the
-    //          - default behaviour of the TimetableRepository - So, in the NeTEx mapper we would just
+    //          - default behaviour of the TransitRepository - So, in the NeTEx mapper we would just
     //          - ignore setting the headsign on the Trip.
     builder.withHeadsign(new NonLocalizedString(headsign.get()));
 
@@ -173,6 +169,7 @@ class TripMapper {
     return null;
   }
 
+  @Nullable
   private org.opentripplanner.transit.model.network.Route resolveRoute(
     ServiceJourney serviceJourney
   ) {
@@ -195,8 +192,9 @@ class TripMapper {
     );
 
     if (route == null) {
-      LOG.warn(
-        "Unable to link ServiceJourney to Route. ServiceJourney id: {}, Line ref: {}",
+      issueStore.add(
+        "InvalidLineRef",
+        "Unable to map ServiceJourney. SJ id: %s, LineRef: %s",
         serviceJourney.getId(),
         lineRef
       );

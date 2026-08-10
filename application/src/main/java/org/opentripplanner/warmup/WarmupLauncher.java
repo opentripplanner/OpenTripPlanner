@@ -1,8 +1,9 @@
 package org.opentripplanner.warmup;
 
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.warmup.api.WarmupParameters;
 import org.slf4j.Logger;
@@ -23,17 +24,17 @@ public class WarmupLauncher {
   @Nullable
   private final WarmupParameters parameters;
 
-  private final OtpServerRequestContext serverContext;
-  private final TimetableRepository timetableRepository;
+  private final Supplier<OtpServerRequestContext> serverContextSupplier;
+  private final TransitRepository transitRepository;
 
   public WarmupLauncher(
     @Nullable WarmupParameters parameters,
-    OtpServerRequestContext serverContext,
-    TimetableRepository timetableRepository
+    Supplier<OtpServerRequestContext> serverContextSupplier,
+    TransitRepository transitRepository
   ) {
     this.parameters = parameters;
-    this.serverContext = serverContext;
-    this.timetableRepository = timetableRepository;
+    this.serverContextSupplier = serverContextSupplier;
+    this.transitRepository = transitRepository;
   }
 
   /**
@@ -47,11 +48,12 @@ public class WarmupLauncher {
     if (parameters == null) {
       return;
     }
-    GraphUpdaterManager updaterManager = timetableRepository.getUpdaterManager();
+    GraphUpdaterManager updaterManager = transitRepository.getUpdaterManager();
     if (updaterManager == null) {
       LOG.info("Application warmup configured but no updaters found. Skipping warmup.");
       return;
     }
+    var serverContext = serverContextSupplier.get();
     var schema = switch (parameters.api()) {
       case TRANSMODEL -> serverContext.transmodelSchema();
       case GTFS -> serverContext.gtfsSchema();

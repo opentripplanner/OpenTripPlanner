@@ -32,7 +32,8 @@
             "alertHeaderText": "First string",
             "alertDescriptionText": "First string"
           }
-        ]
+        ],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:B",
@@ -48,7 +49,23 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": [
+          {
+            "tripOnServiceDate": {
+              "serviceDate": "2024-08-09",
+              "trip": {
+                "gtfsId": "F:CanceledTrip"
+              }
+            },
+            "stopCall": {
+              "stopLocation": {
+                "gtfsId": "F:B"
+              },
+              "realTime": null
+            }
+          }
+        ]
       },
       {
         "gtfsId": "F:C",
@@ -69,7 +86,8 @@
             "alertHeaderText": "Station closed",
             "alertDescriptionText": "This station is currently closed"
           }
-        ]
+        ],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:D",
@@ -85,7 +103,8 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:E",
@@ -101,7 +120,8 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:F",
@@ -117,7 +137,8 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:G",
@@ -133,7 +154,8 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": []
       },
       {
         "gtfsId": "F:H",
@@ -149,7 +171,8 @@
           }
         ],
         "routesWithinRange": [],
-        "alerts": []
+        "alerts": [],
+        "canceledCalls": []
       }
     ]
   }

@@ -1,12 +1,8 @@
 package org.opentripplanner.gbfs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import org.opentripplanner.framework.io.HttpHeaders;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.slf4j.Logger;
@@ -23,25 +19,32 @@ public class GbfsFeedLoaderAndMapper {
   private final GbfsFeedLoader loader;
   private final GbfsFeedMapper mapper;
 
-  public GbfsFeedLoaderAndMapper(
+  private GbfsFeedLoaderAndMapper(GbfsFeedLoader loader, GbfsFeedMapper mapper) {
+    this.loader = loader;
+    this.mapper = mapper;
+  }
+
+  public static GbfsFeedLoaderAndMapper create(
     GbfsDataSourceParameters params,
     OtpHttpClientFactory otpHttpClientFactory
-  ) throws URISyntaxException {
-    URI uri = new URI(params.url());
-
+  ) {
     var client = otpHttpClientFactory.create(LOG);
-    var gbfsNode = client.getAndMapAsJsonNode(uri, HttpHeaders.empty(), new ObjectMapper());
-    var gbfsFeedVersion = JsonUtils.asText(gbfsNode, "version").orElse(null);
+    // Fetched once and handed over to the version-specific loader, since some servers throttle
+    // repeated fetches of the same file.
+    var autoConfiguration = GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), client);
+    var gbfsFeedVersion = autoConfiguration.version().orElse(null);
 
-    switch (gbfsFeedVersion) {
+    return switch (gbfsFeedVersion) {
       case "3.0" -> {
-        var loaderv30 = new org.opentripplanner.gbfs.v3.GbfsFeedLoader(
-          params.url(),
+        var loader = org.opentripplanner.gbfs.v3.GbfsFeedLoader.create(
+          autoConfiguration,
           params.httpHeaders(),
           client
         );
-        loader = loaderv30;
-        mapper = new org.opentripplanner.gbfs.v3.GbfsFeedMapper(loaderv30, params);
+        yield new GbfsFeedLoaderAndMapper(
+          loader,
+          new org.opentripplanner.gbfs.v3.GbfsFeedMapper(loader, params)
+        );
       }
       case "1.1", "2.0", "2.1", "2.2", "2.3" -> {
         if (gbfsFeedVersion.startsWith("1")) {
@@ -51,29 +54,30 @@ public class GbfsFeedLoaderAndMapper {
             gbfsFeedVersion
           );
         }
-        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-          params.url(),
-          params.httpHeaders(),
-          params.language(),
-          client
-        );
-        loader = loaderv23;
-        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loaderv23, params);
+        yield createV23(autoConfiguration, params, client);
       }
-      case null -> {
-        var loaderv23 = new org.opentripplanner.gbfs.v2.GbfsFeedLoader(
-          params.url(),
-          params.httpHeaders(),
-          params.language(),
-          client
-        );
-        loader = loaderv23;
-        mapper = new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loaderv23, params);
-      }
+      case null -> createV23(autoConfiguration, params, client);
       default -> throw new UnsupportedOperationException(
         "Unsupported GBFS version " + gbfsFeedVersion + " for url " + params.url()
       );
-    }
+    };
+  }
+
+  private static GbfsFeedLoaderAndMapper createV23(
+    GbfsAutoConfiguration autoConfiguration,
+    GbfsDataSourceParameters params,
+    OtpHttpClient client
+  ) {
+    var loader = org.opentripplanner.gbfs.v2.GbfsFeedLoader.create(
+      autoConfiguration,
+      params.httpHeaders(),
+      params.language(),
+      client
+    );
+    return new GbfsFeedLoaderAndMapper(
+      loader,
+      new org.opentripplanner.gbfs.v2.GbfsFeedMapper(loader, params)
+    );
   }
 
   /**

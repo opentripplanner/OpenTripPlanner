@@ -8,9 +8,9 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -109,11 +109,10 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   private static TripAndPattern match(EstimatedVehicleJourney evj, TransitTestEnvironment env)
     throws UpdateException {
     var transitService = env.transitService();
-    var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
-    var calls = CallWrapper.of(evj);
+    var cache = new SiriFuzzyTripMatcherCache(env.transitRepository());
+    var fuzzyMatcher = new SiriFuzzyTripMatcher(cache, transitService);
     return fuzzyMatcher.match(
-      evj,
-      calls,
+      EstimatedVehicleJourneyWrapper.of(evj),
       new EntityResolver(transitService, env.feedId()),
       transitService::findTimetable,
       transitService::findNewTripPatternForModifiedTrip

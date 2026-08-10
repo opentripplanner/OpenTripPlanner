@@ -15,9 +15,13 @@ public class StopTimeKey extends AbstractTransitEntity<StopTimeKey, StopTimeKeyB
     super(builder.getId());
   }
 
-  public static StopTimeKeyBuilder of(FeedScopedId tripId, int stopSequenceNumber) {
+  /**
+   * @param tripId
+   * @param stopPositionInPattern the 0 based position in the trip pattern, not GTFS stop_sequence
+   */
+  public static StopTimeKeyBuilder of(FeedScopedId tripId, int stopPositionInPattern) {
     return new StopTimeKeyBuilder(
-      new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber)
+      new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopPositionInPattern)
     );
   }
 

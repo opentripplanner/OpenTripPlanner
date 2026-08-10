@@ -25,7 +25,7 @@ import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 
 class DefaultFareServiceTest implements PlanTestConstants {
@@ -108,7 +108,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
       .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
       .staySeatedBus(
-        TimetableRepositoryForTest.route("123").build(),
+        TransitRepositoryForTest.route("123").build(),
         2,
         T11_12,
         T11_16,

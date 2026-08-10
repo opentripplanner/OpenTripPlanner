@@ -1,13 +1,14 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
-import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLaneTrack;
-import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLeft;
+import static org.opentripplanner.osm.WayTestData.cyclewayLaneTrack;
+import static org.opentripplanner.osm.WayTestData.cyclewayLeft;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 

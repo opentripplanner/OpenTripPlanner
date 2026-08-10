@@ -96,4 +96,12 @@ public enum StreetTraversalPermission {
   public boolean allowsNothing() {
     return this == StreetTraversalPermission.NONE;
   }
+
+  /**
+   * Returns true if this permission allows at least one non-motorized mode (pedestrians and/or
+   * bicycles) and does not allow cars.
+   */
+  public boolean allowsOnlyNonMotorizedModes() {
+    return allowsAnything() && !allows(CAR);
+  }
 }

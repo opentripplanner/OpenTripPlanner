@@ -47,6 +47,9 @@ export const useTripQuery: TripQueryHook = (variables) => {
 
   useEffect(() => {
     if (validLocation(variables?.from) && validLocation(variables?.to)) {
+      // callback() performs a data fetch (an external-system sync), which is a
+      // legitimate effect use even though it eventually calls setState.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       callback();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

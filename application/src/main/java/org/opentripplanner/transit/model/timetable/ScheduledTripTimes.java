@@ -101,7 +101,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
     return new ScheduledTripTimesBuilder(deduplicator);
   }
 
-  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
+  public ScheduledTripTimesBuilder copyOf(DeduplicatorService deduplicator) {
     return new ScheduledTripTimesBuilder(
       timeShift,
       serviceCode,
@@ -227,6 +227,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public boolean isDeleted() {
+    return false;
+  }
+
+  @Override
+  public boolean isTimesModified() {
     return false;
   }
 

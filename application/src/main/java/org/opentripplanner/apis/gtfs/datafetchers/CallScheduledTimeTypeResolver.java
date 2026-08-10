@@ -18,10 +18,8 @@ public class CallScheduledTimeTypeResolver implements TypeResolver {
     }
 
     return switch (o) {
-      case CallScheduledTime.ArrivalDepartureTime adt -> schema.getObjectType(
-        "ArrivalDepartureTime"
-      );
-      case CallScheduledTime.TimeWindow tw -> schema.getObjectType("TimeWindow");
+      case CallScheduledTime.ArrivalDepartureTime _ -> schema.getObjectType("ArrivalDepartureTime");
+      case CallScheduledTime.TimeWindow _ -> schema.getObjectType("TimeWindow");
     };
   }
 }

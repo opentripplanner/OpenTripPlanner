@@ -16,7 +16,6 @@ process, OTP prints a summary of all the issues, like the following:
  11:35:57.518 INFO (Graph.java:976)     HopSpeedSlow - 22
  11:35:57.518 INFO (Graph.java:976)     Graphwide - 1
  11:35:57.518 INFO (Graph.java:976)     GraphConnectivity - 407
- 11:35:57.519 INFO (Graph.java:976)     ParkAndRideUnlinked - 1
  11:35:57.519 INFO (Graph.java:976)     StopNotLinkedForTransfers - 31
  11:35:57.519 INFO (Graph.java:976)     NoFutureDates - 1
 ```
@@ -37,8 +36,8 @@ needed.
 OTP has a very flexible system for deciding when a street is to be allowed by pedestrians, bicycles
 or cars.
 
-To configure the which settings to use for your location, please use
-the [osmTagMapping config attribute](BuildConfiguration.md#Osm-Tag-Mapping).
+To configure the which settings to use for your location, please use the
+[osmTagMapping config attribute](BuildConfiguration.md#Osm-Tag-Mapping).
 
 In the following section we will discuss the default case, which will be used if the property is not
 set.
@@ -48,12 +47,12 @@ set.
 Access tags (such as bicycle/foot = yes/no/designated) can be used to override default
 graph-building parameters.
 
-As a default, foot and bicycle traffic is ''not'' allowed on `highway=trunk`, `highway=trunk_link`
-, `highway=motorway`, `highway=motorway_link`, or `highway=construction`.
+As a default, foot and bicycle traffic is ''not'' allowed on `highway=trunk`, `highway=trunk_link` ,
+`highway=motorway`, `highway=motorway_link`, or `highway=construction`.
 
-Both *are* allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=footway`.
+Both _are_ allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=footway`.
 
-Finally, bicycles are *not* allowed on *highway=footway* when any of the following tags appear on a
+Finally, bicycles are _not_ allowed on _highway=footway_ when any of the following tags appear on a
 footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be
@@ -71,8 +70,8 @@ that it's 100 times worse to cycle on when compared to a way which has a safety 
 
 How this is calculated depends on two things
 
-- the incline of the way (not read from OSM but from
-  the [separately configured elevation data](Configuration.md#Elevation data))
+- the incline of the way (not read from OSM but from the [separately configured elevation
+  data](Configuration.md#Elevation data))
 - its OSM tags
 
 At request time you can then use the `triangleFactors` to decide how important bicycle safety is
@@ -87,16 +86,15 @@ props.setProperties("highway=track", StreetTraversalPermission.ALL, 1.3, 1.3);
 
 This means that an OSM way with the tag `highway=track` is traversable by all modes (pedestrian,
 bicycle, car) and that its bicycle safety score when you traverse in order of the way is `1.3` and
-also `1.3` when going the other way
-(smaller means more cycle-friendly).
+also `1.3` when going the other way (smaller means more cycle-friendly).
 
 If there is a more specific matcher like `highway=track;bicycle=no` and it matches a given OSM way,
 it is chosen instead and its settings applied.
 
 The score can be any positive number but the range (as of writing this) goes from `0.6` for bike
 lanes to `100` for ways that consist of sand. To figure out a good value for your set of tags you
-should read the bicycle safety report (see below) or the source code of your `OsmTagMapper`
-to get a feeling for how much certain tags are penalised or rewarded.
+should read the bicycle safety report (see below) or the source code of your `OsmTagMapper` to get a
+feeling for how much certain tags are penalised or rewarded.
 
 There are also so-called mixins. These are applied on top of the most specific matchers and a single
 OSM way can match many mixins. The mixins' safety values are multiplied with the value of the base
@@ -106,8 +104,8 @@ OSM way can match many mixins. The mixins' safety values are multiplied with the
 props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
 ```
 
-The Javadoc
-of [`OSMSpecifier.java`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/osm/wayproperty/specifier/OsmSpecifier.java)
+The Javadoc of
+[`OSMSpecifier.java`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/osm/wayproperty/specifier/OsmSpecifier.java)
 contains the precise documentation about the syntax of the matchers.
 
 There are a lot of rules for which tags results in a specific safety score so it's not easy to get
@@ -121,9 +119,8 @@ To enable it activate the [Report API sandbox feature](sandbox/ReportApi.md).
 ### Railway Platforms
 
 OTP users in Helsinki have documented their best practices for coding railway platforms in
-OpenStreetMap. These guidelines are
-available [in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
-
+OpenStreetMap. These guidelines are available
+[in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
 
 ### Transit search
 
@@ -145,7 +142,7 @@ find special test cases. To turn on the export enable the slf4j logger:
 
 ### Further information
 
-* [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
-* [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
-* [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)
-* [Elevators](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Elevators)
+- [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
+- [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
+- [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)
+- [Elevators](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Elevators)

@@ -330,8 +330,6 @@ public class TripQuery {
 
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
             - The `constant` must be greater or equal to '0s' and less then '1h'.
-
-            THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
             """.stripIndent()
           )
           .type(RelaxCostType.INPUT_TYPE)

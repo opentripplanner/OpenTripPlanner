@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares.model;
 
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.ext.fares.model.FareModelForTest.fareProduct;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.groupOfRoutes;
 
 import java.time.LocalTime;
 import org.opentripplanner.core.model.id.FeedScopedId;

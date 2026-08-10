@@ -20,13 +20,13 @@ class StopConsolidationModuleTest {
   void replacePatterns() {
     var groups = List.of(new ConsolidatedStopGroup(STOP_D.getId(), List.of(STOP_B.getId())));
 
-    var timetableRepository = TestStopConsolidationModel.buildTimetableRepository();
-    timetableRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    var transitRepository = TestStopConsolidationModel.buildTransitRepository();
+    transitRepository.addTripPattern(PATTERN.getId(), PATTERN);
     var repo = new DefaultStopConsolidationRepository();
-    var module = new StopConsolidationModule(timetableRepository, repo, groups);
+    var module = new StopConsolidationModule(transitRepository, repo, groups);
     module.buildGraph();
 
-    var modifiedPattern = timetableRepository.getTripPatternForId(PATTERN.getId());
+    var modifiedPattern = transitRepository.getTripPatternForId(PATTERN.getId());
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
 
@@ -37,7 +37,7 @@ class StopConsolidationModuleTest {
       .getStop(1);
     assertEquals(modifiedStop, STOP_D);
 
-    var patterns = List.copyOf(timetableRepository.getAllTripPatterns());
+    var patterns = List.copyOf(transitRepository.getAllTripPatterns());
 
     var stops = patterns.stream().map(TripPattern::getStops).toList();
     assertEquals(List.of(List.of(STOP_A, STOP_D, STOP_C)), stops);

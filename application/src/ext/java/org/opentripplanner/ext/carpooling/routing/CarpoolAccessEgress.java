@@ -8,8 +8,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
-import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -104,7 +104,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     double walkWeight =
       GraphPathUtils.weightOrZero(walkToPickup) + GraphPathUtils.weightOrZero(walkFromDropoff);
     double totalWeight = walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance);
-    this.c1 = RaptorCostConverter.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
+    this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
   }
 
   @Override
@@ -293,7 +293,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   /**
    * Walk path from the passenger's origin (or transit stop, for egress) to the snapped pickup
-   * vertex. {@code null} when the origin/stop is already on a car-accessible vertex and no walk
+   * vertex. {@code null} when the origin/stop is already on a car-reachable vertex and no walk
    * is needed.
    */
   @Nullable
@@ -312,7 +312,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   /**
    * Walk path from the snapped dropoff vertex to the passenger's destination (or transit stop, for
-   * access). {@code null} when the destination/stop is already on a car-accessible vertex and no
+   * access). {@code null} when the destination/stop is already on a car-reachable vertex and no
    * walk is needed.
    */
   @Nullable

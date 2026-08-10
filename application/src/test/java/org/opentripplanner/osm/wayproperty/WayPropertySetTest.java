@@ -83,8 +83,8 @@ class WayPropertySetTest {
     var wayPropertySet = builder.build();
     var wayData = wayPropertySet.getDataForWay(way);
     assertEquals(ALL, wayData.forward().getPermission());
-    assertEquals(1.0, wayData.forward().walkSafety());
-    assertEquals(1.0, wayData.backward().walkSafety());
+    assertEquals(1.25, wayData.forward().walkSafety());
+    assertEquals(1.25, wayData.backward().walkSafety());
     assertEquals(1.0, wayData.forward().bicycleSafety());
     assertEquals(1.0, wayData.backward().bicycleSafety());
 
@@ -119,7 +119,7 @@ class WayPropertySetTest {
     builder.addProperties(lane_and_footway, safer_and_peds);
     wayPropertySet = builder.build();
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(new WayPropertiesPair(safer_and_peds, safer_and_peds), dataForWay);
+    assertEquals(new BidirectionalWayProperties(safer_and_peds, safer_and_peds), dataForWay);
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");

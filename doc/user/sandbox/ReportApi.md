@@ -22,10 +22,10 @@ Feel free to add more reports and to add your organization to the contact info l
 This module mounts an endpoint for generating reports under `otp/report`. Available reports:
 
 - [/otp/report/transfers.csv](http://localhost:8080/otp/report/transfers.csv)
-- [/otp/report/graph.json](http://localhost:8080/otp/report/graph.json)
-  Detailed numbers of transit and street entities in the graph
+- [/otp/report/graph.json](http://localhost:8080/otp/report/graph.json) Detailed numbers of transit
+  and street entities in the graph
 - [/otp/report/transit/group/priorities](http://localhost:8080/otp/report/transit/group/priorities):
-  List all transit groups used for transit-group-priority (Competition neutral planning).   
+  List all transit groups used for transit-group-priority (Competition neutral planning).
 
 ### Configuration
 

@@ -15,8 +15,6 @@ public enum VehicleRoutingOptimizeType {
   SAFE_STREETS,
   /** This was previously called FLAT. Needs a rewrite. */
   FLAT_STREETS,
-  /** This was previously called GREENWAYS. */
-  SAFEST_STREETS,
   TRIANGLE;
 
   private static final Set<VehicleRoutingOptimizeType> NON_TRIANGLE_VALUES =

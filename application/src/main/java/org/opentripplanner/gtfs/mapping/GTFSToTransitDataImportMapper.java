@@ -61,6 +61,8 @@ public class GTFSToTransitDataImportMapper {
 
   private final TripMapper tripMapper;
 
+  private final TripSegmentMapper tripSegmentMapper;
+
   private final BookingRuleMapper bookingRuleMapper;
 
   private final StopTimeMapper stopTimeMapper;
@@ -86,6 +88,9 @@ public class GTFSToTransitDataImportMapper {
   private final FareRulesData fareRulesBuilder = new FareRulesData();
 
   private final StopAreaMapper stopAreaMapper;
+
+  private final NoticeMapper noticeMapper;
+  private final NoticeAssignmentMapper noticeAssignmentMapper;
 
   private final TranslationHelper translationHelper;
   private final boolean discardMinTransferTimes;
@@ -145,6 +150,7 @@ public class GTFSToTransitDataImportMapper {
     );
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(idFactory, routeMapper, directionMapper, translationHelper);
+    tripSegmentMapper = new TripSegmentMapper(idFactory);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper = new StopTimeMapper(
       stopMapper,
@@ -167,6 +173,15 @@ public class GTFSToTransitDataImportMapper {
     );
     fareTransferRuleMapper = new FareTransferRuleMapper(idFactory, fareProductMapper);
     stopAreaMapper = new StopAreaMapper(idFactory);
+    noticeMapper = new NoticeMapper(idFactory);
+    noticeAssignmentMapper = new NoticeAssignmentMapper(
+      idFactory,
+      issueStore,
+      noticeMapper,
+      tripMapper,
+      routeMapper,
+      tripSegmentMapper
+    );
   }
 
   public TransitDataImportBuilder getBuilder() {
@@ -218,6 +233,12 @@ public class GTFSToTransitDataImportMapper {
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
     fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
+
+    tripSegmentMapper.map(data.getAllTripSegments(), builder.getStopTimesSortedByTrip());
+    noticeMapper.map(data.getAllNotices());
+    builder
+      .getNoticeAssignments()
+      .putAll(noticeAssignmentMapper.map(data.getAllNoticeAssignments()));
   }
 
   private void mapGtfsStopsToOtpTypes(Collection<Stop> stops) {

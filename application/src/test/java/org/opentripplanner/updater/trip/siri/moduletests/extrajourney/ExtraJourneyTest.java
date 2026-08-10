@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
@@ -12,9 +13,9 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -26,8 +27,8 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
+import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.VehicleModesEnumeration;
 
@@ -194,6 +195,48 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(createExtraJourney);
     assertEquals(0, result.successful());
     assertFailure(UpdateErrorType.NEGATIVE_HOP_TIME, result);
+  }
+
+  @Test
+  void testRejectUnmonitoredExtraJourney() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = createValidAddedJourney(siri)
+      .withMonitored(false)
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertFailure(UpdateErrorType.NOT_MONITORED, result);
+    assertNull(
+      env.transitService().getTrip(id(ADDED_TRIP_ID)),
+      "An unmonitored extra journey must not be added"
+    );
+  }
+
+  /**
+   * The not-monitored validation is overridden for cancellations: an extra journey reported as not
+   * monitored but cancelled is still processed, so the trip is added (in cancelled state) rather
+   * than rejected. This is the counterpart to {@link #testRejectUnmonitoredExtraJourney()}.
+   */
+  @Test
+  void testAcceptUnmonitoredCancelledExtraJourney() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = createValidAddedJourney(siri)
+      .withMonitored(false)
+      .withCancellation(true)
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertSuccess(result);
+    assertNotNull(
+      env.transitService().getTrip(id(ADDED_TRIP_ID)),
+      "An unmonitored but cancelled extra journey must still be added"
+    );
   }
 
   @Test

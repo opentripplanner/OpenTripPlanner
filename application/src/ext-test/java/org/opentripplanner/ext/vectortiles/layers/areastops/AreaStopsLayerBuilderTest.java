@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class AreaStopsLayerBuilderTest {
 
@@ -52,20 +52,20 @@ class AreaStopsLayerBuilderTest {
     .withGeometry(Polygons.BERLIN)
     .build();
 
-  private final TimetableRepository timetableRepository = new TimetableRepository(
+  private final TransitRepository transitRepository = new TransitRepository(
     siteRepositoryBuilder.withAreaStop(AREA_STOP).build()
   );
 
   @Test
   void getAreaStops() {
-    timetableRepository.index();
+    transitRepository.index();
 
     var subject = new AreaStopsLayerBuilder(
-      new DefaultTransitService(timetableRepository),
+      new DefaultTransitService(transitRepository),
       LAYER_CONFIG,
       Locale.ENGLISH
     );
-    var geometries = subject.getGeometries(AREA_STOP.getGeometry().getEnvelopeInternal());
+    var geometries = subject.findGeometries(AREA_STOP.getGeometry().getEnvelopeInternal());
     assertEquals(List.of(Polygons.BERLIN), geometries);
   }
 }

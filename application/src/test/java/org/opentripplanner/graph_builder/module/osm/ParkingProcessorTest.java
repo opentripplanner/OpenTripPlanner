@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -22,7 +22,7 @@ class ParkingProcessorTest {
   private static final ParkingProcessor PROCESSOR = new ParkingProcessor(
     new Graph(),
     DataImportIssueStore.NOOP,
-    (n, w) -> INTERSECTION_VERTEX
+    (_, _) -> INTERSECTION_VERTEX
   );
 
   @Test

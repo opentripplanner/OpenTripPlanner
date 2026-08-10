@@ -47,11 +47,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    estimatedTimetableHandler = new EstimatedTimetableHandler(
-      adapter,
-      config.fuzzyTripMatching(),
-      feedId
-    );
+    estimatedTimetableHandler = new EstimatedTimetableHandler(adapter, feedId);
 
     this.metricsConsumer = metricsConsumer;
   }

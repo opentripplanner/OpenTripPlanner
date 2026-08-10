@@ -19,6 +19,10 @@ public class TripOnServiceDateRequestBuilder {
     "includeRoutes",
     List.of()
   );
+  private FilterValues<FeedScopedId> includePatterns = FilterValues.ofEmptyIsEverything(
+    "includePatterns",
+    List.of()
+  );
   private FilterValues<FeedScopedId> includeServiceJourneys = FilterValues.ofEmptyIsEverything(
     "includeServiceJourneys",
     List.of()
@@ -52,6 +56,11 @@ public class TripOnServiceDateRequestBuilder {
 
   public TripOnServiceDateRequestBuilder withIncludeRoutes(FilterValues<FeedScopedId> routes) {
     this.includeRoutes = routes;
+    return this;
+  }
+
+  public TripOnServiceDateRequestBuilder withIncludePatterns(FilterValues<FeedScopedId> patterns) {
+    this.includePatterns = patterns;
     return this;
   }
 
@@ -110,6 +119,7 @@ public class TripOnServiceDateRequestBuilder {
       includeServiceDateRanges,
       includeAgencies,
       includeRoutes,
+      includePatterns,
       includeServiceJourneys,
       includeReplacementFor,
       includeNetexInternalPlanningCodes,

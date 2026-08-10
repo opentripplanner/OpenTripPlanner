@@ -41,7 +41,7 @@ public class LayerFilters {
 
     var filter = new PatternByServiceDatesFilter(
       // reminder, the end of the date range is exclusive so it's the next Sunday plus one day
-      new LocalDateRange(lastSunday, nextSundayPlusOne),
+      LocalDateRange.ofExclusiveEnd(lastSunday, nextSundayPlusOne),
       // not used
       route -> List.of(),
       getServiceDatesForTrip
@@ -59,8 +59,7 @@ public class LayerFilters {
       case NONE -> NO_FILTER;
       case SUNDAY_TO_SUNDAY_SERVICE_WEEK -> buildCurrentServiceWeekPredicate(
         transitService::findPatterns,
-        trip ->
-          transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId()),
+        trip -> transitService.getTripCalendars().listServiceDates(trip.getServiceId()),
         () -> LocalDate.now(transitService.getTimeZone())
       );
     };

@@ -36,7 +36,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -52,7 +52,7 @@ class LinkingContextFactoryTest {
   private static final FeedScopedId ALPHA_ID = id("alpha");
   private static final FeedScopedId OMEGA_ID = id("omega");
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   private final Station stationAlpha = testModel
     .station("alpha")

@@ -29,7 +29,7 @@ public interface GeofencingZoneService {
     }
 
     @Override
-    public Set<GeofencingZone> allZones() {
+    public Set<GeofencingZone> listZones() {
       return Set.of();
     }
   };
@@ -44,5 +44,5 @@ public interface GeofencingZoneService {
   boolean hasIndexedZones();
 
   /** All zones across all registered data sources. Used by the debug map layer. */
-  Set<GeofencingZone> allZones();
+  Set<GeofencingZone> listZones();
 }

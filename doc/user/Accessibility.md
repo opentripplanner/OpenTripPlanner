@@ -2,16 +2,16 @@
 
 ## Preamble
 
-In this document and in OTP, the term "accessibility" is used with its most common 
-meaning: design of products, devices, services, vehicles, or environments to ensure they are usable by 
-people with disabilities. If you have reached this page looking for cumulative opportunities 
-accessibility indicators (access to opportunities metrics) please see the [Analysis](Analysis.md) page.
+In this document and in OTP, the term "accessibility" is used with its most common meaning: design
+of products, devices, services, vehicles, or environments to ensure they are usable by people with
+disabilities. If you have reached this page looking for cumulative opportunities accessibility
+indicators (access to opportunities metrics) please see the [Analysis](Analysis.md) page.
 
 While accessibility is a complex subject, at this point GTFS and Netex mostly represent it very
-simply as a yes/no possibility of wheelchair use. While OTP developers hope to broaden the
-scope and nuance of accessibility support in OTP, the lack of detailed data from data producers
-currently limits implementation and discussion in this document to this binary
-"wheelchair accessible" definition.
+simply as a yes/no possibility of wheelchair use. While OTP developers hope to broaden the scope and
+nuance of accessibility support in OTP, the lack of detailed data from data producers currently
+limits implementation and discussion in this document to this binary "wheelchair accessible"
+definition.
 
 ## Unknown data
 
@@ -55,7 +55,7 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 The parameters for `stop`, `trip` and `elevator` mean the following:
 
 | name                     |                                                                                                | default |
-|--------------------------|------------------------------------------------------------------------------------------------|---------|
+| ------------------------ | ---------------------------------------------------------------------------------------------- | ------- |
 | `onlyConsiderAccessible` | Whether to exclude unknown accessibility and inaccessible stops/trips/elevators in the search. | `true`  |
 | `unknownCost`            | The cost to add if an entity has unknown wheelchair accessibility                              | 600     |
 | `inaccessibleCost`       | The cost to add if an entity is known to be inaccessible                                       | 3600    |
@@ -73,9 +73,8 @@ Other parameters are:
 - `slopeExceededReluctance`: how steep should the cost increase when you exceed the maximum slope.
   By default, every percent over the limit doubles the cost of the traversal, so if the regular cost
   is 100, being 1 percent over the limit will lead to a cost of 200, 2 percent over will lead to 400
-  and so on.
-  If you want an even steeper increase then set a value higher than 1. If you want it shallower use
-  a value between 0 and 1. To disable the penalty set a value below 0. default: 1
+  and so on. If you want an even steeper increase then set a value higher than 1. If you want it
+  shallower use a value between 0 and 1. To disable the penalty set a value below 0. default: 1
 - `stairsReluctance`: how much should a wheelchair user avoid stairs. This should be quite high so
   that they are used only as a last resort. default: 25
 
@@ -108,5 +107,5 @@ inaccessible to wheelchair users.
 
 ## Example
 
-A full configuration example is available
-at [`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/doc/user/examples/ibi)
+A full configuration example is available at
+[`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/doc/user/examples/ibi)

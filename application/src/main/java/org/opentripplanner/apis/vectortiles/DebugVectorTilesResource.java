@@ -6,6 +6,7 @@ import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZon
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GroupStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Rental;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Transfers;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
@@ -41,6 +42,7 @@ import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuild
 import org.opentripplanner.inspector.vector.rental.RentalLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.GroupStopLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
+import org.opentripplanner.inspector.vector.transfers.TransfersLayerBuilder;
 import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -62,6 +64,7 @@ public class DebugVectorTilesResource {
   private static final LayerParams EDGES = new LayerParams("edges", Edge);
   private static final LayerParams VERTICES = new LayerParams("vertices", Vertex);
   private static final LayerParams RENTAL = new LayerParams("rental", Rental);
+  private static final LayerParams TRANSFERS = new LayerParams("transfers", Transfers);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
@@ -69,7 +72,8 @@ public class DebugVectorTilesResource {
     GEOFENCING_ZONES,
     EDGES,
     VERTICES,
-    RENTAL
+    RENTAL,
+    TRANSFERS
   );
   public static final String PATH = "/otp/debug/vectortiles/";
 
@@ -135,6 +139,7 @@ public class DebugVectorTilesResource {
       tileJsonUrl(base, List.of(GEOFENCING_ZONES))
     );
     var rentalSource = new VectorSource("rental", tileJsonUrl(base, List.of(RENTAL)));
+    var transferSource = new VectorSource("transfers", tileJsonUrl(base, List.of(TRANSFERS)));
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
@@ -144,6 +149,7 @@ public class DebugVectorTilesResource {
       VERTICES.toVectorSourceLayer(streetSource),
       GEOFENCING_ZONES.toVectorSourceLayer(geofencingSource),
       RENTAL.toVectorSourceLayer(rentalSource),
+      TRANSFERS.toVectorSourceLayer(transferSource),
       serverContext.debugUiConfig().additionalBackgroundLayers()
     );
   }
@@ -195,6 +201,11 @@ public class DebugVectorTilesResource {
       );
       case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
       case Rental -> new RentalLayerBuilder(context.vehicleRentalService(), layerParameters);
+      case Transfers -> new TransfersLayerBuilder(
+        context.transitService(),
+        context.transferService(),
+        layerParameters
+      );
     };
   }
 }

@@ -7,12 +7,12 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 public class CanceledTripTest implements RealtimeTestConstants {
 

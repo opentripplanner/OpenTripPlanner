@@ -29,6 +29,7 @@ import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
@@ -45,7 +46,6 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRental
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureSXUpdaterConfig;
 import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;

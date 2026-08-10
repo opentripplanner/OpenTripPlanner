@@ -26,7 +26,7 @@ public class RentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope env) {
+  protected List<Geometry> findGeometries(Envelope env) {
     return service
       .getVehicleRentalPlacesForEnvelope(env)
       .stream()

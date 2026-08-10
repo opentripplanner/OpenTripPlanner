@@ -31,14 +31,14 @@ jobs:
     steps:
       # this is necessary so that the correct credentials are put into the git configuration
       # when we push to dev-2.x and push the compiled output to the git repo
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
           fetch-depth: 0
 
       # for a simple PR where we don't push, we don't need any credentials
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
 
       - uses: actions/setup-node@v6

@@ -2,7 +2,6 @@ package org.opentripplanner.street.search.state;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
@@ -12,8 +11,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
@@ -25,7 +22,6 @@ import org.slf4j.LoggerFactory;
  */
 public class StateEditor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StateEditor.class);
   private final StreetSearchRequest request;
   private final State backState;
   private final Edge backEdge;
@@ -97,25 +93,19 @@ public class StateEditor {
     }
   }
 
-  /* PUBLIC METHODS */
-
   /**
-   *
-   * Why can a state editor only be used once? If you modify some component of state with and
-   * editor, use the editor to create a new state, and then make more modifications, these
-   * modifications will be applied to the previously created state. Reusing the state editor to make
-   * several states would modify an existing state somewhere earlier in the search, messing up the
-   * shortest path tree.
+   * Builds a new state from the current state editor.
    */
-  @Nullable
   public State makeState() {
     if (backState != null) {
       // check that time changes are coherent with edge traversal
       // direction
       double timeDelta = time_ms - backState.getTimeMilliseconds();
       if (traversingBackward ? (timeDelta > 0) : (timeDelta < 0)) {
-        LOG.trace("Time was incremented the wrong direction during state editing. {}", backEdge);
-        return null;
+        throw new IllegalStateException(
+          "Time was incremented the wrong direction during state editing, while traversing " +
+            backEdge
+        );
       }
     }
     return new State(
@@ -141,8 +131,6 @@ public class StateEditor {
   public String toString() {
     return "StateEditor{" + backState + "}";
   }
-
-  /* PUBLIC METHODS TO MODIFY A STATE BEFORE IT IS USED */
 
   /* Incrementors */
 
@@ -188,8 +176,6 @@ public class StateEditor {
     }
     this.traversalDistance_m += length;
   }
-
-  /* Basic Setters */
 
   public void resetEnteredNoThroughTrafficArea() {
     if (!stateData.enteredNoThroughTrafficArea) {
@@ -437,13 +423,9 @@ public class StateEditor {
     this.time_ms = 1000 * seconds;
   }
 
-  /* PUBLIC GETTER METHODS */
-
   public State getBackState() {
     return backState;
   }
-
-  /* PRIVATE METHODS */
 
   /**
    * To be called before modifying anything in the child's StateData. Makes sure that changes are

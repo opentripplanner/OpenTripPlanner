@@ -48,10 +48,10 @@ class ScooterPreferencesMapperTest {
     var preferences = ScooterPreferences.of();
     var callWith = TestDataFetcherDecorator.of(
       "scooterPreferences",
-      Map.of("optimisationMethod", VehicleRoutingOptimizeType.SAFEST_STREETS)
+      Map.of("optimisationMethod", VehicleRoutingOptimizeType.SAFE_STREETS)
     );
     mapScooterPreferences(preferences, callWith);
-    assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, preferences.build().optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, preferences.build().optimizeType());
   }
 
   @Test

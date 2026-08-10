@@ -24,6 +24,7 @@ public class TripOnServiceDateRequest {
   private final FilterValues<LocalDateRange> includeServiceDateRanges;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
+  private final FilterValues<FeedScopedId> includePatterns;
   private final FilterValues<FeedScopedId> includeServiceJourneys;
   private final FilterValues<FeedScopedId> includeReplacementFor;
   private final FilterValues<String> includeNetexInternalPlanningCodes;
@@ -35,6 +36,7 @@ public class TripOnServiceDateRequest {
     FilterValues<LocalDateRange> includeServiceDateRanges,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
+    FilterValues<FeedScopedId> includePatterns,
     FilterValues<FeedScopedId> includeServiceJourneys,
     FilterValues<FeedScopedId> includeReplacementFor,
     FilterValues<String> includeNetexInternalPlanningCodes,
@@ -45,6 +47,7 @@ public class TripOnServiceDateRequest {
     this.includeServiceDateRanges = includeServiceDateRanges;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
+    this.includePatterns = includePatterns;
     this.includeServiceJourneys = includeServiceJourneys;
     this.includeReplacementFor = includeReplacementFor;
     this.includeNetexInternalPlanningCodes = includeNetexInternalPlanningCodes;
@@ -62,6 +65,10 @@ public class TripOnServiceDateRequest {
 
   public FilterValues<FeedScopedId> includeRoutes() {
     return includeRoutes;
+  }
+
+  public FilterValues<FeedScopedId> includePatterns() {
+    return includePatterns;
   }
 
   public FilterValues<FeedScopedId> includeServiceJourneys() {

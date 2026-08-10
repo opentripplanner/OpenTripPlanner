@@ -16,9 +16,8 @@ import formats (yet to be standarized).
   `avg_passenger_count`.
 - The _Trip format_ provided by Entur decorates each trip hop. The plan is to expand this to include
   service date. This allows the emission provider to calculate acurate data down to each trip
-  departure (except departures operated by more than one vehicle). The input parameters are 
+  departure (except departures operated by more than one vehicle). The input parameters are
   `trip_id`, `from_stop_id`, `from_stop_sequence` and `co2`.
- 
 
 ### Emission input data files
 
@@ -42,7 +41,7 @@ The emissions are represented in grams per kilometer (g/Km) unit.
 Emission file has the following columns:
 
 | CSV Header                   | Description                                                                                   |
-| :--------------------------- |:----------------------------------------------------------------------------------------------|
+| :--------------------------- | :-------------------------------------------------------------------------------------------- |
 | `route_id`                   | Route id                                                                                      |
 | `avg_co2_per_vehicle_per_km` | Average carbon dioxide equivalent value for the vehicles used on the route at grams/Km units. |
 | `avg_passenger_count`        | Average passenger count for the vehicles on the route.                                        |
@@ -57,18 +56,19 @@ route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
 ```
 
 ### Emission trip hop format input data files
+
 (by the Entur team)
 
 The emissions are represented in grams per kilometer (g/Km) unit.
 
 Emission file has the following columns:
 
-| CSV Header                 | Description                                                                                                                                                                                                                                  |
-|:---------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `trip_id`                  | The GTFS trip id or the NeTEx ServiceJourney id                                                                                                                                                                                              |
-| `from_stop_id`             | The GTFS stop id or the NeTEx Quay id. This is use together with the `from_stop_sequence` to match the stop. If the emissions data does not match the given transit feed, then the row is dropped and an issue is added to the build report. |
-| `from_stop_sequence`       | The boarding stop sequence number in the trip stop pattern. The first stop is number one(1), not zero(0).                                                                                                                                    |
-| `co2`                      | Average carbon dioxide equivalent value for the vehicles used on given trip hop starting at the given stop. The unit is grams per person per hop.                                                                                            |
+| CSV Header           | Description                                                                                                                                                                                                                                  |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `trip_id`            | The GTFS trip id or the NeTEx ServiceJourney id                                                                                                                                                                                              |
+| `from_stop_id`       | The GTFS stop id or the NeTEx Quay id. This is use together with the `from_stop_sequence` to match the stop. If the emissions data does not match the given transit feed, then the row is dropped and an issue is added to the build report. |
+| `from_stop_sequence` | The boarding stop sequence number in the trip stop pattern. The first stop is number one(1), not zero(0).                                                                                                                                    |
+| `co2`                | Average carbon dioxide equivalent value for the vehicles used on given trip hop starting at the given stop. The unit is grams per person per hop.                                                                                            |
 
 For example:
 
@@ -79,11 +79,10 @@ Trip:3,Stop:A,2,130.483
 Trip:3,Stop:A,3,172.646
 ```
 
-
 ### Configuration
 
-To enable this functionality, you need to enable the "Emission" feature in the
-`otp-config.json` file.
+To enable this functionality, you need to enable the "Emission" feature in the `otp-config.json`
+file.
 
 ```JSON
 //otp-config.json
@@ -93,10 +92,10 @@ To enable this functionality, you need to enable the "Emission" feature in the
 
 ```
 
-Include the `emission` object in the
-`build-config.json` file. The `emission` object should contain parameters called
-`carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car in g/km and
-the `carAvgOccupancy` provides the average number of passengers in a car.
+Include the `emission` object in the `build-config.json` file. The `emission` object should contain
+parameters called `carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average
+emissions value for a car in g/km and the `carAvgOccupancy` provides the average number of
+passengers in a car.
 
 <!-- config BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -147,7 +146,7 @@ List of emission feeds.
 
 ### OTP 2.5
 
-- Initial implementation of the emissions calculation. Support for the route input data format by 
+- Initial implementation of the emissions calculation. Support for the route input data format by
   Digitransit.
 
 ### OTP 2.8

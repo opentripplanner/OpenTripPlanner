@@ -23,14 +23,16 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class _RouteRequestTestContext {
 
@@ -57,9 +59,9 @@ class _RouteRequestTestContext {
     this.locale = locale;
 
     Graph graph = new Graph();
-    var timetableRepository = new TimetableRepository();
-    timetableRepository.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
+    var transitRepository = new TransitRepository();
+    transitRepository.initTimeZone(ZoneIds.BERLIN);
+    final DefaultTransitService transitService = new DefaultTransitService(transitRepository);
     var transferService = TransferServiceTestFactory.defaultTransferService();
     var routeRequest = RouteRequest.defaultValue();
     var vertexLinker = VertexLinkerTestFactory.of(graph);
@@ -80,7 +82,10 @@ class _RouteRequestTestContext {
       new DefaultFareService(),
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
-      new DefaultRealtimeVehicleService(transitService),
+      new DefaultRealtimeVehicleService(
+        new RealtimeVehicleRepositoryLifecycle().freeze(new DefaultRealtimeVehicleRepository()),
+        transitService
+      ),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       new StreetNearbyPlaceFinder(linkingContextFactory),
       StreetNearbyStopFinder.of(linkingContextFactory).build(),

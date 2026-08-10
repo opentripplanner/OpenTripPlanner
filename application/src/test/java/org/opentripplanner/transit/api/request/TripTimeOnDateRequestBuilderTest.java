@@ -3,14 +3,18 @@ package org.opentripplanner.transit.api.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
@@ -19,7 +23,7 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 
 class TripTimeOnDateRequestBuilderTest {
 
-  private static final RegularStop STOP = TimetableRepositoryForTest.of().stop("1").build();
+  private static final RegularStop STOP = TransitRepositoryForTest.of().stop("1").build();
   private static final Instant TIME = Instant.parse("2025-03-02T10:00:00Z");
 
   @Test
@@ -30,7 +34,7 @@ class TripTimeOnDateRequestBuilderTest {
     assertEquals(Duration.ofHours(2), request.timeWindow());
     assertEquals(ArrivalDeparture.BOTH, request.arrivalDeparture());
     assertEquals(10, request.numberOfDepartures());
-    assertFalse(request.includeCancelledTrips());
+    assertEquals(CancellationPolicy.NO_CANCELLATIONS, request.cancellationPolicy());
     assertTrue(request.includeAgencies().includeEverything());
     assertTrue(request.includeRoutes().includeEverything());
     assertTrue(request.excludeAgencies().includeEverything());
@@ -73,13 +77,41 @@ class TripTimeOnDateRequestBuilderTest {
   }
 
   @Test
-  void withIncludeCancelledTrips() {
+  void withCancellationPolicy() {
     var request = TripTimeOnDateRequest.of(List.of(STOP))
       .withTime(TIME)
-      .withIncludeCancelledTrips(true)
+      .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)
       .build();
 
-    assertTrue(request.includeCancelledTrips());
+    assertEquals(CancellationPolicy.ONLY_CANCELLATIONS, request.cancellationPolicy());
+  }
+
+  @Test
+  void withServiceDateRanges() {
+    var range = LocalDateRange.ofExclusiveEnd(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 5));
+    var request = TripTimeOnDateRequest.of(List.of(STOP))
+      .withServiceDateRanges(List.of(range))
+      .build();
+
+    assertEquals(List.of(range), request.serviceDateRanges());
+    assertNull(request.time());
+  }
+
+  @Test
+  void requiresExactlyOneTimeLimitation() {
+    // Neither time nor service date ranges set
+    assertThrows(IllegalArgumentException.class, () ->
+      TripTimeOnDateRequest.of(List.of(STOP)).build()
+    );
+
+    // Both time and service date ranges set
+    var range = LocalDateRange.ofExclusiveEnd(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 5));
+    assertThrows(IllegalArgumentException.class, () ->
+      TripTimeOnDateRequest.of(List.of(STOP))
+        .withTime(TIME)
+        .withServiceDateRanges(List.of(range))
+        .build()
+    );
   }
 
   @Test

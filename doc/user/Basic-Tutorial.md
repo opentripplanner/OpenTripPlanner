@@ -7,25 +7,25 @@ take a few minutes!
 
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of
 the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 25 or later. We
-recommend running on Java 25 rather than a later version, as it is a long-term support release.
-Run `java -version` to check that you have version 25 or newer of the JVM installed. If you do not,
-you will need to install a recent OpenJDK or Oracle Java package for your operating system.
+recommend running on Java 25 rather than a later version, as it is a long-term support release. Run
+`java -version` to check that you have version 25 or newer of the JVM installed. If you do not, you
+will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 ## Get OTP
 
 OpenTripPlanner is written in Java and distributed as a single runnable JAR file. This is a "shaded"
 JAR containing all other libraries needed for OTP to work, and is available from the Maven Central
-repository. You will be able to go
-to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
-navigate to
-the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/),
-and download
-the [file with `otp-shaded` artifactId](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1.jar)
+repository. You will be able to go to
+[the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
+navigate to the
+[directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/), and
+download the
+[file with `otp-shaded` artifactId](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1.jar)
 .
 
-You may also want to get your own copy of the OTP source code
-and [build a bleeding edge development JAR from scratch](Getting-OTP.md), especially if you plan to
-do some development yourself. In that case, check out the branch `dev-2.x`.
+You may also want to get your own copy of the OTP source code and
+[build a bleeding edge development JAR from scratch](Getting-OTP.md), especially if you plan to do
+some development yourself. In that case, check out the branch `dev-2.x`.
 
 ## Get some data
 
@@ -33,19 +33,19 @@ do some development yourself. In that case, check out the branch `dev-2.x`.
 
 First you'll need GTFS data to build a transit network. There's an excellent description of the GTFS
 format [here](http://gtfs.org/). Transport agencies throughout the world provide GTFS schedules to
-the public. Transitland has a
-[registry of feeds](https://transit.land/feed-registry) and [TransitFeeds](http://transitfeeds.com/)
-also provides an extensive catalog. The best option is often to simply fetch the data directly from
-a transit operator or agency. If you know of a feed you want to work with, download it and put it in
-an empty directory you have created for your OTP instance such as `/home/username/otp` on
-Linux, `/Users/username/otp` on MacOS, or `C:\Users\username\otp` on Windows. For OTP2 to detect a
-GTFS file, **its name must end in `.zip` and must contain the letters 'gtfs'**. We often use the
-convention of saving GTFS files with names ending in `.gtfs.zip` which meets both these criteria,
-reflecting the fact that a GTFS feed is just a ZIP file containing a specific set of files. If you
-don't have a particular feed in mind, the one for Portland, Oregon's TriMet agency is a good option.
-It is available at [this URL](http://developer.trimet.org/schedule/gtfs.zip). This is a
-moderate-sized input of good quality (TriMet initiated OTP development and helped develop the GTFS
-format). On Linux, this could be done on the command line as follows:
+the public. Transitland has a [registry of feeds](https://transit.land/feed-registry) and
+[TransitFeeds](http://transitfeeds.com/) also provides an extensive catalog. The best option is
+often to simply fetch the data directly from a transit operator or agency. If you know of a feed you
+want to work with, download it and put it in an empty directory you have created for your OTP
+instance such as `/home/username/otp` on Linux, `/Users/username/otp` on MacOS, or
+`C:\Users\username\otp` on Windows. For OTP2 to detect a GTFS file, **its name must end in `.zip`
+and must contain the letters 'gtfs'**. We often use the convention of saving GTFS files with names
+ending in `.gtfs.zip` which meets both these criteria, reflecting the fact that a GTFS feed is just
+a ZIP file containing a specific set of files. If you don't have a particular feed in mind, the one
+for Portland, Oregon's TriMet agency is a good option. It is available at
+[this URL](http://developer.trimet.org/schedule/gtfs.zip). This is a moderate-sized input of good
+quality (TriMet initiated OTP development and helped develop the GTFS format). On Linux, this could
+be done on the command line as follows:
 
     $ cd /home/username
     $ mkdir otp
@@ -54,28 +54,28 @@ format). On Linux, this could be done on the command line as follows:
 
 ### OSM for Streets
 
-You'll also need OpenStreetMap data to build a road network for walking, cycling, and
-driving. [OpenStreetMap](https://www.openstreetmap.org/) is a global collaborative map database that
-rivals or surpasses the quality of commercial maps in many locations. Several services extract
-smaller geographic regions from this database. Interline Technologies maintains a collection
-of [extracts updated daily for urban areas around the world](https://www.interline.io/osm/extracts/)
-. [Geofabrik](http://download.geofabrik.de/) provides extracts for larger areas like countries or
-states, from which you can prepare your own smaller bounding-box extracts
-using [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis#Extracting_bounding_boxes)
-, [osmconvert](http://wiki.openstreetmap.org/wiki/Osmconvert#Applying_Geographical_Borders), or (our
+You'll also need OpenStreetMap data to build a road network for walking, cycling, and driving.
+[OpenStreetMap](https://www.openstreetmap.org/) is a global collaborative map database that rivals
+or surpasses the quality of commercial maps in many locations. Several services extract smaller
+geographic regions from this database. Interline Technologies maintains a collection of
+[extracts updated daily for urban areas around the world](https://www.interline.io/osm/extracts/) .
+[Geofabrik](http://download.geofabrik.de/) provides extracts for larger areas like countries or
+states, from which you can prepare your own smaller bounding-box extracts using
+[Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis#Extracting_bounding_boxes) ,
+[osmconvert](http://wiki.openstreetmap.org/wiki/Osmconvert#Applying_Geographical_Borders), or (our
 favorite) [Osmium-Tool](https://osmcode.org/osmium-tool/manual.html#creating-geographic-extracts).
-There is also [Protomaps](https://app.protomaps.com/) which can create custom extracts 
-for any region of the world with an easy to use drag and drop interface.
-OSM data can be delivered as XML or in the more compact binary PBF format. OpenTripPlanner consumes
-only PBF because it's smaller and more efficient.
+There is also [Protomaps](https://app.protomaps.com/) which can create custom extracts for any
+region of the world with an easy to use drag and drop interface. OSM data can be delivered as XML or
+in the more compact binary PBF format. OpenTripPlanner consumes only PBF because it's smaller and
+more efficient.
 
 Download OSM PBF data for the same geographic region as your GTFS feed, and place this PBF file in
 the same directory you created for the OSM data. If you are using the TriMet GTFS feed, you could
-download
-the [Geofabrik extract for the US state of Oregon](http://download.geofabrik.de/north-america/us/oregon.html)
-, then further trim that to just
-the [TriMet service area](https://trimet.org/pdfs/taxinfo/trimetdistrictboundary.pdf) using the
-bounding box switch of one of the above tools. On Linux or MacOS you could do that as follows:
+download the
+[Geofabrik extract for the US state of Oregon](http://download.geofabrik.de/north-america/us/oregon.html)
+, then further trim that to just the
+[TriMet service area](https://trimet.org/pdfs/taxinfo/trimetdistrictboundary.pdf) using the bounding
+box switch of one of the above tools. On Linux or MacOS you could do that as follows:
 
     $ cd /home/username
     $ wget http://download.geofabrik.de/north-america/us/oregon-latest.osm.pbf
@@ -89,9 +89,9 @@ outside your bounding box.
 
 If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not
 the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both
-the original file and the extract in a later step. See
-the [page on preparing OSM data](Preparing-OSM.md) for additional information and example commands
-for cropping and filtering OSM data.
+the original file and the extract in a later step. See the
+[page on preparing OSM data](Preparing-OSM.md) for additional information and example commands for
+cropping and filtering OSM data.
 
 ## Starting OTP
 
@@ -100,19 +100,19 @@ A typical command to start OTP looks like `java -Xmx2G -jar otp-shaded-VERSION.j
 are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when
 working with the Portland TriMet data set, and several gigabytes for larger inputs.
 [Here is more information about the system requirements](System-Requirements.md). If you have
-sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses
-a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach
+sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses a
+[garbage collection](<https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)>) approach
 to memory management, which requires some "breathing room" to efficiently operate. Without
 sufficient free memory OTP can grind to a halt. [VisualVM](https://visualvm.github.io) is a good way
-to inspect Java memory usage, especially with
-the [VisualGC plugin](https://visualvm.github.io/plugins.html).
+to inspect Java memory usage, especially with the
+[VisualGC plugin](https://visualvm.github.io/plugins.html).
 
 ## Building Graphs
 
 There are two main phases to preparing and deploying an OTP server. The first is to analyze the
 GTFS, OSM and any other inputs (such as elevation data) and build a representation of the
-transportation network. Following mathematical terminology we call this
-a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29), and refer to this phase as "graph
+transportation network. Following mathematical terminology we call this a
+['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29), and refer to this phase as "graph
 building". The second phase is to start a server that provides trip planning and other API services
 for this graph.
 
@@ -143,9 +143,7 @@ This map-based user interface is in fact sending HTTP GET requests to the OTP se
 local machine. It can be informative to watch the HTTP requests and responses being generated using
 the developer tools in your web browser. OTP's built-in web server will run by default on port 8080.
 If by any chance some other software is already using that port number, you can specify a different
-port number with a switch
-`--port 8801`.
-
+port number with a switch `--port 8801`.
 
 ## Saving a Graph
 
@@ -195,13 +193,14 @@ they control which actions are taken when OTP starts up.
 
 ![Command-Line-Parameter-Flow](images/cli-flow.svg)
 
-You must use at least one of the required parameters: `--load`, `--loadStreet`, `--build`
-, `--buildStreet`. A _required_ parameter may imply other parameters when the flow allows for no
-other choice. For example, `--load` implies `--serve`, so `--serve` is not necessary and has no
-additional effect when used together with `--load`.
+You must use at least one of the required parameters: `--load`, `--loadStreet`, `--build` ,
+`--buildStreet`. A _required_ parameter may imply other parameters when the flow allows for no other
+choice. For example, `--load` implies `--serve`, so `--serve` is not necessary and has no additional
+effect when used together with `--load`.
 
 You can run the OTP .jar file with the `--help` option for a full list of command line parameters.
 
 ## Exploring the API
 
-If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](apis/GraphQL-Tutorial.md).
+If you want to learn how to use OTP's API's, check out the
+[GraphQL tutorial](apis/GraphQL-Tutorial.md).

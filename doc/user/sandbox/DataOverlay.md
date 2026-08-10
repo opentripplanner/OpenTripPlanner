@@ -43,41 +43,39 @@ Please see the configuration part for setup instructions and examples.
 
 ### Configuration
 
-Enable the feature by including it to the ```otp-config.json```:
+Enable the feature by including it to the `otp-config.json`:
 
 ```json
 // otp-config.json
-{ "otpFeatures": { "DataOverlay" : true } }
+{ "otpFeatures": { "DataOverlay": true } }
 ```
 
 Plugin configuration should explain the NetCDF data file and request parameters that use the data
 file.
 
-* _fileName_ points to the data file
-* _latitudeVariable_, _longitudeVariable_ and _timeVariable_ should be equal to the corresponding
+- _fileName_ points to the data file
+- _latitudeVariable_, _longitudeVariable_ and _timeVariable_ should be equal to the corresponding
   variable names of the data file
-* _timeFormat_ options: MS_EPOCH, SECONDS, HOURS
-* _indexVariables_ contain a list of variables of data file that will affect the routing.
-    * _name_ can have any value and exists to act as a reference for _requestPatameters_ (see below)
-    * _displayName_ is a variable name in human-readable form that should make it more
-      understandable
-    * _variable_ is the actual name of the variable from data file
-* _requestParameters_ contains the list of REST request parameters that affects the cost
+- _timeFormat_ options: MS_EPOCH, SECONDS, HOURS
+- _indexVariables_ contain a list of variables of data file that will affect the routing.
+  - _name_ can have any value and exists to act as a reference for _requestPatameters_ (see below)
+  - _displayName_ is a variable name in human-readable form that should make it more understandable
+  - _variable_ is the actual name of the variable from data file
+- _requestParameters_ contains the list of REST request parameters that affects the cost
   calculation.
-    * _name_ should be chosen from the list of enums:
-      org.opentripplanner.ext.dataoverlay.api.ParameterName
-    * _variable_ should correspond to the _name_ of one of the entries from _indexVariables_ list
-      and explain which data field this parameter corresponds to
-    * _formula_ should use the keywords VALUE and THRESHOLD and describe the way the penalty is
-      calculated. Note: if the result of the formula is negative it is ignored.
+  - _name_ should be chosen from the list of enums:
+    org.opentripplanner.ext.dataoverlay.api.ParameterName
+  - _variable_ should correspond to the _name_ of one of the entries from _indexVariables_ list and
+    explain which data field this parameter corresponds to
+  - _formula_ should use the keywords VALUE and THRESHOLD and describe the way the penalty is
+    calculated. Note: if the result of the formula is negative it is ignored.
 
 Example of build-config.json that includes the dataOverlay plugin configuration:
 
 ```json
 // build-config.json
 {
-  "dataOverlay" :
-  {
+  "dataOverlay": {
     "fileName": "graphs/data-file.nc4",
     "latitudeVariable": "lat",
     "longitudeVariable": "lon",
@@ -108,7 +106,6 @@ Example of build-config.json that includes the dataOverlay plugin configuration:
       }
     ]
   }
-
 }
 ```
 
@@ -120,9 +117,9 @@ from router-config are ignored.
 // router-config.json
 {
   "routingDefaults": {
-    "dataOverlay" : {
-      "particulate_matter_10_threshold" : 100,
-      "particulate_matter_10_penalty" : 19
+    "dataOverlay": {
+      "particulate_matter_10_threshold": 100,
+      "particulate_matter_10_penalty": 19
     }
   }
 }

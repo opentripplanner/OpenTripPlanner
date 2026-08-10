@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateInterval;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -69,7 +69,7 @@ public class CalendarServiceBuilder {
   public ServiceCalendar createEmptyCalendar() {
     ServiceCalendar emptyCalendar = new ServiceCalendar();
     emptyCalendar.setServiceId(EMPTY_SERVICE_ID);
-    emptyCalendar.setPeriod(LocalDateInterval.unbounded());
+    emptyCalendar.setPeriod(LocalDateRange.ofUnbounded());
     return emptyCalendar;
   }
 

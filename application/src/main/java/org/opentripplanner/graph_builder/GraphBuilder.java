@@ -32,7 +32,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class GraphBuilder implements Runnable {
 
   private final Queue<GraphBuilderModule> graphBuilderModules = new LinkedList<>();
   private final Graph graph;
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
   private final DeduplicatorService deduplicator;
@@ -59,14 +59,14 @@ public class GraphBuilder implements Runnable {
   public GraphBuilder(
     Graph baseGraph,
     DeduplicatorService deduplicator,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     Closeable closeDataSourcesHandle,
     GraphBuildCacheManager cacheManager
   ) {
     this.graph = baseGraph;
     this.deduplicator = deduplicator;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.issueStore = issueStore;
     this.closeDataSourcesHandle = closeDataSourcesHandle;
     this.cacheManager = cacheManager;
@@ -84,7 +84,7 @@ public class GraphBuilder implements Runnable {
     StreetDetailsRepository streetDetailsRepository,
     FareServiceFactory fareServiceFactory,
     StreetRepository streetRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
@@ -99,7 +99,7 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    timetableRepository.initTimeZone(config.transitModelTimeZone);
+    transitRepository.initTimeZone(config.transitModelTimeZone);
 
     GraphBuilderFactory.Builder builder = DaggerGraphBuilderFactory.builder();
     builder
@@ -108,7 +108,7 @@ public class GraphBuilder implements Runnable {
       .osmInfoGraphBuildRepository(osmInfoGraphBuildRepository)
       .streetDetailsRepository(streetDetailsRepository)
       .streetRepository(streetRepository)
-      .timetableRepository(timetableRepository)
+      .transitRepository(transitRepository)
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
@@ -117,7 +117,7 @@ public class GraphBuilder implements Runnable {
       .empiricalDelayRepository(empiricalDelayRepository)
       .fareServiceFactory(fareServiceFactory)
       .dataSources(dataSources)
-      .timeZoneId(timetableRepository.getTimeZone());
+      .timeZoneId(transitRepository.getTimeZone());
 
     var factory = builder.build();
 
@@ -143,7 +143,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.tripPatternNamer());
       graphBuilder.addModuleOptional(
         factory.timeZoneAdjusterModule(),
-        timetableRepository.getAgencyTimeZones().size() > 1
+        transitRepository.getAgencyTimeZones().size() > 1
       );
 
       if (hasOsm || graphBuilder.graph.hasStreets) {
@@ -229,7 +229,7 @@ public class GraphBuilder implements Runnable {
       new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
       // Log before we validate, this way we have more information if the validation fails
-      logGraphBuilderCompleteStatus(startTime, graph, timetableRepository, deduplicator);
+      logGraphBuilderCompleteStatus(startTime, graph, transitRepository, deduplicator);
 
       validate();
     } finally {
@@ -275,7 +275,7 @@ public class GraphBuilder implements Runnable {
    * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !timetableRepository.hasTransit()) {
+    if (hasTransitData() && !transitRepository.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit service period. " +
           "There is something wrong with your data - see the log above. Another possibility is that the " +
@@ -295,16 +295,16 @@ public class GraphBuilder implements Runnable {
   private static void logGraphBuilderCompleteStatus(
     long startTime,
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DeduplicatorService deduplicator
   ) {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
-    var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
+    var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
+    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
     var nTransfers = f.formatNumber(
-      timetableRepository.getConstrainedTransferService().listAll().size()
+      transitRepository.getConstrainedTransferService().listAll().size()
     );
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());

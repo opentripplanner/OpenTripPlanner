@@ -6,8 +6,8 @@
 
 ## Terminology
 
-**Main/core**   -- All OTP code and additional files, NOT part of the sandbox.
-(`docs`, `src/main`, `src/test` and so on)
+**Main/core** -- All OTP code and additional files, NOT part of the sandbox. (`docs`, `src/main`,
+`src/test` and so on)
 
 **Extensions** -- All features implemented in the OTP Sandbox, provided with no guarantees.
 (`src/ext`, `src/ext-test`)
@@ -19,8 +19,8 @@
 - Encourage refactoring and creation of extension points in the main code.
 - Increase visibility and cooperation of development of new features.
 - Feature toggle
-    - Sandbox features should use the _OTPFeature_ to enable the code. Sandbox features are by
-      default off. To toggle features on/off se the [configuration documentation](Configuration.md).
+  - Sandbox features should use the _OTPFeature_ to enable the code. Sandbox features are by default
+    off. To toggle features on/off se the [configuration documentation](Configuration.md).
 
 ## Contract
 
@@ -31,10 +31,10 @@
 - To integrate the new feature into OTP you may have to create new extension points in the main/core
   code. Changes to the core OTP are subject to normal a review process.
 - Create a readme file (`doc/user/sandbox/<Extension Name>.md` package including:
-    - Extension Name
-    - Contact info
-    - Change log
-    - Documentation of the feature (optional)
+  - Extension Name
+  - Contact info
+  - Change log
+  - Documentation of the feature (optional)
 - List your extension in the [Available extensions](#Available extensions) section and in the
   [mkdocs config file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/mkdocs.yml).
 - Use feature toggling to enable a feature at runtime. The feature must be disabled by default. A
@@ -51,9 +51,9 @@
   author will in fact need to provide support and maintenance.
 - When someone at a later point in time want to change the main code the only thing they are
   responsible for - with regard to the extension code - is:
-    - that it compiles.
-    - that the unit tests run. If a test is not easy to fix, it can be tagged with @Ignore. If
-      ignored it would be polite to notify the author.
+  - that it compiles.
+  - that the unit tests run. If a test is not easy to fix, it can be tagged with @Ignore. If ignored
+    it would be polite to notify the author.
 - Changes to the main OTP API that cannot be toggled _in_ must be clearly marked/tagged as part of
   an experimental feature and documented - This code is subject to review.
 - If a feature is old and not maintained it can be removed 1 month after notifying the submitter
@@ -61,5 +61,3 @@
 - Introducing new dependencies needs approval. They are NOT approved if they are likely to be a
   maintenance challenge (many transitive dependencies or potential conflicts with other
   versions/libraries).
-
-

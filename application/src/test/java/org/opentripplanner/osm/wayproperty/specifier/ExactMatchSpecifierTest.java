@@ -3,6 +3,7 @@ package org.opentripplanner.osm.wayproperty.specifier;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 
 class ExactMatchSpecifierTest extends SpecifierTest {

@@ -150,6 +150,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
     return gbfsVehicleTypes
       .stream()
       .map(vehicleTypeMapper::mapRentalVehicleType)
+      .filter(Objects::nonNull)
       .distinct()
       .collect(Collectors.toMap(v -> v.id().getId(), Function.identity()));
   }

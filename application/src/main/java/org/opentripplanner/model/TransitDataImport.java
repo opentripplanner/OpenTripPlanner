@@ -72,7 +72,7 @@ public interface TransitDataImport {
   boolean hasActiveTransit();
 
   /**
-   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint();
 }

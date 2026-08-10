@@ -39,7 +39,7 @@ class PatternByServiceDatesFilterTest {
   void invalidRange(LocalDate start, LocalDate end) {
     assertThrows(IllegalArgumentException.class, () ->
       new PatternByServiceDatesFilter(
-        new LocalDateRange(start, end),
+        LocalDateRange.ofExclusiveEnd(start, end),
         r -> List.of(),
         d -> List.of()
       )
@@ -60,7 +60,7 @@ class PatternByServiceDatesFilterTest {
   void validRange(LocalDate start, LocalDate end) {
     assertDoesNotThrow(() ->
       new PatternByServiceDatesFilter(
-        new LocalDateRange(start, end),
+        LocalDateRange.ofExclusiveEnd(start, end),
         r -> List.of(),
         d -> List.of()
       )
@@ -116,7 +116,7 @@ class PatternByServiceDatesFilterTest {
 
   private static PatternByServiceDatesFilter defaultFilter(LocalDate start, LocalDate end) {
     return new PatternByServiceDatesFilter(
-      new LocalDateRange(start, end),
+      LocalDateRange.ofExclusiveEnd(start, end),
       route -> List.of(PATTERN_1),
       trip -> List.of(parse("2024-05-01"), parse("2024-06-01"))
     );

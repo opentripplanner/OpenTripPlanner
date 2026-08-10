@@ -124,6 +124,7 @@ export function MapView({
           loading={loading}
         />
 
+        {/* eslint-disable-next-line react-hooks/refs -- RightMenu needs the map instance; re-renders from map state keep it current */}
         <RightMenu position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} mapRef={mapRef?.current} />
         {tripQueryResult?.trip.tripPatterns.length &&
           selectedTripPatternIndexes.map((index) => {

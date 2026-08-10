@@ -1,6 +1,7 @@
 package org.opentripplanner.utils.time;
 
 import java.text.ParseException;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -180,7 +181,7 @@ public class ServiceDateUtils {
   public static Optional<LocalDate> parseStringToOptional(String value) {
     try {
       return Optional.of(parseString(value));
-    } catch (ParseException e) {
+    } catch (ParseException | DateTimeException e) {
       return Optional.empty();
     }
   }

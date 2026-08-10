@@ -40,6 +40,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.LocationGroupImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LocationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.MoneyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.NodeTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.NoticeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PatternImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlaceImpl;
@@ -60,6 +61,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StairsUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StepFeatureTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopCallImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.StopCallOnTripOnServiceDateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnRouteImpl;
@@ -206,6 +208,7 @@ public class SchemaFactory {
         .type(typeWiring.build(DependentFareProductImpl.class))
         .type(typeWiring.build(TripOnServiceDateImpl.class))
         .type(typeWiring.build(StopCallImpl.class))
+        .type(typeWiring.build(StopCallOnTripOnServiceDateImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
         .type(typeWiring.build(LegTimeImpl.class))
         .type(typeWiring.build(RealTimeEstimateImpl.class))
@@ -216,6 +219,7 @@ public class SchemaFactory {
         .type(typeWiring.build(StairsUseImpl.class))
         .type(typeWiring.build(ElevatorUseImpl.class))
         .type(typeWiring.build(RiderCategoryImpl.class))
+        .type(typeWiring.build(NoticeImpl.class))
         .build();
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();

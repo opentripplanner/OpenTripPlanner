@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.service;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -15,17 +16,19 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
-import org.opentripplanner.updater.trip.GtfsRtTestHelper;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
+import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
+import org.opentripplanner.updater.trip.gtfs.TripUpdateBuilder;
 
 /**
  * This test uses the real-time test environment to establish the condition under test.
@@ -47,6 +50,10 @@ class ApiTransitServiceTest {
   private final RegularStop STOP_A = envBuilder.stop("A", b -> b.withCoordinate(60.0, 10.0));
   private final RegularStop STOP_B = envBuilder.stop("B", b -> b.withCoordinate(60.0, 10.01));
   private final RegularStop STOP_C = envBuilder.stop("C", b -> b.withCoordinate(60.0, 10.02));
+
+  private static final List<LocalDateRange> SERVICE_DATE_RANGES = List.of(
+    LocalDateRange.ofExclusiveEnd(SERVICE_DATE, SERVICE_DATE.plusDays(1))
+  );
 
   private final TripInput TRIP1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
@@ -167,6 +174,160 @@ class ApiTransitServiceTest {
       .build();
     var calls = service.findStopCalls(leg);
     assertThat(calls).isEmpty();
+  }
+
+  @Test
+  void canceledStopCalls() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    assertThat(
+      new ApiTransitService(env.transitService()).findCanceledStopCalls(
+        STOP_B,
+        SERVICE_DATE_RANGES,
+        ArrivalDeparture.BOTH
+      )
+    ).isEmpty();
+
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
+
+    var service = new ApiTransitService(env.transitService());
+    var calls = service.findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH);
+    assertThat(calls).hasSize(1);
+    var call = calls.getFirst();
+    assertEquals(TRIP_1_ID, call.stopCall().getTrip().getId().getId());
+    assertEquals(STOP_B, call.stopCall().getStop());
+    assertEquals(SERVICE_DATE, call.stopCall().getServiceDay());
+    assertEquals(TRIP_1_ID, call.tripOnServiceDate().getTrip().getId().getId());
+    assertEquals(SERVICE_DATE, call.tripOnServiceDate().getServiceDate());
+  }
+
+  @Test
+  void skippedStopVisitsAreIncluded() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    // Skip the visit at STOP_B (stop position 1) while the rest of the trip still runs
+    var update = skipSecondStop(rt.tripUpdateScheduled(TRIP_1_ID));
+    assertSuccess(rt.applyTripUpdates(List.of(update), FULL_DATASET));
+
+    var service = new ApiTransitService(env.transitService());
+
+    // The skipped visit at STOP_B is returned
+    var skippedCalls = service.findCanceledStopCalls(
+      STOP_B,
+      SERVICE_DATE_RANGES,
+      ArrivalDeparture.BOTH
+    );
+    assertThat(skippedCalls).hasSize(1);
+    var call = skippedCalls.getFirst();
+    assertEquals(TRIP_1_ID, call.stopCall().getTrip().getId().getId());
+    assertThat(call.stopCall().isCancelledStop()).isTrue();
+
+    // Stops that are not skipped and whose trip is not canceled are not returned
+    assertThat(
+      service.findCanceledStopCalls(STOP_A, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH)
+    ).isEmpty();
+  }
+
+  @Test
+  void canceledStopCallsFilteredByServiceDate() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
+
+    var service = new ApiTransitService(env.transitService());
+
+    // Range that does not include the service date returns nothing
+    var outsideRange = List.of(
+      LocalDateRange.ofExclusiveEnd(SERVICE_DATE.plusDays(1), SERVICE_DATE.plusDays(2))
+    );
+    assertThat(
+      service.findCanceledStopCalls(STOP_B, outsideRange, ArrivalDeparture.BOTH)
+    ).isEmpty();
+
+    // Range that includes the service date returns the canceled call
+    var insideRange = List.of(
+      LocalDateRange.ofExclusiveEnd(SERVICE_DATE, SERVICE_DATE.plusDays(1))
+    );
+    assertThat(service.findCanceledStopCalls(STOP_B, insideRange, ArrivalDeparture.BOTH)).hasSize(
+      1
+    );
+  }
+
+  @Test
+  void canceledStopCallsOmitNonPickups() {
+    // TRIP_3 stops at STOP_C for drop-off only (no boarding/pickup allowed).
+    var tripInput = TripInput.of("TestTrip3")
+      .addStop(STOP_A, "12:00:00", "12:00:00", PickDrop.SCHEDULED, PickDrop.SCHEDULED)
+      .addStop(STOP_C, "12:30:00", "12:30:00", PickDrop.NONE, PickDrop.SCHEDULED);
+    var env = envBuilder.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var update = rt.tripUpdate("TestTrip3", CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
+
+    var service = new ApiTransitService(env.transitService());
+
+    // The drop-off-only visit at STOP_C is returned with BOTH but omitted when only departures
+    // (pickups) are requested.
+    assertThat(
+      service.findCanceledStopCalls(STOP_C, SERVICE_DATE_RANGES, ArrivalDeparture.BOTH)
+    ).hasSize(1);
+    assertThat(
+      service.findCanceledStopCalls(STOP_C, SERVICE_DATE_RANGES, ArrivalDeparture.DEPARTURES)
+    ).isEmpty();
+  }
+
+  @Test
+  void findTripOnServiceDateSynthesizesWhenTripRuns() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+    var trip = env.tripData(TRIP_1_ID).trip();
+
+    var result = service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+
+    assertThat(result).isPresent();
+    assertEquals(trip, result.get().getTrip());
+    assertEquals(SERVICE_DATE, result.get().getServiceDate());
+    // No real TripOnServiceDate exists, so a synthetic one keyed by the trip id is returned.
+    assertEquals(trip.getId(), result.get().getId());
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsEmptyWhenTripDoesNotRunOnDate() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+
+    assertThat(
+      service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1))
+    ).isEmpty();
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsEmptyWhenTripDoesNotExist() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.transitService());
+
+    assertThat(service.findOrCreateTripOnServiceDate(id("unknown"), SERVICE_DATE)).isEmpty();
+  }
+
+  @Test
+  void findTripOnServiceDateReturnsRealTripOnServiceDate() {
+    var tripInput = TRIP1_INPUT.withWithTripOnServiceDate("DSJ1");
+    var env = envBuilder.addTrip(tripInput).build();
+    var service = new ApiTransitService(env.transitService());
+    var trip = env.tripData(TRIP_1_ID).trip();
+
+    var result = service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE);
+
+    assertThat(result).isPresent();
+    // The real TripOnServiceDate (keyed by its own id) is preferred over a synthetic one.
+    assertEquals("DSJ1", result.get().getId().getId());
+    assertEquals(trip, result.get().getTrip());
   }
 
   private static GtfsRealtime.TripUpdate skipSecondStop(TripUpdateBuilder builder) {

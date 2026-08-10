@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.street.geometry.CompactLineStringSequence;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.transit.model._data.TransitTestEnvironment;
-import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 

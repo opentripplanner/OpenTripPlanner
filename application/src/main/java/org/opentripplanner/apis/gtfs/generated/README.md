@@ -11,9 +11,11 @@ The GraphQL to Java type mappings are defined in _graphql-codegen.yml_.
 The files can be generated using the following snippet
 
 Run these in this directory:
+
 ```
 yarn install
 yarn generate
 ```
-- Then run `mvn install` in the root project to prettify the generated files. 
+
+- Then run `mvn install` in the root project to prettify the generated files.
 - Then run IntelliJ's _Optimize Imports_.

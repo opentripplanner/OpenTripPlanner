@@ -190,6 +190,16 @@ public class GraphQLTypes {
     }
   }
 
+  /**
+   * Enum for limiting the returned calls depending on pickup/drop off status on a stop
+   * based on the original schedules.
+   */
+  public enum GraphQLArrivalDeparture {
+    ARRIVALS,
+    DEPARTURES,
+    EITHER,
+  }
+
   public static class GraphQLBicycleParkingPreferencesInput {
 
     private List<GraphQLParkingFilterInput> filters;
@@ -1932,6 +1942,31 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPatternCanceledTripsArgs {
+
+    private List<GraphQLLocalDateRangeInput> serviceDateRanges;
+
+    public GraphQLPatternCanceledTripsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("serviceDateRanges") != null) {
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
+              "serviceDateRanges"
+            )).stream()
+            .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
+      return this.serviceDateRanges;
+    }
+
+    public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {
+      this.serviceDateRanges = serviceDateRanges;
+    }
+  }
+
   public static class GraphQLPatternTripsForDateArgs {
 
     private String serviceDate;
@@ -1947,6 +1982,25 @@ public class GraphQLTypes {
     }
 
     public void setGraphQLServiceDate(String serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+  }
+
+  public static class GraphQLPatternTripsOnServiceDateArgs {
+
+    private java.time.LocalDate serviceDate;
+
+    public GraphQLPatternTripsOnServiceDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (java.time.LocalDate) args.get("serviceDate");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLServiceDate() {
+      return this.serviceDate;
+    }
+
+    public void setGraphQLServiceDate(java.time.LocalDate serviceDate) {
       this.serviceDate = serviceDate;
     }
   }
@@ -3329,6 +3383,25 @@ public class GraphQLTypes {
 
     public void setGraphQLId(String id) {
       this.id = id;
+    }
+  }
+
+  public static class GraphQLQueryTypePatternsByIdsArgs {
+
+    private List<String> ids;
+
+    public GraphQLQueryTypePatternsByIdsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (List<String>) args.get("ids");
+      }
+    }
+
+    public List<String> getGraphQLIds() {
+      return this.ids;
+    }
+
+    public void setGraphQLIds(List<String> ids) {
+      this.ids = ids;
     }
   }
 
@@ -5047,6 +5120,47 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLStopCanceledCallsArgs {
+
+    private GraphQLArrivalDeparture arrivalDeparture;
+    private List<GraphQLLocalDateRangeInput> serviceDateRanges;
+
+    public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("arrivalDeparture") instanceof GraphQLArrivalDeparture) {
+          this.arrivalDeparture = (GraphQLArrivalDeparture) args.get("arrivalDeparture");
+        } else if (args.get("arrivalDeparture") != null) {
+          this.arrivalDeparture = GraphQLArrivalDeparture.valueOf(
+            (String) args.get("arrivalDeparture")
+          );
+        }
+        if (args.get("serviceDateRanges") != null) {
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
+              "serviceDateRanges"
+            )).stream()
+            .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public GraphQLArrivalDeparture getGraphQLArrivalDeparture() {
+      return this.arrivalDeparture;
+    }
+
+    public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
+      return this.serviceDateRanges;
+    }
+
+    public void setGraphQLArrivalDeparture(GraphQLArrivalDeparture arrivalDeparture) {
+      this.arrivalDeparture = arrivalDeparture;
+    }
+
+    public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {
+      this.serviceDateRanges = serviceDateRanges;
+    }
+  }
+
   public static class GraphQLStopDescArgs {
 
     private String language;
@@ -5861,6 +5975,25 @@ public class GraphQLTypes {
 
     public void setGraphQLServiceDate(String serviceDate) {
       this.serviceDate = serviceDate;
+    }
+  }
+
+  public static class GraphQLTripOnServiceDateArgs {
+
+    private java.time.LocalDate date;
+
+    public GraphQLTripOnServiceDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.date = (java.time.LocalDate) args.get("date");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLDate() {
+      return this.date;
+    }
+
+    public void setGraphQLDate(java.time.LocalDate date) {
+      this.date = date;
     }
   }
 

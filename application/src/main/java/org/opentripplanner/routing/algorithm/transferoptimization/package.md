@@ -4,18 +4,17 @@ OTP2 handles transfers differently than OTP1. In OTP1, transfers were optimized 
 for each transfer edge during the search. In OTP2, finding the best transfers is done partially
 during routing and then improved in a post-processing step. It is easier to understand how you
 should tune OTP2 if you understand this process. When optimizing transfers we first find the best
-paths
-(sequences of trips), then identify the best stops to transfer between subsequent trips in each of
-those paths (the post-processing).
+paths (sequences of trips), then identify the best stops to transfer between subsequent trips in
+each of those paths (the post-processing).
 
 ## Supported Input Data
 
 - OTP supports [GTFS Transfers.txt](https://gtfs.org/reference/static#transferstxt) and the Google
-  extension
-  with [Trip to Trip transfers](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#TripToTripTransfers)
+  extension with
+  [Trip to Trip transfers](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#TripToTripTransfers)
   .
-- OTP
-  supports [NeTEx Interchanges](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728760393/timetable#Interchange.1)
+- OTP supports
+  [NeTEx Interchanges](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728760393/timetable#Interchange.1)
   as specified in the Nordic profile.
 
 ## Goals
@@ -24,30 +23,30 @@ those paths (the post-processing).
 2. Prefer some locations (stop pairs) over others.
 3. Support `StaySeated` and `Guaranteed` transfers.
 4. Choose the transfer with the highest priority: `Preferred` over `Recommended` over `Allowed`.
-5. Support for transfer
-   specificity, [Specificity of a transfer](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer)
+5. Support for transfer specificity,
+   [Specificity of a transfer](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer)
    .
 6. Prevent transfers between stops and/or trips/routes. GTFS Transfers `transfer_type = 3` and Netex
    Transfer `priority = -1(not allowed)`.
 7. Find the best place to transfer between two transit trips in a path. Normally we want to maximize
    the "wait-time"/"extra-time" to allow the traveler to have as much time to do the transfer as
    possible.
-    1. Maximize the wait-time
-    2. For a journey with more than one transfer we want to distribute the wait-time, if possible.
-       For a path with 2 transfers it is better to have 4 minutes extra for each transfer than
-       having 30 seconds for one and 7m30s for the other.
-    3. For a transfer between two trips we want to find the right balance, between
-       extra-transfer-time and the path generalized-cost(like the cost of walking and riding a bus).
+   1. Maximize the wait-time
+   2. For a journey with more than one transfer we want to distribute the wait-time, if possible.
+      For a path with 2 transfers it is better to have 4 minutes extra for each transfer than having
+      30 seconds for one and 7m30s for the other.
+   3. For a transfer between two trips we want to find the right balance, between
+      extra-transfer-time and the path generalized-cost(like the cost of walking and riding a bus).
 
 ## Not Supported (jet)
 
 - Using GTFS transfers.txt it is possible to set the `min_transfer_time` with `transfer_type = 2`.
   See issue [#3369](https://github.com/opentripplanner/OpenTripPlanner/issues/3369)
 - The NeTEx Interchange MaximumWaitTime is ignored.
-- Transfer not-allowed at location. See
-  issue [#3505](https://github.com/opentripplanner/OpenTripPlanner/issues/3505).
-- Support for Trip matching when only Route is specified in transfers.txt. See
-  issue [#3429](https://github.com/opentripplanner/OpenTripPlanner/issues/3429)
+- Transfer not-allowed at location. See issue
+  [#3505](https://github.com/opentripplanner/OpenTripPlanner/issues/3505).
+- Support for Trip matching when only Route is specified in transfers.txt. See issue
+  [#3429](https://github.com/opentripplanner/OpenTripPlanner/issues/3429)
 
 ## Implementation
 
@@ -56,38 +55,38 @@ OTP finds the best transfers in 2 steps:
 1. As part of the routing. The routing engine (Raptor) applies generalized-cost and
    number-of-transfers as criteria during the routing. In addition, Raptor supports overriding
    regular transfers with constrained transfers.
-    1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criterion.
-    2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the
-       `StopTransferPriority`.
-    3. Goal 3 and 6 is achieved by allowing constrained transfers to override regular transfers. An
-       optional `RaptorTransferConstraintsProvider` is injected into Raptor which Raptor calls to
-       get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO).
+   1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criterion.
+   2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the
+      `StopTransferPriority`.
+   3. Goal 3 and 6 is achieved by allowing constrained transfers to override regular transfers. An
+      optional `RaptorTransferConstraintsProvider` is injected into Raptor which Raptor calls to get
+      guaranteed transfers. This service is also responsible for rejecting a transfer(TODO).
 2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the
    routing search are revised, optimizing the stop at which transfers happen between each pair of
    transit rides (trips). This step does NOT compare different paths returned by the router
    (Raptor), but instead finds all possible transfer locations for a given path, and the different
    alternatives to transfer between each pair of trips within the path. This is an outline of the
    process:
-    1. For each path find all possible permutations of transfers.
-    2. Filter paths based on priority including `StaySeated=100`, `Guaranteed=10`, `Preferred=2`,
-       `Recommended=1`, `Allowed=0` and `NotAllowed=-1000`. Each path is given a combined score, and
-       the set of the paths with the lowest score is returned (more than one path might have the
-       same score).
-    3. Another filter which breaks ties based on an "optimize-transfer-cost" function.
-    4. Because the number of permutations grow exponentially with the number of transfers, each
-       filter above is applied for each sub-path starting from the end of the path. This keep the
-       number of options down, close to O(N), where N is the number of transfers.
+   1. For each path find all possible permutations of transfers.
+   2. Filter paths based on priority including `StaySeated=100`, `Guaranteed=10`, `Preferred=2`,
+      `Recommended=1`, `Allowed=0` and `NotAllowed=-1000`. Each path is given a combined score, and
+      the set of the paths with the lowest score is returned (more than one path might have the same
+      score).
+   3. Another filter which breaks ties based on an "optimize-transfer-cost" function.
+   4. Because the number of permutations grow exponentially with the number of transfers, each
+      filter above is applied for each sub-path starting from the end of the path. This keep the
+      number of options down, close to O(N), where N is the number of transfers.
 
 ## Design - Optimize transfers
 
-The `OptimizeTranferService` is the entry point and delegates to the "domain" services in
-the `services` package. The result of the optimization process is an `OptimizedPath` found in the
-`api` package. The optimization process first uses the `TransferGenerator` to find all possible
-transfer points between each trip in a path. Then the `OptimizePathService` constructs all possible
-paths starting at the "tail" with the egress-leg, and adds legs until the path is constructed. To
-avoid exploring too many paths, the optimization filters the result of each step, reducing the set
-of optimal tails. The `MinCostFilterChain` is used to filter each equivalent set of paths and
-the `TransitPathLegSelector` finds the best tail for each transfer used to generate a new path-tail.
+The `OptimizeTranferService` is the entry point and delegates to the "domain" services in the
+`services` package. The result of the optimization process is an `OptimizedPath` found in the `api`
+package. The optimization process first uses the `TransferGenerator` to find all possible transfer
+points between each trip in a path. Then the `OptimizePathService` constructs all possible paths
+starting at the "tail" with the egress-leg, and adds legs until the path is constructed. To avoid
+exploring too many paths, the optimization filters the result of each step, reducing the set of
+optimal tails. The `MinCostFilterChain` is used to filter each equivalent set of paths and the
+`TransitPathLegSelector` finds the best tail for each transfer used to generate a new path-tail.
 
 Here is an outline of the calls:
 
@@ -121,9 +120,9 @@ information added to each transfer is:
 
 - Constrained transfer information including priority, guaranteed, stay-seated and so on
 - The various cost described in `TransferOptimized`:
-    - `transfer-priority-cost`
-    - `wait-time-optimized-cost` or `generalized-cost`
-    - `break-tie-cost`
+  - `transfer-priority-cost`
+  - `wait-time-optimized-cost` or `generalized-cost`
+  - `break-tie-cost`
 
 The `wait-time-optimized-cost` is described in [detail below](#the-optimize-transfer-cost-function).
 
@@ -135,8 +134,8 @@ from Raptor with `TransferOptimized` costs.
 
 ### The Optimize-transfer-cost Function
 
-The optimize-transfer-cost function is used select between alternative transfers for a
-"path" with the same set of on-board trips. This address goal 7 above:
+The optimize-transfer-cost function is used select between alternative transfers for a "path" with
+the same set of on-board trips. This address goal 7 above:
 
 1. Maximize the wait-time
 2. Distribute the wait-time between transfers
@@ -145,7 +144,7 @@ The optimize-transfer-cost function is used select between alternative transfers
 To compare two paths we need a cost function that account for the differences in the existing cost,
 except the wait-time cost, and add a new inverse cost for the extra-time:
 
-``` 
+```
 F(t) = path.generalized-cost - total-wait-time * waitReluctance + ∑ f(t)
 ```
 
@@ -197,7 +196,7 @@ Here is a plot with three examples with different values for `n` and `a` which i
 function look like when the linear, and the logarithmic part is present or not. The blue line have
 only the logarithmic part(n=4, a=0), the purple line is a combination (n=2, a=0.5), and the yellow
 line have the linear path only(n=0, a=1). The minimum-safe-transfer-time is set to 600s or 10
-minutes in this case. Notice that the blue line gots from `f(0)=(n+1) * t0` to `f(t0)=t0` with
-delta `n * t0`. The purple line goes from `f(0)=t0` to `f(t0)=0` with delta `-t0`.
+minutes in this case. Notice that the blue line gots from `f(0)=(n+1) * t0` to `f(t0)=t0` with delta
+`n * t0`. The purple line goes from `f(0)=t0` to `f(t0)=0` with delta `-t0`.
 
 ![Optimize-MinSafe-Transfer-Cost](OptimizeMinSafeTransferCost.png)

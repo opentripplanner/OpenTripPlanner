@@ -16,6 +16,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsOnServiceDateArgs;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
+import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -24,10 +27,13 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -225,9 +231,47 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   @Override
+  public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate() {
+    return env -> {
+      var serviceDate = new GraphQLPatternTripsOnServiceDateArgs(
+        env.getArguments()
+      ).getGraphQLServiceDate();
+
+      var apiService = new ApiTransitService(getTransitService(env));
+      return getTrips(env)
+        .stream()
+        .flatMap(t ->
+          apiService.findOrCreateTripOnServiceDate(t.getId(), serviceDate).stream()
+        )::iterator;
+    };
+  }
+
+  @Override
   public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions() {
     return environment ->
       getRealtimeVehiclesService(environment).getRealtimeVehicles(this.getSource(environment));
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripOnServiceDate>> canceledTrips() {
+    return environment -> {
+      var pattern = getSource(environment);
+      var transitService = getTransitService(environment);
+      var args = new GraphQLTypes.GraphQLPatternCanceledTripsArgs(environment.getArguments());
+
+      var serviceDateRanges = LocalDateRangeUtil.mapRanges(args.getGraphQLServiceDateRanges());
+
+      var requestBuilder = TripOnServiceDateRequest.of().withIncludePatterns(
+        FilterValues.ofEmptyIsEverything("patterns", List.of(pattern.getId()))
+      );
+      if (serviceDateRanges != null) {
+        requestBuilder.withIncludeServiceDateRanges(
+          FilterValues.ofRequired("serviceDateRanges", serviceDateRanges)
+        );
+      }
+
+      return transitService.findCanceledTrips(requestBuilder.build());
+    };
   }
 
   private Agency getAgency(DataFetchingEnvironment environment) {

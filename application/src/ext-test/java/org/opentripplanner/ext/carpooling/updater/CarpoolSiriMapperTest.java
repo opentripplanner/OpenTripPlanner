@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.arrivalIsAfterDepartureTime;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.expectedArrivalBeforeExpectedDeparture;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithAllButOneCallCancelled;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithCancelledIntermediateCall;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithDifferentCapacitiesPerCall;
@@ -18,8 +19,11 @@ import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyD
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourneyWithPolygon;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.stopTimesAreOutOfOrder;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDuration;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripExceedingMaxDurationViaDefaultDeviationBudget;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasAimedTimesOnly;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripHasExpectedTimesOnly;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.tripWithWaypointsTooFarApart;
 import static org.opentripplanner.ext.carpooling.model.CarpoolStop.DEFAULT_DEVIATION_BUDGET;
 import static org.opentripplanner.ext.carpooling.model.CarpoolStop.DEFAULT_ONBOARD_COUNT;
 import static org.opentripplanner.ext.carpooling.model.CarpoolTrip.DEFAULT_TOTAL_CAPACITY;
@@ -44,6 +48,29 @@ public class CarpoolSiriMapperTest {
   void mapSiriToCarpoolTrip_lessThanTwoStops_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () ->
       mapper.mapSiriToCarpoolTrip(lessThanTwoStops())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_tripExceedsMaxDuration_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDuration())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_tripExceedsMaxDurationViaDefaultDeviationBudget_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDurationViaDefaultDeviationBudget())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_waypointsTooFarApart_throwsIllegalArgumentException() {
+    // Short claimed times but waypoints ~450 km apart: the timetable check passes, the geometry
+    // check rejects it.
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(tripWithWaypointsTooFarApart())
     );
   }
 
@@ -121,6 +148,13 @@ public class CarpoolSiriMapperTest {
   void mapSiriToCarpoolTrip_stopTimesAreOutOfOrder_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () ->
       mapper.mapSiriToCarpoolTrip(stopTimesAreOutOfOrder())
+    );
+  }
+
+  @Test
+  void mapSiriToCarpoolTrip_expectedArrivalBeforeExpectedDeparture_throwsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () ->
+      mapper.mapSiriToCarpoolTrip(expectedArrivalBeforeExpectedDeparture())
     );
   }
 

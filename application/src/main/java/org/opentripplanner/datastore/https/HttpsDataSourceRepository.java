@@ -50,7 +50,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   /* private methods */
 
   private static boolean skipUri(URI uri) {
-    return !"https".equals(uri.getScheme());
+    return !"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme());
   }
 
   private DataSource createSource(URI uri, FileType type) {

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -14,12 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
+import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
@@ -33,7 +36,7 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -47,14 +50,14 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 class ScheduledDeviatedTripIntegrationTest {
 
   static Graph graph;
-  static TimetableRepository timetableRepository;
+  static TransitRepository transitRepository;
   static TransferRepository transferRepository;
 
   float delta = 0.01f;
 
   @Test
   void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = timetableRepository.getAllFlexTrips();
+    var flexTrips = transitRepository.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -91,11 +94,11 @@ class ScheduledDeviatedTripIntegrationTest {
    */
   @Test
   void flexTripInTransitMode() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
+    var feedId = transitRepository.getFeedIds().iterator().next();
 
     var serverContext = TestServerContext.createServerContext(
       graph,
-      timetableRepository,
+      transitRepository,
       transferRepository,
       new DefaultFareService()
     );
@@ -132,6 +135,52 @@ class ScheduledDeviatedTripIntegrationTest {
   }
 
   /**
+   * A flex service journey with fixed endpoints is routed as a regular scheduled leg, and its
+   * flexible-area stop shows up as an intermediate stop. That stop has no scheduled
+   * arrival/departure time (only a time window), so it must be excluded from the Transmodel
+   * {@code intermediateEstimatedCalls}. Otherwise the {@link StopTime#MISSING_VALUE} placeholder
+   * would be rendered as a bogus time (the day before the trip). See issue #7034.
+   */
+  @Test
+  void intermediateEstimatedCallsSkipFlexWindowStops() {
+    var feedId = transitRepository.getFeedIds().iterator().next();
+
+    var serverContext = TestServerContext.createServerContext(
+      graph,
+      transitRepository,
+      transferRepository,
+      new DefaultFareService()
+    );
+
+    var from = GenericLocation.fromStopId(
+      new FeedScopedId(feedId, "cujv"),
+      "Transfer Point for Route 30"
+    );
+    var to = GenericLocation.fromStopId(
+      new FeedScopedId(feedId, "yz85"),
+      "Zone 1 - PUBLIX Super Market,Zone 1 Collection Point"
+    );
+
+    var leg = getItineraries(from, to, serverContext).get(0).legs().get(0);
+
+    // The flexible-area stop is exposed as an intermediate stop on the leg ...
+    var intermediateStopIds = leg
+      .listIntermediateStops()
+      .stream()
+      .map(s -> s.place.stop.getId().getId())
+      .collect(Collectors.toList());
+    assertTrue(intermediateStopIds.contains("zone_1"));
+
+    // ... but it must not appear among the intermediate estimated calls, and every returned call
+    // must carry a real scheduled time.
+    var intermediateCalls = TripTimeOnDateHelper.getIntermediateTripTimeOnDatesForLeg(leg);
+    assertTrue(intermediateCalls.stream().allMatch(TripTimeOnDate::hasScheduledTimes));
+    assertFalse(
+      intermediateCalls.stream().anyMatch(c -> c.getStop().getId().getId().equals("zone_1"))
+    );
+  }
+
+  /**
    * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
    * <p>
    * Normally these trip times are interpolated/repaired during the graph build but for flex this is
@@ -141,8 +190,8 @@ class ScheduledDeviatedTripIntegrationTest {
    */
   @Test
   void shouldNotInterpolateFlexTimes() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
-    var pattern = timetableRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
+    var feedId = transitRepository.getFeedIds().iterator().next();
+    var pattern = transitRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(4, pattern.numberOfStops());
 
@@ -156,7 +205,7 @@ class ScheduledDeviatedTripIntegrationTest {
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
-    timetableRepository = model.timetableRepository();
+    transitRepository = model.transitRepository();
     transferRepository = TransferServiceTestFactory.defaultTransferRepository();
   }
 
@@ -198,8 +247,8 @@ class ScheduledDeviatedTripIntegrationTest {
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {
-    var feedId = timetableRepository.getFeedIds().iterator().next();
+    var feedId = transitRepository.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return timetableRepository.getFlexTrip(tripId);
+    return transitRepository.getFlexTrip(tripId);
   }
 }

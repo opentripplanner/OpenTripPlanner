@@ -11,7 +11,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
@@ -23,17 +23,17 @@ import org.opentripplanner.transit.service.TimetableRepository;
  */
 class GtfsFlexTest {
 
-  private static TimetableRepository timetableRepository;
+  private static TransitRepository transitRepository;
 
   @BeforeAll
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.aspenGtfs();
-    timetableRepository = model.timetableRepository();
+    transitRepository = model.transitRepository();
   }
 
   @Test
   void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = timetableRepository.getAllFlexTrips();
+    var flexTrips = transitRepository.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
       Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
@@ -48,6 +48,6 @@ class GtfsFlexTest {
 
   @Test
   void shouldGeneratePatternForFlexTripWithSingleStop() {
-    assertFalse(timetableRepository.getAllTripPatterns().isEmpty());
+    assertFalse(transitRepository.getAllTripPatterns().isEmpty());
   }
 }

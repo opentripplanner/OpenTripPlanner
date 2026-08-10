@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -74,7 +74,7 @@ public class TestTransitLegBuilder {
   }
 
   public TestTransitLegBuilder withNetwork(FeedScopedId id) {
-    var route = TimetableRepositoryForTest.route(id)
+    var route = TransitRepositoryForTest.route(id)
       .withGroupOfRoutes(List.of(GroupOfRoutes.of(id).build()))
       .build();
     return withRoute(route);

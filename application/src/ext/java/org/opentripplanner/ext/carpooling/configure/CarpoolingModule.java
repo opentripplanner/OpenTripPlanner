@@ -7,11 +7,12 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
+import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transit.service.TransitService;
 
 @Module
 public class CarpoolingModule {
@@ -27,12 +28,36 @@ public class CarpoolingModule {
   }
 
   @Provides
+  @Singleton
+  @Nullable
+  public static CarReachableVertexSnapper provideCarReachableVertexSnapper() {
+    if (OTPFeature.CarPooling.isOff()) {
+      return null;
+    }
+    return CarReachableVertexSnapper.createDefault();
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  public static CarpoolTripVertexResolver provideCarpoolTripVertexResolver(
+    VertexCreationService vertexCreationService,
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper
+  ) {
+    if (OTPFeature.CarPooling.isOff()) {
+      return null;
+    }
+    return new CarpoolTripVertexResolver(vertexCreationService, carReachableVertexSnapper);
+  }
+
+  @Provides
+  @Singleton
   @Nullable
   public static CarpoolingService provideCarpoolingService(
     @Nullable CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
-    TransitService transitService,
-    VertexCreationService vertexCreationService
+    VertexCreationService vertexCreationService,
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
@@ -40,8 +65,8 @@ public class CarpoolingModule {
     return new DefaultCarpoolingService(
       repository,
       streetLimitationParametersService,
-      transitService,
-      vertexCreationService
+      vertexCreationService,
+      carReachableVertexSnapper
     );
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +59,13 @@ public class CarpoolTrip
 
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;
+
+  /**
+   * The longest span a carpool trip may have — from the first stop's departure to the
+   * destination's latest expected arrival. A trip longer than this is not shaped like a carpool
+   * journey and is not modelled as one.
+   */
+  public static final Duration MAX_TRIP_DURATION = Duration.ofHours(2).plusMinutes(30);
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
