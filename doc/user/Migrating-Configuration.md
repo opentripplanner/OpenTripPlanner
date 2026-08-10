@@ -42,7 +42,7 @@ graph-build phase is less risky, than in the OTP serve phase.
 
 Per-network GBFS settings moved out of `vehicleRentalServiceDirectory` in `router-config.json` and
 into a shared `gbfs` section in `otp-config.json`, where both the service directory and the new
-`vehicleRentalGraphBuilder` read them. See [GBFS configuration](GBFS-Config.md).
+`vehicleRentalGeofencing` read them. See [GBFS configuration](GBFS-Config.md).
 
 ```
 router-config.json                            otp-config.json
@@ -67,14 +67,14 @@ Three things to check when migrating:
 - `geofencingZones` is no longer a boolean. It names the phase that computes the zones -
   `permanent`, `realtime` or `off` - so a network cannot have its zones applied twice.
 
-The build-time sandbox `gbfsGeofencing` was renamed to `vehicleRentalGraphBuilder` and now
+The build-time sandbox `gbfsGeofencing` was renamed to `vehicleRentalGeofencing` and now
 discovers its feeds from a GBFS manifest instead of an explicit `feeds` list. Its
 `OTPFeature.GbfsGeofencingBuildTime` flag was removed: the sandbox is activated by the presence of
-`vehicleRentalGraphBuilder.url` in `build-config.json`.
+`vehicleRentalGeofencing.url` in `build-config.json`.
 
 ```
 build-config.json
-  gbfsGeofencing                      ------>   vehicleRentalGraphBuilder
+  gbfsGeofencing                      ------>   vehicleRentalGeofencing
     feeds[].url                       ------>     url  (the manifest, not per-feed)
     feeds[].network                   ------>     (discovered from system_id)
     feeds[].applyBusinessAreas        ------>     gbfs.networks[].requireDropOffInsideBusinessArea

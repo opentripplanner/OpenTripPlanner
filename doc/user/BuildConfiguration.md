@@ -129,7 +129,7 @@ Sections follow that describe particular settings in more depth.
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle)                    |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
 | [transitRouteToStationCentroid](#transitRouteToStationCentroid)                             |  `feed-scoped-id[]`  | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
-| [vehicleRentalGraphBuilder](#vehicleRentalGraphBuilder)                                     |       `object`       | Load GBFS geofencing zones into the graph at build time.                                                                                                       | *Optional* |                                   |  2.10 |
+| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                                         |       `object`       | Load GBFS geofencing zones into the graph at build time.                                                                                                       | *Optional* |                                   |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -1300,7 +1300,7 @@ transit that starts/ends at the station will work as usual without any additiona
 the centroid.
 
 
-<h3 id="vehicleRentalGraphBuilder">vehicleRentalGraphBuilder</h3>
+<h3 id="vehicleRentalGeofencing">vehicleRentalGeofencing</h3>
 
 **Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 

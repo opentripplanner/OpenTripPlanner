@@ -198,7 +198,7 @@ public class GraphBuilder implements Runnable {
     }
 
     if (loadStreetGraph || hasOsm) {
-      graphBuilder.addModuleOptional(factory.vehicleRentalGraphBuilder());
+      graphBuilder.addModuleOptional(factory.vehicleRentalGeofencingGraphBuilder());
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 

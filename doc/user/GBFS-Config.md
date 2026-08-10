@@ -166,7 +166,7 @@ This is temporary and will be removed in a future version of OTP. Use this to sp
 ## Shared network configuration
 
 Both the [vehicle rental service directory](sandbox/VehicleRentalServiceDirectory.md) and the
-`vehicleRentalGraphBuilder` discover their feeds from a GBFS manifest and need the same per-network
+`vehicleRentalGeofencing` discover their feeds from a GBFS manifest and need the same per-network
 settings. Those are configured once in the `gbfs` section of `otp-config.json`, keyed by the GBFS
 `system_id`.
 
@@ -270,7 +270,7 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
 Which phase computes and applies this network's geofencing zones.
 
-- `permanent` - the `vehicleRentalGraphBuilder` loads and applies the zones at graph
+- `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
   build time, so they are baked into the graph.
 - `realtime` - the vehicle rental updater loads and applies the zones at runtime.
 - `off` - the zones are not processed.
@@ -316,7 +316,7 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
 Which phase computes and applies this network's geofencing zones.
 
-- `permanent` - the `vehicleRentalGraphBuilder` loads and applies the zones at graph
+- `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
   build time, so they are baked into the graph.
 - `realtime` - the vehicle rental updater loads and applies the zones at runtime.
 - `off` - the zones are not processed.

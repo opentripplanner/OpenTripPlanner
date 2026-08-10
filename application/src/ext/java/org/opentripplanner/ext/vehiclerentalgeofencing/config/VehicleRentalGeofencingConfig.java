@@ -1,17 +1,17 @@
-package org.opentripplanner.ext.vehiclerentalgraphbuilder.config;
+package org.opentripplanner.ext.vehiclerentalgeofencing.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters.VehicleRentalGraphBuilderParameters;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * Maps the {@code vehicleRentalGraphBuilder} section of {@code build-config.json}.
+ * Maps the {@code vehicleRentalGeofencing} section of {@code build-config.json}.
  */
-public class VehicleRentalGraphBuilderConfig {
+public class VehicleRentalGeofencingConfig {
 
-  public static VehicleRentalGraphBuilderParameters mapConfig(
+  public static VehicleRentalGeofencingParameters mapConfig(
     String parameterName,
     NodeAdapter root
   ) {
@@ -39,10 +39,10 @@ public class VehicleRentalGraphBuilderConfig {
       .asObject();
 
     if (c.isEmpty()) {
-      return new VehicleRentalGraphBuilderParameters(null, null, HttpHeaders.empty());
+      return new VehicleRentalGeofencingParameters(null, null, HttpHeaders.empty());
     }
 
-    return new VehicleRentalGraphBuilderParameters(
+    return new VehicleRentalGeofencingParameters(
       c
         .of("url")
         .since(V2_10)

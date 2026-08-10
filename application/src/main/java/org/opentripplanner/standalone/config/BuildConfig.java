@@ -30,8 +30,8 @@ import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.config.VehicleRentalGraphBuilderConfig;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters.VehicleRentalGraphBuilderParameters;
+import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -176,7 +176,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
   public final EmpiricalDelayParameters empiricalDelay;
-  public final VehicleRentalGraphBuilderParameters vehicleRentalGraphBuilder;
+  public final VehicleRentalGeofencingParameters vehicleRentalGeofencing;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -599,8 +599,8 @@ public class BuildConfig implements OtpDataStoreConfig {
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
     empiricalDelay = EmpiricalDelayConfig.mapEmissionsConfig("empiricalDelay", root);
-    vehicleRentalGraphBuilder = VehicleRentalGraphBuilderConfig.mapConfig(
-      "vehicleRentalGraphBuilder",
+    vehicleRentalGeofencing = VehicleRentalGeofencingConfig.mapConfig(
+      "vehicleRentalGeofencing",
       root
     );
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");

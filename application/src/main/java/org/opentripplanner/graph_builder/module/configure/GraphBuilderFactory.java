@@ -19,8 +19,8 @@ import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.configure.VehicleRentalGraphBuilderModule;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.internal.graphbuilder.VehicleRentalGraphBuilder;
+import org.opentripplanner.ext.vehiclerentalgeofencing.configure.VehicleRentalGeofencingModule;
+import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -63,7 +63,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
-    VehicleRentalGraphBuilderModule.class,
+    VehicleRentalGeofencingModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
@@ -101,7 +101,7 @@ public interface GraphBuilderFactory {
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
 
   @Nullable
-  VehicleRentalGraphBuilder vehicleRentalGraphBuilder();
+  VehicleRentalGeofencingGraphBuilder vehicleRentalGeofencingGraphBuilder();
 
   @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();

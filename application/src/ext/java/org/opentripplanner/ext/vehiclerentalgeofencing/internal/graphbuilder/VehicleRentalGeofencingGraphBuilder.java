@@ -1,10 +1,10 @@
-package org.opentripplanner.ext.vehiclerentalgraphbuilder.internal.graphbuilder;
+package org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters.VehicleRentalGraphBuilderParameters;
-import org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters.VehicleRentalNetworkDataSourceParameters;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalNetworkDataSourceParameters;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.GbfsAutoConfiguration;
@@ -36,9 +36,11 @@ import org.slf4j.LoggerFactory;
  * {@link DefaultVehicleRentalRepository} via its build-time setter — the raw zones are persisted
  * via {@code SerializedGraphObject} so the runtime application sees them after deserialization.
  */
-public class VehicleRentalGraphBuilder implements GraphBuilderModule {
+public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalGraphBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+    VehicleRentalGeofencingGraphBuilder.class
+  );
 
   /** The GBFS feed that must be published for a network to be worth loading here. */
   private static final String GEOFENCING_ZONES_FEED = "geofencing_zones";
@@ -46,13 +48,13 @@ public class VehicleRentalGraphBuilder implements GraphBuilderModule {
   /** Prefix of the repository key a network's build-time zone index is registered under. */
   private static final String INDEX_KEY_PREFIX = "permanent:";
 
-  private final VehicleRentalGraphBuilderParameters parameters;
+  private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
   private final Graph graph;
   private final DefaultVehicleRentalRepository rentalRepository;
 
-  public VehicleRentalGraphBuilder(
-    VehicleRentalGraphBuilderParameters parameters,
+  public VehicleRentalGeofencingGraphBuilder(
+    VehicleRentalGeofencingParameters parameters,
     GbfsNetworkOverrides overrides,
     Graph graph,
     DefaultVehicleRentalRepository rentalRepository

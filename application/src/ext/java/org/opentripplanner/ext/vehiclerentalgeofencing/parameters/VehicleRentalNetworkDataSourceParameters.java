@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters;
+package org.opentripplanner.ext.vehiclerentalgeofencing.parameters;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;

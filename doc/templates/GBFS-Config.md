@@ -23,7 +23,7 @@ support is limited to the following form factors:
 ## Shared network configuration
 
 Both the [vehicle rental service directory](sandbox/VehicleRentalServiceDirectory.md) and the
-`vehicleRentalGraphBuilder` discover their feeds from a GBFS manifest and need the same per-network
+`vehicleRentalGeofencing` discover their feeds from a GBFS manifest and need the same per-network
 settings. Those are configured once in the `gbfs` section of `otp-config.json`, keyed by the GBFS
 `system_id`.
 

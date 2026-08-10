@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehiclerentalgraphbuilder.parameters;
+package org.opentripplanner.ext.vehiclerentalgeofencing.parameters;
 
 import java.net.URI;
 import javax.annotation.Nullable;
@@ -14,12 +14,12 @@ import org.opentripplanner.framework.io.HttpHeaders;
  * @param language the language to request from the GBFS feeds
  * @param headers HTTP headers added to every request made by this builder
  */
-public record VehicleRentalGraphBuilderParameters(
+public record VehicleRentalGeofencingParameters(
   @Nullable URI url,
   @Nullable String language,
   HttpHeaders headers
 ) {
-  public VehicleRentalGraphBuilderParameters {
+  public VehicleRentalGeofencingParameters {
     if (headers == null) {
       headers = HttpHeaders.empty();
     }

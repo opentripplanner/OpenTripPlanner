@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehiclerentalgraphbuilder.internal.graphbuilder;
+package org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.gbfs.network.GeofencingZonePhase.OFF;
@@ -26,7 +26,7 @@ import org.opentripplanner.gbfs.network.GeofencingZonePhase;
  *   <li>{@code no-versions} - a dataset publishing no GBFS version at all</li>
  * </ul>
  */
-class VehicleRentalGraphBuilderTest {
+class VehicleRentalGeofencingGraphBuilderTest {
 
   private static final URI MANIFEST = Path.of("src/test/resources/gbfs/manifest.json")
     .toAbsolutePath()
@@ -69,14 +69,14 @@ class VehicleRentalGraphBuilderTest {
 
   private static List<String> selectNetworks(GbfsNetworkOverrides overrides) {
     try (var clientFactory = new OtpHttpClientFactory()) {
-      return VehicleRentalGraphBuilder.selectNetworks(
+      return VehicleRentalGeofencingGraphBuilder.selectNetworks(
         manifest(),
         overrides,
         HttpHeaders.empty(),
         clientFactory
       )
         .stream()
-        .map(VehicleRentalGraphBuilder.SelectedNetwork::network)
+        .map(VehicleRentalGeofencingGraphBuilder.SelectedNetwork::network)
         .toList();
     }
   }
