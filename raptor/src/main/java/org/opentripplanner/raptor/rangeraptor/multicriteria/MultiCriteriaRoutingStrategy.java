@@ -190,7 +190,6 @@ public class MultiCriteriaRoutingStrategy<
 
     var ride = patternRideFactory.createPatternRide(
       prevArrival,
-      stopIndex,
       boarding.stopPositionInPattern(),
       boardTime,
       boardC1,

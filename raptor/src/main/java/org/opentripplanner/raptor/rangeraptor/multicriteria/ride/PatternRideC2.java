@@ -16,8 +16,7 @@ public final class PatternRideC2<T extends RaptorTripSchedule> extends AbstractP
 
   public PatternRideC2(
     McStopArrival<T> prevArrival,
-    int boardStopIndex,
-    int boardPos,
+    int boardStopPosition,
     int boardTime,
     int boardC1,
     int relativeC1,
@@ -25,16 +24,7 @@ public final class PatternRideC2<T extends RaptorTripSchedule> extends AbstractP
     int tripSortIndex,
     T trip
   ) {
-    super(
-      prevArrival,
-      boardStopIndex,
-      boardPos,
-      boardTime,
-      boardC1,
-      relativeC1,
-      tripSortIndex,
-      trip
-    );
+    super(prevArrival, boardStopPosition, boardTime, boardC1, relativeC1, tripSortIndex, trip);
     this.c2 = c2;
   }
 

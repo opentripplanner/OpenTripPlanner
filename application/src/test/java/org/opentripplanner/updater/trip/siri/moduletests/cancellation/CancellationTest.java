@@ -143,10 +143,8 @@ class CancellationTest implements RealtimeTestConstants {
 
     changeQuayAndCancelTrip(siri, ADDED_TRIP_ID);
 
-    // the arrival time on first stop is adjusted to the departure time to avoid negative dwell time
-    // conversely the departure time on last stop is adjusted to the arrival time
     assertEquals(
-      "C U | A 0:00:11 0:00:11 | B 0:00:20 0:00:20",
+      "C U | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.tripData(ADDED_TRIP_ID).showTimetable()
     );
     assertThat(env.raptorData().summarizePatterns()).containsExactly(

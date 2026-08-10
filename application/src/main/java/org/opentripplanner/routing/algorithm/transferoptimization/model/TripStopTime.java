@@ -24,21 +24,8 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
     return new TripStopTime<>(trip, stopPosition, false);
   }
 
-  public static <T extends RaptorTripSchedule> TripStopTime<T> arrival(T trip, StopTime stopTime) {
-    int stopPosition = trip.findArrivalStopPosition(stopTime.time(), stopTime.stop());
-    return arrival(trip, stopPosition);
-  }
-
   public static <T extends RaptorTripSchedule> TripStopTime<T> departure(T trip, int stopPosition) {
     return new TripStopTime<>(trip, stopPosition, true);
-  }
-
-  public static <T extends RaptorTripSchedule> TripStopTime<T> departure(
-    T trip,
-    StopTime stopTime
-  ) {
-    int stopPosition = trip.findDepartureStopPosition(stopTime.time(), stopTime.stop());
-    return departure(trip, stopPosition);
   }
 
   public T trip() {

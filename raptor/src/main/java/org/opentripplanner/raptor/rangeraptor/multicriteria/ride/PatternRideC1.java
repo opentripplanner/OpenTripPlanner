@@ -15,24 +15,14 @@ public final class PatternRideC1<T extends RaptorTripSchedule> extends AbstractP
 
   public PatternRideC1(
     McStopArrival<T> prevArrival,
-    int boardStopIndex,
-    int boardPos,
+    int boardStopPosition,
     int boardTime,
     int boardC1,
     int relativeC1,
     int tripSortIndex,
     T trip
   ) {
-    super(
-      prevArrival,
-      boardStopIndex,
-      boardPos,
-      boardTime,
-      boardC1,
-      relativeC1,
-      tripSortIndex,
-      trip
-    );
+    super(prevArrival, boardStopPosition, boardTime, boardC1, relativeC1, tripSortIndex, trip);
   }
 
   public static <T extends RaptorTripSchedule> PatternRideFactory<T, PatternRideC1<T>> factory() {
@@ -40,8 +30,7 @@ public final class PatternRideC1<T extends RaptorTripSchedule> extends AbstractP
       @Override
       public PatternRideC1<T> createPatternRide(
         McStopArrival<T> prevArrival,
-        int boardStopIndex,
-        int boardPos,
+        int boardStopPosition,
         int boardTime,
         int boardCost1,
         int relativeCost1,
@@ -49,8 +38,7 @@ public final class PatternRideC1<T extends RaptorTripSchedule> extends AbstractP
       ) {
         return new PatternRideC1<>(
           prevArrival,
-          boardStopIndex,
-          boardPos,
+          boardStopPosition,
           boardTime,
           boardCost1,
           relativeCost1,

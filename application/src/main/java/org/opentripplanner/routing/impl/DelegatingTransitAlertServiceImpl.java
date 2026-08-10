@@ -35,8 +35,8 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
    * This implies that these instances are expected to remain in use indefinitely (not be replaced
    * with new instances or taken out of service over time).
    */
-  public DelegatingTransitAlertServiceImpl(Iterable<GraphUpdater> updaters) {
-    for (GraphUpdater updater : updaters) {
+  public DelegatingTransitAlertServiceImpl(Iterable<GraphUpdater<?>> updaters) {
+    for (GraphUpdater<?> updater : updaters) {
       if (updater instanceof TransitAlertProvider alertProvider) {
         transitAlertServices.add(alertProvider.getTransitAlertService());
       }
