@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * A read-only, request-scoped view over the {@link RealtimeVehicleRepository} that resolves
+ * A read-only, request-scoped view over the {@link RealtimeVehicleRepositorySnapshot} that resolves
  * patterns created by real-time updates.
  */
 public interface RealtimeVehicleService {

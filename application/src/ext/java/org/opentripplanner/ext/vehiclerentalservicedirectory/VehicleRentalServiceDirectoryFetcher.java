@@ -46,7 +46,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     this.otpHttpClientFactory = otpHttpClientFactory;
   }
 
-  public static List<GraphUpdater> createUpdatersFromEndpoint(
+  public static List<GraphUpdater<?>> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
     GbfsNetworkOverrides overrides,
     VertexLinker vertexLinker,
@@ -74,7 +74,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     return serviceDirectory.createUpdatersFromManifest(parameters, overrides, manifest);
   }
 
-  public List<GraphUpdater> createUpdatersFromManifest(
+  public List<GraphUpdater<?>> createUpdatersFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
     GbfsNetworkOverrides overrides,
     GBFSManifest manifest
@@ -129,10 +129,10 @@ public class VehicleRentalServiceDirectoryFetcher {
     return dataSources;
   }
 
-  private List<GraphUpdater> fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
+  private List<GraphUpdater<?>> fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
     List<GbfsVehicleRentalDataSourceParameters> dataSources
   ) {
-    List<GraphUpdater> updaters = new ArrayList<>();
+    List<GraphUpdater<?>> updaters = new ArrayList<>();
     for (var it : dataSources) {
       updaters.add(fetchAndCreateUpdater(it));
     }

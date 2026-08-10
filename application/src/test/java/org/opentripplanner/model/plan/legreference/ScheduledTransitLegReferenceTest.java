@@ -28,7 +28,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
 class ScheduledTransitLegReferenceTest {
@@ -70,7 +70,7 @@ class ScheduledTransitLegReferenceTest {
       .build();
     TransitRepository transitRepository = new TransitRepository(siteRepository);
     transitRepository.initUpdaterManager(
-      new GraphUpdaterManager(WriteToGraphCallback.NOOP, RunnableUtils.NOOP, List.of())
+      new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
     // build transit data
     CalendarServiceData calendarServiceData = new CalendarServiceData();

@@ -35,8 +35,10 @@ import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.retry.OtpRetryException;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
@@ -50,7 +52,7 @@ import uk.org.siri.siri21.Siri;
  * communicating with the azure service bus and delegates to SiriAzureETUpdater and
  * SiriAzureSXUpdater for ET and SX specific stuff.
  */
-public class SiriAzureUpdater implements GraphUpdater {
+public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAzureUpdater.class);
   private final String updaterType;
@@ -169,8 +171,13 @@ public class SiriAzureUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.messageHandler.setup(writeToGraphCallback);
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override

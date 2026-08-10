@@ -2,54 +2,58 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.util.List;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.network.TripPattern;
 
-@Singleton
+/**
+ * Mutable repository for the realtime vehicles. A new instance is created for each transaction
+ * that writes vehicles — initialized from the last committed snapshot — and is only accessed on
+ * the single writer thread. {@link #createSnapshot()} publishes an immutable snapshot of its
+ * state at commit time, safe for concurrent reads from request threads.
+ */
 public class DefaultRealtimeVehicleRepository implements RealtimeVehicleRepository {
 
-  /**
-   * This multimap is immutable and therefore thread-safe. It is updated using the copy-on-write
-   * pattern so data races are avoided. This is re-enforced with the variable being volatile.
-   */
-  private volatile ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles =
-    ImmutableListMultimap.of();
+  private final ListMultimap<TripPattern, RealtimeVehicle> vehicles;
 
-  @Inject
-  public DefaultRealtimeVehicleRepository() {}
+  /** Create an empty repository. */
+  public DefaultRealtimeVehicleRepository() {
+    this.vehicles = ArrayListMultimap.create();
+  }
+
+  /** Create a repository initialized with the state of the given snapshot. */
+  DefaultRealtimeVehicleRepository(ListMultimap<TripPattern, RealtimeVehicle> vehicles) {
+    this.vehicles = ArrayListMultimap.create(vehicles);
+  }
 
   @Override
   public void setRealtimeVehiclesForFeed(
     String feedId,
     Multimap<TripPattern, RealtimeVehicle> updates
   ) {
-    Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
-    temp.putAll(vehicles);
     // remove all previous updates for this specific feed id
-    vehicles
-      .keys()
+    List.copyOf(vehicles.keySet())
       .stream()
       .filter(p -> p.getFeedId().equals(feedId))
-      .forEach(temp::removeAll);
+      .forEach(vehicles::removeAll);
     // transform keys and put all fresh updates into map
     updates.forEach((pattern, vehicle) -> {
       if (pattern.getOriginalTripPattern() != null) {
         pattern = pattern.getOriginalTripPattern();
       }
-      temp.put(pattern, vehicle);
+      vehicles.put(pattern, vehicle);
     });
-
-    vehicles = ImmutableListMultimap.copyOf(temp);
   }
 
-  @Override
-  public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
-    // the list is made immutable during insertion, so we can safely return them
-    return vehicles.get(pattern);
+  /**
+   * Produce an immutable copy of the state to be used in the repository life-cycle. Only
+   * the lifecycle should have access to this, hence the package local access.
+   */
+  RealtimeVehicleRepositorySnapshot freeze() {
+    return new DefaultRealtimeVehiclesRepositorySnapshot(ImmutableListMultimap.copyOf(vehicles));
   }
 }

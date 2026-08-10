@@ -31,6 +31,7 @@ public class StopArrivalFactoryC2<T extends RaptorTripSchedule> implements McSto
       stopArrivalTime,
       c1,
       ride.c2(),
+      ride.boardStopPosition(),
       ride.trip()
     );
   }

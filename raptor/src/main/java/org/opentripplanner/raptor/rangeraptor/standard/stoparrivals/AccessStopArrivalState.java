@@ -84,14 +84,14 @@ public final class AccessStopArrivalState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int boardStop() {
-    return delegate.boardStop();
+  public int boardStopPosition() {
+    return delegate.boardStopPosition();
   }
 
   @Override
-  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+  public void arriveByTransit(int arrivalTime, int boardStopPosition, T trip) {
     accessArriveOnBoard = null;
-    delegate.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
+    delegate.arriveByTransit(arrivalTime, boardStopPosition, trip);
   }
 
   @Override

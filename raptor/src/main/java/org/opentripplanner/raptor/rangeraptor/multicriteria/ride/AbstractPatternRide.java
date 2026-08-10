@@ -66,8 +66,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
   permits PatternRideC1, PatternRideC2 {
 
   private final McStopArrival<T> prevArrival;
-  private final int boardStopIndex;
-  private final int boardPos;
+  private final int boardStopPosition;
   private final int boardTime;
   private final int boardC1;
   private final int relativeC1;
@@ -76,7 +75,6 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
 
   public AbstractPatternRide(
     McStopArrival<T> prevArrival,
-    int boardStopIndex,
     int boardPos,
     int boardTime,
     int boardC1,
@@ -85,8 +83,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
     T trip
   ) {
     this.prevArrival = prevArrival;
-    this.boardStopIndex = boardStopIndex;
-    this.boardPos = boardPos;
+    this.boardStopPosition = boardPos;
     this.boardTime = boardTime;
     this.boardC1 = boardC1;
     this.relativeC1 = relativeC1;
@@ -94,26 +91,27 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
     this.trip = trip;
   }
 
+  @Override
   public McStopArrival<T> prevArrival() {
     return prevArrival;
   }
 
-  public final int boardStopIndex() {
-    return boardStopIndex;
+  @Override
+  public final int boardStopPosition() {
+    return boardStopPosition;
   }
 
-  public final int boardPos() {
-    return boardPos;
-  }
-
+  @Override
   public final int boardTime() {
     return boardTime;
   }
 
+  @Override
   public final int boardC1() {
     return boardC1;
   }
 
+  @Override
   public final int relativeC1() {
     return relativeC1;
   }
@@ -122,6 +120,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
     return tripSortIndex;
   }
 
+  @Override
   public final T trip() {
     return trip;
   }
@@ -129,8 +128,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
   protected String toString(ToStringBuilder builder, @Nullable Consumer<ToStringBuilder> addC2) {
     builder
       .addNum("prevArrival", prevArrival.stop())
-      .addNum("boardStop", boardStopIndex)
-      .addNum("boardPos", boardPos)
+      .addNum("boardStopPosition", boardStopPosition)
       .addServiceTime("boardTime", boardTime)
       .addNum("boardC1", boardC1)
       .addNum("relativeC1", relativeC1);

@@ -29,9 +29,10 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.utils.lang.ObjectUtils;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * Dynamic vehicle-rental station updater which updates the Graph with vehicle rental stations from
  * one VehicleRentalDataSource.
  */
-public class VehicleRentalUpdater extends PollingGraphUpdater {
+public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
   private static final Duration RETRY_INTERVAL = Duration.ofSeconds(5);
@@ -126,6 +127,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public WriteDomain<StreetRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.STREET;
+  }
+
+  @Override
   public String toString() {
     return ToStringBuilder.of(VehicleRentalUpdater.class).addObj("source", source).toString();
   }
@@ -153,7 +159,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     updateGraph(graphWriterRunnable);
   }
 
-  private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
+  private class VehicleRentalGraphWriterRunnable
+    implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
 
     private final List<VehicleRentalPlace> stations;
     private final Set<GeofencingZone> geofencingZones;
@@ -167,7 +174,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(RealTimeUpdateContext context) {
+    public void run(StreetRealTimeUpdateContext context) {
       // Apply stations to graph
       Set<FeedScopedId> stationSet = new HashSet<>();
 

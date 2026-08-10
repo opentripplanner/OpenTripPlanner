@@ -85,6 +85,9 @@ public class BasicPathTestCase implements RaptorTestConstants {
   /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
   private static final int[] STOP_C1_S = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
 
+  private static final int STOP_POS_0 = 0;
+  private static final int STOP_POS_1 = 1;
+
   // Some times which should not have eny effect on tests
   private static final int VERY_EARLY = time("00:00");
   private static final int VERY_LATE = time("23:59");
@@ -219,8 +222,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       TRIP_3,
       L31_START,
       L31_END,
-      TRIP_3.findDepartureStopPosition(L31_START, STOP_D),
-      TRIP_3.findArrivalStopPosition(L31_END, STOP_E),
+      STOP_POS_0,
+      STOP_POS_1,
       EMPTY_CONSTRAINTS,
       LINE_31_C1,
       leg6
@@ -229,8 +232,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       TRIP_2,
       L21_START,
       L21_END,
-      TRIP_2.findDepartureStopPosition(L21_START, STOP_C),
-      TRIP_2.findArrivalStopPosition(L21_END, STOP_D),
+      STOP_POS_0,
+      STOP_POS_1,
       EMPTY_CONSTRAINTS,
       LINE_21_C1,
       leg5
@@ -248,8 +251,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       TRIP_1,
       L11_START,
       L11_END,
-      TRIP_1.findDepartureStopPosition(L11_START, STOP_A),
-      TRIP_1.findArrivalStopPosition(L11_END, STOP_B),
+      STOP_POS_0,
+      STOP_POS_1,
       EMPTY_CONSTRAINTS,
       LINE_11_C1,
       leg3
@@ -279,8 +282,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
       TRIP_1,
       L11_START,
       L11_END,
-      TRIP_1.findDepartureStopPosition(L11_START, STOP_A),
-      TRIP_1.findArrivalStopPosition(L11_END, STOP_B),
+      STOP_POS_0,
+      STOP_POS_1,
       EMPTY_CONSTRAINTS,
       LINE_11_C1,
       leg3

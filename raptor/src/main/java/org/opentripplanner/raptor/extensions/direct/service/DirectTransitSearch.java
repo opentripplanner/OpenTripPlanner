@@ -85,16 +85,16 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
     for (var access : accesses) {
       var pattern = route.pattern();
-      int boardPos = pattern.findStopPositionAfter(0, access.stop());
+      int boardPos = pattern.findBoardStopPositionAfter(0, access.stop());
 
-      if (boardPos == -1 || !pattern.boardingPossibleAt(boardPos)) {
+      if (boardPos == -1) {
         continue;
       }
 
       for (var egress : egresses) {
-        int alightPos = pattern.findStopPositionAfter(boardPos + 1, egress.stop());
+        int alightPos = pattern.findAlightStopPositionAfter(boardPos, egress.stop());
 
-        if (alightPos == -1 || !pattern.alightingPossibleAt(alightPos)) {
+        if (alightPos == -1) {
           continue;
         }
 

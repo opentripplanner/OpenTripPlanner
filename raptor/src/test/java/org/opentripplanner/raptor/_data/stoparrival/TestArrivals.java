@@ -67,6 +67,9 @@ public class TestArrivals {
     );
   }
 
+  /// This finds the first boarding after the previous arrival. This might not be correct.
+  /// A none zero board-slack or constrained transfer could cause problems, if needed, add andother
+  /// factory method.
   public static ArrivalView<TestTripSchedule> bus(
     int round,
     int stop,
@@ -76,7 +79,23 @@ public class TestArrivals {
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
-    return new Transit(round, stop, arrivalTime, c1, c2, trip, previous);
+    int boardStopPosition = trip.findDepartureStopPosition(previous.arrivalTime(), previous.stop());
+    return new Transit(round, stop, arrivalTime, c1, c2, boardStopPosition, trip, previous);
+  }
+
+  /// For reverse search: finds the alight stop position using the previous stop's arrival time.
+  /// The previous stop is the alight stop in the real (forward) direction.
+  public static ArrivalView<TestTripSchedule> busReverseSearch(
+    int round,
+    int stop,
+    int arrivalTime,
+    int c1,
+    int c2,
+    TestTripSchedule trip,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    int alightStopPosition = trip.findArrivalStopPosition(previous.arrivalTime(), previous.stop());
+    return new Transit(round, stop, arrivalTime, c1, c2, alightStopPosition, trip, previous);
   }
 
   public static ArrivalView<TestTripSchedule> egress(

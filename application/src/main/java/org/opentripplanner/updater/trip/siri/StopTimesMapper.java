@@ -72,9 +72,8 @@ class StopTimesMapper {
       zoneId
     );
 
-    // Use departure time for first stop, and arrival time for last stop, to avoid negative dwell times
-    stopTime.setArrivalTime(isFirstStop ? aimedDepartureTimeSeconds : aimedArrivalTimeSeconds);
-    stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
+    stopTime.setArrivalTime(aimedArrivalTimeSeconds);
+    stopTime.setDepartureTime(aimedDepartureTimeSeconds);
 
     // Update destination display
     var destinationDisplay = call.destinationDisplay();

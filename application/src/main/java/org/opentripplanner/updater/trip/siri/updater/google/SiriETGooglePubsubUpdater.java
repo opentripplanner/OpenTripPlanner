@@ -1,8 +1,10 @@
 package org.opentripplanner.updater.trip.siri.updater.google;
 
 import java.util.function.Consumer;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
@@ -15,13 +17,13 @@ import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
  * configures a {@link GooglePubsubEstimatedTimetableSource} and an {@link EstimatedTimetableHandler}
  * and delegates the update process to {@link AsyncEstimatedTimetableProcessor}
  */
-public class SiriETGooglePubsubUpdater implements GraphUpdater {
+public class SiriETGooglePubsubUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
   private final String configRef;
   private final AsyncEstimatedTimetableSource asyncEstimatedTimetableSource;
   private final EstimatedTimetableHandler estimatedTimetableHandler;
   private final Consumer<UpdateResult> updateResultConsumer;
-  private WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback<TransitRealTimeUpdateContext> saveResultOnGraph;
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
@@ -44,8 +46,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.saveResultOnGraph = writeToGraphCallback;
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override

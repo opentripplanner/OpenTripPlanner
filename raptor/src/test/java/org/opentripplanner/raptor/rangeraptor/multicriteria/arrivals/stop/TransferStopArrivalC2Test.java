@@ -3,10 +3,13 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor.api.view.PathLegType.TRANSFER;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestRoute;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -28,7 +31,9 @@ class TransferStopArrivalC2Test {
   private static final int TRANSIT_LEG_DURATION = 1200;
   private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
   private static final int TRANSIT_C1 = 128000;
-  private static final RaptorTripSchedule TRANSIT_TRIP = null;
+  private static final RaptorTripSchedule TRANSIT_TRIP = TestRoute.route("R1", STOP_C, STOP_B)
+    .withTimetable("10:00 11:00")
+    .getTripSchedule(0);
   private static final int ROUND = 1;
 
   private static final int TRANSFER_TO_STOP = 102;
@@ -54,6 +59,7 @@ class TransferStopArrivalC2Test {
       TRANSIT_ALIGHT_TIME,
       ACCESS_ARRIVAL.c1() + TRANSIT_C1,
       TRANSIT_C2,
+      0,
       TRANSIT_TRIP
     );
 

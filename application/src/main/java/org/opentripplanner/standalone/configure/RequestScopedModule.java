@@ -19,6 +19,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -54,9 +56,14 @@ import org.opentripplanner.transit.service.TransitService;
 @Module
 public class RequestScopedModule {
 
+  /**
+   * The request scope is captured from the transit domain's registry only: the street domain's
+   * registry holds no transactional repositories yet. When street repositories are migrated onto
+   * the transaction framework, requests will need one scope per registry.
+   */
   @Provides
   @HttpRequestScoped
-  static TransactionScope transactionScope(RepositoryRegistry repositoryRegistry) {
+  static TransactionScope transactionScope(@TransitDomain RepositoryRegistry repositoryRegistry) {
     return repositoryRegistry.scope();
   }
 
@@ -84,7 +91,10 @@ public class RequestScopedModule {
     TransitService transitService,
     RegularTransferService transferService,
     WorldEnvelopeService worldEnvelopeService,
-    RealtimeVehicleRepository realtimeVehicleRepository,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleRepositoryHandle,
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,
     List<RideHailingService> rideHailingServices,
@@ -113,6 +123,10 @@ public class RequestScopedModule {
     var flexParameters = routerConfig.flexParameters();
     var transmodelAPIParameters = routerConfig.transmodelApi();
 
+    var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
+      transactionScope
+    );
+
     return new DefaultServerRequestContext(
       debugUiConfig,
       fareService,
@@ -122,7 +136,7 @@ public class RequestScopedModule {
       Metrics.globalRegistry,
       ojpApiParameters,
       raptorConfig,
-      realtimeVehicleRepository,
+      realtimeVehicleSnapshot,
       rideHailingServices,
       defaultRequest,
       streetLimitationParametersService,

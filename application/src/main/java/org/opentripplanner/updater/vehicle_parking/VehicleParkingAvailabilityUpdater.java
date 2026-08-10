@@ -10,9 +10,10 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,8 @@ import org.slf4j.LoggerFactory;
  * Graph updater that dynamically sets availability information on vehicle parking lots. This
  * updater fetches data from a single {@link DataSource<VehicleParking>}.
  */
-public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
+public class VehicleParkingAvailabilityUpdater
+  extends PollingGraphUpdater<StreetRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     VehicleParkingAvailabilityUpdater.class
@@ -42,6 +44,11 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public WriteDomain<StreetRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.STREET;
+  }
+
+  @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
     if (source.update()) {
       var updates = source.getUpdates();
@@ -51,7 +58,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     }
   }
 
-  private class AvailabilityUpdater implements GraphWriterRunnable {
+  private class AvailabilityUpdater implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
 
     private final List<AvailabiltyUpdate> updates;
     private final Map<FeedScopedId, VehicleParking> parkingById;
@@ -65,7 +72,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(RealTimeUpdateContext context) {
+    public void run(StreetRealTimeUpdateContext context) {
       updates.forEach(this::handleUpdate);
     }
 

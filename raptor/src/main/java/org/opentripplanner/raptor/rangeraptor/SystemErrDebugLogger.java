@@ -229,12 +229,12 @@ public class SystemErrDebugLogger implements DebugLogger {
       case TRANSIT -> {
         String tripInfo = a.transitPath().trip().pattern().debugInfo();
         if (forwardSearch) {
-          var t = TripTimesSearch.findTripForwardSearchApproximateTime(a);
+          var t = TripTimesSearch.findTripForwardSearch(a);
           buf.transit(tripInfo, t.boardTime(), t.alightTime());
         }
         // reverse search
         else {
-          var t = TripTimesSearch.findTripReverseSearchApproximateTime(a);
+          var t = TripTimesSearch.findTripReverseSearch(a);
           buf.transit(tripInfo, t.alightTime(), t.boardTime());
         }
       }

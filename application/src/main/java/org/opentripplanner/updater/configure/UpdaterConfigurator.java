@@ -18,6 +18,7 @@ import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -31,6 +32,8 @@ import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
@@ -59,7 +62,10 @@ public class UpdaterConfigurator {
   private final VertexLinker linker;
   private final TransitRepository transitRepository;
   private final UpdatersParameters updatersParameters;
-  private final RealtimeVehicleRepository realtimeVehicleRepository;
+  private final RepositoryHandle<
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
+  > realtimeVehicleRepositoryHandle;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final GbfsNetworkOverrides gbfsNetworkOverrides;
 
@@ -72,7 +78,8 @@ public class UpdaterConfigurator {
   private final CarpoolTripVertexResolver carpoolTripVertexResolver;
 
   private final VehicleParkingRepository parkingRepository;
-  private final UpdateManager updateManager;
+  private final UpdateManager transitUpdateManager;
+  private final UpdateManager streetUpdateManager;
   private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
@@ -85,13 +92,17 @@ public class UpdaterConfigurator {
     Graph graph,
     DeduplicatorService deduplicator,
     VertexLinker linker,
-    RealtimeVehicleRepository realtimeVehicleRepository,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
-    UpdateManager updateManager,
+    UpdateManager transitUpdateManager,
+    UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -99,12 +110,13 @@ public class UpdaterConfigurator {
     this.graph = graph;
     this.deduplicator = deduplicator;
     this.linker = linker;
-    this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.realtimeVehicleRepositoryHandle = realtimeVehicleRepositoryHandle;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitRepository = transitRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
-    this.updateManager = updateManager;
+    this.transitUpdateManager = transitUpdateManager;
+    this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
@@ -115,13 +127,17 @@ public class UpdaterConfigurator {
     Graph graph,
     DeduplicatorService deduplicator,
     VertexLinker linker,
-    RealtimeVehicleRepository realtimeVehicleRepository,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
-    UpdateManager updateManager,
+    UpdateManager transitUpdateManager,
+    UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
@@ -130,13 +146,14 @@ public class UpdaterConfigurator {
       graph,
       deduplicator,
       linker,
-      realtimeVehicleRepository,
+      realtimeVehicleRepositoryHandle,
       vehicleRentalRepository,
       parkingRepository,
       transitRepository,
       carpoolingRepository,
       carpoolTripVertexResolver,
-      updateManager,
+      transitUpdateManager,
+      streetUpdateManager,
       timetableRepositoryHandle,
       updatersParameters,
       gbfsNetworkOverrides
@@ -144,7 +161,7 @@ public class UpdaterConfigurator {
   }
 
   private void configure() {
-    List<GraphUpdater> updaters = new ArrayList<>();
+    List<GraphUpdater<?>> updaters = new ArrayList<>();
 
     updaters.addAll(createUpdatersFromConfig());
 
@@ -155,15 +172,24 @@ public class UpdaterConfigurator {
       )
     );
 
-    var graphWriterService = new GraphWriterService(
-      updateManager,
+    var transitWriterService = GraphWriterService.forTransitDomain(
+      transitUpdateManager,
       timetableRepositoryHandle,
-      graph,
+      realtimeVehicleRepositoryHandle,
       transitRepository
     );
+    var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);
     var updaterManager = new GraphUpdaterManager(
-      graphWriterService,
-      graphWriterService::stop,
+      new WriteToGraphCallbacks()
+        .with(WriteDomain.TRANSIT, transitWriterService)
+        .with(WriteDomain.STREET, streetWriterService),
+      () -> {
+        try {
+          transitWriterService.stop();
+        } finally {
+          streetWriterService.stop();
+        }
+      },
       updaters
     );
 
@@ -191,7 +217,7 @@ public class UpdaterConfigurator {
   /**
    * Use the online UpdaterDirectoryService to fetch VehicleRental updaters.
    */
-  private List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
+  private List<GraphUpdater<?>> fetchVehicleRentalServicesFromOnlineDirectory(
     VehicleRentalServiceDirectoryFetcherParameters parameters
   ) {
     if (parameters == null) {
@@ -208,11 +234,11 @@ public class UpdaterConfigurator {
   /**
    * @return a list of GraphUpdaters created from the configuration
    */
-  private List<GraphUpdater> createUpdatersFromConfig() {
+  private List<GraphUpdater<?>> createUpdatersFromConfig() {
     OpeningHoursCalendarService openingHoursCalendarService =
       graph.getOpeningHoursCalendarService();
 
-    List<GraphUpdater> updaters = new ArrayList<>();
+    List<GraphUpdater<?>> updaters = new ArrayList<>();
 
     if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
       int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
@@ -232,7 +258,7 @@ public class UpdaterConfigurator {
       updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
-      updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
+      updaters.add(new PollingVehiclePositionUpdater(configItem));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
       updaters.add(
