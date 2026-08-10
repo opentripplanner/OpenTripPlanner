@@ -21,7 +21,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -43,8 +42,6 @@ class RealtimeResolverTest {
   private final RegularStop stop2 = testModel.stop("stop2", 2, 1).build();
   private final RegularStop stop3 = testModel.stop("stop3", 3, 1).build();
 
-  private final TransitAlertService transitAlertService = new TransitAlertServiceImpl();
-
   @Test
   void testPopulateLegsWithRealtime() {
     var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
@@ -59,6 +56,7 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
     // Put an alert on stop3
+    var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .addTimePeriod(new TimePeriod(0, 0))
@@ -104,7 +102,7 @@ class RealtimeResolverTest {
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
       transitService,
-      transitAlertService
+      new TransitAlertServiceImpl()
     );
 
     assertEquals(1, itineraries.size());
@@ -130,7 +128,7 @@ class RealtimeResolverTest {
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
       transitService,
-      transitAlertService
+      new TransitAlertServiceImpl()
     );
 
     assertEquals(1, itineraries.size());
