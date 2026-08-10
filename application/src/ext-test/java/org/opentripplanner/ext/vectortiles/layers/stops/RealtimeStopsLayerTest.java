@@ -123,7 +123,7 @@ public class RealtimeStopsLayerTest {
     assertEquals("desc", map.get("desc"));
     assertEquals(true, map.get("closedByServiceAlert"));
     assertEquals("WARNING", map.get("mostSevereAlertSeverityLevel"));
-    assertEquals("NO_SERVICE,REDUCED_SERVICE", map.get("mostSevereAlertEffects"));
+    assertEquals("NO_SERVICE,REDUCED_SERVICE", map.get("mostSevereAlertsEffects"));
     assertEquals(false, map.get("servicesRunningOnServiceDate"));
   }
 }

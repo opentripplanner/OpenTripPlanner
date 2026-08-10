@@ -83,7 +83,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       List.of(
         new KeyValue("closedByServiceAlert", noServiceAlert),
         new KeyValue("mostSevereAlertSeverityLevel", mostSevereAlertSeverityLevel),
-        kColl("mostSevereAlertEffects", mostSevereAlertEffects),
+        kColl("mostSevereAlertsEffects", mostSevereAlertEffects),
         new KeyValue("servicesRunningOnServiceDate", stopTimesExist),
         new KeyValue("servicesRunningInFuture", inService)
       )
