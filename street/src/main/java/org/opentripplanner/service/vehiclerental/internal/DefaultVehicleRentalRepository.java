@@ -22,16 +22,19 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
  * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
  *
  * <p>The spatial indices are {@code transient} — JTS {@code STRtree} / {@code PreparedGeometry}
- * caches don't survive Kryo. Raw zones registered via the permanent-scope
- * {@link #setGeofencingZoneIndex(String, GeofencingZoneIndex, Collection)} overload are persisted
+ * caches don't survive Kryo. Raw zones registered via the persisting
+ * {@link #setGeofencingZoneIndex(String, GeofencingZoneIndex, Collection)} overload are stored
  * and used to rebuild the indices lazily on first access.
+ *
+ * <p>Both maps are keyed by network. A network has exactly one source of zones, so a later
+ * registration replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
 public class DefaultVehicleRentalRepository implements VehicleRentalRepository, Serializable {
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 
-  /** Raw zones for permanent-scope data sources whose state must survive serialization. */
+  /** Raw zones, by network, for sources whose state must survive serialization. */
   private final Map<String, Set<GeofencingZone>> serializedZones = new ConcurrentHashMap<>();
 
   /** Rebuilt lazily from {@link #serializedZones} via {@link #indexes()} after deserialization. */
@@ -52,18 +55,18 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository, 
 
   /** Runtime registration; not persisted. Used by the GBFS rental updater. */
   @Override
-  public void setGeofencingZoneIndex(String dataSourceName, GeofencingZoneIndex index) {
-    indexes().put(dataSourceName, index);
+  public void setGeofencingZoneIndex(String network, GeofencingZoneIndex index) {
+    indexes().put(network, index);
   }
 
-  /** Build-time registration; the raw zones are persisted for rebuild after deserialization. */
+  /** Graph-build registration; the raw zones are stored so the index can be rebuilt on load. */
   public void setGeofencingZoneIndex(
-    String dataSourceName,
+    String network,
     GeofencingZoneIndex index,
     Collection<GeofencingZone> zones
   ) {
-    indexes().put(dataSourceName, index);
-    serializedZones.put(dataSourceName, Set.copyOf(zones));
+    indexes().put(network, index);
+    serializedZones.put(network, Set.copyOf(zones));
   }
 
   @Override

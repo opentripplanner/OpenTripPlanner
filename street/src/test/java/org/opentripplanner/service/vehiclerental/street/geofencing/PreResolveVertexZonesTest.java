@@ -1,7 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.core.model.id.FeedScopedIdFactory.id;
 
 import java.util.List;
 import java.util.Set;
@@ -18,40 +17,79 @@ import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 /**
- * Rental vertices are created by the updater at runtime, so a network whose zones were applied at
- * graph build has no updater-side zone index to pre-resolve against. Reading through the
- * repository instead - as {@code VertexLinker} already does for boundary markers - lets those
- * vertices be seeded from zones the updater never computed.
+ * Rental vertices are created by the updater at runtime, so only the updater can seed them. It used
+ * to pre-resolve against the index it had just computed itself, from inside the block that runs
+ * only when its own feed returned zones. A network in the permanent phase returns none, so its
+ * vertices were never seeded - even though the repository holds an index for it, rebuilt from the
+ * zones stored in the graph.
+ * <p>
+ * Pre-resolving through the repository fixes that, but a rental vertex belongs to exactly one
+ * network, so the zones must still be filtered to it. The old single-index call got that for free.
  */
 class PreResolveVertexZonesTest {
 
-  private static final String NETWORK = "tier";
+  private static final String TIER = "tier";
+  private static final String VOI = "voi";
 
-  private static final GeofencingZone NO_DROP_OFF = TestGeofencingZoneBuilder.of(id("frogner-park"))
-    .withGeometry(Polygons.OSLO_FROGNER_PARK)
-    .withDropOffBanned(true)
-    .build();
+  private static final GeofencingZone TIER_NO_DROP_OFF = zone(TIER, "frogner-park");
+  private static final GeofencingZone VOI_NO_DROP_OFF = zone(VOI, "frogner-park");
 
   @Test
-  void seedsVerticesFromZonesRegisteredByAnotherDataSource() {
+  void seedsVerticesFromZonesRegisteredByAnotherPhase() {
     var repository = new DefaultVehicleRentalRepository();
-    // Registered the way the vehicle rental geofencing graph builder registers permanent zones.
+    // Registered the way the geofencing graph builder registers zones during graph build.
     repository.setGeofencingZoneIndex(
-      "permanent:" + NETWORK,
-      new GeofencingZoneIndex(Set.of(NO_DROP_OFF)),
-      Set.of(NO_DROP_OFF)
+      TIER,
+      new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)),
+      Set.of(TIER_NO_DROP_OFF)
     );
 
-    var vertex = scooterInsideFrognerPark();
+    var vertex = scooterInsideFrognerPark(TIER);
 
     GeofencingZoneApplier.preResolveVertexZones(List.of(vertex), repository, true);
 
-    assertThat(vertex.getInitialGeofencingZones()).containsExactly(NO_DROP_OFF);
+    assertThat(vertex.getInitialGeofencingZones()).containsExactly(TIER_NO_DROP_OFF);
+  }
+
+  /**
+   * Other networks' zones are not inert: {@code DeferredForkHandler} and
+   * {@code NetworkCommitmentHandler} read the zone set without filtering by the state's network.
+   */
+  @Test
+  void seedsOnlyTheVertexOwnNetworkWhenZonesOverlap() {
+    var repository = new DefaultVehicleRentalRepository();
+    repository.setGeofencingZoneIndex(TIER, new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)));
+    repository.setGeofencingZoneIndex(VOI, new GeofencingZoneIndex(Set.of(VOI_NO_DROP_OFF)));
+
+    var tierVertex = scooterInsideFrognerPark(TIER);
+    var voiVertex = scooterInsideFrognerPark(VOI);
+
+    GeofencingZoneApplier.preResolveVertexZones(List.of(tierVertex, voiVertex), repository, true);
+
+    assertThat(tierVertex.getInitialGeofencingZones()).containsExactly(TIER_NO_DROP_OFF);
+    assertThat(voiVertex.getInitialGeofencingZones()).containsExactly(VOI_NO_DROP_OFF);
+  }
+
+  /**
+   * A network has one source of zones, so a later registration replaces an earlier one. Were the
+   * two kept side by side, a stale zone would compare equal to its current version - equality is
+   * id plus priority only - and which one answered a query would be arbitrary.
+   */
+  @Test
+  void registeringANetworkAgainReplacesItsPreviousZones() {
+    var repository = new DefaultVehicleRentalRepository();
+    var stale = zone(TIER, "frogner-park");
+    var fresh = zone(TIER, "sofienberg-park");
+
+    repository.setGeofencingZoneIndex(TIER, new GeofencingZoneIndex(Set.of(stale)), Set.of(stale));
+    repository.setGeofencingZoneIndex(TIER, new GeofencingZoneIndex(Set.of(fresh)));
+
+    assertThat(repository.listZones()).containsExactly(fresh);
   }
 
   @Test
   void seedsNothingWhenNoZonesAreRegistered() {
-    var vertex = scooterInsideFrognerPark();
+    var vertex = scooterInsideFrognerPark(TIER);
 
     GeofencingZoneApplier.preResolveVertexZones(
       List.of(vertex),
@@ -62,16 +100,23 @@ class PreResolveVertexZonesTest {
     assertThat(vertex.getInitialGeofencingZones()).isEmpty();
   }
 
-  private static VehicleRentalPlaceVertex scooterInsideFrognerPark() {
+  private static GeofencingZone zone(String network, String id) {
+    return TestGeofencingZoneBuilder.of(new FeedScopedId(network, id))
+      .withGeometry(Polygons.OSLO_FROGNER_PARK)
+      .withDropOffBanned(true)
+      .build();
+  }
+
+  private static VehicleRentalPlaceVertex scooterInsideFrognerPark(String network) {
     var coordinate = Polygons.OSLO_FROGNER_PARK.getInteriorPoint();
     var vehicle = VehicleRentalVehicle.of()
-      .withId(new FeedScopedId(NETWORK, "scooter-1"))
+      .withId(new FeedScopedId(network, "scooter-1"))
       .withName(new NonLocalizedString("scooter-1"))
       .withLatitude(coordinate.getY())
       .withLongitude(coordinate.getX())
       .withVehicleType(
         RentalVehicleType.of()
-          .withId(new FeedScopedId(NETWORK, "scooter-type"))
+          .withId(new FeedScopedId(network, "scooter-type"))
           .withFormFactor(RentalFormFactor.SCOOTER)
           .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
           .withMaxRangeMeters(50000d)

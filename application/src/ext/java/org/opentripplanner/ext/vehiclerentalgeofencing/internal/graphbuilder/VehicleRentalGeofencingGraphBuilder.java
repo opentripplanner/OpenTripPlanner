@@ -45,9 +45,6 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   /** The GBFS feed that must be published for a network to be worth loading here. */
   private static final String GEOFENCING_ZONES_FEED = "geofencing_zones";
 
-  /** Prefix of the repository key a network's permanent zone index is registered under. */
-  private static final String INDEX_KEY_PREFIX = "permanent:";
-
   private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
   private final Graph graph;
@@ -162,7 +159,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     );
     var result = applier.applyGeofencingZones(zones);
 
-    rentalRepository.setGeofencingZoneIndex(indexKey(network.network()), result.zoneIndex(), zones);
+    rentalRepository.setGeofencingZoneIndex(network.network(), result.zoneIndex(), zones);
 
     LOG.info(
       "Applied {} geofencing zones with {} boundary vertices for network {}",
@@ -197,11 +194,6 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     loaderAndMapper.getUpdated();
 
     return loaderAndMapper.getGeofencingZones();
-  }
-
-  /** The repository key a network's permanent zone index is registered under. */
-  public static String indexKey(String network) {
-    return INDEX_KEY_PREFIX + network;
   }
 
   /** A manifest dataset that passed every selection rule, with its fetched auto-configuration. */

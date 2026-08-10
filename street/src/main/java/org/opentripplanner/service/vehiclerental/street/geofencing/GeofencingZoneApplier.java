@@ -71,12 +71,15 @@ public class GeofencingZoneApplier {
    * Pre-resolves the initial geofencing zones for each vehicle rental vertex by querying the
    * repository.
    *
-   * <p>Reads through {@link GeofencingZoneService} rather than a single index so that a vertex is
-   * seeded from every registered data source, including zones applied during graph build by a
-   * network the updater itself does not compute zones for. This mirrors
-   * {@code VertexLinker}, which resolves split-vertex boundaries the same way. Zones belonging to
-   * other networks are harmless here: restrictions are resolved per network by
-   * {@code GeofencingZone.resolveField}.
+   * <p>Reads through {@link GeofencingZoneService} rather than a single index, so a vertex is
+   * seeded whichever phase produced its network's zones - including zones applied during graph
+   * build, which the updater does not recompute and therefore has no index of its own for.
+   *
+   * <p>A rental vertex belongs to exactly one network, so zones are filtered to it. Passing a
+   * single index used to guarantee that implicitly, since an updater only ever held its own
+   * network's zones; querying the repository does not, and other networks' zones are not inert -
+   * {@code DeferredForkHandler} and {@code NetworkCommitmentHandler} read the zone set without
+   * filtering by the state's network.
    *
    * <p>BAs are excluded when {@code requireDropOffInsideBusinessArea} is false. Without boundary markers
    * a BA never leaves {@code currentZones}; left in the set, its permissive flags can win
@@ -88,13 +91,13 @@ public class GeofencingZoneApplier {
     boolean requireDropOffInsideBusinessArea
   ) {
     for (var vertex : vertices) {
-      var zones = zoneService.findZonesContaining(vertex.getCoordinate());
-      Set<GeofencingZone> initial = requireDropOffInsideBusinessArea
-        ? Set.copyOf(zones)
-        : zones
-            .stream()
-            .filter(z -> !z.isBusinessArea())
-            .collect(Collectors.toUnmodifiableSet());
+      var network = vertex.getStation().network();
+      Set<GeofencingZone> initial = zoneService
+        .findZonesContaining(vertex.getCoordinate())
+        .stream()
+        .filter(z -> z.id().getFeedId().equals(network))
+        .filter(z -> requireDropOffInsideBusinessArea || !z.isBusinessArea())
+        .collect(Collectors.toUnmodifiableSet());
       vertex.setInitialGeofencingZones(initial);
     }
   }

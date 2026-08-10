@@ -245,7 +245,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         latestBoundaryVertices = result.boundaryVertices();
         latestZoneIndex = result.zoneIndex();
         latestAppliedGeofencingZones = geofencingZones;
-        service.setGeofencingZoneIndex(nameForLogging, latestZoneIndex);
+        // Keyed by network, not by this updater's name: a network has one source of zones, so
+        // registering replaces any earlier index for it. One updater serves one GBFS feed, so
+        // every zone here carries the same resolved system id.
+        var network = geofencingZones.iterator().next().id().getFeedId();
+        service.setGeofencingZoneIndex(network, latestZoneIndex);
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);
@@ -257,9 +261,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         );
       }
 
-      // Seed the rental vertices from every registered data source, not just from the zones
-      // computed above. A network whose zones were applied during graph build has none here,
-      // but its vertices are still created by this updater and must know which zones they are in.
+      // Seed from the repository rather than from the zones computed above: a network in the
+      // permanent phase has an index there, rebuilt from the graph, but computes none here.
+      // Runs on every update because vertices are recreated as vehicles come and go.
       GeofencingZoneApplier.preResolveVertexZones(
         verticesByStation.values(),
         service,

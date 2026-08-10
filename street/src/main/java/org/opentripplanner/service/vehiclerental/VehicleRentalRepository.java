@@ -20,7 +20,7 @@ public interface VehicleRentalRepository extends GeofencingZoneService {
    * updater when zones are applied. Each updater (one per network) registers its own index;
    * re-registering with the same {@code dataSourceName} replaces the previous index.
    */
-  void setGeofencingZoneIndex(String dataSourceName, GeofencingZoneIndex index);
+  void setGeofencingZoneIndex(String network, GeofencingZoneIndex index);
 
   Collection<VehicleRentalPlace> listRentalPlaces();
 
