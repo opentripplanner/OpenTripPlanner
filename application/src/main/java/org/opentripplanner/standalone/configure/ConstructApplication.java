@@ -218,7 +218,8 @@ public class ConstructApplication {
       transitRepository(),
       carpoolingRepository(),
       carpoolTripVertexResolver(),
-      factory.updateManager(),
+      factory.transitUpdateManager(),
+      factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
       routerConfig().updaterConfig()
     );

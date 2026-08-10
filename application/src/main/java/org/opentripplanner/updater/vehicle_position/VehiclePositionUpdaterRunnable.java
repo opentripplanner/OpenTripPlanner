@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 
-class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
+class VehiclePositionUpdaterRunnable implements GraphWriterRunnable<TransitRealTimeUpdateContext> {
 
   private final List<VehiclePosition> updates;
   private final String feedId;
@@ -28,7 +28,7 @@ class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
   }
 
   @Override
-  public void run(RealTimeUpdateContext context) {
+  public void run(TransitRealTimeUpdateContext context) {
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       feedId,
       context.transitService()::getTrip,

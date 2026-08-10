@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,8 @@ import org.slf4j.LoggerFactory;
  * {@link RealtimeVehicle} and add them to OTP
  * patterns via a GTFS-RT source.
  */
-public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
+public class PollingVehiclePositionUpdater
+  extends PollingGraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 
@@ -43,6 +46,11 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
       pollingPeriod(),
       vehiclePositionSource
     );
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   /**

@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 
-public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
+public class TripUpdateGraphWriterRunnable
+  implements GraphWriterRunnable<TransitRealTimeUpdateContext> {
 
   private final UpdateIncrementality updateIncrementality;
 
@@ -51,7 +52,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
   }
 
   @Override
-  public void run(RealTimeUpdateContext context) {
+  public void run(TransitRealTimeUpdateContext context) {
     var result = adapter
       .forUpdate(context.timetableRepository())
       .applyTripUpdates(

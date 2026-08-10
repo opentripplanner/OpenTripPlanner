@@ -19,6 +19,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -55,9 +56,14 @@ import org.opentripplanner.transit.service.TransitService;
 @Module
 public class RequestScopedModule {
 
+  /**
+   * The request scope is captured from the transit domain's registry only: the street domain's
+   * registry holds no transactional repositories yet. When street repositories are migrated onto
+   * the transaction framework, requests will need one scope per registry.
+   */
   @Provides
   @HttpRequestScoped
-  static TransactionScope transactionScope(RepositoryRegistry repositoryRegistry) {
+  static TransactionScope transactionScope(@TransitDomain RepositoryRegistry repositoryRegistry) {
     return repositoryRegistry.scope();
   }
 

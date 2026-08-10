@@ -24,6 +24,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
@@ -185,7 +186,7 @@ class RequestScopedFactoryTest {
       Builder transitRepository(TransitRepository transitRepository);
 
       @BindsInstance
-      Builder repositoryRegistry(RepositoryRegistry repositoryRegistry);
+      Builder repositoryRegistry(@TransitDomain RepositoryRegistry repositoryRegistry);
 
       @BindsInstance
       Builder timetableRepositoryHandle(

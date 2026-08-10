@@ -2,7 +2,6 @@ package org.opentripplanner.updater;
 
 import java.util.function.Supplier;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -10,9 +9,8 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 
-public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
+public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdateContext {
 
-  private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final TransitService transitService;
 
@@ -37,13 +35,11 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
    * {@link org.opentripplanner.transit.repository.TimetableRepositorySnapshot}. A cleaner separation
    * would require merging scheduled and real-time data into a single unified store - this is the end goal!
    */
-  public DefaultRealTimeUpdateContext(
-    Graph graph,
+  public DefaultTransitRealTimeUpdateContext(
     TransitRepository transitRepository,
     TimetableRepository timetableRepository,
     Supplier<RealtimeVehicleRepository> realtimeVehicleRepository
   ) {
-    this.graph = graph;
     this.timetableRepository = timetableRepository;
     this.transitService = new DefaultTransitService(transitRepository, timetableRepository);
     this.realtimeVehicleRepository = realtimeVehicleRepository;
@@ -52,8 +48,8 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
   /**
    * Constructor for unit tests only.
    */
-  public DefaultRealTimeUpdateContext(Graph graph, TransitRepository transitRepository) {
-    this(graph, transitRepository, null, () -> {
+  public DefaultTransitRealTimeUpdateContext(TransitRepository transitRepository) {
+    this(transitRepository, null, () -> {
       throw new UnsupportedOperationException(
         "The realtime-vehicle repository is not available in this test context"
       );
@@ -68,11 +64,6 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
   @Override
   public RealtimeVehicleRepository realtimeVehicleRepository() {
     return realtimeVehicleRepository.get();
-  }
-
-  @Override
-  public Graph graph() {
-    return graph;
   }
 
   @Override

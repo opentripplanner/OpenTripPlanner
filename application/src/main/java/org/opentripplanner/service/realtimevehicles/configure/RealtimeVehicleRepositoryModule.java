@@ -5,6 +5,7 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
@@ -18,7 +19,7 @@ public abstract class RealtimeVehicleRepositoryModule {
   public static RepositoryHandle<
     RealtimeVehicleRepositorySnapshot,
     RealtimeVehicleRepository
-  > realtimeVehicleRepositoryHandle(RepositoryRegistry repositoryRegistry) {
+  > realtimeVehicleRepositoryHandle(@TransitDomain RepositoryRegistry repositoryRegistry) {
     return repositoryRegistry.registerRepository(
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()

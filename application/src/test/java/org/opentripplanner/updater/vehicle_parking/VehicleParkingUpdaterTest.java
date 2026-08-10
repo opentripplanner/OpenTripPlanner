@@ -23,17 +23,20 @@ import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
+import org.opentripplanner.updater.DefaultStreetRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
 class VehicleParkingUpdaterTest {
 
   private DataSource<VehicleParking> dataSource;
   private Graph graph;
-  private DefaultRealTimeUpdateContext realTimeUpdateContext;
+  private StreetRealTimeUpdateContext realTimeUpdateContext;
 
   private VehicleParkingUpdater vehicleParkingUpdater;
   private VehicleParkingRepository parkingRepository;
@@ -46,7 +49,7 @@ class VehicleParkingUpdaterTest {
     graph = graphData.getGraph();
     TransitRepository transitRepository = graphData.getTransitRepository();
     parkingRepository = new DefaultVehicleParkingRepository();
-    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, transitRepository);
+    realTimeUpdateContext = new DefaultStreetRealTimeUpdateContext(graph);
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
@@ -264,12 +267,12 @@ class VehicleParkingUpdaterTest {
   }
 
   private void runUpdaterOnce() {
-    WriteToGraphCallback callback = runnable -> {
+    WriteToGraphCallback<StreetRealTimeUpdateContext> callback = runnable -> {
       runnable.run(realTimeUpdateContext);
       return CompletableFuture.completedFuture(null);
     };
     var graphUpdaterManager = new GraphUpdaterManager(
-      callback,
+      new WriteToGraphCallbacks().with(WriteDomain.STREET, callback),
       RunnableUtils.NOOP,
       List.of(vehicleParkingUpdater)
     );

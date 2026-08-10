@@ -29,7 +29,9 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -129,7 +131,13 @@ public interface ConstructApplicationFactory {
   VehicleRentalService vehicleRentalService();
   VehicleParkingRepository vehicleParkingRepository();
   VehicleParkingService vehicleParkingService();
-  UpdateManager updateManager();
+
+  @TransitDomain
+  UpdateManager transitUpdateManager();
+
+  @StreetDomain
+  UpdateManager streetUpdateManager();
+
   RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle();
   DataImportIssueSummary dataImportIssueSummary();
 
