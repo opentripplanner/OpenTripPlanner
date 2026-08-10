@@ -47,7 +47,7 @@ public class DestinationArrivalTest {
 
   private static final ArrivalView<RaptorTripSchedule> TRANSIT_ARRIVAL =
     STOP_ARRIVAL_FACTORY.createTransitStopArrival(
-      new PatternRideC1<>(ACCESS_ARRIVAL, ANY, ANY, ANY, ANY, ANY, ANY, A_TRIP),
+      new PatternRideC1<>(ACCESS_ARRIVAL, ANY, ANY, ANY, ANY, ANY, A_TRIP),
       TRANSIT_STOP,
       TRANSIT_ALIGHT_TIME,
       ACCESS_ARRIVAL.c1() + TRANSIT_COST

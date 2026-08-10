@@ -35,8 +35,8 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
-    super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
+  public void arriveByTransit(int arrivalTime, int boardStopPosition, T trip) {
+    super.arriveByTransit(arrivalTime, boardStopPosition, trip);
     for (RaptorAccessEgress egressPath : egressPaths) {
       callback.newDestinationArrival(round, arrivalTime, true, egressPath);
     }

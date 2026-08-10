@@ -100,10 +100,10 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     state.transferToStop(fromStop, arrivalTime, transfer);
   }
 
-  void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
+  void transitToStop(int stop, int time, int boardStopPosition, T trip, boolean bestTime) {
     var state = getOrCreateStopIndex(round, stop);
 
-    state.arriveByTransit(time, boardStop, boardTime, trip);
+    state.arriveByTransit(time, boardStopPosition, trip);
 
     if (bestTime) {
       state.setBestTimeTransit(time);

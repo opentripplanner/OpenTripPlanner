@@ -24,8 +24,7 @@ public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
   @Override
   public PatternRideC2<T> createPatternRide(
     McStopArrival<T> prevArrival,
-    int boardStopIndex,
-    int boardPos,
+    int boardStopPosition,
     int boardTime,
     int boardCost1,
     int relativeC1,
@@ -33,8 +32,7 @@ public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
   ) {
     return new PatternRideC2<>(
       prevArrival,
-      boardStopIndex,
-      boardPos,
+      boardStopPosition,
       boardTime,
       boardCost1,
       relativeC1,

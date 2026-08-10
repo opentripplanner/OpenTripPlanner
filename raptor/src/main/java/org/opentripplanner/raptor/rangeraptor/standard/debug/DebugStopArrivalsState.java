@@ -58,26 +58,19 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
   public void setNewBestTransitTime(
     int stop,
     int alightTime,
+    int boardStopPosition,
     T trip,
-    int boardStop,
-    int boardTime,
     boolean newBestOverall
   ) {
     debug.dropOldStateAndAcceptNewOnBoardArrival(stop, newBestOverall, () ->
-      delegate.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall)
+      delegate.setNewBestTransitTime(stop, alightTime, boardStopPosition, trip, newBestOverall)
     );
   }
 
   @Override
-  public void rejectNewBestTransitTime(
-    int stop,
-    int alightTime,
-    T trip,
-    int boardStop,
-    int boardTime
-  ) {
-    debug.rejectTransit(stop, alightTime, trip, boardStop, boardTime);
-    delegate.rejectNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime);
+  public void rejectNewBestTransitTime(int stop, int alightTime, int boardStopPosition, T trip) {
+    debug.rejectTransit(stop, alightTime, boardStopPosition, trip);
+    delegate.rejectNewBestTransitTime(stop, alightTime, boardStopPosition, trip);
   }
 
   @Override

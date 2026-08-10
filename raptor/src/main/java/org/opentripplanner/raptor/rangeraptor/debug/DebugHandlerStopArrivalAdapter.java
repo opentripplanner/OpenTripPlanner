@@ -12,7 +12,7 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
   }
 
   @Override
-  protected int stop(ArrivalView<?> arrival) {
+  protected int stopIndex(ArrivalView<?> arrival) {
     return arrival.stop();
   }
 

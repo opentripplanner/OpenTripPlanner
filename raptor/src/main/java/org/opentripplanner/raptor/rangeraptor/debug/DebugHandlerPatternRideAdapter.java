@@ -14,7 +14,7 @@ final class DebugHandlerPatternRideAdapter
   }
 
   @Override
-  protected int stop(PatternRideView<?, ?> ride) {
+  protected int stopIndex(PatternRideView<?, ?> ride) {
     return ride.boardStopIndex();
   }
 

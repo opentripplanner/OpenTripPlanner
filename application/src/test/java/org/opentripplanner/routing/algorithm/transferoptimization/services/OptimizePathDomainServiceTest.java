@@ -289,8 +289,6 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_A, trip2, STOP_B).walk(D10_s).build(),
-        tx(trip1, STOP_A, trip2, STOP_C).walk(D10_s).build(),
         tx(trip1, STOP_B, trip2).build(),
         tx(trip1, STOP_B, trip2, STOP_C).walk(D10_s).build(),
         tx(trip1, STOP_C, trip2, STOP_B).walk(D10_s).build(),

@@ -108,7 +108,6 @@ public class TestStopArivalFactory {
       .build();
     var ride = new PatternRideC2<>(
       previous,
-      fromStop,
       0,
       trip.departure(0),
       ANY,

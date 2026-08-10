@@ -3,7 +3,6 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
@@ -30,19 +29,14 @@ public class PollingVehiclePositionUpdater
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
 
   private final String feedId;
-  private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final boolean fuzzyTripMatching;
 
-  public PollingVehiclePositionUpdater(
-    VehiclePositionsUpdaterParameters params,
-    RealtimeVehicleRepository realtimeVehicleRepository
-  ) {
+  public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
     super(params);
     this.vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(
       params.url(),
       params.headers()
     );
-    this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.feedId = params.feedId();
     this.fuzzyTripMatching = params.fuzzyTripMatching();
     this.vehiclePositionFeatures = params.vehiclePositionFeatures();
@@ -70,7 +64,6 @@ public class PollingVehiclePositionUpdater
 
     // Handle updating trip positions via graph writer runnable
     var runnable = new VehiclePositionUpdaterRunnable(
-      realtimeVehicleRepository,
       vehiclePositionFeatures,
       feedId,
       fuzzyTripMatching,

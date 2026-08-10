@@ -5,6 +5,8 @@ import java.util.function.Function;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.WriteContext;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -40,15 +42,25 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
 
   /**
    * Create the bridge for the transit write domain. Each task checks out the mutable
-   * realtime-timetable repository for the current transaction.
+   * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
+   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot
+   * to be published at commit.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleHandle,
     TransitRepository transitRepository
   ) {
     return new GraphWriterService<>(updateManager, ctx ->
-      new DefaultTransitRealTimeUpdateContext(transitRepository, ctx.repository(timetableHandle))
+      new DefaultTransitRealTimeUpdateContext(
+        transitRepository,
+        ctx.repository(timetableHandle),
+        () -> ctx.repository(realtimeVehicleHandle)
+      )
     );
   }
 
