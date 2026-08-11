@@ -5,8 +5,8 @@ import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.gbfs.GbfsDataSourceParameters;
 
 /**
- * Parameters for loading one network's GBFS feed during graph build. Constructed per dataset
- * discovered in the manifest rather than mapped from configuration, so it can be handed to
+ * Parameters for loading one network's GBFS feed during graph build, constructed per dataset
+ * discovered in the manifest so it can be handed to
  * {@link org.opentripplanner.gbfs.GbfsFeedLoaderAndMapper}.
  * <p>
  * Only geofencing zones are loaded here: vehicles and stations are realtime data supplied

@@ -17,14 +17,8 @@ import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 /**
- * Rental vertices are created by the updater at runtime, so only the updater can seed them. It used
- * to pre-resolve against the index it had just computed itself, from inside the block that runs
- * only when its own feed returned zones. A network in the permanent phase returns none, so its
- * vertices were never seeded - even though the repository holds an index for it, rebuilt from the
- * zones stored in the graph.
- * <p>
- * Pre-resolving through the repository fixes that, but a rental vertex belongs to exactly one
- * network, so the zones must still be filtered to it. The old single-index call got that for free.
+ * A rental vertex is seeded from the repository, so it gets its network's zones whichever phase
+ * produced them, and only its own network's.
  */
 class PreResolveVertexZonesTest {
 

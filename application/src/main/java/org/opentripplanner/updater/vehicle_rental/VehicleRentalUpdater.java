@@ -252,9 +252,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         latestBoundaryVertices = result.boundaryVertices();
         latestZoneIndex = result.zoneIndex();
         latestAppliedGeofencingZones = geofencingZones;
-        // Keyed by network, not by this updater's name: a network has one source of zones, so
-        // registering replaces any earlier index for it. One updater serves one GBFS feed, so
-        // every zone here carries the same resolved system id.
+        // A network has one source of zones, so registering under it replaces any earlier index.
+        // One updater serves one GBFS feed, so every zone here carries the same resolved system id.
         var network = geofencingZones.iterator().next().id().getFeedId();
         service.setGeofencingZoneIndex(network, latestZoneIndex);
 
