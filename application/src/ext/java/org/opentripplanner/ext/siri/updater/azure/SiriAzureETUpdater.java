@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -24,7 +25,7 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   private final Consumer<UpdateResult> recordMetrics;
   private final String feedId;
 
-  private WriteToGraphCallback writeToGraphCallback;
+  private WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback;
 
   public SiriAzureETUpdater(
     SiriAzureETUpdaterParameters config,
@@ -36,7 +37,7 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.writeToGraphCallback = writeToGraphCallback;
   }
 

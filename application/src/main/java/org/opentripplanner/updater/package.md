@@ -99,8 +99,12 @@ receiving, deserializing, and validating data on its own schedule. Importantly, 
 are _not allowed to directly modify the transit data (Graph)_. Instead, they submit instances of
 GraphWriterRunnable which are queued up using the WriteToGraphCallback interface. These instances
 are essentially deferred code snippets that _are allowed_ to write to the Graph, but in a very
-controlled way. In short, there is exactly one thread that is allowed to make changes to the transit
-data, and those changes are queued up and executed in sequence, one at a time.
+controlled way. In short, per write domain there is exactly one thread that is allowed to make
+changes to that domain's data, and those changes are queued up and executed in sequence, one at a
+time. There are currently two write domains (see WriteDomain), each with its own writer thread: the
+transit domain owns the timetable data, alerts and realtime vehicles, while the street domain owns
+the street graph and the vehicle-rental and vehicle-parking repositories. Updaters working on
+unrelated domains run in parallel, but every piece of mutable data still has a single writer.
 
 As mentioned above, these GraphWriterRunnable instances must write to the transit data model in a
 very controlled way, following specific rules. They operate on a buffer containing a shallow copy of
@@ -149,8 +153,9 @@ guarantee that the web of objects pointed to will be consistent without some exp
 synchronization at the hand-off.
 
 For simplicity, the process of creating an immutable live snapshot (and a corresponding new writable
-buffer) is handled by Runnable on the single graph writer thread. This serves to defer any queued
-modifications until the new buffer is in place, without introducing any further locking mechanisms.
+buffer) is handled by a Runnable on the transit domain's single writer thread. This serves to defer
+any queued modifications until the new buffer is in place, without introducing any further locking
+mechanisms.
 
 ## Copy-on-Write Strategy in Timetable Snapshots
 

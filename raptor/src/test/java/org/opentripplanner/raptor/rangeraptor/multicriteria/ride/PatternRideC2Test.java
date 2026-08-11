@@ -20,14 +20,14 @@ public class PatternRideC2Test {
 
     assertTrue(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
@@ -35,36 +35,36 @@ public class PatternRideC2Test {
     // criterion in this direction — different trips are incomparable, only lower index dominates)
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertTrue(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_HIGH, C1_HIGH, C1_LOW, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_HIGH, C1_HIGH, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_HIGH, C1_HIGH, C1_LOW, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_HIGH, C1_HIGH, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertTrue(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_HIGH, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_HIGH, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
-        new PatternRideC2<>(null, 0, 0, 0, C1_LOW, C1_LOW, C1_HIGH, TRIP_SORT_INDEX_1, null)
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC2<>(null, 0, 0, C1_LOW, C1_LOW, C1_HIGH, TRIP_SORT_INDEX_1, null)
       )
     );
   }

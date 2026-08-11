@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
@@ -51,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  */
-public class MqttGtfsRealtimeUpdater implements GraphUpdater {
+public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
   private final String url;
@@ -63,7 +65,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String configRef;
   private final GtfsRealTimeTripUpdateAdapter adapter;
   private final Consumer<UpdateResult> recordMetrics;
-  private WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback<TransitRealTimeUpdateContext> saveResultOnGraph;
 
   private final boolean fuzzyTripMatching;
 
@@ -88,8 +90,13 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.saveResultOnGraph = writeToGraphCallback;
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override

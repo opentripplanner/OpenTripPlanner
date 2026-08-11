@@ -5,6 +5,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
@@ -18,7 +19,7 @@ public class SiriAzureSXUpdater implements SiriAzureMessageHandler {
   private final SiriAlertsUpdateHandler updateHandler;
   private final TransitAlertService transitAlertService;
 
-  private WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback<TransitRealTimeUpdateContext> saveResultOnGraph;
 
   public SiriAzureSXUpdater(
     SiriAzureSXUpdaterParameters config,
@@ -34,7 +35,7 @@ public class SiriAzureSXUpdater implements SiriAzureMessageHandler {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.saveResultOnGraph = writeToGraphCallback;
   }
 

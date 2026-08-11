@@ -13,7 +13,7 @@ import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.ext.reportapi.model.TransitGroupPriorityReport;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -29,12 +29,18 @@ public class ReportResource {
   private final ConstrainedTransferService transferService;
   private final TransitService transitService;
   private final RouteRequest defaultRequest;
+  private final Graph graph;
 
   @SuppressWarnings("unused")
-  public ReportResource(@Context OtpServerRequestContext requestContext) {
-    this.transferService = requestContext.transitService().getConstrainedTransferService();
-    this.transitService = requestContext.transitService();
-    this.defaultRequest = requestContext.defaultRouteRequest();
+  public ReportResource(
+    @Context TransitService transitService,
+    @Context RouteRequest defaultRequest,
+    @Context Graph graph
+  ) {
+    this.transferService = transitService.getConstrainedTransferService();
+    this.transitService = transitService;
+    this.defaultRequest = defaultRequest;
+    this.graph = graph;
   }
 
   @GET
@@ -56,9 +62,9 @@ public class ReportResource {
 
   @GET
   @Path("/graph.json")
-  public Response stats(@Context OtpServerRequestContext serverRequestContext) {
+  public Response stats() {
     return Response.status(Response.Status.OK)
-      .entity(CACHED_STATS.get(() -> GraphReportBuilder.build(serverRequestContext)))
+      .entity(CACHED_STATS.get(() -> GraphReportBuilder.build(transitService, graph)))
       .type("application/json")
       .build();
   }

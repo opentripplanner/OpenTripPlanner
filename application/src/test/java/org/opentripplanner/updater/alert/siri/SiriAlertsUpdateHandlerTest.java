@@ -32,8 +32,8 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.DefaultTransitRealTimeUpdateContext;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import uk.org.ifopt.siri21.StopPlaceRef;
 import uk.org.siri.siri21.AffectedLineStructure;
 import uk.org.siri.siri21.AffectedRouteStructure;
@@ -69,7 +69,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   TransitService transitService;
 
-  private RealTimeUpdateContext realTimeUpdateContext;
+  private TransitRealTimeUpdateContext realTimeUpdateContext;
 
   @Override
   public String getFeedName() {
@@ -81,7 +81,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
-    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, transitRepository);
+    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(transitRepository);
     if (transitService == null) {
       transitService = new DefaultTransitService(transitRepository);
     } else {

@@ -18,13 +18,19 @@ class VectorTilesResourceTest {
   void tileJson() {
     // the Grizzly request is awful to instantiate, using Mockito
     var grizzlyRequest = Mockito.mock(Request.class);
+    var serverContext = TestServerContext.createServerContext(
+      new Graph(),
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository(),
+      new DefaultFareService()
+    );
     var resource = new VectorTilesResource(
-      TestServerContext.createServerContext(
-        new Graph(),
-        new TransitRepository(),
-        TransferServiceTestFactory.defaultTransferRepository(),
-        new DefaultFareService()
-      ),
+      serverContext.transitService(),
+      serverContext.vectorTileConfig(),
+      serverContext.worldEnvelopeService(),
+      serverContext.vehicleRentalService(),
+      serverContext.vehicleParkingService(),
+      serverContext.transitAlertService(),
       grizzlyRequest,
       "default"
     );

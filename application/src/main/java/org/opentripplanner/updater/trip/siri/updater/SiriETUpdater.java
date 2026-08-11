@@ -2,9 +2,11 @@ package org.opentripplanner.updater.trip.siri.updater;
 
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -15,7 +17,7 @@ import uk.org.siri.siri21.ServiceDelivery;
 /**
  * Update OTP stop timetables from some a Siri-ET HTTP sources.
  */
-public class SiriETUpdater extends PollingGraphUpdater {
+public class SiriETUpdater extends PollingGraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETUpdater.class);
   /**
@@ -50,6 +52,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
     estimatedTimetableHandler = new EstimatedTimetableHandler(adapter, feedId);
 
     this.metricsConsumer = metricsConsumer;
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   /**

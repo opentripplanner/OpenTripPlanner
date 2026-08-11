@@ -29,13 +29,20 @@ class DebugVectorTilesResourceTest {
 
   @Test
   void tileJson() {
+    var serverContext = TestServerContext.createServerContext(
+      new Graph(),
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository(),
+      new NoopFareServiceFactory().makeFareService()
+    );
     var resource = new DebugVectorTilesResource(
-      TestServerContext.createServerContext(
-        new Graph(),
-        new TransitRepository(),
-        TransferServiceTestFactory.defaultTransferRepository(),
-        new NoopFareServiceFactory().makeFareService()
-      )
+      serverContext.transitService(),
+      serverContext.graph(),
+      serverContext.debugUiConfig(),
+      serverContext.worldEnvelopeService(),
+      serverContext.vehicleRentalService(),
+      serverContext.streetDetailsService(),
+      serverContext.transferService()
     );
     var req = HttpForTest.containerRequest();
     var tileJson = resource.getTileJson(req.getUriInfo(), req, "l1,l2");

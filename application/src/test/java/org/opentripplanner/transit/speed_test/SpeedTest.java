@@ -16,7 +16,6 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -29,6 +28,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -111,7 +111,6 @@ public class SpeedTest {
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
     var transitService = new DefaultTransitService(transitRepository);
-    var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
 
     TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
@@ -137,19 +136,28 @@ public class SpeedTest {
           LocalDate::now
         )
       );
+    var realtimeVehicleHandle = registry.registerRepository(
+      new DefaultRealtimeVehicleRepository(),
+      new RealtimeVehicleRepositoryLifecycle()
+    );
     var threadFactory = java.util.concurrent.Executors.defaultThreadFactory();
-    var updateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
+    var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
       "speedtest",
       registry,
       threadFactory,
       parameters.maxSnapshotFrequency()
+    );
+    var streetUpdateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
+      "speedtest-street",
+      TransactionFactory.createRepositoryRegistry(),
+      threadFactory
     );
 
     UpdaterConfigurator.configure(
       graph,
       DeduplicatorService.NOOP,
       VertexLinkerTestFactory.of(graph),
-      realtimeVehicleRepository,
+      realtimeVehicleHandle,
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       transitRepository,
@@ -157,7 +165,8 @@ public class SpeedTest {
       // repository nor a resolver.
       null,
       null,
-      updateManager,
+      transitUpdateManager,
+      streetUpdateManager,
       timetableHandle,
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig()
@@ -176,6 +185,7 @@ public class SpeedTest {
     // Creating raptor transit data should be integrated into the TransitRepository, but for now
     // we do it manually here
 
+    var transactionScope = registry.scope();
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       new DefaultFareService(),
@@ -185,16 +195,16 @@ public class SpeedTest {
       timer.getRegistry(),
       null,
       raptorConfig,
-      realtimeVehicleRepository,
+      realtimeVehicleHandle.repositorySnapshot(transactionScope),
       List.of(),
       routerConfig.routingRequestDefaults(),
       TestServerContext.createStreetLimitationParametersService(),
       TransferServiceTestFactory.transferService(transferRepository),
-      new TransactionScope() {},
+      transactionScope,
       routerConfig.transitTuningConfig(),
       new DefaultTransitService(
         transitRepository,
-        timetableHandle.repositorySnapshot(registry.scope())
+        timetableHandle.repositorySnapshot(transactionScope)
       ),
       new DelegatingTransitAlertServiceImpl(),
       null,

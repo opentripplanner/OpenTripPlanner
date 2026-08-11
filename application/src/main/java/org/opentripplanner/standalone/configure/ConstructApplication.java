@@ -11,6 +11,7 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -23,6 +24,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.util.EllipsoidUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -210,13 +212,14 @@ public class ConstructApplication {
       graph(),
       deduplicatorService(),
       vertexLinker(),
-      realtimeVehicleRepository(),
+      realtimeVehicleRepositoryHandle(),
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       transitRepository(),
       carpoolingRepository(),
       carpoolTripVertexResolver(),
-      factory.updateManager(),
+      factory.transitUpdateManager(),
+      factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
       factory.transitAlertService(),
       routerConfig().updaterConfig()
@@ -305,8 +308,11 @@ public class ConstructApplication {
     return factory.streetRepository();
   }
 
-  public RealtimeVehicleRepository realtimeVehicleRepository() {
-    return factory.realtimeVehicleRepository();
+  public RepositoryHandle<
+    RealtimeVehicleRepositorySnapshot,
+    RealtimeVehicleRepository
+  > realtimeVehicleRepositoryHandle() {
+    return factory.realtimeVehicleRepositoryHandle();
   }
 
   public VehicleRentalRepository vehicleRentalRepository() {

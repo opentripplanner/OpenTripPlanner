@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
@@ -47,7 +48,7 @@ public abstract class TransitModule {
   > timetableRepositoryHandle(
     TimetableSnapshotParameters parameters,
     TransitRepository transitRepository,
-    RepositoryRegistry repositoryRegistry,
+    @TransitDomain RepositoryRegistry repositoryRegistry,
     RaptorTransitData scheduledRaptorTransitData,
     DefaultTripCalendars tripCalendars
   ) {

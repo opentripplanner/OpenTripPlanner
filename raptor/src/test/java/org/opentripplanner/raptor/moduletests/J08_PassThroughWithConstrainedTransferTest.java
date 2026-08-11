@@ -87,8 +87,8 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
    * exceeds R2's scheduled departure — the constrained transfer holds the train. R2 then passes
    * through the via point D before reaching the destination E.
    * <p>
-   * Without the fix, {@code findDepartureStopPosition(walkArrivalTime=330s, C)} fails because
-   * R2 departed C at 300s — causing the pass-through continuation to be silently dropped.
+   * This verifies that the via pass-though boarding pick up the boarding stop psition correctly,
+   * ignoting the regular transfer walk duration.
    */
   @Test
   void guaranteedWalkTransferWithPassThrough() {

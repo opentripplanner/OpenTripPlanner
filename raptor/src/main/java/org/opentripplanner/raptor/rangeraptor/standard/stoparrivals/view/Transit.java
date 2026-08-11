@@ -40,7 +40,7 @@ final class Transit<T extends RaptorTripSchedule>
 
   @Override
   public ArrivalView<T> previous() {
-    return cursor.stop(round() - 1, boardStop(), this);
+    return cursor.stop(round() - 1, boardStopIndex(), this);
   }
 
   @Override
@@ -54,8 +54,8 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int boardStop() {
-    return arrival.boardStop();
+  public int boardStopPosition() {
+    return arrival.boardStopPosition();
   }
 
   @Override
@@ -70,5 +70,9 @@ final class Transit<T extends RaptorTripSchedule>
   @Override
   public boolean arrivedOnBoard() {
     return true;
+  }
+
+  private int boardStopIndex() {
+    return arrival.trip().pattern().stopIndex(boardStopPosition());
   }
 }

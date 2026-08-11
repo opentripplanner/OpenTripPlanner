@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.updater;
 
 import java.util.List;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
@@ -29,7 +29,7 @@ public class EstimatedTimetableHandler {
   public UpdateResult applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
     UpdateIncrementality updateMode,
-    RealTimeUpdateContext context
+    TransitRealTimeUpdateContext context
   ) {
     return adapter
       .forUpdate(context.timetableRepository())

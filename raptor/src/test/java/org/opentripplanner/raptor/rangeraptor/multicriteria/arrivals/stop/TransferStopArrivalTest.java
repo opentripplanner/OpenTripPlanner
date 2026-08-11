@@ -54,6 +54,7 @@ class TransferStopArrivalTest {
       TRANSIT_TO_STOP,
       TRANSIT_ALIGHT_TIME,
       ACCESS_ARRIVAL.c1() + TRANSIT_C1,
+      0,
       TRANSIT_TRIP
     );
 

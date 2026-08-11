@@ -80,6 +80,7 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
@@ -515,10 +516,6 @@ class GraphQLIntegrationTest {
     transitAlertService.setAlerts(alerts);
 
     var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
-    var realtimeVehicleService = new DefaultRealtimeVehicleService(
-      realtimeVehicleRepository,
-      transitService
-    );
     var occypancyVehicle = RealtimeVehicle.builder()
       .withTrip(trip)
       .withTime(SERVICE_DATE.atStartOfDay(BERLIN).plusHours(16).toInstant())
@@ -541,6 +538,10 @@ class GraphQLIntegrationTest {
       new ImmutableListMultimap.Builder()
         .putAll(pattern, List.of(occypancyVehicle, positionVehicle))
         .build()
+    );
+    var realtimeVehicleService = new DefaultRealtimeVehicleService(
+      new RealtimeVehicleRepositoryLifecycle().freeze(realtimeVehicleRepository),
+      transitService
     );
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
