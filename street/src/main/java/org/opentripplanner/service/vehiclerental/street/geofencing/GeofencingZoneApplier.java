@@ -26,7 +26,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 /**
  * Applies geofencing zone restrictions to the street graph. For restricted zones,
  * {@link GeofencingBoundaryExtension} is applied to boundary-crossing vertices for state-based
- * zone tracking. When {@code applyBusinessAreas} is false, boundary extensions are not created
+ * zone tracking. When {@code requireDropOffInsideBusinessArea} is false, boundary extensions are not created
  * for business-area-only zones, disabling boundary enforcement while keeping the zones in the
  * index for state tracking, speed limits, and debug tiles.
  */
@@ -34,16 +34,16 @@ public class GeofencingZoneApplier {
 
   private final Function<Collection<LineString>, Set<Edge>> findEdgesAlongLineStrings;
   private final Function<Envelope, Collection<Edge>> findEdgesForEnvelope;
-  private final boolean applyBusinessAreas;
+  private final boolean requireDropOffInsideBusinessArea;
 
   public GeofencingZoneApplier(
     Function<Collection<LineString>, Set<Edge>> findEdgesAlongLineStrings,
     Function<Envelope, Collection<Edge>> findEdgesForEnvelope,
-    boolean applyBusinessAreas
+    boolean requireDropOffInsideBusinessArea
   ) {
     this.findEdgesAlongLineStrings = findEdgesAlongLineStrings;
     this.findEdgesForEnvelope = findEdgesForEnvelope;
-    this.applyBusinessAreas = applyBusinessAreas;
+    this.requireDropOffInsideBusinessArea = requireDropOffInsideBusinessArea;
   }
 
   /**
@@ -58,7 +58,7 @@ public class GeofencingZoneApplier {
     var zonesWithGeometry = geofencingZones
       .stream()
       .filter(z -> z.geometry() != null)
-      .filter(z -> applyBusinessAreas || !z.isBusinessArea())
+      .filter(z -> requireDropOffInsideBusinessArea || !z.isBusinessArea())
       .toList();
 
     var boundaryVertices = addBoundaryExtensions(zonesWithGeometry);
@@ -70,18 +70,18 @@ public class GeofencingZoneApplier {
    * Pre-resolves the initial geofencing zones for each vehicle rental vertex by querying the
    * spatial index.
    *
-   * <p>BAs are excluded when {@code applyBusinessAreas} is false. Without boundary markers
+   * <p>BAs are excluded when {@code requireDropOffInsideBusinessArea} is false. Without boundary markers
    * a BA never leaves {@code currentZones}; left in the set, its permissive flags can win
    * {@code resolveField} and mask lower-priority restrictive zones.
    */
   public static void preResolveVertexZones(
     Collection<VehicleRentalPlaceVertex> vertices,
     GeofencingZoneIndex zoneIndex,
-    boolean applyBusinessAreas
+    boolean requireDropOffInsideBusinessArea
   ) {
     for (var vertex : vertices) {
       var zones = zoneIndex.findZonesContaining(vertex.getCoordinate());
-      Set<GeofencingZone> initial = applyBusinessAreas
+      Set<GeofencingZone> initial = requireDropOffInsideBusinessArea
         ? Set.copyOf(zones)
         : zones
             .stream()

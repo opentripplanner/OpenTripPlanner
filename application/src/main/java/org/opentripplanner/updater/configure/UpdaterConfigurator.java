@@ -16,6 +16,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -66,6 +67,7 @@ public class UpdaterConfigurator {
     RealtimeVehicleRepository
   > realtimeVehicleRepositoryHandle;
   private final VehicleRentalRepository vehicleRentalRepository;
+  private final GbfsNetworkOverrides gbfsNetworkOverrides;
 
   /** {@code null} when {@link OTPFeature#CarPooling} is off. */
   @Nullable
@@ -102,7 +104,8 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    UpdatersParameters updatersParameters
+    UpdatersParameters updatersParameters,
+    GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -117,6 +120,7 @@ public class UpdaterConfigurator {
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
+    this.gbfsNetworkOverrides = gbfsNetworkOverrides;
   }
 
   public static void configure(
@@ -135,7 +139,8 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    UpdatersParameters updatersParameters
+    UpdatersParameters updatersParameters,
+    GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
     new UpdaterConfigurator(
       graph,
@@ -150,7 +155,8 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
-      updatersParameters
+      updatersParameters,
+      gbfsNetworkOverrides
     ).configure();
   }
 
@@ -219,6 +225,7 @@ public class UpdaterConfigurator {
     }
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
+      gbfsNetworkOverrides,
       linker,
       vehicleRentalRepository
     );

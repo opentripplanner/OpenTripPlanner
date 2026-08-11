@@ -1,0 +1,18 @@
+{
+  "gbfs": {
+    "defaults": {
+      "geofencingZones": "off",
+      "requireDropOffInsideBusinessArea": true,
+      "allowKeepingVehicleAtDestination": false
+    },
+    "includeUnlistedNetworks": false,
+    "networks": [
+      {
+        "network": "tier",
+        "geofencingZones": "realtime",
+        "requireDropOffInsideBusinessArea": false,
+        "allowKeepingVehicleAtDestination": true
+      }
+    ]
+  }
+}

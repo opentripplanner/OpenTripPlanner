@@ -221,7 +221,8 @@ public class ConstructApplication {
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
-      routerConfig().updaterConfig()
+      routerConfig().updaterConfig(),
+      otpConfig().gbfsNetworks
     );
 
     // Start application warmup — runs routing queries to warm up the application
