@@ -1,0 +1,158 @@
+package org.opentripplanner.ext.carpickupzone.graphbuilder;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
+import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.model.FlexStopTimesFactory;
+import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.timetable.Trip;
+
+class CarPickupZoneBuilderTest {
+
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
+
+  private static final AreaStop AREA_1 = TEST_MODEL.areaStop("area-1").build();
+  private static final AreaStop AREA_2 = TEST_MODEL.areaStop("area-2").build();
+
+  private static final Trip TRIP = TransitRepositoryForTest.trip("car-pickup").build();
+
+  private static StopTime fullDayAreaStop(
+    AreaStop areaStop,
+    PickDrop pickupType,
+    PickDrop dropOffType
+  ) {
+    return FlexStopTimesFactory.area(areaStop, "00:00", "24:00", TRIP, pickupType, dropOffType);
+  }
+
+  private static StopTime restrictedAreaStop(
+    AreaStop areaStop,
+    PickDrop pickupType,
+    PickDrop dropOffType
+  ) {
+    return FlexStopTimesFactory.area(areaStop, "10:00", "10:30", TRIP, pickupType, dropOffType);
+  }
+
+  private static List<StopTime> validStopTimes() {
+    return List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+  }
+
+  private static FlexTrip<?, ?> unscheduledTrip(List<StopTime> stopTimes) {
+    return UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t1"))
+      .withTrip(TRIP)
+      .withStopTimes(stopTimes)
+      .build();
+  }
+
+  @Test
+  void validTripProducesZone() {
+    var trip = unscheduledTrip(validStopTimes());
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertEquals(1, zones.size());
+    var zone = zones.get(0);
+    assertEquals(AREA_1.getGeometry(), zone.geometry());
+    assertEquals(TRIP.getRoute(), zone.route());
+  }
+
+  @Test
+  void notUnscheduledTripIsSkipped() {
+    var stopTimes = List.of(
+      FlexStopTimesFactory.area(AREA_1, "10:10", "10:15"),
+      FlexStopTimesFactory.regularStop("10:40", "10:45")
+    );
+    var trip = ScheduledDeviatedTrip.of(FeedScopedIdForTestFactory.id("t2"))
+      .withStopTimes(stopTimes)
+      .build();
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
+  void boundedTimeRestrictionIsSkipped() {
+    var stopTimes = List.of(
+      restrictedAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      restrictedAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
+  void fullDayWindowIsAllowed() {
+    var trip = unscheduledTrip(validStopTimes());
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertEquals(1, zones.size());
+  }
+
+  @Test
+  void wrongNumberOfStopsIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
+  void differentAreasIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
+  void invalidPickupTypeIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
+  void invalidDropOffTypeIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+}
