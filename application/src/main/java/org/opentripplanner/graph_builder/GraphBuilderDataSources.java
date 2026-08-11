@@ -91,8 +91,6 @@ public class GraphBuilderDataSources implements Closeable {
     include(cli.doBuildStreet(), CACHE);
     include(cli.doBuildTransit(), GTFS);
     include(cli.doBuildTransit(), NETEX);
-    include(cli.doBuildTransit(), EMISSION);
-    include(cli.doBuildTransit(), EMPIRICAL_DATA);
 
     selectFilesToImport();
 
