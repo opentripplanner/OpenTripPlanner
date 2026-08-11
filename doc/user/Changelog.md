@@ -5,7 +5,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.10.0-SNAPSHOT (in progress)
 
-- Share GBFS per-network configuration between the vehicle rental sandboxes in `otp-config.json`, and make the geofencing graph builder manifest-driven as `vehicleRentalGeofencing`
+- Add the `vehicleRentalGeofencing` sandbox, loading GBFS geofencing zones during the graph build
+- Move per-network GBFS configuration into a shared `gbfs` section of `otp-config.json`
 
 - Add select/not filters to estimatedCalls in Transmodel [#7305](https://github.com/opentripplanner/OpenTripPlanner/pull/7305)
 - Cleanup regular transfer build parameters [#7425](https://github.com/opentripplanner/OpenTripPlanner/pull/7425)

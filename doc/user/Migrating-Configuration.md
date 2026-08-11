@@ -66,17 +66,3 @@ Three things to check when migrating:
   `allowKeepingVehicleAtDestination`.
 - `geofencingZones` is no longer a boolean. It names the phase that computes the zones -
   `permanent`, `realtime` or `off` - so a network cannot have its zones applied twice.
-
-The graph-build sandbox `gbfsGeofencing` was renamed to `vehicleRentalGeofencing` and now
-discovers its feeds from a GBFS manifest instead of an explicit `feeds` list. Its
-`OTPFeature.GbfsGeofencingBuildTime` flag was removed: the sandbox is activated by the presence of
-`vehicleRentalGeofencing.url` in `build-config.json`.
-
-```
-build-config.json
-  gbfsGeofencing                      ------>   vehicleRentalGeofencing
-    feeds[].url                       ------>     url  (the manifest, not per-feed)
-    feeds[].network                   ------>     (discovered from system_id)
-    feeds[].applyBusinessAreas        ------>     gbfs.networks[].requireDropOffInsideBusinessArea
-    feeds[].headers                   ------>     headers
-```
