@@ -32,6 +32,27 @@ public class GbfsFeedLoaderAndMapper {
     // Fetched once and handed over to the version-specific loader, since some servers throttle
     // repeated fetches of the same file.
     var autoConfiguration = GbfsAutoConfiguration.fetch(params.url(), params.httpHeaders(), client);
+    return create(params, autoConfiguration, client);
+  }
+
+  /**
+   * Creates a loader from an auto-configuration file the caller has already fetched, for instance
+   * to inspect {@link GbfsAutoConfiguration#feedNames()} before deciding to load the system at all.
+   * Avoids fetching {@code gbfs.json} twice, which some servers throttle.
+   */
+  public static GbfsFeedLoaderAndMapper create(
+    GbfsDataSourceParameters params,
+    GbfsAutoConfiguration autoConfiguration,
+    OtpHttpClientFactory otpHttpClientFactory
+  ) {
+    return create(params, autoConfiguration, otpHttpClientFactory.create(LOG));
+  }
+
+  private static GbfsFeedLoaderAndMapper create(
+    GbfsDataSourceParameters params,
+    GbfsAutoConfiguration autoConfiguration,
+    OtpHttpClient client
+  ) {
     var gbfsFeedVersion = autoConfiguration.version().orElse(null);
 
     return switch (gbfsFeedVersion) {
