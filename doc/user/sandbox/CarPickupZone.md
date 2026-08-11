@@ -14,16 +14,19 @@ For each driving-ish leg in a car pickup itinerary:
   deletion and removed from the response.
 - If **a matching zone is found**, the generic driving leg is replaced with a `CarPickupZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
+- The filter is only enabled when the request's access or egress mode is `CAR_PICKUP` (see
+  `RouteRequestToFilterChainMapper`).
 
-> **TODO:** Multi-provider support. Currently only the first matching zone is used.
+**TODO:**
+- Multi-provider support. Currently only the first matching zone is used.
+- Possibly add CAR_PICKUP direct mode to GTFS API for enabling the car pickup zone decorator with only direct mode.
 
 ### Car Pickup Zone Data Files
 
-Car pickup zone data is provided as standard GTFS Flex zip files or directories. Files are
-auto-discovered by filename: any GTFS file whose name contains `car_pickup_zone`,
-`car-pickup-zone`, or `carpickupzone` (case-insensitive) is classified as `CAR_PICKUP_ZONE` type
-and processed exclusively by this module. Such files are **not** added to normal transit or flex
-routing.
+Car pickup zone data is provided as standard GTFS Flex zip files. Files are auto-discovered by
+filename: a file whose name contains `car_pickup_zone`, `car-pickup-zone`, or `carpickupzone`
+(case-insensitive) is classified as `CAR_PICKUP_ZONE` type and processed exclusively by this
+module. Such files are **not** added to normal transit or flex routing.
 
 Example graph directory layout:
 
@@ -31,7 +34,7 @@ Example graph directory layout:
 graph/
   build-config.json
   HSL-gtfs.zip
-  Taxi-carpickupzone-gtfs.zip   ← auto-discovered as CAR_PICKUP_ZONE type
+  Taxi-carpickupzone.zip   ← auto-discovered as CAR_PICKUP_ZONE type
 ```
 
 ### GTFS Data Requirements

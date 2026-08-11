@@ -24,7 +24,6 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
@@ -185,9 +184,6 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   private FileType resolveFileType(File file) {
     String name = file.getName();
-    if (OTPFeature.CarPickupZone.isOn() && isTransitFile(file, CAR_PICKUP_ZONE_PATTERN)) {
-      return CAR_PICKUP_ZONE;
-    }
     if (isTransitFile(file, gtfsLocalFilePattern)) {
       return GTFS;
     }
@@ -203,6 +199,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     }
     if (EMISSION_PATTERN.matcher(name).find()) {
       return EMISSION;
+    }
+    if (CAR_PICKUP_ZONE_PATTERN.matcher(name).find()) {
+      return CAR_PICKUP_ZONE;
     }
     if (EMPIRICAL_DELAY_PATTERN.matcher(name).find()) {
       return EMPIRICAL_DATA;

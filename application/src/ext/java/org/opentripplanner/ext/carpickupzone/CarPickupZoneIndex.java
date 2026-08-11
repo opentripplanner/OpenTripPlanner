@@ -10,8 +10,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Spatial index over car pickup provider zones loaded from dedicated GTFS data sources. Used to
- * look up which provider zone covers a given pickup–dropoff coordinate pair.
+ * Spatial index over car pickup provider zones. Used to look up which provider zone covers a given
+ * pickup–dropoff coordinate pair.
  *
  * <p>TODO: Multi-provider support. Currently only the first matching zone is used.
  * In the future all matching providers should be available so users can choose.

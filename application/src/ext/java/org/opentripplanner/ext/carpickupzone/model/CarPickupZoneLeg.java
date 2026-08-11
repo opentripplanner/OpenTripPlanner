@@ -10,9 +10,6 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
-/**
- * A car pickup driving leg decorated with a matched taxi provider derived from Flex zone data.
- */
 public class CarPickupZoneLeg extends StreetLeg {
 
   private final CarPickupZone carPickupZone;

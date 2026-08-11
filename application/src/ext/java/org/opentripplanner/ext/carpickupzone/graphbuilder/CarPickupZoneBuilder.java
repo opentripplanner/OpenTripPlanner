@@ -42,10 +42,6 @@ public class CarPickupZoneBuilder {
     return result;
   }
 
-  /**
-   * Returns {@code true} if the flex trip satisfies all car pickup zone data requirements.
-   * Logs a warning and returns {@code false} for each failed constraint.
-   */
   private static boolean isValidCarPickupZoneTrip(FlexTrip<?, ?> flexTrip) {
     return (
       isUnscheduledTrip(flexTrip) &&
@@ -56,7 +52,6 @@ public class CarPickupZoneBuilder {
     );
   }
 
-  /** Trip must be an {@link UnscheduledTrip}. */
   private static boolean isUnscheduledTrip(FlexTrip<?, ?> flexTrip) {
     if (flexTrip instanceof UnscheduledTrip) {
       return true;
@@ -69,10 +64,6 @@ public class CarPickupZoneBuilder {
     return false;
   }
 
-  /**
-   * No stop may have a meaningful time restriction (start_pickup_dropoff_window / end_pickup_dropoff_window).
-   * A full-day window (0:00:00-24:00:00) is treated as "always available" and is allowed.
-   */
   private static boolean hasNoTimeRestrictions(FlexTrip<?, ?> flexTrip) {
     for (int i = 0; i < flexTrip.numberOfStops(); i++) {
       int start = flexTrip.earliestDepartureTime(i);
@@ -85,7 +76,7 @@ public class CarPickupZoneBuilder {
             " (start_pickup_dropoff_window / end_pickup_dropoff_window must not be set," +
             " or must span the full day 0:00:00-24:00:00)",
           flexTrip.getId(),
-          i
+          flexTrip.getStop(i)
         );
         return false;
       }
@@ -93,25 +84,19 @@ public class CarPickupZoneBuilder {
     return true;
   }
 
-  /**
-   * Trip must have exactly 2 stop times: one pickup stop (index 0) and one drop-off stop (index 1).
-   */
   private static boolean hasTwoStops(FlexTrip<?, ?> flexTrip) {
     if (flexTrip.numberOfStops() == 2) {
       return true;
     }
     LOG.warn(
-      "Skipping trip {} for car pickup zones: expected exactly 2 stop times, got {}",
+      "Skipping trip {} for car pickup zones: expected exactly 2 stop times " +
+        "(one pickup stop and one drop-off stop), got {}",
       flexTrip.getId(),
       flexTrip.numberOfStops()
     );
     return false;
   }
 
-  /**
-   * Both stop times must reference the same GTFS Flex area ({@code location_id}) and that area
-   * must have a geometry.
-   */
   private static boolean hasSingleZone(FlexTrip<?, ?> flexTrip) {
     if (
       flexTrip.getStop(0) instanceof AreaStop stop0 &&
@@ -129,10 +114,6 @@ public class CarPickupZoneBuilder {
     return false;
   }
 
-  /**
-   * Stop 0 must allow pickup and stop 1 must allow drop-off, both with type {@code CALL_AGENCY}
-   * or {@code COORDINATE_WITH_DRIVER}.
-   */
   private static boolean hasValidPickupDropoffTypes(FlexTrip<?, ?> flexTrip) {
     PickDrop boardRule = flexTrip.getBoardRule(0);
     PickDrop alightRule = flexTrip.getAlightRule(1);

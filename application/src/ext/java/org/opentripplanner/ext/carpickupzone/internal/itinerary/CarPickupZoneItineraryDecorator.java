@@ -75,7 +75,7 @@ public class CarPickupZoneItineraryDecorator implements ItineraryListFilter {
     itinerary.flagForDeletion(
       new SystemNotice(
         NO_CAR_PICKUP_ZONE_AVAILABLE,
-        "Itinerary removed: car pickup leg does not fall within any configured taxi zone."
+        "Itinerary removed: car leg does not fall within any configured car pickup zones."
       )
     );
   }
