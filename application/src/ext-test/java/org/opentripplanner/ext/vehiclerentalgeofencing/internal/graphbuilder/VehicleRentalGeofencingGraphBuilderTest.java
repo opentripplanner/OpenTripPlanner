@@ -19,11 +19,10 @@ import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
 import org.opentripplanner.gbfs.network.GeofencingZonePhase;
 
 /**
- * The test manifest lists three datasets:
+ * The test manifest lists two datasets:
  * <ul>
- *   <li>{@code tieroslo} - a v2 feed that publishes {@code geofencing_zones}</li>
+ *   <li>{@code tieroslo} - publishes {@code geofencing_zones}</li>
  *   <li>{@code duplicate-stations} - v2 and v3 feeds, neither publishing geofencing zones</li>
- *   <li>{@code no-versions} - a dataset publishing no GBFS version at all</li>
  * </ul>
  */
 class VehicleRentalGeofencingGraphBuilderTest {

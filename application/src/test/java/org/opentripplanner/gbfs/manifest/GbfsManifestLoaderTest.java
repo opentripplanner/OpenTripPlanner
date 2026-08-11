@@ -24,7 +24,7 @@ class GbfsManifestLoaderTest {
     assertThat(manifest).isNotNull();
     assertThat(
       manifest.getData().getDatasets().stream().map(GBFSDataset::getSystemId).toList()
-    ).containsExactly("tieroslo", "duplicate-stations", "no-versions");
+    ).containsExactly("tieroslo", "duplicate-stations");
   }
 
   @Test

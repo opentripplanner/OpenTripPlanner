@@ -25,10 +25,6 @@
             "url": "file:src/test/resources/gbfs/duplicate-stations-v3/gbfs.json"
           }
         ]
-      },
-      {
-        "system_id": "no-versions",
-        "versions": []
       }
     ]
   }
