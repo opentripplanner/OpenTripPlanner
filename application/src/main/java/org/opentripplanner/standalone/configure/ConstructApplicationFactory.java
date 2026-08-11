@@ -230,7 +230,7 @@ public interface ConstructApplicationFactory {
     Builder empiricalDelayRepository(EmpiricalDelayRepository empiricalDelayRepository);
 
     @BindsInstance
-    Builder schema(RouteRequest defaultRouteRequest);
+    Builder schema(@StaticRouteRequestDefaults RouteRequest defaultRouteRequest);
 
     @BindsInstance
     Builder streetStreetRepository(StreetRepository streetRepository);
