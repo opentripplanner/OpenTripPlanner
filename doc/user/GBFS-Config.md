@@ -272,7 +272,7 @@ Which phase computes and applies this network's geofencing zones.
 
 - `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
   during graph build, so they are baked into the graph.
-- `realtime` - the vehicle rental updater loads and applies the zones at runtime.
+- `realtime` - the vehicle rental updater loads and applies the zones.
 - `off` - the zones are not processed.
 
 The two phases are mutually exclusive, so zones cannot be applied twice for a network.
@@ -318,7 +318,7 @@ Which phase computes and applies this network's geofencing zones.
 
 - `permanent` - the `vehicleRentalGeofencing` graph builder loads and applies the zones at
   during graph build, so they are baked into the graph.
-- `realtime` - the vehicle rental updater loads and applies the zones at runtime.
+- `realtime` - the vehicle rental updater loads and applies the zones.
 - `off` - the zones are not processed.
 
 The two phases are mutually exclusive, so zones cannot be applied twice for a network.

@@ -1315,7 +1315,7 @@ the graph build. This moves the cost of computing zone boundaries off the runtim
 A network is only loaded if its GBFS feed actually publishes a `geofencing_zones` feed;
 this is checked against the feed list in `gbfs.json` before the feed is fetched.
 
-Vehicles and stations remain runtime data, so a vehicle rental updater is still required.
+Vehicles and stations remain realtime data, so a vehicle rental updater is still required.
 
 Note: a GBFS updater configured directly under `updaters` in `router-config.json` does not
 read the shared `gbfs` section. Enabling `geofencingZones` on such an updater for a network

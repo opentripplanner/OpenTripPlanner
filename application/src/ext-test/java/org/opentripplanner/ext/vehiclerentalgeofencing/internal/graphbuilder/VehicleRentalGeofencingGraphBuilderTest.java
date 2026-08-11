@@ -57,7 +57,7 @@ class VehicleRentalGeofencingGraphBuilderTest {
   }
 
   @Test
-  void skipsNetworksHandledAtRuntime() {
+  void skipsNetworksInTheRealtimePhase() {
     assertThat(selectNetworks(allNetworks(REALTIME))).isEmpty();
   }
 

@@ -53,7 +53,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository, 
     rentalPlaces.remove(vehicleRentalStationId);
   }
 
-  /** Runtime registration; not persisted. Used by the GBFS rental updater. */
+  /** Realtime registration; not persisted. Used by the GBFS rental updater. */
   @Override
   public void setGeofencingZoneIndex(String network, GeofencingZoneIndex index) {
     indexes().put(network, index);
