@@ -140,7 +140,10 @@ public class GbfsNetworksConfig {
         .since(V2_10)
         .summary("Whether a vehicle rented from a station may be kept at the destination.")
         .description(
-          "See the regular [GBFS documentation](../GBFS-Config.md) for more information."
+          """
+          When disabled a vehicle rented from a station must be returned to another station, so an
+          itinerary can only end with the vehicle parked at one.
+          """
         )
         .asBoolean(defaults.allowKeepingVehicleAtDestination())
     );

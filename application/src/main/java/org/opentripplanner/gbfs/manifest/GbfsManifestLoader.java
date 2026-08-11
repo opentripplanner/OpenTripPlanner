@@ -47,7 +47,9 @@ public class GbfsManifestLoader {
       String manifestContent;
 
       if ("file".equals(url.getScheme())) {
-        Path filePath = Path.of(url.getPath());
+        // Path.of(URI), not Path.of(url.getPath()): on Windows the latter yields "/D:/..." from
+        // "file:///D:/...", which is not a legal path.
+        Path filePath = Path.of(url);
         manifestContent = Files.readString(filePath);
         LOG.info("Loaded GBFS manifest from file: {}", filePath);
       } else {

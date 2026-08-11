@@ -260,7 +260,9 @@ from here. Setting defaults does not by itself widen which networks are loaded -
 
 Whether a vehicle rented from a station may be kept at the destination.
 
-See the regular [GBFS documentation](../GBFS-Config.md) for more information.
+When disabled a vehicle rented from a station must be returned to another station, so an
+itinerary can only end with the vehicle parked at one.
+
 
 <h4 id="gbfs_defaults_geofencingZones">geofencingZones</h4>
 
@@ -306,7 +308,9 @@ Per-network overrides, keyed by the GBFS `system_id`.
 
 Whether a vehicle rented from a station may be kept at the destination.
 
-See the regular [GBFS documentation](../GBFS-Config.md) for more information.
+When disabled a vehicle rented from a station must be returned to another station, so an
+itinerary can only end with the vehicle parked at one.
+
 
 <h4 id="gbfs_networks_0_geofencingZones">geofencingZones</h4>
 
