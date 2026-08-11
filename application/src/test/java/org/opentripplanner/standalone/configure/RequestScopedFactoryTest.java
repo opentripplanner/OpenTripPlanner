@@ -43,6 +43,7 @@ import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepo
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -124,7 +125,7 @@ class RequestScopedFactoryTest {
       .transferService(TransferServiceTestFactory.transferService(transferRepository))
       .worldEnvelopeService(TestServerContext.createWorldEnvelopeService())
       .realtimeVehicleRepositoryHandle(realtimeVehicleRepositoryHandle)
-      .vehicleRentalService(new DefaultVehicleRentalService())
+      .vehicleRentalService(new DefaultVehicleRentalService(new DefaultVehicleRentalRepository()))
       .vehicleParkingService(TestServerContext.createVehicleParkingService())
       .rideHailingServices(List.of())
       .viaTransferResolver(

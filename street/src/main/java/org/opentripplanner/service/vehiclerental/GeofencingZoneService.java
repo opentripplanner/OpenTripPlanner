@@ -19,7 +19,7 @@ public interface GeofencingZoneService {
    */
   GeofencingZoneService EMPTY = new GeofencingZoneService() {
     @Override
-    public Set<GeofencingZone> zonesContaining(Coordinate coord) {
+    public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
       return Set.of();
     }
 
@@ -35,7 +35,7 @@ public interface GeofencingZoneService {
   };
 
   /** All registered zones (across all data sources) that contain the given coordinate. */
-  Set<GeofencingZone> zonesContaining(Coordinate coord);
+  Set<GeofencingZone> findZonesContaining(Coordinate coord);
 
   /**
    * Whether any data source has registered a zone index. Cheap short-circuit for callers that
