@@ -36,6 +36,32 @@ public class ListUtils {
   }
 
   /**
+   * Partition the list into consecutive sublists with the given {@code maxSize}. Each sublist has
+   * {@code maxSize} elements, except the last one, which may have fewer. For example,
+   * {@code partition([A,B,C,D,E], 2)} yields {@code [[A,B],[C,D],[E]]}.
+   * <p>
+   * The partitioning is computed eagerly - the number of sublists is fixed when this method
+   * returns. The sublists themselves are {@link List#subList(int, int) views} of the original
+   * list, so they must be consumed before the original list is structurally modified (elements
+   * added or removed). Unlike the Guava equivalent, the returned outer list does not reflect
+   * later changes to the input list.
+   *
+   * @param maxSize the maximum number of elements in each sublist, must be at least 1
+   * @throws IllegalArgumentException if {@code maxSize} is less than 1
+   * @throws NullPointerException if {@code list} is {@code null}
+   */
+  public static <T> List<List<T>> partition(List<T> list, int maxSize) {
+    if (maxSize < 1) {
+      throw new IllegalArgumentException("maxSize must be at least 1, but was: " + maxSize);
+    }
+    List<List<T>> partitions = new ArrayList<>();
+    for (int i = 0; i < list.size(); i += maxSize) {
+      partitions.add(list.subList(i, Math.min(i + maxSize, list.size())));
+    }
+    return partitions;
+  }
+
+  /**
    * Take a collection and a {@code keyExtractor} to remove duplicates where the key to be compared
    * is not the entity itself but a field of it.
    * <p>
