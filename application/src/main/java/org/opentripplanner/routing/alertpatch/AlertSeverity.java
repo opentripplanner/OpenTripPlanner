@@ -5,10 +5,6 @@ package org.opentripplanner.routing.alertpatch;
  */
 public enum AlertSeverity {
   /**
-   * Severity is undefined.
-   */
-  UNDEFINED,
-  /**
    * Situation has unknown impact on trips.
    */
   UNKNOWN_SEVERITY,
