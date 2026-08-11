@@ -14,6 +14,7 @@ import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
@@ -29,9 +30,11 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -44,6 +47,7 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
@@ -144,6 +148,63 @@ public class RequestScopedModule {
   @HttpRequestScoped
   static TriasApiParameters triasApiParameters(RouterConfig routerConfig) {
     return routerConfig.triasApiParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static FlexParameters flexParameters(RouterConfig routerConfig) {
+    return routerConfig.flexParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TransitRoutingConfig transitRoutingConfig(RouterConfig routerConfig) {
+    return routerConfig.transitTuningConfig();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static RoutingService routingService(
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    Graph graph,
+    RaptorConfig<TripSchedule> raptorConfig,
+    StreetLimitationParametersService streetLimitationParametersService,
+    VehicleRentalService vehicleRentalService,
+    StreetDetailsService streetDetailsService,
+    RegularTransferService transferService,
+    FlexParameters flexParameters,
+    List<RideHailingService> rideHailingServices,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    ViaCoordinateTransferFactory viaTransferResolver,
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
+    @Nullable StopConsolidationService stopConsolidationService,
+    LinkingContextFactory linkingContextFactory,
+    TransitRoutingConfig transitRoutingConfig
+  ) {
+    return new DefaultRoutingService(
+      transitService,
+      transitAlertService,
+      graph,
+      raptorConfig,
+      Metrics.globalRegistry,
+      streetLimitationParametersService,
+      vehicleRentalService,
+      streetDetailsService,
+      transferService,
+      flexParameters,
+      rideHailingServices,
+      dataOverlayParameterBindings,
+      sorlandsbanenService,
+      viaTransferResolver,
+      carpoolingService,
+      emissionItineraryDecorator,
+      stopConsolidationService,
+      linkingContextFactory,
+      transitRoutingConfig
+    );
   }
 
   @Provides
