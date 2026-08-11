@@ -13,6 +13,7 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -23,6 +24,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
@@ -74,6 +76,7 @@ public class GraphBuilder implements Runnable {
    */
   public static GraphBuilder create(
     BuildConfig config,
+    GbfsNetworkOverrides gbfsNetworkOverrides,
     GraphBuilderDataSources dataSources,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
@@ -84,6 +87,7 @@ public class GraphBuilder implements Runnable {
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
+    VehicleRentalRepository vehicleRentalRepository,
     @Nullable EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -95,6 +99,7 @@ public class GraphBuilder implements Runnable {
     GraphBuilderFactory.Builder builder = DaggerGraphBuilderFactory.builder();
     builder
       .config(config)
+      .gbfsNetworkOverrides(gbfsNetworkOverrides)
       .graph(graph)
       .osmInfoGraphBuildRepository(osmInfoGraphBuildRepository)
       .streetDetailsRepository(streetDetailsRepository)
@@ -103,6 +108,7 @@ public class GraphBuilder implements Runnable {
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
+      .vehicleRentalRepository(vehicleRentalRepository)
       .stopConsolidationRepository(stopConsolidationRepository)
       .emissionRepository(emissionRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
@@ -183,6 +189,7 @@ public class GraphBuilder implements Runnable {
     }
 
     if (loadStreetGraph || dataSources.hasOsm()) {
+      graphBuilder.addModuleOptional(factory.vehicleRentalGeofencingGraphBuilder());
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 

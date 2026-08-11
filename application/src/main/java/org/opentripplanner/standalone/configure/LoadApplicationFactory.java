@@ -22,6 +22,8 @@ import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.configure.StreetDetailsRepositoryModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.configure.VehicleParkingRepositoryModule;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeRepositoryModule;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -54,6 +56,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     StreetRepositoryModule.class,
     TransferRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
+    VehicleRentalRepositoryModule.class,
     FareModule.class,
     DeduplicatorServiceModule.class,
   }
@@ -102,6 +105,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   VehicleParkingRepository emptyVehicleParkingRepository();
+
+  @Singleton
+  VehicleRentalRepository emptyVehicleRentalRepository();
 
   @Component.Builder
   interface Builder {

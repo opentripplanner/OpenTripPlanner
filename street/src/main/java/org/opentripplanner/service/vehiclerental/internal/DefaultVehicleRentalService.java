@@ -145,6 +145,11 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
   }
 
   @Override
+  public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
+    return repository.findZonesContaining(coord, network);
+  }
+
+  @Override
   public boolean hasIndexedZones() {
     return repository.hasIndexedZones();
   }

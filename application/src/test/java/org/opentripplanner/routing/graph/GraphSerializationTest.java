@@ -43,6 +43,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -266,6 +267,7 @@ public class GraphSerializationTest {
       originalTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
+      new DefaultVehicleRentalRepository(),
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),

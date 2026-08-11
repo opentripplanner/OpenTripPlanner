@@ -19,6 +19,9 @@ import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.ext.vehiclerentalgeofencing.configure.VehicleRentalGeofencingModule;
+import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.configure.GraphBuilderModule;
@@ -44,6 +47,7 @@ import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
@@ -59,6 +63,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
+    VehicleRentalGeofencingModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
@@ -96,6 +101,9 @@ public interface GraphBuilderFactory {
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
 
   @Nullable
+  VehicleRentalGeofencingGraphBuilder vehicleRentalGeofencingGraphBuilder();
+
+  @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
 
   @Nullable
@@ -109,6 +117,9 @@ public interface GraphBuilderFactory {
   interface Builder {
     @BindsInstance
     Builder config(BuildConfig config);
+
+    @BindsInstance
+    Builder gbfsNetworkOverrides(GbfsNetworkOverrides gbfsNetworkOverrides);
 
     @BindsInstance
     Builder graph(Graph graph);
@@ -135,6 +146,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
+
+    @BindsInstance
+    Builder vehicleRentalRepository(VehicleRentalRepository rentalRepository);
 
     @BindsInstance
     Builder fareServiceFactory(FareServiceFactory fareServiceFactory);
