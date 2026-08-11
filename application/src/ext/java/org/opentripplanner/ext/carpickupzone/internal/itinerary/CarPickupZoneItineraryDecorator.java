@@ -72,11 +72,13 @@ public class CarPickupZoneItineraryDecorator implements ItineraryListFilter {
   }
 
   private static void flagForDeletion(Itinerary itinerary) {
-    itinerary.flagForDeletion(
-      new SystemNotice(
-        NO_CAR_PICKUP_ZONE_AVAILABLE,
-        "Itinerary removed: car leg does not fall within any configured car pickup zones."
-      )
-    );
+    if (!itinerary.hasSystemNoticeTag(NO_CAR_PICKUP_ZONE_AVAILABLE)) {
+      itinerary.flagForDeletion(
+        new SystemNotice(
+          NO_CAR_PICKUP_ZONE_AVAILABLE,
+          "This itinerary is marked as deleted by the " + NO_CAR_PICKUP_ZONE_AVAILABLE + " filter."
+        )
+      );
+    }
   }
 }
