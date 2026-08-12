@@ -221,10 +221,7 @@ public class TestServerContext {
       timetableHandle.repositorySnapshot(transactionScope)
     );
 
-    var raptorConfig = new RaptorConfig<TripSchedule>(
-      routerConfig.transitTuningConfig(),
-      RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
-    );
+    var raptorConfig = createRaptorConfig();
 
     var vertexLinker = createVertexLinker(graph);
 
@@ -278,10 +275,7 @@ public class TestServerContext {
     TransferRepository transferRepository
   ) {
     var routerConfig = RouterConfig.DEFAULT;
-    var raptorConfig = new RaptorConfig<TripSchedule>(
-      routerConfig.transitTuningConfig(),
-      RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
-    );
+    var raptorConfig = createRaptorConfig();
     var vertexLinker = createVertexLinker(graph);
 
     return new DefaultRoutingService(
@@ -308,6 +302,14 @@ public class TestServerContext {
 
   private static VertexLinker createVertexLinker(Graph graph) {
     return VertexLinkerTestFactory.of(graph);
+  }
+
+  public static RaptorConfig<TripSchedule> createRaptorConfig() {
+    var routerConfig = RouterConfig.DEFAULT;
+    return new RaptorConfig<>(
+      routerConfig.transitTuningConfig(),
+      RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
+    );
   }
 
   /** Static factory method to create a service for test purposes. */
