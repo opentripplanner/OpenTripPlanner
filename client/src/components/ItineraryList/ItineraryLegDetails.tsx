@@ -21,9 +21,9 @@ function legName(leg: Leg): string {
 }
 type Place = Leg['fromPlace'];
 
-/** GBFS form factors are snake_case, e.g. scooter_standing, cargo_bicycle. */
-function readableFormFactor(formFactor: string | undefined): string | undefined {
-  return formFactor?.toLowerCase().replace(/_/g, ' ');
+/** GBFS enum values are snake_case, e.g. scooter_standing, cargo_bicycle, electric_assist. */
+function readable(value: string | undefined | null): string | undefined {
+  return value?.toLowerCase().replace(/_/g, ' ');
 }
 
 /**
@@ -31,13 +31,28 @@ function readableFormFactor(formFactor: string | undefined): string | undefined 
  * vehicle's place name is the GBFS vehicle type name, which is free text: the same network yields
  * "E-scooter" for a scooter and a model number such as "Explorer_5" for a bike, neither of which
  * says it is a rental or whose it is.
+ *
+ * A station keeps its own name, which is a real place, with the network added.
  */
 function placeName(place: Place): string | undefined {
   const vehicle = place.rentalVehicle;
   if (vehicle) {
-    const kind = readableFormFactor(vehicle.vehicleType?.formFactor) ?? 'vehicle';
-    return vehicle.network ? `${kind} rental (${vehicle.network})` : `${kind} rental`;
+    // "human" propulsion is the unremarkable case and only lengthens the line.
+    const propulsion = readable(vehicle.vehicleType?.propulsionType);
+    const kind = [propulsion === 'human' ? undefined : propulsion, readable(vehicle.vehicleType?.formFactor)]
+      .filter(Boolean)
+      .join(' ');
+    const description = kind ? `${kind} rental` : 'rental';
+    return vehicle.network ? `${description} (${vehicle.network})` : description;
   }
+
+  const station = place.bikeRentalStation;
+  if (station) {
+    const networks = station.networks?.filter(Boolean).join(', ');
+    const name = place.name ?? station.name;
+    return networks ? `${name} (${networks})` : (name ?? undefined);
+  }
+
   return place.name ?? undefined;
 }
 
@@ -57,27 +72,7 @@ function PlaceLink({ place }: { place: Place }) {
   return <>{name}</>;
 }
 
-/**
- * Which operator's vehicle this is, and what kind - neither of which the mode alone tells you when
- * several networks serve the same area.
- */
-function rentalDescription(leg: Leg): string | undefined {
-  const vehicle = leg.fromPlace.rentalVehicle;
-  if (vehicle) {
-    const formFactor = readableFormFactor(vehicle.vehicleType?.formFactor);
-    const propulsion = vehicle.vehicleType?.propulsionType?.toLowerCase();
-    const kind = [formFactor, propulsion && `(${propulsion})`].filter(Boolean).join(' ');
-    return [vehicle.network, kind].filter(Boolean).join(' · ');
-  }
-  const station = leg.fromPlace.bikeRentalStation;
-  if (station) {
-    return [station.networks?.filter(Boolean).join(', '), 'station'].filter(Boolean).join(' · ');
-  }
-  return undefined;
-}
-
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
-  const rental = rentalDescription(leg);
   return (
     <div className="itinerary-leg-details">
       <div className="times">
@@ -88,7 +83,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
       <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} /> -{' '}
       <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
       <div className="mode">
-        <b>{leg.mode}</b> {rental && <span className="rental-info">{rental}</span>}{' '}
+        <b>{leg.mode}</b>{' '}
         {leg.line && (
           <>
             <ItineraryGraphiQLLineLink legId={leg.line?.id} legName={legName(leg)} />
