@@ -34,7 +34,7 @@ function readable(value: string | undefined | null): string | undefined {
  *
  * A station keeps its own name, which is a real place, with the network added.
  */
-function placeName(place: Place): string | undefined {
+function placeName(place: Place, withNetwork: boolean): string | undefined {
   const vehicle = place.rentalVehicle;
   if (vehicle) {
     // "human" propulsion is the unremarkable case and only lengthens the line.
@@ -43,25 +43,39 @@ function placeName(place: Place): string | undefined {
       .filter(Boolean)
       .join(' ');
     const description = kind ? `${kind} rental` : 'rental';
-    return vehicle.network ? `${description} (${vehicle.network})` : description;
+    return withNetwork && vehicle.network ? `${description} (${vehicle.network})` : description;
   }
 
   const station = place.bikeRentalStation;
   if (station) {
-    const networks = station.networks?.filter(Boolean).join(', ');
     const name = place.name ?? station.name;
+    const networks = withNetwork ? placeNetwork(place) : undefined;
     return networks ? `${name} (${networks})` : (name ?? undefined);
   }
 
   return place.name ?? undefined;
 }
 
+/** The rental network a place belongs to, whether it holds a vehicle or is a station. */
+function placeNetwork(place: Place): string | undefined {
+  return place.rentalVehicle?.network ?? place.bikeRentalStation?.networks?.filter(Boolean).join(', ') ?? undefined;
+}
+
+/**
+ * You rent from one network for the whole leg, so it belongs to the leg rather than to each end of
+ * it. Undefined on a leg that is not itself the rental - a walk to the vehicle has nowhere else to
+ * put it, so there the place name carries it.
+ */
+function legNetwork(leg: Leg): string | undefined {
+  return placeNetwork(leg.fromPlace);
+}
+
 /**
  * A rental leg's places carry either a free-floating vehicle or a station, and never a quay, so
  * linking to the quay query produced a link with no variables.
  */
-function PlaceLink({ place }: { place: Place }) {
-  const name = placeName(place);
+function PlaceLink({ place, withNetwork }: { place: Place; withNetwork: boolean }) {
+  const name = placeName(place, withNetwork);
   if (place.quay?.id) {
     return <ItineraryGraphiQLQuayLink legId={place.quay.id} legName={name} />;
   }
@@ -73,6 +87,7 @@ function PlaceLink({ place }: { place: Place }) {
 }
 
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
+  const network = legNetwork(leg);
   return (
     <div className="itinerary-leg-details">
       <div className="times">
@@ -83,7 +98,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
       <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} /> -{' '}
       <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
       <div className="mode">
-        <b>{leg.mode}</b>{' '}
+        <b>{leg.mode}</b> {network && <span className="rental-network">{network}</span>}{' '}
         {leg.line && (
           <>
             <ItineraryGraphiQLLineLink legId={leg.line?.id} legName={legName(leg)} />
@@ -93,10 +108,10 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         {leg.mode !== Mode.Foot && (
           <>
             <br />
-            <PlaceLink place={leg.fromPlace} /> →{' '}
+            <PlaceLink place={leg.fromPlace} withNetwork={!network} /> →{' '}
           </>
         )}{' '}
-        {!isLast && <PlaceLink place={leg.toPlace} />}
+        {!isLast && <PlaceLink place={leg.toPlace} withNetwork={!network} />}
       </div>
     </div>
   );
