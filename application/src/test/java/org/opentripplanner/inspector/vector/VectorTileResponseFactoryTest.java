@@ -7,23 +7,14 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.api.TestServerContext;
-import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 
 class VectorTileResponseFactoryTest {
 
-  public static final OtpServerRequestContext SERVER_CONTEXT =
-    TestServerContext.createServerContext(
-      new Graph(),
-      new TransitRepository(),
-      TransferServiceTestFactory.defaultTransferRepository(),
-      new DefaultFareService()
-    );
+  private static final VehicleRentalService VEHICLE_RENTAL_SERVICE =
+    new DefaultVehicleRentalService();
 
   enum LayerType {
     RED,
@@ -45,9 +36,9 @@ class VectorTileResponseFactoryTest {
   private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    OtpServerRequestContext context
+    VehicleRentalService context
   ) {
-    return new GeofencingZonesLayerBuilder(context.vehicleRentalService(), layerParameters);
+    return new GeofencingZonesLayerBuilder(context, layerParameters);
   }
 
   private static Response computeResponse(List<String> layers) {
@@ -59,7 +50,7 @@ class VectorTileResponseFactoryTest {
       layers,
       LAYERS,
       VectorTileResponseFactoryTest::createLayerBuilder,
-      SERVER_CONTEXT
+      VEHICLE_RENTAL_SERVICE
     );
   }
 
