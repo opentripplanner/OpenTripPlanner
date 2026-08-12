@@ -465,9 +465,7 @@ class GraphQLIntegrationTest {
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
       .addEntity(entitySelector)
-      .addTimePeriod(
-        new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
-      )
+      .addTimePeriod(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME))
       .build();
     var stationAlert = TransitAlert.of(id("a-station-alert"))
       .withHeaderText(I18NString.of("Station closed"))

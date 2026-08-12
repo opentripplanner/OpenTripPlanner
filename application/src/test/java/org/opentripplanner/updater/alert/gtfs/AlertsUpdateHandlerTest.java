@@ -10,6 +10,7 @@ import com.google.transit.realtime.GtfsRealtime.Alert.Effect;
 import com.google.transit.realtime.GtfsRealtime.Alert.SeverityLevel;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +37,7 @@ public class AlertsUpdateHandlerTest {
   public void setUp() {
     handler = new AlertsUpdateHandler(false);
     handler.setFeedId("1");
-    handler.setEarlyStart(5);
+    handler.setEarlyStart(Duration.ofSeconds(5));
     handler.setTransitAlertService(service);
   }
 

@@ -977,8 +977,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     // TimePeriod ends BEFORE first validityPeriod starts
     assertFalse(
       transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() - 200,
-        startTimePeriod_1.toEpochSecond() - 100
+        startTimePeriod_1.toInstant().minusSeconds(200),
+        startTimePeriod_1.toInstant().minusSeconds(100)
       ),
       "TimePeriod ends BEFORE first validityPeriod starts: " + label
     );
@@ -986,8 +986,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     // TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
       transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() - 1000,
-        endTimePeriod_1.toEpochSecond() - 100
+        startTimePeriod_1.toInstant().minusSeconds(1000),
+        endTimePeriod_1.toInstant().minusSeconds(100)
       ),
       "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
@@ -995,8 +995,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     // TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
       transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() - 100
+        startTimePeriod_1.toInstant().plusSeconds(100),
+        endTimePeriod_1.toInstant().minusSeconds(100)
       ),
       "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
@@ -1004,8 +1004,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     // TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends
     assertTrue(
       transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() + 100
+        startTimePeriod_1.toInstant().plusSeconds(100),
+        endTimePeriod_1.toInstant().plusSeconds(100)
       ),
       "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
     );
@@ -1013,8 +1013,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     // TimePeriod starts AFTER first validityPeriod ends
     assertFalse(
       transitAlert.displayDuring(
-        endTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() + 200
+        endTimePeriod_1.toInstant().plusSeconds(100),
+        endTimePeriod_1.toInstant().plusSeconds(200)
       ),
       "TimePeriod starts AFTER first validityPeriod ends: " + label
     );

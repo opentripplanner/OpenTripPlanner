@@ -19,10 +19,7 @@ public class StreetNoteMapper {
     alert.withUrl(NonLocalizedString.ofNullable(note.url));
     if (note.effectiveStartDate != null && note.effectiveEndDate != null) {
       alert.addTimePeriod(
-        new TimePeriod(
-          note.effectiveStartDate.getTime() / 1000,
-          note.effectiveEndDate.getTime() / 1000
-        )
+        TimePeriod.of(note.effectiveStartDate.toInstant(), note.effectiveEndDate.toInstant())
       );
     }
     return alert.build();

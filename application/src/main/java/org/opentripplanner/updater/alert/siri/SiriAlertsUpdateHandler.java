@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alert.siri;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,23 +164,18 @@ public class SiriAlertsUpdateHandler {
     ArrayList<TimePeriod> periods = new ArrayList<>();
     if (situation.getValidityPeriods().size() > 0) {
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
-        final long realStart = activePeriod.getStartTime() != null
-          ? getEpochSecond(activePeriod.getStartTime())
-          : 0;
-        final long start = activePeriod.getStartTime() != null
-          ? realStart - earlyStart.toSeconds()
-          : 0;
+        final Instant start = activePeriod.getStartTime() != null
+          ? activePeriod.getStartTime().toInstant().minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.getEndTime() != null
+          ? activePeriod.getEndTime().toInstant()
+          : null;
 
-        final long realEnd = activePeriod.getEndTime() != null
-          ? getEpochSecond(activePeriod.getEndTime())
-          : TimePeriod.OPEN_ENDED;
-        final long end = activePeriod.getEndTime() != null ? realEnd : TimePeriod.OPEN_ENDED;
-
-        periods.add(new TimePeriod(start, end));
+        periods.add(TimePeriod.of(start, end));
       }
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
+      periods.add(TimePeriod.ofUnbounded());
     }
 
     alert.addTimePeriods(periods);
@@ -217,10 +212,6 @@ public class SiriAlertsUpdateHandler {
     }
 
     return alert.build();
-  }
-
-  private long getEpochSecond(ZonedDateTime startTime) {
-    return startTime.toEpochSecond();
   }
 
   /*

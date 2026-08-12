@@ -65,11 +65,11 @@ public class RealtimeStopsLayerTest {
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();
-    var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
-    var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
+    var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toInstant();
+    var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toInstant();
     var alert = TransitAlert.of(stop.getId())
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .addTimePeriod(TimePeriod.of(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
       .build();
     transitAlertService.setAlerts(List.of(alert));

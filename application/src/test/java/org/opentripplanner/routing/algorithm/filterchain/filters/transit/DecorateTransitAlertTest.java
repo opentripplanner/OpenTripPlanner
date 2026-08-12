@@ -81,9 +81,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
 
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {
     var transitAlertService = new TransitAlertServiceImpl();
-    transitAlertService.setAlerts(
-      List.of(builder.addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED)).build())
-    );
+    transitAlertService.setAlerts(List.of(builder.addTimePeriod(TimePeriod.ofUnbounded()).build()));
     return transitAlertService;
   }
 }

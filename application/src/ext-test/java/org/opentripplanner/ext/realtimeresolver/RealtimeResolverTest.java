@@ -59,7 +59,7 @@ class RealtimeResolverTest {
     var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
-      .addTimePeriod(new TimePeriod(0, 0))
+      .addTimePeriod(TimePeriod.ofUnbounded())
       .build();
     transitAlertService.setAlerts(List.of(alert));
 

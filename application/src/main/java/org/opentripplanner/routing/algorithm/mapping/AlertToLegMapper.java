@@ -112,7 +112,7 @@ public class AlertToLegMapper {
 
     // Filter alerts when there are multiple timePeriods for each alert
     totalAlerts.removeIf(alert ->
-      !alert.displayDuring(leg.startTime().toEpochSecond(), leg.endTime().toEpochSecond())
+      !alert.displayDuring(leg.startTime().toInstant(), leg.endTime().toInstant())
     );
 
     if (totalAlerts.isEmpty()) {
@@ -131,7 +131,7 @@ public class AlertToLegMapper {
   ) {
     return alerts
       .stream()
-      .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
+      .filter(alert -> alert.displayDuring(fromTime.toInstant(), toTime.toInstant()))
       .toList();
   }
 

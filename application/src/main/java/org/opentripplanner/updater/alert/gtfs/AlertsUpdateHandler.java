@@ -9,6 +9,8 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,7 +39,7 @@ public class AlertsUpdateHandler {
   private TransitAlertService transitAlertService;
 
   /** How long before the posted start of an event it should be displayed to users */
-  private long earlyStart;
+  private Duration earlyStart = Duration.ZERO;
 
   /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
   private final boolean fuzzyTripMatching;
@@ -72,7 +74,7 @@ public class AlertsUpdateHandler {
     this.transitAlertService = transitAlertService;
   }
 
-  public void setEarlyStart(long earlyStart) {
+  public void setEarlyStart(Duration earlyStart) {
     this.earlyStart = earlyStart;
   }
 
@@ -92,14 +94,17 @@ public class AlertsUpdateHandler {
     ArrayList<TimePeriod> periods = new ArrayList<>();
     if (alert.getActivePeriodCount() > 0) {
       for (TimeRange activePeriod : alert.getActivePeriodList()) {
-        final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
-        final long start = activePeriod.hasStart() ? realStart - earlyStart : 0;
-        final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : TimePeriod.OPEN_ENDED;
-        periods.add(new TimePeriod(start, end));
+        final Instant start = activePeriod.hasStart()
+          ? Instant.ofEpochSecond(activePeriod.getStart()).minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.hasEnd()
+          ? Instant.ofEpochSecond(activePeriod.getEnd())
+          : null;
+        periods.add(TimePeriod.of(start, end));
       }
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
+      periods.add(TimePeriod.ofUnbounded());
     }
     alertBuilder.addTimePeriods(periods);
 

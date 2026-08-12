@@ -422,9 +422,7 @@ public class EstimatedCallType {
       );
 
       // Handle repeating validityPeriods
-      alertPatches.removeIf(alertPatch ->
-        !alertPatch.displayDuring(fromTime.getEpochSecond(), toTime.getEpochSecond())
-      );
+      alertPatches.removeIf(alertPatch -> !alertPatch.displayDuring(fromTime, toTime));
     }
   }
 }

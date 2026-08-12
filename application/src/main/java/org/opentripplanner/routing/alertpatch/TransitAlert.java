@@ -155,56 +155,52 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return timePeriods;
   }
 
-  public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
-    for (TimePeriod timePeriod : timePeriods) {
-      if (endTimeSeconds >= timePeriod.startTime) {
-        if (timePeriod.endTime == 0 || startTimeSeconds < timePeriod.endTime) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public boolean displayDuring(Instant from, Instant to) {
+    return timePeriods.stream().anyMatch(timePeriod -> timePeriod.overlaps(from, to));
   }
 
   /**
-   * Finds the first validity startTime from all timePeriods for this alert.
+   * Finds the first validity start from all timePeriods for this alert.
    *
-   * @return First startDate for this Alert, <code>null</code> if 0 (not set)
+   * @return First start for this Alert, <code>null</code> if any period has an open start
    */
   @Nullable
   public Instant getEffectiveStartDate() {
+    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenStart)) {
+      return null;
+    }
     return timePeriods
       .stream()
-      .map(timePeriod -> timePeriod.startTime)
+      .map(TimePeriod::start)
+      .flatMap(Optional::stream)
       .min(Comparator.naturalOrder())
-      // If 0, null should be returned
-      .filter(startTime -> startTime > 0)
-      .map(Instant::ofEpochSecond)
       .orElse(null);
   }
 
   /**
-   * Finds the last validity endTime from all timePeriods for this alert. Returns <code>null</code>
+   * Finds the last validity end from all timePeriods for this alert. Returns <code>null</code>
    * if the validity is open-ended
    *
-   * @return Last endDate for this Alert, <code>null</code> if open-ended
+   * @return Last end for this Alert, <code>null</code> if open-ended
    */
   @Nullable
   public Instant getEffectiveEndDate() {
+    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenEnd)) {
+      return null;
+    }
     return timePeriods
       .stream()
-      .map(timePeriod -> timePeriod.endTime)
+      .map(TimePeriod::end)
+      .flatMap(Optional::stream)
       .max(Comparator.naturalOrder())
-      // If open-ended, null should be returned
-      .filter(endTime -> endTime < TimePeriod.OPEN_ENDED)
-      .map(Instant::ofEpochSecond)
       .orElse(null);
   }
 
   /**
    * Checks if the alert has a NO_SERVICE alert active at the requested time.
-   * @param instant
-   * @return
+   *
+   * @param instant the point in time to check
+   * @return true if a NO_SERVICE alert is active at the given time
    */
   public boolean noServiceAt(Instant instant) {
     return (
