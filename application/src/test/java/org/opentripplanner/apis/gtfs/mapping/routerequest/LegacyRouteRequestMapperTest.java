@@ -44,6 +44,7 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -89,7 +90,10 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultFareService(),
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
-      new DefaultRealtimeVehicleService(new DefaultRealtimeVehicleRepository(), transitService),
+      new DefaultRealtimeVehicleService(
+        new RealtimeVehicleRepositoryLifecycle().freeze(new DefaultRealtimeVehicleRepository()),
+        transitService
+      ),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       new StreetNearbyPlaceFinder(linkingContextFactory),
       StreetNearbyStopFinder.of(linkingContextFactory).build(),

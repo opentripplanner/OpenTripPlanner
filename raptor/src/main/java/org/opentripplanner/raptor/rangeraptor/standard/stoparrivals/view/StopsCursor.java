@@ -82,12 +82,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     int round,
     int alightStop,
     int alightTime,
-    T trip,
-    int boardStop,
-    int boardTime
+    int boardStopPosition,
+    T trip
   ) {
     StopArrivalState<T> arrival = StopArrivalState.create();
-    arrival.arriveByTransit(alightTime, boardStop, boardTime, trip);
+    arrival.arriveByTransit(alightTime, boardStopPosition, trip);
     return new Transit<>(round, alightStop, arrival, this);
   }
 

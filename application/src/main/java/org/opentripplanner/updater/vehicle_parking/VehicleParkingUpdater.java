@@ -24,9 +24,10 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Graph updater that dynamically sets availability information on vehicle parking lots. This
  * updater fetches data from a single {@link DataSource<VehicleParking>}.
  */
-public class VehicleParkingUpdater extends PollingGraphUpdater {
+public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleParkingUpdater.class);
   private final Map<VehicleParking, List<VehicleParkingEntranceVertex>> verticesByPark =
@@ -65,6 +66,11 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public WriteDomain<StreetRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.STREET;
+  }
+
+  @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
@@ -80,7 +86,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     updateGraph(graphWriterRunnable);
   }
 
-  private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {
+  private class VehicleParkingGraphWriterRunnable
+    implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
 
     private final Map<FeedScopedId, VehicleParking> oldVehicleParkingsById;
     private final Set<VehicleParking> updatedVehicleParkings;
@@ -93,7 +100,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(RealTimeUpdateContext context) {
+    public void run(StreetRealTimeUpdateContext context) {
       // Apply stations to graph
       /* Add any new park and update space available for existing parks */
       Set<VehicleParking> toAdd = new HashSet<>();

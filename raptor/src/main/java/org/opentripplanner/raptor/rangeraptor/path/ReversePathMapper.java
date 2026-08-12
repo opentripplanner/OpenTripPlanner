@@ -26,21 +26,18 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
   private final RaptorSlackProvider slackProvider;
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorStopNameResolver stopNameResolver;
-  private final BoardAndAlightTimeSearch tripSearch;
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
 
   public ReversePathMapper(
     RaptorSlackProvider slackProvider,
     RaptorCostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-    boolean useApproximateTripTimesSearch
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
   ) {
     this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
     this.stopNameResolver = stopNameResolver;
     this.transferConstraintsSearch = transferConstraintsSearch;
-    this.tripSearch = tripTimesSearch(useApproximateTripTimesSearch);
   }
 
   @Override
@@ -65,7 +62,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
           return pathBuilder.build();
         case TRANSIT:
-          var times = tripSearch.find(arrival);
+          var times = TripTimesSearch.findTripReverseSearch(arrival);
           var transit = arrival.transitPath();
           pathBuilder.transit(transit.trip(), times);
           break;
@@ -77,11 +74,5 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
       }
       arrival = arrival.previous();
     }
-  }
-
-  private static BoardAndAlightTimeSearch tripTimesSearch(boolean useApproximateTimeSearch) {
-    return useApproximateTimeSearch
-      ? TripTimesSearch::findTripReverseSearchApproximateTime
-      : TripTimesSearch::findTripReverseSearch;
   }
 }

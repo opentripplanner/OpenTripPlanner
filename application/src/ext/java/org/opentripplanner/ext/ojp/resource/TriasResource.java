@@ -24,8 +24,14 @@ import org.opentripplanner.ext.ojp.RequestHandler;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
 import org.opentripplanner.ext.ojp.service.OjpService;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +46,21 @@ public class TriasResource {
 
   private final RequestHandler handler;
 
-  public TriasResource(@Context OtpServerRequestContext context) {
-    var transitService = context.transitService();
-    var zoneId = context.triasApiParameters().timeZone().orElse(transitService.getTimeZone());
-    var service = new CallAtStopService(transitService, context.nearbyStopFinder());
-    var idMapper = idMapper(context.triasApiParameters());
+  public TriasResource(
+    @Context TransitService transitService,
+    @Context Graph graph,
+    @Context LinkingContextFactory linkingContextFactory,
+    @Context TriasApiParameters triasApiParameters,
+    // Only RoutingService still requires the whole context - it isn't independently
+    // request-scoped/bindable yet, see issue #7441.
+    @Context OtpServerRequestContext context
+  ) {
+    var zoneId = triasApiParameters.timeZone().orElse(transitService.getTimeZone());
+    NearbyStopFinder nearbyStopFinder = graph.hasStreets
+      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
+      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
+    var service = new CallAtStopService(transitService, nearbyStopFinder);
+    var idMapper = idMapper(triasApiParameters);
     var serviceMapper = new OjpService(service, context.routingService(), idMapper, zoneId);
     this.handler = new RequestHandler(serviceMapper, TriasResource::ojpToTrias, "TRIAS");
   }

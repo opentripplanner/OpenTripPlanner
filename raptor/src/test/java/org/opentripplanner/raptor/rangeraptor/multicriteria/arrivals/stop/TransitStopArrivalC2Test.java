@@ -25,24 +25,29 @@ class TransitStopArrivalC2Test {
   private static final int ACCESS_C1 = ACCESS_WALK.c1();
   private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL =
     new AccessStopArrivalC2<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
+  private static final int TRANSIT_BOARD_STOP_POSITION = 0;
   private static final int TRANSIT_TO_STOP = 101;
   private static final int TRANSIT_BOARD_TIME = 9 * 60 * 60;
   private static final int TRANSIT_LEG_DURATION = 1200;
   private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
-  private static final RaptorTripSchedule TRANSIT_TRIP = TestTripSchedule.schedule(pattern("T1", 0))
-    .arrivals(TRANSIT_ALIGHT_TIME)
+  private static final RaptorTripSchedule TRANSIT_TRIP = TestTripSchedule.schedule(
+    pattern("T1", ACCESS_TO_STOP, TRANSIT_TO_STOP)
+  )
+    .times(TRANSIT_BOARD_TIME, TRANSIT_ALIGHT_TIME)
     .build();
   private static final int TRANSIT_TRAVEL_DURATION =
     ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
   private static final int TRANSIT_C1 = 128000;
   private static final int TRANSIT_C2 = 8000;
   private static final int ROUND = 1;
+
   private final TransitStopArrivalC2<RaptorTripSchedule> subject = new TransitStopArrivalC2<>(
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
     ACCESS_ARRIVAL.c1() + TRANSIT_C1,
     TRANSIT_C2,
+    TRANSIT_BOARD_STOP_POSITION,
     TRANSIT_TRIP
   );
 
@@ -63,8 +68,8 @@ class TransitStopArrivalC2Test {
   }
 
   @Test
-  public void boardStop() {
-    assertEquals(ACCESS_TO_STOP, subject.boardStop());
+  public void boardStopPosition() {
+    assertEquals(0, subject.boardStopPosition());
   }
 
   @Test

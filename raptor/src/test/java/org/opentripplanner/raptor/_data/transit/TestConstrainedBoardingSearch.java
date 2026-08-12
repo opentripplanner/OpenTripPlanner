@@ -106,8 +106,8 @@ public class TestConstrainedBoardingSearch
         sourceTrip,
         sourceStopPos,
         targetTrip,
-        targetTripIndex,
         targetStopPos,
+        targetTripIndex,
         targetTime
       )
     );

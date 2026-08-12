@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +11,6 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -328,43 +324,6 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   @Override
   public boolean isTripPatternModified() {
     return state.tripPatternModified();
-  }
-
-  /**
-   * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
-   * negative running or dwell times. We really don't want those being used in routing. This method
-   * checks that all internal times are increasing. Thus, this check should be used at the end of
-   * updating trip times, after any propagating or interpolating delay operations.
-   *
-   * @throws DataValidationException of the first error found.
-   *                                 <p>
-   *                                 Note! This is a duplicate (almost) of the same method in
-   *                                 ScheduledTripTimes. We should aim for just one implementation.
-   *                                 We need to decide how to do this. A common abstract base class
-   *                                 would simplify it, but may lead to other problems and
-   *                                 performance overhead. We should look back on this after
-   *                                 refactoring the rest of the timetable classes
-   *                                 (calendar/patterns).
-   */
-  private void validateNonIncreasingTimes() {
-    final int nStops = scheduledTripTimes.getNumStops();
-    int prevDep = -9_999_999;
-    for (int s = 0; s < nStops; s++) {
-      final int arr = getArrivalTime(s);
-      final int dep = getDepartureTime(s);
-
-      if (dep < arr) {
-        throw new DataValidationException(
-          new TimetableValidationError(NEGATIVE_DWELL_TIME, s, getTrip())
-        );
-      }
-      if (prevDep > arr) {
-        throw new DataValidationException(
-          new TimetableValidationError(NEGATIVE_HOP_TIME, s, getTrip())
-        );
-      }
-      prevDep = dep;
-    }
   }
 
   @Nullable

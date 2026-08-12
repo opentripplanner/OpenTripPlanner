@@ -197,6 +197,80 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertFailure(UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
+  /**
+   * Terminal times that imply a negative dwell are not repaired: the update is rejected. The aimed
+   * times of an added trip must be valid even when a prediction would make the real-time times
+   * valid, because a later cancellation falls back to the aimed times: were the trip accepted here,
+   * the cancellation would be rejected and the trip would be stuck in the graph as running.
+   */
+  @Test
+  void testAddedJourneyWithNegativeDwellAtOriginIsRejected() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(true)
+      .withOperatorRef(OPERATOR_ID)
+      .withLineRef(ROUTE_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_C)
+          // the aimed arrival at the origin is after the aimed departure
+          .arriveAimedExpected("00:05", null)
+          .departAimedExpected("00:02", "00:02")
+          .call(STOP_D)
+          .arriveAimedExpected("00:07", "00:08")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertFailure(UpdateErrorType.NEGATIVE_DWELL_TIME, result);
+    assertNull(env.transitService().getTrip(id(ADDED_TRIP_ID)));
+  }
+
+  /**
+   * An added trip must always be cancellable: the cancellation reverts to the aimed times, which
+   * are validated when the trip is added.
+   */
+  @Test
+  void testAddedJourneyWithTerminalTimesCanBeCancelled() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var creation = siri
+      .etBuilder()
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(true)
+      .withOperatorRef(OPERATOR_ID)
+      .withLineRef(ROUTE_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_C)
+          .arriveAimedExpected("00:01", "00:02")
+          .departAimedExpected("00:02", "00:03")
+          .call(STOP_D)
+          .arriveAimedExpected("00:04", "00:05")
+          .departAimedExpected("00:05", "00:06")
+      )
+      .buildEstimatedTimetableDeliveries();
+    assertSuccess(siri.applyEstimatedTimetable(creation));
+
+    var cancellation = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
+      .withCancellation(true)
+      .buildEstimatedTimetableDeliveries();
+
+    assertSuccess(siri.applyEstimatedTimetable(cancellation));
+
+    assertTrue(env.tripData(ADDED_TRIP_ID).tripTimes().isCanceled());
+    // the cancelled trip falls back to the aimed times, terminal times included
+    assertEquals("C U | C 0:01 0:02 | D 0:04 0:05", env.tripData(ADDED_TRIP_ID).showTimetable());
+  }
+
   @Test
   void testRejectUnmonitoredExtraJourney() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
@@ -338,6 +412,78 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       "S | A 0:01 0:01 | B 0:03 0:05 | C 0:07 0:07",
       env.tripData(ADDED_TRIP_ID).showScheduledTimetable()
     );
+  }
+
+  /**
+   * The arrival at the first stop and the departure from the last stop are ignored by routing, but
+   * they carry information for the APIs and are therefore mapped as provided by the feed, both for
+   * the aimed and for the real-time times.
+   */
+  @Test
+  void testAddJourneyKeepsTerminalTimes() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(true)
+      .withOperatorRef(OPERATOR_ID)
+      .withLineRef(ROUTE_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_C)
+          // the vehicle is ready for boarding at the origin one minute before it departs
+          .arriveAimedExpected("00:01", "00:02")
+          .departAimedExpected("00:02", "00:03")
+          .call(STOP_D)
+          .arriveAimedExpected("00:04", "00:05")
+          // the vehicle leaves the destination for the depot
+          .departAimedExpected("00:05", "00:06")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+
+    assertEquals(
+      "S | C 0:01 0:02 | D 0:04 0:05",
+      env.tripData(ADDED_TRIP_ID).showScheduledTimetable()
+    );
+    assertEquals("A U | C 0:02 0:03 | D 0:05 0:06", env.tripData(ADDED_TRIP_ID).showTimetable());
+  }
+
+  /**
+   * A terminal time that is not provided by the feed falls back to the other time at the same stop.
+   * This is the common case: SIRI feeds normally do not report an arrival at the origin nor a
+   * departure from the destination.
+   */
+  @Test
+  void testAddJourneyFallsBackToTheOtherTerminalTime() {
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(true)
+      .withOperatorRef(OPERATOR_ID)
+      .withLineRef(ROUTE_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_C)
+          .departAimedExpected("00:01", "00:02")
+          .call(STOP_D)
+          .arriveAimedExpected("00:03", "00:04")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    assertSuccess(siri.applyEstimatedTimetable(updates));
+
+    assertEquals(
+      "S | C 0:01 0:01 | D 0:03 0:03",
+      env.tripData(ADDED_TRIP_ID).showScheduledTimetable()
+    );
+    assertEquals("A U | C 0:02 0:02 | D 0:04 0:04", env.tripData(ADDED_TRIP_ID).showTimetable());
   }
 
   /**

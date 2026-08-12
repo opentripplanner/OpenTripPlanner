@@ -19,7 +19,7 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.updater.RealTimeUpdateContext;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.siri.mapping.AffectsMapper;
 import org.opentripplanner.updater.alert.siri.mapping.SiriSeverityMapper;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
@@ -75,7 +75,7 @@ public class SiriAlertsUpdateHandler {
     this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
   }
 
-  public void update(ServiceDelivery delivery, RealTimeUpdateContext context) {
+  public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
     for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
       if (situations != null) {
@@ -135,7 +135,7 @@ public class SiriAlertsUpdateHandler {
    */
   private TransitAlert mapSituationToAlert(
     PtSituationElement situation,
-    RealTimeUpdateContext context
+    TransitRealTimeUpdateContext context
   ) {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 

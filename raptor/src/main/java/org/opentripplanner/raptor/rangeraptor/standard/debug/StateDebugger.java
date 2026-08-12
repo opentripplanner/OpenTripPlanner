@@ -59,9 +59,9 @@ class StateDebugger<T extends RaptorTripSchedule> {
     }
   }
 
-  void rejectTransit(int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
+  void rejectTransit(int alightStop, int alightTime, int boardStopPosition, T trip) {
     if (isDebug(alightStop)) {
-      reject(cursor.fictiveTransit(round, alightStop, alightTime, trip, boardStop, boardTime));
+      reject(cursor.fictiveTransit(round, alightStop, alightTime, boardStopPosition, trip));
     }
   }
 
