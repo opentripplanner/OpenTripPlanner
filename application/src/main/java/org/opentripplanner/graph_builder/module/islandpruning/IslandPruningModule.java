@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -50,14 +51,17 @@ public class IslandPruningModule implements GraphBuilderModule {
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
+
+  @Nullable
   private final StreetLinkerModule streetLinkerModule;
+
   private final IslandPruningParameters parameters;
 
   public IslandPruningModule(
     Graph graph,
     TransitRepository transitRepository,
     DataImportIssueStore issueStore,
-    StreetLinkerModule streetLinkerModule,
+    @Nullable StreetLinkerModule streetLinkerModule,
     IslandPruningParameters parameters
   ) {
     this.graph = graph;
