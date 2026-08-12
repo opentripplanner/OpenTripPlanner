@@ -1,0 +1,15 @@
+query {
+  refetchItinerary(
+    origin: { location: { coordinate: { latitude: 5.0, longitude: 8.0 } } }
+    destination: { location: { coordinate: { latitude: 8.0, longitude: 9.5 } } }
+    legs: ["TG9sOmJhcg=="]
+  ) {
+    itinerary {
+      legs {
+        id
+        transitLeg
+        mode
+      }
+    }
+  }
+}

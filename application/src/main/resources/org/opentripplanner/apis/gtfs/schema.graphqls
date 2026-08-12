@@ -1974,6 +1974,24 @@ type QueryType {
     "The list of points the itinerary is required to pass through."
     via: [PlanViaLocationInput!]
   ): PlanConnection @async @timingData
+  """
+  Get an updated version of an itinerary with realtime changes applied.
+  This uses the provided leg IDs to reconstruct the same itinerary with current realtime data.
+  """
+  refetchItinerary(
+    "The destination where the itinerary ends. Usually coordinates but can also be a stop location."
+    destination: PlanLabeledLocationInput!,
+    "A list of leg IDs describing the itinerary. At least one leg is required."
+    legs: [ID!]!,
+    "Locale used for translations."
+    locale: Locale,
+    "Street and transit modes used during the search."
+    modes: PlanModesInput,
+    "The origin where the itinerary starts. Usually coordinates but can also be a stop location."
+    origin: PlanLabeledLocationInput!,
+    "Preferences that affect the refetch search."
+    preferences: PlanPreferencesInput
+  ): RefetchItineraryResult @timingData
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle @timingData
   "Get all rental vehicles"
@@ -2121,6 +2139,12 @@ type RealTimeEstimate {
   """
   delay: Duration!
   time: OffsetDateTime!
+}
+
+"Refetched data for an itinerary."
+type RefetchItineraryResult {
+  "The refetched itinerary."
+  itinerary: Itinerary
 }
 
 "Rental vehicle represents a vehicle that belongs to a rental network."

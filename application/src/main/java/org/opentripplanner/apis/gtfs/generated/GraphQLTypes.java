@@ -4249,6 +4249,79 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeRefetchItineraryArgs {
+
+    private GraphQLPlanLabeledLocationInput destination;
+    private List<graphql.relay.Relay.ResolvedGlobalId> legs;
+    private java.util.Locale locale;
+    private GraphQLPlanModesInput modes;
+    private GraphQLPlanLabeledLocationInput origin;
+    private GraphQLPlanPreferencesInput preferences;
+
+    public GraphQLQueryTypeRefetchItineraryArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.destination = new GraphQLPlanLabeledLocationInput(
+          (Map<String, Object>) args.get("destination")
+        );
+        this.legs = (List<graphql.relay.Relay.ResolvedGlobalId>) args.get("legs");
+        this.locale = (java.util.Locale) args.get("locale");
+        this.modes = new GraphQLPlanModesInput((Map<String, Object>) args.get("modes"));
+        this.origin = new GraphQLPlanLabeledLocationInput((Map<String, Object>) args.get("origin"));
+        this.preferences = new GraphQLPlanPreferencesInput(
+          (Map<String, Object>) args.get("preferences")
+        );
+      }
+    }
+
+    public GraphQLPlanLabeledLocationInput getGraphQLDestination() {
+      return this.destination;
+    }
+
+    public List<graphql.relay.Relay.ResolvedGlobalId> getGraphQLLegs() {
+      return this.legs;
+    }
+
+    public java.util.Locale getGraphQLLocale() {
+      return this.locale;
+    }
+
+    public GraphQLPlanModesInput getGraphQLModes() {
+      return this.modes;
+    }
+
+    public GraphQLPlanLabeledLocationInput getGraphQLOrigin() {
+      return this.origin;
+    }
+
+    public GraphQLPlanPreferencesInput getGraphQLPreferences() {
+      return this.preferences;
+    }
+
+    public void setGraphQLDestination(GraphQLPlanLabeledLocationInput destination) {
+      this.destination = destination;
+    }
+
+    public void setGraphQLLegs(List<graphql.relay.Relay.ResolvedGlobalId> legs) {
+      this.legs = legs;
+    }
+
+    public void setGraphQLLocale(java.util.Locale locale) {
+      this.locale = locale;
+    }
+
+    public void setGraphQLModes(GraphQLPlanModesInput modes) {
+      this.modes = modes;
+    }
+
+    public void setGraphQLOrigin(GraphQLPlanLabeledLocationInput origin) {
+      this.origin = origin;
+    }
+
+    public void setGraphQLPreferences(GraphQLPlanPreferencesInput preferences) {
+      this.preferences = preferences;
+    }
+  }
+
   public static class GraphQLQueryTypeRentalVehicleArgs {
 
     private String id;

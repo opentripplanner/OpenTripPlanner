@@ -89,7 +89,8 @@ class _RouteRequestTestContext {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       new StreetNearbyPlaceFinder(linkingContextFactory),
       StreetNearbyStopFinder.of(linkingContextFactory).build(),
-      routeRequest
+      routeRequest,
+      null
     );
   }
 

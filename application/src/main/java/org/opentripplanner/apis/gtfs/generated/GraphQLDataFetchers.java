@@ -33,6 +33,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
+import org.opentripplanner.apis.gtfs.model.RefetchItineraryResult;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -721,6 +722,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<
       graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     > planConnection();
+    public DataFetcher<RefetchItineraryResult> refetchItinerary();
     public DataFetcher<VehicleRentalVehicle> rentalVehicle();
     public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
     public DataFetcher<Route> route();
@@ -747,6 +749,11 @@ public class GraphQLDataFetchers {
   public interface GraphQLRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
     public DataFetcher<java.time.OffsetDateTime> time();
+  }
+
+  /** Refetched data for an itinerary. */
+  public interface GraphQLRefetchItineraryResult {
+    public DataFetcher<Itinerary> itinerary();
   }
 
   /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
