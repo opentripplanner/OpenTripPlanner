@@ -3,7 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.service.TransitService;
@@ -31,7 +31,7 @@ public class stopAtDistanceImpl implements GraphQLDataFetchers.GraphQLStopAtDist
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private NearbyStop getSource(DataFetchingEnvironment environment) {

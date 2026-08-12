@@ -104,7 +104,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext),
+      GtfsGraphQLRequestContext.ofServerContext(serverContext),
       TracingUtils.findTagsInHeadersOrQueryParameters(
         gtfsApiParameters.tracingTags(),
         headers,
@@ -133,7 +133,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext),
+      GtfsGraphQLRequestContext.ofServerContext(serverContext),
       TracingUtils.findTagsInHeadersOrQueryParameters(
         gtfsApiParameters.tracingTags(),
         headers,

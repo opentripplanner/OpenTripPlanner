@@ -14,8 +14,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.ArrivalDepartureMapper;
@@ -491,7 +491,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   private RegularTransferService getTransferService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transferService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transferService();
   }
 
   @Override
@@ -559,7 +559,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsOnServiceDateArgs;
@@ -291,11 +291,11 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
+    return environment.<GtfsGraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {

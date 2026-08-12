@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
@@ -84,7 +84,7 @@ public interface RequestScopedFactory {
 
   TransmodelRequestContext transmodelRequestContext();
 
-  GraphQLRequestContext graphQLRequestContext();
+  GtfsGraphQLRequestContext graphQLRequestContext();
 
   @Subcomponent.Builder
   interface Builder {

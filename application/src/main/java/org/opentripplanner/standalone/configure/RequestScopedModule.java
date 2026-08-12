@@ -6,8 +6,8 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
@@ -328,7 +328,7 @@ public class RequestScopedModule {
    */
   @Provides
   @HttpRequestScoped
-  static GraphQLRequestContext graphQLRequestContext(OtpServerRequestContext serverContext) {
-    return GraphQLRequestContext.ofServerContext(serverContext);
+  static GtfsGraphQLRequestContext graphQLRequestContext(OtpServerRequestContext serverContext) {
+    return GtfsGraphQLRequestContext.ofServerContext(serverContext);
   }
 }

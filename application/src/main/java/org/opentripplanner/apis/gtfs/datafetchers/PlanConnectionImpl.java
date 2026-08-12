@@ -7,7 +7,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.model.plan.Itinerary;
@@ -74,7 +74,7 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private RoutingResponse getSource(DataFetchingEnvironment environment) {

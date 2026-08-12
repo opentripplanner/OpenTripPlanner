@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
 import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
@@ -109,11 +109,11 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
     """;
 
   private final GraphQL graphQL;
-  private final GraphQLRequestContext requestContext;
+  private final GtfsGraphQLRequestContext requestContext;
   private final ModeCombinations modeCombinations;
 
   GtfsWarmupQueryExecutor(
-    GraphQLRequestContext requestContext,
+    GtfsGraphQLRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {

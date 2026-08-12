@@ -14,7 +14,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
-public record GraphQLRequestContext(
+public record GtfsGraphQLRequestContext(
   RoutingService routingService,
   TransitService transitService,
   TransitAlertService transitAlertService,
@@ -28,8 +28,8 @@ public record GraphQLRequestContext(
   NearbyStopFinder nearbyStopFinder,
   RouteRequest defaultRouteRequest
 ) {
-  public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
-    return new GraphQLRequestContext(
+  public static GtfsGraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
+    return new GtfsGraphQLRequestContext(
       context.routingService(),
       context.transitService(),
       context.transitAlertService(),
