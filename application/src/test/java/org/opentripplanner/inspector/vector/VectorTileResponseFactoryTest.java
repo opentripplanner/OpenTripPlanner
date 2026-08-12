@@ -9,6 +9,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 
 class VectorTileResponseFactoryTest {
@@ -47,7 +48,7 @@ class VectorTileResponseFactoryTest {
       layers,
       LAYERS,
       VectorTileResponseFactoryTest::createLayerBuilder,
-      new DefaultVehicleRentalService()
+      new DefaultVehicleRentalService(new DefaultVehicleRentalRepository())
     );
   }
 

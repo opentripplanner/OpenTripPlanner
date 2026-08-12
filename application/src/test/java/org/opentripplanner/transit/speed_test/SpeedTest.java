@@ -203,6 +203,7 @@ public class SpeedTest {
       null,
       null,
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
+      routerConfig.transitTuningConfig(),
       routerConfig.transitTuningConfig()
     );
 
