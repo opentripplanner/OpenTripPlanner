@@ -103,26 +103,10 @@ public class TestServerContext {
     if (flexParameters == null) {
       flexParameters = routerConfig.flexParameters();
     }
-    transitRepository.index();
-
-    TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
-    var scheduledRaptorData = RaptorTransitDataMapper.map(
-      tuningParameters,
-      transitRepository,
-      transferRepository
-    );
-    transitRepository.initRaptorTransitData(scheduledRaptorData);
 
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new DefaultTimetableRepository(
-      new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.copyTripCalendarForRealTimeUpdates()
-    );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
-      registry.registerRepositorySnapshot(
-        timetableSnapshot,
-        new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
-      );
+      indexAndRegisterTimetableSnapshot(transitRepository, transferRepository, registry);
 
     return buildContext(
       graph,
@@ -168,6 +152,55 @@ public class TestServerContext {
       routerConfig,
       registry,
       timetableHandle
+    );
+  }
+
+  /**
+   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
+   * raptor transit data, and wraps a pinned timetable snapshot - without building the whole
+   * {@link OtpServerRequestContext} grab-bag.
+   */
+  public static TransitService createTransitService(
+    TransitRepository transitRepository,
+    TransferRepository transferRepository
+  ) {
+    var registry = TransactionFactory.createRepositoryRegistry();
+    var timetableHandle = indexAndRegisterTimetableSnapshot(
+      transitRepository,
+      transferRepository,
+      registry
+    );
+    return new DefaultTransitService(
+      transitRepository,
+      timetableHandle.repositorySnapshot(registry.scope())
+    );
+  }
+
+  private static RepositoryHandle<
+    TimetableRepositorySnapshot,
+    TimetableRepository
+  > indexAndRegisterTimetableSnapshot(
+    TransitRepository transitRepository,
+    TransferRepository transferRepository,
+    org.opentripplanner.framework.transaction.RepositoryRegistry registry
+  ) {
+    transitRepository.index();
+
+    TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
+    var scheduledRaptorData = RaptorTransitDataMapper.map(
+      tuningParameters,
+      transitRepository,
+      transferRepository
+    );
+    transitRepository.initRaptorTransitData(scheduledRaptorData);
+
+    var timetableSnapshot = new DefaultTimetableRepository(
+      new RaptorTransitData(transitRepository.getRaptorTransitData()),
+      transitRepository.copyTripCalendarForRealTimeUpdates()
+    );
+    return registry.registerRepositorySnapshot(
+      timetableSnapshot,
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
     );
   }
 
