@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.apis.vectortiles.model.LayerParams;
@@ -47,6 +48,7 @@ import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -182,8 +184,30 @@ public class DebugVectorTilesResource {
       GEOFENCING_ZONES.toVectorSourceLayer(geofencingSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       TRANSFERS.toVectorSourceLayer(transferSource),
-      debugUiConfig.additionalBackgroundLayers()
+      debugUiConfig.additionalBackgroundLayers(),
+      rentalNetworks()
     );
+  }
+
+  /**
+   * The vehicle rental networks the debug client offers as a filter.
+   * <p>
+   * Rental places and geofencing zones are unioned because a network can have one without the
+   * other: zones applied during the graph build are present before any updater has reported a
+   * vehicle, and a network may equally publish vehicles but no zones.
+   */
+  private List<String> rentalNetworks() {
+    return Stream.concat(
+      vehicleRentalService.getVehicleRentalPlaces().stream().map(VehicleRentalPlace::network),
+      vehicleRentalService
+        .listZones()
+        .stream()
+        .map(zone -> zone.id().getFeedId())
+    )
+      .filter(Objects::nonNull)
+      .distinct()
+      .sorted()
+      .toList();
   }
 
   static String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {

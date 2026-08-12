@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { ControlPosition, MapRef } from 'react-map-gl/maplibre';
 import { findSelectedDebugLayers } from '../../util/map.ts';
 
@@ -6,6 +6,9 @@ interface Layer {
   id: string;
   name: string;
 }
+
+/** The group whose layers can be narrowed to a set of vehicle rental networks. */
+const RENTAL_GROUP = 'Rental';
 
 interface LayerControlProps {
   mapRef: MapRef | null;
@@ -18,9 +21,27 @@ interface LayerControlProps {
  *   1. Background (raster) layers (select exactly one to show).
  *   2. Debug layers (vector-like layers) with groupings, toggle on/off individually.
  */
+const linkButtonStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
+  textDecoration: 'underline',
+  fontSize: 'inherit',
+};
+
 const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayerIds }) => {
   const [rasterLayers, setRasterLayers] = useState<Layer[]>([]);
   const [layerGroups, setLayerGroups] = useState<Record<string, Layer[]>>({});
+  const [rentalNetworks, setRentalNetworks] = useState<string[]>([]);
+  const [selectedNetworks, setSelectedNetworks] = useState<Set<string>>(new Set());
+
+  /**
+   * The filter each rental layer was given by the server, captured before we narrow it. Restoring
+   * it is what makes "all networks selected" identical to an untouched style rather than merely
+   * equivalent to it.
+   */
+  const serverFilters = useRef<Map<string, unknown>>(new Map());
 
   /**
    * Load background + debug layers from the style once the map is ready.
@@ -62,6 +83,12 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         });
 
       setLayerGroups(groups);
+
+      // The networks cannot be derived from the tiles: a tile only reveals the networks present in
+      // the area currently loaded, so the list would change as you pan and be empty when zoomed out.
+      const networks = (style.metadata as Record<string, string[]> | undefined)?.rentalNetworks ?? [];
+      setRentalNetworks(networks);
+      setSelectedNetworks((previous) => (previous.size === 0 ? new Set(networks) : previous));
     };
 
     if (mapInstance.isStyleLoaded()) {
@@ -89,6 +116,57 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
       setInteractiveLayerIds(selected);
     },
     [mapRef, setInteractiveLayerIds],
+  );
+
+  /**
+   * Narrow the rental layers to the given networks, leaving every other layer untouched.
+   */
+  const applyNetworkFilter = useCallback(
+    (networks: Set<string>) => {
+      if (!mapRef) return;
+      const mapInstance = mapRef.getMap();
+
+      (layerGroups[RENTAL_GROUP] ?? []).forEach((layer) => {
+        if (!serverFilters.current.has(layer.id)) {
+          serverFilters.current.set(layer.id, mapInstance.getFilter(layer.id));
+        }
+        const serverFilter = serverFilters.current.get(layer.id);
+
+        // setFilter replaces rather than merges, so the server's own filter - which selects the
+        // vehicle, station or zone type the layer draws - has to be reapplied alongside ours.
+        const filter =
+          networks.size === rentalNetworks.length
+            ? serverFilter
+            : ['all', serverFilter, ['in', ['get', 'network'], ['literal', [...networks]]]];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mapInstance.setFilter(layer.id, filter as any);
+      });
+    },
+    [mapRef, layerGroups, rentalNetworks],
+  );
+
+  const toggleNetwork = useCallback(
+    (network: string, isSelected: boolean) => {
+      const next = new Set(selectedNetworks);
+      if (isSelected) {
+        next.add(network);
+      } else {
+        next.delete(network);
+      }
+      setSelectedNetworks(next);
+      applyNetworkFilter(next);
+    },
+    [selectedNetworks, applyNetworkFilter],
+  );
+
+  const setAllNetworks = useCallback(
+    (isSelected: boolean) => {
+      const next = isSelected ? new Set(rentalNetworks) : new Set<string>();
+      setSelectedNetworks(next);
+      applyNetworkFilter(next);
+    },
+    [rentalNetworks, applyNetworkFilter],
   );
 
   /**
@@ -160,6 +238,33 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
                 {groupName}
               </label>
             </h6>
+
+            {groupName === RENTAL_GROUP && rentalNetworks.length > 0 && (
+              <div style={{ margin: '0 0 6px 20px' }}>
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '3px' }}>
+                  <span style={{ opacity: 0.7 }}>Networks</span>
+                  <button type="button" onClick={() => setAllNetworks(true)} style={linkButtonStyle}>
+                    all
+                  </button>
+                  <button type="button" onClick={() => setAllNetworks(false)} style={linkButtonStyle}>
+                    none
+                  </button>
+                </div>
+                <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                  {rentalNetworks.map((network) => (
+                    <label key={network} style={{ display: 'block', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedNetworks.has(network)}
+                        onChange={(e) => toggleNetwork(network, e.target.checked)}
+                        style={{ marginRight: '5px' }}
+                      />
+                      {network}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {layers.map((layer) => {
               // Figure out if the layer is visible or not:

@@ -2311,6 +2311,12 @@
       }
     }
   ],
-  "version" : 8,
-  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
+  "metadata" : {
+    "rentalNetworks" : [
+      "tier",
+      "voi"
+    ]
+  },
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf",
+  "version" : 8
 }
