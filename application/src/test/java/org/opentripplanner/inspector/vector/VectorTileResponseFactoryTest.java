@@ -13,9 +13,6 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 
 class VectorTileResponseFactoryTest {
 
-  private static final VehicleRentalService VEHICLE_RENTAL_SERVICE =
-    new DefaultVehicleRentalService();
-
   enum LayerType {
     RED,
     GREEN,
@@ -50,7 +47,7 @@ class VectorTileResponseFactoryTest {
       layers,
       LAYERS,
       VectorTileResponseFactoryTest::createLayerBuilder,
-      VEHICLE_RENTAL_SERVICE
+      new DefaultVehicleRentalService()
     );
   }
 
