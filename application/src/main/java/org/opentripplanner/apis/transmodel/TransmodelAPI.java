@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.apis.support.TracingUtils;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,7 @@ public class TransmodelAPI {
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
     @Context HttpHeaders headers,
-    @Context OtpServerRequestContext serverContext
+    @Context TransmodelRequestContext requestContext
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -105,7 +104,7 @@ public class TransmodelAPI {
     String operationName = (String) queryParameters.getOrDefault("operationName", null);
     return index.executeGraphQL(
       query,
-      serverContext,
+      requestContext,
       variables,
       operationName,
       maxNumberOfResultFields,
@@ -118,11 +117,11 @@ public class TransmodelAPI {
   public Response getGraphQL(
     String query,
     @Context HttpHeaders headers,
-    @Context OtpServerRequestContext serverContext
+    @Context TransmodelRequestContext requestContext
   ) {
     return index.executeGraphQL(
       query,
-      serverContext,
+      requestContext,
       null,
       null,
       maxNumberOfResultFields,

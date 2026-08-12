@@ -301,23 +301,37 @@ public class RequestScopedModule {
   }
 
   /**
-   * Pre-assembled request context for the Transmodel API's GraphQL data fetchers. Bound here
-   * (rather than built ad hoc by each caller) so consumers that only need this - e.g. the
-   * warmup module - don't have to depend on {@link OtpServerRequestContext} themselves.
+   * Pre-assembled request context for the Transmodel API's GraphQL data fetchers.
    */
   @Provides
   @HttpRequestScoped
   static TransmodelRequestContext transmodelRequestContext(
-    OtpServerRequestContext serverContext,
     RoutingService routingService,
     TransitService transitService,
-    @Nullable EmpiricalDelayService empiricalDelayService
+    TransitAlertService transitAlertService,
+    @Nullable EmpiricalDelayService empiricalDelayService,
+    RouteRequest defaultRouteRequest,
+    VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
+    Graph graph,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
   ) {
     return new TransmodelRequestContext(
-      serverContext,
       routingService,
       transitService,
-      empiricalDelayService
+      transitAlertService,
+      empiricalDelayService,
+      defaultRouteRequest,
+      vehicleRentalService,
+      vehicleParkingService,
+      graph,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
     );
   }
 

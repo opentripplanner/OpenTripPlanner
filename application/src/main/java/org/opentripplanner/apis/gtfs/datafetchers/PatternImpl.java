@@ -299,7 +299,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitAlertService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
   }
 
   private TripPattern getSource(DataFetchingEnvironment environment) {

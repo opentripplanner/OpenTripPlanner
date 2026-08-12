@@ -1001,7 +1001,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitAlertService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
   }
 
   private FareService getFareService(DataFetchingEnvironment environment) {

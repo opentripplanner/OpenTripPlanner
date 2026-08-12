@@ -563,7 +563,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitAlertService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
   }
 
   private static <T> T getValue(

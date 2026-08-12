@@ -97,7 +97,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitAlertService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
   }
 
   private String getSource(DataFetchingEnvironment environment) {
