@@ -6,6 +6,7 @@ import { InterchangeInfo } from './InterchangeInfo.tsx';
 import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';
 import { ItineraryGraphiQLQuayLink } from './ItineraryGraphiQLQuayLink.tsx';
 import { ItineraryGraphiQLAuthorityLink } from './ItineraryGraphiQLAuthorityLink.tsx';
+import { ItineraryGraphiQLBikeRentalStationLink } from './ItineraryGraphiQLBikeRentalStationLink.tsx';
 import { Leg } from '../../static/query/tripQueryTypes';
 
 /**
@@ -18,7 +19,44 @@ function legName(leg: Leg): string {
     return leg.line?.name || 'unknown';
   }
 }
+type Place = Leg['fromPlace'];
+
+/**
+ * A rental leg's places carry either a free-floating vehicle or a station, and never a quay, so
+ * linking to the quay query produced a link with no variables.
+ */
+function PlaceLink({ place }: { place: Place }) {
+  if (place.quay?.id) {
+    return <ItineraryGraphiQLQuayLink legId={place.quay.id} legName={place.name} />;
+  }
+  if (place.bikeRentalStation?.id) {
+    return <ItineraryGraphiQLBikeRentalStationLink stationId={place.bikeRentalStation.id} legName={place.name} />;
+  }
+  // Transmodel has no root query for a free-floating vehicle, so there is nothing to link to.
+  return <>{place.name}</>;
+}
+
+/**
+ * Which operator's vehicle this is, and what kind - neither of which the mode alone tells you when
+ * several networks serve the same area.
+ */
+function rentalDescription(leg: Leg): string | undefined {
+  const vehicle = leg.fromPlace.rentalVehicle;
+  if (vehicle) {
+    const formFactor = vehicle.vehicleType?.formFactor?.toLowerCase();
+    const propulsion = vehicle.vehicleType?.propulsionType?.toLowerCase();
+    const kind = [formFactor, propulsion && `(${propulsion})`].filter(Boolean).join(' ');
+    return [vehicle.network, kind].filter(Boolean).join(' · ');
+  }
+  const station = leg.fromPlace.bikeRentalStation;
+  if (station) {
+    return [station.networks?.filter(Boolean).join(', '), 'station'].filter(Boolean).join(' · ');
+  }
+  return undefined;
+}
+
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
+  const rental = rentalDescription(leg);
   return (
     <div className="itinerary-leg-details">
       <div className="times">
@@ -29,7 +67,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
       <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} /> -{' '}
       <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
       <div className="mode">
-        <b>{leg.mode}</b>{' '}
+        <b>{leg.mode}</b> {rental && <span className="rental-info">{rental}</span>}{' '}
         {leg.line && (
           <>
             <ItineraryGraphiQLLineLink legId={leg.line?.id} legName={legName(leg)} />
@@ -39,10 +77,10 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         {leg.mode !== Mode.Foot && (
           <>
             <br />
-            <ItineraryGraphiQLQuayLink legId={leg.fromPlace.quay?.id} legName={leg.fromPlace.name} /> →{' '}
+            <PlaceLink place={leg.fromPlace} /> →{' '}
           </>
         )}{' '}
-        {!isLast && <ItineraryGraphiQLQuayLink legId={leg.toPlace.quay?.id} legName={leg.toPlace.name} />}
+        {!isLast && <PlaceLink place={leg.toPlace} />}
       </div>
     </div>
   );
