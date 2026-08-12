@@ -212,7 +212,16 @@ public class RefetchTripPatternQuery {
     var from = mapLocation(environment.getArgument("from"));
     var to = mapLocation(environment.getArgument("to"));
 
-    var refetcher = new RefetchItineraryService(ctx.getServerContext());
+    var serverContext = ctx.getServerContext();
+    var refetcher = new RefetchItineraryService(
+      serverContext.graph(),
+      ctx.getTransitService(),
+      serverContext.transitAlertService(),
+      serverContext.transferService(),
+      serverContext.streetDetailsService(),
+      serverContext.linkingContextFactory(),
+      serverContext.streetLimitationParametersService()
+    );
 
     try {
       var itinerary = refetcher.refetchItinerary(from, to, legs, routeRequest);
