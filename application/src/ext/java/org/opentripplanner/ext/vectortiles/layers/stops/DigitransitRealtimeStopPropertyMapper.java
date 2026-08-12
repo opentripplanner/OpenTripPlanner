@@ -36,10 +36,6 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
     var alertService = transitService.getTransitAlertService();
 
     Collection<TransitAlert> stopAlerts = new ArrayList<>(alertService.getStopAlerts(stop.getId()));
-    for (var route : transitService.findRoutes(stop)) {
-      stopAlerts.addAll(alertService.getStopAndRouteAlerts(stop.getId(), route.getId()));
-      stopAlerts.addAll(alertService.getRouteAlerts(route.getId()));
-    }
 
     boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
 
