@@ -12,7 +12,6 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
 import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.slf4j.Logger;
@@ -114,12 +113,12 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
   private final ModeCombinations modeCombinations;
 
   GtfsWarmupQueryExecutor(
-    OtpServerRequestContext context,
+    GraphQLRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {
-    this.requestContext = GraphQLRequestContext.ofServerContext(context);
-    this.graphQL = GraphQL.newGraphQL(context.gtfsSchema())
+    this.requestContext = requestContext;
+    this.graphQL = GraphQL.newGraphQL(requestContext.schema())
       .defaultDataFetcherExceptionHandler(new OtpDataFetcherExceptionHandler())
       .build();
     this.modeCombinations = new ModeCombinations(accessModes, egressModes);

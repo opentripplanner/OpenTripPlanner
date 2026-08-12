@@ -2,9 +2,11 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
@@ -79,6 +81,10 @@ public interface RequestScopedFactory {
   TriasApiParameters triasApiParameters();
 
   RoutingService routingService();
+
+  TransmodelRequestContext transmodelRequestContext();
+
+  GraphQLRequestContext graphQLRequestContext();
 
   @Subcomponent.Builder
   interface Builder {

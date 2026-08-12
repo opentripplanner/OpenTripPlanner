@@ -6,10 +6,12 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -296,5 +298,37 @@ public class RequestScopedModule {
       stopConsolidationService,
       transmodelAPIParameters
     );
+  }
+
+  /**
+   * Pre-assembled request context for the Transmodel API's GraphQL data fetchers. Bound here
+   * (rather than built ad hoc by each caller) so consumers that only need this - e.g. the
+   * warmup module - don't have to depend on {@link OtpServerRequestContext} themselves.
+   */
+  @Provides
+  @HttpRequestScoped
+  static TransmodelRequestContext transmodelRequestContext(
+    OtpServerRequestContext serverContext,
+    RoutingService routingService,
+    TransitService transitService,
+    @Nullable EmpiricalDelayService empiricalDelayService
+  ) {
+    return new TransmodelRequestContext(
+      serverContext,
+      routingService,
+      transitService,
+      empiricalDelayService
+    );
+  }
+
+  /**
+   * Pre-assembled request context for the GTFS API's GraphQL data fetchers. Bound here (rather
+   * than built ad hoc by each caller) so consumers that only need this - e.g. the warmup module -
+   * don't have to depend on {@link OtpServerRequestContext} themselves.
+   */
+  @Provides
+  @HttpRequestScoped
+  static GraphQLRequestContext graphQLRequestContext(OtpServerRequestContext serverContext) {
+    return GraphQLRequestContext.ofServerContext(serverContext);
   }
 }
