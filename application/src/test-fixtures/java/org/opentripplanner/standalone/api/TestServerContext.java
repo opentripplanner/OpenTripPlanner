@@ -19,12 +19,14 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
@@ -230,6 +232,44 @@ public class TestServerContext {
       null,
       null,
       null
+    );
+  }
+
+  /**
+   * Create a {@link RoutingService} for unit testing, without building the whole {@link
+   * OtpServerRequestContext} grab-bag.
+   */
+  public static RoutingService createRoutingService(
+    Graph graph,
+    TransitService transitService,
+    TransferRepository transferRepository
+  ) {
+    var routerConfig = RouterConfig.DEFAULT;
+    var raptorConfig = new RaptorConfig<TripSchedule>(
+      routerConfig.transitTuningConfig(),
+      RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
+    );
+    var vertexLinker = createVertexLinker(graph);
+
+    return new DefaultRoutingService(
+      transitService,
+      graph,
+      raptorConfig,
+      Metrics.globalRegistry,
+      createStreetLimitationParametersService(),
+      createVehicleRentalService(),
+      createStreetDetailsService(),
+      TransferServiceTestFactory.transferService(transferRepository),
+      routerConfig.flexParameters(),
+      List.of(),
+      null,
+      null,
+      createViaTransferResolver(graph, transitService),
+      null,
+      createEmissionsItineraryDecorator(),
+      null,
+      createLinkingContextFactory(graph, vertexLinker, transitService),
+      routerConfig.transitTuningConfig()
     );
   }
 
