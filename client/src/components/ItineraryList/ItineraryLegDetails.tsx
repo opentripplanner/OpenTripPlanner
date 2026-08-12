@@ -21,19 +21,40 @@ function legName(leg: Leg): string {
 }
 type Place = Leg['fromPlace'];
 
+/** GBFS form factors are snake_case, e.g. scooter_standing, cargo_bicycle. */
+function readableFormFactor(formFactor: string | undefined): string | undefined {
+  return formFactor?.toLowerCase().replace(/_/g, ' ');
+}
+
+/**
+ * What you collect here, rather than what the operator happens to call it. A free-floating
+ * vehicle's place name is the GBFS vehicle type name, which is free text: the same network yields
+ * "E-scooter" for a scooter and a model number such as "Explorer_5" for a bike, neither of which
+ * says it is a rental or whose it is.
+ */
+function placeName(place: Place): string | undefined {
+  const vehicle = place.rentalVehicle;
+  if (vehicle) {
+    const kind = readableFormFactor(vehicle.vehicleType?.formFactor) ?? 'vehicle';
+    return vehicle.network ? `${kind} rental (${vehicle.network})` : `${kind} rental`;
+  }
+  return place.name ?? undefined;
+}
+
 /**
  * A rental leg's places carry either a free-floating vehicle or a station, and never a quay, so
  * linking to the quay query produced a link with no variables.
  */
 function PlaceLink({ place }: { place: Place }) {
+  const name = placeName(place);
   if (place.quay?.id) {
-    return <ItineraryGraphiQLQuayLink legId={place.quay.id} legName={place.name} />;
+    return <ItineraryGraphiQLQuayLink legId={place.quay.id} legName={name} />;
   }
   if (place.bikeRentalStation?.id) {
-    return <ItineraryGraphiQLBikeRentalStationLink stationId={place.bikeRentalStation.id} legName={place.name} />;
+    return <ItineraryGraphiQLBikeRentalStationLink stationId={place.bikeRentalStation.id} legName={name} />;
   }
   // Transmodel has no root query for a free-floating vehicle, so there is nothing to link to.
-  return <>{place.name}</>;
+  return <>{name}</>;
 }
 
 /**
@@ -43,7 +64,7 @@ function PlaceLink({ place }: { place: Place }) {
 function rentalDescription(leg: Leg): string | undefined {
   const vehicle = leg.fromPlace.rentalVehicle;
   if (vehicle) {
-    const formFactor = vehicle.vehicleType?.formFactor?.toLowerCase();
+    const formFactor = readableFormFactor(vehicle.vehicleType?.formFactor);
     const propulsion = vehicle.vehicleType?.propulsionType?.toLowerCase();
     const kind = [formFactor, propulsion && `(${propulsion})`].filter(Boolean).join(' ');
     return [vehicle.network, kind].filter(Boolean).join(' · ');
