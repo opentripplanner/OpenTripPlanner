@@ -45,7 +45,7 @@ class StreetNoteMapperTest {
     note.effectiveStartDate = null;
     note.effectiveEndDate = null;
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
-    assertEquals(Collections.emptyList(), alert.timePeriods());
+    assertEquals(Collections.emptyList(), alert.calendar().timePeriods());
   }
 
   private static StreetNote note() {

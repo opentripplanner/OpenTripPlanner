@@ -14,6 +14,7 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
+import org.opentripplanner.routing.alertpatch.Calendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -161,8 +162,8 @@ public class SiriAlertsUpdateHandler {
       alert.withVersion(situation.getVersion().getValue().intValue());
     }
 
-    ArrayList<TimePeriod> periods = new ArrayList<>();
     if (situation.getValidityPeriods().size() > 0) {
+      ArrayList<TimePeriod> periods = new ArrayList<>();
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
         final Instant start = activePeriod.getStartTime() != null
           ? activePeriod.getStartTime().toInstant().minus(earlyStart)
@@ -173,12 +174,11 @@ public class SiriAlertsUpdateHandler {
 
         periods.add(TimePeriod.of(start, end));
       }
+      alert.withCalendar(Calendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(TimePeriod.ofUnbounded());
+      alert.withCalendar(Calendar.ofAlwaysActive());
     }
-
-    alert.addTimePeriods(periods);
 
     if (situation.getPriority() != null) {
       alert.withPriority(situation.getPriority().intValue());

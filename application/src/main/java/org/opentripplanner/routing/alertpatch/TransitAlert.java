@@ -2,8 +2,6 @@ package org.opentripplanner.routing.alertpatch;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,7 +43,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   private final ZonedDateTime updatedTime;
   private final String siriCodespace;
   private final Set<EntitySelector> entities;
-  private final List<TimePeriod> timePeriods;
+  private final Calendar calendar;
 
   TransitAlert(TransitAlertBuilder builder) {
     super(builder.getId());
@@ -65,7 +63,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.updatedTime = builder.updatedTime();
     this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
-    this.timePeriods = List.copyOf(builder.timePeriods());
+    this.calendar = builder.calendar();
   }
 
   public static TransitAlertBuilder of(FeedScopedId id) {
@@ -151,12 +149,15 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return entities;
   }
 
-  public Collection<TimePeriod> timePeriods() {
-    return timePeriods;
+  /**
+   * The validity of this alert, expressed as a set of time periods.
+   */
+  public Calendar calendar() {
+    return calendar;
   }
 
   public boolean displayDuring(Instant from, Instant to) {
-    return timePeriods.stream().anyMatch(timePeriod -> timePeriod.overlaps(from, to));
+    return calendar.isValidDuring(from, to);
   }
 
   /**
@@ -166,15 +167,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    */
   @Nullable
   public Instant getEffectiveStartDate() {
-    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenStart)) {
-      return null;
-    }
-    return timePeriods
-      .stream()
-      .map(TimePeriod::start)
-      .flatMap(Optional::stream)
-      .min(Comparator.naturalOrder())
-      .orElse(null);
+    return calendar.effectiveStart().orElse(null);
   }
 
   /**
@@ -185,15 +178,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    */
   @Nullable
   public Instant getEffectiveEndDate() {
-    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenEnd)) {
-      return null;
-    }
-    return timePeriods
-      .stream()
-      .map(TimePeriod::end)
-      .flatMap(Optional::stream)
-      .max(Comparator.naturalOrder())
-      .orElse(null);
+    return calendar.effectiveEnd().orElse(null);
   }
 
   /**
@@ -230,7 +215,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
-      Objects.equals(timePeriods, other.timePeriods)
+      Objects.equals(calendar, other.calendar)
     );
   }
 

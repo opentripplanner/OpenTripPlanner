@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.Calendar;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
@@ -18,8 +19,10 @@ public class StreetNoteMapper {
     alert.withDescriptionText(note.descriptionText);
     alert.withUrl(NonLocalizedString.ofNullable(note.url));
     if (note.effectiveStartDate != null && note.effectiveEndDate != null) {
-      alert.addTimePeriod(
-        TimePeriod.of(note.effectiveStartDate.toInstant(), note.effectiveEndDate.toInstant())
+      alert.withCalendar(
+        Calendar.of(
+          TimePeriod.of(note.effectiveStartDate.toInstant(), note.effectiveEndDate.toInstant())
+        )
       );
     }
     return alert.build();

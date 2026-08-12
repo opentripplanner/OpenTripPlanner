@@ -20,6 +20,7 @@ import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
+import org.opentripplanner.routing.alertpatch.Calendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -91,8 +92,8 @@ public class AlertsUpdateHandler {
       .withCause(getAlertCauseForGtfsRtCause(alert.getCause()))
       .withEffect(getAlertEffectForGtfsRtEffect(alert.getEffect()));
 
-    ArrayList<TimePeriod> periods = new ArrayList<>();
     if (alert.getActivePeriodCount() > 0) {
+      ArrayList<TimePeriod> periods = new ArrayList<>();
       for (TimeRange activePeriod : alert.getActivePeriodList()) {
         final Instant start = activePeriod.hasStart()
           ? Instant.ofEpochSecond(activePeriod.getStart()).minus(earlyStart)
@@ -102,11 +103,11 @@ public class AlertsUpdateHandler {
           : null;
         periods.add(TimePeriod.of(start, end));
       }
+      alertBuilder.withCalendar(Calendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(TimePeriod.ofUnbounded());
+      alertBuilder.withCalendar(Calendar.ofAlwaysActive());
     }
-    alertBuilder.addTimePeriods(periods);
 
     for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
       if (fuzzyTripMatching && informed.hasTrip()) {
