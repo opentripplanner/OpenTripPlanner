@@ -4,6 +4,7 @@ import static graphql.Assert.assertTrue;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -15,15 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.TripLocation;
+import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 
 class RouteRequestMapperTest {
 
   private static final Locale LOCALE = Locale.GERMAN;
+  private static final String ON_BOARD_TRIP_ID = "F:trip-10";
+  private static final String ON_BOARD_STOP_ID = "F:stop-3";
+  private static final String ON_BOARD_LABEL = "On board route 10";
   private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(LOCALE);
 
   @Test
@@ -142,6 +150,220 @@ class RouteRequestMapperTest {
     assertEquals(originLabel, routeRequest.from().label());
     assertEquals(FeedScopedId.parseStrict(stopB), routeRequest.to().stopId());
     assertEquals(destinationLabel, routeRequest.to().label());
+  }
+
+  @Test
+  void testOnBoardTripLocation() {
+    var serviceDate = LocalDate.of(2026, 7, 28);
+    var scheduledDepartureTime = OffsetDateTime.of(
+      serviceDate,
+      LocalTime.of(12, 34),
+      ZoneOffset.UTC
+    );
+    var args = testCtx.basicRequest();
+    args.put("origin", onBoardOrigin(serviceDate, scheduledDepartureTime));
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+    var location = request.from();
+
+    assertEquals(ON_BOARD_LABEL, location.label());
+    assertEquals(
+      TripLocation.of(
+        onBoardTripReference(serviceDate),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID),
+        scheduledDepartureTime.toInstant()
+      ),
+      location.tripLocation()
+    );
+  }
+
+  /**
+   * The scheduled departure time is optional; it is only needed to disambiguate patterns which
+   * visit the same stop more than once.
+   */
+  @Test
+  void testOnBoardTripLocationWithoutScheduledDepartureTime() {
+    var serviceDate = LocalDate.of(2026, 7, 28);
+    var args = testCtx.basicRequest();
+    args.put("origin", onBoardOrigin(serviceDate, null));
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+
+    assertEquals(
+      TripLocation.of(
+        onBoardTripReference(serviceDate),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID)
+      ),
+      request.from().tripLocation()
+    );
+  }
+
+  @Test
+  void testInvalidStopLocationId() {
+    var args = testCtx.basicRequest();
+    args.put("origin", Map.of("location", Map.of("stopLocation", Map.of("stopLocationId", "foo"))));
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "'foo' is not a valid value for 'stopLocationId', the expected format is '<feed id>:<entity id>'.",
+      exception.getMessage()
+    );
+  }
+
+  /**
+   * A malformed id inside a trip location names the offending field, so that a client can tell
+   * which of the ids it got wrong.
+   */
+  @Test
+  void testInvalidTripLocationTripId() {
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of(
+            "tripReference",
+            Map.of(
+              "tripIdOnServiceDate",
+              Map.of("tripId", "foo", "serviceDate", LocalDate.of(2026, 7, 28))
+            ),
+            "stopLocationId",
+            ON_BOARD_STOP_ID
+          )
+        )
+      )
+    );
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "'foo' is not a valid value for 'tripId', the expected format is '<feed id>:<entity id>'.",
+      exception.getMessage()
+    );
+  }
+
+  /**
+   * A dated trip may also be referenced directly by its own unique id, used with data sources
+   * such as NeTEx where a trip on a specific date has its own identifier.
+   */
+  @Test
+  void testOnBoardTripLocationWithTripOnDateId() {
+    var args = testCtx.basicRequest();
+    args.put(
+      "origin",
+      Map.of(
+        "location",
+        Map.of(
+          "tripLocation",
+          Map.of(
+            "tripReference",
+            Map.of("tripOnDateId", "F:dated-trip-10"),
+            "stopLocationId",
+            ON_BOARD_STOP_ID
+          )
+        )
+      )
+    );
+
+    var request = RouteRequestMapper.toRouteRequest(
+      testCtx.executionContext(args),
+      testCtx.context()
+    );
+
+    assertEquals(
+      TripLocation.of(
+        TripOnDateReference.ofTripOnServiceDateId(FeedScopedId.parseStrict("F:dated-trip-10")),
+        FeedScopedId.parseStrict(ON_BOARD_STOP_ID)
+      ),
+      request.from().tripLocation()
+    );
+  }
+
+  /**
+   * Arriving on board by a given time is not supported, so an arrive-by search with an on-board
+   * origin is rejected.
+   */
+  @Test
+  void testOnBoardTripLocationRejectsArriveBy() {
+    var args = testCtx.basicRequest();
+    args.put("origin", onBoardOrigin(LocalDate.of(2026, 7, 28), null));
+    args.put(
+      "dateTime",
+      Map.of(
+        "latestArrival",
+        OffsetDateTime.of(LocalDate.of(2026, 7, 28), LocalTime.of(15, 0), ZoneOffset.UTC)
+      )
+    );
+    var env = testCtx.executionContext(args);
+
+    var exception = assertThrows(InvalidInputException.class, () ->
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
+    );
+    assertEquals(
+      "An arrive-by search is not supported for a search starting on board a trip; omit 'latestArrival'.",
+      exception.getMessage()
+    );
+  }
+
+  /**
+   * A start-on-board search is pinned to the boarding time of a single dated trip, so there are
+   * no other pages and paging arguments are rejected.
+   */
+  @Test
+  void testOnBoardTripLocationRejectsPaging() {
+    for (var pagingArgument : List.of("before", "after")) {
+      var args = testCtx.basicRequest();
+      args.put("origin", onBoardOrigin(LocalDate.of(2026, 7, 28), null));
+      args.put(pagingArgument, "cursor");
+      var env = testCtx.executionContext(args);
+
+      var exception = assertThrows(InvalidInputException.class, () ->
+        RouteRequestMapper.toRouteRequest(env, testCtx.context())
+      );
+      assertEquals(
+        "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'.",
+        exception.getMessage()
+      );
+    }
+  }
+
+  private static Map<String, Object> onBoardOrigin(
+    LocalDate serviceDate,
+    @Nullable OffsetDateTime scheduledDepartureTime
+  ) {
+    var tripLocation = new HashMap<String, Object>();
+    tripLocation.put(
+      "tripReference",
+      Map.of("tripIdOnServiceDate", Map.of("tripId", ON_BOARD_TRIP_ID, "serviceDate", serviceDate))
+    );
+    tripLocation.put("stopLocationId", ON_BOARD_STOP_ID);
+    if (scheduledDepartureTime != null) {
+      tripLocation.put("scheduledDepartureTime", scheduledDepartureTime);
+    }
+    return Map.ofEntries(
+      entry("label", ON_BOARD_LABEL),
+      entry("location", Map.of("tripLocation", tripLocation))
+    );
+  }
+
+  private static TripOnDateReference onBoardTripReference(LocalDate serviceDate) {
+    return TripOnDateReference.ofTripIdAndServiceDate(
+      FeedScopedId.parseStrict(ON_BOARD_TRIP_ID),
+      serviceDate
+    );
   }
 
   @Test

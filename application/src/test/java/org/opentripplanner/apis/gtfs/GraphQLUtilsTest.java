@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class GraphQLUtilsTest {
 
@@ -12,5 +13,13 @@ class GraphQLUtilsTest {
   void typeName() {
     var name = GraphQLUtils.typeName(new GraphQLTypes.GraphQLTransitFilterInput(Map.of()));
     assertEquals("TransitFilterInput", name);
+  }
+
+  @Test
+  void startOnBoardError() {
+    assertEquals(
+      GraphQLTypes.GraphQLRoutingErrorCode.TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
+      GraphQLUtils.toGraphQL(RoutingErrorCode.TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME)
+    );
   }
 }

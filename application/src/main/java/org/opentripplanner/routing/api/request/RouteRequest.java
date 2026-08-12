@@ -253,7 +253,7 @@ public class RouteRequest implements Serializable {
 
     if (to.isOnBoard()) {
       throw new InvalidRoutingInputException(
-        "'serviceJourneyLocation' is only supported for the 'from' location, not 'to'"
+        "An on-board trip location is only supported as the origin of a search, not the destination."
       );
     }
   }

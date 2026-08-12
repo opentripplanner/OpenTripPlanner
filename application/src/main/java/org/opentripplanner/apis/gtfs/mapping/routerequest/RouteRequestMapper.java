@@ -14,11 +14,14 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
+import org.opentripplanner.routing.api.request.TripLocation;
+import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -55,6 +58,22 @@ public class RouteRequestMapper {
         ? DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
         : null
     );
+
+    // A start-on-board search is pinned to the boarding time of a single dated trip. Arriving by
+    // a given time is not supported, and there are no other pages to navigate to, so the plan
+    // connection contains no page cursors to pass back.
+    if (request.from().isOnBoard()) {
+      if (dateTime.getGraphQLLatestArrival() != null) {
+        throw new InvalidInputException(
+          "An arrive-by search is not supported for a search starting on board a trip; omit 'latestArrival'."
+        );
+      }
+      if (args.getGraphQLBefore() != null || args.getGraphQLAfter() != null) {
+        throw new InvalidInputException(
+          "Paging is not supported for a search starting on board a trip; omit 'before' and 'after'."
+        );
+      }
+    }
 
     if (args.getGraphQLBefore() != null) {
       request.withPageCursorFromEncoded(args.getGraphQLBefore());
@@ -179,23 +198,67 @@ public class RouteRequestMapper {
   private static GenericLocation parseGenericLocation(
     GraphQLTypes.GraphQLPlanLabeledLocationInput locationInput
   ) {
-    var stopLocation = locationInput.getGraphQLLocation().getGraphQLStopLocation();
-    if (stopLocation.getGraphQLStopLocationId() != null) {
-      var stopId = stopLocation.getGraphQLStopLocationId();
-      return FeedScopedId.parseOptional(stopId)
-        .map(feedScopedId ->
-          GenericLocation.fromStopId(feedScopedId, locationInput.getGraphQLLabel())
-        )
-        .orElseThrow(() ->
-          new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
-        );
+    var location = locationInput.getGraphQLLocation();
+    var label = locationInput.getGraphQLLabel();
+
+    var tripLocation = location.getGraphQLTripLocation();
+    if (tripLocation.getGraphQLStopLocationId() != null) {
+      return GenericLocation.fromTripLocation(mapTripLocation(tripLocation), label);
     }
 
-    var coordinate = locationInput.getGraphQLLocation().getGraphQLCoordinate();
+    var stopLocation = location.getGraphQLStopLocation();
+    if (stopLocation.getGraphQLStopLocationId() != null) {
+      var stopId = parseClientId("stopLocationId", stopLocation.getGraphQLStopLocationId());
+      return GenericLocation.fromStopId(stopId, label);
+    }
+
+    var coordinate = location.getGraphQLCoordinate();
     return GenericLocation.fromCoordinate(
       coordinate.getGraphQLLatitude(),
       coordinate.getGraphQLLongitude(),
-      locationInput.getGraphQLLabel()
+      label
+    );
+  }
+
+  private static TripLocation mapTripLocation(
+    GraphQLTypes.GraphQLPlanTripLocationInput tripLocation
+  ) {
+    var tripOnDateReference = mapTripOnDateReference(tripLocation.getGraphQLTripReference());
+    var stopLocationId = parseClientId("stopLocationId", tripLocation.getGraphQLStopLocationId());
+    var scheduledDepartureTime = tripLocation.getGraphQLScheduledDepartureTime();
+
+    return scheduledDepartureTime == null
+      ? TripLocation.of(tripOnDateReference, stopLocationId)
+      : TripLocation.of(tripOnDateReference, stopLocationId, scheduledDepartureTime.toInstant());
+  }
+
+  private static TripOnDateReference mapTripOnDateReference(
+    GraphQLTypes.GraphQLPlanTripOnDateReferenceInput tripReference
+  ) {
+    if (tripReference.getGraphQLTripOnDateId() != null) {
+      return TripOnDateReference.ofTripOnServiceDateId(
+        parseClientId("tripOnDateId", tripReference.getGraphQLTripOnDateId())
+      );
+    }
+    var tripIdOnServiceDate = tripReference.getGraphQLTripIdOnServiceDate();
+    return TripOnDateReference.ofTripIdAndServiceDate(
+      parseClientId("tripId", tripIdOnServiceDate.getGraphQLTripId()),
+      tripIdOnServiceDate.getGraphQLServiceDate()
+    );
+  }
+
+  /**
+   * Parses a feed-scoped id supplied by the client. A malformed id is a client mistake, so it is
+   * reported as a bad request naming the offending field rather than surfacing as a server error.
+   */
+  private static FeedScopedId parseClientId(String fieldName, String id) {
+    return FeedScopedId.parseOptional(id).orElseThrow(() ->
+      new InvalidInputException(
+        "'%s' is not a valid value for '%s', the expected format is '<feed id>:<entity id>'.".formatted(
+          id,
+          fieldName
+        )
+      )
     );
   }
 
