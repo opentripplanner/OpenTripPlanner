@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
@@ -85,6 +86,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);
     bridge(factory, RequestScopedFactory::routingService, RoutingService.class);
     bridge(factory, RequestScopedFactory::transmodelRequestContext, TransmodelRequestContext.class);
+    bridge(factory, RequestScopedFactory::graphQLRequestContext, GtfsGraphQLRequestContext.class);
   }
 
   /**

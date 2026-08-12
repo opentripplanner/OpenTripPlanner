@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.apis.support.TracingUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +63,7 @@ public class GtfsGraphQLAPI {
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers,
     @Context UriInfo uriInfo,
-    @Context OtpServerRequestContext serverContext
+    @Context GtfsGraphQLRequestContext requestContext
   ) {
     if (jsonParameters == null || !jsonParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -104,7 +103,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GtfsGraphQLRequestContext.ofServerContext(serverContext),
+      requestContext,
       TracingUtils.findTagsInHeadersOrQueryParameters(
         gtfsApiParameters.tracingTags(),
         headers,
@@ -121,7 +120,7 @@ public class GtfsGraphQLAPI {
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers,
     @Context UriInfo uriInfo,
-    @Context OtpServerRequestContext serverContext
+    @Context GtfsGraphQLRequestContext requestContext
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
@@ -133,7 +132,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GtfsGraphQLRequestContext.ofServerContext(serverContext),
+      requestContext,
       TracingUtils.findTagsInHeadersOrQueryParameters(
         gtfsApiParameters.tracingTags(),
         headers,

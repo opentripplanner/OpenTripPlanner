@@ -343,6 +343,19 @@ public class RequestScopedModule {
   @Provides
   @HttpRequestScoped
   static GtfsGraphQLRequestContext graphQLRequestContext(OtpServerRequestContext serverContext) {
-    return GtfsGraphQLRequestContext.ofServerContext(serverContext);
+    return new GtfsGraphQLRequestContext(
+      serverContext.routingService(),
+      serverContext.transitService(),
+      serverContext.transitAlertService(),
+      serverContext.transferService(),
+      serverContext.fareService(),
+      serverContext.vehicleRentalService(),
+      serverContext.vehicleParkingService(),
+      serverContext.realtimeVehicleService(),
+      serverContext.gtfsSchema(),
+      serverContext.nearbyPlaceFinder(),
+      serverContext.nearbyStopFinder(),
+      serverContext.defaultRouteRequest()
+    );
   }
 }
