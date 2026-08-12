@@ -23,6 +23,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
@@ -51,6 +52,7 @@ public class RefetchItineraryService {
   private static final Logger LOG = LoggerFactory.getLogger(RefetchItineraryService.class);
 
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
   private final RegularTransferService transferService;
   private final Graph graph;
   private final LinkingContextFactory linkingContextFactory;
@@ -61,6 +63,7 @@ public class RefetchItineraryService {
     this(
       serverContext.graph(),
       serverContext.transitService(),
+      serverContext.transitAlertService(),
       serverContext.transferService(),
       serverContext.streetDetailsService(),
       serverContext.linkingContextFactory(),
@@ -71,12 +74,14 @@ public class RefetchItineraryService {
   public RefetchItineraryService(
     Graph graph,
     TransitService transitService,
+    TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
     this.transferService = transferService;
     this.linkingContextFactory = linkingContextFactory;
     this.graph = graph;
@@ -161,7 +166,7 @@ public class RefetchItineraryService {
     var transitLegs = new ArrayList<ScheduledTransitLeg>(legReferences.size());
     for (LegReference legReference : legReferences) {
       if (legReference instanceof ScheduledTransitLegReference scheduledTransitLeg) {
-        var transitLeg = scheduledTransitLeg.getLeg(transitService);
+        var transitLeg = scheduledTransitLeg.getLeg(transitService, transitAlertService);
         if (transitLeg == null) {
           throw new RefetchItineraryException("Could not find leg " + scheduledTransitLeg);
         }

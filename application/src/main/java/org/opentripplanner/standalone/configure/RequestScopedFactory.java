@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -60,6 +61,8 @@ public interface RequestScopedFactory {
   RegularTransferService transferService();
 
   VectorTileConfig vectorTileConfig();
+
+  GtfsApiParameters gtfsApiParameters();
 
   TransmodelAPIParameters transmodelAPIParameters();
 

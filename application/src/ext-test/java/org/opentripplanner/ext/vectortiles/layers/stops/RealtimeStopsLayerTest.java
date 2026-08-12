@@ -21,7 +21,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -56,17 +55,11 @@ public class RealtimeStopsLayerTest {
 
   @Test
   void realtimeStopLayer() {
-    var transitRepository = new TransitRepository(new SiteRepository());
-    transitRepository.initTimeZone(ZoneIds.HELSINKI);
-    transitRepository.index();
-    var transitService = new DefaultTransitService(transitRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(transitRepository);
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
+    var timetableRepository = new TransitRepository(new SiteRepository());
+    timetableRepository.initTimeZone(ZoneIds.HELSINKI);
+    timetableRepository.index();
+    var transitService = new DefaultTransitService(timetableRepository);
+    var transitAlertService = new TransitAlertServiceImpl();
 
     Route route = TransitRepositoryForTest.route("route").build();
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
@@ -79,14 +72,19 @@ public class RealtimeStopsLayerTest {
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    transitAlertService.setAlerts(List.of(alert));
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      transitAlertService
+    );
 
     DigitransitRealtimeStopPropertyMapper mapper = new DigitransitRealtimeStopPropertyMapper(
       transitService,
+      transitAlertService,
       new Locale("en-US")
     );
 

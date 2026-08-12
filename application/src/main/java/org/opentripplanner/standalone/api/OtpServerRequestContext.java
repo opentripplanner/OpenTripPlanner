@@ -34,6 +34,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
@@ -100,6 +101,12 @@ public interface OtpServerRequestContext {
 
   @HttpRequestScoped
   TransitService transitService();
+
+  /**
+   * The application-wide alert service. Unlike {@link #transitService()} this is a long-lived
+   * singleton and is not tied to the transit snapshot of the request.
+   */
+  TransitAlertService transitAlertService();
 
   /**
    * Get a request-scoped {@link RoutingService} valid for one HTTP request. It guarantees that

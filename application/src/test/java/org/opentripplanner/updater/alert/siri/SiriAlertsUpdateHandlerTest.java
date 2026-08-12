@@ -88,7 +88,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       transitAlertService.getAllAlerts().clear();
     }
     if (alertsUpdateHandler == null) {
-      transitAlertService = new TransitAlertServiceImpl(transitRepository);
+      transitAlertService = new TransitAlertServiceImpl();
       alertsUpdateHandler = new SiriAlertsUpdateHandler(
         FEED_ID,
         transitAlertService,

@@ -31,6 +31,7 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -45,6 +46,7 @@ public class VectorTilesResource {
   private final WorldEnvelopeService worldEnvelopeService;
   private final VehicleRentalService vehicleRentalService;
   private final VehicleParkingService vehicleParkingService;
+  private final TransitAlertService transitAlertService;
   private final String ignoreRouterId;
   private final Locale locale;
 
@@ -54,6 +56,7 @@ public class VectorTilesResource {
     @Context WorldEnvelopeService worldEnvelopeService,
     @Context VehicleRentalService vehicleRentalService,
     @Context VehicleParkingService vehicleParkingService,
+    @Context TransitAlertService transitAlertService,
     @Context Request grizzlyRequest,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
@@ -67,6 +70,7 @@ public class VectorTilesResource {
     this.worldEnvelopeService = worldEnvelopeService;
     this.vehicleRentalService = vehicleRentalService;
     this.vehicleParkingService = vehicleParkingService;
+    this.transitAlertService = transitAlertService;
     this.ignoreRouterId = ignoreRouterId;
   }
 
@@ -87,7 +91,12 @@ public class VectorTilesResource {
       Arrays.asList(requestedLayers.split(",")),
       vectorTileConfig.layers(),
       VectorTilesResource::createLayerBuilder,
-      new LayerBuilderContext(transitService, vehicleRentalService, vehicleParkingService)
+      new LayerBuilderContext(
+        transitService,
+        vehicleRentalService,
+        vehicleParkingService,
+        transitAlertService
+      )
     );
   }
 
@@ -139,7 +148,12 @@ public class VectorTilesResource {
     LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
-      case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
+      case Stop -> new StopsLayerBuilder(
+        context.transitService(),
+        context.transitAlertService(),
+        layerParameters,
+        locale
+      );
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
       case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
@@ -189,6 +203,7 @@ public class VectorTilesResource {
   private record LayerBuilderContext(
     TransitService transitService,
     VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService
+    VehicleParkingService vehicleParkingService,
+    TransitAlertService transitAlertService
   ) {}
 }

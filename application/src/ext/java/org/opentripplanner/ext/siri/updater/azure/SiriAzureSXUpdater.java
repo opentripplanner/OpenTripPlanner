@@ -5,7 +5,6 @@ import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -24,10 +23,9 @@ public class SiriAzureSXUpdater implements SiriAzureMessageHandler {
 
   public SiriAzureSXUpdater(
     SiriAzureSXUpdaterParameters config,
-    TransitRepository transitRepository,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
-    this.transitAlertService = new TransitAlertServiceImpl(transitRepository);
+    this.transitAlertService = new TransitAlertServiceImpl();
     this.updateHandler = new SiriAlertsUpdateHandler(
       config.feedId(),
       transitAlertService,

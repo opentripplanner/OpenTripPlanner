@@ -1,46 +1,42 @@
 package org.opentripplanner.routing.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.updater.alert.TransitAlertProvider;
-import org.opentripplanner.updater.spi.GraphUpdater;
 
 /**
  * This class is used to combine alerts from multiple {@link TransitAlertService}s. Each
- * {@link TransitAlertProvider} has its own service, and all need to be queried in order to fetch
- * all alerts.
+ * {@link org.opentripplanner.updater.alert.TransitAlertProvider} has its own service, and all need
+ * to be queried in order to fetch all alerts.
  *
  * Concretely: every realtime updater receiving GTFS Alerts or SIRI Situation Exchange (SX)
  * messages currently maintains its own private index of alerts separately from all other updaters.
  * To make the set of all alerts from all updaters available in a single operation and associate it
- * with the graph as a whole, the various indexes are merged in such a way as to have the same
+ * with the application as a whole, the various indexes are merged in such a way as to have the same
  * index as each individual index.
+ *
+ * <p>Instances are registered with {@link #addDelegate(TransitAlertService)} when the updaters are
+ * configured. This class is an application-wide singleton, so registration and reads may happen
+ * concurrently; a {@link CopyOnWriteArrayList} is used to keep reads lock-free.
  */
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
-  private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
+  private final List<TransitAlertService> transitAlertServices = new CopyOnWriteArrayList<>();
 
   /**
-   * Constructor which scans over all existing GraphUpdaters associated with a TransitRepository
-   * instance and retains references to all their TransitAlertService instances.
-   * This implies that these instances are expected to remain in use indefinitely (not be replaced
-   * with new instances or taken out of service over time).
+   * Register a delegate service, typically owned by a single realtime updater.
    */
-  public DelegatingTransitAlertServiceImpl(Iterable<GraphUpdater<?>> updaters) {
-    for (GraphUpdater<?> updater : updaters) {
-      if (updater instanceof TransitAlertProvider alertProvider) {
-        transitAlertServices.add(alertProvider.getTransitAlertService());
-      }
-    }
+  public void addDelegate(TransitAlertService transitAlertService) {
+    transitAlertServices.add(transitAlertService);
   }
 
   @Override
@@ -79,6 +75,15 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
       .map(transitAlertService -> transitAlertService.getStopAlerts(stop, stopConditions))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
+    return transitAlertServices
+      .stream()
+      .map(transitAlertService -> transitAlertService.getStopLocationsAlerts(stopLocationIds))
+      .flatMap(Collection::stream)
+      .collect(Collectors.toSet());
   }
 
   @Override

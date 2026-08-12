@@ -2,18 +2,19 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.geometry.Coordinates;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
-import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.site.RegularStop;
 
 class SubgraphOnlyFerryTest {
 
-  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
-  private static final RegularStop REGULAR_STOP1 = TEST_MODEL.stop("TEST-1").build();
-  private static final RegularStop REGULAR_STOP2 = TEST_MODEL.stop("TEST-2").build();
+  private static final FeedScopedId REGULAR_STOP1 = id("TEST-1");
+  private static final FeedScopedId REGULAR_STOP2 = id("TEST-2");
 
   @Test
   void subgraphHasOnlyFerry() {
@@ -59,7 +60,9 @@ class SubgraphOnlyFerryTest {
     assertFalse(subgraph.hasOnlyFerryStops());
   }
 
-  private static TransitStopVertexBuilder vertexBuilder(RegularStop stop) {
-    return TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry());
+  private static TransitStopVertexBuilder vertexBuilder(FeedScopedId id) {
+    return TransitStopVertex.of()
+      .withId(id)
+      .withPoint(GeometryUtils.getGeometryFactory().createPoint(Coordinates.BERLIN));
   }
 }

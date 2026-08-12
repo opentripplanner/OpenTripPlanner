@@ -10,7 +10,6 @@ import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -52,7 +51,6 @@ public class SiriSXUpdater
 
   public SiriSXUpdater(
     Parameters config,
-    TransitRepository transitRepository,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache,
     SiriLoader siriLoader
   ) {
@@ -67,7 +65,7 @@ public class SiriSXUpdater
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.transitAlertService = new TransitAlertServiceImpl(transitRepository);
+    this.transitAlertService = new TransitAlertServiceImpl();
     this.updateHandler = new SiriAlertsUpdateHandler(
       config.feedId(),
       transitAlertService,

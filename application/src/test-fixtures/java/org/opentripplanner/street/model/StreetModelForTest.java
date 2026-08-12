@@ -142,6 +142,22 @@ public class StreetModelForTest {
     return streetEdge(from, to, 1, permissions);
   }
 
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction, allowing
+   * {@link StreetTraversalPermission#PEDESTRIAN} traffic.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b) {
+    bidirectional(a, b, StreetTraversalPermission.PEDESTRIAN);
+  }
+
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b, StreetTraversalPermission perm) {
+    streetEdge(a, b, perm);
+    streetEdge(b, a, perm);
+  }
+
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
     return VehicleParking.of().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
   }
