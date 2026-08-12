@@ -280,6 +280,7 @@ public class TestServerContext {
 
     return new DefaultRoutingService(
       transitService,
+      new TransitAlertServiceImpl(),
       graph,
       raptorConfig,
       Metrics.globalRegistry,

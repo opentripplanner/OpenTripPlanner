@@ -28,7 +28,6 @@ import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -39,6 +38,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
@@ -128,28 +128,25 @@ public class TripRequestMapperTest implements PlanTestConstants {
       )
       .buildDefault();
 
-    var otpServerRequestContext = TestServerContext.createServerContext(
-      GRAPH,
+    var transitService = TestServerContext.createTransitService(
       TIMETABLE_REPOSITORY,
-      TRANSFER_REPOSITORY,
-      new DefaultFareService(),
-      defaultRequest,
-      null
+      TRANSFER_REPOSITORY
     );
+    var vertexLinker = VertexLinkerTestFactory.of(GRAPH);
 
     context = new TransmodelRequestContext(
-      otpServerRequestContext.routingService(),
-      otpServerRequestContext.transitService(),
-      otpServerRequestContext.transitAlertService(),
-      otpServerRequestContext.empiricalDelayService(),
-      otpServerRequestContext.defaultRouteRequest(),
-      otpServerRequestContext.vehicleRentalService(),
-      otpServerRequestContext.vehicleParkingService(),
-      otpServerRequestContext.graph(),
-      otpServerRequestContext.transferService(),
-      otpServerRequestContext.streetDetailsService(),
-      otpServerRequestContext.linkingContextFactory(),
-      otpServerRequestContext.streetLimitationParametersService()
+      TestServerContext.createRoutingService(GRAPH, transitService, TRANSFER_REPOSITORY),
+      transitService,
+      null,
+      null,
+      defaultRequest,
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createVehicleParkingService(),
+      GRAPH,
+      TransferServiceTestFactory.transferService(TRANSFER_REPOSITORY),
+      TestServerContext.createStreetDetailsService(),
+      TestServerContext.createLinkingContextFactory(GRAPH, vertexLinker, transitService),
+      TestServerContext.createStreetLimitationParametersService()
     );
   }
 
