@@ -21,6 +21,13 @@ interface LayerControlProps {
  *   1. Background (raster) layers (select exactly one to show).
  *   2. Debug layers (vector-like layers) with groupings, toggle on/off individually.
  */
+/** Distinguishes the two lists inside a group: what is drawn, and what it is narrowed to. */
+const subHeadingStyle: React.CSSProperties = {
+  marginLeft: '20px',
+  marginBottom: '3px',
+  opacity: 0.7,
+};
+
 const linkButtonStyle: React.CSSProperties = {
   background: 'none',
   border: 'none',
@@ -212,6 +219,9 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
           (layer) => mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none',
         );
 
+        // Networks filter the rental layers, so the group needs a second, labelled list.
+        const showNetworks = groupName === RENTAL_GROUP && rentalNetworks.length > 0;
+
         // Define a helper to toggle all layers in the group at once.
         const toggleGroupVisibility = (checked: boolean) => {
           layers.forEach((layer) => {
@@ -239,32 +249,7 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
               </label>
             </h6>
 
-            {groupName === RENTAL_GROUP && rentalNetworks.length > 0 && (
-              <div style={{ margin: '0 0 6px 20px' }}>
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '3px' }}>
-                  <span style={{ opacity: 0.7 }}>Networks</span>
-                  <button type="button" onClick={() => setAllNetworks(true)} style={linkButtonStyle}>
-                    all
-                  </button>
-                  <button type="button" onClick={() => setAllNetworks(false)} style={linkButtonStyle}>
-                    none
-                  </button>
-                </div>
-                <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                  {rentalNetworks.map((network) => (
-                    <label key={network} style={{ display: 'block', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedNetworks.has(network)}
-                        onChange={(e) => toggleNetwork(network, e.target.checked)}
-                        style={{ marginRight: '5px' }}
-                      />
-                      {network}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+            {showNetworks && <div style={subHeadingStyle}>Layers</div>}
 
             {layers.map((layer) => {
               // Figure out if the layer is visible or not:
@@ -289,6 +274,33 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
                 </label>
               );
             })}
+
+            {showNetworks && (
+              <div style={{ marginTop: '8px' }}>
+                <div style={{ ...subHeadingStyle, display: 'flex', gap: '6px' }}>
+                  <span>Networks</span>
+                  <button type="button" onClick={() => setAllNetworks(true)} style={linkButtonStyle}>
+                    all
+                  </button>
+                  <button type="button" onClick={() => setAllNetworks(false)} style={linkButtonStyle}>
+                    none
+                  </button>
+                </div>
+                <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                  {rentalNetworks.map((network) => (
+                    <label key={network} style={{ display: 'block', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedNetworks.has(network)}
+                        onChange={(e) => toggleNetwork(network, e.target.checked)}
+                        style={{ marginLeft: '20px', marginRight: '5px' }}
+                      />
+                      {network}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
