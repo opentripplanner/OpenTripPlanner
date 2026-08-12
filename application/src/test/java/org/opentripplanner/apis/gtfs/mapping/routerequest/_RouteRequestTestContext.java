@@ -20,6 +20,7 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -78,6 +79,7 @@ class _RouteRequestTestContext {
     this.context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
+      new TransitAlertServiceImpl(),
       transferService,
       new DefaultFareService(),
       new DefaultVehicleRentalService(),

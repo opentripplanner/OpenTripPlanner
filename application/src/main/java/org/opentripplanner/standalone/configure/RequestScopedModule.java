@@ -30,6 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
@@ -140,6 +141,7 @@ public class RequestScopedModule {
     VertexLinker vertexLinker,
     TransactionScope transactionScope,
     TransitService transitService,
+    TransitAlertService transitAlertService,
     RouteRequest defaultRequest,
     VectorTileConfig vectorTileConfig,
     GtfsApiParameters gtfsApiConfig,
@@ -193,6 +195,7 @@ public class RequestScopedModule {
       transactionScope,
       transitRoutingConfig,
       transitService,
+      transitAlertService,
       triasApiParameters,
       gtfsApiConfig,
       vectorTileConfig,

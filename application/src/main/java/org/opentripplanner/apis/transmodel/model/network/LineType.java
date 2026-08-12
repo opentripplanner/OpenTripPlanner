@@ -190,9 +190,9 @@ public class LineType {
           .description("Get all situations active for the line.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
-              .getTransitAlertService()
-              .getRouteAlerts((getSource(environment)).getId())
+            GqlUtil.getTransitAlertService(environment).getRouteAlerts(
+              (getSource(environment)).getId()
+            )
           )
           .build()
       )

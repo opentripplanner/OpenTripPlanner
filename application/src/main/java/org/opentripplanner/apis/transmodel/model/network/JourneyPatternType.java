@@ -144,12 +144,10 @@ public class JourneyPatternType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
-            return GqlUtil.getTransitService(environment)
-              .getTransitAlertService()
-              .getDirectionAndRouteAlerts(
-                tripPattern.getDirection(),
-                tripPattern.getRoute().getId()
-              );
+            return GqlUtil.getTransitAlertService(environment).getDirectionAndRouteAlerts(
+              tripPattern.getDirection(),
+              tripPattern.getRoute().getId()
+            );
           })
           .build()
       )

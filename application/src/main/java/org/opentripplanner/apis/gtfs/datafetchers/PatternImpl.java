@@ -20,7 +20,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsO
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.apis.support.SemanticHash;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -43,7 +42,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
+      TransitAlertService alertService = getTransitAlertService(environment);
       var args = new GraphQLTypes.GraphQLPatternAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLPatternAlertType> types = args.getGraphQLTypes();
       if (types != null) {
@@ -100,8 +99,9 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
               getSource(environment)
                 .getStops()
                 .forEach(stop -> {
-                  FeedScopedId stopId = stop.getId();
-                  alerts.addAll(alertService.getStopAlerts(stopId));
+                  alerts.addAll(
+                    alertService.getStopLocationsAlerts(stop.getIdAndParentStationId())
+                  );
                 });
               break;
             case STOPS_ON_TRIPS:
@@ -296,6 +296,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
+  }
+
+  private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitAlertService();
   }
 
   private TripPattern getSource(DataFetchingEnvironment environment) {

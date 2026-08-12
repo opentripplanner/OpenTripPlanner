@@ -30,6 +30,7 @@ class VectorTilesResourceTest {
       serverContext.worldEnvelopeService(),
       serverContext.vehicleRentalService(),
       serverContext.vehicleParkingService(),
+      serverContext.transitAlertService(),
       grizzlyRequest,
       "default"
     );

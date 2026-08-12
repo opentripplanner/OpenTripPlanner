@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -95,6 +97,7 @@ public class StopMapperTest {
     assertNull(result.getDescription());
     assertEquals(NAME, result.getName().toString());
     assertNull(result.getParentStation());
+    assertThat(result.getIdAndParentStationId()).containsExactly(result.getId());
     assertNull(result.getCode());
     assertNull(result.getUrl());
     // Skip getting coordinate, it will throw an exception
@@ -162,6 +165,9 @@ public class StopMapperTest {
 
     assertNotNull(result.getParentStation());
     assertEquals(parentStation, result.getParentStation());
+    assertThat(result.getIdAndParentStationId()).containsExactlyElementsIn(
+      List.of(result.getId(), result.getParentStation().getId())
+    );
   }
 
   @Test

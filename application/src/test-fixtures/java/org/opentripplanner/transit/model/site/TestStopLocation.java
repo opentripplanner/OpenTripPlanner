@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
+import java.util.List;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -13,6 +14,11 @@ public class TestStopLocation implements StopLocation {
 
   public TestStopLocation(FeedScopedId id) {
     this.id = id;
+  }
+
+  @Override
+  public List<FeedScopedId> getIdAndParentStationId() {
+    return List.of(getId());
   }
 
   @Override

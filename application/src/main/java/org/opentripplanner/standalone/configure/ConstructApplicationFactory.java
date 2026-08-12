@@ -38,8 +38,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.configure.LinkingServiceModule;
+import org.opentripplanner.routing.services.configure.TransitAlertServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -103,6 +105,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StopConsolidationServiceModule.class,
     StreetLimitationParametersServiceModule.class,
     TransitModule.class,
+    TransitAlertServiceModule.class,
     TransferServiceModule.class,
     VehicleParkingServiceModule.class,
     VehicleRentalRepositoryModule.class,
@@ -162,6 +165,12 @@ public interface ConstructApplicationFactory {
   TransitService transitService();
 
   RequestScopedFactory.Builder requestScopedFactoryBuilder();
+
+  /**
+   * The application-wide alert service aggregator. Exposed as the concrete type so that the updater
+   * configuration can register the per-updater alert services into it.
+   */
+  DelegatingTransitAlertServiceImpl transitAlertService();
 
   MetricsLogging metricsLogging();
 

@@ -357,11 +357,11 @@ public class QuayType {
           .name("situations")
           .description("Get all situations active for the quay.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(env ->
-            GqlUtil.getTransitService(env)
-              .getTransitAlertService()
-              .getStopAlerts(((StopLocation) env.getSource()).getId())
-          )
+          .dataFetcher(env -> {
+            var alertService = GqlUtil.getTransitAlertService(env);
+            var quay = (StopLocation) env.getSource();
+            return alertService.getStopLocationsAlerts(quay.getIdAndParentStationId());
+          })
           .build()
       )
       .field(
