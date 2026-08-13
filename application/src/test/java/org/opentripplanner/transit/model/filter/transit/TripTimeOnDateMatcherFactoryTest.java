@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.route;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -645,6 +647,41 @@ class TripTimeOnDateMatcherFactoryTest {
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     // A scheduled (non-canceled) trip time is not a cancellation, so it does not match.
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
+  }
+
+  @Test
+  void includeRunningTimePeriodOverlapping() {
+    var request = request()
+      .withIncludeRunningTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(9)),
+            Instant.EPOCH.plus(Duration.ofHours(11))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    // The trip runs from 10:00 to 10:05 after the epoch
+    assertTrue(matcher.match(tripTimeOnDate(ROUTE_1)));
+  }
+
+  @Test
+  void includeRunningTimePeriodNotOverlapping() {
+    var request = request()
+      .withIncludeRunningTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(11)),
+            Instant.EPOCH.plus(Duration.ofHours(12))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
   }
 

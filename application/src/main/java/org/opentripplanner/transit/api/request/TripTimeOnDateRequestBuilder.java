@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -20,12 +21,17 @@ public class TripTimeOnDateRequestBuilder {
 
   private static final String INCLUDE_AGENCIES = "includeAgencies";
   private static final String INCLUDE_ROUTES = "includeRoutes";
+  private static final String INCLUDE_RUNNING_TIME_PERIODS = "includeRunningTimePeriods";
   private static final String EXCLUDE_AGENCIES = "excludeAgencies";
   private static final String INCLUDE_MODES = "includeModes";
   private static final String EXCLUDE_ROUTES = "excludeRoutes";
   private static final String EXCLUDE_MODES = "excludeModes";
   private final Collection<StopLocation> stopLocations;
   private CancellationPolicy cancellationPolicy = CancellationPolicy.NO_CANCELLATIONS;
+  private FilterValues<TimePeriod> includeRunningTimePeriods = FilterValues.ofNullIsEverything(
+    INCLUDE_RUNNING_TIME_PERIODS,
+    null
+  );
   private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
     INCLUDE_AGENCIES,
     null
@@ -82,6 +88,21 @@ public class TripTimeOnDateRequestBuilder {
     List<LocalDateRange> serviceDateRanges
   ) {
     this.serviceDateRanges = serviceDateRanges;
+    return this;
+  }
+
+  /**
+   * Only include trip times of trips which are running, according to their schedule, during one of
+   * the given periods. A trip is running from the scheduled departure from its first stop until the
+   * scheduled arrival at its last stop.
+   */
+  public TripTimeOnDateRequestBuilder withIncludeRunningTimePeriods(
+    @Nullable Collection<TimePeriod> runningTimePeriods
+  ) {
+    this.includeRunningTimePeriods = FilterValues.ofNullIsEverything(
+      INCLUDE_RUNNING_TIME_PERIODS,
+      runningTimePeriods
+    );
     return this;
   }
 
@@ -154,6 +175,7 @@ public class TripTimeOnDateRequestBuilder {
       numberOfDepartures,
       sortOrder,
       cancellationPolicy,
+      includeRunningTimePeriods,
       includeAgencies,
       includeRoutes,
       excludeAgencies,

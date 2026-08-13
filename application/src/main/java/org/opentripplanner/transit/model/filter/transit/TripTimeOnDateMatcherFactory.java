@@ -1,6 +1,10 @@
 package org.opentripplanner.transit.model.filter.transit;
 
+import java.time.Instant;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -41,6 +45,10 @@ public class TripTimeOnDateMatcherFactory {
     expr.atLeastOneMatch(request.includeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.atLeastOneMatch(request.includeModes(), TripTimeOnDateMatcherFactory::mode);
+    expr.atLeastOneMatch(
+      request.includeRunningTimePeriods(),
+      TripTimeOnDateMatcherFactory::runningTimePeriod
+    );
     expr.matchesNone(request.excludeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
     expr.matchesNone(request.excludeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.matchesNone(request.excludeModes(), TripTimeOnDateMatcherFactory::mode);
@@ -93,5 +101,41 @@ public class TripTimeOnDateMatcherFactory {
 
   private static Matcher<TripTimeOnDate> mode(TransitMode mode) {
     return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getMode());
+  }
+
+  /**
+   * Matches calls of trips which are running during the given period, according to their schedule.
+   * A trip is running from the scheduled departure from its first stop until the scheduled arrival
+   * at its last stop. Calls whose trip schedule cannot be resolved never match.
+   */
+  private static Matcher<TripTimeOnDate> runningTimePeriod(TimePeriod period) {
+    return new GenericUnaryMatcher<>("runningTimePeriod", call -> {
+      var runningTime = scheduledRunningTime(call);
+      return runningTime != null && period.overlaps(runningTime);
+    });
+  }
+
+  /**
+   * Resolves the period of time the trip of the given call is running on its service date, according
+   * to its schedule.
+   *
+   * @return {@code null} if the schedule of the trip cannot be resolved.
+   */
+  @Nullable
+  private static TimePeriod scheduledRunningTime(TripTimeOnDate call) {
+    var tripTimes = call.getTripTimes();
+    if (tripTimes == null || tripTimes.getNumStops() == 0) {
+      return null;
+    }
+    int departure = tripTimes.getScheduledDepartureTime(0);
+    int arrival = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
+    if (departure == StopTime.MISSING_VALUE || arrival == StopTime.MISSING_VALUE) {
+      return null;
+    }
+    long midnight = call.getServiceDayMidnight();
+    return TimePeriod.of(
+      Instant.ofEpochSecond(midnight + departure),
+      Instant.ofEpochSecond(midnight + arrival)
+    );
   }
 }

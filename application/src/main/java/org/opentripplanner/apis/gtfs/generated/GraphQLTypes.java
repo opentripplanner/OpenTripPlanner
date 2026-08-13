@@ -5206,6 +5206,7 @@ public class GraphQLTypes {
   public static class GraphQLStopCanceledCallsArgs {
 
     private GraphQLArrivalDeparture arrivalDeparture;
+    private List<GraphQLOffsetDateTimeRangeInput> runningTimeRanges;
     private List<GraphQLLocalDateRangeInput> serviceDateRanges;
 
     public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
@@ -5216,6 +5217,13 @@ public class GraphQLTypes {
           this.arrivalDeparture = GraphQLArrivalDeparture.valueOf(
             (String) args.get("arrivalDeparture")
           );
+        }
+        if (args.get("runningTimeRanges") != null) {
+          this.runningTimeRanges = ((List<Map<String, Object>>) args.get(
+              "runningTimeRanges"
+            )).stream()
+            .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("serviceDateRanges") != null) {
           this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
@@ -5231,12 +5239,22 @@ public class GraphQLTypes {
       return this.arrivalDeparture;
     }
 
+    public List<GraphQLOffsetDateTimeRangeInput> getGraphQLRunningTimeRanges() {
+      return this.runningTimeRanges;
+    }
+
     public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
       return this.serviceDateRanges;
     }
 
     public void setGraphQLArrivalDeparture(GraphQLArrivalDeparture arrivalDeparture) {
       this.arrivalDeparture = arrivalDeparture;
+    }
+
+    public void setGraphQLRunningTimeRanges(
+      List<GraphQLOffsetDateTimeRangeInput> runningTimeRanges
+    ) {
+      this.runningTimeRanges = runningTimeRanges;
     }
 
     public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {

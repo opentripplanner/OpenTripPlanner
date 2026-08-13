@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -27,6 +28,7 @@ public class TripTimeOnDateRequest {
 
   private final List<LocalDateRange> serviceDateRanges;
   private final CancellationPolicy cancellationPolicy;
+  private final FilterValues<TimePeriod> includeRunningTimePeriods;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
@@ -48,6 +50,7 @@ public class TripTimeOnDateRequest {
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
     CancellationPolicy cancellationPolicy,
+    FilterValues<TimePeriod> includeRunningTimePeriods,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
@@ -64,6 +67,7 @@ public class TripTimeOnDateRequest {
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
     this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
+    this.includeRunningTimePeriods = includeRunningTimePeriods;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
@@ -108,6 +112,15 @@ public class TripTimeOnDateRequest {
 
   public CancellationPolicy cancellationPolicy() {
     return cancellationPolicy;
+  }
+
+  /**
+   * The periods of time during which a trip has to be running, according to its schedule, for its
+   * calls to be included. A trip is running from the scheduled departure from its first stop until
+   * the scheduled arrival at its last stop.
+   */
+  public FilterValues<TimePeriod> includeRunningTimePeriods() {
+    return includeRunningTimePeriods;
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {
