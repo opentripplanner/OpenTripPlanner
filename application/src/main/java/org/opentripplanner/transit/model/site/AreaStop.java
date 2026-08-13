@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntSupplier;
@@ -56,6 +57,11 @@ public class AreaStop
 
   public static AreaStopBuilder of(FeedScopedId id, IntSupplier indexCounter) {
     return new AreaStopBuilder(id, indexCounter);
+  }
+
+  @Override
+  public List<FeedScopedId> getIdAndParentStationId() {
+    return List.of(getId());
   }
 
   @Override

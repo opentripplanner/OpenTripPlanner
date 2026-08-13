@@ -74,7 +74,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
   /**
    * Returns {@link RaptorConstants#NOT_FOUND} not supported.
    */
-  protected abstract int stop(T arrival);
+  protected abstract int stopIndex(T arrival);
 
   protected abstract Iterable<Integer> stopsVisited(T arrival);
 
@@ -92,11 +92,11 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
   }
 
   private boolean isDebugStopOrTripPath(T arrival) {
-    return stops.contains(stop(arrival)) || isDebugTripPath(arrival);
+    return stops.contains(stopIndex(arrival)) || isDebugTripPath(arrival);
   }
 
   private boolean isDebugTripPath(T arrival) {
-    if (!isDebugTrip(stop(arrival))) {
+    if (!isDebugTrip(stopIndex(arrival))) {
       return false;
     }
 

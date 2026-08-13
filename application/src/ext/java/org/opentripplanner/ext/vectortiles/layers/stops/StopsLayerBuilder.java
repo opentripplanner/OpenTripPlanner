@@ -12,6 +12,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.LayerFilters;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -22,6 +23,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   public StopsLayerBuilder(
     TransitService transitService,
+    TransitAlertService transitAlertService,
     LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
@@ -30,7 +32,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
         entry(MapperType.Digitransit, new DigitransitStopPropertyMapper(transitService, locale)),
         entry(
           MapperType.DigitransitRealtime,
-          new DigitransitRealtimeStopPropertyMapper(transitService, locale)
+          new DigitransitRealtimeStopPropertyMapper(transitService, transitAlertService, locale)
         )
       ).get(MapperType.valueOf(layerParameters.mapper())),
       layerParameters.name(),

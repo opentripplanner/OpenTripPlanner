@@ -31,8 +31,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -116,8 +114,6 @@ public class TransitRepository implements Serializable {
     ArrayListMultimap.create();
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
-
-  private transient TransitAlertService transitAlertService;
 
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
@@ -356,19 +352,6 @@ public class TransitRepository implements Serializable {
     this.noticesByElement.putAll(noticesByElement);
   }
 
-  /**
-   * Returns the alert service. If no updaters are configured an empty instance is returned.
-   * See  {@link TransitRepository#initUpdaterManager(GraphUpdaterManager)}.
-   */
-  public TransitAlertService getTransitAlertService() {
-    if (transitAlertService == null) {
-      transitAlertService = new DelegatingTransitAlertServiceImpl(
-        this.updaterManager == null ? List.of() : this.updaterManager.getUpdaterList()
-      );
-    }
-    return transitAlertService;
-  }
-
   public TripPattern getTripPatternForId(FeedScopedId id) {
     return tripPatternForId.get(id);
   }
@@ -459,7 +442,6 @@ public class TransitRepository implements Serializable {
       this.updaterManager,
       updaterManager
     );
-    this.transitAlertService = null;
   }
 
   /**

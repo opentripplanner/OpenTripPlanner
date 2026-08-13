@@ -21,9 +21,12 @@ import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.configure.StreetDomain;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -35,9 +38,11 @@ public class MetricsLogging {
   @Inject
   public MetricsLogging(
     TransitRepository transitRepository,
+    TransitAlertService transitAlertService,
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary,
-    UpdateManager updateManager
+    @TransitDomain UpdateManager transitUpdateManager,
+    @StreetDomain UpdateManager streetUpdateManager
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -51,7 +56,7 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
     if (OTPFeature.AlertMetrics.isOn()) {
-      new AlertMetrics(transitRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+      new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }
 
     if (transitRepository.getRaptorTransitData() != null) {
@@ -82,9 +87,15 @@ public class MetricsLogging {
     }
 
     new ExecutorServiceMetrics(
-      updateManager.writerThreadExecutor(),
-      "graphUpdateScheduler",
-      List.of(Tag.of("pool", "graphUpdateScheduler"))
+      transitUpdateManager.writerThreadExecutor(),
+      "transitUpdateScheduler",
+      List.of(Tag.of("pool", "transitUpdateScheduler"))
+    ).bindTo(Metrics.globalRegistry);
+
+    new ExecutorServiceMetrics(
+      streetUpdateManager.writerThreadExecutor(),
+      "streetUpdateScheduler",
+      List.of(Tag.of("pool", "streetUpdateScheduler"))
     ).bindTo(Metrics.globalRegistry);
 
     if (raptorConfig.isMultiThreaded()) {

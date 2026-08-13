@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Map;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import javax.annotation.Nullable;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
@@ -20,8 +20,8 @@ public class GeocoderResource {
 
   private final LuceneIndex luceneIndex;
 
-  public GeocoderResource(@Context OtpServerRequestContext requestContext) {
-    luceneIndex = requestContext.lucenceIndex();
+  public GeocoderResource(@Context @Nullable LuceneIndex luceneIndex) {
+    this.luceneIndex = luceneIndex;
   }
 
   @GET

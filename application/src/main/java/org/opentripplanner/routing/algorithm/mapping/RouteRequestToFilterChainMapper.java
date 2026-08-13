@@ -90,7 +90,7 @@ public class RouteRequestToFilterChainMapper {
         params.removeItinerariesWithSameRoutesAndStops()
       )
       .withTransitAlerts(
-        context.transitService().getTransitAlertService(),
+        context.transitAlertService(),
         context.transitService()::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)

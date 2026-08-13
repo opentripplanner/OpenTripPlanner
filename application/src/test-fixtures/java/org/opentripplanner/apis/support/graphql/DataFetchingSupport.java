@@ -56,6 +56,7 @@ public class DataFetchingSupport {
           null,
           null,
           null,
+          null,
           null
         )
       )

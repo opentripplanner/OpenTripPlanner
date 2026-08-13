@@ -78,9 +78,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
@@ -124,7 +124,6 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
@@ -375,19 +374,10 @@ class GraphQLIntegrationTest {
 
     var snapshot = timetableSnapshot.commit();
 
-    TransitService transitService = new DefaultTransitService(transitRepository, snapshot) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(
-        transitRepository
-      );
-
+    var transitService = new DefaultTransitService(transitRepository, snapshot) {
       @Override
       public List<TransitMode> findTransitModes(StopLocation stop) {
         return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
       }
 
       @Override
@@ -521,13 +511,10 @@ class GraphQLIntegrationTest {
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
-    transitService.getTransitAlertService().setAlerts(alerts);
+    var transitAlertService = new TransitAlertServiceImpl();
+    transitAlertService.setAlerts(alerts);
 
     var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
-    var realtimeVehicleService = new DefaultRealtimeVehicleService(
-      realtimeVehicleRepository,
-      transitService
-    );
     var occypancyVehicle = RealtimeVehicle.builder()
       .withTrip(trip)
       .withTime(SERVICE_DATE.atStartOfDay(BERLIN).plusHours(16).toInstant())
@@ -551,6 +538,10 @@ class GraphQLIntegrationTest {
         .putAll(pattern, List.of(occypancyVehicle, positionVehicle))
         .build()
     );
+    var realtimeVehicleService = new DefaultRealtimeVehicleService(
+      new RealtimeVehicleRepositoryLifecycle().freeze(realtimeVehicleRepository),
+      transitService
+    );
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
@@ -561,6 +552,7 @@ class GraphQLIntegrationTest {
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
+      transitAlertService,
       TransferServiceTestFactory.defaultTransferService(),
       fareService,
       defaultVehicleRentalService,

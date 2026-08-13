@@ -10,8 +10,7 @@ public interface PatternRideFactory<
 > {
   R createPatternRide(
     McStopArrival<T> prevArrival,
-    int boardStopIndex,
-    int boardPos,
+    int boardStopPosition,
     int boardTime,
     int boardCost1,
     int relativeCost1,

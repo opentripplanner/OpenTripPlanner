@@ -1,16 +1,16 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 
 /**
- * Give access to the transit data and street model in the context of a real-time updater.
- * The services exposed should be used only from the GraphWriter thread.
+ * Give access to the transit data in the context of a real-time update task in the transit write
+ * domain. The services exposed must be used only from the transit domain's writer thread.
  */
-public interface RealTimeUpdateContext {
+public interface TransitRealTimeUpdateContext {
   /**
    * Return the mutable realtime-timetable repository (write buffer) for this update task. Callers
    * must only use this from the single writer thread.
@@ -18,9 +18,12 @@ public interface RealTimeUpdateContext {
   TimetableRepository timetableRepository();
 
   /**
-   * Return the street model (graph).
+   * Return the mutable realtime-vehicle repository for this update task. Callers must only use
+   * this from the single writer thread. Accessing it causes the current transaction to publish a
+   * new vehicle snapshot at commit — even if nothing was written — so only call it when there are
+   * vehicle updates to apply.
    */
-  Graph graph();
+  RealtimeVehicleRepository realtimeVehicleRepository();
 
   /**
    * Return a transit service that can look up both scheduled and real-time data.

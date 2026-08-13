@@ -1455,9 +1455,9 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(environment -> {
-            Collection<TransitAlert> alerts = GqlUtil.getTransitService(environment)
-              .getTransitAlertService()
-              .getAllAlerts();
+            Collection<TransitAlert> alerts = GqlUtil.getTransitAlertService(
+              environment
+            ).getAllAlerts();
 
             Set<String> codespaces = new HashSet<>();
 
@@ -1510,9 +1510,9 @@ public class TransmodelGraphQLSchemaFactory {
             if (situationNumber.isBlank()) {
               return null;
             }
-            return GqlUtil.getTransitService(environment)
-              .getTransitAlertService()
-              .getAlertById(idMapper.parseNullSafe(situationNumber).orElse(null));
+            return GqlUtil.getTransitAlertService(environment).getAlertById(
+              idMapper.parseNullSafe(situationNumber).orElse(null)
+            );
           })
           .build()
       )
@@ -1537,7 +1537,10 @@ public class TransmodelGraphQLSchemaFactory {
             if (ref == null) {
               return null;
             }
-            return ref.getLeg(GqlUtil.getTransitService(environment));
+            return ref.getLeg(
+              GqlUtil.getTransitService(environment),
+              GqlUtil.getTransitAlertService(environment)
+            );
           })
           .build()
       )

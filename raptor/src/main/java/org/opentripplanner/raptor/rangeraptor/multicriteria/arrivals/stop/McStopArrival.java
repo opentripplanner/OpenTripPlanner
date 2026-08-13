@@ -107,11 +107,4 @@ public abstract sealed class McStopArrival<T extends RaptorTripSchedule>
   public String toString() {
     return asString();
   }
-
-  /**
-   * @return previous state or throw a NPE if no previousArrival exist.
-   */
-  protected final int previousStop() {
-    return previous.stop;
-  }
 }
