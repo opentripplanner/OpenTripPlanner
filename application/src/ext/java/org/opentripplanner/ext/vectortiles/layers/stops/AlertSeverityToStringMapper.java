@@ -9,9 +9,9 @@ final class AlertSeverityToStringMapper {
   static String map(AlertSeverity severity) {
     return switch (severity) {
       case INFO -> "INFO";
-      case WARNING -> "WARNING";
-      case SEVERE -> "SEVERE";
-      default -> "UNKNOWN_SEVERITY";
+      case VERY_SLIGHT, SLIGHT, WARNING -> "WARNING";
+      case VERY_SEVERE, SEVERE -> "SEVERE";
+      case UNDEFINED, UNKNOWN_SEVERITY -> "UNKNOWN_SEVERITY";
     };
   }
 }
