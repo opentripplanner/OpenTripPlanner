@@ -5,14 +5,17 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
 
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
 
-  public RealtimeResolver(TransitService transitService) {
+  public RealtimeResolver(TransitService transitService, TransitAlertService transitAlertService) {
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
   }
 
   /**
@@ -20,9 +23,10 @@ public class RealtimeResolver {
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
-    TransitService transitService
+    TransitService transitService,
+    TransitAlertService transitAlertService
   ) {
-    return new RealtimeResolver(transitService).addRealtimeInfo(itineraries);
+    return new RealtimeResolver(transitService, transitAlertService).addRealtimeInfo(itineraries);
   }
 
   private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries) {
@@ -47,7 +51,7 @@ public class RealtimeResolver {
     if (!(leg.isScheduledTransitLeg())) {
       return leg;
     }
-    var realTimeLeg = ref.getLeg(transitService);
+    var realTimeLeg = ref.getLeg(transitService, transitAlertService);
     if (realTimeLeg == null) {
       return leg;
     }

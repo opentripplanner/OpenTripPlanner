@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
@@ -168,6 +169,7 @@ public class SpeedTest {
       transitUpdateManager,
       streetUpdateManager,
       timetableHandle,
+      new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig(),
       // The speed test does not use GBFS vehicle rental.
       GbfsNetworkOverrides.none()
@@ -207,6 +209,7 @@ public class SpeedTest {
         transitRepository,
         timetableHandle.repositorySnapshot(transactionScope)
       ),
+      new DelegatingTransitAlertServiceImpl(),
       null,
       null,
       VectorTileConfig.DEFAULT,

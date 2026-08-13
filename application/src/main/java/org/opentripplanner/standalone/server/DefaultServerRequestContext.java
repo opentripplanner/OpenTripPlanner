@@ -29,6 +29,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -69,6 +70,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RegularTransferService transferService;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
   private final VectorTileConfig vectorTileConfig;
   private final VehicleParkingService vehicleParkingService;
   private final VehicleRentalService vehicleRentalService;
@@ -142,6 +144,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TransactionScope transactionScope,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    TransitAlertService transitAlertService,
     TriasApiParameters triasApiParameters,
     GtfsApiParameters gtfsApiParameters,
     VectorTileConfig vectorTileConfig,
@@ -178,6 +181,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transactionScope = transactionScope;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
     this.transmodelSchema = transmodelSchema;
     this.triasApiParameters = triasApiParameters;
     this.gtfsApiParameters = gtfsApiParameters;
@@ -229,6 +233,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public TransitService transitService() {
     return transitService;
+  }
+
+  @Override
+  public TransitAlertService transitAlertService() {
+    return transitAlertService;
   }
 
   @Override

@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
@@ -18,21 +19,24 @@ import org.opentripplanner.utils.collection.ListUtils;
 public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
   private final I18NStringMapper i18NStringMapper;
 
-  public DigitransitRealtimeStopPropertyMapper(TransitService transitService, Locale locale) {
+  public DigitransitRealtimeStopPropertyMapper(
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    Locale locale
+  ) {
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
-    boolean noServiceAlert = transitService
-      .getTransitAlertService()
-      .getStopAlerts(stop.getId())
-      .stream()
-      .anyMatch(alert -> alert.noServiceAt(currentTime));
+    var stopAlerts = transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId());
+    boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
 
     var serviceDate = LocalDate.now(transitService.getTimeZone());
     boolean stopTimesExist = transitService

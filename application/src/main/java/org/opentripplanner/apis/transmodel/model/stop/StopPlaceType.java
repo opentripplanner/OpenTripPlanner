@@ -423,9 +423,9 @@ public class StopPlaceType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(env ->
-            GqlUtil.getTransitService(env)
-              .getTransitAlertService()
-              .getStopAlerts(((MonoOrMultiModalStation) env.getSource()).getId())
+            GqlUtil.getTransitAlertService(env).getStopAlerts(
+              ((MonoOrMultiModalStation) env.getSource()).getId()
+            )
           )
           .build()
       )

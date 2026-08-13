@@ -21,7 +21,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -57,15 +56,17 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
     // Put an alert on stop3
+    var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .addTimePeriod(new TimePeriod(0, 0))
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    transitAlertService.setAlerts(List.of(alert));
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
-      transitService
+      transitService,
+      transitAlertService
     );
 
     assertFalse(itinerariesWithRealtime.isEmpty());
@@ -98,7 +99,11 @@ class RealtimeResolverTest {
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      new TransitAlertServiceImpl()
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -120,7 +125,11 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      new TransitAlertServiceImpl()
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -179,13 +188,6 @@ class RealtimeResolverTest {
     transitRepository.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
-    return new DefaultTransitService(transitRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(transitRepository);
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
+    return new DefaultTransitService(transitRepository);
   }
 }

@@ -5,8 +5,9 @@ import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -14,7 +15,6 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This is the primary implementation of TransitAlertService, which actually retains its own set
@@ -33,13 +33,7 @@ import org.opentripplanner.transit.service.TransitRepository;
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
-  private final TransitRepository transitRepository;
-
   private Multimap<EntityKey, TransitAlert> alerts = HashMultimap.create();
-
-  public TransitAlertServiceImpl(TransitRepository transitRepository) {
-    this.transitRepository = transitRepository;
-  }
 
   @Override
   public void setAlerts(Collection<TransitAlert> alerts) {
@@ -77,22 +71,17 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId stopId,
     Set<StopCondition> stopConditions
   ) {
-    EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
-    var result = findMatchingAlerts(entitySelector);
-    var stop = transitRepository.getSiteRepository().getStopLocation(stopId);
+    return findMatchingAlerts(new EntitySelector.Stop(stopId, stopConditions));
+  }
 
-    if (stop != null && stop.isPartOfStation()) {
-      // Add alerts for parent-station
-      result.addAll(
-        findMatchingAlerts(
-          new EntitySelector.Stop(
-            Objects.requireNonNull(stop.getParentStation()).getId(),
-            stopConditions
-          )
-        )
-      );
-    }
-    return result;
+  @Override
+  public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
+    return stopLocationIds
+      .stream()
+      .flatMap(stopLocationId ->
+        findMatchingAlerts(new EntitySelector.Stop(stopLocationId)).stream()
+      )
+      .collect(Collectors.toSet());
   }
 
   @Override

@@ -45,7 +45,13 @@ import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.inspector.vector.transfers.TransfersLayerBuilder;
 import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
+import org.opentripplanner.standalone.config.DebugUiConfig;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
@@ -77,10 +83,30 @@ public class DebugVectorTilesResource {
   );
   public static final String PATH = "/otp/debug/vectortiles/";
 
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+  private final Graph graph;
+  private final DebugUiConfig debugUiConfig;
+  private final WorldEnvelopeService worldEnvelopeService;
+  private final VehicleRentalService vehicleRentalService;
+  private final StreetDetailsService streetDetailsService;
+  private final RegularTransferService transferService;
 
-  public DebugVectorTilesResource(@Context OtpServerRequestContext serverContext) {
-    this.serverContext = serverContext;
+  public DebugVectorTilesResource(
+    @Context TransitService transitService,
+    @Context Graph graph,
+    @Context DebugUiConfig debugUiConfig,
+    @Context WorldEnvelopeService worldEnvelopeService,
+    @Context VehicleRentalService vehicleRentalService,
+    @Context StreetDetailsService streetDetailsService,
+    @Context RegularTransferService transferService
+  ) {
+    this.transitService = transitService;
+    this.graph = graph;
+    this.debugUiConfig = debugUiConfig;
+    this.worldEnvelopeService = worldEnvelopeService;
+    this.vehicleRentalService = vehicleRentalService;
+    this.streetDetailsService = streetDetailsService;
+    this.transferService = transferService;
   }
 
   @GET
@@ -101,7 +127,13 @@ public class DebugVectorTilesResource {
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
       DebugVectorTilesResource::createLayerBuilder,
-      serverContext
+      new LayerBuilderContext(
+        transitService,
+        vehicleRentalService,
+        graph,
+        streetDetailsService,
+        transferService
+      )
     );
   }
 
@@ -113,7 +145,7 @@ public class DebugVectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
-    var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
+    var envelope = worldEnvelopeService.envelope().orElseThrow();
     List<FeedInfo> feedInfos = feedInfos();
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
@@ -150,7 +182,7 @@ public class DebugVectorTilesResource {
       GEOFENCING_ZONES.toVectorSourceLayer(geofencingSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       TRANSFERS.toVectorSourceLayer(transferSource),
-      serverContext.debugUiConfig().additionalBackgroundLayers()
+      debugUiConfig.additionalBackgroundLayers()
     );
   }
 
@@ -163,11 +195,10 @@ public class DebugVectorTilesResource {
   }
 
   private List<FeedInfo> feedInfos() {
-    return serverContext
-      .transitService()
+    return transitService
       .listFeedIds()
       .stream()
-      .map(serverContext.transitService()::getFeedInfo)
+      .map(transitService::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))
       .toList();
   }
@@ -175,7 +206,7 @@ public class DebugVectorTilesResource {
   private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    OtpServerRequestContext context
+    LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
       case RegularStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
@@ -208,4 +239,14 @@ public class DebugVectorTilesResource {
       );
     };
   }
+
+  /** The subset of services {@link #createLayerBuilder} needs, passed through {@link
+   * VectorTileResponseFactory#create} as its generic context parameter. */
+  private record LayerBuilderContext(
+    TransitService transitService,
+    VehicleRentalService vehicleRentalService,
+    Graph graph,
+    StreetDetailsService streetDetailsService,
+    RegularTransferService transferService
+  ) {}
 }

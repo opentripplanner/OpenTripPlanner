@@ -17,6 +17,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -30,6 +31,7 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
+import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -84,6 +86,7 @@ public class UpdaterConfigurator {
     TimetableRepositorySnapshot,
     TimetableRepository
   > timetableRepositoryHandle;
+  private final DelegatingTransitAlertServiceImpl transitAlertService;
 
   @Nullable
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
@@ -104,6 +107,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
@@ -120,6 +124,7 @@ public class UpdaterConfigurator {
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
+    this.transitAlertService = transitAlertService;
     this.gbfsNetworkOverrides = gbfsNetworkOverrides;
   }
 
@@ -139,6 +144,7 @@ public class UpdaterConfigurator {
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
+    DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
@@ -155,6 +161,7 @@ public class UpdaterConfigurator {
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
+      transitAlertService,
       updatersParameters,
       gbfsNetworkOverrides
     ).configure();
@@ -171,6 +178,14 @@ public class UpdaterConfigurator {
         updatersParameters.getVehicleRentalServiceDirectoryFetcherParameters()
       )
     );
+
+    // Register the alert service of each updater that provides one into the application-wide
+    // aggregating alert service.
+    for (var it : updaters) {
+      if (it instanceof TransitAlertProvider provider) {
+        transitAlertService.addDelegate(provider.getTransitAlertService());
+      }
+    }
 
     var transitWriterService = GraphWriterService.forTransitDomain(
       transitUpdateManager,
@@ -252,7 +267,7 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
-      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitRepository));
+      updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
@@ -292,22 +307,10 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriSXUpdater(
-          configItem,
-          transitRepository,
-          siriFuzzyTripMatcherCache()
-        )
-      );
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriSXUpdater(
-          configItem,
-          transitRepository,
-          siriFuzzyTripMatcherCache()
-        )
-      );
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
@@ -338,9 +341,7 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(
-        SiriAzureUpdater.createSXUpdater(configItem, transitRepository, siriFuzzyTripMatcherCache())
-      );
+      updaters.add(SiriAzureUpdater.createSXUpdater(configItem, siriFuzzyTripMatcherCache()));
     }
     for (var configItem : updatersParameters.getMqttSiriETUpdaterParameters()) {
       updaters.add(

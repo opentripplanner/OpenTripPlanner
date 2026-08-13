@@ -16,7 +16,7 @@ import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Created by demory on 7/26/18.
@@ -29,20 +29,21 @@ public class ParkAndRideResource {
   private final NearbyStopFinder nearbyStopFinder;
 
   public ParkAndRideResource(
-    @Context OtpServerRequestContext serverContext,
+    @Context VehicleParkingService vehicleParkingService,
+    @Context TransitService transitService,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.vehicleParkingService = serverContext.vehicleParkingService();
+    this.vehicleParkingService = vehicleParkingService;
 
     // TODO OTP2 - Why are we using the StraightLineNearbyStopFinder here
     //           - This can be replaced with a search done with the SiteRepository
     //           - if we have a radius search there.
     this.nearbyStopFinder = new StraightLineNearbyStopFinder(
-      serverContext.transitService()::findRegularStopsByBoundingBox
+      transitService::findRegularStopsByBoundingBox
     );
   }
 
