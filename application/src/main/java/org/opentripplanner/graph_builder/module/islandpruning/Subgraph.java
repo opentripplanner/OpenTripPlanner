@@ -128,10 +128,10 @@ class Subgraph {
 
     return graph
       .findVertices(envelope)
-      .stream()
+      .parallelStream()
       .filter(vx -> !contains(vx))
-      .map(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
-      .min(Double::compareTo)
+      .mapToDouble(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
+      .min()
       .orElse(searchRadius);
   }
 
