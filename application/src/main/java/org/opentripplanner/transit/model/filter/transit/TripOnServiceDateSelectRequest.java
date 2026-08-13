@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -20,6 +21,7 @@ public class TripOnServiceDateSelectRequest {
   private final FilterValues<FeedScopedId> routes;
   private final FilterValues<MainAndSubMode> transportModes;
   private final FilterValues<LocalDateRange> serviceDateRanges;
+  private final FilterValues<TimePeriod> runningTimePeriods;
 
   private TripOnServiceDateSelectRequest(Builder builder) {
     this.agencies = FilterValues.ofNullIsEverything("agencies", builder.agencies);
@@ -28,6 +30,10 @@ public class TripOnServiceDateSelectRequest {
     this.serviceDateRanges = FilterValues.ofNullIsEverything(
       "serviceDateRanges",
       builder.serviceDateRanges
+    );
+    this.runningTimePeriods = FilterValues.ofNullIsEverything(
+      "runningTimePeriods",
+      builder.runningTimePeriods
     );
   }
 
@@ -51,6 +57,13 @@ public class TripOnServiceDateSelectRequest {
     return serviceDateRanges;
   }
 
+  /**
+   * Periods of time in which the entity must be running, according to its schedule.
+   */
+  public FilterValues<TimePeriod> runningTimePeriods() {
+    return runningTimePeriods;
+  }
+
   @Override
   public String toString() {
     var builder = ToStringBuilder.ofEmbeddedType();
@@ -65,6 +78,9 @@ public class TripOnServiceDateSelectRequest {
     }
     if (!serviceDateRanges.includeEverything()) {
       builder.addCol("serviceDateRanges", serviceDateRanges.get());
+    }
+    if (!runningTimePeriods.includeEverything()) {
+      builder.addCol("runningTimePeriods", runningTimePeriods.get());
     }
     return builder.toString();
   }
@@ -83,6 +99,9 @@ public class TripOnServiceDateSelectRequest {
     @Nullable
     private List<LocalDateRange> serviceDateRanges;
 
+    @Nullable
+    private List<TimePeriod> runningTimePeriods;
+
     public Builder withAgencies(List<FeedScopedId> agencies) {
       this.agencies = agencies;
       return this;
@@ -100,6 +119,11 @@ public class TripOnServiceDateSelectRequest {
 
     public Builder withServiceDateRanges(List<LocalDateRange> serviceDateRanges) {
       this.serviceDateRanges = serviceDateRanges;
+      return this;
+    }
+
+    public Builder withRunningTimePeriods(List<TimePeriod> runningTimePeriods) {
+      this.runningTimePeriods = runningTimePeriods;
       return this;
     }
 

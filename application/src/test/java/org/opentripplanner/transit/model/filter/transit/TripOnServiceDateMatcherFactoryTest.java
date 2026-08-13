@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -32,7 +35,12 @@ class TripOnServiceDateMatcherFactoryTest {
   private TripOnServiceDate tripOnServiceDateAkt;
   private TripPattern patternRut;
   private TripPattern patternAkt;
+  // The RUT trip runs from 10:00 to 11:00 on its service date, the AKT trip is not running at all
+  private static final Instant RUT_START = Instant.parse("2024-02-22T10:00:00Z");
+  private static final Instant RUT_END = Instant.parse("2024-02-22T11:00:00Z");
+
   private BiFunction<Trip, LocalDate, TripPattern> patternResolver;
+  private Function<TripOnServiceDate, TimePeriod> runningTimeResolver;
 
   @BeforeEach
   void setup() {
@@ -110,6 +118,8 @@ class TripOnServiceDateMatcherFactoryTest {
       }
       return null;
     };
+    runningTimeResolver = tripOnServiceDate ->
+      tripOnServiceDate.equals(tripOnServiceDateRut) ? TimePeriod.of(RUT_START, RUT_END) : null;
   }
 
   @Test
@@ -394,5 +404,114 @@ class TripOnServiceDateMatcherFactoryTest {
     assertTrue(matcher.match(tripOnServiceDateRut));
     assertFalse(matcher.match(tripOnServiceDateRut2));
     assertFalse(matcher.match(tripOnServiceDateAkt));
+  }
+
+  @Test
+  void matchesTripRunningInsidePeriod() {
+    assertTrue(
+      matcher(TimePeriod.of(RUT_START.minusSeconds(60), RUT_END.plusSeconds(60))).match(
+        tripOnServiceDateRut
+      )
+    );
+  }
+
+  @Test
+  void matchesTripOverlappingPeriod() {
+    // The trip arrives one minute before the period ends
+    assertTrue(
+      matcher(TimePeriod.of(RUT_END.minusSeconds(60), RUT_END.plusSeconds(3600))).match(
+        tripOnServiceDateRut
+      )
+    );
+    // The trip departs one minute after the period starts
+    assertTrue(
+      matcher(TimePeriod.of(RUT_START.minusSeconds(3600), RUT_START.plusSeconds(60))).match(
+        tripOnServiceDateRut
+      )
+    );
+  }
+
+  @Test
+  void doesNotMatchTripArrivingExactlyAtStartOfPeriod() {
+    // The end of the running time of a trip is exclusive
+    assertFalse(matcher(TimePeriod.of(RUT_END, null)).match(tripOnServiceDateRut));
+  }
+
+  @Test
+  void doesNotMatchTripDepartingExactlyAtEndOfPeriod() {
+    // The end of the period is exclusive
+    assertFalse(matcher(TimePeriod.of(null, RUT_START)).match(tripOnServiceDateRut));
+  }
+
+  @Test
+  void doesNotMatchTripOutsidePeriod() {
+    assertFalse(
+      matcher(TimePeriod.of(RUT_END.plusSeconds(1), RUT_END.plusSeconds(3600))).match(
+        tripOnServiceDateRut
+      )
+    );
+  }
+
+  @Test
+  void matchesOpenEndedPeriods() {
+    assertTrue(matcher(TimePeriod.ofUnbounded()).match(tripOnServiceDateRut));
+  }
+
+  @Test
+  void matchesTripWithOpenEndedRunningTime() {
+    // A trip whose running time has no known end is running indefinitely
+    runningTimeResolver = tripOnServiceDate ->
+      tripOnServiceDate.equals(tripOnServiceDateRut) ? TimePeriod.of(RUT_START, null) : null;
+
+    assertTrue(matcher(TimePeriod.of(RUT_END.plusSeconds(3600), null)).match(tripOnServiceDateRut));
+    assertFalse(
+      matcher(TimePeriod.of(null, RUT_START.minusSeconds(1))).match(tripOnServiceDateRut)
+    );
+  }
+
+  @Test
+  void doesNotMatchTripWithUnresolvableRunningTime() {
+    assertFalse(matcher(TimePeriod.ofUnbounded()).match(tripOnServiceDateAkt));
+  }
+
+  @Test
+  void matchesSelectorRunningTimePeriods() {
+    var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withRunningTimePeriods(List.of(TimePeriod.of(RUT_START, RUT_END)))
+          .build()
+      )
+      .build();
+    var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
+    var matcher = TripOnServiceDateMatcherFactory.of(request, patternResolver, runningTimeResolver);
+
+    assertTrue(matcher.match(tripOnServiceDateRut));
+    assertFalse(matcher.match(tripOnServiceDateRut2));
+    assertFalse(matcher.match(tripOnServiceDateAkt));
+  }
+
+  @Test
+  void serviceDateAndRunningTimeAreAnded() {
+    var request = TripOnServiceDateRequest.of()
+      .withIncludeRunningTimePeriods(
+        FilterValues.ofRequired("runningTimePeriods", List.of(TimePeriod.ofUnbounded()))
+      )
+      .withIncludeServiceDates(
+        FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 23)))
+      )
+      .build();
+    var matcher = TripOnServiceDateMatcherFactory.of(request, patternResolver, runningTimeResolver);
+
+    // The running time of the trip on 2024-02-23 cannot be resolved, so it does not match
+    assertFalse(matcher.match(tripOnServiceDateRut));
+    assertFalse(matcher.match(tripOnServiceDateRut2));
+  }
+
+  private Matcher<TripOnServiceDate> matcher(TimePeriod period) {
+    var request = TripOnServiceDateRequest.of()
+      .withIncludeRunningTimePeriods(FilterValues.ofRequired("runningTimePeriods", List.of(period)))
+      .build();
+    return TripOnServiceDateMatcherFactory.of(request, patternResolver, runningTimeResolver);
   }
 }

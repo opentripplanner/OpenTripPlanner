@@ -2,8 +2,10 @@ package org.opentripplanner.transit.model.filter.transit;
 
 import java.time.LocalDate;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
@@ -29,24 +31,42 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 public class TripOnServiceDateMatcherFactory {
 
   /**
-   * Creates a matcher for TripOnServiceDates.
+   * Creates a matcher for TripOnServiceDates which never matches filters that require the
+   * scheduled running time of a trip.
    *
-   * @param request the criteria for filtering TripOnServiceDates.
-   * @param patternResolver resolves the pattern of a trip on a service date, or {@code null} if it
-   *                        has no pattern.
-   * @return a matcher for filtering TripOnServiceDates.
+   * @see #of(TripOnServiceDateRequest, BiFunction, Function)
    */
   public static Matcher<TripOnServiceDate> of(
     TripOnServiceDateRequest request,
     BiFunction<Trip, LocalDate, TripPattern> patternResolver
   ) {
+    return of(request, patternResolver, tripOnServiceDate -> null);
+  }
+
+  /**
+   * Creates a matcher for TripOnServiceDates.
+   *
+   * @param request the criteria for filtering TripOnServiceDates.
+   * @param patternResolver resolves the pattern of a trip on a service date, or {@code null} if it
+   *                        has no pattern.
+   * @param runningTimeResolver resolves the period of time a trip is running according to its
+   *                            schedule, from the departure from the first stop to the arrival at
+   *                            the last stop. Returns {@code null} if the running time cannot be
+   *                            resolved, in which case the trip never matches a running time
+   *                            filter.
+   * @return a matcher for filtering TripOnServiceDates.
+   */
+  public static Matcher<TripOnServiceDate> of(
+    TripOnServiceDateRequest request,
+    BiFunction<Trip, LocalDate, TripPattern> patternResolver,
+    Function<TripOnServiceDate, TimePeriod> runningTimeResolver
+  ) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
     if (!request.filters().isEmpty()) {
       expr.matches(
-        SelectorBasedMatcherFactory.of(
-          request.filters(),
-          TripOnServiceDateMatcherFactory::buildSelectorMatcher
+        SelectorBasedMatcherFactory.of(request.filters(), selector ->
+          buildSelectorMatcher(selector, runningTimeResolver)
         )
       );
     }
@@ -58,6 +78,9 @@ public class TripOnServiceDateMatcherFactory {
     expr.atLeastOneMatch(
       request.includeServiceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
+    );
+    expr.atLeastOneMatch(request.includeRunningTimePeriods(), period ->
+      runningTimePeriod(period, runningTimeResolver)
     );
     expr.atLeastOneMatch(request.includeAgencies(), TripOnServiceDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripOnServiceDateMatcherFactory::routeId);
@@ -85,7 +108,8 @@ public class TripOnServiceDateMatcherFactory {
    * agencies, routes, and transport modes with AND logic.
    */
   private static Matcher<TripOnServiceDate> buildSelectorMatcher(
-    TripOnServiceDateSelectRequest selector
+    TripOnServiceDateSelectRequest selector,
+    Function<TripOnServiceDate, TimePeriod> runningTimeResolver
   ) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
@@ -94,6 +118,9 @@ public class TripOnServiceDateMatcherFactory {
     expr.atLeastOneMatch(
       selector.serviceDateRanges(),
       TripOnServiceDateMatcherFactory::serviceDateRange
+    );
+    expr.atLeastOneMatch(selector.runningTimePeriods(), period ->
+      runningTimePeriod(period, runningTimeResolver)
     );
 
     if (!selector.transportModes().includeEverything()) {
@@ -157,6 +184,21 @@ public class TripOnServiceDateMatcherFactory {
     return new GenericUnaryMatcher<>("serviceDateRange", date ->
       dateRange.contains(date.getServiceDate())
     );
+  }
+
+  /**
+   * Matches trips which are running during the given period, according to their schedule. A trip is
+   * running from the scheduled departure from its first stop until the scheduled arrival at its
+   * last stop. Trips whose schedule cannot be resolved never match.
+   */
+  static Matcher<TripOnServiceDate> runningTimePeriod(
+    TimePeriod period,
+    Function<TripOnServiceDate, TimePeriod> runningTimeResolver
+  ) {
+    return new GenericUnaryMatcher<>("runningTimePeriod", tripOnServiceDate -> {
+      var runningTime = runningTimeResolver.apply(tripOnServiceDate);
+      return runningTime != null && period.overlaps(runningTime);
+    });
   }
 
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {
