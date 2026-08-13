@@ -133,7 +133,7 @@ class RealtimeVehiclePatternMatcher {
     // need to convert the sucess to the correct type.
     var results = matchResults
       .stream()
-      .map(ignored -> UpdateSuccess.noWarnings())
+      .map(ignored -> UpdateSuccess.of())
       .toList();
     // needs to be put into a new list so the types are correct
     var updateResult = UpdateResult.of(results, errors);
