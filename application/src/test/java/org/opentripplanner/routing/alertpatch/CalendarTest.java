@@ -5,6 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.time.TimePeriod;
 
 class CalendarTest {
 

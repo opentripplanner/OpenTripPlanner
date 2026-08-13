@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.alertpatch;
+package org.opentripplanner.core.model.time;
 
 import java.time.Instant;
 import java.util.Objects;
