@@ -20,58 +20,58 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 class Subgraph {
 
-  private final Set<Vertex> streetVertexSet;
-  private final Set<TransitStopVertex> stopsVertexSet;
+  private final Set<Vertex> streetVertices;
+  private final Set<TransitStopVertex> stopVertices;
 
   Subgraph() {
-    streetVertexSet = new HashSet<>();
-    stopsVertexSet = new HashSet<>();
+    streetVertices = new HashSet<>();
+    stopVertices = new HashSet<>();
   }
 
   void addVertex(Vertex vertex) {
     if (vertex instanceof TransitStopVertex transitStopVertex) {
-      stopsVertexSet.add(transitStopVertex);
+      stopVertices.add(transitStopVertex);
     } else {
-      streetVertexSet.add(vertex);
+      streetVertices.add(vertex);
     }
   }
 
   boolean contains(Vertex vertex) {
-    return (streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex));
+    return (streetVertices.contains(vertex) || stopVertices.contains(vertex));
   }
 
   int streetSize() {
-    return streetVertexSet.size();
+    return streetVertices.size();
   }
 
   int stopSize() {
-    return stopsVertexSet.size();
+    return stopVertices.size();
   }
 
   Vertex getRepresentativeVertex() {
     // Return first OSM vertex if available
-    for (var vertx : streetVertexSet) {
+    for (var vertx : streetVertices) {
       if (vertx instanceof OsmVertex) {
         return vertx;
       }
     }
 
     // Otherwise fallback to what is available
-    return streetVertexSet.iterator().next();
+    return streetVertices.iterator().next();
   }
 
   Iterator<Vertex> streetIterator() {
-    return streetVertexSet.iterator();
+    return streetVertices.iterator();
   }
 
   Iterator<TransitStopVertex> stopIterator() {
-    return stopsVertexSet.iterator();
+    return stopVertices.iterator();
   }
 
   // find minimal distance from a given vertex to vertices of this subgraph
   double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
-    double d1 = computeDistance(v, searchRadius, streetVertexSet);
-    double d2 = computeDistance(v, searchRadius, stopsVertexSet);
+    double d1 = computeDistance(v, searchRadius, streetVertices);
+    double d2 = computeDistance(v, searchRadius, stopVertices);
     return Math.min(d1, d2);
   }
 
@@ -117,12 +117,11 @@ class Subgraph {
 
     Envelope envelope = new Envelope();
 
-    for (Iterator<Vertex> vIter = streetIterator(); vIter.hasNext(); ) {
-      Vertex vx = vIter.next();
-      envelope.expandToInclude(vx.getCoordinate());
+    for (var i : streetVertices) {
+      envelope.expandToInclude(i.getX(), i.getY());
     }
-    for (TransitStopVertex vx : stopsVertexSet) {
-      envelope.expandToInclude(vx.getCoordinate());
+    for (var i : stopVertices) {
+      envelope.expandToInclude(i.getX(), i.getY());
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
@@ -157,7 +156,7 @@ class Subgraph {
    * stopping at the subgraph
    */
   boolean hasOnlyFerryStops() {
-    for (TransitStopVertex v : stopsVertexSet) {
+    for (TransitStopVertex v : stopVertices) {
       if (!v.isFerryStop()) {
         return false;
       }
