@@ -1,6 +1,9 @@
 package org.opentripplanner.routing.alertpatch;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,24 +20,24 @@ class CalendarTest {
   @Test
   void neverActive() {
     var subject = Calendar.ofNeverActive();
-    assertThat(subject.isNeverActive()).isTrue();
+    assertTrue(subject.isNeverActive());
     assertThat(subject.timePeriods()).isEmpty();
-    assertThat(subject.isValidDuring(START, END)).isFalse();
+    assertFalse(subject.isValidDuring(START, END));
     assertThat(subject.effectiveStart()).isEmpty();
     assertThat(subject.effectiveEnd()).isEmpty();
   }
 
   @Test
   void ofEmptyCollectionIsNeverActive() {
-    assertThat(Calendar.of(List.of())).isEqualTo(Calendar.ofNeverActive());
+    assertEquals(Calendar.ofNeverActive(), Calendar.of(List.of()));
   }
 
   @Test
   void ofAlwaysActive() {
     var subject = Calendar.ofAlwaysActive();
     assertThat(subject.timePeriods()).containsExactly(TimePeriod.ofUnbounded());
-    assertThat(subject.isNeverActive()).isFalse();
-    assertThat(subject.isValidDuring(START, END)).isTrue();
+    assertFalse(subject.isNeverActive());
+    assertTrue(subject.isValidDuring(START, END));
     assertThat(subject.effectiveStart()).isEmpty();
     assertThat(subject.effectiveEnd()).isEmpty();
   }
@@ -69,11 +72,11 @@ class CalendarTest {
     var subject = Calendar.of(
       List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, LATER_END))
     );
-    assertThat(subject.isValidDuring(START, END)).isTrue();
-    assertThat(subject.isValidDuring(LATER_START, LATER_END)).isTrue();
+    assertTrue(subject.isValidDuring(START, END));
+    assertTrue(subject.isValidDuring(LATER_START, LATER_END));
     // between the two periods
-    assertThat(subject.isValidDuring(END, LATER_START.minusSeconds(1))).isFalse();
+    assertFalse(subject.isValidDuring(END, LATER_START.minusSeconds(1)));
     // after both periods
-    assertThat(subject.isValidDuring(LATER_END, LATER_END.plusSeconds(100))).isFalse();
+    assertFalse(subject.isValidDuring(LATER_END, LATER_END.plusSeconds(100)));
   }
 }

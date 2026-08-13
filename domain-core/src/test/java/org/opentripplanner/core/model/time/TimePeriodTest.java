@@ -1,6 +1,8 @@
 package org.opentripplanner.core.model.time;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
@@ -16,8 +18,8 @@ class TimePeriodTest {
     var subject = TimePeriod.of(START, END);
     assertThat(subject.start()).hasValue(START);
     assertThat(subject.end()).hasValue(END);
-    assertThat(subject.hasOpenStart()).isFalse();
-    assertThat(subject.hasOpenEnd()).isFalse();
+    assertFalse(subject.hasOpenStart());
+    assertFalse(subject.hasOpenEnd());
   }
 
   @Test
@@ -25,22 +27,22 @@ class TimePeriodTest {
     var subject = TimePeriod.ofUnbounded();
     assertThat(subject.start()).isEmpty();
     assertThat(subject.end()).isEmpty();
-    assertThat(subject.hasOpenStart()).isTrue();
-    assertThat(subject.hasOpenEnd()).isTrue();
+    assertTrue(subject.hasOpenStart());
+    assertTrue(subject.hasOpenEnd());
   }
 
   @Test
   void openStart() {
     var subject = TimePeriod.of(null, END);
-    assertThat(subject.hasOpenStart()).isTrue();
-    assertThat(subject.hasOpenEnd()).isFalse();
+    assertTrue(subject.hasOpenStart());
+    assertFalse(subject.hasOpenEnd());
   }
 
   @Test
   void openEnd() {
     var subject = TimePeriod.of(START, null);
-    assertThat(subject.hasOpenStart()).isFalse();
-    assertThat(subject.hasOpenEnd()).isTrue();
+    assertFalse(subject.hasOpenStart());
+    assertTrue(subject.hasOpenEnd());
   }
 
   @Test
@@ -53,39 +55,39 @@ class TimePeriodTest {
     var subject = TimePeriod.of(START, END);
 
     // entirely before
-    assertThat(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100))).isFalse();
+    assertFalse(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100)));
     // ends exactly at the start - the start is inclusive
-    assertThat(subject.overlaps(START.minusSeconds(100), START)).isTrue();
+    assertTrue(subject.overlaps(START.minusSeconds(100), START));
     // overlapping the start
-    assertThat(subject.overlaps(START.minusSeconds(100), START.plusSeconds(100))).isTrue();
+    assertTrue(subject.overlaps(START.minusSeconds(100), START.plusSeconds(100)));
     // inside
-    assertThat(subject.overlaps(START.plusSeconds(100), END.minusSeconds(100))).isTrue();
+    assertTrue(subject.overlaps(START.plusSeconds(100), END.minusSeconds(100)));
     // overlapping the end
-    assertThat(subject.overlaps(END.minusSeconds(100), END.plusSeconds(100))).isTrue();
+    assertTrue(subject.overlaps(END.minusSeconds(100), END.plusSeconds(100)));
     // starts exactly at the end - the end is exclusive
-    assertThat(subject.overlaps(END, END.plusSeconds(100))).isFalse();
+    assertFalse(subject.overlaps(END, END.plusSeconds(100)));
     // entirely after
-    assertThat(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200))).isFalse();
+    assertFalse(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
   }
 
   @Test
   void overlapsOpenStart() {
     var subject = TimePeriod.of(null, END);
-    assertThat(subject.overlaps(START.minusSeconds(2000), START.minusSeconds(1000))).isTrue();
-    assertThat(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200))).isFalse();
+    assertTrue(subject.overlaps(START.minusSeconds(2000), START.minusSeconds(1000)));
+    assertFalse(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
   }
 
   @Test
   void overlapsOpenEnd() {
     var subject = TimePeriod.of(START, null);
-    assertThat(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100))).isFalse();
-    assertThat(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200))).isTrue();
+    assertFalse(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100)));
+    assertTrue(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
   }
 
   @Test
   void unboundedOverlapsEverything() {
     var subject = TimePeriod.ofUnbounded();
-    assertThat(subject.overlaps(START, END)).isTrue();
-    assertThat(subject.overlaps(Instant.EPOCH, Instant.EPOCH)).isTrue();
+    assertTrue(subject.overlaps(START, END));
+    assertTrue(subject.overlaps(Instant.EPOCH, Instant.EPOCH));
   }
 }
