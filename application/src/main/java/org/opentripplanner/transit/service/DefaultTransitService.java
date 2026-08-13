@@ -71,7 +71,6 @@ import org.opentripplanner.utils.collection.SetUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * Default implementation of the Transit Service and Transit Editor Service.
  * A new instance of this class should be created for each request.
  * This ensures that the same TimetableRepositorySnapshot is used for the
  * duration of the request (which may involve several method calls).
