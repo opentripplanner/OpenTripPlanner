@@ -13,36 +13,38 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The validity of an alert, expressed as a set of {@link TimePeriod}s. The alert is valid if any of
  * the periods is valid, which means that an empty calendar is never valid.
  */
-public final class Calendar {
+public final class ActivityCalendar {
 
-  private static final Calendar NEVER_ACTIVE = new Calendar(List.of());
-  private static final Calendar ALWAYS_ACTIVE = new Calendar(List.of(TimePeriod.ofUnbounded()));
+  private static final ActivityCalendar NEVER_ACTIVE = new ActivityCalendar(List.of());
+  private static final ActivityCalendar ALWAYS_ACTIVE = new ActivityCalendar(
+    List.of(TimePeriod.ofUnbounded())
+  );
 
   private final List<TimePeriod> timePeriods;
 
-  private Calendar(Collection<TimePeriod> timePeriods) {
+  private ActivityCalendar(Collection<TimePeriod> timePeriods) {
     this.timePeriods = List.copyOf(timePeriods);
   }
 
-  public static Calendar of(Collection<TimePeriod> timePeriods) {
-    return timePeriods.isEmpty() ? NEVER_ACTIVE : new Calendar(timePeriods);
+  public static ActivityCalendar of(Collection<TimePeriod> timePeriods) {
+    return timePeriods.isEmpty() ? NEVER_ACTIVE : new ActivityCalendar(timePeriods);
   }
 
-  public static Calendar of(TimePeriod... timePeriods) {
+  public static ActivityCalendar of(TimePeriod... timePeriods) {
     return of(List.of(timePeriods));
   }
 
   /**
    * A calendar with a single, unbounded time period, which is always valid.
    */
-  public static Calendar ofAlwaysActive() {
+  public static ActivityCalendar ofAlwaysActive() {
     return ALWAYS_ACTIVE;
   }
 
   /**
    * A calendar without any time periods, which is never valid.
    */
-  public static Calendar ofNeverActive() {
+  public static ActivityCalendar ofNeverActive() {
     return NEVER_ACTIVE;
   }
 
@@ -101,7 +103,7 @@ public final class Calendar {
     if (this == o) {
       return true;
     }
-    return o instanceof Calendar other && timePeriods.equals(other.timePeriods);
+    return o instanceof ActivityCalendar other && timePeriods.equals(other.timePeriods);
   }
 
   @Override
@@ -111,6 +113,9 @@ public final class Calendar {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(Calendar.class).addCol("timePeriods", timePeriods).toString();
+    return ToStringBuilder.of(ActivityCalendar.class)
+      .addCol("timePeriods", timePeriods)
+      .toString();
   }
 }
+

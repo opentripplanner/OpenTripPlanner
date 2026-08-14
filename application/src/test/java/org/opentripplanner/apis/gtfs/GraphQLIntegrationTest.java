@@ -72,7 +72,7 @@ import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
-import org.opentripplanner.routing.alertpatch.Calendar;
+import org.opentripplanner.routing.alertpatch.ActivityCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
@@ -466,7 +466,7 @@ class GraphQLIntegrationTest {
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
       .addEntity(entitySelector)
-      .withCalendar(Calendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
+      .withActivityCalendar(ActivityCalendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
       .build();
     var stationAlert = TransitAlert.of(id("a-station-alert"))
       .withHeaderText(I18NString.of("Station closed"))

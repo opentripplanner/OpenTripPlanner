@@ -29,7 +29,7 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
   private String siriCodespace;
   private Integer version;
   private final Set<EntitySelector> entities = new HashSet<>();
-  private Calendar calendar = Calendar.ofNeverActive();
+  private ActivityCalendar activityCalendar = ActivityCalendar.ofNeverActive();
 
   TransitAlertBuilder(FeedScopedId id) {
     super(id);
@@ -52,7 +52,7 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
     this.updatedTime = original.updatedTime();
     this.siriCodespace = original.siriCodespace();
     this.entities.addAll(original.entities());
-    this.calendar = original.calendar();
+    this.activityCalendar = original.activityCalendar();
   }
 
   public I18NString headerText() {
@@ -213,15 +213,15 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
     return this;
   }
 
-  public Calendar calendar() {
-    return calendar;
+  public ActivityCalendar activityCalendar() {
+    return activityCalendar;
   }
 
   /**
    * Sets the validity of the alert.
    */
-  public TransitAlertBuilder withCalendar(Calendar calendar) {
-    this.calendar = calendar;
+  public TransitAlertBuilder withActivityCalendar(ActivityCalendar activityCalendar) {
+    this.activityCalendar = activityCalendar;
     return this;
   }
 

@@ -15,7 +15,7 @@ import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
-import org.opentripplanner.routing.alertpatch.Calendar;
+import org.opentripplanner.routing.alertpatch.ActivityCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
@@ -174,10 +174,10 @@ public class SiriAlertsUpdateHandler {
 
         periods.add(TimePeriod.of(start, end));
       }
-      alert.withCalendar(Calendar.of(periods));
+      alert.withActivityCalendar(ActivityCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      alert.withCalendar(Calendar.ofAlwaysActive());
+      alert.withActivityCalendar(ActivityCalendar.ofAlwaysActive());
     }
 
     if (situation.getPriority() != null) {
