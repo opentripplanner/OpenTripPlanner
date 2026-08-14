@@ -18,12 +18,8 @@ import org.junit.jupiter.params.support.ParameterDeclarations;
  * {@link org.opentripplanner.transit.model.TransitTestEnvironment}, and on a control date without
  * one. The test takes the case name and the service date as its parameters.
  * <p>
- * A real-time message reports absolute times, so applying one means subtracting the start of the
- * service day. That origin is noon minus twelve hours, which is calendar midnight only on a
- * 24-hour day (see {@code ServiceDateUtils.asStartOfService}). A test that asserts the same
- * timetable on all three dates therefore pins the origin the times were resolved against: using
- * calendar midnight instead moves them by an hour, in opposite directions on the two transitions,
- * and leaves the control date untouched.
+ * Applying a real-time update should give the same result whether or not the service date contains
+ * a daylight-saving transition.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -13,9 +13,9 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * A GTFS-RT {@code StopTimeEvent.time} is an absolute POSIX timestamp, so applying it means
- * subtracting the start of the service day - both on a trip that is already in the timetable and on
- * one the message creates. See {@link OnEachDstTransitionAndAControlDate}.
+ * A real-time update should give the same result whether or not it is applied on a service date
+ * with a daylight-saving transition - both on a trip that is already in the timetable and on one
+ * the message creates. See {@link OnEachDstTransitionAndAControlDate}.
  */
 class DstServiceDateTest implements RealtimeTestConstants {
 
