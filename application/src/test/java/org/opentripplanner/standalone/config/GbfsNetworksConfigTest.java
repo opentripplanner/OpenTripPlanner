@@ -129,6 +129,30 @@ class GbfsNetworksConfigTest {
     );
   }
 
+  @Test
+  void aNetworkCanOptOutOfZonesEnabledByTheDefaults() {
+    var subject = map(
+      """
+      {
+        "gbfs" : {
+          "includeUnlistedNetworks" : true,
+          "defaults" : { "geofencingZones" : "realtime" },
+          "networks" : [ { "network" : "tier", "geofencingZones" : "off" } ]
+        }
+      }
+      """
+    );
+
+    assertEquals(
+      GeofencingZonePhase.OFF,
+      subject.forNetwork("tier").orElseThrow().geofencingZones()
+    );
+    assertEquals(
+      GeofencingZonePhase.REALTIME,
+      subject.forNetwork("ryde").orElseThrow().geofencingZones()
+    );
+  }
+
   private static org.opentripplanner.gbfs.network.GbfsNetworkOverrides map(String json) {
     return GbfsNetworksConfig.map("gbfs", newNodeAdapterForTest(json));
   }

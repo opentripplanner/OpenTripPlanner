@@ -255,8 +255,9 @@ itinerary can only end with the vehicle parked at one.
 
 Which phase computes and applies this network's geofencing zones.
 
-- `realtime` - the vehicle rental updater loads and applies the zones.
-- `off` - the zones are not processed.
+ - `realtime` The vehicle rental updater loads and applies the zones.
+ - `off` The zones are not processed for this network. Use this to opt a single network out of a
+   `defaults` block that enables them.
 
 
 <h4 id="gbfs_defaults_requireDropOffInsideBusinessArea">requireDropOffInsideBusinessArea</h4>
@@ -299,8 +300,9 @@ itinerary can only end with the vehicle parked at one.
 
 Which phase computes and applies this network's geofencing zones.
 
-- `realtime` - the vehicle rental updater loads and applies the zones.
-- `off` - the zones are not processed.
+ - `realtime` The vehicle rental updater loads and applies the zones.
+ - `off` The zones are not processed for this network. Use this to opt a single network out of a
+   `defaults` block that enables them.
 
 
 <h4 id="gbfs_networks_0_requireDropOffInsideBusinessArea">requireDropOffInsideBusinessArea</h4>

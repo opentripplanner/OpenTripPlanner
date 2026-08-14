@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
 import java.util.LinkedHashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
+import org.opentripplanner.gbfs.network.GeofencingZonePhase;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -108,13 +110,8 @@ public class GbfsNetworksConfig {
       node
         .of("geofencingZones")
         .since(V2_10)
-        .summary("Which phase computes and applies this network's geofencing zones.")
-        .description(
-          """
-          - `realtime` - the vehicle rental updater loads and applies the zones.
-          - `off` - the zones are not processed.
-          """
-        )
+        .summary(GeofencingZonePhase.OFF.typeDescription())
+        .description(docEnumValueList(GeofencingZonePhase.values()))
         .asEnum(defaults.geofencingZones()),
       node
         .of("requireDropOffInsideBusinessArea")
