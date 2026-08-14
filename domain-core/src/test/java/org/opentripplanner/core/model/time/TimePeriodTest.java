@@ -55,39 +55,55 @@ class TimePeriodTest {
     var subject = TimePeriod.of(START, END);
 
     // entirely before
-    assertFalse(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100)));
+    assertFalse(subject.overlaps(TimePeriod.of(START.minusSeconds(200), START.minusSeconds(100))));
     // ends exactly at the start - the start is inclusive
-    assertTrue(subject.overlaps(START.minusSeconds(100), START));
+    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START)));
     // overlapping the start
-    assertTrue(subject.overlaps(START.minusSeconds(100), START.plusSeconds(100)));
+    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START.plusSeconds(100))));
     // inside
-    assertTrue(subject.overlaps(START.plusSeconds(100), END.minusSeconds(100)));
+    assertTrue(subject.overlaps(TimePeriod.of(START.plusSeconds(100), END.minusSeconds(100))));
     // overlapping the end
-    assertTrue(subject.overlaps(END.minusSeconds(100), END.plusSeconds(100)));
+    assertTrue(subject.overlaps(TimePeriod.of(END.minusSeconds(100), END.plusSeconds(100))));
     // starts exactly at the end - the end is exclusive
-    assertFalse(subject.overlaps(END, END.plusSeconds(100)));
+    assertFalse(subject.overlaps(TimePeriod.of(END, END.plusSeconds(100))));
     // entirely after
-    assertFalse(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
+    assertFalse(subject.overlaps(TimePeriod.of(END.plusSeconds(100), END.plusSeconds(200))));
   }
 
   @Test
   void overlapsOpenStart() {
     var subject = TimePeriod.of(null, END);
-    assertTrue(subject.overlaps(START.minusSeconds(2000), START.minusSeconds(1000)));
-    assertFalse(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
+    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(2000), START.minusSeconds(1000))));
+    assertFalse(subject.overlaps(TimePeriod.of(END.plusSeconds(100), END.plusSeconds(200))));
   }
 
   @Test
   void overlapsOpenEnd() {
     var subject = TimePeriod.of(START, null);
-    assertFalse(subject.overlaps(START.minusSeconds(200), START.minusSeconds(100)));
-    assertTrue(subject.overlaps(END.plusSeconds(100), END.plusSeconds(200)));
+    assertFalse(subject.overlaps(TimePeriod.of(START.minusSeconds(200), START.minusSeconds(100))));
+    assertTrue(subject.overlaps(TimePeriod.of(END.plusSeconds(100), END.plusSeconds(200))));
+  }
+
+  @Test
+  void overlapsOpenBoundsOnOtherPeriod() {
+    var subject = TimePeriod.of(START, END);
+    // other period is open-ended, starting before this period ends
+    assertTrue(subject.overlaps(TimePeriod.of(END.minusSeconds(100), null)));
+    // other period is open-ended, starting exactly at this period's end - exclusive
+    assertFalse(subject.overlaps(TimePeriod.of(END, null)));
+    // other period has an open start, ending after this period starts
+    assertTrue(subject.overlaps(TimePeriod.of(null, START.plusSeconds(100))));
+    // other period has an open start, ending exactly at this period's start - inclusive
+    assertTrue(subject.overlaps(TimePeriod.of(null, START)));
+    // other period is entirely unbounded
+    assertTrue(subject.overlaps(TimePeriod.ofUnbounded()));
   }
 
   @Test
   void unboundedOverlapsEverything() {
     var subject = TimePeriod.ofUnbounded();
-    assertTrue(subject.overlaps(START, END));
-    assertTrue(subject.overlaps(Instant.EPOCH, Instant.EPOCH));
+    assertTrue(subject.overlaps(TimePeriod.of(START, END)));
+    assertTrue(subject.overlaps(TimePeriod.of(Instant.EPOCH, Instant.EPOCH)));
+    assertTrue(subject.overlaps(TimePeriod.ofUnbounded()));
   }
 }

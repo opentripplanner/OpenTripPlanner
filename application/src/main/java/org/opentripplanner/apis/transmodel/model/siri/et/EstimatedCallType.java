@@ -27,6 +27,7 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -422,7 +423,9 @@ public class EstimatedCallType {
       );
 
       // Handle repeating validityPeriods
-      alertPatches.removeIf(alertPatch -> !alertPatch.displayDuring(fromTime, toTime));
+      alertPatches.removeIf(alertPatch ->
+        !alertPatch.isActiveDuring(TimePeriod.of(fromTime, toTime))
+      );
     }
   }
 }

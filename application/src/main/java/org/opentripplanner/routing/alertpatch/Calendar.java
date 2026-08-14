@@ -55,11 +55,17 @@ public final class Calendar {
   }
 
   /**
-   * Returns {@code true} if any of the time periods overlaps the interval given by {@code from} and
-   * {@code to}.
+   * Returns {@code true} if any of the time periods overlaps the given {@code period}.
    */
-  public boolean isValidDuring(Instant from, Instant to) {
-    return timePeriods.stream().anyMatch(timePeriod -> timePeriod.overlaps(from, to));
+  public boolean isActiveDuring(TimePeriod period) {
+    return timePeriods.stream().anyMatch(timePeriod -> timePeriod.overlaps(period));
+  }
+
+  /**
+   * Returns {@code true} if any of the time periods contains the given {@code instant}.
+   */
+  public boolean isActiveAt(Instant instant) {
+    return isActiveDuring(TimePeriod.of(instant, instant));
   }
 
   /**

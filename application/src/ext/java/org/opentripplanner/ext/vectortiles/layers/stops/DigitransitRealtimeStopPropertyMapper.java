@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
@@ -36,7 +37,9 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
     var stopAlerts = transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId());
-    boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
+    boolean noServiceAlert = stopAlerts
+      .stream()
+      .anyMatch(alert -> alert.effect() == AlertEffect.NO_SERVICE && alert.isActiveAt(currentTime));
 
     var serviceDate = LocalDate.now(transitService.getTimeZone());
     boolean stopTimesExist = transitService

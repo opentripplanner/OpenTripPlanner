@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 
@@ -156,8 +157,29 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return calendar;
   }
 
-  public boolean displayDuring(Instant from, Instant to) {
-    return calendar.isValidDuring(from, to);
+  /**
+   * Checks if this alert is active at any point during the given {@code period}.
+   * <p>
+   * The alert does not need to be active for the entire period: it is enough that one of its
+   * validity time periods overlaps the given period. In other words, this returns {@code true} as
+   * long as there is at least one instant that is contained in both the given period and the
+   * alert's validity.
+   *
+   * @param period the period to check for overlap with the alert's validity
+   * @return true if the alert is active during any part of the given period
+   */
+  public boolean isActiveDuring(TimePeriod period) {
+    return calendar.isActiveDuring(period);
+  }
+
+  /**
+   * Checks if this alert is active at the given point in time.
+   *
+   * @param instant the point in time to check
+   * @return true if the alert is active at the given time
+   */
+  public boolean isActiveAt(Instant instant) {
+    return calendar.isActiveAt(instant);
   }
 
   /**
@@ -179,20 +201,6 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   @Nullable
   public Instant getEffectiveEndDate() {
     return calendar.effectiveEnd().orElse(null);
-  }
-
-  /**
-   * Checks if the alert has a NO_SERVICE alert active at the requested time.
-   *
-   * @param instant the point in time to check
-   * @return true if a NO_SERVICE alert is active at the given time
-   */
-  public boolean noServiceAt(Instant instant) {
-    return (
-      effect.equals(AlertEffect.NO_SERVICE) &&
-      (getEffectiveStartDate() != null && getEffectiveStartDate().isBefore(instant)) &&
-      (getEffectiveEndDate() == null || getEffectiveEndDate().isAfter(instant))
-    );
   }
 
   @Override

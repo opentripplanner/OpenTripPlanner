@@ -76,10 +76,14 @@ public final class TimePeriod {
   }
 
   /**
-   * Returns {@code true} if this period overlaps the interval given by {@code from} and {@code to}.
+   * Returns {@code true} if this period overlaps the given {@code other} period. Open bounds on
+   * either period are treated as extending indefinitely in that direction.
    */
-  public boolean overlaps(Instant from, Instant to) {
-    return (hasOpenStart() || !to.isBefore(start)) && (hasOpenEnd() || from.isBefore(end));
+  public boolean overlaps(TimePeriod other) {
+    return (
+      (hasOpenStart() || other.hasOpenEnd() || !other.end.isBefore(start)) &&
+      (hasOpenEnd() || other.hasOpenStart() || other.start.isBefore(end))
+    );
   }
 
   @Override

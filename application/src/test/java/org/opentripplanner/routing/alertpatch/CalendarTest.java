@@ -22,7 +22,7 @@ class CalendarTest {
     var subject = Calendar.ofNeverActive();
     assertTrue(subject.isNeverActive());
     assertThat(subject.timePeriods()).isEmpty();
-    assertFalse(subject.isValidDuring(START, END));
+    assertFalse(subject.isActiveDuring(TimePeriod.of(START, END)));
     assertThat(subject.effectiveStart()).isEmpty();
     assertThat(subject.effectiveEnd()).isEmpty();
   }
@@ -37,7 +37,7 @@ class CalendarTest {
     var subject = Calendar.ofAlwaysActive();
     assertThat(subject.timePeriods()).containsExactly(TimePeriod.ofUnbounded());
     assertFalse(subject.isNeverActive());
-    assertTrue(subject.isValidDuring(START, END));
+    assertTrue(subject.isActiveDuring(TimePeriod.of(START, END)));
     assertThat(subject.effectiveStart()).isEmpty();
     assertThat(subject.effectiveEnd()).isEmpty();
   }
@@ -68,15 +68,28 @@ class CalendarTest {
   }
 
   @Test
-  void isValidDuringAnyPeriod() {
+  void isActiveDuringAnyPeriod() {
     var subject = Calendar.of(
       List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, LATER_END))
     );
-    assertTrue(subject.isValidDuring(START, END));
-    assertTrue(subject.isValidDuring(LATER_START, LATER_END));
+    assertTrue(subject.isActiveDuring(TimePeriod.of(START, END)));
+    assertTrue(subject.isActiveDuring(TimePeriod.of(LATER_START, LATER_END)));
     // between the two periods
-    assertFalse(subject.isValidDuring(END, LATER_START.minusSeconds(1)));
+    assertFalse(subject.isActiveDuring(TimePeriod.of(END, LATER_START.minusSeconds(1))));
     // after both periods
-    assertFalse(subject.isValidDuring(LATER_END, LATER_END.plusSeconds(100)));
+    assertFalse(subject.isActiveDuring(TimePeriod.of(LATER_END, LATER_END.plusSeconds(100))));
+  }
+
+  @Test
+  void isActiveAt() {
+    var subject = Calendar.of(List.of(TimePeriod.of(START, END)));
+    // inclusive start
+    assertTrue(subject.isActiveAt(START));
+    // inside
+    assertTrue(subject.isActiveAt(START.plusSeconds(100)));
+    // exclusive end
+    assertFalse(subject.isActiveAt(END));
+    // before
+    assertFalse(subject.isActiveAt(START.minusSeconds(1)));
   }
 }
