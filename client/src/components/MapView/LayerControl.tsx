@@ -37,22 +37,6 @@ interface LayerControlProps {
  *   1. Background (raster) layers (select exactly one to show).
  *   2. Debug layers (vector-like layers) with groupings, toggle on/off individually.
  */
-/** Distinguishes the two lists inside a group: what is drawn, and what it is narrowed to. */
-const subHeadingStyle: React.CSSProperties = {
-  marginLeft: '20px',
-  marginBottom: '3px',
-  opacity: 0.7,
-};
-
-const linkButtonStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  padding: 0,
-  cursor: 'pointer',
-  textDecoration: 'underline',
-  fontSize: 'inherit',
-};
-
 const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayerIds }) => {
   const [rasterLayers, setRasterLayers] = useState<Layer[]>([]);
   const [layerGroups, setLayerGroups] = useState<Record<string, Layer[]>>({});
@@ -208,18 +192,9 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
   );
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '10px',
-        width: '250px',
-        borderRadius: '4px',
-        overflowY: 'auto',
-      }}
-    >
+    <div className="layer-control">
       {/* BACKGROUND (RASTER) LAYERS */}
-      <h4 style={{ marginTop: 0 }}>Background</h4>
+      <h4>Background</h4>
       <select onChange={(e) => setBackgroundLayer(e.target.value)}>
         {rasterLayers.map((layer) => (
           <option key={layer.id} value={layer.id}>
@@ -229,7 +204,7 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
       </select>
 
       {/* DEBUG (VECTOR) LAYERS */}
-      <h4 style={{ marginTop: '1rem' }}>Debug Layers</h4>
+      <h4>Debug Layers</h4>
       {Object.entries(layerGroups).map(([groupName, layers]) => {
         // Determine if *all* layers in this group are currently visible.
         const allVisible = layers.every(
@@ -247,45 +222,26 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         };
 
         return (
-          <div key={groupName} style={{ marginBottom: '10px' }}>
-            <h6 style={{ margin: '0 0 5px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={allVisible}
-                  onChange={(e) => toggleGroupVisibility(e.target.checked)}
-                  style={{ marginRight: '5px' }}
-                />
+          <div key={groupName} className="layer-group">
+            <h6>
+              <label className="group-label">
+                <input type="checkbox" checked={allVisible} onChange={(e) => toggleGroupVisibility(e.target.checked)} />
                 {groupName}
               </label>
             </h6>
 
-            {showNetworks && <div style={subHeadingStyle}>Layers</div>}
+            {showNetworks && <div className="sub-heading">Layers</div>}
 
             {layers.map((layer) => {
               // Figure out if the layer is visible or not:
               const isVisible = mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none';
 
               return (
-                <label
-                  key={layer.id}
-                  style={{
-                    display: 'block',
-                    cursor: 'pointer',
-                    marginBottom: '5px',
-                  }}
-                >
+                <label key={layer.id} className="toggle">
                   <input
                     type="checkbox"
                     checked={isVisible}
                     onChange={(e) => toggleLayerVisibility(layer.id, e.target.checked)}
-                    style={{ marginLeft: '20px', marginRight: '5px' }}
                   />
                   {layer.name}
                 </label>
@@ -293,24 +249,23 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
             })}
 
             {showNetworks && (
-              <div style={{ marginTop: '8px' }}>
-                <div style={{ ...subHeadingStyle, display: 'flex', gap: '6px' }}>
+              <div className="networks">
+                <div className="sub-heading">
                   <span>Networks</span>
-                  <button type="button" onClick={() => setAllNetworks(true)} style={linkButtonStyle}>
+                  <button type="button" className="link-button" onClick={() => setAllNetworks(true)}>
                     all
                   </button>
-                  <button type="button" onClick={() => setAllNetworks(false)} style={linkButtonStyle}>
+                  <button type="button" className="link-button" onClick={() => setAllNetworks(false)}>
                     none
                   </button>
                 </div>
-                <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                <div className="network-list">
                   {rentalNetworks.map((network) => (
-                    <label key={network} style={{ display: 'block', cursor: 'pointer' }}>
+                    <label key={network}>
                       <input
                         type="checkbox"
                         checked={selectedNetworks.has(network)}
                         onChange={(e) => toggleNetwork(network, e.target.checked)}
-                        style={{ marginLeft: '20px', marginRight: '5px' }}
                       />
                       {network}
                     </label>
