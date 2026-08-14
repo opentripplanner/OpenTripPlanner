@@ -98,14 +98,12 @@ public class RealtimeStopsLayerTest {
 
     transitAlertService.setAlerts(List.of(alert, severeAlert, infoAlert, expiredAlert));
 
-
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
       transitService,
-      
-      
+      transitAlertService
     );
 
     DigitransitRealtimeStopPropertyMapper mapper = new DigitransitRealtimeStopPropertyMapper(

@@ -5,14 +5,15 @@ import static org.opentripplanner.inspector.vector.KeyValue.kColl;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
@@ -39,11 +40,12 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
     long currentTimeSeconds = currentTime.getEpochSecond();
-    var alertService = transitService.getTransitAlertService();
 
-    Collection<TransitAlert> stopAlerts = new ArrayList<>(transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId()));
+    Set<TransitAlert> stopAlerts = transitAlertService.getStopLocationsAlerts(
+      stop.getIdAndParentStationId()
+    );
     boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
-    
+
     var validAlerts = stopAlerts
       .stream()
       .filter(alert -> alert.displayDuring(currentTimeSeconds, currentTimeSeconds))
