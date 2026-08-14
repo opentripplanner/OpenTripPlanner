@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
@@ -41,6 +42,7 @@ class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
   private final TransitService transitService;
+  private final TimetableRepository buffer;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> getTripPatternId;
@@ -69,10 +71,12 @@ class AddedTripBuilder {
   AddedTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
     TransitService transitService,
+    TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
   ) {
+    this.buffer = buffer;
     this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
     // Added ServiceJourneyId
@@ -123,6 +127,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     TransitService transitService,
+    TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
@@ -145,6 +150,7 @@ class AddedTripBuilder {
     @Nullable String vehicleRef
   ) {
     this.transitService = transitService;
+    this.buffer = buffer;
     this.deduplicator = deduplicator;
     this.entityResolver = entityResolver;
     this.timeZone = transitService.getTimeZone();
@@ -178,7 +184,7 @@ class AddedTripBuilder {
       throw UpdateException.of(tripId, NO_START_DATE);
     }
 
-    FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
+    FeedScopedId calServiceId = buffer.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
       throw UpdateException.of(tripId, NO_START_DATE);
     }

@@ -196,17 +196,6 @@ public interface TransitService {
   Trip getScheduledTrip(FeedScopedId id);
 
   /**
-   * Get or create a serviceId for a given date. This method is used when a new trip is added from
-   * a real-time data update. It makes sure the date is in the existing transit service period.
-   *
-   * @param serviceDate service date for the added service id
-   * @return service-id for date if it exists or is created. If the given service date is outside
-   * the service period {@code null} is returned.
-   */
-  @Nullable
-  FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
-
-  /**
    * Return all trips, including those created by real-time updates.
    */
   Collection<Trip> listTrips();

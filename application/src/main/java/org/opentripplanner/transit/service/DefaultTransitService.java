@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,7 +64,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
@@ -639,31 +637,6 @@ public class DefaultTransitService implements TransitService {
       this.getTripCalendars()::listServiceDates
     );
     return listTrips().stream().filter(matcher::match).toList();
-  }
-
-  /**
-   * Creates the new service id on the mutable {@link TimetableRepository} write buffer, so that
-   * it is visible to (and only to) this write transaction until it commits. This method must only
-   * be called on an instance constructed with write access to the timetable repository, i.e.
-   * inside a write task.
-   */
-  @Override
-  @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
-    ZonedDateTime time = ServiceDateUtils.asStartOfService(
-      serviceDate,
-      transitRepository.getTimeZone()
-    );
-    if (!transitRepository.transitFeedCovers(time.toInstant())) {
-      return null;
-    }
-    if (!(timetableSnapshot instanceof TimetableRepository mutable)) {
-      throw new UnsupportedOperationException(
-        "getOrCreateServiceIdForDate() requires write access to the TimetableRepository; " +
-          "this TransitService instance was constructed without it."
-      );
-    }
-    return mutable.getOrCreateServiceIdForDate(serviceDate);
   }
 
   @Override

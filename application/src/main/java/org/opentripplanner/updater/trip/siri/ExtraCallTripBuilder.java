@@ -24,6 +24,7 @@ import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
@@ -31,6 +32,7 @@ import org.opentripplanner.updater.spi.UpdateException;
 class ExtraCallTripBuilder {
 
   private final TransitService transitService;
+  private final TimetableRepository buffer;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> generateTripPatternId;
   private final Trip trip;
@@ -50,11 +52,13 @@ class ExtraCallTripBuilder {
   ExtraCallTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
     TransitService transitService,
+    TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> generateTripPatternId,
     Trip trip
   ) {
+    this.buffer = buffer;
     this.trip = Objects.requireNonNull(trip);
 
     this.deduplicator = deduplicator;
@@ -91,7 +95,7 @@ class ExtraCallTripBuilder {
       throw UpdateException.of(trip.getId(), NO_START_DATE);
     }
 
-    FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
+    FeedScopedId calServiceId = buffer.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
       throw UpdateException.of(trip.getId(), NO_START_DATE);
     }

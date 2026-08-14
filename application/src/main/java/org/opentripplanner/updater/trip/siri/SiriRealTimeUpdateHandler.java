@@ -130,6 +130,7 @@ public class SiriRealTimeUpdateHandler {
         case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
           journeyWrapper,
           transitService,
+          buffer,
           deduplicator,
           entityResolver,
           tripPatternIdGenerator::generateUniqueTripPatternId
@@ -299,6 +300,7 @@ public class SiriRealTimeUpdateHandler {
     var tripUpdate = new ExtraCallTripBuilder(
       journey,
       transitService,
+      buffer,
       deduplicator,
       entityResolver,
       tripPatternIdGenerator::generateUniqueTripPatternId,
