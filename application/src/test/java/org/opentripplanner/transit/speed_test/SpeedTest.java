@@ -125,7 +125,7 @@ public class SpeedTest {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.copyTripCalendarForRealTimeUpdates()
+      transitRepository.getTripCalendar()
     );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(

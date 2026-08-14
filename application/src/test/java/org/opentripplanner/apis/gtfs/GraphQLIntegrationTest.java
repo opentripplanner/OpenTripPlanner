@@ -106,7 +106,6 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -298,13 +297,13 @@ class GraphQLIntegrationTest {
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
-    transitRepository.getServiceCodes().put(cal_id, SERVICE_CODE);
+    transitRepository.putServiceCode(cal_id, SERVICE_CODE);
     transitRepository.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      transitRepository.getTripCalendar()
     );
     timetableSnapshot.update(
       RealTimeTripUpdate.of(

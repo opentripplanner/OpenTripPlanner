@@ -15,7 +15,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -188,7 +188,7 @@ class TripTimeOnDateTest {
     transitRepository.index();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     timetableSnapshot.commit();
     var serviceDate = LocalDate.of(2025, 1, 1);

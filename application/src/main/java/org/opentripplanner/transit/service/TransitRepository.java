@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +33,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -97,7 +95,7 @@ public class TransitRepository implements Serializable {
    */
   private transient RaptorTransitData raptorTransitData;
 
-  private final DefaultTripCalendars tripCalendar = new DefaultTripCalendars();
+  private TripCalendars tripCalendars = TripCalendars.empty();
 
   private transient TransitRepositoryIndex index;
   private ZoneId timeZone = null;
@@ -141,7 +139,7 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     if (index == null) {
       LOG.info("Index timetable repository...");
-      this.tripCalendar.initializeServiceCodes();
+      this.tripCalendars = this.tripCalendars.initializeServiceCodes();
       this.index = new TransitRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }
@@ -179,39 +177,31 @@ public class TransitRepository implements Serializable {
     return (!time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds()));
   }
 
+  /**
+   * The build-time scheduled calendar. Also used to seed the runtime write buffer held by the
+   * timetable repository at startup; since {@link TripCalendars} is immutable, sharing this same
+   * instance is safe, and all further calendar mutations (e.g. real-time trip additions) happen on
+   * that buffer, not on this repository's own {@code tripCalendars}. Prefer reading trip calendars
+   * through {@link org.opentripplanner.transit.service.TransitService#getTripCalendars()} on the
+   * request/write path, which resolves a cached, transaction-consistent snapshot instead.
+   */
   public TripCalendars getTripCalendar() {
-    return tripCalendar;
-  }
-
-  public DefaultTripCalendars copyTripCalendarForRealTimeUpdates() {
-    return tripCalendar.copyOf();
+    return tripCalendars;
   }
 
   public void updateCalendarServiceData(CalendarServiceData data) {
     assertModificationsAllowed();
     invalidateIndex();
-    tripCalendar.merge(data);
+    tripCalendars = tripCalendars.merge(data);
   }
 
   /**
-   * Get or create a serviceId for a given date. This method is used when a new trip is added from a
-   * realtime data update. It makes sure the date is in the existing transit service period.
-   * <p>
-   *
-   * @param serviceDate service date for the added service id
-   * @return service-id for date if it exists or is created. If the given service date is outside the
-   * service period {@code null} is returned.
+   * Register {@code code} as the service code for {@code serviceId}. Used during graph build only.
    */
-  @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
-    // Start of day
+  public void putServiceCode(FeedScopedId serviceId, int code) {
     assertModificationsAllowed();
-    ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
-
-    if (!transitFeedCovers(time.toInstant())) {
-      return null;
-    }
-    return tripCalendar.getOrCreateServiceIdForDate(serviceDate);
+    invalidateIndex();
+    tripCalendars = tripCalendars.withServiceCode(serviceId, code);
   }
 
   public Collection<String> getFeedIds() {
@@ -319,7 +309,7 @@ public class TransitRepository implements Serializable {
    * The time when the transit service start. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceStarts() {
-    return tripCalendar
+    return tripCalendars
       .startDate()
       .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
       .orElse(Instant.EPOCH);
@@ -329,7 +319,7 @@ public class TransitRepository implements Serializable {
    * The time when the transit service ends. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceEnds() {
-    return tripCalendar
+    return tripCalendars
       .endDate()
       .map(serviceDate ->
         ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
@@ -375,7 +365,7 @@ public class TransitRepository implements Serializable {
    * from multiple feeds.
    */
   public Map<FeedScopedId, Integer> getServiceCodes() {
-    return tripCalendar.getServiceCodes();
+    return tripCalendars.getServiceCodes();
   }
 
   public SiteRepository getSiteRepository() {
@@ -462,7 +452,7 @@ public class TransitRepository implements Serializable {
 
   /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
-    return !tripCalendar.isEmpty();
+    return !tripCalendars.isEmpty();
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
@@ -525,7 +515,7 @@ public class TransitRepository implements Serializable {
    * For all dates in the system get the service codes that run on it.
    */
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return tripCalendar.getServiceCodesRunningForDate();
+    return tripCalendars.getServiceCodesRunningForDate();
   }
 
   public boolean isIndexed() {

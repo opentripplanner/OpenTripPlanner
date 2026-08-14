@@ -72,7 +72,7 @@ public final class TransitTestEnvironment {
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.copyTripCalendarForRealTimeUpdates()
+      transitRepository.getTripCalendar()
     );
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,

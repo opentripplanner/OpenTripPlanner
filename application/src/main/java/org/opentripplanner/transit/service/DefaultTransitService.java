@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +65,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
@@ -205,7 +207,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return transitRepository
+    return getTripCalendars()
       .getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
@@ -640,13 +642,28 @@ public class DefaultTransitService implements TransitService {
   }
 
   /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
+   * Creates the new service id on the mutable {@link TimetableRepository} write buffer, so that
+   * it is visible to (and only to) this write transaction until it commits. This method must only
+   * be called on an instance constructed with write access to the timetable repository, i.e.
+   * inside a write task.
    */
   @Override
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
-    return transitRepository.getOrCreateServiceIdForDate(serviceDate);
+    ZonedDateTime time = ServiceDateUtils.asStartOfService(
+      serviceDate,
+      transitRepository.getTimeZone()
+    );
+    if (!transitRepository.transitFeedCovers(time.toInstant())) {
+      return null;
+    }
+    if (!(timetableSnapshot instanceof TimetableRepository mutable)) {
+      throw new UnsupportedOperationException(
+        "getOrCreateServiceIdForDate() requires write access to the TimetableRepository; " +
+          "this TransitService instance was constructed without it."
+      );
+    }
+    return mutable.getOrCreateServiceIdForDate(serviceDate);
   }
 
   @Override
@@ -663,7 +680,9 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TripCalendars getTripCalendars() {
-    return this.transitRepository.getTripCalendar();
+    return timetableSnapshot != null
+      ? timetableSnapshot.getTripCalendars()
+      : this.transitRepository.getTripCalendar();
   }
 
   @Override
@@ -731,12 +750,12 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public Set<LocalDate> listServiceDates() {
-    return Collections.unmodifiableSet(transitRepository.getServiceCodesRunningForDate().keySet());
+    return Collections.unmodifiableSet(getTripCalendars().getServiceCodesRunningForDate().keySet());
   }
 
   @Override
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return Collections.unmodifiableMap(transitRepository.getServiceCodesRunningForDate());
+    return Collections.unmodifiableMap(getTripCalendars().getServiceCodesRunningForDate());
   }
 
   @Override

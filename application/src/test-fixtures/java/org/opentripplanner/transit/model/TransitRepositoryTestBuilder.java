@@ -89,7 +89,7 @@ public class TransitRepositoryTestBuilder {
     int serviceCodeCounter = 0;
     for (var serviceCode : serviceCodes.values()) {
       calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
-      transitRepository.getServiceCodes().put(serviceCode.id(), serviceCodeCounter);
+      transitRepository.putServiceCode(serviceCode.id(), serviceCodeCounter);
       serviceCodeCounter += 1;
     }
     transitRepository.updateCalendarServiceData(calendarServiceData);

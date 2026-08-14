@@ -104,7 +104,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
         .getTripTimes()
         .getFirst()
         .getServiceCode();
-      TIMETABLE_REPOSITORY.getServiceCodes().put(pattern.getId(), serviceCode);
+      TIMETABLE_REPOSITORY.putServiceCode(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 

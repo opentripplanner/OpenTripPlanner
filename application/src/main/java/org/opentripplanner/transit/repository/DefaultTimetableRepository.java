@@ -31,7 +31,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternForDateMapper;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -161,7 +161,16 @@ public class DefaultTimetableRepository implements TimetableRepository {
     TripIdAndServiceDate,
     TripOnServiceDate
   > realTimeAddedTripOnServiceDateForTripAndDay;
-  private final DefaultTripCalendars tripCalendars;
+
+  /**
+   * The trip calendar. Since {@link TripCalendars} is immutable, the mutable (not
+   * {@link #readOnly}) instance and the frozen snapshot produced by {@link #createSnapshot()} can
+   * safely share the exact same value: the mutable instance's future calls to
+   * {@link #getOrCreateServiceIdForDate} simply reassign this field to a new value, never touching
+   * the one the snapshot captured.
+   */
+  private TripCalendars tripCalendars;
+
   private RaptorTransitData realtimeRaptorTransitData;
 
   /**
@@ -184,7 +193,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   public DefaultTimetableRepository(
     RaptorTransitData raptorTransitData,
-    DefaultTripCalendars tripCalendars
+    TripCalendars tripCalendars
   ) {
     this(
       new HashMap<>(),
@@ -215,7 +224,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     ListMultimap<FeedScopedId, TripOnServiceDate> realTimeAddedReplacedByTripOnServiceDateById,
     Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay,
     SetMultimap<StopLocation, TripPattern> patternsForStop,
-    DefaultTripCalendars tripCalendars,
+    TripCalendars tripCalendars,
     RaptorTransitData realtimeRaptorTransitData,
     boolean readOnly,
     TimetableUpdateMapper timetableUpdateMapper
@@ -632,6 +641,24 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   public RaptorTransitData getRealtimeRaptorTransitData() {
     return realtimeRaptorTransitData;
+  }
+
+  @Override
+  public TripCalendars getTripCalendars() {
+    return tripCalendars;
+  }
+
+  /**
+   * Creates the new service id directly on this mutable write buffer's trip calendar, so that it
+   * is visible to (and only to) this write transaction until it commits.
+   */
+  @Override
+  @Nullable
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+    validateNotReadOnly();
+    return tripCalendars.getOrCreateServiceIdForDate(serviceDate, updated ->
+      this.tripCalendars = updated
+    );
   }
 
   /**
