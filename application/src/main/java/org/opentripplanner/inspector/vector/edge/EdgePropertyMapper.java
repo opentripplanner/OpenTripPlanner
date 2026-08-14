@@ -7,6 +7,7 @@ import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
@@ -75,7 +76,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
   private List<KeyValue> mapEscalatorEdge(EscalatorEdge ee) {
     var props = new ArrayList<>(
-      List.of(
+      Arrays.asList(
         kv("distance", ee.getDistanceMeters()),
         kv("duration", ee.getDuration().map(Duration::toString).orElse(null)),
         kv("fromVertexLabel", ee.getFromVertex().getLabel().toString()),
@@ -91,7 +92,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
   private List<KeyValue> mapStreetEdge(StreetEdge se) {
     var props = new ArrayList<>(
-      List.of(
+      Arrays.asList(
         kv("permission", streetPermissionAsString(se.getPermission())),
         kv("noThruTraffic", noThruTrafficAsString(se)),
         kv("wheelchairAccessible", se.isWheelchairAccessible()),
