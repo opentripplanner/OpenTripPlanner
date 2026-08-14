@@ -1,6 +1,8 @@
 package org.opentripplanner.gbfs.manifest;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -21,7 +23,7 @@ class GbfsManifestLoaderTest {
   void loadsAManifestFromAFile() {
     var manifest = GbfsManifestLoader.loadManifest(MANIFEST, HttpHeaders.empty());
 
-    assertThat(manifest).isNotNull();
+    assertNotNull(manifest);
     assertThat(
       manifest.getData().getDatasets().stream().map(GBFSDataset::getSystemId).toList()
     ).containsExactly("tieroslo", "duplicate-stations");
@@ -34,7 +36,7 @@ class GbfsManifestLoaderTest {
       HttpHeaders.empty()
     );
 
-    assertThat(manifest).isNull();
+    assertNull(manifest);
   }
 
   @Test
