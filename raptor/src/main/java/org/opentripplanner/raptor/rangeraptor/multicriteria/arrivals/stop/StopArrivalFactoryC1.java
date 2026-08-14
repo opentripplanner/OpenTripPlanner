@@ -30,6 +30,7 @@ public class StopArrivalFactoryC1<T extends RaptorTripSchedule> implements McSto
       alightStop,
       stopArrivalTime,
       c1,
+      ride.boardStopPosition(),
       ride.trip()
     );
   }

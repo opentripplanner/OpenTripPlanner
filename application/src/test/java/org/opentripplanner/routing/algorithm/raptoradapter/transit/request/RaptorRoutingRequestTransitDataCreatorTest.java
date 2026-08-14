@@ -19,7 +19,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -31,7 +31,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
@@ -100,23 +100,23 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     var date = LocalDate.of(2025, 10, 10);
     List<TripTimes> tripTimes = List.of(
       ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:45 23:55")
         .build(),
       ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:47 23:57")
         .build(),
       ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:49 23:59")
         .build(),
       ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:51 24:01")
         .build(),
       ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:53 24:03")
         .build()
     );
@@ -182,7 +182,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
   private TripTimes createTripTimesForTest() {
     return ScheduledTripTimes.of()
-      .withTrip(TimetableRepositoryForTest.trip("Test").build())
+      .withTrip(TransitRepositoryForTest.trip("Test").build())
       .withDepartureTimes("00:00 02:00")
       .build();
   }
@@ -200,7 +200,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
   private static RoutingTripPattern createTripPattern(FeedScopedId id) {
     return TripPattern.of(id)
-      .withRoute(TimetableRepositoryForTest.route("1").withMode(TransitMode.BUS).build())
+      .withRoute(TransitRepositoryForTest.route("1").withMode(TransitMode.BUS).build())
       .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
       .build()
       .getRoutingTripPattern();

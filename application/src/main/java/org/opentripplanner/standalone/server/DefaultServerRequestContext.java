@@ -29,8 +29,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
@@ -62,13 +63,14 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final LinkingContextFactory linkingContextFactory;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
-  private final RealtimeVehicleRepository realtimeVehicleRepository;
+  private final RealtimeVehicleRepositorySnapshot realtimeVehicleSnapshot;
   private final List<RideHailingService> rideHailingServices;
   private final RouteRequest routeRequestDefaults;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final RegularTransferService transferService;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
   private final VectorTileConfig vectorTileConfig;
   private final VehicleParkingService vehicleParkingService;
   private final VehicleRentalService vehicleRentalService;
@@ -134,7 +136,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     OjpApiParameters ojpApiParameters,
     RaptorConfig<TripSchedule> raptorConfig,
-    RealtimeVehicleRepository realtimeVehicleRepository,
+    RealtimeVehicleRepositorySnapshot realtimeVehicleSnapshot,
     List<RideHailingService> rideHailingServices,
     RouteRequest routeRequestDefaults,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -142,6 +144,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TransactionScope transactionScope,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    TransitAlertService transitAlertService,
     TriasApiParameters triasApiParameters,
     GtfsApiParameters gtfsApiParameters,
     VectorTileConfig vectorTileConfig,
@@ -170,7 +173,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.meterRegistry = meterRegistry;
     this.ojpApiParameters = ojpApiParameters;
     this.raptorConfig = raptorConfig;
-    this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.realtimeVehicleSnapshot = realtimeVehicleSnapshot;
     this.rideHailingServices = rideHailingServices;
     this.routeRequestDefaults = routeRequestDefaults;
     this.streetLimitationParametersService = streetLimitationParametersService;
@@ -178,6 +181,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transactionScope = transactionScope;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
     this.transmodelSchema = transmodelSchema;
     this.triasApiParameters = triasApiParameters;
     this.gtfsApiParameters = gtfsApiParameters;
@@ -232,6 +236,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public TransitAlertService transitAlertService() {
+    return transitAlertService;
+  }
+
+  @Override
   public RoutingService routingService() {
     return new DefaultRoutingService(this);
   }
@@ -248,7 +257,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RealtimeVehicleService realtimeVehicleService() {
-    return new DefaultRealtimeVehicleService(realtimeVehicleRepository, transitService);
+    return new DefaultRealtimeVehicleService(realtimeVehicleSnapshot, transitService);
   }
 
   @Override

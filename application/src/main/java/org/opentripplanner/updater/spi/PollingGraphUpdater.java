@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see GraphUpdater
  */
-public abstract class PollingGraphUpdater implements GraphUpdater {
+public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
   private final String configRef;
@@ -42,7 +42,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
-  private WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback<C> saveResultOnGraph;
 
   /**
    * A Future representing pending completion of most recently submitted task.
@@ -118,7 +118,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   }
 
   @Override
-  public final void setup(WriteToGraphCallback writeToGraphCallback) {
+  public final void setup(WriteToGraphCallback<C> writeToGraphCallback) {
     this.saveResultOnGraph = writeToGraphCallback;
   }
 
@@ -136,7 +136,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
    * while technical details about the execution of these tasks
    * (frequency, concurrency, waiting, ...) are encapsulated in this parent class.
    */
-  protected final void updateGraph(GraphWriterRunnable task) {
+  protected final void updateGraph(GraphWriterRunnable<C> task) {
     previousTask = saveResultOnGraph.execute(task);
   }
 

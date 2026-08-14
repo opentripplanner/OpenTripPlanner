@@ -39,7 +39,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
@@ -66,12 +66,12 @@ public class TripTimesUpdaterTest {
   @BeforeAll
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    TimetableRepository timetableRepository = model.timetableRepository();
+    TransitRepository transitRepository = model.transitRepository();
 
-    feedId = timetableRepository.getFeedIds().stream().findFirst().get();
+    feedId = transitRepository.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();
 
-    for (TripPattern pattern : timetableRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 

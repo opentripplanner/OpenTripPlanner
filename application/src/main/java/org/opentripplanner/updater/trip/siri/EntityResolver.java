@@ -112,7 +112,7 @@ public class EntityResolver {
   /**
    * Resolve a {@link RegularStop} from a scheduled stop point or quay id.
    *
-   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   RegularStop resolveQuay(String stopPointRef) {
     var id = resolveId(stopPointRef);

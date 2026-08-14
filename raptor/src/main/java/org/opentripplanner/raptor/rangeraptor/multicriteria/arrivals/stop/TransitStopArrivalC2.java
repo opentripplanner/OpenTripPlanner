@@ -15,6 +15,7 @@ final class TransitStopArrivalC2<T extends RaptorTripSchedule>
   implements TransitPathView<T>, TransitArrival<T> {
 
   private final T trip;
+  private final int boardStopPosition;
 
   TransitStopArrivalC2(
     McStopArrival<T> previous,
@@ -22,15 +23,17 @@ final class TransitStopArrivalC2<T extends RaptorTripSchedule>
     int arrivalTime,
     int c1,
     int c2,
+    int boardStopPosition,
     T trip
   ) {
     super(previous, previous.round() + 1, stopIndex, arrivalTime, c1, c2);
+    this.boardStopPosition = boardStopPosition;
     this.trip = trip;
   }
 
   @Override
-  public int boardStop() {
-    return previousStop();
+  public int boardStopPosition() {
+    return boardStopPosition;
   }
 
   @Override
@@ -60,6 +63,14 @@ final class TransitStopArrivalC2<T extends RaptorTripSchedule>
 
   @Override
   public McStopArrival<T> addSlackToArrivalTime(int slack) {
-    return new TransitStopArrivalC2<>(previous(), stop(), arrivalTime() + slack, c1(), c2(), trip);
+    return new TransitStopArrivalC2<>(
+      previous(),
+      stop(),
+      arrivalTime() + slack,
+      c1(),
+      c2(),
+      boardStopPosition,
+      trip
+    );
   }
 }

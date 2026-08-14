@@ -45,12 +45,11 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule>
   public void setNewBestTransitTime(
     int stop,
     int alightTime,
+    int boardStopPosition,
     T trip,
-    int boardStop,
-    int boardTime,
     boolean newBestOverall
   ) {
-    stops.transitToStop(stop, alightTime, boardStop, boardTime, trip, newBestOverall);
+    stops.transitToStop(stop, alightTime, boardStopPosition, trip, newBestOverall);
   }
 
   @Override

@@ -13,7 +13,7 @@ import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
@@ -22,10 +22,16 @@ import org.opentripplanner.utils.collection.ListUtils;
 public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
   private final I18NStringMapper i18NStringMapper;
 
-  public DigitransitRealtimeStopPropertyMapper(TransitService transitService, Locale locale) {
+  public DigitransitRealtimeStopPropertyMapper(
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    Locale locale
+  ) {
     this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
@@ -35,10 +41,9 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
     long currentTimeSeconds = currentTime.getEpochSecond();
     var alertService = transitService.getTransitAlertService();
 
-    Collection<TransitAlert> stopAlerts = new ArrayList<>(alertService.getStopAlerts(stop.getId()));
-
+    Collection<TransitAlert> stopAlerts = new ArrayList<>(transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId()));
     boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
-
+    
     var validAlerts = stopAlerts
       .stream()
       .filter(alert -> alert.displayDuring(currentTimeSeconds, currentTimeSeconds))

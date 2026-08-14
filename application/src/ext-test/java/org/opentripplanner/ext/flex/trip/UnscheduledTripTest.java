@@ -24,7 +24,7 @@ import org.opentripplanner.model.FlexStopTimesFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -41,7 +41,7 @@ class UnscheduledTripTest {
   private static final int T14_00 = TimeUtils.hm2time(14, 0);
   private static final int T15_00 = TimeUtils.hm2time(15, 0);
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
 

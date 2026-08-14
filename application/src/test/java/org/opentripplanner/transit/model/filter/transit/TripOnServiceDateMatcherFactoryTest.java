@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 class TripOnServiceDateMatcherFactoryTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private TripOnServiceDate tripOnServiceDateRut;
   private TripOnServiceDate tripOnServiceDateRut2;
@@ -87,13 +87,13 @@ class TripOnServiceDateMatcherFactoryTest {
       .withServiceDate(LocalDate.of(2024, 2, 24))
       .build();
 
-    patternRut = TimetableRepositoryForTest.tripPattern(
+    patternRut = TransitRepositoryForTest.tripPattern(
       "pattern:rut",
       tripOnServiceDateRut.getTrip().getRoute()
     )
       .withStopPattern(TEST_MODEL.stopPattern(2))
       .build();
-    patternAkt = TimetableRepositoryForTest.tripPattern(
+    patternAkt = TransitRepositoryForTest.tripPattern(
       "pattern:akt",
       tripOnServiceDateAkt.getTrip().getRoute()
     )

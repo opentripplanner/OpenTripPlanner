@@ -54,7 +54,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -64,7 +64,7 @@ import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public abstract class GraphRoutingTest {
 
@@ -73,10 +73,10 @@ public abstract class GraphRoutingTest {
   protected TestOtpModel modelOf(Builder builder) {
     builder.build();
     Graph graph = builder.graph();
-    TimetableRepository timetableRepository = builder.timetableRepository();
+    TransitRepository transitRepository = builder.transitRepository();
     return new TestOtpModel(
       graph,
-      timetableRepository,
+      transitRepository,
       TransferServiceTestFactory.defaultTransferRepository()
     ).index();
   }
@@ -84,13 +84,13 @@ public abstract class GraphRoutingTest {
   public abstract static class Builder {
 
     private final Graph graph;
-    private final TimetableRepository timetableRepository;
+    private final TransitRepository transitRepository;
     private final VertexFactory vertexFactory;
     private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       graph = new Graph();
-      timetableRepository = new TimetableRepository(new SiteRepository());
+      transitRepository = new TransitRepository(new SiteRepository());
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -101,8 +101,8 @@ public abstract class GraphRoutingTest {
       return graph;
     }
 
-    public TimetableRepository timetableRepository() {
-      return timetableRepository;
+    public TransitRepository transitRepository() {
+      return transitRepository;
     }
 
     // -- Street network
@@ -242,28 +242,26 @@ public abstract class GraphRoutingTest {
     }
 
     RegularStop stopEntity(String id, Consumer<RegularStopBuilder> body) {
-      var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
-      var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
+      var siteRepositoryBuilder = transitRepository.getSiteRepository().withContext();
+      var testModel = new TransitRepositoryForTest(siteRepositoryBuilder);
 
       var stopBuilder = testModel.stop(id);
       body.accept(stopBuilder);
 
       var stop = stopBuilder.build();
-      timetableRepository.mergeSiteRepositories(
-        siteRepositoryBuilder.withRegularStop(stop).build()
-      );
+      transitRepository.mergeSiteRepositories(siteRepositoryBuilder.withRegularStop(stop).build());
       return stop;
     }
 
     public Station stationEntity(String id, Consumer<StationBuilder> stationBuilder) {
-      var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
-      var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
+      var siteRepositoryBuilder = transitRepository.getSiteRepository().withContext();
+      var testModel = new TransitRepositoryForTest(siteRepositoryBuilder);
 
       var builder = testModel.station(id);
       stationBuilder.accept(builder);
       var station = builder.build();
 
-      timetableRepository.mergeSiteRepositories(siteRepositoryBuilder.withStation(station).build());
+      transitRepository.mergeSiteRepositories(siteRepositoryBuilder.withStation(station).build());
       return station;
     }
 
@@ -486,24 +484,24 @@ public abstract class GraphRoutingTest {
     }
 
     public Route route(String id, TransitMode mode, Agency agency) {
-      return TimetableRepositoryForTest.route(id).withAgency(agency).withMode(mode).build();
+      return TransitRepositoryForTest.route(id).withAgency(agency).withMode(mode).build();
     }
 
     // Transit
     public void tripPattern(TripPattern tripPattern) {
-      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     public StopTime st(TransitStopVertex s1) {
       var st = new StopTime();
-      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      var stop = transitRepository.getSiteRepository().getRegularStop(s1.getId());
       st.setStop(stop);
       return st;
     }
 
     public StopTime st(TransitStopVertex s1, boolean board, boolean alight) {
       var st = new StopTime();
-      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      var stop = transitRepository.getSiteRepository().getRegularStop(s1.getId());
       st.setStop(stop);
       st.setPickupType(board ? PickDrop.SCHEDULED : PickDrop.NONE);
       st.setDropOffType(alight ? PickDrop.SCHEDULED : PickDrop.NONE);

@@ -8,7 +8,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class AddTransitEntitiesToTimetable {
 
@@ -20,76 +20,76 @@ public class AddTransitEntitiesToTimetable {
 
   public static void addToTimetable(
     TransitDataImport dataImport,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
-    new AddTransitEntitiesToTimetable(dataImport).applyToTimetableRepository(timetableRepository);
+    new AddTransitEntitiesToTimetable(dataImport).applyToTransitRepository(transitRepository);
   }
 
-  private void applyToTimetableRepository(TimetableRepository timetableRepository) {
-    timetableRepository.mergeSiteRepositories(dataImport.siteRepository());
+  private void applyToTransitRepository(TransitRepository transitRepository) {
+    transitRepository.mergeSiteRepositories(dataImport.siteRepository());
 
     // Netex specific entities
     for (var tripOnServiceDate : dataImport.getTripOnServiceDates()) {
-      timetableRepository.addTripOnServiceDate(tripOnServiceDate);
+      transitRepository.addTripOnServiceDate(tripOnServiceDate);
     }
-    timetableRepository.addOperators(dataImport.getAllOperators());
-    timetableRepository.addNoticeAssignments(dataImport.getNoticeAssignments());
-    timetableRepository.addScheduledStopPointMapping(dataImport.stopsByScheduledStopPoint());
+    transitRepository.addOperators(dataImport.getAllOperators());
+    transitRepository.addNoticeAssignments(dataImport.getNoticeAssignments());
+    transitRepository.addScheduledStopPointMapping(dataImport.stopsByScheduledStopPoint());
 
-    addFeedInfo(timetableRepository);
-    addAgencies(timetableRepository);
-    addServices(timetableRepository);
-    addTripPatterns(timetableRepository);
+    addFeedInfo(transitRepository);
+    addAgencies(transitRepository);
+    addServices(transitRepository);
+    addTripPatterns(transitRepository);
 
     /* Interpret the transfers explicitly defined in transfers.txt. */
-    addTransfers(timetableRepository);
+    addTransfers(transitRepository);
 
     if (OTPFeature.FlexRouting.isOn()) {
-      addFlexTrips(timetableRepository);
+      addFlexTrips(transitRepository);
     }
   }
 
-  private void addFeedInfo(TimetableRepository timetableRepository) {
+  private void addFeedInfo(TransitRepository transitRepository) {
     for (FeedInfo info : dataImport.getAllFeedInfos()) {
-      timetableRepository.addFeedInfo(info);
+      transitRepository.addFeedInfo(info);
     }
   }
 
-  private void addAgencies(TimetableRepository timetableRepository) {
+  private void addAgencies(TransitRepository transitRepository) {
     for (Agency agency : dataImport.getAllAgencies()) {
-      timetableRepository.addAgency(agency);
+      transitRepository.addAgency(agency);
     }
   }
 
-  private void addTransfers(TimetableRepository timetableRepository) {
-    timetableRepository.getConstrainedTransferService().addAll(dataImport.getAllTransfers());
+  private void addTransfers(TransitRepository transitRepository) {
+    transitRepository.getConstrainedTransferService().addAll(dataImport.getAllTransfers());
   }
 
-  private void addServices(TimetableRepository timetableRepository) {
+  private void addServices(TransitRepository transitRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : dataImport.getAllServiceIds()) {
-      timetableRepository
+      transitRepository
         .getServiceCodes()
-        .put(serviceId, timetableRepository.getServiceCodes().size());
+        .put(serviceId, transitRepository.getServiceCodes().size());
     }
   }
 
-  private void addTripPatterns(TimetableRepository timetableRepository) {
+  private void addTripPatterns(TransitRepository transitRepository) {
     Collection<TripPattern> tripPatterns = dataImport.getTripPatterns();
 
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
       // TODO this could be more elegant
-      tripPattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+      tripPattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
 
       // Store the tripPattern in the timetable repository so it will be serialized and usable in routing.
-      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
 
-  private void addFlexTrips(TimetableRepository timetableRepository) {
+  private void addFlexTrips(TransitRepository transitRepository) {
     for (FlexTrip<?, ?> flexTrip : dataImport.getAllFlexTrips()) {
-      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      transitRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
 }

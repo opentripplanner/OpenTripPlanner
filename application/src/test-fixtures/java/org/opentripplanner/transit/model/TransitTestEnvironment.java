@@ -18,29 +18,26 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * A helper class for setting up and interacting with transit data for tests.
  * <p>
- * The builder is used to create a SiteRepository and a TimetableRepository that can then be queried
+ * The builder is used to create a SiteRepository and a TransitRepository that can then be queried
  * by a TransitService.
  */
 public final class TransitTestEnvironment {
 
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final RepositoryRegistry repositoryRegistry;
-  private final RepositoryHandle<
-    ReadOnlyTimetableSnapshot,
-    MutableTimetableSnapshot
-  > timetableHandle;
+  private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
   private final UpdateManager updateManager;
   private final LocalDate defaultServiceDate;
 
@@ -57,29 +54,29 @@ public final class TransitTestEnvironment {
   }
 
   TransitTestEnvironment(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     LocalDate defaultServiceDate
   ) {
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.defaultServiceDate = defaultServiceDate;
 
-    this.timetableRepository.index();
+    this.transitRepository.index();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       new TestTransitTuningParameters(),
-      timetableRepository,
+      transitRepository,
       transferRepository
     );
-    this.timetableRepository.initRaptorTransitData(scheduledRaptorData);
+    this.transitRepository.initRaptorTransitData(scheduledRaptorData);
 
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
-      new RaptorTransitData(timetableRepository.getRaptorTransitData()),
-      timetableRepository.copyTripCalendarForRealTimeUpdates()
+    var timetableSnapshot = new DefaultTimetableRepository(
+      new RaptorTransitData(transitRepository.getRaptorTransitData()),
+      transitRepository.copyTripCalendarForRealTimeUpdates()
     );
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
-      new TimetableSnapshotLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
     var threadFactory = new ThreadFactoryBuilder().setNameFormat("test-commit").build();
     // Use atomic commits (commit immediately after each task) so test assertions see results right away
@@ -102,25 +99,25 @@ public final class TransitTestEnvironment {
    * Get the timezone of the timetable repository
    */
   public ZoneId timeZone() {
-    return timetableRepository.getTimeZone();
+    return transitRepository.getTimeZone();
   }
 
   /**
    * Returns a new fresh TransitService backed by the current snapshot.
    */
   public TransitService transitService() {
-    return new DefaultTransitService(timetableRepository, timetableSnapshot());
+    return new DefaultTransitService(transitRepository, timetableSnapshot());
   }
 
   public String feedId() {
     return FeedScopedIdForTestFactory.FEED_ID;
   }
 
-  public TimetableRepository timetableRepository() {
-    return timetableRepository;
+  public TransitRepository transitRepository() {
+    return transitRepository;
   }
 
-  public RepositoryHandle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> timetableHandle() {
+  public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {
     return timetableHandle;
   }
 
@@ -128,7 +125,7 @@ public final class TransitTestEnvironment {
     return updateManager;
   }
 
-  public ReadOnlyTimetableSnapshot timetableSnapshot() {
+  public TimetableRepositorySnapshot timetableSnapshot() {
     return timetableHandle.repositorySnapshot(repositoryRegistry.scope());
   }
 
@@ -137,7 +134,7 @@ public final class TransitTestEnvironment {
    * TransitService timezone.
    */
   public LocalTimeParser localTimeParser() {
-    return new LocalTimeParser(timetableRepository.getTimeZone(), defaultServiceDate);
+    return new LocalTimeParser(transitRepository.getTimeZone(), defaultServiceDate);
   }
 
   /**
@@ -174,10 +171,10 @@ public final class TransitTestEnvironment {
   public RaptorRoutingRequestTransitData raptorRoutingRequestTransitData(LocalDate serviceDate) {
     var transitSearchTimeZero = ServiceDateUtils.asStartOfService(
       serviceDate,
-      timetableRepository.getTimeZone()
+      transitRepository.getTimeZone()
     );
     return new RaptorRoutingRequestTransitData(
-      timetableRepository.getRaptorTransitData(),
+      transitRepository.getRaptorTransitData(),
       TransitGroupPriorityService.empty(),
       transitSearchTimeZero,
       0,

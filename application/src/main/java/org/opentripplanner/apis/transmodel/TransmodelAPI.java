@@ -42,17 +42,18 @@ public class TransmodelAPI {
   private final Collection<String> tracingHeaderTags;
   private final int maxNumberOfResultFields;
 
-  private final OtpServerRequestContext serverContext;
   private final TransmodelGraph index;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public TransmodelAPI(@Context OtpServerRequestContext serverContext) {
-    this.serverContext = serverContext;
-    this.schema = serverContext.transmodelSchema();
+  public TransmodelAPI(
+    @Context TransmodelGraphQLSchema transmodelGraphQLSchema,
+    @Context TransmodelAPIParameters transmodelAPIParameters
+  ) {
+    this.schema = transmodelGraphQLSchema.schema();
     this.index = new TransmodelGraph(schema);
 
-    tracingHeaderTags = serverContext.transmodelAPIParameters().tracingHeaderTags();
-    maxNumberOfResultFields = serverContext.transmodelAPIParameters().maxNumberOfResultFields();
+    tracingHeaderTags = transmodelAPIParameters.tracingHeaderTags();
+    maxNumberOfResultFields = transmodelAPIParameters.maxNumberOfResultFields();
   }
 
   /**
@@ -62,10 +63,11 @@ public class TransmodelAPI {
   public static class TransmodelAPIOldPath extends TransmodelAPI {
 
     public TransmodelAPIOldPath(
-      @Context OtpServerRequestContext serverContext,
+      @Context TransmodelGraphQLSchema transmodelGraphQLSchema,
+      @Context TransmodelAPIParameters transmodelAPIParameters,
       @PathParam("ignoreRouterId") String ignore
     ) {
-      super(serverContext);
+      super(transmodelGraphQLSchema, transmodelAPIParameters);
     }
   }
 
@@ -73,7 +75,8 @@ public class TransmodelAPI {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
-    @Context HttpHeaders headers
+    @Context HttpHeaders headers,
+    @Context OtpServerRequestContext serverContext
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -112,7 +115,11 @@ public class TransmodelAPI {
 
   @POST
   @Consumes("application/graphql")
-  public Response getGraphQL(String query, @Context HttpHeaders headers) {
+  public Response getGraphQL(
+    String query,
+    @Context HttpHeaders headers,
+    @Context OtpServerRequestContext serverContext
+  ) {
     return index.executeGraphQL(
       query,
       serverContext,

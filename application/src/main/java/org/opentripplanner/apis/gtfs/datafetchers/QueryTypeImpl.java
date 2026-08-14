@@ -63,6 +63,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -110,9 +111,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      Collection<TransitAlert> alerts = getTransitService(environment)
-        .getTransitAlertService()
-        .getAllAlerts();
+      Collection<TransitAlert> alerts = getTransitAlertService(environment).getAllAlerts();
       var args = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(environment.getArguments());
       return filterAlerts(alerts, args);
     };
@@ -378,7 +377,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       if (ref == null) {
         return null;
       }
-      return ref.getLeg(transitService);
+      return ref.getLeg(transitService, getTransitAlertService(environment));
     };
   }
 
@@ -397,7 +396,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Agency":
           return transitService.getAgency(FeedScopedId.parseStrict(id));
         case "Alert":
-          return transitService.getTransitAlertService().getAlertById(FeedScopedId.parseStrict(id));
+          return getTransitAlertService(environment).getAlertById(FeedScopedId.parseStrict(id));
         case "BikePark":
           var bikeParkId = FeedScopedId.parseStrict(id);
           return vehicleParkingService == null
@@ -999,6 +998,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
+  }
+
+  private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitAlertService();
   }
 
   private FareService getFareService(DataFetchingEnvironment environment) {

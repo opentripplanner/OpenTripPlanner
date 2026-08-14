@@ -1,18 +1,18 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.test.support.ResourceLoader;
 
-public class PruneNoThruIslandsTest {
+class PruneNoThruIslandsTest {
 
   private static Graph graph;
 
@@ -22,15 +22,12 @@ public class PruneNoThruIslandsTest {
       ResourceLoader.of(PruneNoThruIslandsTest.class).file(
         "herrenberg-island-prune-nothru.osm.pbf"
       ),
-      10,
-      2,
-      50,
-      250
+      IslandPruningParameters.DEFAULTS
     );
   }
 
   @Test
-  public void bicycleIslandsBecomeNoThru() {
+  void bicycleIslandsBecomeNoThru() {
     assertTrue(
       graph
         .getStreetEdges()
@@ -43,7 +40,7 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void carIslandsBecomeNoThru() {
+  void carIslandsBecomeNoThru() {
     assertTrue(
       graph
         .getStreetEdges()
@@ -56,8 +53,8 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void pruneFloatingBikeAndWalkIsland() {
-    Assertions.assertFalse(
+  void pruneFloatingBikeAndWalkIsland() {
+    assertFalse(
       graph
         .getStreetEdges()
         .stream()

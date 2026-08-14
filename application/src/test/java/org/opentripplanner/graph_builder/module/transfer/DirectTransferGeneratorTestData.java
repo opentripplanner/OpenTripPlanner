@@ -13,7 +13,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
@@ -86,7 +86,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
 
     new DirectTransferGenerator(
       model.graph(),
-      model.timetableRepository(),
+      model.transitRepository(),
       model.transferRepository(),
       DataImportIssueStore.NOOP,
       regularTransferParameters.build()
@@ -151,7 +151,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
       street(V22, V23, 100, StreetTraversalPermission.ALL);
 
       if (addPatterns) {
-        var agency = TimetableRepositoryForTest.agency("Agency");
+        var agency = TransitRepositoryForTest.agency("Agency");
 
         tripPattern(
           TripPattern.of(FeedScopedIdForTestFactory.id("TP0"))
@@ -175,7 +175,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
               builder.addTripTimes(
                 ScheduledTripTimes.of()
                   .withTrip(
-                    TimetableRepositoryForTest.trip("bikesAllowedTrip")
+                    TransitRepositoryForTest.trip("bikesAllowedTrip")
                       .withBikesAllowed(BikeAccess.ALLOWED)
                       .build()
                   )
@@ -212,7 +212,7 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
     private static ScheduledTripTimes createCarsAllowedTripTimesWithTwoStops() {
       return ScheduledTripTimes.of()
         .withTrip(
-          TimetableRepositoryForTest.trip("carsAllowed").withCarsAllowed(CarAccess.ALLOWED).build()
+          TransitRepositoryForTest.trip("carsAllowed").withCarsAllowed(CarAccess.ALLOWED).build()
         )
         .withDepartureTimes("00:00 01:00")
         .build();

@@ -20,10 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.configure.StreetDomain;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
@@ -33,9 +37,12 @@ public class MetricsLogging {
 
   @Inject
   public MetricsLogging(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
+    TransitAlertService transitAlertService,
     RaptorConfig<TripSchedule> raptorConfig,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    @TransitDomain UpdateManager transitUpdateManager,
+    @StreetDomain UpdateManager streetUpdateManager
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -49,12 +56,12 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
     if (OTPFeature.AlertMetrics.isOn()) {
-      new AlertMetrics(timetableRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+      new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }
 
-    if (timetableRepository.getRaptorTransitData() != null) {
+    if (transitRepository.getRaptorTransitData() != null) {
       new GuavaCacheMetrics(
-        timetableRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
+        transitRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
         "raptorTransfersCache",
         List.of(Tag.of("cache", "raptorTransfers"))
       ).bindTo(Metrics.globalRegistry);
@@ -65,19 +72,31 @@ public class MetricsLogging {
       List.of(Tag.of("pool", "commonPool"))
     ).bindTo(Metrics.globalRegistry);
 
-    if (timetableRepository.getUpdaterManager() != null) {
+    if (transitRepository.getUpdaterManager() != null) {
       new ExecutorServiceMetrics(
-        timetableRepository.getUpdaterManager().getPollingUpdaterPool(),
+        transitRepository.getUpdaterManager().getPollingUpdaterPool(),
         "pollingGraphUpdaters",
         List.of(Tag.of("pool", "pollingGraphUpdaters"))
       ).bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
-        timetableRepository.getUpdaterManager().getNonPollingUpdaterPool(),
+        transitRepository.getUpdaterManager().getNonPollingUpdaterPool(),
         "nonPollingGraphUpdaters",
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
       ).bindTo(Metrics.globalRegistry);
     }
+
+    new ExecutorServiceMetrics(
+      transitUpdateManager.writerThreadExecutor(),
+      "transitUpdateScheduler",
+      List.of(Tag.of("pool", "transitUpdateScheduler"))
+    ).bindTo(Metrics.globalRegistry);
+
+    new ExecutorServiceMetrics(
+      streetUpdateManager.writerThreadExecutor(),
+      "streetUpdateScheduler",
+      List.of(Tag.of("pool", "streetUpdateScheduler"))
+    ).bindTo(Metrics.globalRegistry);
 
     if (raptorConfig.isMultiThreaded()) {
       new ExecutorServiceMetrics(

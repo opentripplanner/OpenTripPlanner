@@ -31,17 +31,32 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.transit.service.TransitService;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+  private final VectorTileConfig vectorTileConfig;
+  private final WorldEnvelopeService worldEnvelopeService;
+  private final VehicleRentalService vehicleRentalService;
+  private final VehicleParkingService vehicleParkingService;
+  private final TransitAlertService transitAlertService;
   private final String ignoreRouterId;
   private final Locale locale;
 
   public VectorTilesResource(
-    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService,
+    @Context VectorTileConfig vectorTileConfig,
+    @Context WorldEnvelopeService worldEnvelopeService,
+    @Context VehicleRentalService vehicleRentalService,
+    @Context VehicleParkingService vehicleParkingService,
+    @Context TransitAlertService transitAlertService,
     @Context Request grizzlyRequest,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
@@ -50,7 +65,12 @@ public class VectorTilesResource {
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
     this.locale = grizzlyRequest.getLocale();
-    this.serverContext = serverContext;
+    this.transitService = transitService;
+    this.vectorTileConfig = vectorTileConfig;
+    this.worldEnvelopeService = worldEnvelopeService;
+    this.vehicleRentalService = vehicleRentalService;
+    this.vehicleParkingService = vehicleParkingService;
+    this.transitAlertService = transitAlertService;
     this.ignoreRouterId = ignoreRouterId;
   }
 
@@ -69,9 +89,14 @@ public class VectorTilesResource {
       z,
       locale,
       Arrays.asList(requestedLayers.split(",")),
-      serverContext.vectorTileConfig().layers(),
+      vectorTileConfig.layers(),
       VectorTilesResource::createLayerBuilder,
-      serverContext
+      new LayerBuilderContext(
+        transitService,
+        vehicleRentalService,
+        vehicleParkingService,
+        transitAlertService
+      )
     );
   }
 
@@ -83,11 +108,11 @@ public class VectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
-    var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
+    var envelope = worldEnvelopeService.envelope().orElseThrow();
 
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
-    var config = serverContext.vectorTileConfig();
+    var config = vectorTileConfig;
     var url = config
       .basePath()
       .map(overrideBasePath ->
@@ -109,11 +134,10 @@ public class VectorTilesResource {
   }
 
   private List<FeedInfo> getFeedInfos() {
-    return serverContext
-      .transitService()
+    return transitService
       .listFeedIds()
       .stream()
-      .map(serverContext.transitService()::getFeedInfo)
+      .map(transitService::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))
       .toList();
   }
@@ -121,10 +145,15 @@ public class VectorTilesResource {
   private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    OtpServerRequestContext context
+    LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
-      case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
+      case Stop -> new StopsLayerBuilder(
+        context.transitService(),
+        context.transitAlertService(),
+        layerParameters,
+        locale
+      );
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
       case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
@@ -168,4 +197,13 @@ public class VectorTilesResource {
   public interface LayersParameters<T extends Enum<T>> {
     List<LayerParameters<T>> layers();
   }
+
+  /** The subset of services {@link #createLayerBuilder} needs, passed through {@link
+   * VectorTileResponseFactory#create} as its generic context parameter. */
+  private record LayerBuilderContext(
+    TransitService transitService,
+    VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
+    TransitAlertService transitAlertService
+  ) {}
 }

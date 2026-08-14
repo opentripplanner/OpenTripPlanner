@@ -43,7 +43,6 @@ public class StopArrivalFactoryC1Test {
   private McStopArrival<TestTripSchedule> transitArrival() {
     PatternRideView<TestTripSchedule, McStopArrival<TestTripSchedule>> ride = new PatternRideC1<>(
       accessArrival(),
-      STOP_A,
       0,
       TRIP.departure(0),
       ANY,

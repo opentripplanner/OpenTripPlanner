@@ -3,7 +3,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model.basic.Money.euros;
 
 import java.util.LinkedList;
@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -73,7 +73,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     FareZone C = FareZone.of(new FeedScopedId(FEED_ID, "C")).build();
     FareZone D = FareZone.of(new FeedScopedId(FEED_ID, "D")).build();
 
-    var testModel = TimetableRepositoryForTest.of();
+    var testModel = TransitRepositoryForTest.of();
     Place A1 = testModel.place("A1", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(A));
     Place A2 = testModel.place("A2", sb -> sb.withCoordinate(10.0, 12.0).addFareZone(A));
 

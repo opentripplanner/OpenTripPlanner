@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime.stopTime;
-import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
@@ -62,32 +60,6 @@ public class TripStopTimeTest {
   public void testToString() {
     assertEquals("[2 10:01 BUS L31]", departureStop1.toString());
     assertEquals("[7 10:20 BUS L31]", arrivalStop3.toString());
-  }
-
-  @Test
-  public void createArrival() {
-    // Arrival at the first stop is not valid (cannot alight where the trip originates)
-    assertEquals(
-      "[5 10:05 BUS L31]",
-      TripStopTime.arrival(trip, stopTime(STOP_2, time("10:05"))).toString()
-    );
-    assertEquals(
-      "[7 10:20 BUS L31]",
-      TripStopTime.arrival(trip, stopTime(STOP_3, time("10:20"))).toString()
-    );
-  }
-
-  @Test
-  public void createDeparture() {
-    assertEquals(
-      "[2 10:01 BUS L31]",
-      TripStopTime.departure(trip, stopTime(STOP_1, time("10:01"))).toString()
-    );
-    assertEquals(
-      "[5 10:06 BUS L31]",
-      TripStopTime.departure(trip, stopTime(STOP_2, time("10:06"))).toString()
-    );
-    // Departure at the last stop is not valid (cannot board where the trip terminates)
   }
 
   @Test

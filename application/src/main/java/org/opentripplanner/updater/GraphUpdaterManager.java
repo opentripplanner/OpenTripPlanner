@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +24,12 @@ import org.slf4j.LoggerFactory;
  * Manages the lifecycle of all {@link GraphUpdater} instances: starts each updater on its own
  * thread, shuts them down cleanly, and tracks readiness.
  * <p>
- * Write tasks submitted by updaters are serialised by the {@link WriteToGraphCallback} passed at
- * construction — currently a {@link GraphWriterService}, which will be replaced by the new
- * {@link org.opentripplanner.framework.transaction.UpdateManager} framework.
+ * Write tasks submitted by updaters are serialised per {@link WriteDomain} by the
+ * {@link WriteToGraphCallback}s passed at construction — currently {@link GraphWriterService}
+ * instances, which will be replaced by the new
+ * {@link org.opentripplanner.framework.transaction.UpdateManager} framework. Each updater is
+ * routed to the callback of its declared write domain, so updaters working on unrelated domains
+ * run in parallel.
  */
 public class GraphUpdaterManager implements GraphUpdaterStatus {
 
@@ -45,14 +50,14 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   /**
    * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
    */
-  private final List<GraphUpdater> updaterList = new ArrayList<>();
+  private final List<GraphUpdater<?>> updaterList = new ArrayList<>();
 
   private final Runnable shutdownGraphWriter;
 
   public GraphUpdaterManager(
-    WriteToGraphCallback writeToGraphCallback,
+    WriteToGraphCallbacks writeToGraphCallbacks,
     Runnable shutdownGraphWriter,
-    List<GraphUpdater> updaters
+    List<GraphUpdater<?>> updaters
   ) {
     var updaterThreadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
     this.pollingUpdaterPool = Executors.newScheduledThreadPool(
@@ -62,10 +67,26 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     this.nonPollingUpdaterPool = Executors.newCachedThreadPool(updaterThreadFactory);
     this.shutdownGraphWriter = shutdownGraphWriter;
 
-    for (GraphUpdater updater : updaters) {
+    for (GraphUpdater<?> updater : updaters) {
       updaterList.add(updater);
-      updater.setup(writeToGraphCallback);
+      setup(updater, writeToGraphCallbacks);
     }
+  }
+
+  /**
+   * Pair an updater with the callback of its write domain.
+   */
+  private static <C> void setup(GraphUpdater<C> updater, WriteToGraphCallbacks callbacks) {
+    var callback = callbacks.forDomain(updater.writeDomain());
+    if (callback == null) {
+      throw new IllegalArgumentException(
+        "No WriteToGraphCallback configured for write domain %s (required by %s)".formatted(
+          updater.writeDomain(),
+          updater.getClass().getName()
+        )
+      );
+    }
+    updater.setup(callback);
   }
 
   /**
@@ -73,7 +94,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    * only after all the updaters have had their setup methods called.
    */
   public void startUpdaters() {
-    for (GraphUpdater updater : updaterList) {
+    for (GraphUpdater<?> updater : updaterList) {
       Runnable runUpdater = () -> {
         try {
           updater.run();
@@ -81,7 +102,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
           LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
         }
       };
-      if (updater instanceof PollingGraphUpdater pollingGraphUpdater) {
+      if (updater instanceof PollingGraphUpdater<?> pollingGraphUpdater) {
         LOG.info("Scheduling polling updater {}", updater);
         if (pollingGraphUpdater.runOnlyOnce()) {
           pollingUpdaterPool.schedule(runUpdater, 0, TimeUnit.SECONDS);
@@ -138,7 +159,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
       LOG.warn("Interrupted while waiting for updaters to finish.");
     }
 
-    for (GraphUpdater updater : updaterList) {
+    for (GraphUpdater<?> updater : updaterList) {
       updater.teardown();
     }
     updaterList.clear();
@@ -168,13 +189,13 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   public Map<Integer, String> getUpdaterDescriptions() {
     Map<Integer, String> ret = new TreeMap<>();
     int i = 0;
-    for (GraphUpdater updater : updaterList) {
+    for (GraphUpdater<?> updater : updaterList) {
       ret.put(i++, updater.toString());
     }
     return ret;
   }
 
-  public GraphUpdater getUpdater(int id) {
+  public GraphUpdater<?> getUpdater(int id) {
     if (id >= updaterList.size()) {
       return null;
     }
@@ -183,11 +204,11 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
 
   @Override
   public Class<?> getUpdaterClass(int id) {
-    GraphUpdater updater = getUpdater(id);
+    GraphUpdater<?> updater = getUpdater(id);
     return updater == null ? null : updater.getClass();
   }
 
-  public List<GraphUpdater> getUpdaterList() {
+  public List<GraphUpdater<?>> getUpdaterList() {
     return updaterList;
   }
 

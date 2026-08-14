@@ -39,20 +39,6 @@ class RaptorTripScheduleTest {
   }
 
   @Test
-  void findArrivalStopPosition() {
-    assertEquals("10:00:00", timeToStrLong(subject.arrival(0, STOP_A)));
-    assertEquals("10:05:00", timeToStrLong(subject.arrival(1, STOP_A)));
-    assertEquals("10:55:00", timeToStrLong(subject.arrival(2, STOP_A)));
-  }
-
-  @Test
-  void findDepartureStopPosition() {
-    assertEquals("10:01:00", timeToStrLong(subject.departure(0, STOP_A)));
-    assertEquals("10:46:00", timeToStrLong(subject.departure(0, STOP_E)));
-    assertEquals("10:56:00", timeToStrLong(subject.departure(2, STOP_A)));
-  }
-
-  @Test
   void restrictedFindArrivalStopPosition() {
     var subject = TestTripSchedule.schedule(
       TestTripPattern.of("flex-with-repeating-stops", STOP_F, STOP_A, STOP_A, STOP_B, STOP_C)

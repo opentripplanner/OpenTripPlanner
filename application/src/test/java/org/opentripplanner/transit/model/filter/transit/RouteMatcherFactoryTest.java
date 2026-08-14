@@ -11,7 +11,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.network.Route;
@@ -24,13 +24,13 @@ class RouteMatcherFactoryTest {
   @BeforeEach
   void setup() {
     route1 = Route.of(new FeedScopedId("feedId", "routeId"))
-      .withAgency(TimetableRepositoryForTest.agency("AGENCY"))
+      .withAgency(TransitRepositoryForTest.agency("AGENCY"))
       .withMode(TransitMode.BUS)
       .withShortName("ROUTE1")
       .withLongName(I18NString.of("ROUTE1LONG"))
       .build();
     route2 = Route.of(new FeedScopedId("otherFeedId", "otherRouteId"))
-      .withAgency(TimetableRepositoryForTest.agency("OTHER_AGENCY"))
+      .withAgency(TransitRepositoryForTest.agency("OTHER_AGENCY"))
       .withMode(TransitMode.RAIL)
       .withShortName("ROUTE2")
       .withLongName(I18NString.of("ROUTE2LONG"))

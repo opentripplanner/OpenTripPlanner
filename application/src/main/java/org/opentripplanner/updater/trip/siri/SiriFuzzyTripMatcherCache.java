@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +25,8 @@ public class SiriFuzzyTripMatcherCache {
   final Map<String, Set<Trip>> internalPlanningCodeCache = new HashMap<>();
   final Map<String, Set<Trip>> startStopTripCache = new HashMap<>();
 
-  public SiriFuzzyTripMatcherCache(TimetableRepository timetableRepository) {
-    initCache(new DefaultTransitService(timetableRepository, null));
+  public SiriFuzzyTripMatcherCache(TransitRepository transitRepository) {
+    initCache(new DefaultTransitService(transitRepository, null));
   }
 
   private void initCache(TransitService index) {

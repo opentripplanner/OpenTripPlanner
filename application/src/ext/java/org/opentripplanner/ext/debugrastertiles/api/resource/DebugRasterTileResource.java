@@ -15,7 +15,8 @@ import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.debugrastertiles.MapTile;
 import org.opentripplanner.ext.debugrastertiles.TileRenderer;
 import org.opentripplanner.ext.debugrastertiles.TileRendererManager;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Slippy raster map tile API for rendering various graph information for inspection/debugging
@@ -34,10 +35,10 @@ public class DebugRasterTileResource {
 
   private final TileRendererManager tileRendererManager;
 
-  public DebugRasterTileResource(@Context OtpServerRequestContext serverContext) {
+  public DebugRasterTileResource(@Context Graph graph, @Context RouteRequest defaultRouteRequest) {
     this.tileRendererManager = new TileRendererManager(
-      serverContext.graph(),
-      serverContext.defaultRouteRequest().preferences().wheelchair()
+      graph,
+      defaultRouteRequest.preferences().wheelchair()
     );
   }
 
