@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
-  private final TransitEditorService transitService;
+  private final TransitService transitService;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> getTripPatternId;
@@ -68,7 +68,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
-    TransitEditorService transitService,
+    TransitService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
@@ -122,7 +122,7 @@ class AddedTripBuilder {
   }
 
   AddedTripBuilder(
-    TransitEditorService transitService,
+    TransitService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,

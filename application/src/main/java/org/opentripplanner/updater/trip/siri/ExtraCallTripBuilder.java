@@ -24,13 +24,13 @@ import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 
 class ExtraCallTripBuilder {
 
-  private final TransitEditorService transitService;
+  private final TransitService transitService;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> generateTripPatternId;
   private final Trip trip;
@@ -49,7 +49,7 @@ class ExtraCallTripBuilder {
 
   ExtraCallTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
-    TransitEditorService transitService,
+    TransitService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> generateTripPatternId,

@@ -5,10 +5,7 @@ TODO RTM - Add framework class diagram
 ### Services and its context
 
 The `TransitService` is the main entry point for accessing all transit model objects. It may have
-nested services or provide read-only access to key model classes. For changing the model a
-`TransitEditorService` is created(obtained from the service). The editor can then be used to get a
-builder for all _aggregate roots_[1]. For simplicity, we only allow _one_ editor to be active at any
-given time.
+nested services or provide read-only access to key model classes.
 
 [TODO RTM, clarify] Modifying, adding and deleting entities are **not** synchronized, so if more
 than one thread are doing updates at concurrent, then the synchronization responsibility is put on
