@@ -62,7 +62,9 @@ class CalendarTest {
 
   @Test
   void openEndGivesNoEffectiveEnd() {
-    var subject = ActivityCalendar.of(List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, null)));
+    var subject = ActivityCalendar.of(
+      List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, null))
+    );
     assertThat(subject.effectiveStart()).hasValue(START);
     assertThat(subject.effectiveEnd()).isEmpty();
   }

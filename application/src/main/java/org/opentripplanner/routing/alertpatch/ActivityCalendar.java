@@ -113,9 +113,6 @@ public final class ActivityCalendar {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(ActivityCalendar.class)
-      .addCol("timePeriods", timePeriods)
-      .toString();
+    return ToStringBuilder.of(ActivityCalendar.class).addCol("timePeriods", timePeriods).toString();
   }
 }
-
