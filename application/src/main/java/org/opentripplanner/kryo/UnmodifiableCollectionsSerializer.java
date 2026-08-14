@@ -72,7 +72,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       );
       // the ordinal could be replaced by s.th. else (e.g. a explicitely managed "id")
       output.writeInt(unmodifiableCollection.ordinal(), true);
-      kryo.writeClassAndObject(output, getValues(object));
+      kryo.writeClassAndObject(output, unmodifiableCollection.toIntermediate(object));
     } catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions because the ObjectBuffer.write...
       // handles SerializationException specifically (resizing the buffer)...
@@ -86,8 +86,8 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
   public Object read(Kryo kryo, Input input, Class<?> clazz) {
     int ordinal = input.readInt(true);
     UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.values()[ordinal];
-    Object sourceCollection = kryo.readClassAndObject(input);
-    return unmodifiableCollection.create(sourceCollection);
+    Object intermediate = kryo.readClassAndObject(input);
+    return unmodifiableCollection.create(intermediate);
   }
 
   @Override
@@ -96,8 +96,8 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.valueOfType(
         original.getClass()
       );
-      Object sourceCollectionCopy = kryo.copy(getValues(original));
-      return unmodifiableCollection.create(sourceCollectionCopy);
+      Object intermediateCopy = kryo.copy(unmodifiableCollection.toIntermediate(original));
+      return unmodifiableCollection.create(intermediateCopy);
     } catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions
       throw e;
@@ -106,51 +106,90 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
     }
   }
 
-  private Collection<?> getValues(Object coll) {
-    return new ArrayList<>((Collection) coll);
-  }
-
+  /**
+   * Each variant converts to/from a plain, Kryo-friendly intermediate representation on write/copy
+   * ({@link #toIntermediate}), and reconstructs the concrete collection/map type it needs before
+   * wrapping it back up as unmodifiable on read/copy ({@link #create}). This is deliberately not
+   * symmetric (e.g. {@code Map} isn't a {@code Collection}, and the intermediate {@code ArrayList}
+   * read back for a {@code Set} isn't itself a {@code Set}), so each side needs its own conversion
+   * rather than a single shared cast.
+   */
   private enum UnmodifiableCollection {
     COLLECTION(Collections.unmodifiableCollection(Arrays.asList("")).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableCollection((Collection<?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new ArrayList<>((Collection<?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableCollection((Collection<?>) intermediate);
       }
     },
     RANDOM_ACCESS_LIST(Collections.unmodifiableList(new ArrayList<Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableList((List<?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new ArrayList<>((Collection<?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableList(new ArrayList<>((Collection<?>) intermediate));
       }
     },
     LIST(Collections.unmodifiableList(new LinkedList<Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableList((List<?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new ArrayList<>((Collection<?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableList(new LinkedList<>((Collection<?>) intermediate));
       }
     },
     SET(Collections.unmodifiableSet(new HashSet<Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableSet((Set<?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new ArrayList<>((Collection<?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableSet(new HashSet<>((Collection<?>) intermediate));
       }
     },
     SORTED_SET(Collections.unmodifiableSortedSet(new TreeSet<Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableSortedSet((SortedSet<?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new ArrayList<>((Collection<?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableSortedSet(new TreeSet<>((Collection<?>) intermediate));
       }
     },
     MAP(Collections.unmodifiableMap(new HashMap<Void, Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableMap((Map<?, ?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new HashMap<>((Map<?, ?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableMap(new HashMap<>((Map<?, ?>) intermediate));
       }
     },
     SORTED_MAP(Collections.unmodifiableSortedMap(new TreeMap<Void, Void>()).getClass()) {
       @Override
-      public Object create(Object sourceCollection) {
-        return Collections.unmodifiableSortedMap((SortedMap<?, ?>) sourceCollection);
+      Object toIntermediate(Object source) {
+        return new HashMap<>((Map<?, ?>) source);
+      }
+
+      @Override
+      public Object create(Object intermediate) {
+        return Collections.unmodifiableSortedMap(new TreeMap<>((Map<?, ?>) intermediate));
       }
     };
 
@@ -160,7 +199,9 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       this.type = type;
     }
 
-    public abstract Object create(Object sourceCollection);
+    abstract Object toIntermediate(Object source);
+
+    public abstract Object create(Object intermediate);
 
     static UnmodifiableCollection valueOfType(Class<?> type) {
       for (UnmodifiableCollection item : values()) {
