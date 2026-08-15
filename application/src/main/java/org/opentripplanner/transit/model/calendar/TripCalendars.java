@@ -41,6 +41,12 @@ public class TripCalendars implements Serializable {
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
   private final Map<FeedScopedId, Integer> serviceCodes;
 
+  @Nullable
+  private final LocalDate startDate;
+
+  @Nullable
+  private final LocalDate endDate;
+
   private TripCalendars(
     Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId,
     Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate,
@@ -51,6 +57,8 @@ public class TripCalendars implements Serializable {
     this.serviceIdsByDate = serviceIdsByDate;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
     this.serviceCodes = serviceCodes;
+    this.startDate = serviceIdsByDate.keySet().stream().min(LocalDate::compareTo).orElse(null);
+    this.endDate = serviceIdsByDate.keySet().stream().max(LocalDate::compareTo).orElse(null);
   }
 
   /** An empty trip calendar, with no service ids registered. */
@@ -138,11 +146,11 @@ public class TripCalendars implements Serializable {
   }
 
   public Optional<LocalDate> startDate() {
-    return serviceIdsByDate.keySet().stream().min(LocalDate::compareTo);
+    return Optional.ofNullable(startDate);
   }
 
   public Optional<LocalDate> endDate() {
-    return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
+    return Optional.ofNullable(endDate);
   }
 
   public boolean isEmpty() {
@@ -296,14 +304,10 @@ public class TripCalendars implements Serializable {
   }
 
   private boolean isWithinServicePeriod(LocalDate serviceDate) {
-    return (
-      startDate()
-        .filter(d -> !serviceDate.isBefore(d))
-        .isPresent() &&
-      endDate()
-        .filter(d -> !serviceDate.isAfter(d))
-        .isPresent()
-    );
+    if (startDate == null || endDate == null) {
+      return false;
+    }
+    return !serviceDate.isBefore(startDate) && !serviceDate.isAfter(endDate);
   }
 
   private static Map<LocalDate, Set<FeedScopedId>> deepCopy(
