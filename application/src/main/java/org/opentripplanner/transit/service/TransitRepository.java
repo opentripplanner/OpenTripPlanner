@@ -139,7 +139,7 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     if (index == null) {
       LOG.info("Index timetable repository...");
-      this.tripCalendars = this.tripCalendars.initializeServiceCodes();
+      this.tripCalendars = this.tripCalendars.initializeServiceCodesRunningForDate();
       this.index = new TransitRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }

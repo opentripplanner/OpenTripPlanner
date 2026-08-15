@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * on, and the small integer service codes used by Raptor.
  * <p>
  * There is no builder: every modification (see {@link #merge}, {@link #withServiceCode},
- * {@link #initializeServiceCodes}, {@link #getOrCreateServiceIdForDate}) returns a new instance
+ * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a new instance
  * rather than mutating this one, so callers that hold onto a {@code TripCalendars} keep seeing a
  * stable value even while another reference is evolving. A caller that needs a long-lived,
  * continuously-updated view (e.g. {@code DefaultTimetableRepository}'s write buffer) just holds a
@@ -213,7 +213,7 @@ public class TripCalendars implements Serializable {
    *
    * @return a new instance with {@link #getServiceCodesRunningForDate()} computed.
    */
-  public TripCalendars initializeServiceCodes() {
+  public TripCalendars initializeServiceCodesRunningForDate() {
     Map<LocalDate, TIntSet> newServiceCodesRunningForDate = new HashMap<>();
     for (FeedScopedId serviceId : serviceDatesByServiceId.keySet()) {
       Integer code = serviceCodes.get(serviceId);
