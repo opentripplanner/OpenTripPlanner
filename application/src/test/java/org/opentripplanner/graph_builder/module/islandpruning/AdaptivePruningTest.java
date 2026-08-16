@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
@@ -47,7 +48,7 @@ class AdaptivePruningTest {
 
   @Test
   void nearIslandIsRemoved() {
-    Assertions.assertFalse(
+    assertFalse(
       graph
         .getStreetEdges()
         .stream()

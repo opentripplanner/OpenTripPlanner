@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -60,12 +59,12 @@ class Subgraph {
     return streetVertices.iterator().next();
   }
 
-  Iterator<Vertex> streetIterator() {
-    return streetVertices.iterator();
+  Iterable<Vertex> streetVertices() {
+    return streetVertices::iterator;
   }
 
-  Iterator<TransitStopVertex> stopIterator() {
-    return stopVertices.iterator();
+  Iterable<TransitStopVertex> stopVertices() {
+    return stopVertices::iterator;
   }
 
   // find minimal distance from a given vertex to vertices of this subgraph
@@ -143,8 +142,8 @@ class Subgraph {
 
     Consumer<Vertex> vertexAdder = vertex ->
       points.add(geometryFactory.createPoint(vertex.getCoordinate()));
-    streetIterator().forEachRemaining(vertexAdder);
-    stopIterator().forEachRemaining(vertexAdder);
+    streetVertices().forEach(vertexAdder);
+    stopVertices().forEach(vertexAdder);
 
     return new MultiPoint(points.toArray(new Point[0]), geometryFactory);
   }
