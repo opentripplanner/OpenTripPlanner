@@ -18,22 +18,12 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class StraightLineNearbyStopFinder implements NearbyStopFinder {
 
-  private final Duration durationLimit;
   private final Function<Envelope, Collection<RegularStop>> queryNearbyStops;
 
   public StraightLineNearbyStopFinder(
     Function<Envelope, Collection<RegularStop>> queryNearbyStops
   ) {
-    this(queryNearbyStops, Duration.ofHours(10000));
-  }
-
-  public StraightLineNearbyStopFinder(
-    Function<Envelope, Collection<RegularStop>> queryNearbyStops,
-    Duration durationLimit
-  ) {
     this.queryNearbyStops = queryNearbyStops;
-    // TODO move request specific parameters to method
-    this.durationLimit = durationLimit;
   }
 
   /**
@@ -71,12 +61,17 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
     Vertex vertex,
     RouteRequest routingRequest,
     StreetMode streetMode,
-    boolean reverseDirection
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount
   ) {
-    return findNearbyStopsViaDirectTransfers(vertex);
+    return findNearbyStopsViaDirectTransfers(vertex, durationLimit);
   }
 
-  private List<NearbyStop> findNearbyStopsViaDirectTransfers(Vertex vertex) {
+  private List<NearbyStop> findNearbyStopsViaDirectTransfers(
+    Vertex vertex,
+    Duration durationLimit
+  ) {
     // TODO why we use default speed here?
     double limitMeters = durationLimit.toSeconds() * WalkPreferences.DEFAULT.speed();
     Coordinate c0 = vertex.getCoordinate();
