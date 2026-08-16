@@ -6,11 +6,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TLongList;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -40,7 +43,7 @@ class VertexGenerator {
 
   private static final String NODE_LABEL_FORMAT = "osm:node:%d";
 
-  private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
+  private final TLongObjectMap<IntersectionVertex> intersectionNodes = new TLongObjectHashMap<>();
 
   private final HashMap<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes =
     new HashMap<>();
@@ -313,10 +316,19 @@ class VertexGenerator {
   }
 
   /**
-   * Track OSM nodes that will become graph vertices because they appear in multiple OSM ways
+   * Returns whether the given OSM node id is a shared intersection node, i.e. it appears in more
+   * than one OSM way (or way/area boundary) and therefore needs to become a graph vertex.
    */
-  Map<Long, IntersectionVertex> intersectionNodes() {
-    return intersectionNodes;
+  boolean isIntersectionNode(long nodeId) {
+    return intersectionNodes.containsKey(nodeId);
+  }
+
+  /**
+   * Return the graph vertex already created for the given intersection node id, or null if the
+   * node is not an intersection node, or a vertex hasn't been created for it yet.
+   */
+  IntersectionVertex getIntersectionVertex(long nodeId) {
+    return Objects.requireNonNull(intersectionNodes.get(nodeId), "Intersection vertex not found.");
   }
 
   /**

@@ -427,7 +427,7 @@ public class OsmModule implements GraphBuilderModule {
         }
 
         if (
-          vertexGenerator.intersectionNodes().containsKey(endNode) ||
+          vertexGenerator.isIntersectionNode(endNode) ||
           i == nodes.size() - 2 ||
           nodes.subList(0, i).contains(nodes.get(i)) ||
           osmEndNode.hasTag("ele") ||
