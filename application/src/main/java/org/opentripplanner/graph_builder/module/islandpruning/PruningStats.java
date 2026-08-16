@@ -10,6 +10,9 @@ class PruningStats {
   private int removed = 0;
   private int noThru = 0;
   private int restricted = 0;
+  private int modifiedIslands = 0;
+  private int islandsWithStops = 0;
+  private int islandsWithStopsChanged = 0;
 
   void incrementIsolated() {
     isolated++;
@@ -27,6 +30,18 @@ class PruningStats {
     restricted++;
   }
 
+  void incrementModifiedIslands() {
+    modifiedIslands++;
+  }
+
+  void incrementIslandsWithStops() {
+    islandsWithStops++;
+  }
+
+  void incrementIslandsWithStopsChanged() {
+    islandsWithStopsChanged++;
+  }
+
   int isolated() {
     return isolated;
   }
@@ -41,5 +56,17 @@ class PruningStats {
 
   int restricted() {
     return restricted;
+  }
+
+  int modifiedIslands() {
+    return modifiedIslands;
+  }
+
+  int islandsWithStops() {
+    return islandsWithStops;
+  }
+
+  int islandsWithStopsChanged() {
+    return islandsWithStopsChanged;
   }
 }

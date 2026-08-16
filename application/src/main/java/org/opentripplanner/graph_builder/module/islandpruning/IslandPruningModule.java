@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
@@ -208,16 +206,13 @@ public class IslandPruningModule implements GraphBuilderModule {
     double adaptivePruningFactor = parameters.adaptivePruningFactor();
     int adaptivePruningDistance = parameters.adaptivePruningDistance();
 
-    int count = 0;
-    int islandsWithStops = 0;
-    int islandsWithStopsChanged = 0;
     for (Subgraph island : islands) {
       if (island == largest) {
         continue;
       }
       if (island.stopSize() > 0) {
         //for islands with stops
-        islandsWithStops++;
+        stats.incrementIslandsWithStops();
         boolean onlyFerry = island.hasOnlyFerryStops();
         int pruningThresholdWithStops = parameters.pruningThresholdIslandWithStops();
         // do not remove real islands which have only ferry stops
@@ -229,8 +224,8 @@ public class IslandPruningModule implements GraphBuilderModule {
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
-              islandsWithStopsChanged++;
-              count++;
+              stats.incrementIslandsWithStopsChanged();
+              stats.incrementModifiedIslands();
             }
           }
         }
@@ -244,7 +239,7 @@ public class IslandPruningModule implements GraphBuilderModule {
             : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
-              count++;
+              stats.incrementModifiedIslands();
             }
           }
         }
@@ -253,8 +248,8 @@ public class IslandPruningModule implements GraphBuilderModule {
     if (markIsolated) {
       LOG.info("Detected {} isolated edges", stats.isolated());
     } else {
-      LOG.info("Number of islands with stops: {}", islandsWithStops);
-      LOG.info("Modified connectivity of {} islands with stops", islandsWithStopsChanged);
+      LOG.info("Number of islands with stops: {}", stats.islandsWithStops());
+      LOG.info("Modified connectivity of {} islands with stops", stats.islandsWithStopsChanged());
       LOG.info("Removed {} edges", stats.removed());
       LOG.info("Removed traversal mode from {} edges", stats.restricted());
       LOG.info("Converted {} edges to noThruTraffic", stats.noThru());
@@ -262,15 +257,15 @@ public class IslandPruningModule implements GraphBuilderModule {
         new GraphConnectivity(
           traverseMode,
           islands.size(),
-          islandsWithStops,
-          islandsWithStopsChanged,
+          stats.islandsWithStops(),
+          stats.islandsWithStopsChanged(),
           stats.removed(),
           stats.restricted(),
           stats.noThru()
         )
       );
     }
-    return count;
+    return stats.modifiedIslands();
   }
 
   private void collectNeighbourVertices(
