@@ -223,6 +223,19 @@ public class Graph implements Serializable {
   }
 
   /**
+   * Lazily iterate over all edges of a certain type in the graph, without materializing an
+   * intermediate collection. Walks the vertices and yielding only the ones that are instances
+   * of {@code clazz}.
+   */
+  public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
+    return this.vertices.values()
+      .stream()
+      .flatMap(v -> v.getOutgoing().stream())
+      .filter(clazz::isInstance)
+      .map(clazz::cast)::iterator;
+  }
+
+  /**
    * Return only the StreetEdges in the graph.
    */
   public Collection<StreetEdge> getStreetEdges() {
