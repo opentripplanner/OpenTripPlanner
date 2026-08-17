@@ -226,8 +226,10 @@ public class Graph implements Serializable {
    * Lazily iterate over all edges of a certain type in the graph, without materializing an
    * intermediate collection. Walks the vertices and yielding only the ones that are instances
    * of {@code clazz}.
+   * <p>
+   * The iterator may contain duplicates.
    */
-  public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
+  public <T extends Edge> Iterable<T> iterateEdges(Class<T> clazz) {
     return this.vertices.values()
       .stream()
       .flatMap(v -> v.getOutgoing().stream())

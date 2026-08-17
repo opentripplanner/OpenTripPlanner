@@ -98,7 +98,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     HashSet<AreaGroup> areas = new HashSet<>();
     HashSet<Vertex> visibilityVertices = new HashSet<>();
 
-    for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
+    for (AreaEdge ae : graph.iterateEdges(AreaEdge.class)) {
       areas.add(ae.getArea());
     }
     for (AreaGroup a : areas) {

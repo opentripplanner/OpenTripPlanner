@@ -1,5 +1,6 @@
 package org.opentripplanner.street.graph;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
@@ -127,6 +128,31 @@ class GraphTest {
     Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
     assertEquals(4, edges.size());
     assertEquals(allStreetEdges, edges);
+  }
+
+  @Test
+  void iterateEdgesFiltersByType() {
+    Graph g = new Graph();
+    StreetVertex a = intersectionVertex("A", 5, 5);
+    StreetVertex b = intersectionVertex("B", 6, 6);
+    StreetVertex c = intersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
+
+    StreetEdge streetEdge = edge(a, b, 1.0);
+    FreeEdge freeEdge = FreeEdge.createFreeEdge(b, c);
+
+    assertThat(g.iterateEdges(StreetEdge.class)).containsExactly(streetEdge);
+    assertThat(g.iterateEdges(FreeEdge.class)).containsExactly(freeEdge);
+    assertThat(g.iterateEdges(Edge.class)).containsExactly(streetEdge, freeEdge);
+  }
+
+  @Test
+  void iterateEdgesEmptyGraph() {
+    Graph g = new Graph();
+    assertThat(g.iterateEdges(Edge.class)).isEmpty();
   }
 
   /**
