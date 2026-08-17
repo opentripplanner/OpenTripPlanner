@@ -14,10 +14,6 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 /**
  * Maps the {@code gbfs} section of {@code otp-config.json} into {@link GbfsNetworkOverrides}.
  * <p>
- * The section lives in {@code otp-config.json} because it is the only configuration file read in
- * both the graph build and the serve phase, and both the vehicle rental graph builder and the
- * vehicle rental service directory need these values.
- * <p>
  * Field inheritance is resolved while parsing rather than by merging afterwards: the
  * {@code defaults} block is mapped first, and the resulting parameters are used as the fallback
  * value for every field of every listed network.
@@ -34,9 +30,8 @@ public class GbfsNetworksConfig {
         `vehicleRentalServiceDirectory` loads its feeds from a GBFS manifest and takes its
         per-network settings from here, keyed by the GBFS `system_id`.
 
-        This section lives in `otp-config.json` because it is the only configuration file that is
-        read both when the graph is built and when it is served. Note that it is not embedded in
-        the graph, so it must be present in the deployment directory in both phases.
+        These values are not embedded in the graph, so `otp-config.json` must be present in the
+        deployment directory when the graph is served as well as when it is built.
         """
       )
       .asObject();

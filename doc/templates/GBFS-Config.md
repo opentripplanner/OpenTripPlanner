@@ -26,9 +26,8 @@ The [vehicle rental service directory](sandbox/VehicleRentalServiceDirectory.md)
 from a GBFS manifest and takes its per-network settings from the `gbfs` section of
 `otp-config.json`, keyed by the GBFS `system_id`.
 
-This section lives in `otp-config.json` because it is the only configuration file read both when the
-graph is built and when it is served. Note that it is _not_ embedded in the graph, so it must be
-present in the deployment directory in both phases.
+These values are _not_ embedded in the graph, so `otp-config.json` must be present in the deployment
+directory when the graph is served as well as when it is built.
 
 `defaults` is applied per field: a listed network overrides only the fields it names and inherits
 the rest. `includeUnlistedNetworks` is a separate switch so that adding defaults to avoid repetition
