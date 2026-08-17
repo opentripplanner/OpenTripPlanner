@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - deduplicate-linestrings
 
 jobs:
   perf-test:
@@ -30,34 +31,34 @@ jobs:
           - location: norway
             iterations: 4
             jfr-delay: "35s"
-            profile: core
+            profile: extended
 
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
-            profile: core
+            profile: extended
 
           # extended locations that are run only after merging to dev-2.x
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: switzerland
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
-            profile: extended
+            profile: core
 
           - location: helsinki
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v7
