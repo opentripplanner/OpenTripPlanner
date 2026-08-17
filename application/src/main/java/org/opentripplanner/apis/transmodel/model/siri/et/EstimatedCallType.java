@@ -414,15 +414,6 @@ public class EstimatedCallType {
     Instant toTime
   ) {
     if (alertPatches != null) {
-      // First and last period
-      alertPatches.removeIf(
-        alert ->
-          (alert.getEffectiveStartDate() != null &&
-            alert.getEffectiveStartDate().isAfter(toTime)) ||
-          (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().isBefore(fromTime))
-      );
-
-      // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch ->
         !alertPatch.isActiveDuring(TimePeriod.of(fromTime, toTime))
       );
