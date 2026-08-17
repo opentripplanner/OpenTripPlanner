@@ -106,4 +106,52 @@ class TimePeriodTest {
     assertTrue(subject.overlaps(TimePeriod.of(Instant.EPOCH, Instant.EPOCH)));
     assertTrue(subject.overlaps(TimePeriod.ofUnbounded()));
   }
+
+  @Test
+  void containsBoundedPeriod() {
+    var subject = TimePeriod.of(START, END);
+
+    // before the start
+    assertFalse(subject.contains(START.minusSeconds(1)));
+    // exactly at the start - inclusive
+    assertTrue(subject.contains(START));
+    // inside
+    assertTrue(subject.contains(START.plusSeconds(100)));
+    // exactly at the end - exclusive
+    assertFalse(subject.contains(END));
+    // after the end
+    assertFalse(subject.contains(END.plusSeconds(1)));
+  }
+
+  @Test
+  void containsOpenStart() {
+    var subject = TimePeriod.of(null, END);
+
+    // far in the past is contained because the start is open
+    assertTrue(subject.contains(Instant.EPOCH));
+    assertTrue(subject.contains(START));
+    // exactly at the end - exclusive
+    assertFalse(subject.contains(END));
+    assertFalse(subject.contains(END.plusSeconds(1)));
+  }
+
+  @Test
+  void containsOpenEnd() {
+    var subject = TimePeriod.of(START, null);
+
+    // before the start
+    assertFalse(subject.contains(START.minusSeconds(1)));
+    // exactly at the start - inclusive
+    assertTrue(subject.contains(START));
+    // far in the future is contained because the end is open
+    assertTrue(subject.contains(END.plusSeconds(1_000_000)));
+  }
+
+  @Test
+  void unboundedContainsEverything() {
+    var subject = TimePeriod.ofUnbounded();
+    assertTrue(subject.contains(Instant.EPOCH));
+    assertTrue(subject.contains(START));
+    assertTrue(subject.contains(END.plusSeconds(1_000_000)));
+  }
 }

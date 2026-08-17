@@ -67,7 +67,7 @@ public final class ActivityCalendar {
    * Returns {@code true} if any of the time periods contains the given {@code instant}.
    */
   public boolean isActiveAt(Instant instant) {
-    return isActiveDuring(TimePeriod.of(instant, instant));
+    return timePeriods.stream().anyMatch(timePeriod -> timePeriod.contains(instant));
   }
 
   /**

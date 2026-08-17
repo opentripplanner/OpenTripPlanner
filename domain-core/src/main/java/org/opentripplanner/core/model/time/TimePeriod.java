@@ -86,6 +86,13 @@ public final class TimePeriod {
     );
   }
 
+  /**
+   * Returns {@code true} if the {@code instant} is within this period.
+   */
+  public boolean contains(Instant instant) {
+    return ((hasOpenStart() || !instant.isBefore(start)) && (hasOpenEnd() || end.isAfter(instant)));
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
