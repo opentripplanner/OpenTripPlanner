@@ -236,6 +236,6 @@ class PartialReplacementTest implements RealtimeTestConstants {
 
   private void assertReplacedBy(List<ReplacedByRelation> replacedBys, FeedScopedId expectedId) {
     assertEquals(1, replacedBys.size());
-    assertEquals(replacedBys.getFirst().getTripOnServiceDate().getId(), expectedId);
+    assertEquals(expectedId, replacedBys.getFirst().getTripOnServiceDate().getId());
   }
 }
