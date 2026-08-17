@@ -190,7 +190,7 @@ class PartialReplacementTest implements RealtimeTestConstants {
   }
 
   @Test
-  void testCircularRouteDisabiguateByTime() {
+  void testCircularRouteDisambiguateByTime() {
     var env = ENV_BUILDER.addTrip(CIRCULAR_TRIP_INPUT).addTrip(TRIP_2_INPUT).build();
     var siri = SiriTestHelper.of(env);
 

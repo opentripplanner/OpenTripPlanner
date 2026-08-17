@@ -243,7 +243,7 @@ public class SiriEtBuilder {
     String toStop,
     @Nullable ZonedDateTime endTime,
     String replacementJourney,
-    LocalDate servicceDate
+    LocalDate serviceDate
   ) {
     var relations = evj.getJourneyRelations();
     if (relations == null) {
@@ -270,12 +270,12 @@ public class SiriEtBuilder {
     parts.getJourneyPartInfos().add(part);
 
     var relatedJourney = new RelatedJourney();
-    var framedVehicleJoureyRef = new FramedVehicleJourneyRefStructure();
-    framedVehicleJoureyRef.setDatedVehicleJourneyRef(replacementJourney);
+    var framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
+    framedVehicleJourneyRef.setDatedVehicleJourneyRef(replacementJourney);
     var dataFrameRefStructure = new DataFrameRefStructure();
-    dataFrameRefStructure.setValue(servicceDate.toString());
-    framedVehicleJoureyRef.setDataFrameRef(dataFrameRefStructure);
-    relatedJourney.setFramedVehicleJourneyRef(framedVehicleJoureyRef);
+    dataFrameRefStructure.setValue(serviceDate.toString());
+    framedVehicleJourneyRef.setDataFrameRef(dataFrameRefStructure);
+    relatedJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
 
     var rel = new JourneyRelationStructure();
     rel.setJourneyParts(parts);
