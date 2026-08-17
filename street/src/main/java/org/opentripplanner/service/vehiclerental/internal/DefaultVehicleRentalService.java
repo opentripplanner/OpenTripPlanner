@@ -17,7 +17,10 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 
-/** Read-side service backed by a {@link VehicleRentalRepository}. */
+/**
+ * Default implementation of {@link VehicleRentalService}, delegating to the
+ * {@link VehicleRentalRepository} that holds the data.
+ */
 @Singleton
 public class DefaultVehicleRentalService implements VehicleRentalService {
 
