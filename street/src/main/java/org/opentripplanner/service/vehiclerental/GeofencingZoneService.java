@@ -35,15 +35,15 @@ public interface GeofencingZoneService {
     }
   };
 
-  /** All registered zones (across all data sources) that contain the given coordinate. */
+  /** All registered zones (across all networks) that contain the given coordinate. */
   Set<GeofencingZone> findZonesContaining(Coordinate coord);
 
   /**
-   * Whether any data source has registered a zone index. Cheap short-circuit for callers that
+   * Whether any network has registered a zone index. Cheap short-circuit for callers that
    * want to avoid per-vertex lookups when no zones exist.
    */
   boolean hasIndexedZones();
 
-  /** All zones across all registered data sources. Used by the debug map layer. */
+  /** All zones across all registered networks. Used by the debug map layer. */
   Set<GeofencingZone> listZones();
 }

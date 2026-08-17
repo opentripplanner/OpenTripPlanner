@@ -16,9 +16,9 @@ public interface VehicleRentalRepository extends GeofencingZoneService {
   void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId);
 
   /**
-   * Register a geofencing zone index for a specific data source. Called by the vehicle rental
-   * updater when zones are applied. Each updater (one per network) registers its own index;
-   * re-registering with the same {@code dataSourceName} replaces the previous index.
+   * Register a geofencing zone index for a network. Called by the vehicle rental updater when
+   * zones are applied. Each updater (one per network) registers its own index; re-registering
+   * with the same {@code network} replaces the previous index.
    */
   void setGeofencingZoneIndex(String network, GeofencingZoneIndex index);
 
