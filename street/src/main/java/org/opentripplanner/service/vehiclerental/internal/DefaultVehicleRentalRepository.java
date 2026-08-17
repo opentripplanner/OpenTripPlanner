@@ -2,7 +2,6 @@ package org.opentripplanner.service.vehiclerental.internal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +29,7 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
  * registration replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
-public class DefaultVehicleRentalRepository implements VehicleRentalRepository, Serializable {
+public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 

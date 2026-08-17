@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental;
 
+import java.io.Serializable;
 import java.util.Collection;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -9,8 +10,11 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
  * The writable data store of vehicle rental information. Also exposes raw read access and
  * geofencing zone queries (via {@link GeofencingZoneService}); the higher-level
  * {@link VehicleRentalService} provides typed views on top of this.
+ * <p>
+ * Geofencing zones may be written here during graph build, in which case the repository is saved
+ * into the serialized graph object.
  */
-public interface VehicleRentalRepository extends GeofencingZoneService {
+public interface VehicleRentalRepository extends GeofencingZoneService, Serializable {
   void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation);
 
   void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId);
