@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
@@ -52,6 +53,11 @@ public class GeometryProcessor {
   private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
   // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
+  // Interns generated LineStrings so that geometrically identical ones share the same instance.
+  // this is a thread-safe implementation
+  private final Map<LineStringKey, LineString> internedLineStrings = new ConcurrentHashMap<>();
+  // Counts how many times intern() was handed a LineString that duplicated one already seen.
+  private final LongAdder deduplicatedLineStringCount = new LongAdder();
   private final double maxStopToShapeSnapDistance;
   private final DataImportIssueStore issueStore;
 
@@ -89,6 +95,30 @@ public class GeometryProcessor {
     }
 
     return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+  }
+
+  /**
+   * Returns a canonical instance for the given LineString, so that geometrically identical
+   * LineStrings generated at different times always point to the same object.
+   */
+  private LineString intern(LineString lineString) {
+    LineString existing = internedLineStrings.putIfAbsent(
+      new LineStringKey(lineString),
+      lineString
+    );
+    if (existing != null) {
+      deduplicatedLineStringCount.increment();
+      return existing;
+    }
+    return lineString;
+  }
+
+  /**
+   * Returns how many generated LineStrings turned out to be duplicates of one already produced,
+   * and were therefore replaced by the existing shared instance instead of being kept.
+   */
+  public long deduplicatedLineStringCount() {
+    return deduplicatedLineStringCount.sum();
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -202,7 +232,7 @@ public class GeometryProcessor {
           geometry.getCoordinates(),
           2
         );
-        geometry = GEOMETRY_FACTORY.createLineString(sequence);
+        geometry = intern(GEOMETRY_FACTORY.createLineString(sequence));
       }
       geoms[i] = geometry;
     }
@@ -450,7 +480,7 @@ public class GeometryProcessor {
     };
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
 
-    return GEOMETRY_FACTORY.createLineString(sequence);
+    return intern(GEOMETRY_FACTORY.createLineString(sequence));
   }
 
   private boolean isValid(Geometry geometry, StopLocation s0, StopLocation s1) {
@@ -505,7 +535,7 @@ public class GeometryProcessor {
         geometry.getCoordinates(),
         2
       );
-      geometry = GEOMETRY_FACTORY.createLineString(sequence);
+      geometry = intern(GEOMETRY_FACTORY.createLineString(sequence));
 
       if (!isValid(geometry, st0.getStop(), st1.getStop())) {
         issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
@@ -578,7 +608,7 @@ public class GeometryProcessor {
     }
 
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
-    geometry = GEOMETRY_FACTORY.createLineString(sequence);
+    geometry = intern(GEOMETRY_FACTORY.createLineString(sequence));
     geometriesByShapeId.put(shapeId, geometry);
 
     // If we don't have distances here, we can't calculate them ourselves because we can't

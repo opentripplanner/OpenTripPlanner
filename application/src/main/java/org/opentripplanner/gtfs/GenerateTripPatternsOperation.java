@@ -103,6 +103,10 @@ public class GenerateTripPatternsOperation {
       freqCount,
       scheduledCount
     );
+    LOG.info(
+      "Deduplicated {} LineStrings.",
+      geometryProcessor.deduplicatedLineStringCount()
+    );
   }
 
   public boolean hasFrequencyBasedTrips() {
