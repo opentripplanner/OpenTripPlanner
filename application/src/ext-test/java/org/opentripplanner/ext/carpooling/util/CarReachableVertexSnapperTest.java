@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.edge.TemporaryFreeEdge.createTemporaryFreeEdge;
 
 import java.time.Duration;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -68,6 +71,34 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
         }
       }
     );
+  }
+
+  /**
+   * Clears the interrupt flag so that a cancellation raised by one test cannot surface as a
+   * spurious {@link OTPRequestTimeoutException} in an unrelated test sharing the same thread.
+   */
+  @AfterEach
+  void clearInterruptFlag() {
+    Thread.interrupted();
+  }
+
+  /**
+   * The walk search runs inside the snap, so a cancelled request surfaces there. A cancellation
+   * carries no verdict on whether a car-reachable vertex is within the walk budget: it must be
+   * raised as an exception rather than reported as a missing snap, and it must leave no verdict
+   * behind that a later snap of the same vertex would read.
+   */
+  @Test
+  void propagateCancellationInsteadOfReturningNull() {
+    Thread.currentThread().interrupt();
+    assertThrows(OTPRequestTimeoutException.class, () ->
+      snapper.snapPickup(StreetSearchRequest.DEFAULT, A, Duration.ofMinutes(10))
+    );
+    Thread.interrupted();
+
+    var result = snapper.snapPickup(StreetSearchRequest.DEFAULT, A, Duration.ofMinutes(10));
+    assertNotNull(result, "A cancelled snap must leave no verdict behind");
+    assertEquals(C, result.vertex());
   }
 
   @Test

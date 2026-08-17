@@ -10,6 +10,7 @@ import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -175,6 +176,7 @@ public final class CarReachableVertexSnapper {
       .build();
     // No heuristic is available since there is no fixed destination.
     var builder = StreetSearchBuilder.of()
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withRequest(request)
       .withSkipEdgeStrategy(
         new ComposingSkipEdgeStrategy<>(scope, new DurationSkipEdgeStrategy<>(maxWalk))
@@ -275,6 +277,10 @@ public final class CarReachableVertexSnapper {
     // The Euclidean heuristic is not appropriate without a fixed destination, and a purpose-built
     // one is out of scope for now, so this runs as plain Dijkstra (f = g).
     var builder = StreetSearchBuilder.of()
+      // Deliberately no cancellation check: this probe starts once per settled vertex of the
+      // enclosing search, so the yield() inside checkForTimeout would dominate it. The no-op is
+      // explicit because an unset hook logs a warning.
+      .withPreStartHook(() -> {})
       .withRequest(arriveBy ? CAR_ARRIVE : CAR_DEPART)
       .withSkipEdgeStrategy(skipEdges)
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
