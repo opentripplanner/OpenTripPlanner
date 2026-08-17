@@ -56,10 +56,10 @@ class TimePeriodTest {
 
     // entirely before
     assertFalse(subject.overlaps(TimePeriod.of(START.minusSeconds(200), START.minusSeconds(100))));
-    // ends exactly at the start - the start is inclusive
-    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START)));
+    // ends exactly at the start - the start is inclusive, but end is exclusive
+    assertFalse(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START)));
     // overlapping the start
-    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START.plusSeconds(100))));
+    assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(100), START.plusSeconds(1))));
     // inside
     assertTrue(subject.overlaps(TimePeriod.of(START.plusSeconds(100), END.minusSeconds(100))));
     // overlapping the end
@@ -92,9 +92,10 @@ class TimePeriodTest {
     // other period is open-ended, starting exactly at this period's end - exclusive
     assertFalse(subject.overlaps(TimePeriod.of(END, null)));
     // other period has an open start, ending after this period starts
-    assertTrue(subject.overlaps(TimePeriod.of(null, START.plusSeconds(100))));
-    // other period has an open start, ending exactly at this period's start - inclusive
-    assertTrue(subject.overlaps(TimePeriod.of(null, START)));
+    assertTrue(subject.overlaps(TimePeriod.of(null, START.plusSeconds(1))));
+    // other period has an open start, ending exactly at this period's start. Because end
+    // is exclusive, there is no overlap
+    assertFalse(subject.overlaps(TimePeriod.of(null, START)));
     // other period is entirely unbounded
     assertTrue(subject.overlaps(TimePeriod.ofUnbounded()));
   }

@@ -81,7 +81,7 @@ public final class TimePeriod {
    */
   public boolean overlaps(TimePeriod other) {
     return (
-      (hasOpenStart() || other.hasOpenEnd() || !other.end.isBefore(start)) &&
+      (hasOpenStart() || other.hasOpenEnd() || start.isBefore(other.end)) &&
       (hasOpenEnd() || other.hasOpenStart() || other.start.isBefore(end))
     );
   }
