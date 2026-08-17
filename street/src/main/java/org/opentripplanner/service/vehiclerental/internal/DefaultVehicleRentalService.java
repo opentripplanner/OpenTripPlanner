@@ -2,7 +2,6 @@ package org.opentripplanner.service.vehiclerental.internal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +19,7 @@ import org.opentripplanner.street.model.RentalFormFactor;
 
 /** Read-side service backed by a {@link VehicleRentalRepository}. */
 @Singleton
-public class DefaultVehicleRentalService implements VehicleRentalService, Serializable {
+public class DefaultVehicleRentalService implements VehicleRentalService {
 
   private final VehicleRentalRepository repository;
 
