@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -464,4 +465,11 @@ public interface TransitService {
    * as TransitService.
    */
   ReplacementHelper getReplacementHelper();
+
+  /**
+   * @return the current (real-time if available, otherwise scheduled) trip times
+   *         for the given trip on the given service date, or empty if the
+   *         trip does not run on that date.
+   */
+  Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 }
