@@ -324,11 +324,14 @@ class VertexGenerator {
   }
 
   /**
-   * Return the graph vertex already created for the given intersection node id, or null if the
-   * node is not an intersection node, or a vertex hasn't been created for it yet.
+   * Return the graph vertex already created for the given intersection node id. Throws an exception
+   * if the node is not an intersection node, or a vertex hasn't been created for it yet.
    */
   IntersectionVertex getIntersectionVertex(long nodeId) {
-    return Objects.requireNonNull(intersectionNodes.get(nodeId), "Intersection vertex not found.");
+    return Objects.requireNonNull(
+      intersectionNodes.get(nodeId),
+      "Intersection vertex %s not found.".formatted(nodeId)
+    );
   }
 
   /**
