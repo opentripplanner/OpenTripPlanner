@@ -207,7 +207,7 @@ class ElevatorProcessor {
       }
       List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(way);
       List<Long> nodes = Arrays.stream(way.getNodeRefs().toArray())
-        .filter(vertexGenerator::isIntersectionNode)
+        .filter(vertexGenerator::hasIntersectionVertex)
         .boxed()
         .toList();
 
