@@ -42,7 +42,7 @@ public class DataOverlayContext implements ExtensionRequestContext {
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
   ) {
     var list = new ArrayList<ExtensionRequestContext>();
-    if (OTPFeature.DataOverlay.isOn()) {
+    if (OTPFeature.DataOverlay.isOn() && dataOverlayParameterBindings != null) {
       list.add(
         new DataOverlayContext(
           dataOverlayParameterBindings,
