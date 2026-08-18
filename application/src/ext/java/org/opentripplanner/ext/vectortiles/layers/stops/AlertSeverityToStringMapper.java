@@ -11,7 +11,7 @@ final class AlertSeverityToStringMapper {
       case INFO -> "INFO";
       case VERY_SLIGHT, SLIGHT, WARNING -> "WARNING";
       case VERY_SEVERE, SEVERE -> "SEVERE";
-      case UNDEFINED, UNKNOWN_SEVERITY -> "UNKNOWN_SEVERITY";
+      case UNKNOWN_SEVERITY -> "UNKNOWN_SEVERITY";
     };
   }
 }
