@@ -144,15 +144,15 @@ class GraphTest {
     StreetEdge streetEdge = edge(a, b, 1.0);
     FreeEdge freeEdge = FreeEdge.createFreeEdge(b, c);
 
-    assertThat(g.iterateEdges(StreetEdge.class)).containsExactly(streetEdge);
-    assertThat(g.iterateEdges(FreeEdge.class)).containsExactly(freeEdge);
-    assertThat(g.iterateEdges(Edge.class)).containsExactly(streetEdge, freeEdge);
+    assertThat(g.findEdges(StreetEdge.class)).containsExactly(streetEdge);
+    assertThat(g.findEdges(FreeEdge.class)).containsExactly(freeEdge);
+    assertThat(g.findEdges(Edge.class)).containsExactly(streetEdge, freeEdge);
   }
 
   @Test
   void iterateEdgesEmptyGraph() {
     Graph g = new Graph();
-    assertThat(g.iterateEdges(Edge.class)).isEmpty();
+    assertThat(g.findEdges(Edge.class)).isEmpty();
   }
 
   /**

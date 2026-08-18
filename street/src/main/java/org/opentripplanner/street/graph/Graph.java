@@ -229,7 +229,7 @@ public class Graph implements Serializable {
    * <p>
    * The iterator may contain duplicates.
    */
-  public <T extends Edge> Iterable<T> iterateEdges(Class<T> clazz) {
+  public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
     return this.vertices.values()
       .stream()
       .flatMap(v -> v.getOutgoing().stream())
