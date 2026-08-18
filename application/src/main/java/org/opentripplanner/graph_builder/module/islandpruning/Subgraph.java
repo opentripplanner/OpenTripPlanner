@@ -74,14 +74,10 @@ class Subgraph {
     return Math.min(d1, d2);
   }
 
-  private double computeDistance(
-    Vertex v,
-    double searchRadius,
-    Set<? extends Vertex> streetVertexSet1
-  ) {
+  private double computeDistance(Vertex v, double searchRadius, Set<? extends Vertex> vertices) {
     double distance = Double.MAX_VALUE;
     Vertex clostestVertex = null;
-    for (Vertex vertex : streetVertexSet1) {
+    for (Vertex vertex : vertices) {
       var d = SphericalDistanceLibrary.fastDistance(
         v.getLat(),
         v.getLon(),
