@@ -30,6 +30,16 @@ class GbfsManifestLoaderTest {
   }
 
   @Test
+  void loadsAManifestFromARelativeFileUri() {
+    var manifest = GbfsManifestLoader.loadManifest(
+      URI.create("file:src/test/resources/gbfs/manifest.json"),
+      HttpHeaders.empty()
+    );
+
+    assertNotNull(manifest);
+  }
+
+  @Test
   void returnsNullWhenTheManifestCannotBeLoaded() {
     var manifest = GbfsManifestLoader.loadManifest(
       Path.of("src/test/resources/gbfs/does-not-exist.json").toAbsolutePath().toUri(),

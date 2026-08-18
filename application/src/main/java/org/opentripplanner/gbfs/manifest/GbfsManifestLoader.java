@@ -3,10 +3,7 @@ package org.opentripplanner.gbfs.manifest;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -35,7 +32,7 @@ public class GbfsManifestLoader {
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   /**
-   * Loads the manifest from a remote URL or a local {@code file://} path.
+   * Loads the manifest from a remote URL or a local {@code file:} path.
    *
    * @return the parsed manifest, or {@code null} if it could not be fetched or parsed. Failing to
    *   reach a manifest must not fail the whole graph build or server startup, so this is logged
@@ -43,27 +40,13 @@ public class GbfsManifestLoader {
    */
   @Nullable
   public static GBFSManifest loadManifest(URI url, HttpHeaders headers) {
-    try {
-      String manifestContent;
-
-      if ("file".equals(url.getScheme())) {
-        // Path.of(URI), not Path.of(url.getPath()): on Windows the latter yields "/D:/..." from
-        // "file:///D:/...", which is not a legal path.
-        Path filePath = Path.of(url);
-        manifestContent = Files.readString(filePath);
-        LOG.info("Loaded GBFS manifest from file: {}", filePath);
-      } else {
-        try (var httpClientFactory = new OtpHttpClientFactory()) {
-          var jsonNode = httpClientFactory
-            .create(LOG)
-            .getAndMapAsJsonNode(url, headers, OBJECT_MAPPER);
-          manifestContent = OBJECT_MAPPER.writeValueAsString(jsonNode);
-        }
-        LOG.info("Loaded GBFS manifest from URL: {}", url);
-      }
-
-      return OBJECT_MAPPER.readValue(manifestContent, GBFSManifest.class);
-    } catch (OtpHttpClientException | IOException e) {
+    try (var httpClientFactory = new OtpHttpClientFactory()) {
+      var manifest = httpClientFactory
+        .create(LOG)
+        .getAndMapAsJsonObject(url, headers, OBJECT_MAPPER, GBFSManifest.class);
+      LOG.info("Loaded GBFS manifest from {}", url);
+      return manifest;
+    } catch (OtpHttpClientException e) {
       LOG.error("Error loading GBFS manifest from {}", url, e);
       return null;
     }
