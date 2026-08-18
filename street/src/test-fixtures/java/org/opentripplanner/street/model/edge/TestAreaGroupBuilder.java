@@ -33,16 +33,19 @@ public class TestAreaGroupBuilder {
     coordinates[boundaryVertices.size()] = coordinates[0];
 
     var polygon = GeometryUtils.getGeometryFactory().createPolygon(coordinates);
-    var areaGroup = new AreaGroup(polygon);
-    areaGroup.addVisibilityVertices(visibilityVertices);
 
-    var area = new Area();
-    area.setName(I18NString.of("test area"));
-    area.setWalkSafety(0.5f);
-    area.setBicycleSafety(0.5f);
-    area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    area.setGeometry(polygon);
-    areaGroup.addArea(area);
+    var area = Area.of()
+      .withName(I18NString.of("test area"))
+      .withWalkSafety(0.5f)
+      .withBicycleSafety(0.5f)
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withGeometry(polygon)
+      .build();
+
+    var areaGroup = AreaGroup.of(polygon)
+      .withVisibilityVertices(visibilityVertices)
+      .addArea(area)
+      .build();
 
     for (int i = 0; i < boundaryVertices.size(); i++) {
       var from = boundaryVertices.get(i);
