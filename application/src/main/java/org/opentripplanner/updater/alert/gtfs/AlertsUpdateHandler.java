@@ -27,6 +27,8 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -35,6 +37,7 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
  */
 public class AlertsUpdateHandler {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AlertsUpdateHandler.class);
   private static final int MISSING_INT_FIELD_VALUE = -1;
   private String feedId;
   private TransitAlertService transitAlertService;
@@ -60,7 +63,11 @@ public class AlertsUpdateHandler {
       }
       GtfsRealtime.Alert alert = entity.getAlert();
       String id = entity.getId();
-      alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
+      try {
+        alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
+      } catch (Exception e) {
+        LOG.warn("Failed to map GTFS-RT alert with id {}: {}", id, e.getMessage(), e);
+      }
     }
     transitAlertService.setAlerts(alerts);
   }
