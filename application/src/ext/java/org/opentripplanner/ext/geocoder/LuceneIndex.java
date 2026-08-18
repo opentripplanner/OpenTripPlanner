@@ -50,7 +50,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopType;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -78,10 +78,10 @@ public class LuceneIndex implements Serializable {
    * constructor.
    */
   public LuceneIndex(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StopConsolidationService stopConsolidationService
   ) {
-    this(new DefaultTransitService(timetableRepository), stopConsolidationService);
+    this(new DefaultTransitService(transitRepository), stopConsolidationService);
   }
 
   /**

@@ -19,12 +19,12 @@ import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class VehicleParkingLinkingTest {
 
   private Graph graph;
-  private TimetableRepository timetableRepository;
+  private TransitRepository transitRepository;
   private IntersectionVertex A;
   private IntersectionVertex B;
 
@@ -37,7 +37,7 @@ public class VehicleParkingLinkingTest {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
     graphData.initGraph();
     graph = graphData.getGraph();
-    timetableRepository = graphData.getTimetableRepository();
+    transitRepository = graphData.getTransitRepository();
     A = graphData.getAVertex();
     B = graphData.getBVertex();
     vertexFactory = new VertexFactory(graph);
@@ -53,7 +53,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, transitRepository);
 
     assertEquals(1, parkingVertex.getOutgoing().size());
     parkingVertex.getOutgoing().forEach(e -> assertEquals(e.getToVertex(), A));
@@ -75,7 +75,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, transitRepository);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(2, streetLinks.size());
@@ -108,7 +108,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, transitRepository);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(4, streetLinks.size());
@@ -142,7 +142,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, transitRepository);
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
@@ -171,7 +171,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, vehicleParkingService, timetableRepository);
+    TestStreetLinkerModule.link(graph, vehicleParkingService, transitRepository);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 

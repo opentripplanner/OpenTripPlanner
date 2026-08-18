@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
@@ -375,8 +375,8 @@ class TransferMapperTest {
 
   private DefaultEntityById<Trip> createTripsIndex() {
     var trips = new DefaultEntityById<Trip>();
-    trips.add(TimetableRepositoryForTest.trip(FROM_JOURNEY_ID).build());
-    trips.add(TimetableRepositoryForTest.trip(TO_JOURNEY_ID).build());
+    trips.add(TransitRepositoryForTest.trip(FROM_JOURNEY_ID).build());
+    trips.add(TransitRepositoryForTest.trip(TO_JOURNEY_ID).build());
     return trips;
   }
 

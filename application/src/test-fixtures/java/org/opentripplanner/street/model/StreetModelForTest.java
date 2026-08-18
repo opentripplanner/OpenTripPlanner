@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -141,8 +142,28 @@ public class StreetModelForTest {
     return streetEdge(from, to, 1, permissions);
   }
 
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction, allowing
+   * {@link StreetTraversalPermission#PEDESTRIAN} traffic.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b) {
+    bidirectional(a, b, StreetTraversalPermission.PEDESTRIAN);
+  }
+
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b, StreetTraversalPermission perm) {
+    streetEdge(a, b, perm);
+    streetEdge(b, a, perm);
+  }
+
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
     return VehicleParking.of().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
+  }
+
+  public static OsmVertex osmVertex(Coordinate c, long nodeId) {
+    return new OsmVertex(c.x, c.y, nodeId);
   }
 
   static class GraphBuilder {

@@ -10,7 +10,7 @@ import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -145,8 +145,8 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
       : TestTransfers.transfer(toStopIndex, walkDurationSec);
 
     return new TripToTripTransfer<>(
-      departure(fromTrip, fromStopIndex),
-      arrival(toTrip, toStopIndex),
+      arrival(fromTrip, fromStopIndex),
+      departure(toTrip, toStopIndex),
       pathTransfer,
       buildConstrainedTransfer()
     );
@@ -154,7 +154,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TimetableRepositoryForTest.trip(
+    return TransitRepositoryForTest.trip(
       trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0))
     ).build();
   }
@@ -163,8 +163,8 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     if (constraint == null) {
       return null;
     }
-    int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStopIndex);
-    int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStopIndex);
+    int fromStopPos = fromTrip.pattern().findAlightStopPositionAfter(0, fromStopIndex);
+    int toStopPos = toTrip.pattern().findBoardStopPositionAfter(0, toStopIndex);
 
     return new ConstrainedTransfer(
       null,
@@ -175,11 +175,13 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   }
 
   private static <T extends RaptorTripSchedule> TripStopTime<T> departure(T trip, int stopIndex) {
-    return TripStopTime.departure(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
+    int boardStopPos = trip.pattern().findBoardStopPositionAfter(0, stopIndex);
+    return TripStopTime.departure(trip, boardStopPos);
   }
 
   private static <T extends RaptorTripSchedule> TripStopTime<T> arrival(T trip, int stopIndex) {
-    return TripStopTime.arrival(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
+    int alightStopPos = trip.pattern().findAlightStopPositionAfter(0, stopIndex);
+    return TripStopTime.arrival(trip, alightStopPos);
   }
 
   private void validateFromTo() {

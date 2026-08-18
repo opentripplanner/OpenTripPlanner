@@ -185,6 +185,8 @@ type DatedServiceJourney {
     "Only fetch the last n quays on the service journey"
     last: Int
   ): [Quay!]!
+  "The real-time state of this dated service journey."
+  realTimeJourneyState: RealTimeJourneyState
   "Dated service journeys this dated service journey is replaced by"
   replacedByRelation: [ReplacedByRelation!]!
   "List of the dated service journeys this dated service journeys replaces"
@@ -267,7 +269,7 @@ type EstimatedCall {
   quay: Quay!
   "Whether this call has been updated with real time information."
   realtime: Boolean!
-  realtimeState: RealtimeState!
+  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   serviceJourney: ServiceJourney!
@@ -1075,6 +1077,20 @@ type QueryType {
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
   ): ViaTrip! @deprecated(reason : "Use the regular trip query with via stop instead.") @timingData
+}
+
+"The real-time state of a service journey."
+type RealTimeJourneyState {
+  "Has this journey been cancelled?"
+  cancellation: Boolean!
+  "Has this journey been added via real-time updates? (extra journey not in the planned data)"
+  extraJourney: Boolean!
+  "Has the quay sequence changed from the planned journey pattern? True if quays were added, removed, reordered, or reassigned to a different quay's location. False if the journey was cancelled"
+  journeyPatternModified: Boolean!
+  "Have any quay's arrival or departure times been modified from the scheduled times?"
+  timesModified: Boolean!
+  "Have there been any real-time updates on this journey?"
+  updated: Boolean!
 }
 
 "Refetched data for a trip pattern"

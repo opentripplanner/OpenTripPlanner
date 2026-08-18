@@ -31,7 +31,7 @@ class WalkRoutingTest {
     );
     roundabout = model.graph();
 
-    model.timetableRepository().index();
+    model.transitRepository().index();
     roundabout.index();
   }
 

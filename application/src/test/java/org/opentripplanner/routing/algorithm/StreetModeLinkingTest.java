@@ -136,7 +136,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     graph = otpModel.graph();
 
     graph.hasStreets = true;
-    TestStreetLinkerModule.link(graph, otpModel.timetableRepository());
+    TestStreetLinkerModule.link(graph, otpModel.transitRepository());
     String label = stop.getLabelString();
     this.stopLocation = GenericLocation.fromStopId(stop.getId(), label);
   }

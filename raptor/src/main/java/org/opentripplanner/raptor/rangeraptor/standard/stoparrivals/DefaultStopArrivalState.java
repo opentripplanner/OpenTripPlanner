@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -11,12 +12,12 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * garbage collect.
  * <p/>
  * This class holds both the best transit and the best transfer to a stop if they exist for a given
- * round and stop. The normal case is that this class represent either a transit arrival or a
+ * round and stop. The normal case is that this class represents either a transit arrival or a
  * transfer arrival. We only keep both if the transfer is better, arriving before the transit.
  * <p/>
  * The reason we need to keep both the best transfer and the best transit for a given stop and round
  * is that we may arrive at a stop by transit, then in the same or later round we may arrive by
- * transit. If the transfer arrival is better then the transit arrival it might be tempting to
+ * transit. If the transfer arrival is better than the transit arrival, it might be tempting to
  * remove the transit arrival, but this transit might be the best way (or only way) to get to
  * another stop by transfer.
  *
@@ -27,7 +28,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
   permits EgressStopArrivalState {
 
   /**
-   * Used to initialize all none time based attributes.
+   * Used to initialize all none-time-based attributes.
    */
   static final int NOT_SET = -1;
 
@@ -39,8 +40,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   // Transit
   private T trip = null;
-  private int boardTime = NOT_SET;
-  private int boardStop = NOT_SET;
+  private int boardStopPosition = NOT_SET;
 
   // Transfer
   private int transferFromStop = NOT_SET;
@@ -89,7 +89,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   @Override
   public boolean arrivedByTransit() {
-    return boardStop != NOT_SET;
+    return boardStopPosition != NOT_SET;
   }
 
   @Override
@@ -99,20 +99,19 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   @Override
   public final int boardTime() {
-    return boardTime;
+    return trip.departure(boardStopPosition);
   }
 
   @Override
-  public final int boardStop() {
-    return boardStop;
+  public final int boardStopPosition() {
+    return boardStopPosition;
   }
 
   @Override
-  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+  public void arriveByTransit(int arrivalTime, int boardStopPosition, T trip) {
     this.onBoardArrivalTime = arrivalTime;
+    this.boardStopPosition = boardStopPosition;
     this.trip = trip;
-    this.boardTime = boardTime;
-    this.boardStop = boardStop;
   }
 
   @Override
@@ -158,9 +157,8 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
     builder
       .addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
       .addServiceTime("onBoardArrivalTime", onBoardArrivalTime, NOT_SET)
-      .addNum("boardStop", boardStop, NOT_SET)
-      .addServiceTime("boardTime", boardTime, NOT_SET)
-      .addObj("trip", trip == null ? null : trip.pattern().debugInfo())
+      .addNum("boardStopPosition", boardStopPosition, NOT_SET)
+      .addObj("trip", tripInfo())
       .addNum("transferFromStop", transferFromStop, NOT_SET);
 
     if (transferPath != null) {
@@ -180,8 +178,15 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
       this.onBoardArrivalTime = time;
       // Clear transit to avoid mistakes
       this.trip = null;
-      this.boardTime = NOT_SET;
-      this.boardStop = NOT_SET;
+      this.boardStopPosition = NOT_SET;
     }
+  }
+
+  private String tripInfo() {
+    return boardStopPosition == NOT_SET
+      ? null
+      : trip.pattern().debugInfo() +
+        " @" +
+        TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
   }
 }

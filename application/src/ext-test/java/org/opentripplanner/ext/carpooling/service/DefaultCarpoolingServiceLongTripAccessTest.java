@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -61,7 +60,7 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
   private static final float CAR_SPEED_MPS = 10.0f;
 
   private DefaultCarpoolingService service;
-  private CarpoolingRepository repository;
+  private CarpoolingServiceTestContext context;
   private TransitServiceResolver transitServiceResolver;
 
   private TransitStopVertex stopS;
@@ -100,9 +99,8 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
       }
     );
 
-    var context = CarpoolingServiceTestContext.of(model);
+    context = CarpoolingServiceTestContext.of(model);
     service = context.service();
-    repository = context.repository();
     transitServiceResolver = context.transitServiceResolver();
   }
 
@@ -113,7 +111,7 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
     var tripStart = SEARCH_TIME.plusMinutes(30);
     var tripEnd = tripStart.plusMinutes(60);
     var trip = CarpoolTripTestData.createSimpleTripWithTimes(coordA, coordD, tripStart, tripEnd);
-    repository.upsertCarpoolTrip(trip);
+    context.upsertTrip(trip);
 
     var request = RouteRequest.of()
       .withFrom(GenericLocation.fromCoordinate(coordP.latitude(), coordP.longitude()))

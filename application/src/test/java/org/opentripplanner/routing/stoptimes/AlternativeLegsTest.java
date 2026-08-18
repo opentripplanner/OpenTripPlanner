@@ -15,6 +15,7 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
 /**
@@ -35,7 +36,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testPreviousLegs() {
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(transitRepository);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "1.2"),
@@ -45,7 +46,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService);
+    ).getLeg(transitService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -68,7 +69,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testNextLegs() {
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(transitRepository);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "2.2"),
@@ -78,7 +79,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService);
+    ).getLeg(transitService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -101,7 +102,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testCircularRoutes() {
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(transitRepository);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -111,7 +112,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_Y,
       null
-    ).getLeg(transitService);
+    ).getLeg(transitService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -128,7 +129,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testComplexCircularRoutes() {
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(transitRepository);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -138,7 +139,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_B,
       null
-    ).getLeg(transitService);
+    ).getLeg(transitService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,

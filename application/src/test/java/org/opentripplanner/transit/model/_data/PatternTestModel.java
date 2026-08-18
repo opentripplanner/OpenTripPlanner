@@ -13,18 +13,18 @@ import org.opentripplanner.transit.service.SiteRepository;
 
 public class PatternTestModel {
 
-  public static final Route ROUTE_1 = TimetableRepositoryForTest.route("1").build();
+  public static final Route ROUTE_1 = TransitRepositoryForTest.route("1").build();
 
   private static final FeedScopedId SERVICE_ID = id("service");
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("t1")
+  private static final Trip TRIP = TransitRepositoryForTest.trip("t1")
     .withRoute(ROUTE_1)
     .withServiceId(SERVICE_ID)
     .build();
-  private static final TimetableRepositoryForTest MODEL = new TimetableRepositoryForTest(
+  private static final TransitRepositoryForTest MODEL = new TransitRepositoryForTest(
     SiteRepository.of()
   );
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
-  private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
+  private static final StopPattern STOP_PATTERN = TransitRepositoryForTest.stopPattern(
     STOP_1,
     STOP_1
   );
@@ -39,7 +39,7 @@ public class PatternTestModel {
       .withDepartureTimes("10:00 10:05")
       .build();
 
-    return TimetableRepositoryForTest.tripPattern("1", ROUTE_1)
+    return TransitRepositoryForTest.tripPattern("1", ROUTE_1)
       .withStopPattern(STOP_PATTERN)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tt))
       .build();

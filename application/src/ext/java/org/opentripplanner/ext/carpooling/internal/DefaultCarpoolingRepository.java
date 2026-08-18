@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
    */
   private static final Duration SWEEP_INTERVAL = Duration.ofHours(1);
 
-  private final Map<FeedScopedId, CarpoolTrip> trips = new ConcurrentHashMap<>();
+  private final Map<FeedScopedId, CarpoolTripWithVertices> trips = new ConcurrentHashMap<>();
 
   /**
    * Outcome of routing each trip's baseline, memoized across requests and tagged with the geometry
@@ -40,21 +41,28 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
 
   @Override
-  public Collection<CarpoolTrip> getCarpoolTrips() {
+  public Collection<CarpoolTripWithVertices> getCarpoolTrips() {
     return trips.values();
   }
 
   @Override
-  public void upsertCarpoolTrip(CarpoolTrip trip) {
-    CarpoolTrip existingTrip = trips.put(trip.getId(), trip);
+  @Nullable
+  public CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id) {
+    return trips.get(id);
+  }
+
+  @Override
+  public void upsertCarpoolTrip(CarpoolTripWithVertices tripWithVertices) {
+    CarpoolTrip trip = tripWithVertices.trip();
+    CarpoolTripWithVertices existing = trips.put(trip.getId(), tripWithVertices);
     // A read already validates the cached entry against the trip's geometry, so correctness does
     // not depend on this drop; it just promptly frees an entry whose route points changed instead
     // of letting it linger until the trip is removed or expires. A budget- or time-only update
     // keeps the same route points, so the entry survives and is reused.
-    if (existingTrip == null || !existingTrip.routePoints().equals(trip.routePoints())) {
+    if (existing == null || !existing.trip().routePoints().equals(trip.routePoints())) {
       baselineRouting.remove(trip.getId());
     }
-    if (existingTrip != null) {
+    if (existing != null) {
       LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     } else {
       LOG.debug("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
@@ -63,7 +71,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   @Override
   public void removeCarpoolTrip(FeedScopedId id) {
-    CarpoolTrip removed = trips.remove(id);
+    CarpoolTripWithVertices removed = trips.remove(id);
     baselineRouting.remove(id);
     if (removed != null) {
       LOG.debug("Removed carpool trip {}", id);
@@ -81,10 +89,11 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
     Instant expiryThreshold = now.minus(expiry);
     int removed = 0;
-    for (CarpoolTrip trip : trips.values()) {
+    for (CarpoolTripWithVertices tripWithVertices : trips.values()) {
+      CarpoolTrip trip = tripWithVertices.trip();
       if (
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
-        trips.remove(trip.getId(), trip)
+        trips.remove(trip.getId(), tripWithVertices)
       ) {
         baselineRouting.remove(trip.getId());
         removed++;

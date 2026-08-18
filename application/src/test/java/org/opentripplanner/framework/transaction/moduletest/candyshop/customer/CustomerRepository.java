@@ -14,7 +14,7 @@ public class CustomerRepository extends AbstractRepository<Customer> {
     this(new HashMap<>());
   }
 
-  CustomerSnapshot freeze() {
-    return new CustomerSnapshot(copyOfEntitiesById());
+  CustomerRepositorySnapshot freeze() {
+    return new CustomerRepositorySnapshot(copyOfEntitiesById());
   }
 }

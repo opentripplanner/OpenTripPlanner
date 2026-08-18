@@ -66,9 +66,8 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
   public void setNewBestTransitTime(
     int stop,
     int alightTime,
+    int boardStopPosition,
     T trip,
-    int boardStop,
-    int boardTime,
     boolean newBestOverall
   ) {
     bestNumberOfTransfers.arriveAtStop(stop);

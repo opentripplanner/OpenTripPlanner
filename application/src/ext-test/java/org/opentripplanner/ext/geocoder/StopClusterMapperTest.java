@@ -11,16 +11,16 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class StopClusterMapperTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
@@ -28,7 +28,7 @@ class StopClusterMapperTest {
   private static final SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStops(STOPS)
     .build();
-  private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
+  private static final TransitRepository TIMETABLE_REPOSITORY = new TransitRepository(
     SITE_REPOSITORY
   );
   private static final List<StopLocation> LOCATIONS = STOPS.stream()

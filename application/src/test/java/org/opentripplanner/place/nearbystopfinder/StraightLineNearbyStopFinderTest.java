@@ -32,7 +32,7 @@ class StraightLineNearbyStopFinderTest extends GraphRoutingTest {
         }
       }
     );
-    siteRepository = model.timetableRepository().getSiteRepository();
+    siteRepository = model.transitRepository().getSiteRepository();
   }
 
   @Test

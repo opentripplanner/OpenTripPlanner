@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -59,7 +59,7 @@ public class PlaceTest {
 
   @Test
   public void sameLocationBasedOnStopId() {
-    var testModel = TimetableRepositoryForTest.of();
+    var testModel = TransitRepositoryForTest.of();
     var s1 = testModel.stop("1").withCoordinate(1.0, 1.0).build();
     var s2 = testModel.stop("2").withCoordinate(1.0, 2.0).build();
 
@@ -142,7 +142,7 @@ public class PlaceTest {
 
   @Test
   public void forStop() {
-    var testModel = TimetableRepositoryForTest.of();
+    var testModel = TransitRepositoryForTest.of();
     var stop = testModel.stop("1").withCoordinate(1.0, 1.0).build();
 
     Place place = Place.forStop(stop);
@@ -157,7 +157,7 @@ public class PlaceTest {
 
   @Test
   public void forStopWithViaLocationType() {
-    var testModel = TimetableRepositoryForTest.of();
+    var testModel = TransitRepositoryForTest.of();
     var stop = testModel.stop("1").withCoordinate(1.0, 1.0).build();
     var type = ViaLocationType.PASS_THROUGH;
 

@@ -8,32 +8,32 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Adjust all scheduled times to match the transit model timezone.
  */
 public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   @Inject
-  public TimeZoneAdjusterModule(TimetableRepository timetableRepository) {
-    this.timetableRepository = timetableRepository;
+  public TimeZoneAdjusterModule(TransitRepository transitRepository) {
+    this.transitRepository = transitRepository;
   }
 
   @Override
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = timetableRepository.getTransitServiceStarts();
+    final Instant serviceStart = transitRepository.getTransitServiceStarts();
     var graphOffset = Duration.ofSeconds(
-      timetableRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
+      transitRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );
 
     Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
-    timetableRepository
+    transitRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
         var timeShift = agencyShift.computeIfAbsent(
@@ -51,8 +51,8 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
           .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
           .build();
         // replace the original pattern with the updated pattern in the transit model
-        timetableRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
+        transitRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
       });
-    timetableRepository.index();
+    transitRepository.index();
   }
 }

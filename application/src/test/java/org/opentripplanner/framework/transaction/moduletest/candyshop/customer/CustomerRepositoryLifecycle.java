@@ -9,15 +9,15 @@ import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
  * follow every task.
  */
 public class CustomerRepositoryLifecycle
-  implements RepositoryLifecycle<CustomerSnapshot, CustomerRepository> {
+  implements RepositoryLifecycle<CustomerRepositorySnapshot, CustomerRepository> {
 
   @Override
-  public CustomerRepository copyOnWrite(CustomerSnapshot snapshot) {
+  public CustomerRepository copyOnWrite(CustomerRepositorySnapshot snapshot) {
     return snapshot.copyOnWrite();
   }
 
   @Override
-  public CustomerSnapshot freeze(CustomerRepository repository) {
+  public CustomerRepositorySnapshot freeze(CustomerRepository repository) {
     return repository.freeze();
   }
 }

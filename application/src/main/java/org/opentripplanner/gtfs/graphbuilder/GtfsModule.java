@@ -5,17 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.Area;
-import org.onebusaway.gtfs.model.FareLegRule;
-import org.onebusaway.gtfs.model.FareMedium;
-import org.onebusaway.gtfs.model.FareProduct;
-import org.onebusaway.gtfs.model.FareTransferRule;
-import org.onebusaway.gtfs.model.RiderCategory;
-import org.onebusaway.gtfs.model.RouteNetworkAssignment;
-import org.onebusaway.gtfs.model.StopAreaElement;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
@@ -42,22 +31,11 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
-
-  public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
-    Area.class,
-    FareProduct.class,
-    FareLegRule.class,
-    FareMedium.class,
-    FareTransferRule.class,
-    RiderCategory.class,
-    RouteNetworkAssignment.class,
-    StopAreaElement.class
-  );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
   /**
@@ -68,7 +46,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
 
-  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
   private final StreetDetailsRepository streetDetailsRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
@@ -79,7 +57,7 @@ public class GtfsModule implements GraphBuilderModule {
 
   public GtfsModule(
     List<GtfsBundle> bundles,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
@@ -90,7 +68,7 @@ public class GtfsModule implements GraphBuilderModule {
     int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
-    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -106,13 +84,13 @@ public class GtfsModule implements GraphBuilderModule {
    */
   public static GtfsModule forTest(
     List<GtfsBundle> bundles,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,
-      timetableRepository,
+      transitRepository,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
@@ -132,7 +110,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     try {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
-        var gtfsDao = loadBundle(gtfsBundle);
+        var gtfsDao = gtfsBundle.loadDao();
 
         var feedId = gtfsBundle.getFeedId();
         verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
@@ -140,7 +118,7 @@ public class GtfsModule implements GraphBuilderModule {
         feedIdsEncountered.put(feedId, gtfsBundle);
 
         GTFSToTransitDataImportMapper mapper = new GTFSToTransitDataImportMapper(
-          new TransitDataImportBuilder(timetableRepository.getSiteRepository(), issueStore),
+          new TransitDataImportBuilder(transitRepository.getSiteRepository(), issueStore),
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
@@ -179,7 +157,7 @@ public class GtfsModule implements GraphBuilderModule {
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(
           deduplicator,
-          timetableRepository,
+          transitRepository,
           builder,
           calendarServiceData.getServiceIds(),
           geometryProcessor,
@@ -188,16 +166,11 @@ public class GtfsModule implements GraphBuilderModule {
 
         TransitDataImport dataImport = builder.build();
 
-        addTimetableRepositoryToGraph(
-          graph,
-          timetableRepository,
-          streetDetailsRepository,
-          dataImport
-        );
+        addTransitRepositoryToGraph(graph, transitRepository, streetDetailsRepository, dataImport);
 
         if (gtfsBundle.parameters().blockBasedInterlining()) {
           new InterlineProcessor(
-            timetableRepository.getConstrainedTransferService(),
+            transitRepository.getConstrainedTransferService(),
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
@@ -211,11 +184,11 @@ public class GtfsModule implements GraphBuilderModule {
       throw new RuntimeException(e);
     }
 
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.updateCalendarServiceData(calendarServiceData);
     TransitWithFutureDateValidator.validate(
       calendarServiceData,
       issueStore,
-      timetableRepository.getTimeZone()
+      transitRepository.getTimeZone()
     );
   }
 
@@ -269,7 +242,7 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private void createTripPatterns(
     DeduplicatorService deduplicator,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransitDataImportBuilder builder,
     Set<FeedScopedId> calServiceIds,
     GeometryProcessor geometryProcessor,
@@ -283,62 +256,26 @@ public class GtfsModule implements GraphBuilderModule {
       geometryProcessor
     );
     buildTPOp.run();
-    timetableRepository.setHasFrequencyService(
-      timetableRepository.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
+    transitRepository.setHasFrequencyService(
+      transitRepository.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
     );
-    timetableRepository.setHasScheduledService(
-      timetableRepository.hasScheduledService() || buildTPOp.hasScheduledTrips()
+    transitRepository.setHasScheduledService(
+      transitRepository.hasScheduledService() || buildTPOp.hasScheduledTrips()
     );
   }
 
-  private void addTimetableRepositoryToGraph(
+  private void addTransitRepositoryToGraph(
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StreetDetailsRepository streetDetailsRepository,
     TransitDataImport dataImport
   ) {
-    AddTransitEntitiesToTimetable.addToTimetable(dataImport, timetableRepository);
+    AddTransitEntitiesToTimetable.addToTimetable(dataImport, transitRepository);
     AddTransitEntitiesToGraph.addToGraph(
       dataImport,
       subwayAccessTime_s,
       graph,
       streetDetailsRepository
     );
-  }
-
-  private GtfsRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
-    var dao = new GtfsRelationalDaoImpl();
-    dao.setPackShapePoints(true);
-    LOG.info("reading {}", gtfsBundle.feedInfo());
-
-    String gtfsFeedId = gtfsBundle.getFeedId();
-
-    GtfsReader reader = new GtfsReader();
-    reader.setInputSource(gtfsBundle.getCsvInputSource());
-    reader.setEntityStore(dao);
-    reader.setInternStrings(true);
-    reader.setDefaultAgencyId(gtfsFeedId);
-
-    dao.open();
-    for (Class<?> entityClass : reader.getEntityClasses()) {
-      if (skipEntityClass(entityClass)) {
-        LOG.info("Skipping entity: {}", entityClass.getName());
-        continue;
-      }
-      LOG.info("Reading entity: {}", entityClass.getName());
-      reader.readEntities(entityClass);
-    }
-
-    dao.close();
-    return dao;
-  }
-
-  /**
-   * Since GTFS Fares V2 is a very new, constantly evolving standard there might be a lot of errors
-   * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
-   * it can easily lead to graph build failures.
-   */
-  private boolean skipEntityClass(Class<?> entityClass) {
-    return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
   }
 }

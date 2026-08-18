@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.event.DomainEvent;
@@ -39,7 +41,17 @@ class DefaultUpdateManager implements UpdateManager {
     @Nullable Duration commitInterval
   ) {
     this.transactionManager = transactionManager;
-    this.executor = Executors.newSingleThreadExecutor(threadFactory);
+    // Equivalent to Executors.newSingleThreadExecutor(threadFactory), except the executor is not
+    // hidden behind a delegating wrapper — micrometer needs the ThreadPoolExecutor itself to read
+    // queue and pool-size gauges without reflective access to JDK internals.
+    this.executor = new ThreadPoolExecutor(
+      1,
+      1,
+      0L,
+      TimeUnit.MILLISECONDS,
+      new LinkedBlockingQueue<>(),
+      threadFactory
+    );
     this.periodicCommitScheduler = commitInterval != null && !commitInterval.isZero()
       ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
       : null;
@@ -58,6 +70,11 @@ class DefaultUpdateManager implements UpdateManager {
   @Override
   public Future<Void> submit(Consumer<WriteContext> task) {
     return useAtomicCommit() ? submitAndAutoCommit(task) : submitAndReturn(task);
+  }
+
+  @Override
+  public ExecutorService writerThreadExecutor() {
+    return executor;
   }
 
   @Override

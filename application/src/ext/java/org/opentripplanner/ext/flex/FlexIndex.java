@@ -14,7 +14,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class FlexIndex {
 
@@ -28,10 +28,10 @@ public class FlexIndex {
 
   private final Multimap<StopLocation, Route> routeByStop;
 
-  public FlexIndex(TimetableRepository timetableRepository) {
+  public FlexIndex(TransitRepository transitRepository) {
     var routeByStopBuilder = ImmutableSetMultimap.<StopLocation, Route>builder();
 
-    for (FlexTrip<?, ?> flexTrip : timetableRepository.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : transitRepository.getAllFlexTrips()) {
       var route = flexTrip.getTrip().getRoute();
       routeById.put(route.getId(), route);
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
@@ -47,7 +47,7 @@ public class FlexIndex {
         }
       }
 
-      timetableRepository
+      transitRepository
         .getTripCalendar()
         .listServiceDates(flexTrip.getTrip().getServiceId())
         .forEach(serviceDate -> {

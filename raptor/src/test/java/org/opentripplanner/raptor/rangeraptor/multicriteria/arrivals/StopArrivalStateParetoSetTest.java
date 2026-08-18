@@ -139,7 +139,7 @@ public class StopArrivalStateParetoSetTest {
     int cost
   ) {
     var prev = prev(round);
-    var anyRide = new PatternRideC1<>(prev, ANY, ANY, ANY, ANY, ANY, ANY, ANY_TRIP);
+    var anyRide = new PatternRideC1<>(prev, ANY, ANY, ANY, ANY, ANY, ANY_TRIP);
     return STOP_ARRIVAL_FACTORY.createTransitStopArrival(anyRide, stop, arrivalTime, cost);
   }
 

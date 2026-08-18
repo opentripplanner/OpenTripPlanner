@@ -35,13 +35,13 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class OsmBoardingLocationsModuleTest {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   static Stream<Arguments> herrenbergTestCases() {
     return Stream.of(
@@ -89,7 +89,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
 
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepo);
+    var transitRepository = new TransitRepository(siteRepo);
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
@@ -114,7 +114,7 @@ class OsmBoardingLocationsModuleTest {
     var platformVertex = factory.transitStop(ofStop(platform));
     var busVertex = factory.transitStop(ofStop(busStop));
 
-    timetableRepository.index();
+    transitRepository.index();
     graph.index();
 
     assertEquals(0, busVertex.getIncoming().size());
@@ -126,7 +126,7 @@ class OsmBoardingLocationsModuleTest {
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
     new OsmBoardingLocationsModule(
       graph,
-      timetableRepository,
+      transitRepository,
       VertexLinkerTestFactory.of(graph),
       osmService
     ).buildGraph();
@@ -305,7 +305,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
     new OsmBoardingLocationsModule(
       graph,
-      new TimetableRepository(siteRepo),
+      new TransitRepository(siteRepo),
       VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
@@ -371,7 +371,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
 
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepo);
+    var transitRepository = new TransitRepository(siteRepo);
     var factory = new VertexFactory(graph);
 
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -388,7 +388,7 @@ class OsmBoardingLocationsModuleTest {
     var platformVertex1 = factory.transitStop(ofStop(platform1));
     var platformVertex2 = factory.transitStop(ofStop(platform2));
 
-    timetableRepository.index();
+    transitRepository.index();
     graph.index();
 
     // Both vertices should start unlinked
@@ -400,7 +400,7 @@ class OsmBoardingLocationsModuleTest {
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
     new OsmBoardingLocationsModule(
       graph,
-      timetableRepository,
+      transitRepository,
       VertexLinkerTestFactory.of(graph),
       osmService
     ).buildGraph();

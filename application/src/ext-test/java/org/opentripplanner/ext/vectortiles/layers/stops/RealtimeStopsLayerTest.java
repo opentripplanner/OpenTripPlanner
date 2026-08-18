@@ -21,13 +21,12 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class RealtimeStopsLayerTest {
 
@@ -56,19 +55,13 @@ public class RealtimeStopsLayerTest {
 
   @Test
   void realtimeStopLayer() {
-    var timetableRepository = new TimetableRepository(new SiteRepository());
+    var timetableRepository = new TransitRepository(new SiteRepository());
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
+    var transitService = new DefaultTransitService(timetableRepository);
+    var transitAlertService = new TransitAlertServiceImpl();
 
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
-
-    Route route = TimetableRepositoryForTest.route("route").build();
+    Route route = TransitRepositoryForTest.route("route").build();
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();
@@ -79,14 +72,19 @@ public class RealtimeStopsLayerTest {
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    transitAlertService.setAlerts(List.of(alert));
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      transitAlertService
+    );
 
     DigitransitRealtimeStopPropertyMapper mapper = new DigitransitRealtimeStopPropertyMapper(
       transitService,
+      transitAlertService,
       new Locale("en-US")
     );
 

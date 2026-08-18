@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
@@ -88,7 +87,6 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   private PathMapper<T> createPathMapper(boolean includeCost) {
     return createPathMapper(
-      ctx.profile(),
       ctx.searchDirection(),
       ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
@@ -99,7 +97,6 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-    RaptorProfile profile,
     SearchDirection searchDirection,
     RaptorSlackProvider slackProvider,
     RaptorCostCalculator<S> costCalculator,
@@ -113,15 +110,13 @@ public class PathConfig<T extends RaptorTripSchedule> {
           costCalculator,
           stopNameResolver,
           txConstraintsSearch,
-          lifeCycle,
-          profile.useApproximateTripSearch()
+          lifeCycle
         )
       : new ReversePathMapper<>(
           slackProvider,
           costCalculator,
           stopNameResolver,
-          txConstraintsSearch,
-          profile.useApproximateTripSearch()
+          txConstraintsSearch
         );
   }
 }

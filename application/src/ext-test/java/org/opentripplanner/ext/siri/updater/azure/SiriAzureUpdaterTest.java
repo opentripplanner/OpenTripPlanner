@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryException;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
@@ -58,7 +59,9 @@ class SiriAzureUpdaterTest {
         mockConfig,
         new SiriAzureMessageHandler() {
           @Override
-          public void setup(WriteToGraphCallback writeToGraphCallback) {}
+          public void setup(
+            WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
+          ) {}
 
           @Override
           @Nullable
@@ -77,7 +80,9 @@ class SiriAzureUpdaterTest {
       config,
       new SiriAzureMessageHandler() {
         @Override
-        public void setup(WriteToGraphCallback writeToGraphCallback) {}
+        public void setup(
+          WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
+        ) {}
 
         @Override
         @Nullable

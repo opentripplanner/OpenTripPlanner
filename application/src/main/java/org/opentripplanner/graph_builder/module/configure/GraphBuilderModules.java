@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module.configure;
 
-import static org.opentripplanner.datastore.api.FileType.DEM;
-
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
@@ -26,7 +24,8 @@ import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidat
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
-import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningModule;
+import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -55,7 +54,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -129,7 +128,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     DeduplicatorService deduplicator,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     FareServiceFactory fareServiceFactory
@@ -140,7 +139,7 @@ public class GraphBuilderModules {
     }
     return new GtfsModule(
       gtfsBundles,
-      timetableRepository,
+      transitRepository,
       streetDetailsRepository,
       graph,
       deduplicator,
@@ -159,14 +158,14 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     DeduplicatorService deduplicator,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     StreetDetailsRepository streetDetailsRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore
   ) {
     return new NetexConfigure(config).createNetexModule(
       dataSources.getNetexConfiguredDataSource(),
-      timetableRepository,
+      transitRepository,
       parkingRepository,
       streetDetailsRepository,
       graph,
@@ -180,17 +179,11 @@ public class GraphBuilderModules {
   static StreetLinkerModule provideStreetLinkerModule(
     Graph graph,
     VehicleParkingRepository parkingRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
-    return new StreetLinkerModule(
-      graph,
-      linker,
-      parkingRepository,
-      timetableRepository,
-      issueStore
-    );
+    return new StreetLinkerModule(graph, linker, parkingRepository, transitRepository, issueStore);
   }
 
   @Provides
@@ -204,29 +197,29 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static PruneIslands providePruneIslands(
+  static IslandPruningModule provideIslandPruningModule(
     BuildConfig config,
     Graph graph,
     VehicleParkingRepository parkingRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
-    PruneIslands pruneIslands = new PruneIslands(
+    var parameters = IslandPruningParameters.of()
+      .withPruningThresholdIslandWithoutStops(
+        config.islandPruning.pruningThresholdIslandWithoutStops
+      )
+      .withPruningThresholdIslandWithStops(config.islandPruning.pruningThresholdIslandWithStops)
+      .withAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor)
+      .withAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance)
+      .build();
+    return new IslandPruningModule(
       graph,
-      timetableRepository,
+      transitRepository,
       issueStore,
-      new StreetLinkerModule(graph, linker, parkingRepository, timetableRepository, issueStore)
+      new StreetLinkerModule(graph, linker, parkingRepository, transitRepository, issueStore),
+      parameters
     );
-    pruneIslands.setPruningThresholdIslandWithoutStops(
-      config.islandPruning.pruningThresholdIslandWithoutStops
-    );
-    pruneIslands.setPruningThresholdIslandWithStops(
-      config.islandPruning.pruningThresholdIslandWithStops
-    );
-    pruneIslands.setAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor);
-    pruneIslands.setAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance);
-    return pruneIslands;
   }
 
   @Provides
@@ -245,7 +238,7 @@ public class GraphBuilderModules {
       gridCoverageFactories.add(
         createNedElevationFactory(dataSources.getNedCacheDirectory(), config)
       );
-    } else if (dataSources.has(DEM)) {
+    } else if (dataSources.hasDem()) {
       gridCoverageFactories.addAll(
         createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );
@@ -264,13 +257,13 @@ public class GraphBuilderModules {
   static DirectTransferGenerator provideDirectTransferGenerator(
     BuildConfig config,
     Graph graph,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferGenerator(
       graph,
-      timetableRepository,
+      transitRepository,
       transferRepository,
       issueStore,
       config.regularTransferParameters()
@@ -283,13 +276,13 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     VertexLinker linker,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferAnalyzer(
       graph,
       linker,
-      timetableRepository,
+      transitRepository,
       issueStore,
       config.regularTransferParameters().maxDuration().toSeconds() * WalkPreferences.DEFAULT.speed()
     );
@@ -341,13 +334,13 @@ public class GraphBuilderModules {
   @Singleton
   @Nullable
   static StopConsolidationModule providesStopConsolidationModule(
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
       .stopConsolidation()
-      .map(ds -> StopConsolidationModule.of(timetableRepository, repo, ds))
+      .map(ds -> StopConsolidationModule.of(transitRepository, repo, ds))
       .orElse(null);
   }
 
@@ -357,12 +350,12 @@ public class GraphBuilderModules {
   static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
     DataImportIssueStore issueStore,
     BuildConfig config,
-    TimetableRepository timetableRepository
+    TransitRepository transitRepository
   ) {
     var ids = config.transitRouteToStationCentroid();
     return ids.isEmpty()
       ? null
-      : new RouteToCentroidStationIdsValidator(issueStore, ids, timetableRepository);
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, transitRepository);
   }
 
   @Provides

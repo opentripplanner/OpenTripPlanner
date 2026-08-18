@@ -318,8 +318,8 @@ public class TestTransitData
     int toStop,
     TestTransferConstraint constraint
   ) {
-    int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStop);
-    int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStop);
+    int fromStopPos = fromTrip.pattern().findAlightStopPositionAfter(0, fromStop);
+    int toStopPos = toTrip.pattern().findBoardStopPositionAfter(0, toStop);
 
     for (TestRoute route : routes) {
       route.addTransferConstraint(fromTrip, fromStopPos, toTrip, toStopPos, constraint);

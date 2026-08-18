@@ -25,6 +25,12 @@ public interface StopLocation extends LogInfo {
   FeedScopedId getId();
 
   /**
+   * The IDs for the StopLocation and its parent station (if the location is part of a station). The
+   * location's id comes first and the station is the second id in the list.
+   */
+  List<FeedScopedId> getIdAndParentStationId();
+
+  /**
    * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.  This is used
    * to optimize routing, we do not access the stop instance only keep the {code index}. The index will not change.
    * <p>

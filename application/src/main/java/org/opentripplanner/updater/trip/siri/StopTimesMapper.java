@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -13,11 +12,9 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 class StopTimesMapper {
 
   private final EntityResolver entityResolver;
-  private final ZoneId zoneId;
 
-  public StopTimesMapper(EntityResolver entityResolver, ZoneId zoneId) {
+  public StopTimesMapper(EntityResolver entityResolver) {
     this.entityResolver = entityResolver;
-    this.zoneId = zoneId;
   }
 
   /**
@@ -26,7 +23,7 @@ class StopTimesMapper {
   @Nullable
   StopTime createAimedStopTime(
     Trip trip,
-    ZonedDateTime departureDate,
+    ZonedDateTime startOfService,
     int stopSequence,
     CallWrapper call,
     boolean isFirstStop,
@@ -57,9 +54,8 @@ class StopTimesMapper {
       : call.getAimedDepartureTime();
 
     var aimedArrivalTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
-      departureDate,
-      aimedArrivalTime,
-      zoneId
+      startOfService,
+      aimedArrivalTime
     );
 
     var aimedDepartureTime = call.getAimedDepartureTime() != null
@@ -67,14 +63,12 @@ class StopTimesMapper {
       : call.getAimedArrivalTime();
 
     var aimedDepartureTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
-      departureDate,
-      aimedDepartureTime,
-      zoneId
+      startOfService,
+      aimedDepartureTime
     );
 
-    // Use departure time for first stop, and arrival time for last stop, to avoid negative dwell times
-    stopTime.setArrivalTime(isFirstStop ? aimedDepartureTimeSeconds : aimedArrivalTimeSeconds);
-    stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
+    stopTime.setArrivalTime(aimedArrivalTimeSeconds);
+    stopTime.setDepartureTime(aimedDepartureTimeSeconds);
 
     // Update destination display
     var destinationDisplay = call.destinationDisplay();

@@ -33,6 +33,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -484,6 +485,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<StopArrival> to();
     public DataFetcher<Boolean> transitLeg();
     public DataFetcher<Trip> trip();
+    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
     public DataFetcher<Boolean> walkingBike();
   }
 
@@ -549,6 +551,12 @@ public class GraphQLDataFetchers {
     }
   }
 
+  /**
+   * A textual message about a transit entity that is already known at planning time.
+   *
+   * It is not intended to convey real-time or emergency updates of the transit system but information that
+   * is known well ahead of time.
+   */
   public interface GraphQLNotice {
     public DataFetcher<String> text();
   }
@@ -587,6 +595,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Trip>> trips();
     public DataFetcher<Iterable<Trip>> tripsForDate();
+    public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate();
     public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions();
   }
 
@@ -740,6 +749,15 @@ public class GraphQLDataFetchers {
   public interface GraphQLRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
     public DataFetcher<java.time.OffsetDateTime> time();
+  }
+
+  /** The real-time state of a trip */
+  public interface GraphQLRealTimeTripState {
+    public DataFetcher<Boolean> added();
+    public DataFetcher<Boolean> canceled();
+    public DataFetcher<Boolean> timesModified();
+    public DataFetcher<Boolean> tripPatternModified();
+    public DataFetcher<Boolean> updated();
   }
 
   /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
@@ -926,6 +944,7 @@ public class GraphQLDataFetchers {
    * This may contain real-time information, if available.
    */
   public interface GraphQLStopCall {
+    public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<CallRealTime> realTime();
     public DataFetcher<CallSchedule> schedule();
     public DataFetcher<Object> stopLocation();
@@ -1039,6 +1058,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> isReplacement();
     public DataFetcher<Iterable<org.opentripplanner.transit.model.basic.Notice>> notices();
     public DataFetcher<TripOccupancy> occupancy();
+    public DataFetcher<TripOnServiceDate> onServiceDate();
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Boolean> replacementsExist();
     public DataFetcher<Route> route();
@@ -1069,6 +1089,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLTripOnServiceDate {
     public DataFetcher<TripTimeOnDate> end();
     public DataFetcher<Boolean> isReplacement();
+    public DataFetcher<RealTimeTripStateModel> realTimeTripState();
     public DataFetcher<Iterable<ReplacedByRelation>> replacedByRelation();
     public DataFetcher<Iterable<ReplacementForRelation>> replacementForRelation();
     public DataFetcher<java.time.LocalDate> serviceDate();

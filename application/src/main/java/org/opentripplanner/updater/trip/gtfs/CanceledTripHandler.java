@@ -7,8 +7,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
@@ -22,11 +22,11 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
  */
 class CanceledTripHandler {
 
-  private final TransitEditorService transitEditorService;
-  private final MutableTimetableSnapshot buffer;
+  private final TransitService transitService;
+  private final TimetableRepository buffer;
 
-  CanceledTripHandler(TransitEditorService transitEditorService, MutableTimetableSnapshot buffer) {
-    this.transitEditorService = transitEditorService;
+  CanceledTripHandler(TransitService transitService, TimetableRepository buffer) {
+    this.transitService = transitService;
     this.buffer = buffer;
   }
 
@@ -95,8 +95,8 @@ class CanceledTripHandler {
   }
 
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitEditorService.getTrip(tripId);
-    return transitEditorService.findPattern(trip);
+    Trip trip = transitService.getTrip(tripId);
+    return transitService.findPattern(trip);
   }
 
   private enum CancelationType {

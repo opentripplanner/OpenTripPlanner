@@ -18,7 +18,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
@@ -47,6 +46,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -56,12 +56,12 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not TimetableRepository.
- *   Is this intentional, because RaptorTransitData is meant to be read-only and TimetableRepository is not?
+ * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not TransitRepository.
+ *   Is this intentional, because RaptorTransitData is meant to be read-only and TransitRepository is not?
  *   Should this be renamed TransitDataService since it seems to provide access to the data but
  *   not to transit routing functionality (which is provided by the RoutingService)?
- *   The DefaultTransitService implementation has a TimetableRepository instance and many of its methods
- *   read through to that TimetableRepository instance. But that field itself is not exposed, while the
+ *   The DefaultTransitService implementation has a TransitRepository instance and many of its methods
+ *   read through to that TransitRepository instance. But that field itself is not exposed, while the
  *   RaptorTransitData is here. It seems like exposing the raw RaptorTransitData is still a risk since it's
  *   copy-on-write and shares a lot of objects with any other RaptorTransitData instances.
  */
@@ -189,6 +189,23 @@ public interface TransitService {
    */
   @Nullable
   Trip getTrip(FeedScopedId id);
+
+  /**
+   * Return the trip for the given id, not including trips created in real time.
+   */
+  @Nullable
+  Trip getScheduledTrip(FeedScopedId id);
+
+  /**
+   * Get or create a serviceId for a given date. This method is used when a new trip is added from
+   * a real-time data update. It makes sure the date is in the existing transit service period.
+   *
+   * @param serviceDate service date for the added service id
+   * @return service-id for date if it exists or is created. If the given service date is outside
+   * the service period {@code null} is returned.
+   */
+  @Nullable
+  FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
 
   /**
    * Return all trips, including those created by real-time updates.
@@ -351,8 +368,6 @@ public interface TransitService {
 
   ZoneId getTimeZone();
 
-  TransitAlertService getTransitAlertService();
-
   FlexIndex getFlexIndex();
 
   Instant getTransitServiceEnds();
@@ -417,7 +432,7 @@ public interface TransitService {
   boolean containsTrip(FeedScopedId id);
 
   /**
-   * @see TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint);
 
@@ -450,4 +465,11 @@ public interface TransitService {
    * as TransitService.
    */
   ReplacementHelper getReplacementHelper();
+
+  /**
+   * @return the current (real-time if available, otherwise scheduled) trip times
+   *         for the given trip on the given service date, or empty if the
+   *         trip does not run on that date.
+   */
+  Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 }
