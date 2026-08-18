@@ -251,7 +251,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         carpoolingRequest.getPassengerDropoff()
       );
       if (passengerPickupVertex == null || passengerDropoffVertex == null) {
-        LOG.warn("Could not link passenger origin/destination to graph");
+        LOG.info("Could not link passenger origin/destination to graph");
         return List.of();
       }
 
@@ -413,7 +413,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
 
       if (passengerAccessEgressVertex == null) {
-        LOG.error("Could not link passenger coordinates {} to graph", passengerCoordinates);
+        LOG.info("Could not link passenger coordinates {} to graph", passengerCoordinates);
         return List.of();
       }
 

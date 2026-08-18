@@ -249,9 +249,9 @@ public class CarpoolSiriMapper {
    * Extracts the total capacity from the EstimatedCalls' ExpectedDepartureCapacities.
    * Expects the cancelled calls to have already been filtered out. Only the first element
    * of each call's capacities list is inspected; additional entries are ignored. Uses the
-   * value from the first call that has it. Logs a warning if calls report different capacity
-   * values. Returns {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data
-   * or if the value is invalid.
+   * value from the first call that has it; a differing value in a later call is ignored.
+   * Returns {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data or if
+   * the value is invalid.
    */
   private int extractTotalCapacity(String tripId, List<EstimatedCall> calls) {
     Integer firstCapacity = null;
@@ -271,7 +271,7 @@ public class CarpoolSiriMapper {
         firstCapacity = intValue;
         firstCapacityIndex = i;
       } else if (intValue != firstCapacity) {
-        LOG.warn(
+        LOG.info(
           "Trip {}: totalCapacity differs between calls (call {} has {}, call {} has {})",
           tripId,
           firstCapacityIndex,
@@ -286,7 +286,7 @@ public class CarpoolSiriMapper {
       return DEFAULT_TOTAL_CAPACITY;
     }
     if (firstCapacity <= 0) {
-      LOG.warn(
+      LOG.info(
         "Trip {}: invalid totalCapacity {} at call {}, using default {}",
         tripId,
         firstCapacity,
@@ -310,7 +310,7 @@ public class CarpoolSiriMapper {
       if (onboardCount != null) {
         int value = onboardCount.intValue();
         if (value <= 0) {
-          LOG.warn(
+          LOG.info(
             "Trip {}: invalid onboardCount {}, using default {}",
             tripId,
             value,
@@ -340,9 +340,9 @@ public class CarpoolSiriMapper {
    *   <li>Returns {@link CarpoolStop#DEFAULT_DEVIATION_BUDGET} if either timestamp is missing.
    *       This is intentionally permissive — the absence of a commitment should not block
    *       insertions.</li>
-   *   <li>Returns {@link Duration#ZERO} (and logs a warning) if {@code latestExpectedArrivalTime}
-   *       is before the arrival time — the schedule has slipped past the commitment, so no
-   *       further deviation is acceptable.</li>
+   *   <li>Returns {@link Duration#ZERO} if {@code latestExpectedArrivalTime} is before the
+   *       arrival time — the schedule has slipped past the commitment, so no further deviation
+   *       is acceptable.</li>
    * </ul>
    */
   private Duration extractDeviationBudget(EstimatedCall call) {
@@ -357,7 +357,7 @@ public class CarpoolSiriMapper {
 
     Duration budget = Duration.between(arrivalTime, latestExpected);
     if (budget.isNegative()) {
-      LOG.warn(
+      LOG.info(
         "latestExpectedArrivalTime ({}) is before arrivalTime ({}), using zero deviation budget",
         latestExpected,
         arrivalTime
@@ -380,7 +380,7 @@ public class CarpoolSiriMapper {
     ZonedDateTime lastTime = calls.getLast().getAimedArrivalTime();
 
     if (firstTime == null || lastTime == null) {
-      LOG.warn("Cannot validate call order - missing timing information in first or last call");
+      LOG.info("Cannot validate call order - missing timing information in first or last call");
       return;
     }
 
@@ -402,7 +402,7 @@ public class CarpoolSiriMapper {
         : intermediateCall.getAimedArrivalTime();
 
       if (intermediateTime == null) {
-        LOG.warn("Intermediate call at index {} has no timing information", i);
+        LOG.info("Intermediate call at index {} has no timing information", i);
         continue;
       }
 
