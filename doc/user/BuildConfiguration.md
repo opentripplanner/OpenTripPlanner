@@ -57,6 +57,8 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                                                 |       `object`       | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)                          |       `double`       | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                                         |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
+| [elevatorRefTags](#elevatorRefTags)                                                         |      `object[]`      | Groups of OSM tags whose values are combined into elevator ids.                                                                                                | *Optional* |                                   |  2.10 |
+|       [tagGroup](#elevatorRefTags_0_tagGroup)                                               |      `string[]`      | The ordered OSM tag keys whose values are combined into one id.                                                                                                | *Optional* |                                   |  2.10 |
 | [emission](sandbox/Emission.md)                                                             |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | empiricalDelay                                                                              |       `object`       | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
 | [fares](sandbox/Fares.md)                                                                   |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
@@ -780,6 +782,26 @@ for the next graph build operation. You should add the `--cache <directory>` com
 to specify your NED tile cache location.
 
 
+<h3 id="elevatorRefTags">elevatorRefTags</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Groups of OSM tags whose values are combined into elevator ids.
+
+Each group is a list of one or more OSM tag keys. If every tag in a group is present
+on an elevator node/way, their values are joined with ':' (in the given order) into
+one id. A group with a single tag key produces a plain id. If any tag in a group is
+missing, that group produces no id. Configuring more than one group can produce more
+than one id for the same elevator.
+
+<h3 id="elevatorRefTags_0_tagGroup">tagGroup</h3>
+
+**Since version:** `2.10` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /elevatorRefTags/[0] 
+
+The ordered OSM tag keys whose values are combined into one id.
+
 <h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>
 
 **Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
@@ -1328,6 +1350,14 @@ the centroid.
       "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
       "timeZone" : "Europe/Oslo",
       "osmTagMapping" : "norway"
+    }
+  ],
+  "elevatorRefTags" : [
+    {
+      "tagGroup" : [
+        "manufacturer",
+        "ref"
+      ]
     }
   ],
   "demDefaults" : {

@@ -39,6 +39,7 @@ import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferPara
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
+import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
@@ -169,6 +170,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
   public final Set<String> boardingLocationTags;
+  public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
@@ -495,6 +497,28 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .description("[Detailed documentation](BoardingLocations.md)")
       .asStringSet(List.copyOf(Set.of("ref")));
+    elevatorRefTags = root
+      .of("elevatorRefTags")
+      .since(V2_10)
+      .summary("Groups of OSM tags whose values are combined into elevator ids.")
+      .description(
+        """
+        Each group is a list of one or more OSM tag keys. If every tag in a group is present
+        on an elevator node/way, their values are joined with ':' (in the given order) into
+        one id. A group with a single tag key produces a plain id. If any tag in a group is
+        missing, that group produces no id. Configuring more than one group can produce more
+        than one id for the same elevator."""
+      )
+      .asObjects(List.of(), node ->
+        CompoundRefTagGroup.of(
+          node
+            .of("tagGroup")
+            .since(V2_10)
+            .summary("The ordered OSM tag keys whose values are combined into one id.")
+            .asStringList(List.of())
+            .toArray(String[]::new)
+        )
+      );
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")

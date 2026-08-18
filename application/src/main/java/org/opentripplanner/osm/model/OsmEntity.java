@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -820,6 +822,22 @@ public abstract class OsmEntity {
       }
     }
     return result;
+  }
+
+  /**
+   * Combines the values of one or more tags into a single id, for each given group of tag keys.
+   * <p>
+   * Each group's tag values are joined with {@code :} in the given order. If any tag in a group
+   * is missing from this entity, that group contributes no id. A group with a single tag key
+   * produces a plain (non-compound) id.
+   */
+  public Set<String> getCompoundTagValues(List<CompoundRefTagGroup> tagGroups) {
+    return tagGroups
+      .stream()
+      .map(tagGroup -> tagGroup.compoundValue(this::getTag))
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .collect(Collectors.toSet());
   }
 
   public OsmProvider getOsmProvider() {

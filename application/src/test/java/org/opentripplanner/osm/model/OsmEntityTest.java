@@ -221,6 +221,29 @@ public class OsmEntityTest {
   }
 
   @Test
+  void getCompoundTagValuesSingleTagGroup() {
+    var osm = new OsmTestEntity("ref", "E1");
+
+    assertEquals(Set.of("E1"), osm.getCompoundTagValues(List.of(CompoundRefTagGroup.of("ref"))));
+  }
+
+  @Test
+  void getCompoundTagValuesUnionsMultipleGroupsAndSkipsMissingTags() {
+    var osm = new OsmTestEntity(Map.of("manufacturer", "KONE", "ref", "12345"));
+
+    assertEquals(
+      Set.of("12345", "KONE:12345"),
+      osm.getCompoundTagValues(
+        List.of(
+          CompoundRefTagGroup.of("ref"),
+          CompoundRefTagGroup.of("manufacturer", "ref"),
+          CompoundRefTagGroup.of("missing")
+        )
+      )
+    );
+  }
+
+  @Test
   void isWheelchairAccessible() {
     var osm1 = new OsmTestEntity();
     assertTrue(osm1.isWheelchairAccessible());
