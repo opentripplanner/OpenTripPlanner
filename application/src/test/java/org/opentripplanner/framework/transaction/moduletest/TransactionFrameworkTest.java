@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,7 +91,7 @@ public class TransactionFrameworkTest {
   }
 
   private void setupUpdateManagerWithAutoCommits() {
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("AutoCommit").build();
+    var threadFactory = Thread.ofPlatform().name("AutoCommit").factory();
     updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       getClass().getSimpleName(),
       registry,
@@ -133,7 +132,7 @@ public class TransactionFrameworkTest {
   }
 
   private void setupUpdateManagerWithPeriodicCommits() {
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("AutoCommit").build();
+    var threadFactory = Thread.ofPlatform().name("AutoCommit").factory();
     updateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
       getClass().getSimpleName(),
       registry,
