@@ -5,11 +5,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -59,6 +63,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
 
     // Binding for all request-scoped services used by resources
     bridge(factory, RequestScopedFactory::transitService, TransitService.class);
+    bridge(factory, RequestScopedFactory::transitAlertService, TransitAlertService.class);
     bridge(factory, RequestScopedFactory::createServerContext, OtpServerRequestContext.class);
     bridge(factory, RequestScopedFactory::graph, Graph.class);
     bridge(factory, RequestScopedFactory::defaultRouteRequest, RouteRequest.class);
@@ -70,6 +75,9 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::streetDetailsService, StreetDetailsService.class);
     bridge(factory, RequestScopedFactory::transferService, RegularTransferService.class);
     bridge(factory, RequestScopedFactory::vectorTileConfig, VectorTileConfig.class);
+    bridge(factory, RequestScopedFactory::gtfsApiParameters, GtfsApiParameters.class);
+    bridge(factory, RequestScopedFactory::transmodelAPIParameters, TransmodelAPIParameters.class);
+    bridge(factory, RequestScopedFactory::transmodelGraphQLSchema, TransmodelGraphQLSchema.class);
     bridge(factory, RequestScopedFactory::linkingContextFactory, LinkingContextFactory.class);
     bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);

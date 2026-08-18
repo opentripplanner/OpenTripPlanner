@@ -29,9 +29,10 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
 class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
-  private final TransitEditorService transitService;
+  private final TransitService transitService;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> getTripPatternId;
@@ -68,7 +69,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
-    TransitEditorService transitService,
+    TransitService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
@@ -118,11 +119,11 @@ class AddedTripBuilder {
     timeZone = transitService.getTimeZone();
 
     replacedTrips = getReplacedVehicleJourneys(journey);
-    stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
+    stopTimesMapper = new StopTimesMapper(entityResolver);
   }
 
   AddedTripBuilder(
-    TransitEditorService transitService,
+    TransitService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
@@ -166,7 +167,7 @@ class AddedTripBuilder {
     this.replacedTrips = replacedTrips;
     this.dataSource = dataSource;
     this.vehicleRef = vehicleRef;
-    stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
+    stopTimesMapper = new StopTimesMapper(entityResolver);
   }
 
   TripUpdate build() throws UpdateException {
@@ -197,14 +198,14 @@ class AddedTripBuilder {
 
     Trip trip = createTrip(route, calServiceId);
 
-    ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
+    ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, timeZone);
 
     // Create the "scheduled version" of the trip
     var aimedStopTimes = new ArrayList<StopTime>();
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
-        departureDate,
+        startOfService,
         stopSequence,
         calls.get(stopSequence),
         stopSequence == 0,
@@ -245,7 +246,7 @@ class AddedTripBuilder {
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       TimetableHelper.applyUpdates(
-        departureDate,
+        startOfService,
         builder,
         stopSequence,
         stopSequence == (calls.size() - 1),

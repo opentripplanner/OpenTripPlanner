@@ -16,8 +16,6 @@ public class SeverityMapper {
       return "normal";
     }
     switch (severity) {
-      case UNDEFINED:
-        return "undefined";
       case UNKNOWN_SEVERITY:
         return "unknown";
       case INFO:

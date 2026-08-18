@@ -34,7 +34,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
-import org.opentripplanner.transit.service.TransitService;
 
 public class EstimatedCallType {
 
@@ -162,7 +161,10 @@ public class EstimatedCallType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("realtimeState")
           .type(new GraphQLNonNull(EnumTypes.REALTIME_STATE))
-          .dataFetcher(env -> getRealtimeStateOnStop(env))
+          .deprecate(
+            "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state."
+          )
+          .dataFetcher(EstimatedCallType::getRealtimeStateOnStop)
           .build()
       )
       .field(
@@ -289,7 +291,9 @@ public class EstimatedCallType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
-          .dataFetcher(env -> getAllRelevantAlerts(env.getSource(), GqlUtil.getTransitService(env)))
+          .dataFetcher(env ->
+            getAllRelevantAlerts(env.getSource(), GqlUtil.getTransitAlertService(env))
+          )
           .build()
       )
       .field(
@@ -374,7 +378,7 @@ public class EstimatedCallType {
    */
   private static Collection<TransitAlert> getAllRelevantAlerts(
     TripTimeOnDate tripTimeOnDate,
-    TransitService transitService
+    TransitAlertService alertPatchService
   ) {
     Trip trip = tripTimeOnDate.getTrip();
     FeedScopedId tripId = trip.getId();
@@ -384,8 +388,6 @@ public class EstimatedCallType {
     FeedScopedId stopId = stop.getId();
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
-
-    TransitAlertService alertPatchService = transitService.getTransitAlertService();
 
     final LocalDate serviceDate = tripTimeOnDate.getServiceDay();
 

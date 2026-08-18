@@ -104,6 +104,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add pickup/drop off filter to canceledCalls [#7858](https://github.com/opentripplanner/OpenTripPlanner/pull/7858)
 - SIRI: Map terminal times as provided by the feed [#7864](https://github.com/opentripplanner/OpenTripPlanner/pull/7864)
 - Replace raptor stop index with position [#7811](https://github.com/opentripplanner/OpenTripPlanner/pull/7811)
+- Fix TransitAlertService is null for vector tiles [#7902](https://github.com/opentripplanner/OpenTripPlanner/pull/7902)
+- Deprecate RealtimeState in both APIs [#7748](https://github.com/opentripplanner/OpenTripPlanner/pull/7748)
+- Remove UNDEFINED alert severity [#7883](https://github.com/opentripplanner/OpenTripPlanner/pull/7883)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)

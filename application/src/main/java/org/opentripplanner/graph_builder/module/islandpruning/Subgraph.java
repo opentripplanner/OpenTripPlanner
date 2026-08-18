@@ -113,7 +113,7 @@ class Subgraph {
   }
 
   /**
-   * Get a {@link Geometry for all the contained vertices}
+   * Get a {@link Geometry} for all the contained vertices
    */
   Geometry getGeometry() {
     List<Point> points = new ArrayList<>();

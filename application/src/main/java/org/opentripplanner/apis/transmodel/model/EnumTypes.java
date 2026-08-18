@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model;
 
 import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLEnumValueDefinition;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -366,10 +367,23 @@ public class EnumTypes {
     .value("noImpact", "noImpact", "Situation has no impact on trips.")
     .value("verySlight", "verySlight", "Situation has a very slight impact on trips.")
     .value("slight", "slight", "Situation has a slight impact on trips.")
-    .value("normal", "normal", "Situation has an impact on trips (default).")
+    .value(
+      "normal",
+      "normal",
+      "Situation has an impact on trips (default). Used for SIRI severities `normal` and `undefined`."
+    )
     .value("severe", "severe", "Situation has a severe impact on trips.")
     .value("verySevere", "verySevere", "Situation has a very severe impact on trips.")
-    .value("undefined", "undefined", "Severity is undefined.")
+    .value(
+      GraphQLEnumValueDefinition.newEnumValueDefinition()
+        .name("undefined")
+        .value("undefined")
+        .description("Severity is undefined.")
+        .deprecationReason(
+          "This value is never returned, and filtering on it matches no situations. SIRI severity `undefined` is mapped to `normal`."
+        )
+        .build()
+    )
     .build();
 
   /**

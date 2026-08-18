@@ -42,6 +42,7 @@ import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -332,6 +333,20 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).trip();
+  }
+
+  @Override
+  public DataFetcher<TripOnServiceDate> tripOnServiceDate() {
+    return environment -> {
+      Leg leg = getSource(environment);
+      Trip trip = leg.trip();
+      if (trip == null || leg.serviceDate() == null) {
+        return null;
+      }
+      return new ApiTransitService(transitService(environment))
+        .findOrCreateTripOnServiceDate(trip.getId(), leg.serviceDate())
+        .orElse(null);
+    };
   }
 
   @Override

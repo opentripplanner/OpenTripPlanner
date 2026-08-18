@@ -26,6 +26,7 @@ import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -37,6 +38,7 @@ public class MetricsLogging {
   @Inject
   public MetricsLogging(
     TransitRepository transitRepository,
+    TransitAlertService transitAlertService,
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary,
     @TransitDomain UpdateManager transitUpdateManager,
@@ -54,7 +56,7 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
     if (OTPFeature.AlertMetrics.isOn()) {
-      new AlertMetrics(transitRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+      new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }
 
     if (transitRepository.getRaptorTransitData() != null) {

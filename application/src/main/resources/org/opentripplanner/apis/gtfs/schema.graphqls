@@ -941,9 +941,9 @@ type Leg {
     originModesWithParentStation: [TransitMode!]
   ): [Leg!]
   "Whether there is real-time data about this Leg"
-  realTime: Boolean
+  realTime: Boolean @deprecated(reason : "Use `realTimeTripState.updated` on `TripOnServiceDate` instead.")
   "State of real-time data"
-  realtimeState: RealtimeState
+  realtimeState: RealtimeState @deprecated(reason : "Use `realTimeTripState` on `TripOnServiceDate` instead.")
   "Whether this leg is traversed with a rented vehicle."
   rentedBike: Boolean
   "Estimate of a hailed ride like Uber."
@@ -970,6 +970,8 @@ type Leg {
   transitLeg: Boolean
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
+  "For transit legs, the trip on service date. For non-transit legs, `null`."
+  tripOnServiceDate: TripOnServiceDate
   "Whether this leg is walking with a bike."
   walkingBike: Boolean
 }
@@ -2123,6 +2125,23 @@ type RealTimeEstimate {
   time: OffsetDateTime!
 }
 
+"The real-time state of a trip"
+type RealTimeTripState {
+  "Has the trip been added via real-time updates? (extra trip)"
+  added: Boolean!
+  "Has the trip been canceled?"
+  canceled: Boolean!
+  "Have any stop arrival or departure times been modified from the scheduled times?"
+  timesModified: Boolean!
+  """
+  Has the stop sequence changed from the scheduled pattern? True if stops were added, removed,
+  reordered, or reassigned to a different stop location (`assigned_stop_id`).
+  """
+  tripPatternModified: Boolean!
+  "Have there been any real-time updates on this trip?"
+  updated: Boolean!
+}
+
 "Rental vehicle represents a vehicle that belongs to a rental network."
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
@@ -2669,7 +2688,12 @@ type Stoptime {
   realtimeArrival: Int
   "Real-time prediction of departure time. Format: seconds since midnight of the departure date"
   realtimeDeparture: Int
-  "State of real-time data"
+  """
+  State of real-time data. Currently used to determine, whether a stop has been canceled.
+  Disclaimer: this is, in most cases the trips realtime state, unless the stop is canceled,
+  then the Trips State will be overwritten to be CANCELED.
+  It is recommended to avoid using this field.
+  """
   realtimeState: RealtimeState
   "Scheduled arrival time. Format: seconds since midnight of the departure date"
   scheduledArrival: Int
@@ -2894,6 +2918,8 @@ type TripOnServiceDate {
   end: StopCall!
   "Is this TripOnServiceDate a replacement? For GTFS-sourced data this might be all we know."
   isReplacement: Boolean
+  "Real-time state of the trip on this service date."
+  realTimeTripState: RealTimeTripState
   "Replaced by these TripOnServiceDates."
   replacedByRelation: [ReplacedByRelation!]!
   "Replacement for these TripOnServiceDates."

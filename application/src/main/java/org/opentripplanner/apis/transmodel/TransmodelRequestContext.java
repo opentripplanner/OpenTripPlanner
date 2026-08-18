@@ -3,6 +3,7 @@ package org.opentripplanner.apis.transmodel;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
@@ -36,6 +37,10 @@ public class TransmodelRequestContext {
 
   public TransitService getTransitService() {
     return transitService;
+  }
+
+  public TransitAlertService getTransitAlertService() {
+    return serverContext.transitAlertService();
   }
 
   @Nullable

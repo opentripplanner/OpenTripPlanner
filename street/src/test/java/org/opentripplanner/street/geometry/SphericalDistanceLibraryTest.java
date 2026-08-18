@@ -27,7 +27,7 @@ class SphericalDistanceLibraryTest {
       geometryFactory.getCoordinateSequenceFactory();
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString line = new LineString(sequence, geometryFactory);
-    double length = SphericalDistanceLibrary.length(line);
+    double length = GeometryUtils.sumDistances(line);
 
     // A nautical mile is 1852 meters, and is defined as one 1/60th of a degree longitude on the
     // equator. As this is an approximate calculation, we expect the real value to be within a

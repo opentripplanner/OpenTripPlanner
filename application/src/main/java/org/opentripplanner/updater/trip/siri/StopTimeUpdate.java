@@ -45,7 +45,7 @@ class StopTimeUpdate {
     this.lastStop = lastStop;
   }
 
-  public boolean hasRealTimeUpdate() {
+  boolean hasRealTimeUpdate() {
     return realTimeArrivalTime != null || realTimeDepartureTime != null;
   }
 

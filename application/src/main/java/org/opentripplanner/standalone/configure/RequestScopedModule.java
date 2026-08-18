@@ -6,7 +6,10 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -29,6 +32,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
@@ -112,6 +116,26 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static GtfsApiParameters gtfsApiParameters(RouterConfig routerConfig) {
+    return routerConfig.gtfsApiParameters();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TransmodelAPIParameters transmodelAPIParameters(RouterConfig routerConfig) {
+    return routerConfig.transmodelApi();
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TransmodelGraphQLSchema transmodelGraphQLSchema(
+    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema
+  ) {
+    return new TransmodelGraphQLSchema(transmodelSchema);
+  }
+
+  @Provides
+  @HttpRequestScoped
   static OjpApiParameters ojpApiParameters(RouterConfig routerConfig) {
     return routerConfig.ojpApiParameters();
   }
@@ -133,8 +157,11 @@ public class RequestScopedModule {
     VertexLinker vertexLinker,
     TransactionScope transactionScope,
     TransitService transitService,
+    TransitAlertService transitAlertService,
     RouteRequest defaultRequest,
     VectorTileConfig vectorTileConfig,
+    GtfsApiParameters gtfsApiConfig,
+    TransmodelAPIParameters transmodelAPIParameters,
     OjpApiParameters ojpApiParameters,
     TriasApiParameters triasApiParameters,
     RegularTransferService transferService,
@@ -161,9 +188,7 @@ public class RequestScopedModule {
     FareService fareService
   ) {
     var transitRoutingConfig = routerConfig.transitTuningConfig();
-    var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var flexParameters = routerConfig.flexParameters();
-    var transmodelAPIParameters = routerConfig.transmodelApi();
 
     var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
       transactionScope
@@ -186,6 +211,7 @@ public class RequestScopedModule {
       transactionScope,
       transitRoutingConfig,
       transitService,
+      transitAlertService,
       triasApiParameters,
       gtfsApiConfig,
       vectorTileConfig,

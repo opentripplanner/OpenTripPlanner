@@ -37,8 +37,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import uk.org.siri.siri21.VehicleModesEnumeration;
@@ -81,7 +81,7 @@ class AddedTripBuilderTest {
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
   private final TransitRepository TRANSIT_MODEL = new TransitRepository(SITE_REPOSITORY);
-  private TransitEditorService transitService;
+  private TransitService transitService;
   private EntityResolver ENTITY_RESOLVER;
 
   @BeforeEach

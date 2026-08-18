@@ -5,17 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.Area;
-import org.onebusaway.gtfs.model.FareLegRule;
-import org.onebusaway.gtfs.model.FareMedium;
-import org.onebusaway.gtfs.model.FareProduct;
-import org.onebusaway.gtfs.model.FareTransferRule;
-import org.onebusaway.gtfs.model.RiderCategory;
-import org.onebusaway.gtfs.model.RouteNetworkAssignment;
-import org.onebusaway.gtfs.model.StopAreaElement;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
@@ -47,17 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
-
-  public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
-    Area.class,
-    FareProduct.class,
-    FareLegRule.class,
-    FareMedium.class,
-    FareTransferRule.class,
-    RiderCategory.class,
-    RouteNetworkAssignment.class,
-    StopAreaElement.class
-  );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
   /**
@@ -132,7 +110,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     try {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
-        var gtfsDao = loadBundle(gtfsBundle);
+        var gtfsDao = gtfsBundle.loadDao();
 
         var feedId = gtfsBundle.getFeedId();
         verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
@@ -299,41 +277,5 @@ public class GtfsModule implements GraphBuilderModule {
       graph,
       streetDetailsRepository
     );
-  }
-
-  private GtfsRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
-    var dao = new GtfsRelationalDaoImpl();
-    dao.setPackShapePoints(true);
-    LOG.info("reading {}", gtfsBundle.feedInfo());
-
-    String gtfsFeedId = gtfsBundle.getFeedId();
-
-    GtfsReader reader = new GtfsReader();
-    reader.setInputSource(gtfsBundle.getCsvInputSource());
-    reader.setEntityStore(dao);
-    reader.setInternStrings(true);
-    reader.setDefaultAgencyId(gtfsFeedId);
-
-    dao.open();
-    for (Class<?> entityClass : reader.getEntityClasses()) {
-      if (skipEntityClass(entityClass)) {
-        LOG.info("Skipping entity: {}", entityClass.getName());
-        continue;
-      }
-      LOG.info("Reading entity: {}", entityClass.getName());
-      reader.readEntities(entityClass);
-    }
-
-    dao.close();
-    return dao;
-  }
-
-  /**
-   * Since GTFS Fares V2 is a very new, constantly evolving standard there might be a lot of errors
-   * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
-   * it can easily lead to graph build failures.
-   */
-  private boolean skipEntityClass(Class<?> entityClass) {
-    return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
   }
 }

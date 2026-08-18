@@ -43,6 +43,11 @@ public class GroupStop
   }
 
   @Override
+  public List<FeedScopedId> getIdAndParentStationId() {
+    return List.of(getId());
+  }
+
+  @Override
   public int getIndex() {
     return index;
   }
