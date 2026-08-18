@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -188,6 +189,23 @@ public interface TransitService {
    */
   @Nullable
   Trip getTrip(FeedScopedId id);
+
+  /**
+   * Return the trip for the given id, not including trips created in real time.
+   */
+  @Nullable
+  Trip getScheduledTrip(FeedScopedId id);
+
+  /**
+   * Get or create a serviceId for a given date. This method is used when a new trip is added from
+   * a real-time data update. It makes sure the date is in the existing transit service period.
+   *
+   * @param serviceDate service date for the added service id
+   * @return service-id for date if it exists or is created. If the given service date is outside
+   * the service period {@code null} is returned.
+   */
+  @Nullable
+  FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
 
   /**
    * Return all trips, including those created by real-time updates.
@@ -447,4 +465,11 @@ public interface TransitService {
    * as TransitService.
    */
   ReplacementHelper getReplacementHelper();
+
+  /**
+   * @return the current (real-time if available, otherwise scheduled) trip times
+   *         for the given trip on the given service date, or empty if the
+   *         trip does not run on that date.
+   */
+  Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 }

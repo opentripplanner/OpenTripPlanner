@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -43,7 +42,6 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -241,18 +239,6 @@ public class OsmModule implements GraphBuilderModule {
     params.edgeNamer().finalizeNames();
   }
 
-  /**
-   * Returns the length of the geometry in meters.
-   */
-  private static double getGeometryLengthMeters(Geometry geometry) {
-    Coordinate[] coordinates = geometry.getCoordinates();
-    double d = 0;
-    for (int i = 1; i < coordinates.length; ++i) {
-      d += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
-    }
-    return d;
-  }
-
   private List<OsmAreaGroup> groupAreas(
     OsmDatabase osmdb,
     Collection<OsmArea> areas,
@@ -429,7 +415,7 @@ public class OsmModule implements GraphBuilderModule {
         // where the current edge might end
         OsmNode osmEndNode = osmdb.getNode(endNode);
 
-        LineString geometry;
+        LineString lineString;
 
         /*
          * We split segments at intersections, self-intersections, nodes with ele tags, and transit stops;
@@ -441,7 +427,7 @@ public class OsmModule implements GraphBuilderModule {
         }
 
         if (
-          vertexGenerator.intersectionNodes().containsKey(endNode) ||
+          vertexGenerator.isIntersectionNode(endNode) ||
           i == nodes.size() - 2 ||
           nodes.subList(0, i).contains(nodes.get(i)) ||
           osmEndNode.hasTag("ele") ||
@@ -453,7 +439,7 @@ public class OsmModule implements GraphBuilderModule {
           segmentCoordinates.add(osmEndNode.lon);
           segmentCoordinates.add(osmEndNode.lat);
 
-          geometry = GeometryUtils.makeLineString(segmentCoordinates.toArray());
+          lineString = GeometryUtils.makeLineString(segmentCoordinates.toArray());
           segmentCoordinates.clear();
         } else {
           segmentCoordinates.add(osmEndNode.lon);
@@ -486,7 +472,7 @@ public class OsmModule implements GraphBuilderModule {
           // However, intersection vertices are created in this loop.
           continue;
         } else if (way.isEscalator()) {
-          var length = getGeometryLengthMeters(geometry);
+          var length = GeometryUtils.sumDistances(lineString);
           EscalatorEdgePair escalatorEdgePair = escalatorProcessor.buildEscalatorEdge(
             way,
             length,
@@ -509,7 +495,7 @@ public class OsmModule implements GraphBuilderModule {
             i,
             forwardPermission,
             backwardPermission,
-            geometry
+            lineString
           );
 
           params.edgeNamer().recordEdges(way, streets, osmdb);
@@ -665,7 +651,7 @@ public class OsmModule implements GraphBuilderModule {
     LineString backGeometry = geometry.reverse();
     StreetEdge street = null;
     StreetEdge backStreet = null;
-    double length = getGeometryLengthMeters(geometry);
+    double length = GeometryUtils.sumDistances(geometry);
 
     if (forwardPermission.allowsAnything()) {
       street = getEdgeForStreet(

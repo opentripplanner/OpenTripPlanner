@@ -106,12 +106,24 @@ public class GraphBuilderDataSources implements Closeable {
     return outputGraph;
   }
 
-  /**
-   * @return {@code true} if and only if the data source exist, proper command line parameters is
-   * set and not disabled by the loaded configuration files.
-   */
-  public boolean has(FileType type) {
-    return inputData.containsKey(type);
+  public boolean hasOsm() {
+    return has(OSM);
+  }
+
+  public boolean hasDem() {
+    return has(DEM);
+  }
+
+  public boolean hasGtfs() {
+    return has(GTFS);
+  }
+
+  public boolean hasNetex() {
+    return has(NETEX);
+  }
+
+  public boolean hasTransitData() {
+    return hasOneOf(GTFS, NETEX);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -199,6 +211,23 @@ public class GraphBuilderDataSources implements Closeable {
 
   /* private methods */
 
+  /**
+   * @return {@code true} if and only if the data source exist, proper command line parameters is
+   * set and not disabled by the loaded configuration files.
+   */
+  private boolean has(FileType type) {
+    return inputData.containsKey(type);
+  }
+
+  private boolean hasOneOf(FileType... types) {
+    for (FileType type : types) {
+      if (has(type)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
     var p = buildConfig.osm.parameters
       .stream()
@@ -283,15 +312,6 @@ public class GraphBuilderDataSources implements Closeable {
     );
   }
 
-  private boolean hasOneOf(FileType... types) {
-    for (FileType type : types) {
-      if (has(type)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private void logSkippedAndSelectedFiles() {
     LOG.info("Data source location(s): {}", String.join(", ", store.getRepositoryDescriptions()));
 
@@ -315,7 +335,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOneOf(OSM, GTFS, NETEX)) {
+      if (!hasOsm() && !hasTransitData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
@@ -336,7 +356,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasOneOf(GTFS, NETEX)) {
+      if (!hasTransitData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }

@@ -24,7 +24,7 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 /**
  * Update-scoped object produced by {@link GtfsRealTimeTripUpdateAdapter#forUpdate}. Holds the
- * per-task collaborators (sub-handlers constructed with an update-scoped {@code TransitEditorService})
+ * per-task collaborators (sub-handlers constructed with an update-scoped {@code TransitService})
  * and applies GTFS-RT trip updates against the mutable timetable snapshot.
  */
 public class GtfsRealTimeUpdateHandler {

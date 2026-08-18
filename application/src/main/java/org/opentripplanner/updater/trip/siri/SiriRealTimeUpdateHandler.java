@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateException;
@@ -37,14 +37,14 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
  * Update-scoped object produced by {@link SiriRealTimeTripUpdateAdapter#forUpdate}. Holds a
- * per-task {@link TransitEditorService} backed by the update's mutable timetable snapshot, so all
+ * per-task {@link TransitService} backed by the update's mutable timetable snapshot, so all
  * pattern and trip lookups within the task see in-progress real-time additions.
  */
 public class SiriRealTimeUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriRealTimeUpdateHandler.class);
 
-  private final TransitEditorService transitEditorService;
+  private final TransitService transitService;
   private final TimetableRepository buffer;
 
   @Nullable
@@ -55,14 +55,14 @@ public class SiriRealTimeUpdateHandler {
   private final TripPatternIdGenerator tripPatternIdGenerator;
 
   SiriRealTimeUpdateHandler(
-    TransitEditorService transitEditorService,
+    TransitService transitService,
     TimetableRepository buffer,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
     DeduplicatorService deduplicator,
     TripPatternIdGenerator tripPatternIdGenerator
   ) {
-    this.transitEditorService = transitEditorService;
+    this.transitService = transitService;
     this.buffer = buffer;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.tripPatternCache = tripPatternCache;
@@ -103,7 +103,7 @@ public class SiriRealTimeUpdateHandler {
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
           try {
-            successes.add(apply(journey, transitEditorService, entityResolver));
+            successes.add(apply(journey, entityResolver));
           } catch (UpdateException e) {
             errors.add(
               e
@@ -120,11 +120,8 @@ public class SiriRealTimeUpdateHandler {
     return UpdateResult.of(successes, errors);
   }
 
-  private UpdateSuccess apply(
-    EstimatedVehicleJourney journey,
-    TransitEditorService transitService,
-    EntityResolver entityResolver
-  ) throws UpdateException {
+  private UpdateSuccess apply(EstimatedVehicleJourney journey, EntityResolver entityResolver)
+    throws UpdateException {
     var journeyWrapper = EstimatedVehicleJourneyWrapper.of(journey);
     SiriUpdateType siriUpdateType = null;
     try {
@@ -223,7 +220,7 @@ public class SiriRealTimeUpdateHandler {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitEditorService.findPattern(trip);
+      pattern = transitService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
@@ -249,7 +246,7 @@ public class SiriRealTimeUpdateHandler {
       pattern,
       journey,
       serviceDate,
-      transitEditorService.getTimeZone(),
+      transitService.getTimeZone(),
       entityResolver
     ).build();
 
@@ -277,7 +274,7 @@ public class SiriRealTimeUpdateHandler {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitEditorService.findPattern(trip);
+      pattern = transitService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
@@ -301,7 +298,7 @@ public class SiriRealTimeUpdateHandler {
     }
     var tripUpdate = new ExtraCallTripBuilder(
       journey,
-      transitEditorService,
+      transitService,
       deduplicator,
       entityResolver,
       tripPatternIdGenerator::generateUniqueTripPatternId,
@@ -330,7 +327,7 @@ public class SiriRealTimeUpdateHandler {
       pattern = tripPatternCache.getOrCreateTripPattern(
         tripUpdate.stopPattern(),
         trip,
-        transitEditorService.findPattern(trip)
+        transitService.findPattern(trip)
       );
     }
 

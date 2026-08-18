@@ -217,7 +217,7 @@ public class TransactionFrameworkTest {
     assertEquals(Arrays.asList(expectedEvents), eventLog);
   }
 
-  /// Assert both repositories contains the entities from the given events
+  // Assert both repositories contains the entities from the given events
   private void assertState(String expScope, TestEvent... expectedEntities) {
     var expected = Arrays.asList(expectedEntities);
     assertState(expScope, expected, expected);

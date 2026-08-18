@@ -9,11 +9,6 @@ public enum AlertSeverity {
    * user's journey, for example: A single entrance to a metro station is temporarily closed.
    */
   INFO,
-  /**
-   * Severity is undefined.
-   */
-  UNDEFINED,
-  /**
    * Situation has unknown impact on trips.
    */
   UNKNOWN_SEVERITY,

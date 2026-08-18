@@ -1,9 +1,5 @@
 package org.opentripplanner.graph_builder;
 
-import static org.opentripplanner.datastore.api.FileType.GTFS;
-import static org.opentripplanner.datastore.api.FileType.NETEX;
-import static org.opentripplanner.datastore.api.FileType.OSM;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
@@ -94,11 +90,6 @@ public class GraphBuilder implements Runnable {
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
-    boolean hasOsm = dataSources.has(OSM);
-    boolean hasGtfs = dataSources.has(GTFS);
-    boolean hasNetex = dataSources.has(NETEX);
-    boolean hasTransitData = hasGtfs || hasNetex;
-
     transitRepository.initTimeZone(config.transitModelTimeZone);
 
     GraphBuilderFactory.Builder builder = DaggerGraphBuilderFactory.builder();
@@ -123,22 +114,22 @@ public class GraphBuilder implements Runnable {
 
     var graphBuilder = factory.graphBuilder();
 
-    graphBuilder.hasTransitData = hasTransitData;
+    graphBuilder.hasTransitData = dataSources.hasTransitData();
 
-    if (hasOsm) {
+    if (dataSources.hasOsm()) {
       graphBuilder.addModule(factory.osmModule());
     }
 
-    if (hasGtfs) {
+    if (dataSources.hasGtfs()) {
       graphBuilder.addModule(factory.gtfsModule());
     }
 
-    if (hasNetex) {
+    if (dataSources.hasNetex()) {
       graphBuilder.addModule(factory.netexModule());
     }
 
     // Consolidate stops only if a stop consolidation repo has been provided
-    if (hasTransitData) {
+    if (graphBuilder.hasTransitData) {
       graphBuilder.addModuleOptional(factory.stopConsolidationModule());
       graphBuilder.addModule(factory.tripPatternNamer());
       graphBuilder.addModuleOptional(
@@ -146,7 +137,7 @@ public class GraphBuilder implements Runnable {
         transitRepository.getAgencyTimeZones().size() > 1
       );
 
-      if (hasOsm || graphBuilder.graph.hasStreets) {
+      if (dataSources.hasOsm() || graphBuilder.graph.hasStreets) {
         graphBuilder.addModule(factory.osmBoardingLocationsModule());
       }
     }
@@ -156,14 +147,14 @@ public class GraphBuilder implements Runnable {
     graphBuilder.addModule(factory.streetLinkerModule());
 
     // Avoid applying turn restrictions twice if doing separate street graph and graph builds.
-    if (hasOsm) {
+    if (dataSources.hasOsm()) {
       graphBuilder.addModule(factory.turnRestrictionModule());
     }
 
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
-    if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
+    if ((dataSources.hasOsm() && !saveStreetGraph) || loadStreetGraph) {
       graphBuilder.addModule(factory.pruneIslands());
     }
 
@@ -173,7 +164,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(it);
     }
 
-    if (hasTransitData) {
+    if (graphBuilder.hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       graphBuilder.addModuleOptional(factory.areaStopsToVerticesMapper(), OTPFeature.FlexRouting);
 
@@ -191,7 +182,7 @@ public class GraphBuilder implements Runnable {
       );
     }
 
-    if (loadStreetGraph || hasOsm) {
+    if (loadStreetGraph || dataSources.hasOsm()) {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
