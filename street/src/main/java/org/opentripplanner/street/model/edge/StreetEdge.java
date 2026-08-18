@@ -13,7 +13,6 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInt
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.EndpointContextLineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.SplitLineString;
 import org.opentripplanner.street.linking.LinkingDirection;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -744,8 +743,8 @@ public class StreetEdge
     return lengthInMillimeter;
   }
 
-  static int defaultMillimeterLength(LineString geometry) {
-    return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
+  static int defaultMillimeterLength(LineString lineString) {
+    return (int) (GeometryUtils.sumDistances(lineString) * 1000);
   }
 
   private State[] traverseWithGeofencing(State s0) {

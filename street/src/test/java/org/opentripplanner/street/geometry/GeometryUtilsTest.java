@@ -243,4 +243,20 @@ public class GeometryUtilsTest {
     var meters = GeometryUtils.sumDistances(coordinates);
     assertEquals(0.0, meters);
   }
+
+  @Test
+  void sumDistancesLineString() {
+    LineString line = GeometryUtils.makeLineString(BERLIN, HAMBURG);
+    var meters = GeometryUtils.sumDistances(line);
+    assertEquals(255_384.0, meters, 0.5);
+  }
+
+  @Test
+  void sumDistancesNonLineStringGeometry() {
+    var multiPoint = GeometryUtils.getGeometryFactory().createMultiPointFromCoords(
+      new Coordinate[] { BERLIN, HAMBURG }
+    );
+    var meters = GeometryUtils.sumDistances(multiPoint);
+    assertEquals(255_384.0, meters, 0.5);
+  }
 }
