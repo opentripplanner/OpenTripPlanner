@@ -1993,14 +1993,14 @@ enum ServiceAlteration {
 enum Severity {
   "Situation has no impact on trips."
   noImpact
-  "Situation has an impact on trips (default)."
+  "Situation has an impact on trips (default). Used for SIRI severities `normal` and `undefined`."
   normal
   "Situation has a severe impact on trips."
   severe
   "Situation has a slight impact on trips."
   slight
   "Severity is undefined."
-  undefined
+  undefined @deprecated(reason : "This value is never returned, and filtering on it matches no situations. SIRI severity `undefined` is mapped to `normal`.")
   "Situation has unknown impact on trips."
   unknown
   "Situation has a very severe impact on trips."
