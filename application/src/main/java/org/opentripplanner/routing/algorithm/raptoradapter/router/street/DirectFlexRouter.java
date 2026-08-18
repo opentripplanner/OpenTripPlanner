@@ -40,10 +40,14 @@ public class DirectFlexRouter {
     }
     OTPRequestTimeoutException.checkForTimeout();
     // Prepare access/egress transfers
+    var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
+      request.preferences().system().dataOverlay(),
+      dataOverlayParameterBindings
+    );
     Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
-      DataOverlayContext.listExtensionRequestContexts(request, dataOverlayParameterBindings),
+      dataOverlayContext,
       AccessEgressType.ACCESS,
       flexParameters.maxAccessWalkDuration(),
       0,
@@ -52,7 +56,7 @@ public class DirectFlexRouter {
     Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
-      DataOverlayContext.listExtensionRequestContexts(request, dataOverlayParameterBindings),
+      dataOverlayContext,
       AccessEgressType.EGRESS,
       flexParameters.maxEgressWalkDuration(),
       0,

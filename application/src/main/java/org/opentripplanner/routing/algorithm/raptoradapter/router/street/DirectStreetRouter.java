@@ -52,8 +52,12 @@ public class DirectStreetRouter {
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
+      var dataOverlayContexts = DataOverlayContext.listExtensionRequestContexts(
+        request.preferences().system().dataOverlay(),
+        dataOverlayParameterBindings
+      );
       GraphPathFinder gpFinder = new GraphPathFinder(
-        DataOverlayContext.listExtensionRequestContexts(request, dataOverlayParameterBindings),
+        dataOverlayContexts,
         streetLimitationParametersService,
         vehicleRentalService
       );

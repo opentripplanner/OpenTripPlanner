@@ -174,10 +174,14 @@ class AccessEgressFetcher {
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
     int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
+    var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
+      accessRequest.preferences().system().dataOverlay(),
+      dataOverlayParameterBindings
+    );
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
       mode,
-      DataOverlayContext.listExtensionRequestContexts(accessRequest, dataOverlayParameterBindings),
+      dataOverlayContext,
       type,
       durationLimit,
       stopCountLimit,
@@ -198,10 +202,7 @@ class AccessEgressFetcher {
         streetDetailsService,
         additionalSearchDays,
         flexParameters,
-        DataOverlayContext.listExtensionRequestContexts(
-          accessRequest,
-          dataOverlayParameterBindings
-        ),
+        dataOverlayContext,
         type,
         linkingContext
       );

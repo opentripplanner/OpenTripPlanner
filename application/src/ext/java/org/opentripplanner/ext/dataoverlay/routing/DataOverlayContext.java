@@ -12,7 +12,6 @@ import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.api.ParameterType;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,23 +33,18 @@ public class DataOverlayContext implements ExtensionRequestContext {
 
   /**
    * Builds the {@link ExtensionRequestContext} list for a request, given the app-singleton
-   * {@link DataOverlayParameterBindings} (independently bindable, unlike the whole
-   * {@code OtpServerRequestContext} this replaces the need for at several router call sites).
+   * {@link DataOverlayParameterBindings}.
+   * <p/>
+   * @return an immutable list.
    */
   public static List<ExtensionRequestContext> listExtensionRequestContexts(
-    RouteRequest request,
+    DataOverlayParameters dataOverlayRequest,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
   ) {
-    var list = new ArrayList<ExtensionRequestContext>();
     if (OTPFeature.DataOverlay.isOn() && dataOverlayParameterBindings != null) {
-      list.add(
-        new DataOverlayContext(
-          dataOverlayParameterBindings,
-          request.preferences().system().dataOverlay()
-        )
-      );
+      return List.of(new DataOverlayContext(dataOverlayParameterBindings, dataOverlayRequest));
     }
-    return list;
+    return List.of();
   }
 
   public Iterable<? extends Parameter> getParameters() {
