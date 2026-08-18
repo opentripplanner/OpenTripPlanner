@@ -21,13 +21,17 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * it.
  * <p>
  * In this test, node {@code b} sits at the same coordinate as the elevator way's other endpoint
- * {@code a} (elevator ways are commonly drawn with zero length, relying only on differing level
- * tags to distinguish the ends) and carries no node-level "level" tag itself, so the
+ * {@code a} - a mapping error rather than a legitimate way of tagging an elevator, but one that
+ * does occur in real OSM data - and carries no node-level "level" tag itself, so the
  * duplicate-node handling in OsmModule's street-graph-building loop drops it while processing the
- * elevator way. Node {@code b} is also referenced by a second way that is relevant for routing
- * (it's a bicycle parking way) but not "routable" in the street-graph sense, so it is skipped by
- * that same loop entirely. As a result no vertex is ever created for {@code b}, even though it
- * was recorded as a candidate intersection node while scanning for nodes shared between ways.
+ * elevator way: it never becomes the "from" or "to" node of a street edge there. Node {@code b}
+ * is also referenced by a second way that is relevant for routing (it's a bicycle parking way)
+ * but not "routable" in the street-graph sense, so OsmModule's street-graph-building loop skips
+ * that way entirely too. As a result no vertex is ever created for {@code b}, even though it was
+ * recorded as a candidate intersection node while scanning for nodes shared between ways -
+ * exactly the combination that made {@code ElevatorProcessor} crash: it found {@code b} in its
+ * list of candidate intersection nodes for the elevator way, then failed to look up a vertex that
+ * was never built.
  * <p>
  * The vertex-generator's intersection-node check must distinguish "candidate, not yet built" from
  * "has a real vertex" so that elevator-way processing degrades gracefully (reporting a
