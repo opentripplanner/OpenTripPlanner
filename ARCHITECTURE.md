@@ -100,12 +100,13 @@ to do during the routing process.
 ### [Transaction Framework](application/src/main/java/org/opentripplanner/framework/transaction/package.md)
 
 A generic, reusable copy-on-write concurrency mechanism for application-scoped repositories: any
-number of concurrent readers see a consistent, unchanging snapshot while a single writer thread
+number of concurrent readers sees a consistent, unchanging snapshot while a single writer thread
 applies and publishes changes, with no locking required on the read path. This is what backs the
 `Domain Model`/`Repository` split described above, generalizing the timetable-snapshot approach also
 documented in the
 [Realtime Updaters](application/src/main/java/org/opentripplanner/updater/package.md#realtime-concurrency)
-package.
+package. The snapshot is consistent over all registered repositories, updates spanning several
+repositories are still committed in an atomic operation.
 
 ### [Service](application/src/main/java/org/opentripplanner/service/package.md)
 

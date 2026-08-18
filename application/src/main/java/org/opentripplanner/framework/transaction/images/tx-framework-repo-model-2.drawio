@@ -27,7 +27,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e4" value="reads using&lt;br&gt;&amp;nbsp;handle &amp;amp; trabsaction scope" style="html=1;endArrow=block;endFill=1;rounded=0;fontSize=11;entryX=0.25;entryY=1;entryDx=0;entryDy=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" source="defservice" target="zsnap" edge="1">
+        <mxCell id="e4" value="reads using&lt;br&gt;&amp;nbsp;handle &amp;amp; transaction scope" style="html=1;endArrow=block;endFill=1;rounded=0;fontSize=11;entryX=0.25;entryY=1;entryDx=0;entryDy=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" source="defservice" target="zsnap" edge="1">
           <mxGeometry x="0.2715" y="-11" relative="1" as="geometry">
             <mxPoint x="170" y="290" as="sourcePoint" />
             <mxPoint x="690" y="100" as="targetPoint" />

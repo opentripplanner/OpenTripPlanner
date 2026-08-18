@@ -44,7 +44,7 @@ Wiring happens once, at application (or graph-build) startup, typically from a D
 There can be more than one `RepositoryRegistry`/`UpdateManager` pair in one application — for
 example, one for transit data and one for street data. A `Transaction` is always bound to exactly
 one `UpdateManager`; repositories registered on different registries are versioned independently,
-and is updated in paralell, by two diffrent writer threads.
+and are updated in parallel, by two different writer threads.
 
 ## Read Path
 
@@ -104,15 +104,16 @@ this is how handlers reach a repository without a `WriteContext` of their own.
 
 The recommended shape splits `Service`, `Repository`, and `RepositorySnapshot` into separate
 interfaces. For the implementation a `DefaultService`, `DefaultRepository`, and
-`DefaultRepositorySnapshot` is one option. This isn't the only way to structure the repository
-implemetation. A single small aggregate can get away with just one `DefaultRepository` that
-implements both `Repository` and `RepositorySnapshot`.
-
-![Recommended repository shape - alt 1](images/tx-framework-repo-model.png)
+`DefaultRepositorySnapshot` is one option.
 
 ![Recommended repository shape - alt 2](images/tx-framework-repo-model-2.png)
 
-The lifecycle implementaion, `MyRepositoryLifeCycle`, needs to downcasts to the implementation to
+This isn't the only way to structure the repository implementation. A single small aggregate can get
+away with just one `DefaultRepository` that implements both `Repository` and `RepositorySnapshot`.
+
+![Recommended repository shape - alt 1](images/tx-framework-repo-model.png)
+
+The lifecycle implementation, `MyRepositoryLifeCycle`, needs to downcast to the implementation to
 reach `copyOnWrite`/`freeze`. This downcast feels a bit awkward, but it keeps the public API clean
 and avoids exposing implementation details to the application code. Keeping the lifecycle
 implementation in the same package as the repository implementation will isolate this downcast.
@@ -143,9 +144,10 @@ obvious from the API alone:
 - **Two different lifecycle strategies, side by side.** `CustomerRepositoryLifecycle` does a real
   copy-on-write (`DefaultCustomerRepository.copyOnWrite()` returns a new instance backed by a copied
   map), so a failed task rolls back cleanly — the in-progress copy is simply discarded.
-  `OrderRepositoryLifecycle`'s `copyOnWrite` instead returns `this`, which is cheaper (no copy on
-  every task) but means a failed task's partial writes are _not_ rolled back — they leak into the
-  next commit. `TransactionFrameworkTest.testRollback()` demonstrates the difference directly.
+  `OrderRepositoryLifecycle`'s `copyOnWrite` instead ignores the snapshot argument and returns the
+  same stored repository instance every time, which is cheaper (no copy on every task) but means a
+  failed task's partial writes are _not_ rolled back — they leak into the next commit.
+  `TransactionFrameworkTest.testRollback()` demonstrates the difference directly.
 - **Visibility is commit-gated, not task-gated.** `testHappyDayScenario()` blocks a submitted task
   on a `CountDownLatch` and asserts that `registry.scope()` still sees the pre-task state until the
   task (and its atomic commit) actually completes.
