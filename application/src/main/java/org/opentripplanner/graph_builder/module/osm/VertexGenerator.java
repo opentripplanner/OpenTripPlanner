@@ -318,8 +318,28 @@ class VertexGenerator {
   /**
    * Returns whether the given OSM node id is a shared intersection node, i.e. it appears in more
    * than one OSM way (or way/area boundary) and therefore needs to become a graph vertex.
+   * <p>
+   * This is {@code true} as soon as the node is recorded as a candidate by
+   * {@link #initIntersectionNodes()}, even before a vertex has actually been built for it - the
+   * street-graph-building loop in {@code OsmModule} relies on that to decide where to split a way
+   * while it is still creating vertices. Use {@link #hasIntersectionVertex(long)} if you need to
+   * know whether a vertex has actually been created.
    */
   boolean isIntersectionNode(long nodeId) {
+    return intersectionNodes.containsKey(nodeId);
+  }
+
+  /**
+   * Returns whether a real graph vertex has already been created for the given OSM node id.
+   * <p>
+   * Unlike {@link #isIntersectionNode(long)}, this is only {@code true} once
+   * {@link #getVertexForOsmNode} has actually run for the node - some nodes that are marked as
+   * candidate intersection nodes never get a vertex built, e.g. because every way that would have
+   * built one is skipped by {@code OsmModule}'s street-graph-building loop (not routable, or
+   * de-duplicated away). Use this instead of {@link #isIntersectionNode(long)} when you need to
+   * look up a vertex that must already exist.
+   */
+  boolean hasIntersectionVertex(long nodeId) {
     return intersectionNodes.get(nodeId) != null;
   }
 
