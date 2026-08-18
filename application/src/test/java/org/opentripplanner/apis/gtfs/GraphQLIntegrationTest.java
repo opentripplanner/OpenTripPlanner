@@ -69,7 +69,7 @@ import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.api.PlaceAtDistance;
-import org.opentripplanner.routing.alertpatch.ActivityCalendar;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -466,7 +466,7 @@ class GraphQLIntegrationTest {
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
       .addEntity(entitySelector)
-      .withActivityCalendar(ActivityCalendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
+      .withCalendar(AlertCalendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
       .build();
     var stationAlert = TransitAlert.of(id("a-station-alert"))
       .withHeaderText(I18NString.of("Station closed"))

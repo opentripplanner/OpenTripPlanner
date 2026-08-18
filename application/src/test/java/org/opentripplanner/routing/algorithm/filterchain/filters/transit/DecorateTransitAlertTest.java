@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.alertpatch.ActivityCalendar;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
@@ -82,7 +82,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {
     var transitAlertService = new TransitAlertServiceImpl();
     transitAlertService.setAlerts(
-      List.of(builder.withActivityCalendar(ActivityCalendar.ofAlwaysActive()).build())
+      List.of(builder.withCalendar(AlertCalendar.ofAlwaysActive()).build())
     );
     return transitAlertService;
   }

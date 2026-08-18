@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.time.TimePeriod;
 
-class CalendarTest {
+class AlertCalendarTest {
 
   private static final Instant START = Instant.parse("2024-01-01T10:00:00Z");
   private static final Instant END = Instant.parse("2024-01-01T12:00:00Z");
@@ -19,7 +19,7 @@ class CalendarTest {
 
   @Test
   void neverActive() {
-    var subject = ActivityCalendar.ofNeverActive();
+    var subject = AlertCalendar.ofNeverActive();
     assertTrue(subject.isNeverActive());
     assertThat(subject.timePeriods()).isEmpty();
     assertFalse(subject.isActiveDuring(TimePeriod.of(START, END)));
@@ -29,12 +29,12 @@ class CalendarTest {
 
   @Test
   void ofEmptyCollectionIsNeverActive() {
-    assertEquals(ActivityCalendar.ofNeverActive(), ActivityCalendar.of(List.of()));
+    assertEquals(AlertCalendar.ofNeverActive(), AlertCalendar.of(List.of()));
   }
 
   @Test
   void ofAlwaysActive() {
-    var subject = ActivityCalendar.ofAlwaysActive();
+    var subject = AlertCalendar.ofAlwaysActive();
     assertThat(subject.timePeriods()).containsExactly(TimePeriod.ofUnbounded());
     assertFalse(subject.isNeverActive());
     assertTrue(subject.isActiveDuring(TimePeriod.of(START, END)));
@@ -44,7 +44,7 @@ class CalendarTest {
 
   @Test
   void effectiveBounds() {
-    var subject = ActivityCalendar.of(
+    var subject = AlertCalendar.of(
       List.of(TimePeriod.of(LATER_START, LATER_END), TimePeriod.of(START, END))
     );
     assertThat(subject.effectiveStart()).hasValue(START);
@@ -53,7 +53,7 @@ class CalendarTest {
 
   @Test
   void openStartGivesNoEffectiveStart() {
-    var subject = ActivityCalendar.of(
+    var subject = AlertCalendar.of(
       List.of(TimePeriod.of(null, END), TimePeriod.of(LATER_START, LATER_END))
     );
     assertThat(subject.effectiveStart()).isEmpty();
@@ -62,7 +62,7 @@ class CalendarTest {
 
   @Test
   void openEndGivesNoEffectiveEnd() {
-    var subject = ActivityCalendar.of(
+    var subject = AlertCalendar.of(
       List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, null))
     );
     assertThat(subject.effectiveStart()).hasValue(START);
@@ -71,7 +71,7 @@ class CalendarTest {
 
   @Test
   void isActiveDuringAnyPeriod() {
-    var subject = ActivityCalendar.of(
+    var subject = AlertCalendar.of(
       List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, LATER_END))
     );
     assertTrue(subject.isActiveDuring(TimePeriod.of(START, END)));
@@ -84,7 +84,7 @@ class CalendarTest {
 
   @Test
   void isActiveAt() {
-    var subject = ActivityCalendar.of(List.of(TimePeriod.of(START, END)));
+    var subject = AlertCalendar.of(List.of(TimePeriod.of(START, END)));
     // inclusive start
     assertTrue(subject.isActiveAt(START));
     // inside

@@ -17,7 +17,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.routing.alertpatch.ActivityCalendar;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -70,7 +70,7 @@ public class RealtimeStopsLayerTest {
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toInstant();
     var alert = TransitAlert.of(stop.getId())
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .withActivityCalendar(ActivityCalendar.of(TimePeriod.of(startDate, endDate)))
+      .withCalendar(AlertCalendar.of(TimePeriod.of(startDate, endDate)))
       .withEffect(AlertEffect.NO_SERVICE)
       .build();
     transitAlertService.setAlerts(List.of(alert));

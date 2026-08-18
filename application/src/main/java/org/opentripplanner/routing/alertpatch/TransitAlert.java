@@ -44,7 +44,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   private final ZonedDateTime updatedTime;
   private final String siriCodespace;
   private final Set<EntitySelector> entities;
-  private final ActivityCalendar activityCalendar;
+  private final AlertCalendar calendar;
 
   TransitAlert(TransitAlertBuilder builder) {
     super(builder.getId());
@@ -64,7 +64,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.updatedTime = builder.updatedTime();
     this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
-    this.activityCalendar = builder.activityCalendar();
+    this.calendar = builder.calendar();
   }
 
   public static TransitAlertBuilder of(FeedScopedId id) {
@@ -153,8 +153,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   /**
    * The validity of this alert, expressed as a set of time periods.
    */
-  public ActivityCalendar activityCalendar() {
-    return activityCalendar;
+  public AlertCalendar calendar() {
+    return calendar;
   }
 
   /**
@@ -169,7 +169,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    * @return true if the alert is active during any part of the given period
    */
   public boolean isActiveDuring(TimePeriod period) {
-    return activityCalendar.isActiveDuring(period);
+    return calendar.isActiveDuring(period);
   }
 
   /**
@@ -179,7 +179,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    * @return true if the alert is active at the given time
    */
   public boolean isActiveAt(Instant instant) {
-    return activityCalendar.isActiveAt(instant);
+    return calendar.isActiveAt(instant);
   }
 
   /**
@@ -189,7 +189,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    */
   @Nullable
   public Instant getEffectiveStartDate() {
-    return activityCalendar.effectiveStart().orElse(null);
+    return calendar.effectiveStart().orElse(null);
   }
 
   /**
@@ -200,7 +200,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    */
   @Nullable
   public Instant getEffectiveEndDate() {
-    return activityCalendar.effectiveEnd().orElse(null);
+    return calendar.effectiveEnd().orElse(null);
   }
 
   @Override
@@ -223,7 +223,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
-      Objects.equals(activityCalendar, other.activityCalendar)
+      Objects.equals(calendar, other.calendar)
     );
   }
 

@@ -21,7 +21,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
-import org.opentripplanner.routing.alertpatch.ActivityCalendar;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
@@ -103,10 +103,10 @@ public class AlertsUpdateHandler {
           : null;
         periods.add(TimePeriod.of(start, end));
       }
-      alertBuilder.withActivityCalendar(ActivityCalendar.of(periods));
+      alertBuilder.withCalendar(AlertCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      alertBuilder.withActivityCalendar(ActivityCalendar.ofAlwaysActive());
+      alertBuilder.withCalendar(AlertCalendar.ofAlwaysActive());
     }
 
     for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
