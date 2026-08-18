@@ -261,6 +261,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
+      transitRoutingConfig,
       transitRoutingConfig
     );
   }

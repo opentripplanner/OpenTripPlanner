@@ -12,11 +12,13 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.RequestPreProcessor;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.RoutingWorkerRequest;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.RoutingService;
@@ -29,7 +31,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
@@ -60,7 +61,10 @@ public class DefaultRoutingService implements RoutingService {
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContextFactory linkingContextFactory;
-  private final TransitRoutingConfig transitRoutingConfig;
+  private final TransitTuningParameters transitTuningParameters;
+  private final RaptorTuningParameters raptorTuningParameters;
+
+  //private final TransitRoutingConfig transitRoutingConfig;
 
   @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
@@ -98,7 +102,8 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig
+    TransitTuningParameters transitTuningParameters,
+    RaptorTuningParameters raptorTuningParameters
   ) {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
@@ -118,13 +123,14 @@ public class DefaultRoutingService implements RoutingService {
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
-    this.transitRoutingConfig = transitRoutingConfig;
+    this.transitTuningParameters = transitTuningParameters;
+    this.raptorTuningParameters = raptorTuningParameters;
 
     var timeZone = ZoneIdFallback.zoneId(transitService.getTimeZone());
 
     this.requestPreProcessor = new RequestPreProcessor(
       transitService,
-      transitRoutingConfig,
+      raptorTuningParameters,
       timeZone
     );
   }
@@ -171,7 +177,8 @@ public class DefaultRoutingService implements RoutingService {
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
-      transitRoutingConfig,
+      transitTuningParameters,
+      raptorTuningParameters,
       workerRequest
     );
   }

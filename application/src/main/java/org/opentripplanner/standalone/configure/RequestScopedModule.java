@@ -203,6 +203,7 @@ public class RequestScopedModule {
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
+      transitRoutingConfig,
       transitRoutingConfig
     );
   }

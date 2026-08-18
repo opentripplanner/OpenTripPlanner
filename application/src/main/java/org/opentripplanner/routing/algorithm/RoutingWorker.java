@@ -21,6 +21,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -33,6 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -50,7 +52,6 @@ import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -87,7 +88,8 @@ public class RoutingWorker {
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContextFactory linkingContextFactory;
-  private final TransitRoutingConfig transitRoutingConfig;
+  private final TransitTuningParameters transitTuningParameters;
+  private final RaptorTuningParameters raptorTuningParameters;
 
   @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
@@ -133,7 +135,8 @@ public class RoutingWorker {
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig,
+    TransitTuningParameters transitTuningParameters,
+    RaptorTuningParameters raptorTuningParameters,
     RoutingWorkerRequest workerRequest
   ) {
     this.request = workerRequest.request();
@@ -157,7 +160,8 @@ public class RoutingWorker {
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
-    this.transitRoutingConfig = transitRoutingConfig;
+    this.raptorTuningParameters = raptorTuningParameters;
+    this.transitTuningParameters = transitTuningParameters;
     this.debugTimingAggregator = new DebugTimingAggregator(
       meterRegistry,
       request.preferences().system().tags()
@@ -430,8 +434,8 @@ public class RoutingWorker {
   private PagingService createPagingService(List<Itinerary> itineraries) {
     return PagingServiceFactory.createPagingService(
       searchStartTime(),
-      transitRoutingConfig,
-      transitRoutingConfig,
+      transitTuningParameters,
+      raptorTuningParameters,
       request,
       raptorSearchParamsUsed,
       pageCursorInput,
