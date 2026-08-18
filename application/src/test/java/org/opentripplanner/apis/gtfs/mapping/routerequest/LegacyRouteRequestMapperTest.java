@@ -48,6 +48,7 @@ import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehi
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
@@ -90,7 +91,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new TransitAlertServiceImpl(),
       transferService,
       new DefaultFareService(),
-      new DefaultVehicleRentalService(),
+      new DefaultVehicleRentalService(new DefaultVehicleRentalRepository()),
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
       new DefaultRealtimeVehicleService(
         new RealtimeVehicleRepositoryLifecycle().freeze(new DefaultRealtimeVehicleRepository()),

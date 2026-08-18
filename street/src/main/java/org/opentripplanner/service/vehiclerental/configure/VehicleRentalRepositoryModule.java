@@ -3,14 +3,11 @@ package org.opentripplanner.service.vehiclerental.configure;
 import dagger.Binds;
 import dagger.Module;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 
-/**
- * The service is used during application serve phase, not loading, so we need to provide
- * a module for the service without the repository, which is injected from the loading phase.
- */
+/** Binds the writable {@link VehicleRentalRepository} for the load phase. */
 @Module
 public interface VehicleRentalRepositoryModule {
   @Binds
-  VehicleRentalRepository bindService(DefaultVehicleRentalService service);
+  VehicleRentalRepository bind(DefaultVehicleRentalRepository repository);
 }
