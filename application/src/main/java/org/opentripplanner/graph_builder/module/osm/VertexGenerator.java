@@ -320,7 +320,7 @@ class VertexGenerator {
    * than one OSM way (or way/area boundary) and therefore needs to become a graph vertex.
    */
   boolean isIntersectionNode(long nodeId) {
-    return intersectionNodes.containsKey(nodeId);
+    return intersectionNodes.get(nodeId) != null;
   }
 
   /**
