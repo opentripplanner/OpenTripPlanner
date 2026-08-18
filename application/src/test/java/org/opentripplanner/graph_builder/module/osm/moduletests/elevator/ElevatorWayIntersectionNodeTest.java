@@ -1,9 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.elevator;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.FewerThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
@@ -11,7 +13,6 @@ import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
-import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 
 /**
  * Regression test for a NullPointerException reported after #7905 ("Speed up OSM way
@@ -65,20 +66,10 @@ class ElevatorWayIntersectionNodeTest {
     var summarizer = new GraphSummarizer(graph);
 
     assertWithMessage("Expected no elevator hop edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(graph.getEdgesOfType(ElevatorHopEdge.class))
-      .isEmpty();
+      .that(summarizer.summarizeEdges())
+      .containsExactly("(1,1) → (2,2) PEDESTRIAN ♿✅", "(2,2) → (1,1) PEDESTRIAN ♿✅");
 
-    var issues = issueStore
-      .listIssues()
-      .stream()
-      .filter(FewerThanTwoIntersectionNodesInElevatorWay.class::isInstance)
-      .map(FewerThanTwoIntersectionNodesInElevatorWay.class::cast)
-      .toList();
-    assertWithMessage("Expected exactly one FewerThanTwoIntersectionNodesInElevatorWay issue")
-      .that(issues)
-      .hasSize(1);
-    assertWithMessage("Only node `a` should have gotten a real vertex")
-      .that(issues.getFirst().intersectionNodes())
-      .isEqualTo(1);
+    var issues = issueStore.listIssues().stream().map(DataImportIssue::getType);
+    assertThat(issues).containsExactly("FewerThanTwoIntersectionNodesInElevatorWay");
   }
 }
