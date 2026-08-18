@@ -42,7 +42,7 @@ import org.rutebanken.netex.model.UicOperatingPeriod;
  */
 public class DayTypeAssignmentMapper {
 
-  private static final Set<DayOfWeek> EVERY_DAY_OF_WEEK = Set.of(DayOfWeek.values());
+  private static final Set<DayOfWeek> EVERY_DAY_OF_WEEK = Collections.unmodifiableSet(EnumSet.allOf(DayOfWeek.class));
 
   // Input data
   private final DayType dayType;
