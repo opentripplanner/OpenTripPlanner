@@ -16,8 +16,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 import uk.org.siri.siri21.DataFrameRefStructure;
 import uk.org.siri.siri21.DatedVehicleJourneyRef;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.JourneyRelationStructure;
-import uk.org.siri.siri21.JourneyRelationsStructure;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.VehicleJourneyRef;
@@ -209,10 +207,16 @@ final class EstimatedVehicleJourneyWrapper {
     return Optional.ofNullable(journey.getOccupancy()).map(OccupancyMapper::mapOccupancyStatus);
   }
 
-  public List<JourneyRelationStructure> journeyRelations() {
-    return Optional.ofNullable(journey.getJourneyRelations())
-      .map(JourneyRelationsStructure::getJourneyRelations)
-      .orElseGet(List::of);
+  public List<JourneyRelationWrapper> journeyRelations() {
+    if (journey.getJourneyRelations() == null) {
+      return List.of();
+    }
+    return journey
+      .getJourneyRelations()
+      .getJourneyRelations()
+      .stream()
+      .map(relation -> new JourneyRelationWrapper(relation, calls))
+      .toList();
   }
 
   Optional<String> dataSource() {

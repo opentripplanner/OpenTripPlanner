@@ -25,8 +25,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.JourneyRelationStructure;
-import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -45,7 +43,7 @@ class ModifiedTripBuilder {
   private final OccupancyStatus occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
-  private final List<JourneyRelationStructure> journeyRelations;
+  private final List<JourneyRelationWrapper> journeyRelations;
 
   @Nullable
   private final String vehicleRef;
@@ -143,34 +141,17 @@ class ModifiedTripBuilder {
     applyUpdates(builder);
 
     for (var r : journeyRelations) {
-      if (r.getJourneyRelationType().equals(JourneyRelationTypeEnumeration.REPLACED_BY_JOURNEY)) {
+      if (r.isReplacedBy()) {
         var replacedByTripsOnServiceDate = r
-          .getRelatedJourneies()
+          .relatedJourneys()
           .stream()
-          .map(j ->
-            entityResolver.resolveTripOnServiceDate(
-              VehicleJourneyIdAndServiceDate.of(j.getFramedVehicleJourneyRef())
-            )
-          )
+          .map(entityResolver::resolveTripOnServiceDate)
           .filter(Objects::nonNull)
           .toList();
-        for (var part : r.getJourneyParts().getJourneyPartInfos()) {
-          var fromPos = resolvePositionInPattern(
-            part.getFromStopPointRef().getValue(),
-            part.getStartTime(),
-            calls
-          );
-          var toPos = resolvePositionInPattern(
-            part.getToStopPointRef().getValue(),
-            part.getEndTime(),
-            calls
-          );
-          if (fromPos.isEmpty() || toPos.isEmpty()) {
-            continue;
+        for (var part : r.journeyParts()) {
+          for (var trip : replacedByTripsOnServiceDate) {
+            builder.withPartialReplacedBy(part.fromPos(), part.toPos(), trip);
           }
-          replacedByTripsOnServiceDate.forEach(t ->
-            builder.withPartialReplacedBy(fromPos.get(), toPos.get(), t)
-          );
         }
       }
     }
