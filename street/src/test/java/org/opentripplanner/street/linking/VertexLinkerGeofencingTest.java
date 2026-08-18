@@ -197,7 +197,7 @@ class VertexLinkerGeofencingTest {
     var index = new GeofencingZoneIndex(Set.of(NO_DROP_OFF_ZONE));
     return new GeofencingZoneService() {
       @Override
-      public Set<GeofencingZone> zonesContaining(Coordinate coord) {
+      public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
         return index.findZonesContaining(coord);
       }
 

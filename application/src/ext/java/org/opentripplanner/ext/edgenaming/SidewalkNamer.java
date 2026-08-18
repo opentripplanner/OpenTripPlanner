@@ -21,7 +21,6 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +96,7 @@ class SidewalkNamer implements EdgeNamer {
    */
   public boolean assignNameToEdge(EdgeOnLevel sidewalkOnLevel, Geometry buffer) {
     var sidewalk = sidewalkOnLevel.edge();
-    var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
+    var sidewalkLength = GeometryUtils.sumDistances(sidewalk.getGeometry());
 
     var candidates = streetIndex.query(buffer);
 
@@ -185,7 +184,7 @@ class SidewalkNamer implements EdgeNamer {
 
     private double length(Geometry intersection) {
       return switch (intersection) {
-        case LineString ls -> SphericalDistanceLibrary.length(ls);
+        case LineString ls -> GeometryUtils.sumDistances(ls);
         case MultiLineString mls -> GeometryUtils.getLineStrings(mls)
           .stream()
           .mapToDouble(this::intersectionLength)

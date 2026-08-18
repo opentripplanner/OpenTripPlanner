@@ -87,6 +87,13 @@
             }
           }
         }
+        realTimeTripState {
+          added
+          canceled
+          timesModified
+          tripPatternModified
+          updated
+        }
         trip {
           gtfsId
         }
