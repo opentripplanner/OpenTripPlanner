@@ -7,23 +7,30 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithOpDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithPeriod;
+import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeWithProperties;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriod;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriodWithOperatingDays;
 import static org.opentripplanner.netex.NetexTestDataSupport.createUicOperatingPeriod;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
+import static org.rutebanken.netex.model.DayOfWeekEnumeration.NONE;
+import static org.rutebanken.netex.model.DayOfWeekEnumeration.SUNDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
+import org.rutebanken.netex.model.PropertyOfDay;
 
 class DayTypeAssignmentMapperTest {
 
@@ -337,6 +344,152 @@ class DayTypeAssignmentMapperTest {
         "2020-11-30]",
       toStr(result, DAY_TYPE_1)
     );
+  }
+
+  /**
+   * A day type with a property which does not state any days of the week does not restrict the
+   * assigned operating period - the period is valid for every day.
+   */
+  @Test
+  void periodWithEmptyDayOfWeekPropertyAppliesToEveryDay() {
+    // GIVEN - a day type with '<properties><PropertyOfDay/></properties>'
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(createDayTypeWithProperties(DAY_TYPE_1, new PropertyOfDay()));
+    periods.add(createOperatingPeriod(OP_1, D2020_11_01, D2020_11_03));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - all days in the period, Sunday to Tuesday
+    assertEquals("[2020-11-01, 2020-11-02, 2020-11-03]", toStr(result, DAY_TYPE_1));
+  }
+
+  /** A day type without any properties at all does not restrict the assigned operating period. */
+  @Test
+  void periodWithNoDayTypePropertiesAppliesToEveryDay() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(createDayType(DAY_TYPE_1));
+    periods.add(createOperatingPeriod(OP_1, D2020_11_01, D2020_11_03));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - all days in the period, Sunday to Tuesday
+    assertEquals("[2020-11-01, 2020-11-02, 2020-11-03]", toStr(result, DAY_TYPE_1));
+  }
+
+  /**
+   * An explicitly stated NONE is not the same as an unstated day of week - it states that no day
+   * of the week applies.
+   */
+  @Test
+  void periodWithExplicitNoneDayOfWeekHasNoDates() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(createDayType(DAY_TYPE_1, NONE));
+    periods.add(createOperatingPeriod(OP_1, D2020_11_01, D2020_11_03));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    var issueStore = new DefaultDataImportIssueStore();
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      issueStore
+    );
+
+    // THEN - no dates, and the empty schedule is reported
+    assertEquals("[]", toStr(result, DAY_TYPE_1));
+    assertEquals(
+      List.of("DayTypeScheduleIsEmpty"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  /** An empty property must not widen the days of the week stated by a sibling property. */
+  @Test
+  void periodWithStatedAndEmptyDayOfWeekPropertiesUsesStatedDaysOnly() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(
+      createDayTypeWithProperties(
+        DAY_TYPE_1,
+        new PropertyOfDay().withDaysOfWeek(SUNDAY),
+        new PropertyOfDay()
+      )
+    );
+    periods.add(createOperatingPeriod(OP_1, D2020_11_01, D2020_11_03));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - only the stated Sunday
+    assertEquals("[2020-11-01]", toStr(result, DAY_TYPE_1));
+  }
+
+  /**
+   * A UIC operating period states its days with valid-day-bits, hence the days of the week of the
+   * day type do not apply.
+   */
+  @Test
+  void uicPeriodIgnoresMissingDayOfWeekProperty() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(createDayTypeWithProperties(DAY_TYPE_1, new PropertyOfDay()));
+    periods.add(createUicOperatingPeriod(OP_1, D2020_11_01, D2020_11_03, "101"));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - the valid-day-bits decide, the second day is skipped
+    assertEquals("[2020-11-01, 2020-11-03]", toStr(result, DAY_TYPE_1));
   }
 
   /* private helper methods */
