@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.test.support.ResourceLoader;
 
 /**
@@ -18,7 +19,7 @@ import org.opentripplanner.test.support.ResourceLoader;
  */
 class AdaptivePruningTest {
 
-  private static Graph graph;
+  private static GraphSummarizer graph;
 
   @BeforeAll
   static void setup() {
@@ -37,7 +38,7 @@ class AdaptivePruningTest {
   void distantIslandIsRetained() {
     assertTrue(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
@@ -49,7 +50,7 @@ class AdaptivePruningTest {
   void nearIslandIsRemoved() {
     assertFalse(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
@@ -61,7 +62,7 @@ class AdaptivePruningTest {
   void mainGraphIsNotRemoved() {
     assertTrue(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

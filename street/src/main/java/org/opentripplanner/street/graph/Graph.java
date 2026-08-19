@@ -250,13 +250,6 @@ public class Graph implements Serializable {
       .map(clazz::cast)::iterator;
   }
 
-  /**
-   * Return only the StreetEdges in the graph.
-   */
-  public Collection<StreetEdge> getStreetEdges() {
-    return getEdgesOfType(StreetEdge.class);
-  }
-
   public boolean containsVertex(Vertex v) {
     return (v != null) && vertices.get(v.getLabel()) == v;
   }

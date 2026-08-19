@@ -9,12 +9,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.test.support.ResourceLoader;
 
 class PruneNoThruIslandsTest {
 
-  private static Graph graph;
+  private static GraphSummarizer graph;
 
   @BeforeAll
   static void setup() {
@@ -30,7 +31,7 @@ class PruneNoThruIslandsTest {
   void bicycleIslandsBecomeNoThru() {
     assertTrue(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .filter(StreetEdge::isBicycleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
@@ -43,7 +44,7 @@ class PruneNoThruIslandsTest {
   void carIslandsBecomeNoThru() {
     assertTrue(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .filter(StreetEdge::isMotorVehicleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
@@ -56,7 +57,7 @@ class PruneNoThruIslandsTest {
   void pruneFloatingBikeAndWalkIsland() {
     assertFalse(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

@@ -21,6 +21,7 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphTest {
 
@@ -104,7 +105,7 @@ class GraphTest {
     allEdges.add(FreeEdge.createFreeEdge(c, b));
     allEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
+    var edges = ListUtils.ofIterable(g.findEdges(StreetEdge.class));
     assertEquals(0, edges.size());
   }
 
@@ -125,9 +126,9 @@ class GraphTest {
     allStreetEdges.add(edge(c, b, 1.0));
     allStreetEdges.add(edge(c, a, 1.0));
 
-    Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
+    var edges = ListUtils.ofIterable(g.findEdges(StreetEdge.class));
     assertEquals(4, edges.size());
-    assertEquals(allStreetEdges, edges);
+    assertThat(allStreetEdges).containsExactlyElementsIn(edges);
   }
 
   @Test
