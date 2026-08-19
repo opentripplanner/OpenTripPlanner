@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -129,7 +130,7 @@ public class AlertToLegMapper {
 
     // Filter alerts when there are multiple timePeriods for each alert
     totalAlerts.removeIf(alert ->
-      !alert.displayDuring(leg.startTime().toEpochSecond(), leg.endTime().toEpochSecond())
+      !alert.isActiveDuring(TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant()))
     );
 
     if (totalAlerts.isEmpty()) {
@@ -148,7 +149,9 @@ public class AlertToLegMapper {
   ) {
     return alerts
       .stream()
-      .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
+      .filter(alert ->
+        alert.isActiveDuring(TimePeriod.of(fromTime.toInstant(), toTime.toInstant()))
+      )
       .toList();
   }
 
