@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -13,10 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
+import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -38,14 +39,14 @@ public class RealtimeStopsLayerTest {
     var name = I18NString.of("name");
     var desc = I18NString.of("desc");
     stop = SiteRepository.of()
-      .regularStop(new FeedScopedId("F", "name"))
+      .regularStop(id("name"))
       .withName(name)
       .withDescription(desc)
       .withCoordinate(50, 10)
       .withTimeZone(ZoneIds.HELSINKI)
       .build();
     stop2 = SiteRepository.of()
-      .regularStop(new FeedScopedId("F", "name"))
+      .regularStop(id("name"))
       .withName(name)
       .withDescription(desc)
       .withCoordinate(51, 10)
@@ -67,12 +68,35 @@ public class RealtimeStopsLayerTest {
       .build();
     var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
-    var alert = TransitAlert.of(stop.getId())
+    var alert = TransitAlert.of(id("alert-1"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
+      .withSeverity(AlertSeverity.WARNING)
       .build();
-    transitAlertService.setAlerts(List.of(alert));
+    var severeAlert = TransitAlert.of(id("alert-2"))
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withEffect(AlertEffect.REDUCED_SERVICE)
+      .withSeverity(AlertSeverity.WARNING)
+      .build();
+    var infoAlert = TransitAlert.of(id("alert-3"))
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withEffect(AlertEffect.MODIFIED_SERVICE)
+      .withSeverity(AlertSeverity.INFO)
+      .build();
+
+    var expiredStartDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(3).toEpochSecond();
+    var expiredEndDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(2).toEpochSecond();
+    var expiredAlert = TransitAlert.of(id("alert-4"))
+      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addTimePeriod(new TimePeriod(expiredStartDate, expiredEndDate))
+      .withEffect(AlertEffect.DETOUR)
+      .withSeverity(AlertSeverity.SEVERE)
+      .build();
+
+    transitAlertService.setAlerts(List.of(alert, severeAlert, infoAlert, expiredAlert));
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);
@@ -95,6 +119,8 @@ public class RealtimeStopsLayerTest {
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
     assertEquals(true, map.get("closedByServiceAlert"));
+    assertEquals("WARNING", map.get("mostSevereAlertSeverityLevel"));
+    assertEquals("NO_SERVICE,REDUCED_SERVICE", map.get("mostSevereAlertsEffects"));
     assertEquals(false, map.get("servicesRunningOnServiceDate"));
   }
 }

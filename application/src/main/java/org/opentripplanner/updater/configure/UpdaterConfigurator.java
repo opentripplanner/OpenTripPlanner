@@ -359,7 +359,7 @@ public class UpdaterConfigurator {
 
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache() {
     if (siriFuzzyTripMatcherCache == null) {
-      siriFuzzyTripMatcherCache = new SiriFuzzyTripMatcherCache(transitRepository);
+      siriFuzzyTripMatcherCache = SiriFuzzyTripMatcherCache.create(transitRepository);
     }
     return siriFuzzyTripMatcherCache;
   }

@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitEditorService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
@@ -33,18 +33,18 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
  */
 class NewTripHandler {
 
-  private final TransitEditorService transitEditorService;
+  private final TransitService transitService;
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
 
   NewTripHandler(
-    TransitEditorService transitEditorService,
+    TransitService transitService,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache
   ) {
-    this.transitEditorService = transitEditorService;
+    this.transitService = transitService;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
@@ -54,15 +54,15 @@ class NewTripHandler {
    * Validate and handle GTFS-RT TripUpdate message containing a NEW trip.
    */
   UpdateSuccess handleNew(final TripUpdate tripUpdate) throws UpdateException {
-    if (transitEditorService.getScheduledTrip(tripUpdate.tripId()) != null) {
+    if (transitService.getScheduledTrip(tripUpdate.tripId()) != null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_ALREADY_EXISTS);
     }
-    var serviceId = transitEditorService.getOrCreateServiceIdForDate(tripUpdate.startDate());
+    var serviceId = transitService.getOrCreateServiceIdForDate(tripUpdate.startDate());
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }
 
-    var result = new RouteFactory(transitEditorService).getOrCreate(tripUpdate);
+    var result = new RouteFactory(transitService).getOrCreate(tripUpdate);
 
     // TODO: which Agency ID to use? Currently use feed id.
     var tripBuilder = Trip.of(tripUpdate.tripId())
@@ -81,13 +81,13 @@ class NewTripHandler {
    * Validate and handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
    */
   UpdateSuccess handleReplacement(TripUpdate tripUpdate) throws UpdateException {
-    Trip trip = transitEditorService.getTrip(tripUpdate.tripId());
+    Trip trip = transitService.getTrip(tripUpdate.tripId());
 
     if (trip == null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
 
-    final Set<FeedScopedId> serviceIds = transitEditorService
+    final Set<FeedScopedId> serviceIds = transitService
       .getTripCalendars()
       .listServiceIdsOnServiceDate(tripUpdate.startDate());
     if (!serviceIds.contains(trip.getServiceId())) {
@@ -127,7 +127,7 @@ class NewTripHandler {
       stopAndStopTimeUpdates,
       added,
       modified,
-      transitEditorService.getTripCalendars().getServiceCode(trip.getServiceId())
+      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
     );
 
     return addNewOrReplacementTripToSnapshot(
@@ -156,7 +156,7 @@ class NewTripHandler {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      transitEditorService.findPattern(trip)
+      transitService.findPattern(trip)
     );
 
     TripPattern hideTripInScheduledPattern = null;
@@ -190,7 +190,7 @@ class NewTripHandler {
           .stopId()
           .flatMap(id -> {
             var stopId = new FeedScopedId(tripUpdate.tripId().getFeedId(), id);
-            var stop = transitEditorService.getRegularStop(stopId);
+            var stop = transitService.getRegularStop(stopId);
             return Optional.ofNullable(stop).map(s -> new StopAndStopTimeUpdate(s, st));
           })
           .stream()
@@ -199,7 +199,7 @@ class NewTripHandler {
   }
 
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitEditorService.getTrip(tripId);
-    return transitEditorService.findPattern(trip);
+    Trip trip = transitService.getTrip(tripId);
+    return transitService.findPattern(trip);
   }
 }

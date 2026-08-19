@@ -7,7 +7,7 @@ import {
   NavigationControl,
   MapRef,
 } from 'react-map-gl/maplibre';
-import maplibregl, { VectorTileSource } from 'maplibre-gl';
+import { AttributionControl, VectorTileSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -76,7 +76,7 @@ export function MapView({
 
   const onLoad = (e: MapEvent) => {
     const map = e.target;
-    map.addControl(new maplibregl.AttributionControl(), 'bottom-left');
+    map.addControl(new AttributionControl(), 'bottom-left');
   };
 
   function handleMapLoad(e: MapEvent) {

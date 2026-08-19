@@ -13,18 +13,21 @@ class DefaultVehicleRentalServiceTest {
 
   @Test
   void getVehicleRentalStationForEnvelopeShouldExcludeVehicleRentalVehicle() {
-    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
+    DefaultVehicleRentalRepository repository = new DefaultVehicleRentalRepository();
+    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService(
+      repository
+    );
 
     VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
       .withCoordinates(1, 1)
       .build();
-    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
+    repository.addVehicleRentalStation(vehicleRentalStation);
 
     VehicleRentalVehicle vehicleRentalVehicle = new TestFreeFloatingRentalVehicleBuilder()
       .withLatitude(2)
       .withLongitude(2)
       .build();
-    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalVehicle);
+    repository.addVehicleRentalStation(vehicleRentalVehicle);
 
     List<VehicleRentalStation> vehicleRentalStationForEnvelope =
       defaultVehicleRentalService.getVehicleRentalStationForEnvelope(0, 0, 10, 10);

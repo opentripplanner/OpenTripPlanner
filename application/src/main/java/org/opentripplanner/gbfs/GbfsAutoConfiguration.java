@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
@@ -70,6 +73,30 @@ public class GbfsAutoConfiguration {
   }
 
   /**
+   * The names of the feeds the system publishes, e.g. {@code geofencing_zones}. Use this to skip
+   * loading a system that does not publish a feed you need, without having to fetch and parse the
+   * feed itself.
+   * <p>
+   * GBFS v3 lists the feeds directly under {@code data}, while v2 nests them per language; the
+   * names are unioned across languages. Returns an empty set if the file declares no feeds.
+   */
+  public Set<String> feedNames() {
+    var data = json.get("data");
+    if (data == null) {
+      return Set.of();
+    }
+    var names = new HashSet<String>();
+    if (data.has("feeds")) {
+      addFeedNames(data.get("feeds"), names);
+    } else {
+      for (var language : data) {
+        addFeedNames(language.get("feeds"), names);
+      }
+    }
+    return Set.copyOf(names);
+  }
+
+  /**
    * Maps the file onto the model class of the GBFS version it declares.
    */
   public <T> T mapTo(Class<T> clazz) {
@@ -90,6 +117,18 @@ public class GbfsAutoConfiguration {
 
   public String url() {
     return url;
+  }
+
+  private static void addFeedNames(@Nullable JsonNode feeds, Set<String> names) {
+    if (feeds == null || !feeds.isArray()) {
+      return;
+    }
+    for (var feed : feeds) {
+      var name = feed.get("name");
+      if (name != null && name.isTextual()) {
+        names.add(name.asText());
+      }
+    }
   }
 
   private static URI toUri(String url) {

@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.io.HttpHeaders;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
@@ -31,12 +31,13 @@ class VehicleRentalUpdaterTest {
     Duration.ZERO,
     new FakeParams()
   );
-  public static final DefaultVehicleRentalService SERVICE = new DefaultVehicleRentalService();
+  public static final DefaultVehicleRentalRepository REPOSITORY =
+    new DefaultVehicleRentalRepository();
 
   @Test
   void failingDataSourceCountsAsPrimed() {
     var source = new FailingDataSource();
-    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, REPOSITORY);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);
@@ -53,7 +54,7 @@ class VehicleRentalUpdaterTest {
   @Disabled
   void failingSetup() {
     var source = new FailingSetupDataSource();
-    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, REPOSITORY);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);

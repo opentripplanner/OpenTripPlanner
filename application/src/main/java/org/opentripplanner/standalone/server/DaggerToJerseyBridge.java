@@ -13,6 +13,7 @@ import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -62,6 +63,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
 
     // Binding for all request-scoped services used by resources
     bridge(factory, RequestScopedFactory::transitService, TransitService.class);
+    bridge(factory, RequestScopedFactory::transitAlertService, TransitAlertService.class);
     bridge(factory, RequestScopedFactory::createServerContext, OtpServerRequestContext.class);
     bridge(factory, RequestScopedFactory::graph, Graph.class);
     bridge(factory, RequestScopedFactory::defaultRouteRequest, RouteRequest.class);
