@@ -7,7 +7,7 @@ import {
   NavigationControl,
   MapRef,
 } from 'react-map-gl/maplibre';
-import { AttributionControl, VectorTileSource } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -69,14 +69,14 @@ export function MapView({
     // in such a case we pan to the area that is specified in the tile bounds, which is
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
-      const source = map.getSource('stops') as VectorTileSource;
+      const source = map.getSource('stops') as maplibregl.VectorTileSource;
       map.fitBounds(source.bounds, { animate: false });
     }
   };
 
   const onLoad = (e: MapEvent) => {
     const map = e.target;
-    map.addControl(new AttributionControl(), 'bottom-left');
+    map.addControl(new maplibregl.AttributionControl(), 'bottom-left');
   };
 
   function handleMapLoad(e: MapEvent) {
@@ -96,7 +96,7 @@ export function MapView({
       <Map
         attributionControl={false}
         // @ts-ignore
-        mapLib={import('maplibre-gl')}
+        mapLib={maplibregl}
         // @ts-ignore
         mapStyle={styleUrl}
         onDblClick={onMapDoubleClick}
