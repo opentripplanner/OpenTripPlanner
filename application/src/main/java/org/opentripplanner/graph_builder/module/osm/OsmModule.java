@@ -572,7 +572,7 @@ public class OsmModule implements GraphBuilderModule {
     var size = nodeRefs.size();
     var nodes = new Coordinate[size];
     for (int i = 0; i < size; i++) {
-      nodes[i] = osmdb.getNode(nodeRefs.get(i)).getCoordinate();
+      nodes[i] = osmdb.getNodeCoordinate(nodeRefs.get(i));
     }
 
     var geometryFactory = GeometryUtils.getGeometryFactory();
