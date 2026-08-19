@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TLongArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -348,7 +349,7 @@ public class OsmModule implements GraphBuilderModule {
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
-      ArrayList<Long> nodes = new ArrayList<>(way.getNodeRefs().size());
+      TLongArrayList nodes = new TLongArrayList(way.getNodeRefs().size());
       long last = -1;
       double lastLat = -1;
       double lastLon = -1;
@@ -390,7 +391,7 @@ public class OsmModule implements GraphBuilderModule {
        * if the next vertex also appears earlier in the way, we need to split the way, because otherwise we have a way that loops from a
        * vertex to itself, which could cause issues with splitting.
        */
-      Long startNode = null;
+      long startNode = -777;
       // where the current edge should start
       OsmNode osmStartNode = null;
 
@@ -406,7 +407,7 @@ public class OsmModule implements GraphBuilderModule {
           continue;
         }
 
-        Long endNode = nodes.get(i + 1);
+        long endNode = nodes.get(i + 1);
 
         if (osmStartNode == null) {
           startNode = nodes.get(i);

@@ -28,7 +28,12 @@ import org.opentripplanner.osm.model.OsmNode;
  */
 class OsmNodeStore {
 
-  /** OSM coordinates have 7 decimal digits of precision, i.e. about 1cm - the same as this fixed point encoding. */
+  /**
+   * OSM coordinates have 7 decimal digits of precision, i.e. about 1cm - the same as this fixed
+   * point encoding.
+   *
+   * @see <a href="https://wiki.openstreetmap.org/wiki/Node#Structure">OSM wiki: Node structure</a>
+   */
   private static final double FIXED_POINT_FACTOR = 1e7;
 
   /** Coordinates of all retained nodes, packed as two fixed-point ints in one long. */

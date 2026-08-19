@@ -12,10 +12,12 @@ import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
 
-public class OsmParserTest {
+class OsmParserTest {
+
+  public static final double EPSILON = 0.0000001;
 
   @Test
-  public void testBinaryParser() {
+  void testBinaryParser() {
     File osmFile = ResourceLoader.of(this).file("map.osm.pbf");
     DefaultOsmProvider pr = new DefaultOsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
@@ -26,8 +28,8 @@ public class OsmParserTest {
 
     OsmNode nodeA = osmdb.getNode(314192918L);
     assertEquals(314192918, nodeA.getId());
-    assertEquals(52.3750447, nodeA.lat, 0.0000001);
-    assertEquals(16.8431974, nodeA.lon, 0.0000001);
+    assertEquals(52.3750447, nodeA.lat, EPSILON);
+    assertEquals(16.8431974, nodeA.lon, EPSILON);
     assertTrue(nodeA.hasTag("railway"));
     assertEquals("level_crossing", nodeA.getTag("railway"));
 

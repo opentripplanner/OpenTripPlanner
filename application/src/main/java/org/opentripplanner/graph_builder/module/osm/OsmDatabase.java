@@ -124,10 +124,6 @@ public class OsmDatabase {
     return nodes.get(nodeId);
   }
 
-  public OsmNode getNode(Long nodeId) {
-    return nodes.get(nodeId);
-  }
-
   /**
    * Returns just the coordinate of the given node. Cheaper than {@code getNode(nodeId).getCoordinate()}
    * for call sites that don't need the node's tags or provider.
@@ -136,7 +132,7 @@ public class OsmDatabase {
     return nodes.getCoordinate(nodeId);
   }
 
-  public OsmWay getWay(Long wayId) {
+  public OsmWay getWay(long wayId) {
     return waysById.get(wayId);
   }
 
@@ -144,11 +140,11 @@ public class OsmDatabase {
     return Collections.unmodifiableCollection(waysById.valueCollection());
   }
 
-  public boolean isAreaWay(Long wayId) {
+  public boolean isAreaWay(long wayId) {
     return areaWayIds.contains(wayId);
   }
 
-  public int nodeCount() {
+  int nodeCount() {
     return nodes.size();
   }
 
