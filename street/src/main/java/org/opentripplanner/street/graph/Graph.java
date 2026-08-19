@@ -205,6 +205,10 @@ public class Graph implements Serializable {
 
   /**
    * Return all the edges in the graph. Derived from vertices on demand.
+   * <p>
+   * Note: Under concurrent modification this method may return edges that have been removed from
+   * the graph or not return edges that have been added to the graph after this method has been
+   * called.
    */
   public Collection<Edge> getEdges() {
     Set<Edge> edges = new HashSet<>();
@@ -214,6 +218,11 @@ public class Graph implements Serializable {
     return edges;
   }
 
+  /**
+   * Note: Under concurrent modification this method may return edges that have been removed from
+   * the graph or not return edges that have been added to the graph after this method has been
+   * called.
+   */
   public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
     return this.getEdges()
       .stream()
@@ -228,6 +237,10 @@ public class Graph implements Serializable {
    * of {@code clazz}.
    * <p>
    * The iterator may contain duplicates.
+   * <p>
+   * Note: Under concurrent modification this method may return edges that have been removed from
+   * the graph or not return edges that have been added to the graph after this method has been
+   * called.
    */
   public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
     return this.vertices.values()
