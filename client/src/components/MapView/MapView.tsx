@@ -8,7 +8,7 @@ import {
   MapRef,
 } from 'react-map-gl/maplibre';
 import * as maplibregl from 'maplibre-gl';
-import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 // maplibre-gl resolves its worker script relative to `import.meta.url` at runtime, which Vite
