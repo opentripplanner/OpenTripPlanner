@@ -65,16 +65,23 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
     Duration durationLimit,
     int maxStopCount
   ) {
-    return findNearbyStopsViaDirectTransfers(vertex, durationLimit);
+    return findNearbyStopsViaDirectTransfers(vertex, durationLimit, maxStopCount);
   }
 
   private List<NearbyStop> findNearbyStopsViaDirectTransfers(
     Vertex vertex,
-    Duration durationLimit
+    Duration durationLimit,
+    int maxStopCount
   ) {
     // TODO why we use default speed here?
     double limitMeters = durationLimit.toSeconds() * WalkPreferences.DEFAULT.speed();
     Coordinate c0 = vertex.getCoordinate();
-    return findNearbyStops(c0, limitMeters);
+    List<NearbyStop> stopsFound = findNearbyStops(c0, limitMeters);
+
+    if (maxStopCount > 0 && stopsFound.size() > maxStopCount) {
+      return List.copyOf(stopsFound.subList(0, maxStopCount));
+    }
+
+    return stopsFound;
   }
 }

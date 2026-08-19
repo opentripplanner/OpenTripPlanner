@@ -141,6 +141,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param originVertices   the origin point of the street search.
    * @param reverseDirection if true the paths returned instead originate at the nearby stops and
    *                         have the originVertex as the destination.
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
+   *                         we will always return all the directly connected stops.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,

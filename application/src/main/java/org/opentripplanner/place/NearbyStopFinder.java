@@ -17,8 +17,7 @@ public interface NearbyStopFinder {
   /**
    * Return all stops within a certain distance from the given vertex.
    *
-   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
-   * we will always return all the directly connected stops.
+   * @param maxStopCount The maximum stops to return. 0 means no limit.
    */
   Collection<NearbyStop> findNearbyStops(
     Vertex vertex,

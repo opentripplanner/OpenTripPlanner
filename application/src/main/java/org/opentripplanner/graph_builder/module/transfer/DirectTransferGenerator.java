@@ -393,7 +393,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
       StreetMode mode = transferProfile.journey().transfer().mode();
       Duration durationLimit = transferConfiguration.defaultDurationLimitForMode().get(mode);
-      //maxStopCount is 0 in original StreetNearbyStopFinder declaration and unused in StraightLineNearbyStopFinder
       var nearbyStops = nearbyStopFinder.findNearbyStops(
         ts0,
         transferProfile,
