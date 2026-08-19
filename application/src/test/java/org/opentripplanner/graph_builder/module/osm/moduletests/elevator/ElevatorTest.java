@@ -381,8 +381,7 @@ class ElevatorTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var elevatorHopEdges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
-    assertThat(elevatorHopEdges).hasSize(4);
+    assertThat(graph.findEdges(ElevatorHopEdge.class)).hasSize(4);
     var elevatorHopVertices = graph
       .getVerticesOfType(ElevatorHopVertex.class)
       .stream()
@@ -412,8 +411,7 @@ class ElevatorTest {
       .build()
       .buildGraph();
 
-    var elevatorHopEdges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
-    assertThat(elevatorHopEdges).hasSize(0);
+    assertThat(graph.findEdges(ElevatorHopEdge.class)).isEmpty();
 
     var issues = issueStore
       .listIssues()

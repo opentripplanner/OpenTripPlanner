@@ -7,7 +7,6 @@ import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruni
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.test.support.ResourceLoader;
 
