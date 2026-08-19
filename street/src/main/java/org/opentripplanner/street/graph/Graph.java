@@ -219,19 +219,6 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Note: Under concurrent modification this method may return edges that have been removed from
-   * the graph or not return edges that have been added to the graph after this method has been
-   * called.
-   */
-  public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
-    return this.getEdges()
-      .stream()
-      .filter(cls::isInstance)
-      .map(cls::cast)
-      .collect(Collectors.toList());
-  }
-
-  /**
    * Lazily iterate over all edges of a certain type in the graph, without materializing an
    * intermediate collection. Walks the vertices and yielding only the ones that are instances
    * of {@code clazz}.

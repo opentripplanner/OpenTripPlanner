@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class ElevatorTest {
 
@@ -42,7 +43,7 @@ class ElevatorTest {
 
     osmModule.buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));
@@ -66,7 +67,7 @@ class ElevatorTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));
@@ -89,7 +90,7 @@ class ElevatorTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertEquals(edge.getLevels(), 0.0);
@@ -214,11 +215,10 @@ class ElevatorTest {
     int streetEdgeCount = 8;
     assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.getEdges().size());
 
-    graph
-      .getEdgesOfType(ElevatorHopEdge.class)
+    ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
       .stream()
       .forEach(edge -> elevatorHopEdgeLevels.put(edge, edge.getLevels()));
-    for (var edge : graph.getEdgesOfType(ElevatorHopEdge.class)) {
+    for (var edge : ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))) {
       assertEquals(edge.getLevels(), elevatorHopEdgeLevels.get(edge));
     }
   }
@@ -381,7 +381,7 @@ class ElevatorTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var elevatorHopEdges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(elevatorHopEdges).hasSize(4);
     var elevatorHopVertices = graph
       .getVerticesOfType(ElevatorHopVertex.class)
@@ -412,7 +412,7 @@ class ElevatorTest {
       .build()
       .buildGraph();
 
-    var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var elevatorHopEdges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(elevatorHopEdges).hasSize(0);
 
     var issues = issueStore
@@ -478,22 +478,19 @@ class ElevatorTest {
   private Set<String> getActualEdgeSet(Graph graph) {
     Set<String> actualEdgeSet = new HashSet<>();
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorBoardEdge.class)
+      ListUtils.ofIterable(graph.findEdges(ElevatorBoardEdge.class))
         .stream()
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorAlightEdge.class)
+      ListUtils.ofIterable(graph.findEdges(ElevatorAlightEdge.class))
         .stream()
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorHopEdge.class)
+      ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
         .stream()
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()

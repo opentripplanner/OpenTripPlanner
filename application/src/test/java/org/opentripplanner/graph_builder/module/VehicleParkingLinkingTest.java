@@ -20,6 +20,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class VehicleParkingLinkingTest {
 
@@ -77,7 +78,7 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, transitRepository);
 
-    var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
+    var streetLinks = ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class));
     assertEquals(2, streetLinks.size());
 
     streetLinks.forEach(e ->
@@ -110,7 +111,7 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, transitRepository);
 
-    var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
+    var streetLinks = ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class));
     assertEquals(4, streetLinks.size());
 
     streetLinks.forEach(e ->
@@ -148,8 +149,8 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(1, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
-    assertEquals(1, graph.getEdgesOfType(VehicleParkingEdge.class).size());
-    assertEquals(2, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertEquals(1, ListUtils.ofIterable(graph.findEdges(VehicleParkingEdge.class)).size());
+    assertEquals(2, ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class)).size());
   }
 
   @Test
@@ -175,10 +176,10 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
-    assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertEquals(0, ListUtils.ofIterable(graph.findEdges(VehicleParkingEdge.class)).size());
+    assertEquals(0, ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class)).size());
 
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertEquals(0, ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class)).size());
     assertEquals(0, vehicleParkingService.listVehicleParkings().size());
   }
 }

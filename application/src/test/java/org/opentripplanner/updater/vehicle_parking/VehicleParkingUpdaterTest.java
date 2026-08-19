@@ -30,6 +30,7 @@ import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
 class VehicleParkingUpdaterTest {
@@ -282,7 +283,7 @@ class VehicleParkingUpdaterTest {
 
   private void assertVehicleParkingNotLinked() {
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
-    assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
+    assertEquals(0, ListUtils.ofIterable(graph.findEdges(StreetVehicleParkingLink.class)).size());
+    assertEquals(0, ListUtils.ofIterable(graph.findEdges(VehicleParkingEdge.class)).size());
   }
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
@@ -56,16 +57,18 @@ public class GraphSummarizer {
    * outgoing.
    */
   public List<Edge> listEdges() {
-    return graph
-      .getVertices()
-      .stream()
-      .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
-      .distinct()
-      .toList();
+    return distinctEdges().toList();
   }
 
   public List<AreaEdge> listAreaEdges() {
-    return graph.getEdgesOfType(AreaEdge.class);
+    return findEdges(AreaEdge.class);
+  }
+
+  /**
+   * Return all edges of a certain type in the graph.
+   */
+  public <T extends Edge> List<T> findEdges(Class<T> cls) {
+    return distinctEdges().filter(cls::isInstance).map(cls::cast).toList();
   }
 
   public String geoJsonUrl() {
@@ -98,5 +101,13 @@ public class GraphSummarizer {
 
   public Graph graph() {
     return graph;
+  }
+
+  private @NonNull Stream<Edge> distinctEdges() {
+    return graph
+      .getVertices()
+      .stream()
+      .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
+      .distinct();
   }
 }

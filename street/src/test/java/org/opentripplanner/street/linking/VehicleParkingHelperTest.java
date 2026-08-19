@@ -15,6 +15,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class VehicleParkingHelperTest {
 
@@ -64,7 +65,7 @@ class VehicleParkingHelperTest {
     new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertEquals(3, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
-    assertEquals(7, graph.getEdgesOfType(VehicleParkingEdge.class).size());
+    assertEquals(7, ListUtils.ofIterable(graph.findEdges(VehicleParkingEdge.class)).size());
   }
 
   private VehicleParking createParingWithEntrances(int entranceNumber) {
