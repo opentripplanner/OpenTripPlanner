@@ -8,7 +8,13 @@ import {
   MapRef,
 } from 'react-map-gl/maplibre';
 import * as maplibregl from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+
+// maplibre-gl resolves its worker script relative to `import.meta.url` at runtime, which Vite
+// cannot statically detect and therefore never copies into the build output. Point it at the
+// worker asset Vite does bundle instead.
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
