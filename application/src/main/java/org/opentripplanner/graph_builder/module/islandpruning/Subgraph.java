@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -20,67 +19,86 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 class Subgraph {
 
-  private final Set<Vertex> streetVertexSet;
-  private final Set<TransitStopVertex> stopsVertexSet;
+  private final Set<Vertex> streetVertices;
+  private final Set<TransitStopVertex> stopVertices;
 
   Subgraph() {
-    streetVertexSet = new HashSet<>();
-    stopsVertexSet = new HashSet<>();
+    streetVertices = new HashSet<>();
+    stopVertices = new HashSet<>();
   }
 
   void addVertex(Vertex vertex) {
     if (vertex instanceof TransitStopVertex transitStopVertex) {
-      stopsVertexSet.add(transitStopVertex);
+      stopVertices.add(transitStopVertex);
     } else {
-      streetVertexSet.add(vertex);
+      streetVertices.add(vertex);
     }
   }
 
   boolean contains(Vertex vertex) {
-    return (streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex));
+    return (streetVertices.contains(vertex) || stopVertices.contains(vertex));
   }
 
   int streetSize() {
-    return streetVertexSet.size();
+    return streetVertices.size();
   }
 
   int stopSize() {
-    return stopsVertexSet.size();
+    return stopVertices.size();
   }
 
   Vertex getRepresentativeVertex() {
     // Return first OSM vertex if available
-    for (var vertx : streetVertexSet) {
+    for (var vertx : streetVertices) {
       if (vertx instanceof OsmVertex) {
         return vertx;
       }
     }
 
     // Otherwise fallback to what is available
-    return streetVertexSet.iterator().next();
+    return streetVertices.iterator().next();
   }
 
-  Iterator<Vertex> streetIterator() {
-    return streetVertexSet.iterator();
+  Iterable<Vertex> streetVertices() {
+    return streetVertices::iterator;
   }
 
-  Iterator<TransitStopVertex> stopIterator() {
-    return stopsVertexSet.iterator();
+  Iterable<TransitStopVertex> stopVertices() {
+    return stopVertices::iterator;
   }
 
   // find minimal distance from a given vertex to vertices of this subgraph
   double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
-    double d1 = streetVertexSet
-      .stream()
-      .map(x -> SphericalDistanceLibrary.distance(x.getCoordinate(), v.getCoordinate()))
-      .min(Double::compareTo)
-      .orElse(searchRadius);
-    double d2 = stopsVertexSet
-      .stream()
-      .map(x -> SphericalDistanceLibrary.distance(x.getCoordinate(), v.getCoordinate()))
-      .min(Double::compareTo)
-      .orElse(searchRadius);
+    double d1 = computeDistance(v, searchRadius, streetVertices);
+    double d2 = computeDistance(v, searchRadius, stopVertices);
     return Math.min(d1, d2);
+  }
+
+  private double computeDistance(Vertex v, double searchRadius, Set<? extends Vertex> vertices) {
+    double distance = Double.MAX_VALUE;
+    Vertex clostestVertex = null;
+    for (Vertex vertex : vertices) {
+      var d = SphericalDistanceLibrary.fastDistance(
+        v.getLat(),
+        v.getLon(),
+        vertex.getLat(),
+        vertex.getLon()
+      );
+      if (d < distance) {
+        clostestVertex = vertex;
+        distance = d;
+      }
+    }
+    if (clostestVertex == null) {
+      return searchRadius;
+    } else {
+      return SphericalDistanceLibrary.distance(
+        clostestVertex.getLat(),
+        clostestVertex.getLon(),
+        v.getLat(),
+        v.getLon()
+      );
+    }
   }
 
   // Estimate distance of a subgraph from other parts of the graph.
@@ -94,21 +112,20 @@ class Subgraph {
 
     Envelope envelope = new Envelope();
 
-    for (Iterator<Vertex> vIter = streetIterator(); vIter.hasNext(); ) {
-      Vertex vx = vIter.next();
-      envelope.expandToInclude(vx.getCoordinate());
+    for (var i : streetVertices) {
+      envelope.expandToInclude(i.getX(), i.getY());
     }
-    for (TransitStopVertex vx : stopsVertexSet) {
-      envelope.expandToInclude(vx.getCoordinate());
+    for (var i : stopVertices) {
+      envelope.expandToInclude(i.getX(), i.getY());
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
     return graph
       .findVertices(envelope)
-      .stream()
+      .parallelStream()
       .filter(vx -> !contains(vx))
-      .map(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
-      .min(Double::compareTo)
+      .mapToDouble(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
+      .min()
       .orElse(searchRadius);
   }
 
@@ -121,8 +138,8 @@ class Subgraph {
 
     Consumer<Vertex> vertexAdder = vertex ->
       points.add(geometryFactory.createPoint(vertex.getCoordinate()));
-    streetIterator().forEachRemaining(vertexAdder);
-    stopIterator().forEachRemaining(vertexAdder);
+    streetVertices().forEach(vertexAdder);
+    stopVertices().forEach(vertexAdder);
 
     return new MultiPoint(points.toArray(new Point[0]), geometryFactory);
   }
@@ -134,7 +151,7 @@ class Subgraph {
    * stopping at the subgraph
    */
   boolean hasOnlyFerryStops() {
-    for (TransitStopVertex v : stopsVertexSet) {
+    for (TransitStopVertex v : stopVertices) {
       if (!v.isFerryStop()) {
         return false;
       }

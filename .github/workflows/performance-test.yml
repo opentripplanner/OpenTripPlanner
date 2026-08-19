@@ -5,6 +5,13 @@ on:
     branches:
       - dev-2.x
 
+# There is only one performance-test runner, so runs queue up behind each other anyway.
+# Without this, GitHub picks the newest queued run first; `queue: max` makes it process
+# queued runs in FIFO order (oldest push first) instead.
+concurrency:
+  group: performance-test
+  queue: max
+
 jobs:
   perf-test:
     if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for') && !startsWith(github.event.head_commit.message ,'Upgrade debug client to version')

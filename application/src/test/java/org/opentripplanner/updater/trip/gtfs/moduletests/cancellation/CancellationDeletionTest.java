@@ -84,6 +84,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
           .addStop(STOP_A, "0:00:10", "0:00:11")
           .addStop(STOP_B, "0:00:20", "0:00:21")
       )
+      // the added trip below also visits stop C
+      .addStops(STOP_C_ID)
       .build();
     var rt = GtfsRtTestHelper.of(env);
     var addedTripId = "added-trip";

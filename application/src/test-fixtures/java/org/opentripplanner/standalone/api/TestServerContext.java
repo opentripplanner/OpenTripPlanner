@@ -36,6 +36,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
@@ -248,7 +249,7 @@ public class TestServerContext {
   }
 
   public static VehicleRentalService createVehicleRentalService() {
-    return new DefaultVehicleRentalService();
+    return new DefaultVehicleRentalService(new DefaultVehicleRentalRepository());
   }
 
   public static VehicleParkingService createVehicleParkingService() {

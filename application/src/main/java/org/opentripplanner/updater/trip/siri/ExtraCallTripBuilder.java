@@ -28,6 +28,7 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class ExtraCallTripBuilder {
 
@@ -79,7 +80,7 @@ class ExtraCallTripBuilder {
     this.generateTripPatternId = generateTripPatternId;
     timeZone = transitService.getTimeZone();
 
-    stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
+    stopTimesMapper = new StopTimesMapper(entityResolver);
   }
 
   TripUpdate build() throws UpdateException {
@@ -100,7 +101,7 @@ class ExtraCallTripBuilder {
       throw UpdateException.of(trip.getId(), NO_START_DATE);
     }
 
-    ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
+    ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, timeZone);
 
     // Create the "scheduled version" of the trip
     // We do not reuse the trip times of the original scheduled trip
@@ -111,7 +112,7 @@ class ExtraCallTripBuilder {
       CallWrapper call = calls.get(stopSequence);
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
-        departureDate,
+        startOfService,
         stopSequence,
         call,
         stopSequence == 0,
@@ -168,7 +169,7 @@ class ExtraCallTripBuilder {
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       TimetableHelper.applyUpdates(
-        departureDate,
+        startOfService,
         builder,
         stopSequence,
         stopSequence == (calls.size() - 1),

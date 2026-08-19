@@ -207,7 +207,7 @@ class ElevatorProcessor {
       }
       List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(way);
       List<Long> nodes = Arrays.stream(way.getNodeRefs().toArray())
-        .filter(nodeRef -> vertexGenerator.intersectionNodes().get(nodeRef) != null)
+        .filter(vertexGenerator::hasIntersectionVertex)
         .boxed()
         .toList();
 
@@ -252,7 +252,7 @@ class ElevatorProcessor {
       List<ElevatorHopVertex> elevatorHopVertices = new ArrayList<>();
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
-        var sourceVertex = vertexGenerator.intersectionNodes().get(node);
+        var sourceVertex = vertexGenerator.getIntersectionVertex(node);
         OsmLevel level = nodeLevels.get(i);
         createElevatorVertices(
           elevatorHopVertices,

@@ -51,6 +51,6 @@ public class TripUpdateApplier {
 
     // Phase 3: Apply the main update
     buffer.update(update);
-    return UpdateSuccess.noWarnings(update.producer());
+    return UpdateSuccess.of(update.producer());
   }
 }

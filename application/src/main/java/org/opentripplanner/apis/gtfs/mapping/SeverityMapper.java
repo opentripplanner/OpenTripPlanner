@@ -20,7 +20,7 @@ public class SeverityMapper {
       case INFO -> GraphQLAlertSeverityLevelType.INFO;
       case VERY_SLIGHT, SLIGHT, WARNING -> GraphQLAlertSeverityLevelType.WARNING;
       case VERY_SEVERE, SEVERE -> GraphQLAlertSeverityLevelType.SEVERE;
-      case UNDEFINED, UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
+      case UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     };
   }
 }
