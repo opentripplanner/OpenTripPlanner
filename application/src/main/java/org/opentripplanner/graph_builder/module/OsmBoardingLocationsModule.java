@@ -314,7 +314,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .withToVertex(to)
       .withGeometry(line)
       .withName(LOCALIZED_PLATFORM_NAME)
-      .withMeterLength(SphericalDistanceLibrary.length(line))
+      .withMeterLength(GeometryUtils.sumDistances(line))
       .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
       .withBack(false)
       .buildAndConnect();

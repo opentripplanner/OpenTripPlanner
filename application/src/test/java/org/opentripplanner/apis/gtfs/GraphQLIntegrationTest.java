@@ -92,6 +92,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -124,7 +125,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -376,7 +376,7 @@ class GraphQLIntegrationTest {
 
     var snapshot = timetableSnapshot.commit();
 
-    TransitEditorService transitService = new DefaultTransitService(transitRepository, snapshot) {
+    var transitService = new DefaultTransitService(transitRepository, snapshot) {
       @Override
       public List<TransitMode> findTransitModes(StopLocation stop) {
         return List.of(BUS, FERRY);
@@ -543,10 +543,13 @@ class GraphQLIntegrationTest {
       transitService
     );
 
-    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
-    defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
-    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
-    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
+    DefaultVehicleRentalRepository rentalRepository = new DefaultVehicleRentalRepository();
+    rentalRepository.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
+    rentalRepository.addVehicleRentalStation(RENTAL_VEHICLE_1);
+    rentalRepository.addVehicleRentalStation(RENTAL_VEHICLE_2);
+    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService(
+      rentalRepository
+    );
 
     var routeRequest = RouteRequest.defaultValue();
     context = new GraphQLRequestContext(

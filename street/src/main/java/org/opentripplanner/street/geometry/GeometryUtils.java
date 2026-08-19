@@ -315,6 +315,19 @@ public class GeometryUtils {
     return Arrays.stream(envelopes);
   }
 
+  /**
+   * Returns the length of the geometry in meters.
+   */
+  public static double sumDistances(Geometry geometry) {
+    // Optimization: In the case of a LineString, it is more efficient to compute the distance
+    // from the coordinate sequence than the coordinates (less intermediate objects creation)
+    if (geometry instanceof LineString ls) {
+      return GeometryUtils.sumDistances(ls.getCoordinateSequence());
+    } else {
+      return GeometryUtils.sumDistances(geometry.getCoordinates());
+    }
+  }
+
   /// Returns the sum of the distances in between the pairs of coordinates in meters.
   /// If the number of coordinates is empty or just one(a point), then `0` is returned.
   public static double sumDistances(Coordinate[] coordinates) {

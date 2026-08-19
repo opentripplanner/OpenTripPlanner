@@ -33,6 +33,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -484,6 +485,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<StopArrival> to();
     public DataFetcher<Boolean> transitLeg();
     public DataFetcher<Trip> trip();
+    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
     public DataFetcher<Boolean> walkingBike();
   }
 
@@ -747,6 +749,15 @@ public class GraphQLDataFetchers {
   public interface GraphQLRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
     public DataFetcher<java.time.OffsetDateTime> time();
+  }
+
+  /** The real-time state of a trip */
+  public interface GraphQLRealTimeTripState {
+    public DataFetcher<Boolean> added();
+    public DataFetcher<Boolean> canceled();
+    public DataFetcher<Boolean> timesModified();
+    public DataFetcher<Boolean> tripPatternModified();
+    public DataFetcher<Boolean> updated();
   }
 
   /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
@@ -1078,6 +1089,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLTripOnServiceDate {
     public DataFetcher<TripTimeOnDate> end();
     public DataFetcher<Boolean> isReplacement();
+    public DataFetcher<RealTimeTripStateModel> realTimeTripState();
     public DataFetcher<Iterable<ReplacedByRelation>> replacedByRelation();
     public DataFetcher<Iterable<ReplacementForRelation>> replacementForRelation();
     public DataFetcher<java.time.LocalDate> serviceDate();

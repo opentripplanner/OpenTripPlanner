@@ -298,6 +298,6 @@ public class LegacyTimetableRepositoryIntegrationTest {
       serviceDate
     ).build();
     resolver.update(realTimeTripUpdate);
-    return UpdateSuccess.noWarnings(realTimeTripUpdate.producer());
+    return UpdateSuccess.of(realTimeTripUpdate.producer());
   }
 }
