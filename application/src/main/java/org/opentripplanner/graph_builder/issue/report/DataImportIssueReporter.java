@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issue.report;
 
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,83 +11,115 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class generates a nice HTML graph import data issue report.
+ * Generates a single self-contained HTML report of all data import issues, plus individual GeoJSON
+ * files for issue types that carry geometry.
  * <p>
- * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived
- * classes.
- *
- * @author mabu
+ * The report is written as a single {@code index.html} file containing all issue data as embedded
+ * JSON with inline CSS and JavaScript for interactive filtering, search, and pagination. This
+ * replaces the previous multi-file approach where large issue types were split across many HTML
+ * files.
  */
 public class DataImportIssueReporter implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataImportIssueReporter.class);
 
-  //Path to output folder
   private final CompositeDataSource reportDirectory;
-
-  //If there are more then this number of issues the report are split into multiple files
-  //This is because browsers aren't made for giant HTML files which can be made with 500k lines
-  private final int maxNumberOfIssuesPerFile;
-
   private final DataImportIssueStore issueStore;
+  private final ReportConfig config;
 
   public DataImportIssueReporter(
     DataImportIssueStore issueStore,
     CompositeDataSource reportDirectory,
-    int maxNumberOfIssuesPerFile
+    ReportConfig config
   ) {
     this.issueStore = issueStore;
     this.reportDirectory = reportDirectory;
-    this.maxNumberOfIssuesPerFile = maxNumberOfIssuesPerFile;
+    this.config = config;
+  }
+
+  /** Convenience constructor using default white-label config. */
+  public DataImportIssueReporter(
+    DataImportIssueStore issueStore,
+    CompositeDataSource reportDirectory
+  ) {
+    this(issueStore, reportDirectory, ReportConfig.DEFAULT);
   }
 
   @Override
   public void buildGraph() {
     try {
-      // Delete all files in the report directory if it exists
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
-      List<Bucket> buckets = partitionIssues(issueStore.listIssues(), maxNumberOfIssuesPerFile);
-      List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
 
-      var progress = ProgressTracker.track("Creating data import issue report", 50, buckets.size());
+      List<DataImportIssue> allIssues = issueStore.listIssues();
+      LOG.info("Writing data import issue report ({} issues)…", allIssues.size());
 
-      LOG.info(progress.startMessage());
+      // Group by type, sorted alphabetically, each group sorted by priority descending
+      Map<String, List<DataImportIssue>> issuesByType = allIssues
+        .stream()
+        .sorted(Comparator.comparing(DataImportIssue::getType))
+        .collect(
+          Collectors.groupingBy(DataImportIssue::getType, LinkedHashMap::new, Collectors.toList())
+        );
 
-      for (Bucket bucket : buckets) {
-        boolean addGeoJSONLink = new GeoJsonWriter(reportDirectory, bucket).writeFile();
-        new HTMLWriter(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
-        //noinspection Convert2MethodRef
-        progress.step(m -> LOG.info(m));
-      }
+      issuesByType.replaceAll((type, issues) ->
+        issues
+          .stream()
+          .sorted(Comparator.comparing(DataImportIssue::getPriority, Comparator.reverseOrder()))
+          .toList()
+      );
 
-      try {
-        HTMLWriter indexFileWriter = new HTMLWriter(reportDirectory, "index", keys);
-        indexFileWriter.writeFile();
-      } catch (Exception e) {
-        LOG.error("Index file couldn't be created:{}", e.getMessage());
-      }
-      LOG.info(progress.completeMessage());
-      LOG.info("Data import issue report is in {}", reportDirectory.path());
+      // Write GeoJSON files and track which types have geometry
+      List<String> typesWithGeoJson = writeGeoJsonFiles(issuesByType);
+
+      // Write the single-page HTML report
+      new SinglePageReportWriter(
+        reportDirectory,
+        config,
+        issuesByType,
+        typesWithGeoJson
+      ).writeFile();
+
+      LOG.info("Data import issue report written to {}", reportDirectory.path());
     } catch (Exception e) {
-      // If the issue report fails due to a remote storage or network problem, then we log
-      // the error an CONTINUE with the graph build process. Preventing OTP from saving the
-      // Graph might have much bigger consequences than just failing to save the issue report.
+      // If the issue report fails (e.g. remote storage problem) log the error and continue.
+      // Preventing OTP from saving the Graph has much bigger consequences than a missing report.
       LOG.error("OTP failed to save issue report!", e);
     } finally {
       closeReportDirectory();
     }
   }
 
+  private List<String> writeGeoJsonFiles(Map<String, List<DataImportIssue>> issuesByType) {
+    List<String> typesWithGeoJson = new ArrayList<>();
+    for (var entry : issuesByType.entrySet()) {
+      String type = entry.getKey();
+      List<DataImportIssue> issues = entry.getValue();
+
+      var withGeometry = issues
+        .stream()
+        .filter(i -> i.getGeometry() != null)
+        .toList();
+      if (withGeometry.isEmpty()) {
+        continue;
+      }
+      var bucket = new Bucket(new BucketKey(type, null), withGeometry);
+      boolean written = new GeoJsonWriter(reportDirectory, bucket).writeFile();
+      if (written) {
+        typesWithGeoJson.add(type);
+      }
+    }
+    return typesWithGeoJson;
+  }
+
   /**
-   * Delete report if it exists, and return true if successful. Return {@code false} if the {@code
-   * reportDirectory} is {@code null} or the directory can NOT be deleted.
+   * Delete report directory if it exists. Returns {@code false} if the directory is {@code null}
+   * or cannot be deleted (report generation will be skipped).
    */
   private boolean deleteReportDirectoryAndContent() {
     if (reportDirectory == null) {
@@ -95,73 +127,25 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       return false;
     }
     if (reportDirectory.exists()) {
-      //Removes all files from report directory
       try {
         reportDirectory.delete();
       } catch (Exception e) {
         LOG.error(
-          "Failed to clean HTML report directory: " +
-            reportDirectory.path() +
-            ". HTML report won't be generated!",
+          "Failed to clean HTML report directory: {}. Report won't be generated!",
+          reportDirectory.path(),
           e
         );
         return false;
       }
     }
-    // No need to create directories here, because the 'reportDirectory' is responsible for
-    // creating paths (it they don´t exist) when saving files.
     return true;
-  }
-
-  /**
-   * Creates buckets, where each bucket has only a single issue type and max approximately
-   * {@link this#maxNumberOfIssuesPerFile} issues
-   */
-  static List<Bucket> partitionIssues(List<DataImportIssue> issues, int maxNumberOfIssuesPerFile) {
-    //Groups issues according to issue type
-    Map<String, List<DataImportIssue>> issuesByType = issues
-      .stream()
-      .collect(Collectors.groupingBy(DataImportIssue::getType));
-
-    List<Bucket> buckets = new ArrayList<>();
-
-    for (Map.Entry<String, List<DataImportIssue>> entry : issuesByType.entrySet()) {
-      var key = entry.getKey();
-
-      // Sort each issue type by priority
-      var sortedIssues = entry
-        .getValue()
-        .stream()
-        .sorted(Comparator.comparing(DataImportIssue::getPriority, Comparator.reverseOrder()))
-        .toList();
-
-      // Split the issues to buckets if needed
-      if (sortedIssues.size() > 1.2 * maxNumberOfIssuesPerFile) {
-        List<List<DataImportIssue>> partitions = Lists.partition(
-          sortedIssues,
-          maxNumberOfIssuesPerFile
-        );
-        for (int i = 0; i < partitions.size(); i++) {
-          buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i)));
-        }
-      } else {
-        buckets.add(new Bucket(new BucketKey(key, null), sortedIssues));
-      }
-    }
-
-    return buckets;
   }
 
   private void closeReportDirectory() {
     try {
       reportDirectory.close();
     } catch (IOException e) {
-      LOG.warn(
-        "Failed to close report directory: {}, details: {}. ",
-        reportDirectory.path(),
-        e.getLocalizedMessage(),
-        e
-      );
+      LOG.warn("Failed to close report directory: {}", reportDirectory.path(), e);
     }
   }
 }

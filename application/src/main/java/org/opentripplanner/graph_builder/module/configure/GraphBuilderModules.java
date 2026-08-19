@@ -308,11 +308,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     DataImportIssueStore issueStore
   ) {
-    return new DataImportIssueReporter(
-      issueStore,
-      dataSources.getBuildReportDir(),
-      config.maxDataImportIssuesPerFile
-    );
+    return new DataImportIssueReporter(issueStore, dataSources.getBuildReportDir());
   }
 
   @Provides
