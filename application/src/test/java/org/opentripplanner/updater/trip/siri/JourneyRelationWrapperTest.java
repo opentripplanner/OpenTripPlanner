@@ -57,13 +57,22 @@ class JourneyRelationWrapperTest {
     var relation = relationWithPart("b", "c");
     var wrapper = new JourneyRelationWrapper(relation, calls);
 
-    assertThat(wrapper.journeyParts()).containsExactly(new JourneyPart(1, 2));
+    assertThat(wrapper.journeyParts()).containsExactly(new JourneyPartData(1, 2));
   }
 
   @Test
   void journeyPartsUnmatchedStop() {
     var calls = calls("a", "b", "c", "d");
     var relation = relationWithPart("unmatched", "d");
+    var wrapper = new JourneyRelationWrapper(relation, calls);
+
+    assertThat(wrapper.journeyParts()).isEmpty();
+  }
+
+  @Test
+  void journeyPartsInvalidOrder() {
+    var calls = calls("a", "b", "c", "d");
+    var relation = relationWithPart("c", "b");
     var wrapper = new JourneyRelationWrapper(relation, calls);
 
     assertThat(wrapper.journeyParts()).isEmpty();

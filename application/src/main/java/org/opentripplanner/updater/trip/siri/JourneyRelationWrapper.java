@@ -10,7 +10,7 @@ import uk.org.siri.siri21.JourneyRelationStructure;
 import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
 import uk.org.siri.siri21.StopPointRefStructure;
 
-public final class JourneyRelationWrapper {
+final class JourneyRelationWrapper {
 
   private final JourneyRelationStructure relation;
   private final List<CallWrapper> calls;
@@ -40,19 +40,23 @@ public final class JourneyRelationWrapper {
       .toList();
   }
 
-  List<JourneyPart> journeyParts() {
+  List<JourneyPartData> journeyParts() {
     var parts = relation.getJourneyParts();
     if (parts == null || parts.getJourneyPartInfos() == null) {
       return List.of();
     }
-    var result = new ArrayList<JourneyPart>();
+    var result = new ArrayList<JourneyPartData>();
     for (var part : parts.getJourneyPartInfos()) {
       var fromPos = resolvePosInPattern(part.getFromStopPointRef(), part.getStartTime());
       var toPos = resolvePosInPattern(part.getToStopPointRef(), part.getEndTime());
       if (fromPos.isEmpty() || toPos.isEmpty()) {
         continue;
       }
-      result.add(new JourneyPart(fromPos.get(), toPos.get()));
+      if (fromPos.get() >= toPos.get()) {
+        // Ignore invalid parts that start after they end.
+        continue;
+      }
+      result.add(new JourneyPartData(fromPos.get(), toPos.get()));
     }
     return result;
   }
