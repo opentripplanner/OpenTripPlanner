@@ -72,7 +72,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       );
       // the ordinal could be replaced by s.th. else (e.g. a explicitely managed "id")
       output.writeInt(unmodifiableCollection.ordinal(), true);
-      kryo.writeClassAndObject(output, unmodifiableCollection.toIntermediate(object));
+      kryo.writeClassAndObject(output, unmodifiableCollection.toKryoSerializedObject(object));
     } catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions because the ObjectBuffer.write...
       // handles SerializationException specifically (resizing the buffer)...
@@ -87,7 +87,7 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
     int ordinal = input.readInt(true);
     UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.values()[ordinal];
     Object intermediate = kryo.readClassAndObject(input);
-    return unmodifiableCollection.create(intermediate);
+    return unmodifiableCollection.fromKryoSerializedObject(intermediate);
   }
 
   @Override
@@ -96,8 +96,8 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.valueOfType(
         original.getClass()
       );
-      Object intermediateCopy = kryo.copy(unmodifiableCollection.toIntermediate(original));
-      return unmodifiableCollection.create(intermediateCopy);
+      Object intermediateCopy = kryo.copy(unmodifiableCollection.toKryoSerializedObject(original));
+      return unmodifiableCollection.fromKryoSerializedObject(intermediateCopy);
     } catch (RuntimeException e) {
       // Don't eat and wrap RuntimeExceptions
       throw e;
@@ -108,8 +108,8 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
 
   /**
    * Each variant converts to/from a plain, Kryo-friendly intermediate representation on write/copy
-   * ({@link #toIntermediate}), and reconstructs the concrete collection/map type it needs before
-   * wrapping it back up as unmodifiable on read/copy ({@link #create}). This is deliberately not
+   * ({@link #toKryoSerializedObject}), and reconstructs the concrete collection/map type it needs before
+   * wrapping it back up as unmodifiable on read/copy ({@link #fromKryoSerializedObject}). This is deliberately not
    * symmetric (e.g. {@code Map} isn't a {@code Collection}, and the intermediate {@code ArrayList}
    * read back for a {@code Set} isn't itself a {@code Set}), so each side needs its own conversion
    * rather than a single shared cast.
@@ -117,79 +117,79 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
   private enum UnmodifiableCollection {
     COLLECTION(Collections.unmodifiableCollection(Arrays.asList("")).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new ArrayList<>((Collection<?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableCollection((Collection<?>) intermediate);
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableCollection((Collection<?>) serializedObject);
       }
     },
     RANDOM_ACCESS_LIST(Collections.unmodifiableList(new ArrayList<Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new ArrayList<>((Collection<?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableList(new ArrayList<>((Collection<?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableList(new ArrayList<>((Collection<?>) serializedObject));
       }
     },
     LIST(Collections.unmodifiableList(new LinkedList<Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new ArrayList<>((Collection<?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableList(new LinkedList<>((Collection<?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableList(new LinkedList<>((Collection<?>) serializedObject));
       }
     },
     SET(Collections.unmodifiableSet(new HashSet<Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new ArrayList<>((Collection<?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableSet(new HashSet<>((Collection<?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableSet(new HashSet<>((Collection<?>) serializedObject));
       }
     },
     SORTED_SET(Collections.unmodifiableSortedSet(new TreeSet<Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new ArrayList<>((Collection<?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableSortedSet(new TreeSet<>((Collection<?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableSortedSet(new TreeSet<>((Collection<?>) serializedObject));
       }
     },
     MAP(Collections.unmodifiableMap(new HashMap<Void, Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new HashMap<>((Map<?, ?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableMap(new HashMap<>((Map<?, ?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableMap(new HashMap<>((Map<?, ?>) serializedObject));
       }
     },
     SORTED_MAP(Collections.unmodifiableSortedMap(new TreeMap<Void, Void>()).getClass()) {
       @Override
-      Object toIntermediate(Object source) {
+      Object toKryoSerializedObject(Object source) {
         return new HashMap<>((Map<?, ?>) source);
       }
 
       @Override
-      public Object create(Object intermediate) {
-        return Collections.unmodifiableSortedMap(new TreeMap<>((Map<?, ?>) intermediate));
+      public Object fromKryoSerializedObject(Object serializedObject) {
+        return Collections.unmodifiableSortedMap(new TreeMap<>((Map<?, ?>) serializedObject));
       }
     };
 
@@ -199,9 +199,17 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       this.type = type;
     }
 
-    abstract Object toIntermediate(Object source);
+    /**
+     * Converts an unmodifiable collection/map wrapper into a mutable, Kryo-friendly intermediate
+     * representation before serialization or copy.
+     */
+    abstract Object toKryoSerializedObject(Object source);
 
-    public abstract Object create(Object intermediate);
+    /**
+     * Reconstructs the expected collection/map implementation from the intermediate representation,
+     * then wraps it back into the matching unmodifiable type.
+     */
+    public abstract Object fromKryoSerializedObject(Object serializedObject);
 
     static UnmodifiableCollection valueOfType(Class<?> type) {
       for (UnmodifiableCollection item : values()) {
