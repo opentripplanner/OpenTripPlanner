@@ -31,6 +31,7 @@ import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 class ElevatorTest {
 
@@ -476,20 +477,17 @@ class ElevatorTest {
   private Set<String> getActualEdgeSet(Graph graph) {
     Set<String> actualEdgeSet = new HashSet<>();
     actualEdgeSet.addAll(
-      ListUtils.ofIterable(graph.findEdges(ElevatorBoardEdge.class))
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorBoardEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      ListUtils.ofIterable(graph.findEdges(ElevatorAlightEdge.class))
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorAlightEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );

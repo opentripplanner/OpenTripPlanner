@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
@@ -103,7 +102,7 @@ public class GraphSummarizer {
     return graph;
   }
 
-  private @NonNull Stream<Edge> distinctEdges() {
+  private Stream<Edge> distinctEdges() {
     return graph
       .getVertices()
       .stream()
