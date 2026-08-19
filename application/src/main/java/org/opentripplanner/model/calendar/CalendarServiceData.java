@@ -81,20 +81,6 @@ public class CalendarServiceData implements Serializable {
     return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
   }
 
-  /**
-   * Make an independent copy. {@code serviceIdsByDate}'s values are mutated in place by
-   * {@link #getOrCreateServiceIdForDate(LocalDate)}, so they must be copied too, or a mutation of
-   * the copy (or the original) could be observed through the other.
-   */
-  public CalendarServiceData copyOf() {
-    var copy = new CalendarServiceData();
-    copy.serviceDatesByServiceId.putAll(serviceDatesByServiceId);
-    serviceIdsByDate.forEach((date, serviceIds) ->
-      copy.serviceIdsByDate.put(date, new HashSet<>(serviceIds))
-    );
-    return copy;
-  }
-
   /* private methods */
 
   private static <T> List<T> sortedImmutableList(Collection<T> c) {
