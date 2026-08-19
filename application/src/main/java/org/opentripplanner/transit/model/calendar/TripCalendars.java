@@ -64,7 +64,7 @@ public class TripCalendars implements Serializable {
   /** An empty trip calendar, with no service ids registered. */
   public static TripCalendars empty() {
     // Note: Collections.emptyMap(), not Map.of() — the latter throws NullPointerException on a
-    // null probe key (see the constructor's note on withEntry/withAddedServiceId below).
+    // null probe key.
     return new TripCalendars(
       Collections.emptyMap(),
       Collections.emptyMap(),
