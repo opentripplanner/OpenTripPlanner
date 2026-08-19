@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
  * This class is responsible for finding and adding transit alerts to individual transit legs.
@@ -50,6 +51,7 @@ public class AlertToLegMapper {
 
     FeedScopedId routeId = leg.route().getId();
     FeedScopedId tripId = leg.trip().getId();
+    var direction = leg.trip().getDirection();
     LocalDate serviceDate = leg.serviceDate();
 
     var totalAlerts = new HashSet<TransitAlert>();
@@ -59,7 +61,12 @@ public class AlertToLegMapper {
         ? StopCondition.FIRST_DEPARTURE
         : StopCondition.DEPARTURE;
 
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+        stop,
+        routeId,
+        stopConditions,
+        direction
+      );
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
@@ -68,7 +75,12 @@ public class AlertToLegMapper {
     }
     if (toStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = StopCondition.ARRIVING;
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+        stop,
+        routeId,
+        stopConditions,
+        direction
+      );
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
@@ -80,7 +92,12 @@ public class AlertToLegMapper {
       Set<StopCondition> stopConditions = StopCondition.PASSING;
       for (StopArrival visit : leg.listIntermediateStops()) {
         if (visit.place.stop instanceof RegularStop stop) {
-          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+            stop,
+            routeId,
+            stopConditions,
+            direction
+          );
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
           alerts.addAll(
             getAlertsForRelatedStops(stop, id ->
@@ -138,10 +155,11 @@ public class AlertToLegMapper {
   private Collection<TransitAlert> getAlertsForStopAndRoute(
     RegularStop stop,
     FeedScopedId routeId,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   ) {
     return getAlertsForRelatedStops(stop, id ->
-      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions)
+      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions, direction)
     );
   }
 

@@ -62,13 +62,14 @@ public interface TransitAlertService {
   Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency);
 
   default Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route) {
-    return getStopAndRouteAlerts(stop, route, Set.of());
+    return getStopAndRouteAlerts(stop, route, Set.of(), Direction.UNKNOWN);
   }
 
   Collection<TransitAlert> getStopAndRouteAlerts(
     FeedScopedId stop,
     FeedScopedId route,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   );
 
   default Collection<TransitAlert> getStopAndTripAlerts(

@@ -370,12 +370,16 @@ public class EstimatedCallType {
       StopCondition.EXCEPTIONAL_STOP
     );
 
+    var direction = trip.getDirection();
+
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId, stopConditions));
     allAlerts.addAll(
       alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate, stopConditions)
     );
-    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions));
+    allAlerts.addAll(
+      alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions, direction)
+    );
     // StopPlace
     if (stop.getParentStation() != null) {
       FeedScopedId parentStopId = stop.getParentStation().getId();
@@ -384,7 +388,7 @@ public class EstimatedCallType {
         alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate, stopConditions)
       );
       allAlerts.addAll(
-        alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions)
+        alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions, direction)
       );
     }
     // Trip
@@ -395,7 +399,7 @@ public class EstimatedCallType {
     // TODO OTP2 This should probably have a FeedScopeId argument instead of string
     allAlerts.addAll(alertPatchService.getAgencyAlerts(trip.getRoute().getAgency().getId()));
     // Route's direction
-    allAlerts.addAll(alertPatchService.getDirectionAndRouteAlerts(trip.getDirection(), routeId));
+    allAlerts.addAll(alertPatchService.getDirectionAndRouteAlerts(direction, routeId));
 
     long serviceDay = tripTimeOnDate.getServiceDayMidnight();
     long arrivalTime = tripTimeOnDate.getRealtimeArrival();
