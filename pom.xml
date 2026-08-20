@@ -142,6 +142,16 @@
                                 <include>src/ext/java/**/*.java</include>
                                 <include>src/ext-test/java/**/*.java</include>
                             </includes>
+                            <!--
+                              Steps are applied in the order they are declared, so unused imports
+                              are removed before the code is formatted. The 'cleanthat' engine is
+                              used because it is based on JavaParser; the default
+                              'google-java-format' engine needs extra JVM flags to access internal
+                              JDK compiler classes.
+                            -->
+                            <removeUnusedImports>
+                                <engine>cleanthat-javaparser-unnecessaryimport</engine>
+                            </removeUnusedImports>
                             <prettier>
                                 <devDependencies>
                                     <prettier>${prettier.version}</prettier>
@@ -481,7 +491,12 @@
                 <executions>
                     <execution>
                         <id>validate</id>
-                        <phase>validate</phase>
+                        <!--
+                          Checkstyle runs in 'process-sources', which is after the 'validate' phase
+                          used by Spotless. This way Spotless gets to auto-fix issues (like unused
+                          imports) before Checkstyle verifies the code.
+                        -->
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>

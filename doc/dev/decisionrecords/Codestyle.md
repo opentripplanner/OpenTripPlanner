@@ -11,6 +11,9 @@ Note! Spotless runs Prettier with Node, so `node` and `npm` must be available on
 Prettier and Prettier Java versions, as well as the formatting options, are configured in the root
 `pom.xml` (`prettier.version`, `prettier.java.version` and the Spotless plugin configuration).
 
+In addition to running Prettier, Spotless removes unused imports from Java files before formatting
+them. Imports that are only referenced from Javadoc (for example `{@link Foo}`) are kept.
+
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
 plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and fix
 issues. We also have an OpenRewrite Maven plugin available that can be used to automatically fix
@@ -25,8 +28,10 @@ configured it to run by default as part of our Maven build. We also have OpenRew
 maven to fix some issues automatically, but it is not run by default as it takes a bit longer to
 run.
 
-Checkstyle will check for code style issues in the Maven "validate" phase, which runs before the
-test, package, and install phases. So checkstyle will happen for example when you run:
+Checkstyle will check for code style issues in the Maven "process-sources" phase, which runs after
+the "validate" phase used by Spotless (so that Spotless can auto-fix issues like unused imports
+first) and before the test, package, and install phases. So checkstyle will happen for example when
+you run:
 
 ```shell
 % mvn test
