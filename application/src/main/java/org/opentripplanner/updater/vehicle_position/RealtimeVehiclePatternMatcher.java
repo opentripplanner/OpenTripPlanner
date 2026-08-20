@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -416,6 +417,7 @@ class RealtimeVehiclePatternMatcher {
     return new PatternAndRealtimeVehicle(pattern, newVehicle);
   }
 
+  @Nullable
   private static TripTimes matchFrequencyTripTimes(
     VehiclePosition vehiclePosition,
     Timetable scheduledTimetable
