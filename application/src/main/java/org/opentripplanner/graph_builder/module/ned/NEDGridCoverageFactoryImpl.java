@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -186,7 +185,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
       }
       LOG.info("decompressing {}", filename);
       OutputStream os = cacheDir.entry(filename).asOutputStream();
-      ByteStreams.copy(zis, os);
+      zis.transferTo(os);
       os.close();
     }
     zis.close();

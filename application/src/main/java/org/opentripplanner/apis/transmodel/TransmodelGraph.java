@@ -39,9 +39,7 @@ class TransmodelGraph {
   final ExecutorService threadPool;
 
   TransmodelGraph(GraphQLSchema schema) {
-    this.threadPool = Executors.newCachedThreadPool(
-      OtpRequestThreadFactory.of("transmodel-api-%d")
-    );
+    this.threadPool = Executors.newCachedThreadPool(OtpRequestThreadFactory.of("transmodel-api-"));
     this.indexSchema = schema;
   }
 

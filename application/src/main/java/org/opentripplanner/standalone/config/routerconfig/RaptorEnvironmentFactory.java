@@ -33,7 +33,7 @@ public class RaptorEnvironmentFactory {
       @Override
       public ExecutorService threadPool() {
         return threadPoolSize > 0
-          ? Executors.newFixedThreadPool(threadPoolSize, OtpRequestThreadFactory.of("raptor-%d"))
+          ? Executors.newFixedThreadPool(threadPoolSize, OtpRequestThreadFactory.of("raptor-"))
           : null;
       }
     };

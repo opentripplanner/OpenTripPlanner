@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.transaction.configure;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
@@ -33,7 +32,7 @@ public abstract class TransactionModule {
     @TransitDomain RepositoryRegistry repositoryRegistry,
     TimetableSnapshotParameters timetableSnapshotParameters
   ) {
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("transitWriter").build();
+    var threadFactory = Thread.ofPlatform().name("transitWriter").factory();
     return TransactionFactory.createUpdateManagerWithPeriodicCommits(
       "transit",
       repositoryRegistry,
@@ -66,7 +65,7 @@ public abstract class TransactionModule {
   public static UpdateManager streetUpdateManager(
     @StreetDomain RepositoryRegistry repositoryRegistry
   ) {
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("streetWriter").build();
+    var threadFactory = Thread.ofPlatform().name("streetWriter").factory();
     return TransactionFactory.createUpdateManagerWithAtomicCommits(
       "street",
       repositoryRegistry,

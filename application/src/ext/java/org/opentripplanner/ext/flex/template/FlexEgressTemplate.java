@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.template;
 
-import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -42,7 +41,7 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {
-    return Lists.reverse(transfer.getEdges());
+    return transfer.getEdges().reversed();
   }
 
   protected RegularStop getFinalStop(PathTransfer transfer) {
