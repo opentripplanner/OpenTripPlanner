@@ -35,8 +35,10 @@ mvn clean -Pclean-test-snapshots
 
 Quality gates run in the Maven `validate` phase and fail the build on violations:
 
-- **Prettier** auto-formats Java (`.prettierrc.yml`: 100-char width, 2-space indent). CI enforces
-  it; check with `mvn prettier:check`. Skip locally with `-Dps`.
+- **Prettier**, run through the **Spotless** Maven plugin, auto-formats Java (100-char width,
+  2-space indent; the options are configured in the root `pom.xml`). Requires `node`/`npm` on the
+  `PATH`. CI enforces it; check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip
+  locally with `-Dps`.
 - **Checkstyle** runs against `checkstyle.xml`. Skip with `-Dcs` (or `-PcheckstyleSkip`).
 
 OpenRewrite (recipes in `openrewrite.yml`, e.g. removing unused imports) does **not** run

@@ -3,9 +3,13 @@
 ## Java
 
 The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
-[Prettier Java](https://github.com/jhipster/prettier-java) as is. Maven is set up to run
-`prettier-maven-plugin`. A check is run in the CI build, which fails the build preventing merging a
-PR if the code style is incorrect.
+[Prettier Java](https://github.com/jhipster/prettier-java) as is. Maven is set up to run Prettier
+through the [Spotless](https://github.com/diffplug/spotless) Maven plugin. A check is run in the CI
+build, which fails the build preventing merging a PR if the code style is incorrect.
+
+Note! Spotless runs Prettier with Node, so `node` and `npm` must be available on the `PATH`. The
+Prettier and Prettier Java versions, as well as the formatting options, are configured in the root
+`pom.xml` (`prettier.version`, `prettier.java.version` and the Spotless plugin configuration).
 
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
 plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and fix
@@ -46,7 +50,7 @@ OpenRewrite can be used to fix some of the checkstyle issues automatically. The 
 runs OpenRewrite and Prettier, but not checkstyle:
 
 ```shell
-% mvn rewrite:run prettier:write -P rewrite
+% mvn rewrite:run spotless:apply -P rewrite
 ```
 
 ### How to Run Prettier
@@ -66,7 +70,7 @@ test, package, and install phases. So formatting will happen for example when yo
 You can manually run _only_ the formatting process with:
 
 ```shell
-% mvn prettier:write
+% mvn spotless:apply
 ```
 
 To skip the Prettier formating, use the profile `prettierSkip`:
@@ -95,15 +99,15 @@ Code Style_. Then select **Project** in the \_Scheme drop down.
 
 #### Run Prettier Maven Plugin as an External Tool in IntelliJ
 
-You can run the Prettier Maven plugin as an external tool in IntelliJ. Set it up as an
-`External tool` and assign a keyboard shortcut to the tool execution.
+You can run Spotless as an external tool in IntelliJ. Set it up as an `External tool` and assign a
+keyboard shortcut to the tool execution.
 
 ![External Tool Dialog](../images/ExternalToolDialog.png)
 
 ```text
 Name:              Prettier Format Current File
 Program:           mvn
-Arguments:         prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
+Arguments:         spotless:apply -DspotlessFiles=$FilePathRelativeToProjectRoot$
 Working Directory: $ProjectFileDir$
 ```
 
@@ -133,7 +137,7 @@ Name:              Format files with Prettier
 File Type:         Java
 Scope:             Project Files
 Program:           mvn
-Arguments:         prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
+Arguments:         spotless:apply -DspotlessFiles=$FilePathRelativeToProjectRoot$
 Working Directory: $ProjectFileDir$
 ```
 

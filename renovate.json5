@@ -92,7 +92,7 @@
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
-        "com.hubspot.maven.plugins:prettier-maven-plugin",
+        "com.diffplug.spotless:spotless-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
         "com.puppycrawl.tools:checkstyle",
         "org.apache.maven.plugins:maven-shade-plugin",
