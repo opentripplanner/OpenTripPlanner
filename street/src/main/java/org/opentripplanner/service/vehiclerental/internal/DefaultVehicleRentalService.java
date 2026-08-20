@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
@@ -90,6 +91,18 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
           return false;
         }
       });
+  }
+
+  @Override
+  public List<String> listNetworks() {
+    return Stream.concat(
+      repository.listRentalPlaces().stream().map(VehicleRentalPlace::network),
+      repository.listZoneNetworks().stream()
+    )
+      .filter(Objects::nonNull)
+      .distinct()
+      .sorted()
+      .toList();
   }
 
   @Override

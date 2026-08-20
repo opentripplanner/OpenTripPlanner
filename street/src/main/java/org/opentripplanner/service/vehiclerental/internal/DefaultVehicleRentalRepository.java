@@ -54,6 +54,11 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
   }
 
   @Override
+  public Collection<String> listZoneNetworks() {
+    return Set.copyOf(geofencingZoneIndexes.keySet());
+  }
+
+  @Override
   public VehicleRentalPlace getRentalPlace(FeedScopedId id) {
     return rentalPlaces.get(id);
   }

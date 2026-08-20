@@ -33,6 +33,15 @@ public interface VehicleRentalService extends GeofencingZoneService {
   boolean hasRentalBikes();
 
   /**
+   * The vehicle rental networks known to OTP, in alphabetical order.
+   * <p>
+   * Rental places and geofencing zones are unioned because a network can have one without the
+   * other: zones applied during the graph build are present before any updater has reported a
+   * vehicle, and a network may equally publish vehicles but no zones.
+   */
+  List<String> listNetworks();
+
+  /**
    * Gets all the vehicle rental stations inside the envelope. This is currently done by iterating
    * over a set, but we could use a spatial index if the number of vehicle rental stations is high
    * enough for performance to be a concern.
