@@ -452,7 +452,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
       );
 
-      var streetNearbyStopFinder = StreetNearbyStopFinder.of(null, nearbyStopSearchDuration, 0);
+      var streetNearbyStopFinder = StreetNearbyStopFinder.of(null);
 
       // CAR_PICKUP models a walk → drive → walk chain inside a single A*. Using it here (instead
       // of plain CAR) lets the search find transit stops whose link endpoint is only walk-reachable
@@ -469,7 +469,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
           Set.of(passengerSnap.vertex()),
           request,
           StreetMode.CAR_PICKUP,
-          accessOrEgress.isEgress()
+          accessOrEgress.isEgress(),
+          nearbyStopSearchDuration,
+          0
         );
       // AreaStops are GTFS Flex zones — their linked vertex is a synthetic point inside the zone,
       // not a real stop or platform a carpool driver could drop the passenger at, so skip them.
