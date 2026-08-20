@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
@@ -391,22 +392,13 @@ class RealtimeVehiclePatternMatcher {
     // look at the static trips for the stop_sequence->stop mapping
     var staticTripTimes = scheduledTimetable.getTripTimes(trip);
 
+    // no fixed trip found, try frequency-based one
     if (
+      staticTripTimes == null &&
       !scheduledTimetable.getFrequencyEntries().isEmpty() &&
       vehiclePosition.getTrip().hasStartDate()
     ) {
-      var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
-      staticTripTimes = scheduledTimetable
-        .getFrequencyEntries()
-        .stream()
-        .map(FrequencyEntry::tripTimes)
-        .filter(e -> {
-          var start = e.getScheduledDepartureTime(0);
-          var startTime = LocalTime.ofSecondOfDay(start).truncatedTo(ChronoUnit.MINUTES);
-          return updateStartTime.equals(startTime);
-        })
-        .findFirst()
-        .orElse(null);
+      staticTripTimes = matchFrequencyTripTimes(vehiclePosition, scheduledTimetable);
     }
 
     if (staticTripTimes == null) {
@@ -422,6 +414,21 @@ class RealtimeVehiclePatternMatcher {
     );
 
     return new PatternAndRealtimeVehicle(pattern, newVehicle);
+  }
+
+  private static TripTimes matchFrequencyTripTimes(VehiclePosition vehiclePosition, Timetable scheduledTimetable) {
+    var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
+    return scheduledTimetable
+      .getFrequencyEntries()
+      .stream()
+      .map(FrequencyEntry::tripTimes)
+      .filter(e -> {
+        var start = e.getScheduledDepartureTime(0);
+        var startTime = LocalTime.ofSecondOfDay(start).truncatedTo(ChronoUnit.MINUTES);
+        return updateStartTime.equals(startTime);
+      })
+      .findFirst()
+      .orElse(null);
   }
 
   private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
