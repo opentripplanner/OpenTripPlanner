@@ -33,7 +33,7 @@ class ExtraCallScheduledStopTest implements RealtimeTestConstants {
     .addStop(STOP_B, "0:00:20", "0:00:21");
 
   @Test
-  void testExtraCall() {
+  void testScheduledStopOnExtraCall() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
