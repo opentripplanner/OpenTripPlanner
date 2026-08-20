@@ -147,4 +147,5 @@ config:
     CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
     Notice: org.opentripplanner.transit.model.basic.Notice
+    OpenEndedOffsetDateTimeRange: org.opentripplanner.apis.gtfs.model.OpenEndedOffsetDateTimeRange#OpenEndedOffsetDateTimeRange
     RealTimeTripState: org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel#RealTimeTripStateModel

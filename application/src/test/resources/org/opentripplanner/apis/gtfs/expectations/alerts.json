@@ -8,7 +8,10 @@
         "descriptionDefault": "",
         "descriptionDe": "",
         "urlDefault": null,
-        "urlDe": null
+        "urlDe": null,
+        "activityPeriods": [],
+        "effectiveStartDate": null,
+        "effectiveEndDate": null
       },
       {
         "id": "QWxlcnQ6Rjpuby1oZWFkZXI",
@@ -17,7 +20,10 @@
         "descriptionDefault": "Second string",
         "descriptionDe": "Zweite Zeichenabfolge",
         "urlDefault": null,
-        "urlDe": null
+        "urlDe": null,
+        "activityPeriods": [],
+        "effectiveStartDate": null,
+        "effectiveEndDate": null
       },
       {
         "id": "QWxlcnQ6Rjphbi1hbGVydA",
@@ -26,7 +32,15 @@
         "descriptionDefault": "A description",
         "descriptionDe": "A description",
         "urlDefault": "https://example.com",
-        "urlDe": "https://example.com"
+        "urlDe": "https://example.com",
+        "activityPeriods": [
+          {
+            "start": "2023-02-15T12:03:28+01:00",
+            "end": "2023-02-16T12:03:28+01:00"
+          }
+        ],
+        "effectiveStartDate": 1676459008,
+        "effectiveEndDate": 1676545408
       },
       {
         "id": "QWxlcnQ6Rjpuby1kZXNjcmlwdGlvbg",
@@ -35,7 +49,10 @@
         "descriptionDefault": "First string",
         "descriptionDe": "Erste Zeichenabfolge",
         "urlDefault": null,
-        "urlDe": null
+        "urlDe": null,
+        "activityPeriods": [],
+        "effectiveStartDate": null,
+        "effectiveEndDate": null
       },
       {
         "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
@@ -44,7 +61,23 @@
         "descriptionDefault": "This station is currently closed",
         "descriptionDe": "This station is currently closed",
         "urlDefault": null,
-        "urlDe": null
+        "urlDe": null,
+        "activityPeriods": [
+          {
+            "start": null,
+            "end": "2023-02-15T12:03:28+01:00"
+          },
+          {
+            "start": "2023-02-15T12:03:28+01:00",
+            "end": "2023-02-16T12:03:28+01:00"
+          },
+          {
+            "start": "2023-02-16T12:03:28+01:00",
+            "end": null
+          }
+        ],
+        "effectiveStartDate": null,
+        "effectiveEndDate": null
       }
     ]
   }

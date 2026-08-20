@@ -136,6 +136,12 @@ type Agency implements Node {
 "Alert of a current or upcoming disruption in public transportation"
 type Alert implements Node {
   """
+  The periods of time when this alert is active, sorted chronologically. An empty list means
+  that the alert is never active. A period without a start has always been active and a period
+  without an end is active indefinitely.
+  """
+  activityPeriods: [OpenEndedOffsetDateTimeRange!]!
+  """
   Agency affected by the disruption. Note that this value is present only if the
   disruption has an effect on all operations of the agency (e.g. in case of a strike).
   """
@@ -170,9 +176,9 @@ type Alert implements Node {
   "Url with more information in all different available languages"
   alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
-  effectiveEndDate: Long
+  effectiveEndDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"
-  effectiveStartDate: Long
+  effectiveStartDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Entities affected by the disruption."
   entities: [AlertEntity]
   "The feed in which this alert was published"
@@ -1061,6 +1067,20 @@ is known well ahead of time.
 type Notice {
   "Textual representation of the message"
   text: String
+}
+
+"""
+A range of time which can be open in either direction.
+
+The range is half-open, which means that the start is included in the range but the end is not.
+A `null` start means that the range extends indefinitely into the past and a `null` end means
+that it extends indefinitely into the future.
+"""
+type OpenEndedOffsetDateTimeRange {
+  "The exclusive end of the range or `null` if the range has no end."
+  end: OffsetDateTime
+  "The inclusive start of the range or `null` if the range has no start."
+  start: OffsetDateTime
 }
 
 type OpeningHours {
