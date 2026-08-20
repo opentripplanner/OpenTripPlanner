@@ -32,7 +32,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 ┌────────────────────────────────────────────┐
 │ DefaultCarpoolingService                   │
 │                                            │
-│  1. Filter Phase (TripPreFilters)         │
+│  1. Filter Phase (TripPreFilters)          │
 │     - Time window check                    │
 │     - Distance check                       │
 │     - Direction check                      │
@@ -40,15 +40,16 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │  2. Insertion Phase                        │
 │     2a. Position Pre-screening             │
 │         (InsertionPositionFinder)          │
+│         - Needs routed baseline (memoized) │
 │         - Capacity check                   │
 │         - Beeline delay heuristic          │
 │                                            │
 │     2b. Routing & Selection                │
 │         (InsertionEvaluator)               │
-│         - Route baseline segments (cached) │
-│         - Route viable positions           │
-│         - Endpoint-matching segment reuse  │
+│         - Route each position's detours    │
 │         - Select minimum additional time   │
+│         - Route baseline once, lazily,     │
+│           to build the winning geometry    │
 │                                            │
 └────────┬───────────────────────────────────┘
          │
@@ -122,9 +123,13 @@ For trips that pass filtering, computes optimal pickup/dropoff positions using a
 
 #### Stage 1: Position Pre-screening (InsertionPositionFinder)
 
-Fast heuristic checks eliminate impossible positions **before any A* routing**:
+Fast heuristic checks eliminate impossible positions **before any per-position A\* routing**. They
+are not routing-free, though: the checks measure each detour against the trip's routed baseline,
+which must therefore be routed first.
 
 ```
+Once per trip: route the driver's baseline legs, keeping each leg's duration.
+
 For each remaining trip:
   1. Generate all position combinations (pickup, dropoff) where:
      - Pickup: between any two consecutive stops (0-based index in modified route)
@@ -132,41 +137,42 @@ For each remaining trip:
 
   2. For each position pair, check:
      a. Capacity: Does insertion exceed vehicle capacity at any point?
-     b. Beeline delay: Do straight-line estimates exceed delay threshold?
+     b. Beeline delay: beeline only the new detour segments, reuse the trip's
+        routed baseline durations for every untouched leg, and reject if the
+        resulting delay exceeds a stop's budget.
 
   3. Return only "viable" positions that pass all checks
 ```
 
 **Key optimizations**:
 - **Capacity validation**: Uses `CarpoolTrip.hasCapacityForInsertion()` to check entire journey range
-- **Beeline heuristic**: Optimistic straight-line estimates eliminate positions early
-- **No routing yet**: All checks use geometric calculations only
+- **Guaranteed lower bound**: The detour is beelined and untouched legs keep their routed duration, so the estimated delay never exceeds the routed delay — no feasible insertion is lost
+- **Measured from the resolved vertices**: The beeline runs between the vertices the route points snapped to (`CarpoolTripWithVertices.vertexCoordinates()`), which is where the driver is actually routed
+- **Baseline routed per trip, not per position**: Memoized on the repository until the trip's route points change, so the cost falls once per trip rather than once per request
 
 #### Stage 2: Routing and Selection (InsertionEvaluator)
 
-For viable positions from Stage 1, perform A* routing to find the optimal insertion:
+For viable positions from Stage 1, route each candidate's detour and select the best insertion. Baseline geometry is routed **lazily** — only for the legs a winner actually reuses:
 
 ```
 For each trip with viable positions:
-  1. Route baseline segments (driver's original route) and cache results
+  1. For each viable position:
+     a. Build the modified route with the passenger inserted
+     b. Route only the detour segments around the inserted pickup/dropoff
+     c. Take each untouched leg's duration from the routed baseline durations
+     d. Reject the position if any stop's delay exceeds its deviation budget
 
-  2. For each viable position:
-     a. Build modified route with passenger inserted
-     b. Route only segments with changed endpoints
-     c. Reuse cached segments where endpoints match exactly
-     d. Calculate total duration and additional time vs. baseline
-     e. Check passenger delay constraints
+  2. Select the surviving insertion with the minimum total trip duration
 
-  3. Select insertion with minimum additional time
-  4. Ensure additional time ≤ driver's deviation budget
+  3. Route the baseline legs the winners reuse, and stitch them into the
+     selected detour segments to build the leg geometry
 ```
 
-**Critical optimization - Endpoint-matching segment reuse**:
-- Baseline segments are cached after first routing
-- For modified routes, segments are reused **only if both endpoints match exactly**
-- Endpoint matching uses `WgsCoordinate.equals()` with 7-decimal precision (~1cm)
-- Only segments with changed endpoints are re-routed
-- Prevents incorrect reuse when passenger insertion splits existing segments
+**Critical optimization - lazy baseline, durations-first selection**:
+- Selection routes only each position's detour segments; untouched legs reuse the routed baseline durations
+- A trip whose every position fails the delay constraints costs **no** baseline-geometry routing
+- Only the baseline legs some winner reuses are routed, once each and shared across winners. An insertion replaces the legs around its pickup and dropoff, so a two-stop trip reuses none at all
+- `InsertionPosition.baselineSegmentIndex` maps a modified segment to its baseline leg, or `-1` for the (at most four) new detour segments
 
 ## Usage Examples
 

@@ -1,17 +1,19 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.ext.carpooling.util.CarpoolStreetSearch;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,10 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning)</li>
  * </ul>
  *
+ * <p>
+ * Results are memoized per {@code (from, to)} pair, including {@code null}. The cache is unbounded
+ * but request-scoped, and not thread-safe.
+ *
  * @see InsertionEvaluator for usage in insertion evaluation
  */
 public class CarpoolStreetRouter implements CarpoolRouter {
@@ -38,6 +44,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolStreetRouter.class);
 
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final Map<Pair<Vertex>, GraphPath<State, Edge, Vertex>> pathCache = new HashMap<>();
 
   /**
    * Creates a new carpool street router.
@@ -50,12 +57,19 @@ public class CarpoolStreetRouter implements CarpoolRouter {
 
   @Override
   public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+    var key = new Pair<>(from, to);
+    if (pathCache.containsKey(key)) {
+      return pathCache.get(key);
+    }
+    GraphPath<State, Edge, Vertex> path;
     try {
-      return carpoolRouting(from, to);
+      path = carpoolRouting(from, to);
     } catch (Exception e) {
       LOG.warn("Routing failed from {} to {}: {}", from, to, e.getMessage());
-      return null;
+      path = null;
     }
+    pathCache.put(key, path);
+    return path;
   }
 
   /**
@@ -73,7 +87,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * @return the first (best) path found, or null if no paths exist
    */
   private GraphPath<State, Edge, Vertex> carpoolRouting(Vertex fromVertex, Vertex toVertex) {
-    var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
+    var request = CarpoolStreetSearch.carRequest(false);
     var streetSearch = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
       // Bound the search at the carpool trip ceiling rather than the passenger request's

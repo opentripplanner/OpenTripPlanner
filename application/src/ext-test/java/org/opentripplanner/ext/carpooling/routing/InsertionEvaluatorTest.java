@@ -14,6 +14,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NOR
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.beelineRoutedTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithDeviationBudget;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -76,12 +78,10 @@ class InsertionEvaluatorTest {
   }
 
   private WgsCoordinate getCoordinate(Vertex vertex) {
-    return new WgsCoordinate(vertex.getCoordinate().y, vertex.getCoordinate().x);
+    return vertex.toWgsCoordinate();
   }
 
-  /**
-   * Runs position finding followed by evaluation and returns the best insertion.
-   */
+  /** Runs position finding followed by evaluation. */
   private InsertionCandidate findOptimalInsertion(
     CarpoolTrip trip,
     WgsCoordinate passengerPickup,
@@ -89,8 +89,15 @@ class InsertionEvaluatorTest {
     CarpoolRouter carpoolRouter
   ) {
     var tripWithVertices = createTripWithVertices(trip);
+    // A trip whose baseline cannot be routed cannot carry a passenger. The same durations feed the
+    // finder and the evaluator.
+    var legDurations = carpoolRouter.routeLegDurations(tripWithVertices.vertices());
+    if (legDurations == null) {
+      return null;
+    }
+    var routedTrip = new RoutedCarpoolTrip(tripWithVertices, legDurations);
     List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-      trip,
+      routedTrip,
       passengerPickup,
       passengerDropoff,
       Duration.ZERO
@@ -102,7 +109,7 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
-      tripWithVertices,
+      routedTrip,
       viablePositions,
       new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
@@ -248,6 +255,174 @@ class InsertionEvaluatorTest {
   }
 
   /**
+   * No baseline leg may be routed when no insertion is valid, through either entry point. The router
+   * throws if asked for a leg between two driver waypoints.
+   */
+  @Test
+  void doesNotRouteBaselineWhenNoInsertionIsValid() {
+    var trip = createTripWithDeviationBudget(Duration.ofMinutes(5), OSLO_CENTER, OSLO_NORTH);
+    var tripWithVertices = createTripWithVertices(trip);
+
+    var centerVertex = vertexMap.get(OSLO_CENTER);
+    var northVertex = vertexMap.get(OSLO_NORTH);
+    var slowDetour = createGraphPath(Duration.ofMinutes(30));
+    CarpoolRouter routingFunction = (from, to) -> {
+      boolean baselineLeg =
+        (from == centerVertex || from == northVertex) && (to == centerVertex || to == northVertex);
+      if (baselineLeg) {
+        throw new AssertionError(
+          "baseline routed though no insertion is valid: " + from + " → " + to
+        );
+      }
+      return slowDetour;
+    };
+    var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
+
+    var routedTrip = beelineRoutedTrip(tripWithVertices);
+    var viablePositions = finderPositions(routedTrip, OSLO_EAST, OSLO_WEST);
+    assertFalse(viablePositions.isEmpty(), "beeline pre-filter should admit the position");
+
+    assertNull(
+      evaluator.findBestInsertion(
+        routedTrip,
+        viablePositions,
+        new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
+      ),
+      "findBestInsertion must reject the position"
+    );
+
+    var candidates = evaluator.findBestInsertions(
+      new TripWithViableAccessEgress(
+        routedTrip,
+        List.of(accessAtEastEndingAt(OSLO_WEST), accessAtEastEndingAt(OSLO_MIDPOINT_NORTH))
+      )
+    );
+    assertTrue(candidates.isEmpty(), "findBestInsertions must yield no candidate for any stop");
+  }
+
+  private List<InsertionPosition> finderPositions(
+    RoutedCarpoolTrip routedTrip,
+    WgsCoordinate pickup,
+    WgsCoordinate dropoff
+  ) {
+    return positionFinder.findViablePositions(routedTrip, pickup, dropoff, Duration.ZERO);
+  }
+
+  /** A two-stop trip's only baseline leg is replaced by the insertion, so it is never routed. */
+  @Test
+  void findBestInsertions_doesNotRouteBaselineLegsTheInsertionReplaces() {
+    var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+    var tripWithVertices = createTripWithVertices(trip);
+
+    var pathsMap = Map.of(
+      // Both stops share the leg from the driver's origin to the passenger.
+      new Pair<>(OSLO_CENTER, OSLO_EAST),
+      createGraphPath(Duration.ofMinutes(3)),
+      // Stop served at OSLO_WEST: 3 + 4 + 5 = 12 min.
+      new Pair<>(OSLO_EAST, OSLO_WEST),
+      createGraphPath(Duration.ofMinutes(4)),
+      new Pair<>(OSLO_WEST, OSLO_NORTH),
+      createGraphPath(Duration.ofMinutes(5)),
+      // Stop served at OSLO_MIDPOINT_NORTH: 3 + 2 + 1 = 6 min.
+      new Pair<>(OSLO_EAST, OSLO_MIDPOINT_NORTH),
+      createGraphPath(Duration.ofMinutes(2)),
+      new Pair<>(OSLO_MIDPOINT_NORTH, OSLO_NORTH),
+      createGraphPath(Duration.ofMinutes(1))
+    );
+
+    final int[] baselineLegCalls = { 0 };
+    CarpoolRouter routingFunction = (from, to) -> {
+      if (from == vertexMap.get(OSLO_CENTER) && to == vertexMap.get(OSLO_NORTH)) {
+        baselineLegCalls[0]++;
+      }
+      return pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+    };
+
+    var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
+    var candidates = evaluator.findBestInsertions(
+      new TripWithViableAccessEgress(
+        new RoutedCarpoolTrip(tripWithVertices, new Duration[] { Duration.ofMinutes(10) }),
+        List.of(accessAtEastEndingAt(OSLO_WEST), accessAtEastEndingAt(OSLO_MIDPOINT_NORTH))
+      )
+    );
+
+    assertEquals(0, baselineLegCalls[0], "the replaced baseline leg must never be routed");
+    assertEquals(
+      List.of(Duration.ofMinutes(12), Duration.ofMinutes(6)),
+      candidates.stream().map(InsertionCandidate::totalTripDuration).toList()
+    );
+  }
+
+  /** A leg that survives the insertion is routed once and shared by every winning stop. */
+  @Test
+  void findBestInsertions_routesAReusedBaselineLegOnceForAllWinningStops() {
+    var budget = Duration.ofMinutes(20);
+    var trip = createTripWithStops(
+      OSLO_CENTER,
+      List.of(createStopAt(OSLO_NORTHEAST, budget)),
+      OSLO_NORTH,
+      budget
+    );
+    var tripWithVertices = createTripWithVertices(trip);
+
+    var pathsMap = Map.of(
+      new Pair<>(OSLO_CENTER, OSLO_EAST),
+      createGraphPath(Duration.ofMinutes(3)),
+      // Stop served at OSLO_WEST: 3 + 4 + 5 + reused 5 = 17 min.
+      new Pair<>(OSLO_EAST, OSLO_WEST),
+      createGraphPath(Duration.ofMinutes(4)),
+      new Pair<>(OSLO_WEST, OSLO_NORTHEAST),
+      createGraphPath(Duration.ofMinutes(5)),
+      // Stop served at OSLO_MIDPOINT_NORTH: 3 + 2 + 1 + reused 5 = 11 min.
+      new Pair<>(OSLO_EAST, OSLO_MIDPOINT_NORTH),
+      createGraphPath(Duration.ofMinutes(2)),
+      new Pair<>(OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST),
+      createGraphPath(Duration.ofMinutes(1)),
+      // The surviving second leg.
+      new Pair<>(OSLO_NORTHEAST, OSLO_NORTH),
+      createGraphPath(Duration.ofMinutes(5))
+    );
+
+    final int[] reusedLegCalls = { 0 };
+    CarpoolRouter routingFunction = (from, to) -> {
+      if (from == vertexMap.get(OSLO_NORTHEAST) && to == vertexMap.get(OSLO_NORTH)) {
+        reusedLegCalls[0]++;
+      }
+      return pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+    };
+
+    var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
+    var candidates = evaluator.findBestInsertions(
+      new TripWithViableAccessEgress(
+        new RoutedCarpoolTrip(
+          tripWithVertices,
+          new Duration[] { Duration.ofMinutes(10), Duration.ofMinutes(5) }
+        ),
+        List.of(accessAtEastEndingAt(OSLO_WEST), accessAtEastEndingAt(OSLO_MIDPOINT_NORTH))
+      )
+    );
+
+    assertEquals(1, reusedLegCalls[0], "the reused leg must be routed once for both winning stops");
+    assertEquals(
+      List.of(Duration.ofMinutes(17), Duration.ofMinutes(11)),
+      candidates.stream().map(InsertionCandidate::totalTripDuration).toList()
+    );
+  }
+
+  /** An access candidate from {@code OSLO_EAST} to {@code transitCoordinate} at position (1, 2). */
+  private ViableAccessEgress accessAtEastEndingAt(WgsCoordinate transitCoordinate) {
+    return new ViableAccessEgress(
+      null,
+      vertexMap.get(transitCoordinate),
+      vertexMap.get(OSLO_EAST),
+      AccessEgressType.ACCESS,
+      List.of(new InsertionPosition(1, 2)),
+      null,
+      null
+    );
+  }
+
+  /**
    * Given two viable insertion positions with different total trip durations,
    * the evaluator should select the one with the shorter total.
    *
@@ -296,7 +471,10 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
-      tripWithVertices,
+      new RoutedCarpoolTrip(
+        tripWithVertices,
+        routingFunction.routeLegDurations(tripWithVertices.vertices())
+      ),
       viablePositions,
       new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );

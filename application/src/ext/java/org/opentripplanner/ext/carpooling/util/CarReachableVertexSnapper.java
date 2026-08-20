@@ -48,12 +48,8 @@ public final class CarReachableVertexSnapper {
    */
   private static final double DEFAULT_MIN_CAR_ESCAPE_METERS = 500;
 
-  private static final StreetSearchRequest CAR_DEPART = StreetSearchRequest.of()
-    .withMode(StreetMode.CAR)
-    .build();
-  private static final StreetSearchRequest CAR_ARRIVE = StreetSearchRequest.copyOf(CAR_DEPART)
-    .withArriveBy(true)
-    .build();
+  private static final StreetSearchRequest CAR_DEPART = CarpoolStreetSearch.carRequest(false);
+  private static final StreetSearchRequest CAR_ARRIVE = CarpoolStreetSearch.carRequest(true);
 
   private final double minCarEscapeMeters;
 

@@ -63,4 +63,22 @@ public class InsertionPosition {
 
     return modifiedIndex;
   }
+
+  /**
+   * The baseline leg the modified-route segment {@code [i, i+1)} corresponds to, or {@code -1} when
+   * it touches the inserted pickup or dropoff and so is one of the four new detour segments.
+   */
+  public int baselineSegmentIndex(int modifiedIndex) {
+    int i = modifiedIndex;
+    if (i == pickupPos - 1 || i == pickupPos || i == dropOffPos - 1 || i == dropOffPos) {
+      return -1;
+    }
+    if (i < pickupPos) {
+      return i;
+    }
+    if (i < dropOffPos) {
+      return i - 1;
+    }
+    return i - 2;
+  }
 }
