@@ -189,6 +189,15 @@ public class SiriEtBuilder {
   }
 
   public SiriEtBuilder withFramedVehicleJourneyRef(
+    String vehicleJourneyRef,
+    LocalDate serviceDate
+  ) {
+    return withFramedVehicleJourneyRef(b ->
+      b.withVehicleJourneyRef(vehicleJourneyRef).withServiceDate(serviceDate)
+    );
+  }
+
+  public SiriEtBuilder withFramedVehicleJourneyRef(
     Function<FramedVehicleRefBuilder, FramedVehicleRefBuilder> producer
   ) {
     var builder = new FramedVehicleRefBuilder();
