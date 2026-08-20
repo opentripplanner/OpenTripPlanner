@@ -416,7 +416,10 @@ class RealtimeVehiclePatternMatcher {
     return new PatternAndRealtimeVehicle(pattern, newVehicle);
   }
 
-  private static TripTimes matchFrequencyTripTimes(VehiclePosition vehiclePosition, Timetable scheduledTimetable) {
+  private static TripTimes matchFrequencyTripTimes(
+    VehiclePosition vehiclePosition,
+    Timetable scheduledTimetable
+  ) {
     var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
     return scheduledTimetable
       .getFrequencyEntries()

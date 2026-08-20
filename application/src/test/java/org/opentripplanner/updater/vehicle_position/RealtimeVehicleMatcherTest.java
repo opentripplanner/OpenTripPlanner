@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.routerconfig.updaters.Vehicl
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -40,6 +41,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -182,6 +184,75 @@ public class RealtimeVehicleMatcherTest {
       )
       .build();
     testVehiclePositions(posWithInvalidSequence);
+  }
+
+  @Test
+  @DisplayName("A vehicle position for a frequency-based trip is matched using its start_time")
+  void matchFrequencyBasedTrip() {
+    var repository = new DefaultRealtimeVehicleRepository();
+
+    var trip = TransitRepositoryForTest.trip(tripId).build();
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0, time("10:00:00")),
+      testModel.stopTime(trip, 1, time("10:05:00")),
+      testModel.stopTime(trip, 2, time("10:10:00"))
+    );
+    var frequencyTripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    var frequencyEntry = new FrequencyEntry(
+      time("10:00:00"),
+      time("12:00:00"),
+      (int) Duration.ofMinutes(10).toSeconds(),
+      false,
+      frequencyTripTimes
+    );
+
+    var stopPattern = new StopPattern(stopTimes);
+    var pattern = TripPattern.of(trip.getId())
+      .withStopPattern(stopPattern)
+      .withRoute(ROUTE)
+      .withScheduledTimeTableBuilder(builder -> builder.addFrequencyEntry(frequencyEntry))
+      .build();
+
+    var tripForId = Map.of(scopedTripId, trip);
+    var patternForTrip = Map.of(trip, pattern);
+
+    // an untouched pattern has no vehicle positions
+    assertEquals(0, vehicles(repository, pattern).size());
+
+    var matcher = new RealtimeVehiclePatternMatcher(
+      TransitRepositoryForTest.FEED_ID,
+      tripForId::get,
+      patternForTrip::get,
+      (id, time) -> patternForTrip.get(id),
+      ignored -> null,
+      repository,
+      zoneId,
+      null,
+      FEATURES
+    );
+
+    var pos = VehiclePosition.newBuilder()
+      .setTrip(
+        TripDescriptor.newBuilder()
+          .setTripId(tripId)
+          .setStartDate("20220314")
+          .setStartTime("10:00:00")
+          .build()
+      )
+      .setStopId("stop-1")
+      .setPosition(
+        GtfsRealtime.Position.newBuilder().setLatitude(1).setLongitude(1).setBearing(30).build()
+      )
+      .build();
+
+    matcher.applyRealtimeVehicleUpdates(List.of(pos));
+
+    var realtimeVehicles = vehicles(repository, pattern);
+    assertEquals(1, realtimeVehicles.size());
+
+    var parsedVehicle = realtimeVehicles.get(0);
+    assertEquals(tripId, parsedVehicle.trip().getId().getId());
+    assertEquals("F:stop-1", parsedVehicle.stop().get().stop().getId().toString());
   }
 
   private void testVehiclePositions(VehiclePosition pos) {
