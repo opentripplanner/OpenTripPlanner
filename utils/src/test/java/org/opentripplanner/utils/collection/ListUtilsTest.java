@@ -1,5 +1,6 @@
 package org.opentripplanner.utils.collection;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,6 +9,7 @@ import static org.opentripplanner.utils.collection.ListUtils.last;
 import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +59,22 @@ class ListUtilsTest {
     // as a result the second element is removed from the result as its "string" value is
     // equal to the first element's
     assertEquals(List.of(first, third), deduplicated);
+  }
+
+  @Test
+  void ofIterableEmpty() {
+    assertThat(ListUtils.ofIterable(List.of())).isEmpty();
+  }
+
+  @Test
+  void ofIterableList() {
+    assertThat(ListUtils.ofIterable(List.of(1, 2, 3))).containsExactly(1, 2, 3).inOrder();
+  }
+
+  @Test
+  void ofIterableNonCollectionIterable() {
+    Iterable<Integer> iterable = Set.of(1, 2, 3)::iterator;
+    assertThat(ListUtils.ofIterable(iterable)).containsExactly(1, 2, 3);
   }
 
   @Test
