@@ -32,7 +32,7 @@ public class GraphReportBuilder {
       GraphReportBuilder::firstLetterToLowerCase
     );
 
-    var edgeTypes = countValues(graph.getEdges(), GraphReportBuilder::firstLetterToLowerCase);
+    var edgeTypes = countValues(graph.listEdges(), GraphReportBuilder::firstLetterToLowerCase);
     var vertexTypes = countValues(graph.getVertices(), GraphReportBuilder::firstLetterToLowerCase);
 
     return new GraphStats(

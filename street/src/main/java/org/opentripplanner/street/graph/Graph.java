@@ -210,7 +210,7 @@ public class Graph implements Serializable {
    * the graph or not return edges that have been added to the graph after this method has been
    * called.
    */
-  public Collection<Edge> getEdges() {
+  public Collection<Edge> listEdges() {
     Set<Edge> edges = new HashSet<>();
     for (Vertex v : this.getVertices()) {
       edges.addAll(v.getOutgoing());
@@ -223,7 +223,7 @@ public class Graph implements Serializable {
    * intermediate collection. Walks the vertices and yielding only the ones that are instances
    * of {@code clazz}.
    * <p>
-   * The iterator may contain duplicates.
+   * The iterable may contain duplicates and can only be iterated once.
    * <p>
    * Note: Under concurrent modification this method may return edges that have been removed from
    * the graph or not return edges that have been added to the graph after this method has been

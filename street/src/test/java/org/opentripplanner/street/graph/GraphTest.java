@@ -54,7 +54,7 @@ class GraphTest {
   }
 
   @Test
-  void testGetEdgesOneEdge() {
+  void testListEdgesOneEdge() {
     Graph g = new Graph();
     Vertex a = intersectionVertex("A", 5, 5);
     Vertex b = intersectionVertex("B", 6, 6);
@@ -64,13 +64,13 @@ class GraphTest {
 
     FreeEdge ee = FreeEdge.createFreeEdge(a, b);
 
-    List<Edge> edges = new ArrayList<>(g.getEdges());
+    List<Edge> edges = new ArrayList<>(g.listEdges());
     assertEquals(1, edges.size());
     assertEquals(ee, edges.get(0));
   }
 
   @Test
-  void testGetEdgesMultiple() {
+  void testListEdgesMultiple() {
     Graph g = new Graph();
     Vertex a = intersectionVertex("A", 5, 5);
     Vertex b = intersectionVertex("B", 6, 6);
@@ -86,7 +86,7 @@ class GraphTest {
     expectedEdges.add(FreeEdge.createFreeEdge(c, b));
     expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<Edge> edges = new HashSet<>(g.getEdges());
+    Set<Edge> edges = new HashSet<>(g.listEdges());
     assertEquals(4, edges.size());
     assertEquals(expectedEdges, edges);
   }

@@ -214,7 +214,7 @@ class ElevatorTest {
 
     assertEquals(expectedEdgeSet, actualEdgeSet);
     int streetEdgeCount = 8;
-    assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.getEdges().size());
+    assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.listEdges().size());
 
     ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
       .stream()
@@ -263,13 +263,13 @@ class ElevatorTest {
       edgeSet,
       new HashSet<>(
         graph
-          .getEdges()
+          .listEdges()
           .stream()
           .map(edge -> convertEdgeToVertexLabelString(edge))
           .toList()
       )
     );
-    assertEquals(edgeSet.size(), graph.getEdges().size());
+    assertEquals(edgeSet.size(), graph.listEdges().size());
   }
 
   @Test
@@ -306,13 +306,13 @@ class ElevatorTest {
       edgeSet,
       new HashSet<>(
         graph
-          .getEdges()
+          .listEdges()
           .stream()
           .map(edge -> convertEdgeToVertexLabelString(edge))
           .toList()
       )
     );
-    assertEquals(edgeSet.size(), graph.getEdges().size());
+    assertEquals(edgeSet.size(), graph.listEdges().size());
   }
 
   @ParameterizedTest
