@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -383,6 +384,14 @@ public class TripTimeOnDate {
 
   public BookingInfo getDropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(stopPosition);
+  }
+
+  public List<ReplacedByRelation> getArrivalReplacedBys() {
+    return tripTimes.getArrivalReplacedByRelations(stopPosition);
+  }
+
+  public List<ReplacedByRelation> getDepartureReplacedBys() {
+    return tripTimes.getDepartureReplacedByRelations(stopPosition);
   }
 
   @Override

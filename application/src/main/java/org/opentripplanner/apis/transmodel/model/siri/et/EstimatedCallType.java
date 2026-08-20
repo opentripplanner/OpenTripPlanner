@@ -51,6 +51,7 @@ public class EstimatedCallType {
     GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
     GraphQLOutputType empiricalDelayType,
+    GraphQLOutputType replacedByType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -302,6 +303,32 @@ public class EstimatedCallType {
           .description("Booking arrangements for this EstimatedCall.")
           .type(bookingArrangementType)
           .dataFetcher(env -> env.<TripTimeOnDate>getSource().getPickupBookingInfo())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("arrivalReplacedBy")
+          .description(
+            "Information about any trips replacing the current trip at the arrival of this call."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
+          .dataFetcher(env -> {
+            var source = env.<TripTimeOnDate>getSource();
+            return source.getArrivalReplacedBys();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("departureReplacedBy")
+          .description(
+            "Information about any trips replacing the current trip at the departure of this call."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
+          .dataFetcher(env -> {
+            var source = env.<TripTimeOnDate>getSource();
+            return source.getDepartureReplacedBys();
+          })
           .build()
       )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()

@@ -242,6 +242,8 @@ type EstimatedCall {
   aimedArrivalTime: DateTime!
   "Scheduled time of departure from quay. Not affected by read time updated"
   aimedDepartureTime: DateTime!
+  "Information about any trips replacing the current trip at the arrival of this call."
+  arrivalReplacedBy: [ReplacedByRelation!]!
   "Booking arrangements for this EstimatedCall."
   bookingArrangements: BookingArrangement
   "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by real-time data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
@@ -249,6 +251,8 @@ type EstimatedCall {
   "The date the estimated call is valid for."
   date: Date!
   datedServiceJourney: DatedServiceJourney
+  "Information about any trips replacing the current trip at the departure of this call."
+  departureReplacedBy: [ReplacedByRelation!]!
   destinationDisplay: DestinationDisplay
   "The typical delay for this trip on this day for this stop based on historical data."
   empiricalDelay: EmpiricalDelay
