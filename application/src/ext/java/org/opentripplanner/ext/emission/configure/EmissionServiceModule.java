@@ -2,9 +2,11 @@ package org.opentripplanner.ext.emission.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
@@ -16,8 +18,14 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 public class EmissionServiceModule {
 
   @Provides
+  @Nullable
   @EmissionDecorator
-  public ItineraryDecorator provideEmissionService(EmissionRepository emissionRepository) {
+  public ItineraryDecorator provideEmissionItineraryDecorator(
+    EmissionRepository emissionRepository
+  ) {
+    if (OTPFeature.Emission.isOff() || emissionRepository == null) {
+      return null;
+    }
     return new EmissionItineraryDecorator(new DefaultEmissionService(emissionRepository));
   }
 }

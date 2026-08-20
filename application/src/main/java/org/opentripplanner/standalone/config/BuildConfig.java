@@ -595,7 +595,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
-    empiricalDelay = EmpiricalDelayConfig.mapEmissionsConfig("empiricalDelay", root);
+    empiricalDelay = EmpiricalDelayConfig.mapEmpiricalDelayConfig("empiricalDelay", root);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(
