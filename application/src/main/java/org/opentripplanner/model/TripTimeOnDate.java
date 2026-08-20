@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -207,7 +206,7 @@ public class TripTimeOnDate {
       .count();
     var scheduledPos = stopPosition - extraCallsBefore;
     if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
-      throw new InvalidInputException("Number of stops is inconsistent in scheduled trip pattern");
+      throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
     }
     return scheduledTripPattern.getStop(scheduledPos);
   }
