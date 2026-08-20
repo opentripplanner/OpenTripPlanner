@@ -44,7 +44,7 @@ public class OsmDatabase {
   private final DataImportIssueStore issueStore;
   private final OsmLevelFactory osmLevelFactory;
 
-  /* Nodes used in ways/areas, keyed by their OSM ID. See OsmNodeStore for why this isn't a plain map. */
+  // Nodes used in ways/areas, keyed by their OSM ID. See OsmNodeStore for why this isn't a plain map.
   private final OsmNodeStore nodes = new OsmNodeStore();
 
   /* Map of all bike parking nodes, keyed by their OSM ID */
