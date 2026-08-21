@@ -114,6 +114,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Direction of line restriction in SIRI-SX [#7903](https://github.com/opentripplanner/OpenTripPlanner/pull/7903)
 - Support for SIRI partial replacedBy [#7873](https://github.com/opentripplanner/OpenTripPlanner/pull/7873)
 - Expose scheduled quay [#7739](https://github.com/opentripplanner/OpenTripPlanner/pull/7739)
+- Document the transaction framework and cleanup module test [#7894](https://github.com/opentripplanner/OpenTripPlanner/pull/7894)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
