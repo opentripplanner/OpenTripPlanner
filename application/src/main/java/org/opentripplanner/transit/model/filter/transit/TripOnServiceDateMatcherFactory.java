@@ -32,19 +32,6 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 public class TripOnServiceDateMatcherFactory {
 
   /**
-   * Creates a matcher for TripOnServiceDates which never matches filters that require the
-   * scheduled running time of a trip.
-   *
-   * @see #of(TripOnServiceDateRequest, BiFunction, Function)
-   */
-  public static Matcher<TripOnServiceDate> of(
-    TripOnServiceDateRequest request,
-    BiFunction<Trip, LocalDate, TripPattern> patternResolver
-  ) {
-    return of(request, patternResolver, tripOnServiceDate -> null);
-  }
-
-  /**
    * Creates a matcher for TripOnServiceDates.
    *
    * @param request the criteria for filtering TripOnServiceDates.

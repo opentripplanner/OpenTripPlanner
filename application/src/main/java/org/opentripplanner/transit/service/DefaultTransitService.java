@@ -640,7 +640,8 @@ public class DefaultTransitService implements TransitService {
   public List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      this::findPattern
+      this::findPattern,
+      this::findScheduledRunningTime
     );
     return listTripsOnServiceDate().stream().filter(matcher::match).toList();
   }

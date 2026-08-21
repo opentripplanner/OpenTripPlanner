@@ -132,7 +132,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -155,7 +156,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -189,7 +191,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -222,7 +225,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -250,7 +254,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertFalse(matcher.match(tripOnServiceDateRut));
@@ -266,7 +271,8 @@ class TripOnServiceDateMatcherFactoryTest {
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -282,7 +288,8 @@ class TripOnServiceDateMatcherFactoryTest {
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertFalse(matcher.match(tripOnServiceDateRut));
@@ -300,7 +307,8 @@ class TripOnServiceDateMatcherFactoryTest {
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -319,7 +327,8 @@ class TripOnServiceDateMatcherFactoryTest {
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -339,7 +348,8 @@ class TripOnServiceDateMatcherFactoryTest {
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filterRut, filterAkt)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -357,7 +367,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     assertTrue(matcher.match(tripOnServiceDateRut));
@@ -376,7 +387,8 @@ class TripOnServiceDateMatcherFactoryTest {
     // A resolver that cannot resolve a pattern (returns null) must not match the filter.
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      (trip, serviceDate) -> null
+      (trip, serviceDate) -> null,
+      tripOnServiceDate -> null
     );
 
     assertFalse(matcher.match(tripOnServiceDateRut));
@@ -397,7 +409,8 @@ class TripOnServiceDateMatcherFactoryTest {
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      patternResolver
+      patternResolver,
+      runningTimeResolver
     );
 
     // Same pattern, but only the trip on the matching service date passes.
