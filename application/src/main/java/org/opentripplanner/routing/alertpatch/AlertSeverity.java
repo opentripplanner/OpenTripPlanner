@@ -5,18 +5,14 @@ package org.opentripplanner.routing.alertpatch;
  */
 public enum AlertSeverity {
   /**
-   * Severity is undefined.
-   */
-  UNDEFINED,
-  /**
-   * Situation has unknown impact on trips.
-   */
-  UNKNOWN_SEVERITY,
-  /**
    * Info alerts are used for informational messages that should not have a significant effect on
    * user's journey, for example: A single entrance to a metro station is temporarily closed.
    */
   INFO,
+  /**
+   * Situation has unknown impact on trips.
+   */
+  UNKNOWN_SEVERITY,
   /**
    * Situation has a very slight impact on trips.
    */
@@ -38,5 +34,15 @@ public enum AlertSeverity {
   /**
    * Situation has a very severe impact on trips.
    */
-  VERY_SEVERE,
+  VERY_SEVERE;
+
+  /**
+   * Return the sorting index for severity ordering.
+   *
+   * <p>This index is based on the enum declaration order via {@link #ordinal()}. A lower index
+   * means lower severity when sorting.
+   */
+  public int sortingIndex() {
+    return ordinal();
+  }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.moduletests;
+package org.opentripplanner.graph_builder.module.osm.moduletests.elevator;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

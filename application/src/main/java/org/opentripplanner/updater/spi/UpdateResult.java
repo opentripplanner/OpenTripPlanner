@@ -15,7 +15,6 @@ public record UpdateResult(
   int successful,
   int failed,
   Multimap<UpdateErrorType, UpdateError> failures,
-  List<UpdateSuccess.WarningType> warnings,
   List<UpdateSuccess> successes,
   List<UpdateError> errors
 ) {
@@ -23,25 +22,14 @@ public record UpdateResult(
    * Create an empty result.
    */
   public static UpdateResult empty() {
-    return new UpdateResult(0, 0, ArrayListMultimap.create(), List.of(), List.of(), List.of());
+    return new UpdateResult(0, 0, ArrayListMultimap.create(), List.of(), List.of());
   }
 
   /**
    * Aggregate a list of results and errors into an instance of {@link UpdateResult}.
    */
   public static UpdateResult of(List<UpdateSuccess> successes, List<UpdateError> errors) {
-    List<UpdateSuccess.WarningType> warnings = successes
-      .stream()
-      .flatMap(s -> s.warnings().stream())
-      .toList();
     ImmutableListMultimap errorIndex = Multimaps.index(errors, UpdateError::errorType);
-    return new UpdateResult(
-      successes.size(),
-      errors.size(),
-      errorIndex,
-      warnings,
-      successes,
-      errors
-    );
+    return new UpdateResult(successes.size(), errors.size(), errorIndex, successes, errors);
   }
 }

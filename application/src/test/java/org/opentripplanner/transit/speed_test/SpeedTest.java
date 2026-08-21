@@ -30,7 +30,7 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
@@ -158,7 +158,7 @@ public class SpeedTest {
       DeduplicatorService.NOOP,
       VertexLinkerTestFactory.of(graph),
       realtimeVehicleHandle,
-      new DefaultVehicleRentalService(),
+      new DefaultVehicleRentalRepository(),
       new DefaultVehicleParkingRepository(),
       transitRepository,
       // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling

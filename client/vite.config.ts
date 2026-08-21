@@ -9,6 +9,9 @@ export default defineConfig({
     outDir: 'output',
     emptyOutDir: true,
   },
+  optimizeDeps: {
+    exclude: ['maplibre-gl'],
+  },
   // @ts-ignore
   test: {
     environment: 'jsdom',

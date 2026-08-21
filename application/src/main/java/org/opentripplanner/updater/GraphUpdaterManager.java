@@ -1,6 +1,5 @@
 package org.opentripplanner.updater;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     Runnable shutdownGraphWriter,
     List<GraphUpdater<?>> updaters
   ) {
-    var updaterThreadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
+    var updaterThreadFactory = Thread.ofPlatform().name("updater-", 0).factory();
     this.pollingUpdaterPool = Executors.newScheduledThreadPool(
       Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
       updaterThreadFactory
@@ -229,31 +228,31 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    * mostly idle, and it is short-lived, so the busy-wait is a compromise.
    */
   private void reportReadinessForUpdaters() {
-    Executors.newSingleThreadExecutor(
-      new ThreadFactoryBuilder().setNameFormat("updater-ready").build()
-    ).submit(() -> {
-      boolean otpIsShuttingDown = false;
+    Executors.newSingleThreadExecutor(Thread.ofPlatform().name("updater-ready").factory()).submit(
+      () -> {
+        boolean otpIsShuttingDown = false;
 
-      while (!otpIsShuttingDown) {
-        try {
-          if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
-            LOG.info(
-              "OTP UPDATERS INITIALIZED ({} updaters) - OTP {} is ready for routing!",
-              updaterList.size(),
-              OtpProjectInfo.projectInfo().version
-            );
-            return;
+        while (!otpIsShuttingDown) {
+          try {
+            if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
+              LOG.info(
+                "OTP UPDATERS INITIALIZED ({} updaters) - OTP {} is ready for routing!",
+                updaterList.size(),
+                OtpProjectInfo.projectInfo().version
+              );
+              return;
+            }
+            //noinspection BusyWait
+            Thread.sleep(1000);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            otpIsShuttingDown = true;
+            LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
+          } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
           }
-          //noinspection BusyWait
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          otpIsShuttingDown = true;
-          LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
-        } catch (Exception e) {
-          LOG.error(e.getMessage(), e);
         }
       }
-    });
+    );
   }
 }

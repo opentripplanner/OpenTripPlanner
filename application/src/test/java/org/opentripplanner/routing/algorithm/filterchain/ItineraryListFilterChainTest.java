@@ -314,12 +314,12 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Test
   void makeSureEmissionDecoratorIsAddedToTheFilterChainTest() {
     final Box<String> state = Box.of("I");
-    ItineraryDecorator emissionDecorator = it -> {
+    ItineraryDecorator emissionItineraryDecorator = it -> {
       state.modify(v -> v + "+C");
       return it;
     };
     createBuilder(false, false, 10)
-      .withEmissions(emissionDecorator)
+      .withEmissionItineraryDecorator(emissionItineraryDecorator)
       .build()
       .filter(List.of(i1, i2));
     assertEquals("I+C+C", state.get());

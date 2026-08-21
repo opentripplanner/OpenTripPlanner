@@ -737,3 +737,93 @@ input.comma-separated-input[type='number'] {
     max-width: 1140px; /* Bootstrap xl size for lg screens and up */
   }
 }
+
+.layer-control {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  width: 250px;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+
+.layer-control h4 {
+  margin-top: 1rem;
+}
+
+.layer-control h4:first-of-type {
+  margin-top: 0;
+}
+
+.layer-control .layer-group {
+  margin-bottom: 10px;
+}
+
+.layer-control .layer-group h6 {
+  margin: 0 0 5px;
+}
+
+.layer-control .group-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.layer-control .group-label input {
+  margin-right: 5px;
+}
+
+/* Distinguishes the two lists inside a group: what is drawn, and what it is narrowed to. */
+.layer-control .sub-heading {
+  margin-left: 20px;
+  margin-bottom: 3px;
+  opacity: 0.7;
+}
+
+.layer-control .networks {
+  margin-top: 8px;
+}
+
+.layer-control .networks .sub-heading {
+  display: flex;
+  gap: 6px;
+}
+
+.layer-control .network-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.layer-control label.toggle {
+  display: block;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.layer-control label.toggle input {
+  margin-left: 20px;
+  margin-right: 5px;
+}
+
+.layer-control .network-list label {
+  display: block;
+  cursor: pointer;
+}
+
+.layer-control .network-list input {
+  margin-left: 20px;
+  margin-right: 5px;
+}
+
+.layer-control .link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+.itinerary-leg-details .rental-network {
+  opacity: 0.7;
+}

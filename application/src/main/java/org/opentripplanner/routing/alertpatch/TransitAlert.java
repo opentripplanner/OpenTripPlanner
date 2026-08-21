@@ -2,8 +2,6 @@ package org.opentripplanner.routing.alertpatch;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 
@@ -45,7 +44,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   private final ZonedDateTime updatedTime;
   private final String siriCodespace;
   private final Set<EntitySelector> entities;
-  private final List<TimePeriod> timePeriods;
+  private final AlertCalendar calendar;
 
   TransitAlert(TransitAlertBuilder builder) {
     super(builder.getId());
@@ -65,7 +64,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.updatedTime = builder.updatedTime();
     this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
-    this.timePeriods = List.copyOf(builder.timePeriods());
+    this.calendar = builder.calendar();
   }
 
   public static TransitAlertBuilder of(FeedScopedId id) {
@@ -151,67 +150,57 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return entities;
   }
 
-  public Collection<TimePeriod> timePeriods() {
-    return timePeriods;
-  }
-
-  public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
-    for (TimePeriod timePeriod : timePeriods) {
-      if (endTimeSeconds >= timePeriod.startTime) {
-        if (timePeriod.endTime == 0 || startTimeSeconds < timePeriod.endTime) {
-          return true;
-        }
-      }
-    }
-    return false;
+  /**
+   * The validity of this alert, expressed as a set of time periods.
+   */
+  public AlertCalendar calendar() {
+    return calendar;
   }
 
   /**
-   * Finds the first validity startTime from all timePeriods for this alert.
+   * Checks if this alert is active at any point during the given {@code period}.
+   * <p>
+   * The alert does not need to be active for the entire period: it is enough that one of its
+   * validity time periods overlaps the given period. In other words, this returns {@code true} as
+   * long as there is at least one instant that is contained in both the given period and the
+   * alert's validity.
    *
-   * @return First startDate for this Alert, <code>null</code> if 0 (not set)
+   * @param period the period to check for overlap with the alert's validity
+   * @return true if the alert is active during any part of the given period
+   */
+  public boolean isActiveDuring(TimePeriod period) {
+    return calendar.isActiveDuring(period);
+  }
+
+  /**
+   * Checks if this alert is active at the given point in time.
+   *
+   * @param instant the point in time to check
+   * @return true if the alert is active at the given time
+   */
+  public boolean isActiveAt(Instant instant) {
+    return calendar.isActiveAt(instant);
+  }
+
+  /**
+   * Finds the first validity start from all timePeriods for this alert.
+   *
+   * @return First start for this Alert, <code>null</code> if any period has an open start
    */
   @Nullable
   public Instant getEffectiveStartDate() {
-    return timePeriods
-      .stream()
-      .map(timePeriod -> timePeriod.startTime)
-      .min(Comparator.naturalOrder())
-      // If 0, null should be returned
-      .filter(startTime -> startTime > 0)
-      .map(Instant::ofEpochSecond)
-      .orElse(null);
+    return calendar.effectiveStart().orElse(null);
   }
 
   /**
-   * Finds the last validity endTime from all timePeriods for this alert. Returns <code>null</code>
+   * Finds the last validity end from all timePeriods for this alert. Returns <code>null</code>
    * if the validity is open-ended
    *
-   * @return Last endDate for this Alert, <code>null</code> if open-ended
+   * @return Last end for this Alert, <code>null</code> if open-ended
    */
   @Nullable
   public Instant getEffectiveEndDate() {
-    return timePeriods
-      .stream()
-      .map(timePeriod -> timePeriod.endTime)
-      .max(Comparator.naturalOrder())
-      // If open-ended, null should be returned
-      .filter(endTime -> endTime < TimePeriod.OPEN_ENDED)
-      .map(Instant::ofEpochSecond)
-      .orElse(null);
-  }
-
-  /**
-   * Checks if the alert has a NO_SERVICE alert active at the requested time.
-   * @param instant
-   * @return
-   */
-  public boolean noServiceAt(Instant instant) {
-    return (
-      effect.equals(AlertEffect.NO_SERVICE) &&
-      (getEffectiveStartDate() != null && getEffectiveStartDate().isBefore(instant)) &&
-      (getEffectiveEndDate() == null || getEffectiveEndDate().isAfter(instant))
-    );
+    return calendar.effectiveEnd().orElse(null);
   }
 
   @Override
@@ -234,7 +223,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
-      Objects.equals(timePeriods, other.timePeriods)
+      Objects.equals(calendar, other.calendar)
     );
   }
 

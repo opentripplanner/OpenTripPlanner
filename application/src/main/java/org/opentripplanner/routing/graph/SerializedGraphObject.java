@@ -91,7 +91,7 @@ public class SerializedGraphObject implements Serializable {
   public final DataImportIssueSummary issueSummary;
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
-  public final EmissionRepository emissionRepository;
+  public final @Nullable EmissionRepository emissionRepository;
   public final @Nullable CarPickupZoneRepository carPickupZoneRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
@@ -110,7 +110,7 @@ public class SerializedGraphObject implements Serializable {
     BuildConfig buildConfig,
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
-    EmissionRepository emissionRepository,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable CarPickupZoneRepository carPickupZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,

@@ -75,15 +75,20 @@ public final class NetexTestDataSupport {
   }
 
   public static DayType createDayType(String id, DayOfWeekEnumeration... daysOfWeek) {
-    DayType dayType = new DayType().withId(id);
-    if (daysOfWeek != null && daysOfWeek.length > 0) {
-      dayType.setProperties(
-        new PropertiesOfDay_RelStructure().withPropertyOfDay(
-          new PropertyOfDay().withDaysOfWeek(daysOfWeek)
-        )
-      );
+    if (daysOfWeek == null || daysOfWeek.length == 0) {
+      return new DayType().withId(id);
     }
-    return dayType;
+    return createDayTypeWithProperties(id, new PropertyOfDay().withDaysOfWeek(daysOfWeek));
+  }
+
+  /**
+   * Create a day type with the given properties, allowing tests to construct day types with an
+   * empty {@code PropertyOfDay} - which states no days of the week at all.
+   */
+  public static DayType createDayTypeWithProperties(String id, PropertyOfDay... properties) {
+    return new DayType()
+      .withId(id)
+      .withProperties(new PropertiesOfDay_RelStructure().withPropertyOfDay(properties));
   }
 
   public static DayTypeRefStructure createDayTypeRef(String id) {

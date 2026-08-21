@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.DataValidationException;
+import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
@@ -242,6 +243,32 @@ public sealed interface TripTimes<T extends TripTimes>
    * This is only for API-purposes (does not affect routing).
    */
   OccupancyStatus getOccupancyStatus(int stopPos);
+
+  /**
+   * A list of partial replacements for this trip at the particular stop. this will return whether the
+   * <strong>arrival</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   *
+   * <pre>
+   * stop:                A  B  C       D       E
+   * Arrival replacement: [] [] [trip2] [trip2] []
+   * </pre>
+   */
+  default List<ReplacedByRelation> getArrivalReplacedByRelations(int stopPos) {
+    return List.of();
+  }
+
+  /**
+   * A list of partial replacements for this trip at the particular stop. this will return whether the
+   * <strong>departure</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   *
+   * <pre>
+   * stop:                  A  B       C       D  E
+   * Departure replacement: [] [trip2] [trip2] [] []
+   * </pre>
+   */
+  default List<ReplacedByRelation> getDepartureReplacedByRelations(int stopPos) {
+    return List.of();
+  }
 
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.

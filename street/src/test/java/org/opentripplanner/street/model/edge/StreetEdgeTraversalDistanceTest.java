@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.edge;
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
-import com.google.common.collect.Range;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.street.geometry.TestCoordinates;
@@ -23,13 +22,14 @@ public class StreetEdgeTraversalDistanceTest {
     var v0 = intersectionVertex(TestCoordinates.BERLIN_TV_TOWER);
     var v1 = intersectionVertex(TestCoordinates.BERLIN_BRANDENBURG_GATE);
     var edge = StreetModelFactory.streetEdge(v0, v1);
-    var range = Range.closed(2000d, 3000d);
-    assertThat(edge.getDistanceMeters()).isIn(range);
+    assertThat(edge.getDistanceMeters()).isAtLeast(2000d);
+    assertThat(edge.getDistanceMeters()).isAtMost(3000d);
     State s0 = new State(
       v0,
       StreetSearchRequest.copyOf(StreetSearchRequest.DEFAULT).withMode(mode).build()
     );
     State s1 = edge.traverse(s0)[0];
-    assertThat(s1.getTraversalDistanceMeters()).isIn(range);
+    assertThat(s1.getTraversalDistanceMeters()).isAtLeast(2000d);
+    assertThat(s1.getTraversalDistanceMeters()).isAtMost(3000d);
   }
 }

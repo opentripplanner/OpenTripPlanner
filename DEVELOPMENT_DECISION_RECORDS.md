@@ -102,6 +102,11 @@ Prefer immutable types over mutable. Use builders where appropriate. See
 
 [Avoid using records if you cannot encapsulate it properly](doc/dev/decisionrecords/RecordsPOJOsBuilders.md#records)
 
+## Restrict-Guava-Usage
+
+Use only Guava classes on the [white-list](doc/dev/decisionrecords/RestrictGuavaUsage.md) enforced
+by the `GuavaArchitectureTest`. Prefer the JDK or the OTP utils where they provide an equivalent.
+
 ## GraphQL Best Practices - API Design
 
 [Follow best practices for designing GraphQL APIs. Our APIs need to be backwards compatible as they are used by hundreds of clients (web-pages/apps/services).](doc/dev/decisionrecords/APIGraphQLDesign.md)

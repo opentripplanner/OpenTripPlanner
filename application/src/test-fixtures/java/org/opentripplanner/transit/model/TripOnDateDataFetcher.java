@@ -1,9 +1,12 @@
 package org.opentripplanner.transit.model;
 
 import java.time.LocalDate;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -36,6 +39,11 @@ public class TripOnDateDataFetcher {
     }
     trip = transitService.getTrip(tripId);
     return trip;
+  }
+
+  @Nullable
+  public TripOnServiceDate tripOnServiceDate() {
+    return transitService.getTripOnServiceDate(new TripIdAndServiceDate(tripId, serviceDate));
   }
 
   /**

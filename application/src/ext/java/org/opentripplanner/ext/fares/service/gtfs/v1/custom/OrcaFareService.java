@@ -3,7 +3,6 @@ package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
-import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -468,7 +467,7 @@ public class OrcaFareService extends DefaultFareService {
     FareType fareType,
     Collection<FareRuleSet> fareRules
   ) {
-    return calculateCost(fareType, Lists.newArrayList(leg), fareRules);
+    return calculateCost(fareType, List.of(leg), fareRules);
   }
 
   /**
