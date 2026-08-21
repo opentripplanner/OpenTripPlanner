@@ -94,9 +94,18 @@ jobs:
 
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
+        env:
+          PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
+          SPEEDTEST_LOCATION: ${{ matrix.location }}
         run: |
           cp otp-shaded/target/otp-shaded-*-SNAPSHOT.jar otp.jar
+          start=$(date +%s)
           java -Xmx32G -XX:+UseCompactObjectHeaders -jar otp.jar --build --save test/performance/${{ matrix.location }}/
+          end=$(date +%s)
+          duration=$((end - start))
+          curl -sSf -XPOST "https://db.otp-performance.leonard.io/write?db=performance&precision=s" \
+            --user "performance:${PERFORMANCE_INFLUX_DB_PASSWORD}" \
+            --data-raw "graph_build_duration,git_commit=${{ github.sha }},git_branch=${{ github.ref_name }},location=${SPEEDTEST_LOCATION} value=${duration} ${end}"
 
       - name: Run RAPTOR speed test
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
