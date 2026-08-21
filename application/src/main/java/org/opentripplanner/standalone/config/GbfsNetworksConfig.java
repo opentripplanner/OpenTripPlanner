@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
-import org.opentripplanner.gbfs.network.GeofencingZonePhase;
+import org.opentripplanner.gbfs.network.GeofencingZoneScope;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -103,11 +103,11 @@ public class GbfsNetworksConfig {
   ) {
     return new GbfsNetworkParameters(
       node
-        .of("geofencingZones")
+        .of("applyGeofencingZones")
         .since(V2_10)
-        .summary(GeofencingZonePhase.OFF.typeDescription())
-        .description(docEnumValueList(GeofencingZonePhase.values()))
-        .asEnum(defaults.geofencingZones()),
+        .summary(GeofencingZoneScope.OFF.typeDescription())
+        .description(docEnumValueList(GeofencingZoneScope.values()))
+        .asEnum(defaults.geofencingZoneScope()),
       node
         .of("requireDropOffInsideBusinessArea")
         .since(V2_10)
@@ -118,7 +118,7 @@ public class GbfsNetworksConfig {
           permissive. When enabled, the router forces a drop-off at the border of that area,
           preventing itineraries that leave the operator's service area with a rented vehicle.
 
-          Has no effect when `geofencingZones` is `off`.
+          Has no effect when `applyGeofencingZones` is `off`.
           """
         )
         .asBoolean(defaults.requireDropOffInsideBusinessArea()),

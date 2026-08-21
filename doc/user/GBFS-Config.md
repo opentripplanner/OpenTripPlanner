@@ -181,13 +181,13 @@ cannot silently widen which networks OTP loads.
 {
   "gbfs" : {
     "defaults" : {
-      "geofencingZones" : "off",
+      "applyGeofencingZones" : "off",
       "requireDropOffInsideBusinessArea" : true,
       "allowKeepingVehicleAtDestination" : false
     },
     "includeUnlistedNetworks" : true,
     "networks" : [
-      { "network" : "oslobysykkel", "geofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true }
+      { "network" : "oslobysykkel", "applyGeofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true }
     ]
   }
 }
@@ -201,11 +201,11 @@ cannot silently widen which networks OTP loads.
 | [includeUnlistedNetworks](#gbfs_includeUnlistedNetworks)                                    |  `boolean` | Whether networks in the GBFS manifest but absent from `networks` are loaded.   | *Optional* | `false`       |  2.10 |
 | [defaults](#gbfs_defaults)                                                                  |  `object`  | Values applied to every network that does not set them itself.                 | *Optional* |               |  2.10 |
 |    [allowKeepingVehicleAtDestination](#gbfs_defaults_allowKeepingVehicleAtDestination)      |  `boolean` | Whether a vehicle rented from a station may be kept at the destination.        | *Optional* | `false`       |  2.10 |
-|    [geofencingZones](#gbfs_defaults_geofencingZones)                                        |   `enum`   | Which phase computes and applies this network's geofencing zones.              | *Optional* | `"off"`       |  2.10 |
+|    [applyGeofencingZones](#gbfs_defaults_applyGeofencingZones)                              |   `enum`   | When this network's geofencing zones are computed and applied.                 | *Optional* | `"off"`       |  2.10 |
 |    [requireDropOffInsideBusinessArea](#gbfs_defaults_requireDropOffInsideBusinessArea)      |  `boolean` | Whether a rented vehicle must be dropped off before leaving the business area. | *Optional* | `true`        |  2.10 |
 | [networks](#gbfs_networks)                                                                  | `object[]` | Per-network overrides, keyed by the GBFS `system_id`.                          | *Optional* |               |  2.10 |
 |       [allowKeepingVehicleAtDestination](#gbfs_networks_0_allowKeepingVehicleAtDestination) |  `boolean` | Whether a vehicle rented from a station may be kept at the destination.        | *Optional* | `false`       |  2.10 |
-|       [geofencingZones](#gbfs_networks_0_geofencingZones)                                   |   `enum`   | Which phase computes and applies this network's geofencing zones.              | *Optional* | `"off"`       |  2.10 |
+|       [applyGeofencingZones](#gbfs_networks_0_applyGeofencingZones)                         |   `enum`   | When this network's geofencing zones are computed and applied.                 | *Optional* | `"off"`       |  2.10 |
 |       network                                                                               |  `string`  | The GBFS `system_id` of the network these values apply to.                     | *Required* |               |  2.10 |
 |       [requireDropOffInsideBusinessArea](#gbfs_networks_0_requireDropOffInsideBusinessArea) |  `boolean` | Whether a rented vehicle must be dropped off before leaving the business area. | *Optional* | `true`        |  2.10 |
 
@@ -246,13 +246,13 @@ When disabled a vehicle rented from a station must be returned to another statio
 itinerary can only end with the vehicle parked at one.
 
 
-<h4 id="gbfs_defaults_geofencingZones">geofencingZones</h4>
+<h4 id="gbfs_defaults_applyGeofencingZones">applyGeofencingZones</h4>
 
 **Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
 **Path:** /gbfs/defaults   
 **Enum values:** `realtime` | `off`
 
-Which phase computes and applies this network's geofencing zones.
+When this network's geofencing zones are computed and applied.
 
  - `realtime` The vehicle rental updater loads and applies the zones.
  - `off` The zones are not processed for this network. Use this to opt a single network out of a
@@ -270,7 +270,7 @@ A business area is inferred from geofencing zones whose ride and traversal rules
 permissive. When enabled, the router forces a drop-off at the border of that area,
 preventing itineraries that leave the operator's service area with a rented vehicle.
 
-Has no effect when `geofencingZones` is `off`.
+Has no effect when `applyGeofencingZones` is `off`.
 
 
 <h4 id="gbfs_networks">networks</h4>
@@ -291,13 +291,13 @@ When disabled a vehicle rented from a station must be returned to another statio
 itinerary can only end with the vehicle parked at one.
 
 
-<h4 id="gbfs_networks_0_geofencingZones">geofencingZones</h4>
+<h4 id="gbfs_networks_0_applyGeofencingZones">applyGeofencingZones</h4>
 
 **Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
 **Path:** /gbfs/networks/[0]   
 **Enum values:** `realtime` | `off`
 
-Which phase computes and applies this network's geofencing zones.
+When this network's geofencing zones are computed and applied.
 
  - `realtime` The vehicle rental updater loads and applies the zones.
  - `off` The zones are not processed for this network. Use this to opt a single network out of a
@@ -315,7 +315,7 @@ A business area is inferred from geofencing zones whose ride and traversal rules
 permissive. When enabled, the router forces a drop-off at the border of that area,
 preventing itineraries that leave the operator's service area with a rented vehicle.
 
-Has no effect when `geofencingZones` is `off`.
+Has no effect when `applyGeofencingZones` is `off`.
 
 
 

@@ -3,19 +3,22 @@ package org.opentripplanner.gbfs.network;
 import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
- * Which phase computes and applies a network's geofencing zones.
+ * The scope of a network's geofencing zones: which kind of change to the street graph they are, and
+ * therefore which phase computes and applies them. Configured per network as
+ * {@code applyGeofencingZones}, which names the setting from the reader's side - when the zones are
+ * applied - where this type names it from the graph's.
  * <p>
  * The vocabulary mirrors {@link org.opentripplanner.street.Scope}, which OTP already defines for
  * this distinction: {@code REALTIME} changes to the street graph are done by updaters. This is a
  * separate enum rather than {@code Scope} itself because most of {@code Scope} is meaningless here.
  */
-public enum GeofencingZonePhase implements DocumentedEnum<GeofencingZonePhase> {
+public enum GeofencingZoneScope implements DocumentedEnum<GeofencingZoneScope> {
   REALTIME,
   OFF;
 
   @Override
   public String typeDescription() {
-    return "Which phase computes and applies this network's geofencing zones.";
+    return "When this network's geofencing zones are computed and applied.";
   }
 
   @Override

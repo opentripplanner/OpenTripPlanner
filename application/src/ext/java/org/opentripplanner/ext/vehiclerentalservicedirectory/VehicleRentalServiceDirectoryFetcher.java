@@ -9,7 +9,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
-import org.opentripplanner.gbfs.network.GeofencingZonePhase;
+import org.opentripplanner.gbfs.network.GeofencingZoneScope;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -115,7 +115,7 @@ public class VehicleRentalServiceDirectoryFetcher {
           networkParams.allowKeepingVehicleAtDestination(),
           parameters.getHeaders(),
           networkName,
-          networkParams.geofencingZones() == GeofencingZonePhase.REALTIME,
+          networkParams.geofencingZoneScope() == GeofencingZoneScope.REALTIME,
           networkParams.requireDropOffInsideBusinessArea(),
           // overloadingAllowed - not part of GBFS, not supported here
           false,

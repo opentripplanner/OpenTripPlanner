@@ -38,13 +38,13 @@ cannot silently widen which networks OTP loads.
 {
   "gbfs" : {
     "defaults" : {
-      "geofencingZones" : "off",
+      "applyGeofencingZones" : "off",
       "requireDropOffInsideBusinessArea" : true,
       "allowKeepingVehicleAtDestination" : false
     },
     "includeUnlistedNetworks" : true,
     "networks" : [
-      { "network" : "oslobysykkel", "geofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true }
+      { "network" : "oslobysykkel", "applyGeofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true }
     ]
   }
 }

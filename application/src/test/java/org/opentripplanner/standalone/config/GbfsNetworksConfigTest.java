@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.gbfs.network.GeofencingZonePhase;
+import org.opentripplanner.gbfs.network.GeofencingZoneScope;
 
 class GbfsNetworksConfigTest {
 
@@ -27,11 +27,11 @@ class GbfsNetworksConfigTest {
       {
         "gbfs" : {
           "defaults" : {
-            "geofencingZones" : "off",
+            "applyGeofencingZones" : "off",
             "requireDropOffInsideBusinessArea" : false,
             "allowKeepingVehicleAtDestination" : true
           },
-          "networks" : [ { "network" : "tier", "geofencingZones" : "realtime" } ]
+          "networks" : [ { "network" : "tier", "applyGeofencingZones" : "realtime" } ]
         }
       }
       """
@@ -39,7 +39,7 @@ class GbfsNetworksConfigTest {
 
     var tier = subject.forNetwork("tier").orElseThrow();
 
-    assertEquals(GeofencingZonePhase.REALTIME, tier.geofencingZones());
+    assertEquals(GeofencingZoneScope.REALTIME, tier.geofencingZoneScope());
     assertFalse(tier.requireDropOffInsideBusinessArea());
     assertTrue(tier.allowKeepingVehicleAtDestination());
   }
@@ -74,7 +74,7 @@ class GbfsNetworksConfigTest {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
           "defaults" : {
-            "geofencingZones" : "realtime",
+            "applyGeofencingZones" : "realtime",
             "requireDropOffInsideBusinessArea" : false
           },
           "networks" : [
@@ -86,11 +86,11 @@ class GbfsNetworksConfigTest {
     );
 
     var listed = subject.forNetwork("boltoslo").orElseThrow();
-    assertEquals(GeofencingZonePhase.REALTIME, listed.geofencingZones());
+    assertEquals(GeofencingZoneScope.REALTIME, listed.geofencingZoneScope());
     assertTrue(listed.requireDropOffInsideBusinessArea());
 
     var unlisted = subject.forNetwork("voioslo").orElseThrow();
-    assertEquals(GeofencingZonePhase.REALTIME, unlisted.geofencingZones());
+    assertEquals(GeofencingZoneScope.REALTIME, unlisted.geofencingZoneScope());
     assertFalse(unlisted.requireDropOffInsideBusinessArea());
   }
 
@@ -104,7 +104,7 @@ class GbfsNetworksConfigTest {
 
     var tier = subject.forNetwork("tier").orElseThrow();
 
-    assertEquals(GeofencingZonePhase.OFF, tier.geofencingZones());
+    assertEquals(GeofencingZoneScope.OFF, tier.geofencingZoneScope());
     assertTrue(tier.requireDropOffInsideBusinessArea());
     assertFalse(tier.allowKeepingVehicleAtDestination());
   }
@@ -116,7 +116,7 @@ class GbfsNetworksConfigTest {
       {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
-          "defaults" : { "geofencingZones" : "realtime" },
+          "defaults" : { "applyGeofencingZones" : "realtime" },
           "networks" : []
         }
       }
@@ -124,8 +124,8 @@ class GbfsNetworksConfigTest {
     );
 
     assertEquals(
-      GeofencingZonePhase.REALTIME,
-      subject.forNetwork("ryde").orElseThrow().geofencingZones()
+      GeofencingZoneScope.REALTIME,
+      subject.forNetwork("ryde").orElseThrow().geofencingZoneScope()
     );
   }
 
@@ -136,20 +136,20 @@ class GbfsNetworksConfigTest {
       {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
-          "defaults" : { "geofencingZones" : "realtime" },
-          "networks" : [ { "network" : "tier", "geofencingZones" : "off" } ]
+          "defaults" : { "applyGeofencingZones" : "realtime" },
+          "networks" : [ { "network" : "tier", "applyGeofencingZones" : "off" } ]
         }
       }
       """
     );
 
     assertEquals(
-      GeofencingZonePhase.OFF,
-      subject.forNetwork("tier").orElseThrow().geofencingZones()
+      GeofencingZoneScope.OFF,
+      subject.forNetwork("tier").orElseThrow().geofencingZoneScope()
     );
     assertEquals(
-      GeofencingZonePhase.REALTIME,
-      subject.forNetwork("ryde").orElseThrow().geofencingZones()
+      GeofencingZoneScope.REALTIME,
+      subject.forNetwork("ryde").orElseThrow().geofencingZoneScope()
     );
   }
 

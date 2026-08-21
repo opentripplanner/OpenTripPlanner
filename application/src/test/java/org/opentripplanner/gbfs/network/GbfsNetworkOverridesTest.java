@@ -1,8 +1,8 @@
 package org.opentripplanner.gbfs.network;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.gbfs.network.GeofencingZonePhase.OFF;
-import static org.opentripplanner.gbfs.network.GeofencingZonePhase.REALTIME;
+import static org.opentripplanner.gbfs.network.GeofencingZoneScope.OFF;
+import static org.opentripplanner.gbfs.network.GeofencingZoneScope.REALTIME;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;

@@ -50,8 +50,8 @@ router-config.json                            otp-config.json
       network: "default-network"      ------>     defaults { ... }
                                                   includeUnlistedNetworks: true
       network: "<other>"              ------>     networks[].network
-      geofencingZones: true           ------>     geofencingZones: "realtime"
-      geofencingZones: false          ------>     geofencingZones: "off"
+      geofencingZones: true           ------>     applyGeofencingZones: "realtime"
+      geofencingZones: false          ------>     applyGeofencingZones: "off"
       allowKeepingVehicleAtDestination ----->     allowKeepingVehicleAtDestination
 ```
 
@@ -63,8 +63,8 @@ Three things to check when migrating:
 - `defaults` now fills in missing fields on listed networks, which the `default-network` sentinel
   explicitly did not. Check listed networks that omit `requireDropOffInsideBusinessArea` or
   `allowKeepingVehicleAtDestination`.
-- `geofencingZones` is no longer a boolean. It names the phase that computes the zones -
-  `realtime` or `off`.
+- `geofencingZones` becomes `applyGeofencingZones` and is no longer a boolean. It names when the
+  zones are computed and applied - `realtime` or `off`.
 
 `geofencingBusinessAreaBorders` is renamed `requireDropOffInsideBusinessArea` and is configurable
 per network rather than hardcoded to `true`. The default is unchanged.
