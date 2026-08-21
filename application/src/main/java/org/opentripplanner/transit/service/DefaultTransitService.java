@@ -392,21 +392,13 @@ public class DefaultTransitService implements TransitService {
     if (tripTimes == null) {
       tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
     }
-    if (tripTimes == null || tripTimes.getNumStops() == 0) {
+    if (tripTimes == null) {
       return null;
     }
     ZoneId timeZone = trip.getRoute().getAgency().getTimezone();
-    var start = ServiceDateUtils.toZonedDateTime(
-      serviceDate,
-      timeZone,
-      tripTimes.getScheduledDepartureTime(0)
+    return tripTimes.scheduledRunningTime(
+      ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant()
     );
-    var end = ServiceDateUtils.toZonedDateTime(
-      serviceDate,
-      timeZone,
-      tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1)
-    );
-    return TimePeriod.of(start.toInstant(), end.toInstant());
   }
 
   @Override

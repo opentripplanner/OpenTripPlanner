@@ -4,7 +4,6 @@ import java.time.Instant;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -124,18 +123,10 @@ public class TripTimeOnDateMatcherFactory {
   @Nullable
   private static TimePeriod scheduledRunningTime(TripTimeOnDate call) {
     var tripTimes = call.getTripTimes();
-    if (tripTimes == null || tripTimes.getNumStops() == 0) {
-      return null;
-    }
-    int departure = tripTimes.getScheduledDepartureTime(0);
-    int arrival = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
-    if (departure == StopTime.MISSING_VALUE || arrival == StopTime.MISSING_VALUE) {
-      return null;
-    }
     long midnight = call.getServiceDayMidnight();
-    return TimePeriod.of(
-      Instant.ofEpochSecond(midnight + departure),
-      Instant.ofEpochSecond(midnight + arrival)
-    );
+    if (tripTimes == null || midnight == TripTimeOnDate.UNDEFINED) {
+      return null;
+    }
+    return tripTimes.scheduledRunningTime(Instant.ofEpochSecond(midnight));
   }
 }
