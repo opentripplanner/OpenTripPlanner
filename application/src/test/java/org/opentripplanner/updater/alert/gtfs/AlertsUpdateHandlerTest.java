@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.alert.gtfs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -10,6 +11,7 @@ import com.google.transit.realtime.GtfsRealtime.Alert.Effect;
 import com.google.transit.realtime.GtfsRealtime.Alert.SeverityLevel;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +38,7 @@ public class AlertsUpdateHandlerTest {
   public void setUp() {
     handler = new AlertsUpdateHandler(false);
     handler.setFeedId("1");
-    handler.setEarlyStart(5);
+    handler.setEarlyStart(Duration.ofSeconds(5));
     handler.setTransitAlertService(service);
   }
 
@@ -71,6 +73,28 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     assertNull(transitAlert.getEffectiveStartDate());
     assertEquals(Instant.ofEpochSecond(20), transitAlert.getEffectiveEndDate());
+  }
+
+  @Test
+  public void testAlertWithInvalidTimePeriodIsSkipped() {
+    // The start of the active period is after its end, which is invalid and should cause the
+    // alert to be skipped rather than fail the whole update. A valid alert in the same feed
+    // should still be added.
+    GtfsRealtime.Alert invalidAlert = GtfsRealtime.Alert.newBuilder()
+      .addActivePeriod(GtfsRealtime.TimeRange.newBuilder().setStart(20).setEnd(10).build())
+      .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
+      .build();
+    GtfsRealtime.Alert validAlert = GtfsRealtime.Alert.newBuilder()
+      .addActivePeriod(GtfsRealtime.TimeRange.newBuilder().setStart(10).setEnd(20).build())
+      .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("2"))
+      .build();
+    GtfsRealtime.FeedMessage message = GtfsRealtime.FeedMessage.newBuilder()
+      .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))
+      .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(invalidAlert).setId("1"))
+      .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(validAlert).setId("2"))
+      .build();
+    handler.update(message, null);
+    assertThat(service.getAllAlerts()).hasSize(1);
   }
 
   @Test

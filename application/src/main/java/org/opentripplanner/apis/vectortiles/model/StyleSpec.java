@@ -18,11 +18,18 @@ public final class StyleSpec {
   private final String name;
   private final Collection<TileSource> sources;
   private final List<JsonNode> layers;
+  private final List<String> rentalNetworks;
 
-  public StyleSpec(String name, Collection<TileSource> sources, List<StyleBuilder> layers) {
+  public StyleSpec(
+    String name,
+    Collection<TileSource> sources,
+    List<StyleBuilder> layers,
+    List<String> rentalNetworks
+  ) {
     this.name = name;
     this.sources = sources;
     this.layers = layers.stream().map(StyleBuilder::toJson).toList();
+    this.rentalNetworks = List.copyOf(rentalNetworks);
   }
 
   @JsonSerialize
@@ -45,6 +52,17 @@ public final class StyleSpec {
   @JsonSerialize
   public List<JsonNode> layers() {
     return layers;
+  }
+
+  /**
+   * Style-level metadata, which the spec allows to carry arbitrary keys. The debug client uses
+   * {@code rentalNetworks} to offer a per-network filter on the vehicle rental layers; the values
+   * cannot be derived from the tiles, since a tile only tells you about the networks present in
+   * the area currently loaded.
+   */
+  @JsonSerialize
+  public Map<String, Object> metadata() {
+    return Map.of("rentalNetworks", rentalNetworks);
   }
 
   @JsonSerialize

@@ -1,8 +1,6 @@
 package org.opentripplanner.updater.trip.siri;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import com.google.common.collect.ImmutableSetMultimap;
 import java.util.Set;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -22,14 +20,22 @@ public class SiriFuzzyTripMatcherCache {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcherCache.class);
 
-  final Map<String, Set<Trip>> internalPlanningCodeCache = new HashMap<>();
-  final Map<String, Set<Trip>> startStopTripCache = new HashMap<>();
+  private final ImmutableSetMultimap<String, Trip> internalPlanningCodeCache;
+  private final ImmutableSetMultimap<String, Trip> startStopTripCache;
 
-  public SiriFuzzyTripMatcherCache(TransitRepository transitRepository) {
-    initCache(new DefaultTransitService(transitRepository, null));
+  private SiriFuzzyTripMatcherCache(
+    ImmutableSetMultimap<String, Trip> internalPlanningCodeCache,
+    ImmutableSetMultimap<String, Trip> startStopTripCache
+  ) {
+    this.internalPlanningCodeCache = internalPlanningCodeCache;
+    this.startStopTripCache = startStopTripCache;
   }
 
-  private void initCache(TransitService index) {
+  public static SiriFuzzyTripMatcherCache create(TransitRepository transitRepository) {
+    TransitService index = new DefaultTransitService(transitRepository, null);
+    var internalPlanningCodes = ImmutableSetMultimap.<String, Trip>builder();
+    var startStopTrips = ImmutableSetMultimap.<String, Trip>builder();
+
     for (Trip trip : index.listTrips()) {
       TripPattern tripPattern = index.findPattern(trip);
 
@@ -40,9 +46,7 @@ public class SiriFuzzyTripMatcherCache {
       if (tripPattern.getRoute().getMode().equals(TransitMode.RAIL)) {
         String internalPlanningCode = trip.getNetexInternalPlanningCode();
         if (internalPlanningCode != null) {
-          internalPlanningCodeCache
-            .computeIfAbsent(internalPlanningCode, key -> new HashSet<>())
-            .add(trip);
+          internalPlanningCodes.put(internalPlanningCode, trip);
         }
       }
       String lastStopId = tripPattern.lastStop().getId().getId();
@@ -50,12 +54,39 @@ public class SiriFuzzyTripMatcherCache {
       TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
       if (tripTimes != null) {
         int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
-        String key = lastStopId + ":" + arrivalTime;
-        startStopTripCache.computeIfAbsent(key, k -> new HashSet<>()).add(trip);
+        startStopTrips.put(startStopKey(lastStopId, arrivalTime), trip);
       }
     }
 
-    LOG.info("Built internalPlanningCode-cache [{}].", internalPlanningCodeCache.size());
-    LOG.info("Built start-stop-cache [{}].", startStopTripCache.size());
+    var cache = new SiriFuzzyTripMatcherCache(
+      internalPlanningCodes.build(),
+      startStopTrips.build()
+    );
+
+    LOG.info(
+      "Built internalPlanningCode-cache [{}].",
+      cache.internalPlanningCodeCache.keySet().size()
+    );
+    LOG.info("Built start-stop-cache [{}].", cache.startStopTripCache.keySet().size());
+    return cache;
+  }
+
+  /**
+   * The rail trips with the given NeTEx internal planning code, or an empty set if there are none.
+   */
+  public Set<Trip> tripsByInternalPlanningCode(String internalPlanningCode) {
+    return internalPlanningCodeCache.get(internalPlanningCode);
+  }
+
+  /**
+   * The trips whose scheduled last stop and arrival time (in seconds since start of the service
+   * day) match the given values, or an empty set if there are none.
+   */
+  public Set<Trip> tripsByLastStopArrival(String stopId, int arrivalTime) {
+    return startStopTripCache.get(startStopKey(stopId, arrivalTime));
+  }
+
+  private static String startStopKey(String stopId, int arrivalTime) {
+    return stopId + ":" + arrivalTime;
   }
 }

@@ -2,7 +2,6 @@ package org.opentripplanner.framework.transaction.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -21,7 +20,7 @@ class UpdateManagerMetricsTest {
 
   @Test
   void writerThreadExecutorExposesQueueMetrics() {
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("metrics-test").build();
+    var threadFactory = Thread.ofPlatform().name("metrics-test").factory();
     var updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "metrics-test",
       TransactionFactory.createRepositoryRegistry(),

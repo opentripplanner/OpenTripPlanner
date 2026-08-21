@@ -44,11 +44,6 @@ public class DistanceTripFilter implements CarpoolTripFilter {
     var passengerDropoff = request.getPassengerDropoff();
     List<WgsCoordinate> routePoints = trip.routePoints();
 
-    if (routePoints.size() < 2) {
-      LOG.warn("Trip {} has fewer than 2 route points, rejecting", trip.getId());
-      return false;
-    }
-
     for (int i = 0; i < routePoints.size() - 1; i++) {
       WgsCoordinate segmentStart = routePoints.get(i);
       WgsCoordinate segmentEnd = routePoints.get(i + 1);

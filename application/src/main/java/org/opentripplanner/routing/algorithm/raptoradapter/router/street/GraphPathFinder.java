@@ -100,7 +100,7 @@ class GraphPathFinder {
   private Set<GeofencingZone> computeZonesAtVertices(Set<Vertex> vertices) {
     var zones = new HashSet<GeofencingZone>();
     for (var vertex : vertices) {
-      zones.addAll(geofencingZoneService.zonesContaining(vertex.getCoordinate()));
+      zones.addAll(geofencingZoneService.findZonesContaining(vertex.getCoordinate()));
     }
     return zones;
   }

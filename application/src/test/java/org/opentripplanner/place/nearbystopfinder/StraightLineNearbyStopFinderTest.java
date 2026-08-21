@@ -2,6 +2,7 @@ package org.opentripplanner.place.nearbystopfinder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -45,5 +48,33 @@ class StraightLineNearbyStopFinderTest extends GraphRoutingTest {
     assertEquals(List.of(ns1), subject.findNearbyStops(coordinate, 100));
 
     assertEquals(List.of(ns1, ns2), subject.findNearbyStops(coordinate, 2000));
+  }
+
+  @Test
+  void findNearbyStopsWithMaxStopCount() {
+    var ns1 = new NearbyStop(S1.getId(), 0, null, null);
+    var ns2 = new NearbyStop(S2.getId(), 1112, null, null);
+
+    var subject = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
+
+    var limitedStops = subject.findNearbyStops(
+      S1,
+      RouteRequest.defaultValue(),
+      StreetMode.WALK,
+      false,
+      Duration.ofSeconds(3000),
+      2
+    );
+    assertEquals(List.of(ns1, ns2), limitedStops);
+
+    var unlimitedStops = subject.findNearbyStops(
+      S1,
+      RouteRequest.defaultValue(),
+      StreetMode.WALK,
+      false,
+      Duration.ofSeconds(3000),
+      0
+    );
+    assertEquals(3, unlimitedStops.size());
   }
 }

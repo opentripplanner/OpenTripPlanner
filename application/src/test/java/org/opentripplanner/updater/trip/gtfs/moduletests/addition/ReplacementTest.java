@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -122,5 +124,31 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
       assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
     }
+  }
+
+  @Test
+  void replacementTripWithUnknownStop() {
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00");
+    var env = builder.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime("UNKNOWN_STOP_ID", "00:45")
+      .addStopTime(STOP_B_ID, "01:00")
+      .build();
+
+    assertFailure(UNKNOWN_STOP, rt.applyTripUpdate(tripUpdate));
+
+    var tripTimes = env.tripData(TRIP_1_ID).tripTimes();
+    assertNotNull(tripTimes);
+    assertFalse(tripTimes.isTripPatternModified());
+    assertFalse(tripTimes.isCanceledOrDeleted());
   }
 }

@@ -117,7 +117,7 @@ public class RouteRequestToFilterChainMapper {
     }
 
     if (OTPFeature.Emission.isOn()) {
-      builder.withEmissions(emissionItineraryDecorator);
+      builder.withEmissionItineraryDecorator(emissionItineraryDecorator);
     }
 
     if (stopConsolidationService != null && stopConsolidationService.isActive()) {

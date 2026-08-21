@@ -111,6 +111,7 @@ import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQu
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
+import org.opentripplanner.apis.transmodel.model.timetable.RealTimeTripStateType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacedByRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
@@ -334,6 +335,9 @@ public class TransmodelGraphQLSchemaFactory {
 
     GraphQLOutputType sjEstimatedCallsType = SJEstimatedCallsType.create();
 
+    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
+    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
+
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -344,6 +348,7 @@ public class TransmodelGraphQLSchemaFactory {
       sjEstimatedCallsType,
       DatedServiceJourneyType.REF,
       empiricalDelay,
+      replacedByRelationType,
       dateTimeScalar
     );
 
@@ -360,16 +365,15 @@ public class TransmodelGraphQLSchemaFactory {
       TimetabledPassingTimeType.REF
     );
 
-    GraphQLOutputType replacementForRelationType = replacementForRelationTypeFactory.create();
-    GraphQLOutputType replacedByRelationType = replacedByRelationTypeFactory.create();
-
+    GraphQLObjectType realTimeJourneyStateType = RealTimeTripStateType.create();
     GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
       journeyPatternType,
       estimatedCallType,
       quayType,
       replacedByRelationType,
-      replacementForRelationType
+      replacementForRelationType,
+      realTimeJourneyStateType
     );
 
     var timetabledPassingTime = TimetabledPassingTimeType.create(

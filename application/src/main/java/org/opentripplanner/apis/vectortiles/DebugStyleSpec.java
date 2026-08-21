@@ -148,7 +148,8 @@ public class DebugStyleSpec {
     VectorSourceLayer geofencingZones,
     VectorSourceLayer rental,
     VectorSourceLayer transfers,
-    List<BackgroundTileLayer> extraLayers
+    List<BackgroundTileLayer> extraLayers,
+    List<String> rentalNetworks
   ) {
     List<TileSource> vectorSources = Stream.of(
       regularStops,
@@ -192,7 +193,8 @@ public class DebugStyleSpec {
         elevators(edges, vertices),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
-      )
+      ),
+      rentalNetworks
     );
   }
 

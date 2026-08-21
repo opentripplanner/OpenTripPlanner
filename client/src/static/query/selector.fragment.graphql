@@ -25,11 +25,37 @@
                 quay {
                     id
                 }
+                rentalVehicle {
+                    id
+                    network
+                    vehicleType {
+                        formFactor
+                        propulsionType
+                    }
+                }
+                bikeRentalStation {
+                    id
+                    name
+                    networks
+                }
             }
             toPlace {
                 name
                 quay {
                     id
+                }
+                rentalVehicle {
+                    id
+                    network
+                    vehicleType {
+                        formFactor
+                        propulsionType
+                    }
+                }
+                bikeRentalStation {
+                    id
+                    name
+                    networks
                 }
             }
             fromEstimatedCall {

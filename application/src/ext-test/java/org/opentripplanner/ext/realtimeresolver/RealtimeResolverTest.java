@@ -17,8 +17,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -59,7 +59,7 @@ class RealtimeResolverTest {
     var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
-      .addTimePeriod(new TimePeriod(0, 0))
+      .withCalendar(AlertCalendar.ofAlwaysActive())
       .build();
     transitAlertService.setAlerts(List.of(alert));
 

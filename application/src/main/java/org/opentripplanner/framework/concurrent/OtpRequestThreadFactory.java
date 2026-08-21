@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.concurrent;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.concurrent.ThreadFactory;
 import org.opentripplanner.framework.application.LogMDCSupport;
 
@@ -27,8 +26,12 @@ public class OtpRequestThreadFactory implements ThreadFactory {
     this.delegate = delegate;
   }
 
-  public static ThreadFactory of(String nameFormat) {
-    var defaultFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
+  /**
+   * Create a factory whose threads are named with the given prefix followed by an increasing
+   * number, e.g. {@code prefix0, prefix1, ...}.
+   */
+  public static ThreadFactory of(String namePrefix) {
+    var defaultFactory = Thread.ofPlatform().name(namePrefix, 0).factory();
     return new OtpRequestThreadFactory(defaultFactory);
   }
 

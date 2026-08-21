@@ -305,8 +305,8 @@ public class CarpoolItineraryMapper {
    * from the driver's trip origin/destination.
    * <p>
    * If the contact's booking URL cannot be parsed as a valid {@link URI}, the URL is dropped from
-   * the returned {@code BookingInfo} (a malformed URL is logged as a warning and treated as if
-   * the trip published no booking URL at all) and {@link BookingMethod#ONLINE} is omitted from
+   * the returned {@code BookingInfo} (a malformed URL is logged and treated as if the trip
+   * published no booking URL at all) and {@link BookingMethod#ONLINE} is omitted from
    * the booking methods. This keeps the "non-null return ⇒ at least one usable booking method"
    * contract honest: a {@code BookingInfo} is never returned advertising {@code ONLINE} without
    * a URL the user can actually open.
@@ -390,7 +390,7 @@ public class CarpoolItineraryMapper {
    * rather than swallowing them.
    *
    * @return the augmented URL, or {@code null} if the input is not a parseable URI — in which
-   *         case a warning is logged and the caller should drop the URL (and the
+   *         case the failure is logged and the caller should drop the URL (and the
    *         {@link BookingMethod#ONLINE} booking method along with it).
    */
   @Nullable
@@ -419,7 +419,11 @@ public class CarpoolItineraryMapper {
         uri.getFragment()
       ).toString();
     } catch (URISyntaxException e) {
-      LOG.warn("Failed to parse carpool booking URL '{}'; dropping URL from booking info", url, e);
+      LOG.info(
+        "Failed to parse carpool booking URL '{}'; dropping URL from booking info: {}",
+        url,
+        e.getMessage()
+      );
       return null;
     }
   }

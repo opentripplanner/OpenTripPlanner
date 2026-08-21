@@ -1,0 +1,31 @@
+{
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 0,
+  "version": "3.0",
+  "data": {
+    "datasets": [
+      {
+        "system_id": "tieroslo",
+        "versions": [
+          {
+            "version": "2.3",
+            "url": "file:src/test/resources/gbfs/tieroslo/gbfs.json"
+          }
+        ]
+      },
+      {
+        "system_id": "duplicate-stations",
+        "versions": [
+          {
+            "version": "2.3",
+            "url": "file:src/test/resources/gbfs/duplicate-stations-v2/gbfs.json"
+          },
+          {
+            "version": "3.0",
+            "url": "file:src/test/resources/gbfs/duplicate-stations-v3/gbfs.json"
+          }
+        ]
+      }
+    ]
+  }
+}

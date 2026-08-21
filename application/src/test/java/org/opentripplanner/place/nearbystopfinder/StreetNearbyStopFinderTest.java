@@ -90,17 +90,15 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   void testIsolatedStop() {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 0;
-    var finder = StreetNearbyStopFinder.of(
-      linkingContextFactory,
-      durationLimit,
-      maxStopCount
-    ).build();
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     var nearbyStops = finder.findNearbyStops(
       isolatedStop,
       RouteRequest.defaultValue(),
       StreetMode.WALK,
-      false
+      false,
+      durationLimit,
+      maxStopCount
     );
 
     assertThat(nearbyStops).hasSize(1);
@@ -112,14 +110,17 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   void testMultipleStops() {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 0;
-    var finder = StreetNearbyStopFinder.of(
-      linkingContextFactory,
-      durationLimit,
-      maxStopCount
-    ).build();
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetMode.WALK, false)
+      finder.findNearbyStops(
+        stopA,
+        RouteRequest.defaultValue(),
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(4);
@@ -133,14 +134,17 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   void testMaxStopCount() {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 2;
-    var finder = StreetNearbyStopFinder.of(
-      linkingContextFactory,
-      durationLimit,
-      maxStopCount
-    ).build();
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory).build();
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetMode.WALK, false)
+      finder.findNearbyStops(
+        stopA,
+        RouteRequest.defaultValue(),
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -158,13 +162,16 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       .withPreferences(b -> b.withWalk(w -> w.withSpeed(1.0)))
       .buildDefault();
 
-    var finder = StreetNearbyStopFinder.of(
-      linkingContextFactory,
-      durationLimit,
-      maxStopCount
-    ).build();
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory).build();
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, routeRequest, StreetMode.WALK, false)
+      finder.findNearbyStops(
+        stopA,
+        routeRequest,
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -177,12 +184,19 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 0;
     Set<Vertex> ignore = Set.of(stopA, stopB);
-    var finder = StreetNearbyStopFinder.of(linkingContextFactory, durationLimit, maxStopCount)
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory)
       .withIgnoreVertices(ignore)
       .build();
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), RouteRequest.defaultValue(), StreetMode.WALK, false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -195,12 +209,19 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 1;
     Set<Vertex> ignore = Set.of(stopA, stopB);
-    var finder = StreetNearbyStopFinder.of(linkingContextFactory, durationLimit, maxStopCount)
+    var finder = StreetNearbyStopFinder.of(linkingContextFactory)
       .withIgnoreVertices(ignore)
       .build();
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), RouteRequest.defaultValue(), StreetMode.WALK, false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(1);

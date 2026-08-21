@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model;
 
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.LocalTimeParser;
@@ -78,7 +77,7 @@ public final class TransitTestEnvironment {
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("test-commit").build();
+    var threadFactory = Thread.ofPlatform().name("test-commit").factory();
     // Use atomic commits (commit immediately after each task) so test assertions see results right away
     this.updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
@@ -134,7 +133,11 @@ public final class TransitTestEnvironment {
    * TransitService timezone.
    */
   public LocalTimeParser localTimeParser() {
-    return new LocalTimeParser(transitRepository.getTimeZone(), defaultServiceDate);
+    return localTimeParser(defaultServiceDate);
+  }
+
+  public LocalTimeParser localTimeParser(LocalDate serviceDate) {
+    return new LocalTimeParser(transitRepository.getTimeZone(), serviceDate);
   }
 
   /**

@@ -2,6 +2,7 @@ package org.opentripplanner.updater.alert.gtfs;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
@@ -41,7 +42,7 @@ public class GtfsRealtimeAlertsUpdater
     this.transitAlertService = transitAlertService;
 
     this.updateHandler = new AlertsUpdateHandler(config.fuzzyTripMatching());
-    this.updateHandler.setEarlyStart(config.earlyStartSec());
+    this.updateHandler.setEarlyStart(Duration.ofSeconds(config.earlyStartSec()));
     this.updateHandler.setFeedId(config.feedId());
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
