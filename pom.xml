@@ -142,6 +142,11 @@
                                 <include>src/ext/java/**/*.java</include>
                                 <include>src/ext-test/java/**/*.java</include>
                             </includes>
+                            <excludes>
+                                <!-- Some source directories contain npm projects (e.g. the GraphQL
+                                     Java code generator), never format their dependencies. -->
+                                <exclude>**/node_modules/**</exclude>
+                            </excludes>
                             <!--
                               Steps are applied in the order they are declared, so unused imports
                               are removed before the code is formatted. The 'cleanthat' engine is
@@ -172,6 +177,9 @@
                                 <includes>
                                     <include>src/main/java/**/*.md</include>
                                 </includes>
+                                <excludes>
+                                    <exclude>**/node_modules/**</exclude>
+                                </excludes>
                                 <prettier>
                                     <devDependencies>
                                         <prettier>${prettier.version}</prettier>
@@ -189,6 +197,7 @@
                                     <include>src/test/resources/org/opentripplanner/apis/**/*.graphql</include>
                                 </includes>
                                 <excludes>
+                                    <exclude>**/node_modules/**</exclude>
                                     <exclude>src/test/resources/org/opentripplanner/apis/vectortiles/style.json</exclude>
                                 </excludes>
                                 <prettier>
@@ -226,6 +235,7 @@
                                 <include>doc/**/*.md</include>
                             </includes>
                             <excludes>
+                                <exclude>**/node_modules/**</exclude>
                                 <!-- Skip doc/user/**/*.md files. Many of these files are generated
                                      by JUnit tests and the CI pipeline. To avoid conflicts we skip
                                      these for now.
