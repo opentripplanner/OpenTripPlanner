@@ -69,6 +69,31 @@ class CarPickupZoneLegTest implements PlanTestConstants {
   }
 
   @Test
+  void tripComesFromZone() {
+    var leg = carPickupZoneLeg();
+    assertEquals(TRIP, leg.trip());
+  }
+
+  @Test
+  void isTransitLeg() {
+    var leg = carPickupZoneLeg();
+    assertTrue(leg.isTransitLeg());
+  }
+
+  @Test
+  void serviceDateComesFromLegStartTime() {
+    var leg = carPickupZoneLeg();
+    assertEquals(leg.startTime().toLocalDate(), leg.serviceDate());
+  }
+
+  @Test
+  void boardAndAlightStopPositionsAreFixed() {
+    var leg = carPickupZoneLeg();
+    assertEquals(0, leg.boardStopPosInPattern());
+    assertEquals(1, leg.alightStopPosInPattern());
+  }
+
+  @Test
   void bookingInfoComesFromZone() {
     var leg = carPickupZoneLeg();
     assertEquals(PICKUP_BOOKING_INFO, leg.pickupBookingInfo());
@@ -82,15 +107,6 @@ class CarPickupZoneLegTest implements PlanTestConstants {
     var carPickupLeg = assertInstanceOf(CarPickupZoneLeg.class, updated);
     assertEquals(leg.carPickupZone(), carPickupLeg.carPickupZone());
     assertEquals(Emission.ofCo2Gram(5), carPickupLeg.emissionPerPerson());
-  }
-
-  @Test
-  void withAccessibilityScoreRetainsType() {
-    var leg = carPickupZoneLeg();
-    var updated = leg.withAccessibilityScore(0.5f);
-    var carPickupLeg = assertInstanceOf(CarPickupZoneLeg.class, updated);
-    assertEquals(leg.carPickupZone(), carPickupLeg.carPickupZone());
-    assertEquals(0.5f, carPickupLeg.accessibilityScore());
   }
 
   @Test

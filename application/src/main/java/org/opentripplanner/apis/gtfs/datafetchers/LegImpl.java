@@ -18,7 +18,6 @@ import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZoneLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.fares.ItineraryFareDataLoader;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
@@ -215,9 +214,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<String> mode() {
     return environment -> {
       Leg leg = getSource(environment);
-      if (leg instanceof CarPickupZoneLeg cpzl) {
-        return cpzl.mode().name();
-      }
       if (leg instanceof StreetLeg s) {
         return s.getMode().name();
       }

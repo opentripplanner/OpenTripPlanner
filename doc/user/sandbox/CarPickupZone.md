@@ -20,6 +20,9 @@ For each driving-ish leg in a car pickup itinerary:
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
 - Possibly add CAR_PICKUP direct mode to GTFS API for enabling the car pickup zone decorator with only direct mode.
+- Calendar/service-date validation. The matched flex trip's `service_id` is currently not checked
+  against the itinerary's travel date, so a zone will decorate a leg regardless of the day of week
+  or date range configured in `calendar.txt`/`calendar_dates.txt`.
 
 ### Car Pickup Zone Data Files
 
@@ -56,16 +59,22 @@ a warning in the build report:
 
 ### Decorated Leg Fields
 
-When a car pickup leg matches a zone, it is replaced by a `CarPickupZoneLeg`
-with the following fields from the matched provider:
+When a car pickup leg matches a zone, it is replaced by a `CarPickupZoneLeg`, which is modeled as
+a transit leg, since it carries route/agency/booking information from the matched provider's flex
+trip. The physical street route (geometry, distance, elevation, etc.) of the original driving leg
+is preserved.
 
-| Field                | Source                                                    |
-|:---------------------|:----------------------------------------------------------|
-| `agency`             | Agency from the matched route.                            |
-| `route`              | Route from the matched flex trip.                         |
-| `mode`               | `TransitMode` from the matched route (e.g. `TAXI`).       |
-| `pickupBookingInfo`  | Booking info from stop 0 of the matched flex trip.        |
-| `dropOffBookingInfo` | Booking info from stop 1 of the matched flex trip.        |
+| Field                       | Source                                                       |
+|:-----------------------------|:--------------------------------------------------------------|
+| `agency`                    | Agency from the matched route.                                |
+| `route`                     | Route from the matched flex trip.                             |
+| `trip`                      | The matched flex trip.                                        |
+| `mode`                      | `TransitMode` from the matched route (e.g. `TAXI`).           |
+| `serviceDate`               | The leg's own start date (no calendar/service-date validation is performed). |
+| `boardStopPosInPattern`     | Always `0` (the pickup stop).                                  |
+| `alightStopPosInPattern`    | Always `1` (the drop-off stop).                                |
+| `pickupBookingInfo`         | Booking info from stop 0 of the matched flex trip.             |
+| `dropOffBookingInfo`        | Booking info from stop 1 of the matched flex trip.             |
 
 Itineraries where the leg does not match any zone are tagged with the system notice
 `no-car-pickup-zone-available` and removed.
