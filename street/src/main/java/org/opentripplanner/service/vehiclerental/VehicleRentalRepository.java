@@ -24,5 +24,11 @@ public interface VehicleRentalRepository extends GeofencingZoneService {
 
   Collection<VehicleRentalPlace> listRentalPlaces();
 
+  /**
+   * The networks that have registered a geofencing zone index. A network appears here as soon as
+   * its zones are applied, even if no rental place has been reported for it yet.
+   */
+  Collection<String> listZoneNetworks();
+
   VehicleRentalPlace getRentalPlace(FeedScopedId id);
 }
