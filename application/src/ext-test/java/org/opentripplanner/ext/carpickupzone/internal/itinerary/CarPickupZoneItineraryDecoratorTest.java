@@ -19,6 +19,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
 
@@ -38,8 +39,12 @@ class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
 
   private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
 
+  private static final Trip ZONE_TRIP = TransitRepositoryForTest.trip("taxi-trip")
+    .withRoute(ZONE_ROUTE)
+    .build();
+
   private static final CarPickupZoneIndex MATCHING_INDEX = new CarPickupZoneIndex(
-    List.of(new CarPickupZone(ZONE_POLYGON, ZONE_ROUTE, null, null))
+    List.of(new CarPickupZone(ZONE_POLYGON, ZONE_TRIP, null, null))
   );
   private static final CarPickupZoneIndex EMPTY_INDEX = new CarPickupZoneIndex(List.of());
 

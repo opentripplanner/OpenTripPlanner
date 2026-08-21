@@ -51,8 +51,8 @@ a warning in the build report:
    drop-off stop.
 4. Both stop times must reference the same GTFS Flex area (`location_id`) and that area must
    have a geometry. Trips with separate departure and arrival zones are not supported.
-5. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) or `3` (COORDINATE_WITH_DRIVER), and stop 1
-   must have `drop_off_type` `2` or `3`. `0` (SCHEDULED) is not accepted.
+5. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
+   (CALL_AGENCY). `0` (SCHEDULED) and `3` (COORDINATE_WITH_DRIVER) are not accepted.
 
 ### Decorated Leg Fields
 

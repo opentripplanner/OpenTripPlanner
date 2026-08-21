@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
@@ -44,7 +46,7 @@ class CarPickupZoneBuilderTest {
   private static List<StopTime> validStopTimes() {
     return List.of(
       fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
     );
   }
 
@@ -63,7 +65,7 @@ class CarPickupZoneBuilderTest {
     assertEquals(1, zones.size());
     var zone = zones.get(0);
     assertEquals(AREA_1.getGeometry(), zone.geometry());
-    assertEquals(TRIP.getRoute(), zone.route());
+    assertEquals(TRIP, zone.trip());
   }
 
   @Test
@@ -108,7 +110,7 @@ class CarPickupZoneBuilderTest {
     var stopTimes = List.of(
       fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
       fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -121,7 +123,7 @@ class CarPickupZoneBuilderTest {
   void differentAreasIsSkipped() {
     var stopTimes = List.of(
       fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.CALL_AGENCY)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -130,11 +132,12 @@ class CarPickupZoneBuilderTest {
     assertTrue(zones.isEmpty());
   }
 
-  @Test
-  void invalidPickupTypeIsSkipped() {
+  @ParameterizedTest
+  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
+  void invalidPickupTypeIsSkipped(PickDrop pickupType) {
     var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+      fullDayAreaStop(AREA_1, pickupType, PickDrop.NONE),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -143,11 +146,12 @@ class CarPickupZoneBuilderTest {
     assertTrue(zones.isEmpty());
   }
 
-  @Test
-  void invalidDropOffTypeIsSkipped() {
+  @ParameterizedTest
+  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
+  void invalidDropOffTypeIsSkipped(PickDrop dropOffType) {
     var stopTimes = List.of(
       fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE)
+      fullDayAreaStop(AREA_1, PickDrop.NONE, dropOffType)
     );
     var trip = unscheduledTrip(stopTimes);
 

@@ -32,7 +32,7 @@ public class CarPickupZoneBuilder {
         result.add(
           new CarPickupZone(
             areaStop.getGeometry(),
-            flexTrip.getTrip().getRoute(),
+            flexTrip.getTrip(),
             flexTrip.getPickupBookingInfo(0),
             flexTrip.getDropOffBookingInfo(1)
           )
@@ -117,20 +117,20 @@ public class CarPickupZoneBuilder {
   private static boolean hasValidPickupDropoffTypes(FlexTrip<?, ?> flexTrip) {
     PickDrop boardRule = flexTrip.getBoardRule(0);
     PickDrop alightRule = flexTrip.getAlightRule(1);
-    if (boardRule != PickDrop.CALL_AGENCY && boardRule != PickDrop.COORDINATE_WITH_DRIVER) {
+    if (boardRule != PickDrop.CALL_AGENCY) {
       LOG.warn(
         "Skipping trip {} for car pickup zones: stop 0 has pickup_type {} ({}); " +
-          "must be 2 (CALL_AGENCY) or 3 (COORDINATE_WITH_DRIVER)",
+          "must be 2 (CALL_AGENCY)",
         flexTrip.getId(),
         boardRule.ordinal(),
         boardRule
       );
       return false;
     }
-    if (alightRule != PickDrop.CALL_AGENCY && alightRule != PickDrop.COORDINATE_WITH_DRIVER) {
+    if (alightRule != PickDrop.CALL_AGENCY) {
       LOG.warn(
         "Skipping trip {} for car pickup zones: stop 1 has drop_off_type {} ({}); " +
-          "must be 2 (CALL_AGENCY) or 3 (COORDINATE_WITH_DRIVER)",
+          "must be 2 (CALL_AGENCY)",
         flexTrip.getId(),
         alightRule.ordinal(),
         alightRule

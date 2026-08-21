@@ -15,12 +15,17 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 class CarPickupZoneLegTest implements PlanTestConstants {
 
   private static final Route ROUTE = TransitRepositoryForTest.route("taxi-route")
     .withMode(TransitMode.TAXI)
+    .build();
+
+  private static final Trip TRIP = TransitRepositoryForTest.trip("taxi-trip")
+    .withRoute(ROUTE)
     .build();
 
   private static final Place PLACE_A = Place.forStop(
@@ -41,7 +46,7 @@ class CarPickupZoneLegTest implements PlanTestConstants {
   }
 
   private static CarPickupZoneLeg carPickupZoneLeg() {
-    var zone = new CarPickupZone(null, ROUTE, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
+    var zone = new CarPickupZone(null, TRIP, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
     return new CarPickupZoneLeg(driveLeg(), zone);
   }
 
@@ -115,7 +120,8 @@ class CarPickupZoneLegTest implements PlanTestConstants {
     var otherRoute = TransitRepositoryForTest.route("other-route")
       .withMode(TransitMode.CARPOOL)
       .build();
-    var otherZone = new CarPickupZone(null, otherRoute, null, null);
+    var otherTrip = TransitRepositoryForTest.trip("other-trip").withRoute(otherRoute).build();
+    var otherZone = new CarPickupZone(null, otherTrip, null, null);
     var other = new CarPickupZoneLeg(driveLeg(), otherZone);
     assertFalse(leg.hasSameMode(other));
   }

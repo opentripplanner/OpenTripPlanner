@@ -24,17 +24,17 @@ public class CarPickupZoneLeg extends StreetLeg {
   }
 
   public TransitMode mode() {
-    return carPickupZone.route().getMode();
+    return carPickupZone.trip().getRoute().getMode();
   }
 
   @Override
   public Agency agency() {
-    return carPickupZone.route().getAgency();
+    return carPickupZone.trip().getRoute().getAgency();
   }
 
   @Override
   public Route route() {
-    return carPickupZone.route();
+    return carPickupZone.trip().getRoute();
   }
 
   @Override
