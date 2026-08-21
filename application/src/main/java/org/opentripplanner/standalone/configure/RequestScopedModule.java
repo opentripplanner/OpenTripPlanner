@@ -203,6 +203,7 @@ public class RequestScopedModule {
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
+      // transitRoutingConfig implements 2 roles; hence the repetition below
       transitRoutingConfig,
       transitRoutingConfig
     );
