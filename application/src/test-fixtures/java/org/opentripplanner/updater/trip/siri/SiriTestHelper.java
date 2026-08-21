@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
@@ -34,6 +35,10 @@ public class SiriTestHelper {
 
   public SiriEtBuilder etBuilder() {
     return new SiriEtBuilder(transitTestEnvironment.localTimeParser());
+  }
+
+  public SiriEtBuilder etBuilder(LocalDate serviceDate) {
+    return new SiriEtBuilder(transitTestEnvironment.localTimeParser(serviceDate));
   }
 
   public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(

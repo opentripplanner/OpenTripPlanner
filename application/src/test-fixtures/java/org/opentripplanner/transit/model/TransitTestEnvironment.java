@@ -133,7 +133,11 @@ public final class TransitTestEnvironment {
    * TransitService timezone.
    */
   public LocalTimeParser localTimeParser() {
-    return new LocalTimeParser(transitRepository.getTimeZone(), defaultServiceDate);
+    return localTimeParser(defaultServiceDate);
+  }
+
+  public LocalTimeParser localTimeParser(LocalDate serviceDate) {
+    return new LocalTimeParser(transitRepository.getTimeZone(), serviceDate);
   }
 
   /**
