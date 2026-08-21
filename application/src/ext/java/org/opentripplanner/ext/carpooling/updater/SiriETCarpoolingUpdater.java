@@ -139,7 +139,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         var estimatedVehicleJourneys = frame.getEstimatedVehicleJourneies();
 
         if (estimatedVehicleJourneys == null || estimatedVehicleJourneys.isEmpty()) {
-          LOG.warn("Received an empty EstimatedJourneyVersionFrame, skipping");
+          LOG.debug("Received an empty EstimatedJourneyVersionFrame, skipping");
           continue;
         }
 
@@ -172,7 +172,11 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       }
       repository.upsertCarpoolTrip(tripWithVertices);
     } catch (Exception e) {
-      LOG.warn("Failed to process EstimatedVehicleJourney", e);
+      LOG.info(
+        "Failed to process EstimatedVehicleJourney {}",
+        estimatedVehicleJourney.getEstimatedVehicleJourneyCode(),
+        e
+      );
     }
   }
 
