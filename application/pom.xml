@@ -311,7 +311,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>26.0</version>
+            <version>26.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
