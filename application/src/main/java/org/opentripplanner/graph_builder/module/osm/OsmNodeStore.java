@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -76,6 +77,7 @@ class OsmNodeStore {
   /**
    * Reassembles and returns the node with the given id, or {@code null} if it isn't stored.
    */
+  @Nullable
   OsmNode get(long id) {
     if (!coordinatesById.containsKey(id)) {
       return null;
@@ -106,6 +108,7 @@ class OsmNodeStore {
    * stored. Cheaper than {@link #get(long)} for the (common) call sites that don't need the
    * node's tags or provider, since it skips reassembling a full {@link OsmNode}.
    */
+  @Nullable
   Coordinate getCoordinate(long id) {
     if (!coordinatesById.containsKey(id)) {
       return null;
@@ -141,15 +144,20 @@ class OsmNodeStore {
    * fixed-point {@code int} (by scaling with {@link #FIXED_POINT_FACTOR} and rounding), then the
    * latitude occupies the high 32 bits and the longitude the low 32 bits.
    * <p>
-   * Latitude is in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both fixed-point
-   * values comfortably fit in a (signed) {@code int} - no range checking is needed here. Packing
-   * relies on two's-complement bit patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL}
-   * before the {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign),
-   * and OR-ing it into the low bits of the shifted {@code latFixed} recombines the two without the
-   * sign bits interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this
-   * by shifting/narrowing back down to {@code int}, which restores the correct sign for each half.
+   * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both
+   * fixed-point values comfortably fit in a (signed) {@code int}. Packing relies on
+   * two's-complement bit patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
+   * {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign), and OR-ing
+   * it into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
+   * interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this by
+   * shifting/narrowing back down to {@code int}, which restores the correct sign for each half.
+   *
+   * @throws IllegalArgumentException if lat/lon are outside their valid ranges
    */
   private static long packCoordinate(double lat, double lon) {
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+      throw new IllegalArgumentException("Invalid coordinate: lat=%s, lon=%s".formatted(lat, lon));
+    }
     int latFixed = (int) Math.round(lat * FIXED_POINT_FACTOR);
     int lonFixed = (int) Math.round(lon * FIXED_POINT_FACTOR);
     return (((long) latFixed) << 32) | (lonFixed & 0xFFFFFFFFL);

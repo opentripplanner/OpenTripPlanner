@@ -197,6 +197,16 @@ class OsmNodeStoreTest {
   }
 
   @Test
+  void addThrowsForOutOfRangeCoordinates() {
+    var store = new OsmNodeStore();
+    var tooFarNorth = OsmNode.of().withId(1).withLatLon(90.1, 0).build();
+    var tooFarWest = OsmNode.of().withId(2).withLatLon(0, -180.1).build();
+
+    assertThrows(IllegalArgumentException.class, () -> store.add(tooFarNorth));
+    assertThrows(IllegalArgumentException.class, () -> store.add(tooFarWest));
+  }
+
+  @Test
   void coordinatesWithMoreThanSevenDecimalDigitsAreRoundedHarmlessly() {
     var store = new OsmNodeStore();
     // OSM coordinates only have 7 decimal digits of precision (~1cm), matching the fixed-point
