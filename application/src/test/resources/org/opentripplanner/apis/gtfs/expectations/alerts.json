@@ -9,7 +9,12 @@
         "descriptionDe": "",
         "urlDefault": null,
         "urlDe": null,
-        "activityPeriods": [],
+        "activityPeriods": [
+          {
+            "start": null,
+            "end": null
+          }
+        ],
         "effectiveStartDate": null,
         "effectiveEndDate": null
       },
@@ -21,7 +26,12 @@
         "descriptionDe": "Zweite Zeichenabfolge",
         "urlDefault": null,
         "urlDe": null,
-        "activityPeriods": [],
+        "activityPeriods": [
+          {
+            "start": null,
+            "end": null
+          }
+        ],
         "effectiveStartDate": null,
         "effectiveEndDate": null
       },
@@ -50,7 +60,12 @@
         "descriptionDe": "Erste Zeichenabfolge",
         "urlDefault": null,
         "urlDe": null,
-        "activityPeriods": [],
+        "activityPeriods": [
+          {
+            "start": null,
+            "end": null
+          }
+        ],
         "effectiveStartDate": null,
         "effectiveEndDate": null
       },

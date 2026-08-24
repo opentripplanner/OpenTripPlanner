@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.alertpatch;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,25 +18,14 @@ class AlertCalendarTest {
   private static final Instant LATER_END = Instant.parse("2024-01-02T12:00:00Z");
 
   @Test
-  void neverActive() {
-    var subject = AlertCalendar.ofNeverActive();
-    assertTrue(subject.isNeverActive());
-    assertThat(subject.timePeriods()).isEmpty();
-    assertFalse(subject.isActiveDuring(TimePeriod.of(START, END)));
-    assertThat(subject.effectiveStart()).isEmpty();
-    assertThat(subject.effectiveEnd()).isEmpty();
-  }
-
-  @Test
-  void ofEmptyCollectionIsNeverActive() {
-    assertEquals(AlertCalendar.ofNeverActive(), AlertCalendar.of(List.of()));
+  void ofEmptyCollectionIsRejected() {
+    assertThrows(IllegalArgumentException.class, () -> AlertCalendar.of(List.of()));
   }
 
   @Test
   void ofAlwaysActive() {
     var subject = AlertCalendar.ofAlwaysActive();
     assertThat(subject.timePeriods()).containsExactly(TimePeriod.ofUnbounded());
-    assertFalse(subject.isNeverActive());
     assertTrue(subject.isActiveDuring(TimePeriod.of(START, END)));
     assertThat(subject.effectiveStart()).isEmpty();
     assertThat(subject.effectiveEnd()).isEmpty();

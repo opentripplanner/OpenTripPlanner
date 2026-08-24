@@ -136,9 +136,9 @@ type Agency implements Node {
 "Alert of a current or upcoming disruption in public transportation"
 type Alert implements Node {
   """
-  The periods of time when this alert is active, sorted chronologically. An empty list means
-  that the alert is never active. A period without a start has always been active and a period
-  without an end is active indefinitely.
+  The periods of time when this alert is active, sorted chronologically. There is always at
+  least one period. A period without a start has always been active and a period without an
+  end is active indefinitely.
   """
   activityPeriods: [OpenEndedOffsetDateTimeRange!]!
   """

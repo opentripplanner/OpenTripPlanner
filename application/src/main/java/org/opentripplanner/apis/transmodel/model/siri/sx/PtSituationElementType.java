@@ -252,7 +252,8 @@ public class PtSituationElementType {
           .name("validityPeriods")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(validityPeriodType))))
           .description(
-            "The validity periods this situation is in effect, sorted in chronological order."
+            "The validity periods this situation is in effect, sorted in chronological order. " +
+              "There is always at least one period."
           )
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();

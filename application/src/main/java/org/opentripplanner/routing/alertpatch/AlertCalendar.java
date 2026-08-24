@@ -10,12 +10,12 @@ import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The validity of an alert, expressed as a set of {@link TimePeriod}s. The alert is valid if any of
- * the periods is valid, which means that an empty calendar is never valid.
+ * The validity of an alert, expressed as a non-empty set of {@link TimePeriod}s. The alert is valid
+ * if any of the periods is valid. An alert always has at least one period: if the source data does
+ * not contain any validity information, the alert is {@link #ofAlwaysActive() always active}.
  */
 public final class AlertCalendar {
 
-  private static final AlertCalendar NEVER_ACTIVE = new AlertCalendar(List.of());
   private static final AlertCalendar ALWAYS_ACTIVE = new AlertCalendar(
     List.of(TimePeriod.ofUnbounded())
   );
@@ -27,7 +27,13 @@ public final class AlertCalendar {
   }
 
   public static AlertCalendar of(Collection<TimePeriod> timePeriods) {
-    return timePeriods.isEmpty() ? NEVER_ACTIVE : new AlertCalendar(timePeriods);
+    if (timePeriods.isEmpty()) {
+      throw new IllegalArgumentException(
+        "An alert calendar must have at least one time period. Use ofAlwaysActive() if the alert " +
+          "has no validity information."
+      );
+    }
+    return new AlertCalendar(timePeriods);
   }
 
   public static AlertCalendar of(TimePeriod... timePeriods) {
@@ -41,19 +47,8 @@ public final class AlertCalendar {
     return ALWAYS_ACTIVE;
   }
 
-  /**
-   * A calendar without any time periods, which is never valid.
-   */
-  public static AlertCalendar ofNeverActive() {
-    return NEVER_ACTIVE;
-  }
-
   public Collection<TimePeriod> timePeriods() {
     return timePeriods;
-  }
-
-  public boolean isNeverActive() {
-    return timePeriods.isEmpty();
   }
 
   /**
