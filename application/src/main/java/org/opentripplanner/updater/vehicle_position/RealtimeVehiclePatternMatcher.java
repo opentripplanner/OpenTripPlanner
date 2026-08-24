@@ -423,7 +423,7 @@ class RealtimeVehiclePatternMatcher {
     Timetable scheduledTimetable
   ) {
     var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
-    return scheduledTimetable
+    var tripTimes = scheduledTimetable
       .getFrequencyEntries()
       .stream()
       .map(FrequencyEntry::tripTimes)
@@ -432,8 +432,12 @@ class RealtimeVehiclePatternMatcher {
         var startTime = LocalTime.ofSecondOfDay(start).truncatedTo(ChronoUnit.MINUTES);
         return updateStartTime.equals(startTime);
       })
-      .findFirst()
-      .orElse(null);
+      .toList();
+    return switch (tripTimes.size()) {
+      case 0 -> null;
+      case 1 -> tripTimes.getFirst();
+      default -> throw UpdateException.of(null, UpdateErrorType.AMBIGIOUS_TRIP_REFERENCE);
+    };
   }
 
   private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
