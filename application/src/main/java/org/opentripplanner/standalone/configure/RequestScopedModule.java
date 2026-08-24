@@ -14,7 +14,6 @@ import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
@@ -41,7 +40,6 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySna
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -222,38 +220,14 @@ public class RequestScopedModule {
   }
 
   /**
-   * Pre-assembled request context for the Transmodel API's GraphQL data fetchers.
+   * Request context for the Transmodel API's GraphQL data fetchers. Every accessor delegates to
+   * the enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data
+   * fetcher actually asks for it.
    */
   @Provides
   @HttpRequestScoped
-  static TransmodelRequestContext transmodelRequestContext(
-    RoutingService routingService,
-    TransitService transitService,
-    TransitAlertService transitAlertService,
-    @Nullable EmpiricalDelayService empiricalDelayService,
-    RouteRequest defaultRouteRequest,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    Graph graph,
-    RegularTransferService transferService,
-    StreetDetailsService streetDetailsService,
-    LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
-  ) {
-    return new TransmodelRequestContext(
-      routingService,
-      transitService,
-      transitAlertService,
-      empiricalDelayService,
-      defaultRouteRequest,
-      vehicleRentalService,
-      vehicleParkingService,
-      graph,
-      transferService,
-      streetDetailsService,
-      linkingContextFactory,
-      streetLimitationParametersService
-    );
+  static TransmodelRequestContext transmodelRequestContext(RequestScopedFactory factory) {
+    return new DaggerTransmodelRequestContext(factory);
   }
 
   /**

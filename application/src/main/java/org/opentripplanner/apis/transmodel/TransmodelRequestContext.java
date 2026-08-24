@@ -4,9 +4,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
-import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -20,106 +17,44 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
 
-public class TransmodelRequestContext {
+/**
+ * The per-HTTP-request context threaded through the Transmodel GraphQL API's data fetchers,
+ * bundling the services a query may need (routing, transit, empirical delay, ...).
+ * <p>
+ * Implementations should resolve these dependencies lazily rather than up front: the production
+ * implementation delegates to the request-scoped Dagger component, so a service is only
+ * constructed if some data fetcher actually asks for it during that request. This interface also
+ * lets tests substitute a plain, hand-built implementation (e.g. {@code
+ * TestTransmodelGraphQLRequestContext}) without needing a Dagger component at all.
+ */
+public interface TransmodelRequestContext {
+  RoutingService getRoutingService();
 
-  private final RoutingService routingService;
-  private final TransitService transitService;
-  private final TransitAlertService transitAlertService;
-  private final @Nullable EmpiricalDelayService empiricalDelayService;
-  private final RouteRequest defaultRouteRequest;
-  private final VehicleRentalService vehicleRentalService;
-  private final VehicleParkingService vehicleParkingService;
-  private final Graph graph;
-  private final RegularTransferService transferService;
-  private final StreetDetailsService streetDetailsService;
-  private final LinkingContextFactory linkingContextFactory;
-  private final StreetLimitationParametersService streetLimitationParametersService;
+  TransitService getTransitService();
 
-  public TransmodelRequestContext(
-    RoutingService routingService,
-    TransitService transitService,
-    TransitAlertService transitAlertService,
-    @Nullable EmpiricalDelayService empiricalDelayService,
-    RouteRequest defaultRouteRequest,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    Graph graph,
-    RegularTransferService transferService,
-    StreetDetailsService streetDetailsService,
-    LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
-  ) {
-    this.routingService = routingService;
-    this.transitService = transitService;
-    this.transitAlertService = transitAlertService;
-    this.empiricalDelayService = empiricalDelayService;
-    this.defaultRouteRequest = defaultRouteRequest;
-    this.vehicleRentalService = vehicleRentalService;
-    this.vehicleParkingService = vehicleParkingService;
-    this.graph = graph;
-    this.transferService = transferService;
-    this.streetDetailsService = streetDetailsService;
-    this.linkingContextFactory = linkingContextFactory;
-    this.streetLimitationParametersService = streetLimitationParametersService;
-  }
-
-  public RoutingService getRoutingService() {
-    return routingService;
-  }
-
-  public TransitService getTransitService() {
-    return transitService;
-  }
-
-  public TransitAlertService getTransitAlertService() {
-    return transitAlertService;
-  }
+  TransitAlertService getTransitAlertService();
 
   @Nullable
   @Sandbox
-  public EmpiricalDelayService getEmpiricalDelayService() {
-    return empiricalDelayService;
-  }
+  EmpiricalDelayService getEmpiricalDelayService();
 
-  public RouteRequest getDefaultRouteRequest() {
-    return defaultRouteRequest;
-  }
+  RouteRequest getDefaultRouteRequest();
 
-  public VehicleRentalService getVehicleRentalService() {
-    return vehicleRentalService;
-  }
+  VehicleRentalService getVehicleRentalService();
 
-  public VehicleParkingService getVehicleParkingService() {
-    return vehicleParkingService;
-  }
+  VehicleParkingService getVehicleParkingService();
 
-  public Graph getGraph() {
-    return graph;
-  }
+  Graph getGraph();
 
-  public RegularTransferService getTransferService() {
-    return transferService;
-  }
+  RegularTransferService getTransferService();
 
-  public StreetDetailsService getStreetDetailsService() {
-    return streetDetailsService;
-  }
+  StreetDetailsService getStreetDetailsService();
 
-  public LinkingContextFactory getLinkingContextFactory() {
-    return linkingContextFactory;
-  }
+  LinkingContextFactory getLinkingContextFactory();
 
-  public StreetLimitationParametersService getStreetLimitationParametersService() {
-    return streetLimitationParametersService;
-  }
+  StreetLimitationParametersService getStreetLimitationParametersService();
 
-  public NearbyPlaceFinder getNearbyPlaceFinder() {
-    return new StreetNearbyPlaceFinder(linkingContextFactory);
-  }
+  NearbyPlaceFinder getNearbyPlaceFinder();
 
-  public NearbyStopFinder getNearbyStopFinder() {
-    return graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-  }
+  NearbyStopFinder getNearbyStopFinder();
 }

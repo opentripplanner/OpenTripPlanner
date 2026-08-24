@@ -9,6 +9,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
@@ -27,6 +28,7 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -90,6 +92,11 @@ public interface RequestScopedFactory {
   @Nullable
   @GtfsSchema
   GraphQLSchema gtfsSchema();
+
+  StreetLimitationParametersService streetLimitationParametersService();
+
+  @Nullable
+  EmpiricalDelayService empiricalDelayService();
 
   TransmodelRequestContext transmodelRequestContext();
 
