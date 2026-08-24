@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Comparator;
@@ -8,6 +11,8 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.transit.model.framework.DataValidationException;
+import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
@@ -192,12 +197,78 @@ public sealed interface TripTimes<T extends TripTimes>
 
   int getNumStops();
 
+  /**
+   * When creating trip times, or wrapping them in updates, we could potentially imply negative
+   * running or dwell times. We really don't want those being used in routing. This method checks
+   * that the times are increasing at every stop. It should therefore be used at the end of updating
+   * trip times, after any propagating or interpolating delay operations.
+   * <p>
+   * The dwell time at the first and at the last stop is checked as well, even though raptor ignores
+   * those times. Scheduled times of a real-time added trip are used as-is when the trip is later
+   * cancelled, so they must pass the very same validation as the real-time times, or the
+   * cancellation would be rejected and the trip would be stuck in the graph as running.
+   *
+   * @throws DataValidationException of the first error found.
+   */
+  default void validateNonIncreasingTimes() {
+    final int nStops = getNumStops();
+
+    // This check is currently used since Flex trips may have only one stop. This interface should
+    // not be used to represent FLEX, so remove this check and create new data classes for FLEX
+    // trips.
+    if (nStops < 2) {
+      return;
+    }
+
+    for (int stopPos = 0; stopPos < nStops; ++stopPos) {
+      final int arrival = getArrivalTime(stopPos);
+      final int departure = getDepartureTime(stopPos);
+
+      if (departure < arrival) {
+        throw new DataValidationException(
+          new TimetableValidationError(NEGATIVE_DWELL_TIME, stopPos, getTrip())
+        );
+      }
+      if (stopPos > 0 && getDepartureTime(stopPos - 1) > arrival) {
+        throw new DataValidationException(
+          new TimetableValidationError(NEGATIVE_HOP_TIME, stopPos, getTrip())
+        );
+      }
+    }
+  }
+
   Accessibility getWheelchairAccessibility();
 
   /**
    * This is only for API-purposes (does not affect routing).
    */
   OccupancyStatus getOccupancyStatus(int stopPos);
+
+  /**
+   * A list of partial replacements for this trip at the particular stop. this will return whether the
+   * <strong>arrival</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   *
+   * <pre>
+   * stop:                A  B  C       D       E
+   * Arrival replacement: [] [] [trip2] [trip2] []
+   * </pre>
+   */
+  default List<ReplacedByRelation> getArrivalReplacedByRelations(int stopPos) {
+    return List.of();
+  }
+
+  /**
+   * A list of partial replacements for this trip at the particular stop. this will return whether the
+   * <strong>departure</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   *
+   * <pre>
+   * stop:                  A  B       C       D  E
+   * Departure replacement: [] [trip2] [trip2] [] []
+   * </pre>
+   */
+  default List<ReplacedByRelation> getDepartureReplacedByRelations(int stopPos) {
+    return List.of();
+  }
 
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.

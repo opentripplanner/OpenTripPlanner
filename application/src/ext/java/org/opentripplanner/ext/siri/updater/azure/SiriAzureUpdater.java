@@ -11,7 +11,6 @@ import com.azure.messaging.servicebus.administration.ServiceBusAdministrationCli
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
@@ -34,9 +33,10 @@ import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.retry.OtpRetryException;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcherCache;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
@@ -50,7 +50,7 @@ import uk.org.siri.siri21.Siri;
  * communicating with the azure service bus and delegates to SiriAzureETUpdater and
  * SiriAzureSXUpdater for ET and SX specific stuff.
  */
-public class SiriAzureUpdater implements GraphUpdater {
+public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAzureUpdater.class);
   private final String updaterType;
@@ -134,14 +134,9 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   public static SiriAzureUpdater createSXUpdater(
     SiriAzureSXUpdaterParameters config,
-    TimetableRepository timetableRepository,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
-    var messageHandler = new SiriAzureSXUpdater(
-      config,
-      timetableRepository,
-      siriFuzzyTripMatcherCache
-    );
+    var messageHandler = new SiriAzureSXUpdater(config, siriFuzzyTripMatcherCache);
     return new SxWrapper(config, messageHandler);
   }
 
@@ -169,8 +164,13 @@ public class SiriAzureUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.messageHandler.setup(writeToGraphCallback);
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override
@@ -324,7 +324,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      Preconditions.checkNotNull(
+      Objects.requireNonNull(
         fullyQualifiedNamespace,
         "fullyQualifiedNamespace must be set for FederatedIdentity authentication"
       );
@@ -332,7 +332,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         .fullyQualifiedNamespace(fullyQualifiedNamespace)
         .credential(new DefaultAzureCredentialBuilder().build());
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      Preconditions.checkNotNull(
+      Objects.requireNonNull(
         serviceBusUrl,
         "serviceBusUrl must be set for SharedAccessKey authentication"
       );

@@ -6,7 +6,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class VehicleParkingTestGraphData {
 
@@ -15,12 +15,12 @@ public class VehicleParkingTestGraphData {
 
   protected Graph graph;
 
-  protected TimetableRepository timetableRepository;
+  protected TransitRepository transitRepository;
 
   public void initGraph() {
     var siteRepository = new SiteRepository();
     graph = new Graph();
-    timetableRepository = new TimetableRepository(siteRepository);
+    transitRepository = new TransitRepository(siteRepository);
     graph.hasStreets = true;
 
     var factory = new VertexFactory(graph);
@@ -35,8 +35,8 @@ public class VehicleParkingTestGraphData {
     return graph;
   }
 
-  public TimetableRepository getTimetableRepository() {
-    return timetableRepository;
+  public TransitRepository getTransitRepository() {
+    return transitRepository;
   }
 
   public IntersectionVertex getAVertex() {

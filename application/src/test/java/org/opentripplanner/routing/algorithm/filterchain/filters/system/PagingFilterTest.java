@@ -19,13 +19,13 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.utils.collection.ListSection;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class PagingFilterTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);

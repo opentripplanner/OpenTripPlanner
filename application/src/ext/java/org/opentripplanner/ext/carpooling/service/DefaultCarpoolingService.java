@@ -251,7 +251,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         carpoolingRequest.getPassengerDropoff()
       );
       if (passengerPickupVertex == null || passengerDropoffVertex == null) {
-        LOG.warn("Could not link passenger origin/destination to graph");
+        LOG.info("Could not link passenger origin/destination to graph");
         return List.of();
       }
 
@@ -413,7 +413,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
 
       if (passengerAccessEgressVertex == null) {
-        LOG.error("Could not link passenger coordinates {} to graph", passengerCoordinates);
+        LOG.info("Could not link passenger coordinates {} to graph", passengerCoordinates);
         return List.of();
       }
 
@@ -452,7 +452,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS
       );
 
-      var streetNearbyStopFinder = StreetNearbyStopFinder.of(null, nearbyStopSearchDuration, 0);
+      var streetNearbyStopFinder = StreetNearbyStopFinder.of(null);
 
       // CAR_PICKUP models a walk → drive → walk chain inside a single A*. Using it here (instead
       // of plain CAR) lets the search find transit stops whose link endpoint is only walk-reachable
@@ -469,7 +469,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
           Set.of(passengerSnap.vertex()),
           request,
           StreetMode.CAR_PICKUP,
-          accessOrEgress.isEgress()
+          accessOrEgress.isEgress(),
+          nearbyStopSearchDuration,
+          0
         );
       // AreaStops are GTFS Flex zones — their linked vertex is a synthetic point inside the zone,
       // not a real stop or platform a carpool driver could drop the passenger at, so skip them.

@@ -169,7 +169,7 @@ class DefaultTransitDataImport implements TransitDataImport {
   }
 
   /**
-   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   @Override
   public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint() {

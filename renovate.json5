@@ -236,7 +236,8 @@
       ],
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
-      "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+      "reviewers": ["habrahamsson-skanetrafiken"],
+      "assignees": ["habrahamsson-skanetrafiken"]
     },
     {
       "groupName": "GitHub Actions",

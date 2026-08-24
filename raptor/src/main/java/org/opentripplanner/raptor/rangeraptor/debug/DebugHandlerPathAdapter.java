@@ -14,7 +14,7 @@ final class DebugHandlerPathAdapter extends AbstractDebugHandlerAdapter<RaptorPa
   }
 
   @Override
-  protected int stop(RaptorPath<?> path) {
+  protected int stopIndex(RaptorPath<?> path) {
     EgressPathLeg<?> egressPathLeg = path.egressLeg();
     return egressPathLeg != null ? egressPathLeg.fromStop() : RaptorConstants.NOT_FOUND;
   }

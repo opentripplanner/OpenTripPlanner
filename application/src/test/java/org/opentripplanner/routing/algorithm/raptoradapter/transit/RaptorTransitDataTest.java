@@ -11,7 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class RaptorTransitDataTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final TripTimes TRIP_TIMES;
 
   private static final RoutingTripPattern TRIP_PATTERN;
@@ -31,14 +31,14 @@ class RaptorTransitDataTest {
     var stopTime = new StopTime();
     stopTime.setStop(stop);
     var stopPattern = new StopPattern(List.of(stopTime));
-    var route = TimetableRepositoryForTest.route("1").build();
+    var route = TransitRepositoryForTest.route("1").build();
     TRIP_PATTERN = TripPattern.of(FeedScopedIdForTestFactory.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
     TRIP_TIMES = TripTimesFactory.tripTimes(
-      TimetableRepositoryForTest.trip("1").withRoute(route).build(),
+      TransitRepositoryForTest.trip("1").withRoute(route).build(),
       List.of(new StopTime()),
       new Deduplicator()
     );

@@ -3,7 +3,10 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -12,13 +15,16 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -30,19 +36,19 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 class LegImplTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest MODEL = TransitRepositoryForTest.of();
   private static final AreaStop AREA_STOP = MODEL.areaStop("a1").build();
   private static final RegularStop REGULAR_STOP = MODEL.stop("r1", 60.0, 10.0).build();
   private static final GroupStop GROUP_STOP = MODEL.groupStop("g1", REGULAR_STOP);
-  private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
+  private static final StopPattern STOP_PATTERN = TransitRepositoryForTest.stopPattern(
     REGULAR_STOP,
     REGULAR_STOP,
     AREA_STOP,
     GROUP_STOP,
     REGULAR_STOP
   );
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("trip1").build();
-  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern(
+  private static final Trip TRIP = TransitRepositoryForTest.trip("trip1").build();
+  private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
     "p",
     TRIP.getRoute()
   )
@@ -117,6 +123,49 @@ class LegImplTest implements PlanTestConstants {
   void walkLegWithFilter() throws Exception {
     var env = dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
     assertNull(IMPL.intermediateStops().get(env));
+  }
+
+  @Test
+  void tripOnServiceDate() throws Exception {
+    var serviceDate = LocalDate.of(2024, 1, 15);
+    var envBuilder = TransitTestEnvironment.of(serviceDate);
+    var stopA = envBuilder.stop("A");
+    var stopB = envBuilder.stop("B");
+    var tripInput = TripInput.of("Trip1")
+      .withWithTripOnServiceDate("Tosd1")
+      .addStop(stopA, "10:00:00", "10:00:00")
+      .addStop(stopB, "11:00:00", "11:00:00");
+    var env = envBuilder.addTrip(tripInput).build();
+    var transitService = env.transitService();
+
+    var tripData = env.tripData("Trip1");
+    var leg = new ScheduledTransitLegBuilder<>()
+      .withStartTime(ZonedDateTime.of(serviceDate, LocalTime.of(10, 0), env.timeZone()))
+      .withEndTime(ZonedDateTime.of(serviceDate, LocalTime.of(11, 0), env.timeZone()))
+      .withZoneId(env.timeZone())
+      .withServiceDate(serviceDate)
+      .withTripTimes(tripData.scheduledTripTimes())
+      .withTripPattern(tripData.scheduledTripPattern())
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(1)
+      .build();
+
+    var dfEnv = dataFetchingEnvironment(leg, Map.of(), transitService);
+    var tripOnServiceDate = IMPL.tripOnServiceDate().get(dfEnv);
+    assertThat(tripOnServiceDate).isEqualTo(transitService.getTripOnServiceDate(id("Tosd1")));
+
+    // The TripOnServiceDate returned by the leg is the same one TripOnServiceDateImpl resolves
+    // realTimeTripState over, so the real-time state is reachable from the leg.
+    var tosdEnv = dataFetchingEnvironment(tripOnServiceDate, Map.of(), transitService);
+    assertThat(new TripOnServiceDateImpl().realTimeTripState().get(tosdEnv)).isEqualTo(
+      new RealTimeTripStateModel(false, false, false, false, false)
+    );
+  }
+
+  @Test
+  void tripOnServiceDateNullForWalkLeg() throws Exception {
+    var env = dataFetchingEnvironment(WALK_LEG);
+    assertNull(IMPL.tripOnServiceDate().get(env));
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {

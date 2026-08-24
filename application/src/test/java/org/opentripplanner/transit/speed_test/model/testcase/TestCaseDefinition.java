@@ -27,14 +27,21 @@ public record TestCaseDefinition(
 ) {
   @Override
   public String toString() {
+    var viaLoc = "";
+    var viaCoordinate = "";
+    if (viaLocation != null) {
+      viaLoc = " - via " + viaLocation.label();
+      viaCoordinate = " - via " + coordinateString(viaLocation.coordinateLocation());
+    }
+
     return String.format(
-      "#%s %s - via:%s - %s, %s - via:%s - %s, %s-%s(%s)",
+      "#%s %s%s - %s, %s%s - %s, %s-%s(%s)",
       id,
       fromPlace.label(),
-      viaLocation != null ? viaLocation.label() : null,
+      viaLoc,
       toPlace.label(),
       coordinateString(fromPlace),
-      viaLocation != null ? coordinateString(viaLocation.coordinateLocation()) : null,
+      viaCoordinate,
       coordinateString(toPlace),
       TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
       TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),

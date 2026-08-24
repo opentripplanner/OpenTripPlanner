@@ -38,51 +38,28 @@ import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final LinkingContextFactory linkingContextFactory;
-  private final Duration durationLimit;
-  private final int maxStopCount;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
   private final Set<Vertex> ignoreVertices;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
-   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
-   *                     we will always return all the directly connected stops.
    * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
     @Nullable LinkingContextFactory linkingContextFactory,
-    Duration durationLimit,
-    int maxStopCount,
     Collection<ExtensionRequestContext> extensionRequestContexts,
     Set<Vertex> ignoreVertices
   ) {
     // This is temporarily nullable as we don't need it when we don't link coordinates, but soon
     // setting this everywhere will be easier once construction is moved to dagger
     this.linkingContextFactory = linkingContextFactory;
-    // TODO move request specific parameters to method
-    this.durationLimit = requireNonNull(durationLimit);
-    this.maxStopCount = requireNonNull(maxStopCount);
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
     this.ignoreVertices = requireNonNull(ignoreVertices);
   }
 
   public static Builder of(LinkingContextFactory linkingContextFactory) {
     return new Builder(linkingContextFactory);
-  }
-
-  /**
-   * Build a NearbyStopFinder for the given graph and search radius, defined by the
-   * {@code durationLimit}.
-   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the
-   *                     maxStopCount we will always return all the directly connected stops.
-   */
-  public static Builder of(
-    LinkingContextFactory linkingContextFactory,
-    Duration durationLimit,
-    int maxStopCount
-  ) {
-    return new Builder(linkingContextFactory, durationLimit, maxStopCount);
   }
 
   @Override
@@ -107,9 +84,18 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     Vertex vertex,
     RouteRequest routingRequest,
     StreetMode streetMode,
-    boolean reverseDirection
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount
   ) {
-    return findNearbyStops(Set.of(vertex), routingRequest, streetMode, reverseDirection);
+    return findNearbyStops(
+      Set.of(vertex),
+      routingRequest,
+      streetMode,
+      reverseDirection,
+      durationLimit,
+      maxStopCount
+    );
   }
 
   /**
@@ -155,12 +141,16 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param originVertices   the origin point of the street search.
    * @param reverseDirection if true the paths returned instead originate at the nearby stops and
    *                         have the originVertex as the destination.
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
+   *                         we will always return all the directly connected stops.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
     RouteRequest request,
     StreetMode streetMode,
-    boolean reverseDirection
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -247,24 +237,11 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   public static class Builder {
 
     private final LinkingContextFactory linkingContextFactory;
-    // TODO these should be moved to be method parameters instead of constructor
-    private Duration durationLimit = Duration.ofHours(10000);
-    private int maxStopCount = 1000;
     private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
     private Set<Vertex> ignoreVertices = Set.of();
 
     public Builder(LinkingContextFactory linkingContextFactory) {
       this.linkingContextFactory = linkingContextFactory;
-    }
-
-    public Builder(
-      LinkingContextFactory linkingContextFactory,
-      Duration durationLimit,
-      int maxStopCount
-    ) {
-      this.linkingContextFactory = linkingContextFactory;
-      this.durationLimit = durationLimit;
-      this.maxStopCount = maxStopCount;
     }
 
     /**
@@ -291,8 +268,6 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     public StreetNearbyStopFinder build() {
       return new StreetNearbyStopFinder(
         linkingContextFactory,
-        durationLimit,
-        maxStopCount,
         extensionRequestContexts,
         ignoreVertices
       );

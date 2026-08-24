@@ -15,6 +15,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.street.graph.Graph;
 
 class DefaultDirectStreetRouterTest {
 
@@ -47,8 +48,15 @@ class DefaultDirectStreetRouterTest {
       Set.of()
     );
 
+    var ctx = TestServerContext.ofGraph(new Graph());
+
     var itineraries = new DefaultDirectStreetRouter().route(
-      TestServerContext.of(),
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.streetLimitationParametersService(),
+      ctx.vehicleRentalService(),
+      ctx.streetDetailsService(),
+      ctx.dataOverlayParameterBindings(),
       request,
       linkingContext
     );

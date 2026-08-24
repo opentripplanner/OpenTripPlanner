@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class TripOnServiceDateTest {
 
@@ -22,7 +22,7 @@ class TripOnServiceDateTest {
   private static final TripOnServiceDate SUBJECT = TripOnServiceDate.of(
     FeedScopedIdForTestFactory.id(ID)
   )
-    .withTrip(TimetableRepositoryForTest.trip(TRIP_ID).build())
+    .withTrip(TransitRepositoryForTest.trip(TRIP_ID).build())
     .withServiceDate(SERVICE_DATE)
     .withTripAlteration(TRIP_ALTERATION)
     .withReplacementFor(REPLACEMENT_FOR)

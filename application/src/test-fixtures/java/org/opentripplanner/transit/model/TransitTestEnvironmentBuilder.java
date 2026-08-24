@@ -21,7 +21,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 public class TransitTestEnvironmentBuilder {
 
   private final SiteRepositoryTestBuilder site;
-  private final TimetableRepositoryTestBuilder timetable;
+  private final TransitRepositoryTestBuilder timetable;
 
   private final LocalDate defaultServiceDate;
 
@@ -29,14 +29,14 @@ public class TransitTestEnvironmentBuilder {
     this.defaultServiceDate = defaultServiceDate;
 
     site = new SiteRepositoryTestBuilder(SiteRepository.of());
-    timetable = new TimetableRepositoryTestBuilder(timeZone, defaultServiceDate);
+    timetable = new TransitRepositoryTestBuilder(timeZone, defaultServiceDate);
   }
 
   public TransitTestEnvironment build() {
     var siteRepository = site.build();
-    var timetableRepository = timetable.build(siteRepository);
+    var transitRepository = timetable.build(siteRepository);
     return new TransitTestEnvironment(
-      timetableRepository,
+      transitRepository,
       TransferServiceTestFactory.defaultTransferRepository(),
       defaultServiceDate
     );
@@ -85,7 +85,7 @@ public class TransitTestEnvironmentBuilder {
 
   /* TIMETABLE ENTITIES */
 
-  public TimetableRepositoryTestBuilder timetable() {
+  public TransitRepositoryTestBuilder timetable() {
     return timetable;
   }
 

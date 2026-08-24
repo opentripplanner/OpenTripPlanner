@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor._data.api;
 
-import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
-
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -10,6 +8,7 @@ import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.path.PathBuilder;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -18,7 +17,7 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
- * access(...)} methods are called the builder reset it self.
+ * access(...)} methods are called the builder reset itself.
  * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
  */
@@ -84,10 +83,13 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   public TestPathBuilder bus(TestTripSchedule trip, int alightStop) {
     int boardStop = currentStop();
-    // We use the startTime as earliest-board-time, this may cause problems for
-    // testing routes visiting the same stop more than once. Create a new factory
-    // method if this happens.
-    var baTime = findTripTimes(trip, boardStop, alightStop, startTime);
+    // We use the last leg arrival-time as the earliest-board-time; this may cause problems for
+    // testing circular routes. Create a new factory method if this happens.
+    int boardStopPosition = trip.findDepartureStopPosition(currentArrivalTime(), boardStop);
+    int alightStopPosition = trip
+      .pattern()
+      .findAlightStopPositionAfter(boardStopPosition, alightStop);
+    var baTime = new BoardAndAlightTime(trip, boardStopPosition, alightStopPosition);
     builder.transit(trip, baTime);
     return this;
   }
@@ -124,6 +126,10 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   int currentStop() {
     return builder.tail().toStop();
+  }
+
+  int currentArrivalTime() {
+    return builder.tail().toTime();
   }
 
   private void reset(int startTime) {

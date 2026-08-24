@@ -40,7 +40,8 @@ class DebugStyleSpecTest {
       geofencingZones,
       rental,
       transfers,
-      List.of()
+      List.of(),
+      List.of("tier", "voi")
     );
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);

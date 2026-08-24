@@ -2,8 +2,10 @@ package org.opentripplanner.ext.siri.updater.mqtt;
 
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
@@ -11,14 +13,14 @@ import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableProc
 import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
 
-public class SiriETMqttUpdater implements GraphUpdater {
+public class SiriETMqttUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
   private final String configRef;
 
   private final AsyncEstimatedTimetableSource asyncEstimatedTimetableSource;
   private final EstimatedTimetableHandler estimatedTimetableHandler;
   private final Consumer<UpdateResult> updateResultConsumer;
-  private WriteToGraphCallback writeToGraphCallback;
+  private WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback;
 
   public SiriETMqttUpdater(
     MqttSiriETUpdaterParameters parameters,
@@ -31,8 +33,15 @@ public class SiriETMqttUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(@Nonnull WriteToGraphCallback writeToGraphCallback) {
+  public void setup(
+    @Nonnull WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
+  ) {
     this.writeToGraphCallback = writeToGraphCallback;
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override

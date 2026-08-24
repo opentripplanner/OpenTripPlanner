@@ -195,7 +195,16 @@ public class BarrierRoutingTest {
     var ctx = TestServerContext.ofGraph(graph);
 
     var router = new DefaultDirectStreetRouter();
-    var itineraries = router.route(ctx, request, linkingContext);
+    var itineraries = router.route(
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.streetLimitationParametersService(),
+      ctx.vehicleRentalService(),
+      ctx.streetDetailsService(),
+      ctx.dataOverlayParameterBindings(),
+      request,
+      linkingContext
+    );
 
     assertAll(assertions.apply(itineraries));
 

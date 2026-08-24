@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.graph.Graph;
@@ -16,7 +16,7 @@ import org.opentripplanner.test.support.ResourceLoader;
  * Adaptive pruning retains the distant island but removes the closer one which appears to be
  * disconnected part of the main graph.
  */
-public class AdaptivePruningTest {
+class AdaptivePruningTest {
 
   private static Graph graph;
 
@@ -24,15 +24,17 @@ public class AdaptivePruningTest {
   static void setup() {
     graph = buildOsmGraph(
       ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"),
-      5,
-      0,
-      20,
-      30
+      IslandPruningParameters.of()
+        .withPruningThresholdIslandWithoutStops(5)
+        .withPruningThresholdIslandWithStops(0)
+        .withAdaptivePruningFactor(20)
+        .withAdaptivePruningDistance(30)
+        .build()
     );
   }
 
   @Test
-  public void distantIslandIsRetained() {
+  void distantIslandIsRetained() {
     assertTrue(
       graph
         .getStreetEdges()
@@ -44,8 +46,8 @@ public class AdaptivePruningTest {
   }
 
   @Test
-  public void nearIslandIsRemoved() {
-    Assertions.assertFalse(
+  void nearIslandIsRemoved() {
+    assertFalse(
       graph
         .getStreetEdges()
         .stream()
@@ -56,7 +58,7 @@ public class AdaptivePruningTest {
   }
 
   @Test
-  public void mainGraphIsNotRemoved() {
+  void mainGraphIsNotRemoved() {
     assertTrue(
       graph
         .getStreetEdges()

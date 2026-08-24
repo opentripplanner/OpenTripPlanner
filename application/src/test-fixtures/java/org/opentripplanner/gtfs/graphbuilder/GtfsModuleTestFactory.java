@@ -7,19 +7,19 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class GtfsModuleTestFactory {
 
   public static GtfsModule forTest(
     List<GtfsBundle> bundles,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,
-      timetableRepository,
+      transitRepository,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),

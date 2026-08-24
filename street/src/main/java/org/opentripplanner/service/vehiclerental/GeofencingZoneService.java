@@ -9,8 +9,9 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * the routing layer (and the debug map layer) so they can query zone membership without depending
  * on the rental service implementation.
  *
- * <p>{@link org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService} is
- * the production implementation; tests can use {@link #EMPTY}.
+ * <p>{@link org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository}
+ * holds the zone indices and answers these queries; {@link VehicleRentalService} re-exposes them
+ * to read-only consumers. Tests can use {@link #EMPTY}.
  */
 public interface GeofencingZoneService {
   /**
@@ -19,7 +20,7 @@ public interface GeofencingZoneService {
    */
   GeofencingZoneService EMPTY = new GeofencingZoneService() {
     @Override
-    public Set<GeofencingZone> zonesContaining(Coordinate coord) {
+    public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
       return Set.of();
     }
 
@@ -34,15 +35,15 @@ public interface GeofencingZoneService {
     }
   };
 
-  /** All registered zones (across all data sources) that contain the given coordinate. */
-  Set<GeofencingZone> zonesContaining(Coordinate coord);
+  /** All registered zones (across all networks) that contain the given coordinate. */
+  Set<GeofencingZone> findZonesContaining(Coordinate coord);
 
   /**
-   * Whether any data source has registered a zone index. Cheap short-circuit for callers that
+   * Whether any network has registered a zone index. Cheap short-circuit for callers that
    * want to avoid per-vertex lookups when no zones exist.
    */
   boolean hasIndexedZones();
 
-  /** All zones across all registered data sources. Used by the debug map layer. */
+  /** All zones across all registered networks. Used by the debug map layer. */
   Set<GeofencingZone> listZones();
 }

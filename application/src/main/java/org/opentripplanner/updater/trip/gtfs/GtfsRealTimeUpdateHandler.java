@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
+import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -24,12 +24,12 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 /**
  * Update-scoped object produced by {@link GtfsRealTimeTripUpdateAdapter#forUpdate}. Holds the
- * per-task collaborators (sub-handlers constructed with an update-scoped {@code TransitEditorService})
+ * per-task collaborators (sub-handlers constructed with an update-scoped {@code TransitService})
  * and applies GTFS-RT trip updates against the mutable timetable snapshot.
  */
 public class GtfsRealTimeUpdateHandler {
 
-  private final MutableTimetableSnapshot buffer;
+  private final TimetableRepository buffer;
   private final Supplier<LocalDate> localDateNow;
   private final ScheduledTripHandler scheduledTripHandler;
   private final NewTripHandler addedTripHandler;
@@ -37,7 +37,7 @@ public class GtfsRealTimeUpdateHandler {
   private final DuplicatedTripHandler duplicatedTripHandler;
 
   GtfsRealTimeUpdateHandler(
-    MutableTimetableSnapshot buffer,
+    TimetableRepository buffer,
     Supplier<LocalDate> localDateNow,
     ScheduledTripHandler scheduledTripHandler,
     NewTripHandler addedTripHandler,

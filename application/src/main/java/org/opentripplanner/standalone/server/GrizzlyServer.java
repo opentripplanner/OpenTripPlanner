@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.server;
 import static org.opentripplanner.framework.application.ApplicationShutdownSupport.addShutdownHook;
 import static org.opentripplanner.framework.application.ApplicationShutdownSupport.removeShutdownHook;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -73,7 +72,7 @@ public class GrizzlyServer {
     int nHandlerThreads = getMaxThreads();
     ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
       .setPoolName("grizzly")
-      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("grizzly-%d").build())
+      .setThreadFactory(Thread.ofPlatform().name("grizzly-", 0).factory())
       .setCorePoolSize(nHandlerThreads)
       .setMaxPoolSize(nHandlerThreads)
       .setQueueLimit(-1);

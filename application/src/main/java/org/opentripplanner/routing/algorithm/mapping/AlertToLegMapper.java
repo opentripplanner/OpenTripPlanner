@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -18,6 +19,7 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
  * This class is responsible for finding and adding transit alerts to individual transit legs.
@@ -50,6 +52,7 @@ public class AlertToLegMapper {
 
     FeedScopedId routeId = leg.route().getId();
     FeedScopedId tripId = leg.trip().getId();
+    var direction = leg.trip().getDirection();
     LocalDate serviceDate = leg.serviceDate();
 
     var totalAlerts = new HashSet<TransitAlert>();
@@ -59,7 +62,12 @@ public class AlertToLegMapper {
         ? StopCondition.FIRST_DEPARTURE
         : StopCondition.DEPARTURE;
 
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+        stop,
+        routeId,
+        stopConditions,
+        direction
+      );
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
@@ -68,7 +76,12 @@ public class AlertToLegMapper {
     }
     if (toStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = StopCondition.ARRIVING;
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+        stop,
+        routeId,
+        stopConditions,
+        direction
+      );
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
@@ -80,7 +93,12 @@ public class AlertToLegMapper {
       Set<StopCondition> stopConditions = StopCondition.PASSING;
       for (StopArrival visit : leg.listIntermediateStops()) {
         if (visit.place.stop instanceof RegularStop stop) {
-          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
+            stop,
+            routeId,
+            stopConditions,
+            direction
+          );
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
           alerts.addAll(
             getAlertsForRelatedStops(stop, id ->
@@ -112,7 +130,7 @@ public class AlertToLegMapper {
 
     // Filter alerts when there are multiple timePeriods for each alert
     totalAlerts.removeIf(alert ->
-      !alert.displayDuring(leg.startTime().toEpochSecond(), leg.endTime().toEpochSecond())
+      !alert.isActiveDuring(TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant()))
     );
 
     if (totalAlerts.isEmpty()) {
@@ -131,17 +149,20 @@ public class AlertToLegMapper {
   ) {
     return alerts
       .stream()
-      .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
+      .filter(alert ->
+        alert.isActiveDuring(TimePeriod.of(fromTime.toInstant(), toTime.toInstant()))
+      )
       .toList();
   }
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(
     RegularStop stop,
     FeedScopedId routeId,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   ) {
     return getAlertsForRelatedStops(stop, id ->
-      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions)
+      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions, direction)
     );
   }
 

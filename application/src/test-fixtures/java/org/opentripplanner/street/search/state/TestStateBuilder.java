@@ -33,7 +33,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -41,7 +41,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  */
 public class TestStateBuilder {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
   private static final Instant DEFAULT_START_TIME = OffsetDateTime.parse(
     "2023-04-18T12:00:00+02:00"

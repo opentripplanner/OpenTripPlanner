@@ -221,3 +221,5 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
   [#5704](https://github.com/opentripplanner/OpenTripPlanner/pull/5704)
 - 2024-03-25: Add layer for realtime stops
   [#5743](https://github.com/opentripplanner/OpenTripPlanner/pull/5743)
+- 2026-08-04: Realtime stops return the highest alert severity level and the related alert effects.
+  [#7859](https://github.com/opentripplanner/OpenTripPlanner/pull/7859)

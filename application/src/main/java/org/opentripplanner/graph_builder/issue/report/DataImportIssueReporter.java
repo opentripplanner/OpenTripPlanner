@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.issue.report;
 
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +10,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +137,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
 
       // Split the issues to buckets if needed
       if (sortedIssues.size() > 1.2 * maxNumberOfIssuesPerFile) {
-        List<List<DataImportIssue>> partitions = Lists.partition(
+        List<List<DataImportIssue>> partitions = ListUtils.partition(
           sortedIssues,
           maxNumberOfIssuesPerFile
         );

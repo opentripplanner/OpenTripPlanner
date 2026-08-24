@@ -9,15 +9,16 @@ import uk.org.siri.siri21.SeverityEnumeration;
 public class SiriSeverityMapper {
 
   /**
-   * Returns internal {@link AlertSeverity} enum counterpart for SIRI enum. Defaults to returning
-   * WARNING.
+   * Returns internal {@link AlertSeverity} enum counterpart for SIRI enum. SIRI's {@code undefined}
+   * severity is mapped to {@link AlertSeverity#WARNING}, which is also the default used when the
+   * severity is missing or {@code normal}.
    */
   public static AlertSeverity getAlertSeverityForSiriSeverity(SeverityEnumeration severity) {
     if (severity == null) {
       return AlertSeverity.WARNING;
     }
     return switch (severity) {
-      case UNDEFINED -> AlertSeverity.UNDEFINED;
+      case UNDEFINED -> AlertSeverity.WARNING;
       case UNKNOWN -> AlertSeverity.UNKNOWN_SEVERITY;
       case NO_IMPACT -> AlertSeverity.INFO;
       case VERY_SLIGHT -> AlertSeverity.VERY_SLIGHT;

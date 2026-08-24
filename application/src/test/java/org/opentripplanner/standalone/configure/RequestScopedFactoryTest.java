@@ -24,6 +24,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
@@ -34,12 +35,16 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.services.configure.TransitAlertServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -55,12 +60,12 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
-import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
-import org.opentripplanner.transit.repository.MutableTimetableSnapshot;
-import org.opentripplanner.transit.repository.ReadOnlyTimetableSnapshot;
-import org.opentripplanner.transit.repository.TimetableSnapshotLifecycle;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
@@ -75,15 +80,19 @@ class RequestScopedFactoryTest {
 
   @Test
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
-    var timetableRepository = new TimetableRepository();
+    var transitRepository = new TransitRepository();
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new TimetableSnapshot(
+    var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       new DefaultTripCalendars()
     );
     var timetableRepositoryHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
-      new TimetableSnapshotLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> LocalDate.of(2026, 1, 1))
+    );
+    var realtimeVehicleRepositoryHandle = repositoryRegistry.registerRepository(
+      new DefaultRealtimeVehicleRepository(),
+      new RealtimeVehicleRepositoryLifecycle()
     );
 
     var routerConfig = RouterConfig.DEFAULT;
@@ -91,10 +100,10 @@ class RequestScopedFactoryTest {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
     var transferRepository = new DefaultTransferRepository(new TransferIndex());
     // Only used to wire up the throwaway helper services below; not part of what's under test.
-    var placeholderTransitService = new DefaultTransitService(timetableRepository);
+    var placeholderTransitService = new DefaultTransitService(transitRepository);
 
     var factory = DaggerRequestScopedFactoryTest_TestFactory.builder()
-      .timetableRepository(timetableRepository)
+      .transitRepository(transitRepository)
       .repositoryRegistry(repositoryRegistry)
       .timetableRepositoryHandle(timetableRepositoryHandle)
       .routerConfig(routerConfig)
@@ -116,8 +125,8 @@ class RequestScopedFactoryTest {
       .vertexLinker(vertexLinker)
       .transferService(TransferServiceTestFactory.transferService(transferRepository))
       .worldEnvelopeService(TestServerContext.createWorldEnvelopeService())
-      .realtimeVehicleRepository(new DefaultRealtimeVehicleRepository())
-      .vehicleRentalService(new DefaultVehicleRentalService())
+      .realtimeVehicleRepositoryHandle(realtimeVehicleRepositoryHandle)
+      .vehicleRentalService(new DefaultVehicleRentalService(new DefaultVehicleRentalRepository()))
       .vehicleParkingService(TestServerContext.createVehicleParkingService())
       .rideHailingServices(List.of())
       .viaTransferResolver(
@@ -169,24 +178,21 @@ class RequestScopedFactoryTest {
   }
 
   @Singleton
-  @Component(modules = ConstructApplicationModule.class)
+  @Component(modules = { ConstructApplicationModule.class, TransitAlertServiceModule.class })
   interface TestFactory {
     RequestScopedFactory.Builder requestScopedFactoryBuilder();
 
     @Component.Builder
     interface Builder {
       @BindsInstance
-      Builder timetableRepository(TimetableRepository timetableRepository);
+      Builder transitRepository(TransitRepository transitRepository);
 
       @BindsInstance
-      Builder repositoryRegistry(RepositoryRegistry repositoryRegistry);
+      Builder repositoryRegistry(@TransitDomain RepositoryRegistry repositoryRegistry);
 
       @BindsInstance
       Builder timetableRepositoryHandle(
-        RepositoryHandle<
-          ReadOnlyTimetableSnapshot,
-          MutableTimetableSnapshot
-        > timetableRepositoryHandle
+        RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle
       );
 
       @BindsInstance
@@ -214,7 +220,12 @@ class RequestScopedFactoryTest {
       Builder worldEnvelopeService(WorldEnvelopeService worldEnvelopeService);
 
       @BindsInstance
-      Builder realtimeVehicleRepository(RealtimeVehicleRepository realtimeVehicleRepository);
+      Builder realtimeVehicleRepositoryHandle(
+        RepositoryHandle<
+          RealtimeVehicleRepositorySnapshot,
+          RealtimeVehicleRepository
+        > realtimeVehicleRepositoryHandle
+      );
 
       @BindsInstance
       Builder vehicleRentalService(VehicleRentalService vehicleRentalService);

@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.time.LocalDate;
 import java.util.Collection;

@@ -2,15 +2,17 @@ package org.opentripplanner.updater.alert.gtfs;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,9 @@ import org.slf4j.LoggerFactory;
 /**
  * GTFS-RT alerts updater
  */
-public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements TransitAlertProvider {
+public class GtfsRealtimeAlertsUpdater
+  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
+  implements TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
@@ -29,19 +33,16 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   private final OtpHttpClient otpHttpClient;
   private Long lastTimestamp = Long.MIN_VALUE;
 
-  public GtfsRealtimeAlertsUpdater(
-    GtfsRealtimeAlertsUpdaterParameters config,
-    TimetableRepository timetableRepository
-  ) {
+  public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
     super(config);
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
-    TransitAlertService transitAlertService = new TransitAlertServiceImpl(timetableRepository);
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl();
 
     this.transitAlertService = transitAlertService;
 
     this.updateHandler = new AlertsUpdateHandler(config.fuzzyTripMatching());
-    this.updateHandler.setEarlyStart(config.earlyStartSec());
+    this.updateHandler.setEarlyStart(Duration.ofSeconds(config.earlyStartSec()));
     this.updateHandler.setFeedId(config.feedId());
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
@@ -50,6 +51,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   public TransitAlertService getTransitAlertService() {
     return transitAlertService;
+  }
+
+  @Override
+  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.TRANSIT;
   }
 
   @Override

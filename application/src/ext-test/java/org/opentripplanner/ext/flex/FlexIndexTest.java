@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.FlexStopTimesFactory.area;
 import static org.opentripplanner.model.FlexStopTimesFactory.groupStop;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
+import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.trip;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,19 +15,19 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class FlexIndexTest {
 
-  public static final Route ROUTE_2 = TimetableRepositoryForTest.route("r2").build();
+  public static final Route ROUTE_2 = TransitRepositoryForTest.route("r2").build();
 
   @Test
   void testFlexTripSpanningMidnight() {
-    TimetableRepository repo = new TimetableRepository();
+    TransitRepository repo = new TransitRepository();
 
     FeedScopedId serviceId = id("S1");
     Trip trip = trip("T1").withServiceId(serviceId).build();
@@ -70,7 +70,7 @@ class FlexIndexTest {
 
   @Test
   void testFlexTripStartingAfterMidnight() {
-    TimetableRepository repo = new TimetableRepository();
+    TransitRepository repo = new TransitRepository();
     FeedScopedId serviceId = id("S2");
     Trip trip = trip("T2").withServiceId(serviceId).build();
 
@@ -100,7 +100,7 @@ class FlexIndexTest {
 
   @Test
   void routesAtArea() {
-    var repo = new TimetableRepository();
+    var repo = new TransitRepository();
 
     var st1 = area("10:00", "12:00");
     var st2 = area("14:00", "16:00");
@@ -120,7 +120,7 @@ class FlexIndexTest {
 
   @Test
   void routesAtGroup() {
-    var repo = new TimetableRepository();
+    var repo = new TransitRepository();
 
     var st1 = groupStop("10:00", "12:00");
     var st2 = groupStop("14:00", "16:00");

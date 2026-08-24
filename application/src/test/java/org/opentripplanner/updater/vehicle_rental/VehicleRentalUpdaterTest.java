@@ -11,11 +11,13 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.io.HttpHeaders;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -29,12 +31,13 @@ class VehicleRentalUpdaterTest {
     Duration.ZERO,
     new FakeParams()
   );
-  public static final DefaultVehicleRentalService SERVICE = new DefaultVehicleRentalService();
+  public static final DefaultVehicleRentalRepository REPOSITORY =
+    new DefaultVehicleRentalRepository();
 
   @Test
   void failingDataSourceCountsAsPrimed() {
     var source = new FailingDataSource();
-    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, REPOSITORY);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);
@@ -51,7 +54,7 @@ class VehicleRentalUpdaterTest {
   @Disabled
   void failingSetup() {
     var source = new FailingSetupDataSource();
-    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, REPOSITORY);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);
@@ -64,7 +67,11 @@ class VehicleRentalUpdaterTest {
   static class MockManager extends GraphUpdaterManager {
 
     public MockManager(VehicleRentalUpdater updater) {
-      super(WriteToGraphCallback.NOOP, RunnableUtils.NOOP, List.of(updater));
+      super(
+        new WriteToGraphCallbacks().with(WriteDomain.STREET, WriteToGraphCallback.noop()),
+        RunnableUtils.NOOP,
+        List.of(updater)
+      );
     }
   }
 

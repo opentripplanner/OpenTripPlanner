@@ -33,6 +33,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 class ViaDirectStreetRouterTest {
@@ -131,8 +132,15 @@ class ViaDirectStreetRouterTest {
       Set.of()
     );
 
+    var ctx = TestServerContext.ofGraph(new Graph());
+
     var itineraries = new ViaDirectStreetRouter().route(
-      TestServerContext.of(),
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.streetLimitationParametersService(),
+      ctx.vehicleRentalService(),
+      ctx.streetDetailsService(),
+      ctx.dataOverlayParameterBindings(),
       request,
       linkingContext
     );

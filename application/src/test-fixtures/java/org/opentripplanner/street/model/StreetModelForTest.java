@@ -122,7 +122,7 @@ public class StreetModelForTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    AreaGroup area = new AreaGroup(null);
+    AreaGroup area = AreaGroup.of(null).build();
 
     return new AreaEdgeBuilder()
       .withFromVertex(vA)
@@ -140,6 +140,22 @@ public class StreetModelForTest {
     StreetTraversalPermission permissions
   ) {
     return streetEdge(from, to, 1, permissions);
+  }
+
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction, allowing
+   * {@link StreetTraversalPermission#PEDESTRIAN} traffic.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b) {
+    bidirectional(a, b, StreetTraversalPermission.PEDESTRIAN);
+  }
+
+  /**
+   * Connects two vertices with a pair of {@link StreetEdge}s, one in each direction.
+   */
+  public static void bidirectional(StreetVertex a, StreetVertex b, StreetTraversalPermission perm) {
+    streetEdge(a, b, perm);
+    streetEdge(b, a, perm);
   }
 
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {

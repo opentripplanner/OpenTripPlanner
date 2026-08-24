@@ -12,7 +12,7 @@ o.o.service.<name>
       <Name>Module
     grapbuilder                 -- If this module has its own graph-builder module
       <Name>GraphBuilderModule
-    internal                    -- Internal implementaion
+    internal                    -- Internal implementation
       Default<Name>Service
       Default<Name>Repository
     model                       -- Public model/api

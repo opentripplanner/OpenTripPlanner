@@ -5,9 +5,9 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
-import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
@@ -75,11 +75,13 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
   }
 
   private List<KeyValue> mapEscalatorEdge(EscalatorEdge ee) {
-    var props = Lists.newArrayList(
-      kv("distance", ee.getDistanceMeters()),
-      kv("duration", ee.getDuration().map(Duration::toString).orElse(null)),
-      kv("fromVertexLabel", ee.getFromVertex().getLabel().toString()),
-      kv("toVertexLabel", ee.getToVertex().getLabel().toString())
+    var props = new ArrayList<>(
+      Arrays.asList(
+        kv("distance", ee.getDistanceMeters()),
+        kv("duration", ee.getDuration().map(Duration::toString).orElse(null)),
+        kv("fromVertexLabel", ee.getFromVertex().getLabel().toString()),
+        kv("toVertexLabel", ee.getToVertex().getLabel().toString())
+      )
     );
     var inclinedEdgeLevelInfoOptional = streetDetailsService.findInclinedEdgeLevelInfo(ee);
     if (inclinedEdgeLevelInfoOptional.isPresent()) {
@@ -89,13 +91,15 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
   }
 
   private List<KeyValue> mapStreetEdge(StreetEdge se) {
-    var props = Lists.newArrayList(
-      kv("permission", streetPermissionAsString(se.getPermission())),
-      kv("noThruTraffic", noThruTrafficAsString(se)),
-      kv("wheelchairAccessible", se.isWheelchairAccessible()),
-      kv("maximumSlope", roundTo2Decimals(se.getMaxSlope())),
-      kv("fromVertexLabel", se.getFromVertex().getLabel().toString()),
-      kv("toVertexLabel", se.getToVertex().getLabel().toString())
+    var props = new ArrayList<>(
+      Arrays.asList(
+        kv("permission", streetPermissionAsString(se.getPermission())),
+        kv("noThruTraffic", noThruTrafficAsString(se)),
+        kv("wheelchairAccessible", se.isWheelchairAccessible()),
+        kv("maximumSlope", roundTo2Decimals(se.getMaxSlope())),
+        kv("fromVertexLabel", se.getFromVertex().getLabel().toString()),
+        kv("toVertexLabel", se.getToVertex().getLabel().toString())
+      )
     );
     if (se.getPermission().allows(BICYCLE)) {
       props.add(kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())));

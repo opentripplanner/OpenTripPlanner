@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class GroupOfStationsTest {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");

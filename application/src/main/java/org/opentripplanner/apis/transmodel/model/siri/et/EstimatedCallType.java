@@ -27,6 +27,7 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -34,7 +35,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
-import org.opentripplanner.transit.service.TransitService;
 
 public class EstimatedCallType {
 
@@ -51,6 +51,7 @@ public class EstimatedCallType {
     GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
     GraphQLOutputType empiricalDelayType,
+    GraphQLOutputType replacedByType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -63,6 +64,21 @@ public class EstimatedCallType {
           .name("quay")
           .type(new GraphQLNonNull(quayType))
           .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getStop())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("scheduledQuay")
+          .description(
+            "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"
+          )
+          .type(new GraphQLNonNull(quayType))
+          .dataFetcher(env -> {
+            TripTimeOnDate tripTimeOnDate = env.getSource();
+            return tripTimeOnDate.getScheduledStop(
+              GqlUtil.getTransitService(env).findPattern(tripTimeOnDate.getTrip())
+            );
+          })
           .build()
       )
       .field(
@@ -161,7 +177,10 @@ public class EstimatedCallType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("realtimeState")
           .type(new GraphQLNonNull(EnumTypes.REALTIME_STATE))
-          .dataFetcher(env -> getRealtimeStateOnStop(env))
+          .deprecate(
+            "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state."
+          )
+          .dataFetcher(EstimatedCallType::getRealtimeStateOnStop)
           .build()
       )
       .field(
@@ -288,7 +307,9 @@ public class EstimatedCallType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
-          .dataFetcher(env -> getAllRelevantAlerts(env.getSource(), GqlUtil.getTransitService(env)))
+          .dataFetcher(env ->
+            getAllRelevantAlerts(env.getSource(), GqlUtil.getTransitAlertService(env))
+          )
           .build()
       )
       .field(
@@ -297,6 +318,32 @@ public class EstimatedCallType {
           .description("Booking arrangements for this EstimatedCall.")
           .type(bookingArrangementType)
           .dataFetcher(env -> env.<TripTimeOnDate>getSource().getPickupBookingInfo())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("arrivalReplacedBy")
+          .description(
+            "Information about any trips replacing the current trip at the arrival of this call."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
+          .dataFetcher(env -> {
+            var source = env.<TripTimeOnDate>getSource();
+            return source.getArrivalReplacedBys();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("departureReplacedBy")
+          .description(
+            "Information about any trips replacing the current trip at the departure of this call."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
+          .dataFetcher(env -> {
+            var source = env.<TripTimeOnDate>getSource();
+            return source.getDepartureReplacedBys();
+          })
           .build()
       )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -347,7 +394,7 @@ public class EstimatedCallType {
    */
   private static Collection<TransitAlert> getAllRelevantAlerts(
     TripTimeOnDate tripTimeOnDate,
-    TransitService transitService
+    TransitAlertService alertPatchService
   ) {
     Trip trip = tripTimeOnDate.getTrip();
     FeedScopedId tripId = trip.getId();
@@ -358,8 +405,6 @@ public class EstimatedCallType {
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
 
-    TransitAlertService alertPatchService = transitService.getTransitAlertService();
-
     final LocalDate serviceDate = tripTimeOnDate.getServiceDay();
 
     Set<StopCondition> stopConditions = Set.of(
@@ -368,12 +413,16 @@ public class EstimatedCallType {
       StopCondition.EXCEPTIONAL_STOP
     );
 
+    var direction = trip.getDirection();
+
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId, stopConditions));
     allAlerts.addAll(
       alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate, stopConditions)
     );
-    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions));
+    allAlerts.addAll(
+      alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions, direction)
+    );
     // StopPlace
     if (stop.getParentStation() != null) {
       FeedScopedId parentStopId = stop.getParentStation().getId();
@@ -382,7 +431,7 @@ public class EstimatedCallType {
         alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate, stopConditions)
       );
       allAlerts.addAll(
-        alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions)
+        alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions, direction)
       );
     }
     // Trip
@@ -393,7 +442,7 @@ public class EstimatedCallType {
     // TODO OTP2 This should probably have a FeedScopeId argument instead of string
     allAlerts.addAll(alertPatchService.getAgencyAlerts(trip.getRoute().getAgency().getId()));
     // Route's direction
-    allAlerts.addAll(alertPatchService.getDirectionAndRouteAlerts(trip.getDirection(), routeId));
+    allAlerts.addAll(alertPatchService.getDirectionAndRouteAlerts(direction, routeId));
 
     long serviceDay = tripTimeOnDate.getServiceDayMidnight();
     long arrivalTime = tripTimeOnDate.getRealtimeArrival();
@@ -414,17 +463,8 @@ public class EstimatedCallType {
     Instant toTime
   ) {
     if (alertPatches != null) {
-      // First and last period
-      alertPatches.removeIf(
-        alert ->
-          (alert.getEffectiveStartDate() != null &&
-            alert.getEffectiveStartDate().isAfter(toTime)) ||
-          (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().isBefore(fromTime))
-      );
-
-      // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch ->
-        !alertPatch.displayDuring(fromTime.getEpochSecond(), toTime.getEpochSecond())
+        !alertPatch.isActiveDuring(TimePeriod.of(fromTime, toTime))
       );
     }
   }

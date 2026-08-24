@@ -2,6 +2,7 @@ package org.opentripplanner.routing.services;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -37,7 +38,17 @@ public interface TransitAlertService {
     return getStopAlerts(stop, Set.of());
   }
 
+  /**
+   * Returns the alerts for the exact stop only. Alerts on the parent station (or any other related
+   * stop) are not included; use {@link #getStopLocationsAlerts} to get alerts for multiple
+   * locations at once.
+   */
   Collection<TransitAlert> getStopAlerts(FeedScopedId stop, Set<StopCondition> stopConditions);
+
+  /**
+   * Returns the alerts for the stop locations.
+   */
+  Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds);
 
   Collection<TransitAlert> getRouteAlerts(FeedScopedId route);
 
@@ -51,13 +62,14 @@ public interface TransitAlertService {
   Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency);
 
   default Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route) {
-    return getStopAndRouteAlerts(stop, route, Set.of());
+    return getStopAndRouteAlerts(stop, route, Set.of(), Direction.UNKNOWN);
   }
 
   Collection<TransitAlert> getStopAndRouteAlerts(
     FeedScopedId stop,
     FeedScopedId route,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   );
 
   default Collection<TransitAlert> getStopAndTripAlerts(

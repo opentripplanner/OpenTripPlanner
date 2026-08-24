@@ -6,10 +6,11 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
 public class EmissionGraphBuilderModule {
@@ -21,10 +22,10 @@ public class EmissionGraphBuilderModule {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionRepository emissionRepository,
-    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
-    if (emissionRepository == null) {
+    if (OTPFeature.Emission.isOff() || emissionRepository == null) {
       return null;
     }
 
@@ -33,7 +34,7 @@ public class EmissionGraphBuilderModule {
       dataSources.getEmissionConfiguredDataSource(),
       config.emission,
       emissionRepository,
-      timetableRepository,
+      transitRepository,
       issueStore
     );
   }

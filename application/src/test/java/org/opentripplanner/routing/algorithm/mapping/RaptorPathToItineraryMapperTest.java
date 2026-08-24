@@ -58,7 +58,7 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -68,12 +68,12 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final int BOARD_COST_SEC = 60;
   private static final int TRANSFER_COST_SEC = 120;
   private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
@@ -267,7 +267,7 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripTimes buildTripTimes(TripPattern originalPattern) {
-    var trip = TimetableRepositoryForTest.trip("test").build();
+    var trip = TransitRepositoryForTest.trip("test").build();
     var stopTimes = new ArrayList<StopTime>();
     for (int i = 0; i < originalPattern.numberOfStops(); i++) {
       var st = new StopTime();
@@ -312,12 +312,12 @@ public class RaptorPathToItineraryMapperTest {
     Instant dateTime = LocalDateTime.of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
-    TimetableRepository timetableRepository = new TimetableRepository();
-    timetableRepository.initTimeZone(ZoneIds.CET);
-    timetableRepository.index();
+    TransitRepository transitRepository = new TransitRepository();
+    transitRepository.initTimeZone(ZoneIds.CET);
+    transitRepository.index();
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
-      new DefaultTransitService(timetableRepository),
+      new DefaultTransitService(transitRepository),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
       dateTime.atZone(ZoneIds.CET),

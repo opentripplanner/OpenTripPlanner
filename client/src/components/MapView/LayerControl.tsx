@@ -1,10 +1,29 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { ControlPosition, MapRef } from 'react-map-gl/maplibre';
 import { findSelectedDebugLayers } from '../../util/map.ts';
 
 interface Layer {
   id: string;
   name: string;
+}
+
+/** The group whose layers can be narrowed to a set of vehicle rental networks. */
+const RENTAL_GROUP = 'Rental';
+
+/**
+ * MapLibre's legacy filter syntax names the property directly, as in ["in", "class", "StreetEdge"],
+ * where the expression syntax wraps it: ["in", ["get", "class"], ["literal", [...]]]. The debug
+ * style uses both - the rental vehicle and station layers are class-filtered in the legacy form,
+ * the geofencing zone layers use expressions - and the two cannot be mixed inside one filter.
+ */
+function isLegacyFilter(filter: unknown): boolean {
+  return Array.isArray(filter) && filter[0] === 'in' && typeof filter[1] === 'string';
+}
+
+function networkFilter(serverFilter: unknown, networks: Set<string>): unknown[] {
+  return isLegacyFilter(serverFilter)
+    ? ['in', 'network', ...networks]
+    : ['in', ['get', 'network'], ['literal', [...networks]]];
 }
 
 interface LayerControlProps {
@@ -21,6 +40,15 @@ interface LayerControlProps {
 const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayerIds }) => {
   const [rasterLayers, setRasterLayers] = useState<Layer[]>([]);
   const [layerGroups, setLayerGroups] = useState<Record<string, Layer[]>>({});
+  const [rentalNetworks, setRentalNetworks] = useState<string[]>([]);
+  const [selectedNetworks, setSelectedNetworks] = useState<Set<string>>(new Set());
+
+  /**
+   * The filter each rental layer was given by the server, captured before we narrow it. Restoring
+   * it is what makes "all networks selected" identical to an untouched style rather than merely
+   * equivalent to it.
+   */
+  const serverFilters = useRef<Map<string, unknown>>(new Map());
 
   /**
    * Load background + debug layers from the style once the map is ready.
@@ -62,6 +90,12 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         });
 
       setLayerGroups(groups);
+
+      // The networks cannot be derived from the tiles: a tile only reveals the networks present in
+      // the area currently loaded, so the list would change as you pan and be empty when zoomed out.
+      const networks = (style.metadata as Record<string, string[]> | undefined)?.rentalNetworks ?? [];
+      setRentalNetworks(networks);
+      setSelectedNetworks((previous) => (previous.size === 0 ? new Set(networks) : previous));
     };
 
     if (mapInstance.isStyleLoaded()) {
@@ -92,6 +126,58 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
   );
 
   /**
+   * Narrow the rental layers to the given networks, leaving every other layer untouched.
+   */
+  const applyNetworkFilter = useCallback(
+    (networks: Set<string>) => {
+      if (!mapRef) return;
+      const mapInstance = mapRef.getMap();
+
+      (layerGroups[RENTAL_GROUP] ?? []).forEach((layer) => {
+        if (!serverFilters.current.has(layer.id)) {
+          serverFilters.current.set(layer.id, mapInstance.getFilter(layer.id));
+        }
+        const serverFilter = serverFilters.current.get(layer.id);
+
+        // setFilter replaces rather than merges, so the server's own filter - which selects the
+        // vehicle, station or zone type the layer draws - has to be reapplied alongside ours, in
+        // the same dialect: an expression cannot be combined with a legacy filter.
+        const filter =
+          networks.size === rentalNetworks.length
+            ? serverFilter
+            : ['all', serverFilter, networkFilter(serverFilter, networks)];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mapInstance.setFilter(layer.id, filter as any);
+      });
+    },
+    [mapRef, layerGroups, rentalNetworks],
+  );
+
+  const toggleNetwork = useCallback(
+    (network: string, isSelected: boolean) => {
+      const next = new Set(selectedNetworks);
+      if (isSelected) {
+        next.add(network);
+      } else {
+        next.delete(network);
+      }
+      setSelectedNetworks(next);
+      applyNetworkFilter(next);
+    },
+    [selectedNetworks, applyNetworkFilter],
+  );
+
+  const setAllNetworks = useCallback(
+    (isSelected: boolean) => {
+      const next = isSelected ? new Set(rentalNetworks) : new Set<string>();
+      setSelectedNetworks(next);
+      applyNetworkFilter(next);
+    },
+    [rentalNetworks, applyNetworkFilter],
+  );
+
+  /**
    * Show exactly one background (raster) layer at a time.
    */
   const setBackgroundLayer = useCallback(
@@ -106,18 +192,9 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
   );
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '10px',
-        width: '250px',
-        borderRadius: '4px',
-        overflowY: 'auto',
-      }}
-    >
+    <div className="layer-control">
       {/* BACKGROUND (RASTER) LAYERS */}
-      <h4 style={{ marginTop: 0 }}>Background</h4>
+      <h4>Background</h4>
       <select onChange={(e) => setBackgroundLayer(e.target.value)}>
         {rasterLayers.map((layer) => (
           <option key={layer.id} value={layer.id}>
@@ -127,12 +204,15 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
       </select>
 
       {/* DEBUG (VECTOR) LAYERS */}
-      <h4 style={{ marginTop: '1rem' }}>Debug Layers</h4>
+      <h4>Debug Layers</h4>
       {Object.entries(layerGroups).map(([groupName, layers]) => {
         // Determine if *all* layers in this group are currently visible.
         const allVisible = layers.every(
           (layer) => mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none',
         );
+
+        // Networks filter the rental layers, so the group needs a second, labelled list.
+        const showNetworks = groupName === RENTAL_GROUP && rentalNetworks.length > 0;
 
         // Define a helper to toggle all layers in the group at once.
         const toggleGroupVisibility = (checked: boolean) => {
@@ -142,48 +222,57 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         };
 
         return (
-          <div key={groupName} style={{ marginBottom: '10px' }}>
-            <h6 style={{ margin: '0 0 5px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={allVisible}
-                  onChange={(e) => toggleGroupVisibility(e.target.checked)}
-                  style={{ marginRight: '5px' }}
-                />
+          <div key={groupName} className="layer-group">
+            <h6>
+              <label className="group-label">
+                <input type="checkbox" checked={allVisible} onChange={(e) => toggleGroupVisibility(e.target.checked)} />
                 {groupName}
               </label>
             </h6>
+
+            {showNetworks && <div className="sub-heading">Layers</div>}
 
             {layers.map((layer) => {
               // Figure out if the layer is visible or not:
               const isVisible = mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none';
 
               return (
-                <label
-                  key={layer.id}
-                  style={{
-                    display: 'block',
-                    cursor: 'pointer',
-                    marginBottom: '5px',
-                  }}
-                >
+                <label key={layer.id} className="toggle">
                   <input
                     type="checkbox"
                     checked={isVisible}
                     onChange={(e) => toggleLayerVisibility(layer.id, e.target.checked)}
-                    style={{ marginLeft: '20px', marginRight: '5px' }}
                   />
                   {layer.name}
                 </label>
               );
             })}
+
+            {showNetworks && (
+              <div className="networks">
+                <div className="sub-heading">
+                  <span>Networks</span>
+                  <button type="button" className="link-button" onClick={() => setAllNetworks(true)}>
+                    all
+                  </button>
+                  <button type="button" className="link-button" onClick={() => setAllNetworks(false)}>
+                    none
+                  </button>
+                </div>
+                <div className="network-list">
+                  {rentalNetworks.map((network) => (
+                    <label key={network}>
+                      <input
+                        type="checkbox"
+                        checked={selectedNetworks.has(network)}
+                        onChange={(e) => toggleNetwork(network, e.target.checked)}
+                      />
+                      {network}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
       })}

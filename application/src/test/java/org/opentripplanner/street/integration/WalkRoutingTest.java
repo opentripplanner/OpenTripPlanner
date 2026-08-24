@@ -31,7 +31,7 @@ class WalkRoutingTest {
     );
     roundabout = model.graph();
 
-    model.timetableRepository().index();
+    model.transitRepository().index();
     roundabout.index();
   }
 
@@ -71,7 +71,16 @@ class WalkRoutingTest {
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var ctx = TestServerContext.ofGraph(graph);
       var router = new DefaultDirectStreetRouter();
-      return router.route(ctx, request, linkingContext);
+      return router.route(
+        ctx.graph(),
+        ctx.transitService(),
+        ctx.streetLimitationParametersService(),
+        ctx.vehicleRentalService(),
+        ctx.streetDetailsService(),
+        ctx.dataOverlayParameterBindings(),
+        request,
+        linkingContext
+      );
     }
   }
 }

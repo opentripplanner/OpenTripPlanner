@@ -7,10 +7,12 @@ import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
@@ -21,13 +23,15 @@ public class DefaultDirectStreetRouter extends DirectStreetRouter {
 
   @Override
   List<Itinerary> findItineraries(
-    OtpServerRequestContext serverContext,
+    Graph graph,
+    TransitService transitService,
+    StreetDetailsService streetDetailsService,
     GraphPathFinder graphPathFinder,
     LinkingContext linkingContext,
     RouteRequest request
   ) {
     var paths = graphPathFinder.find(request, linkingContext);
-    return mapToItineraries(serverContext, request, paths);
+    return mapToItineraries(graph, transitService, streetDetailsService, request, paths);
   }
 
   @Override
@@ -51,16 +55,18 @@ public class DefaultDirectStreetRouter extends DirectStreetRouter {
   }
 
   private List<Itinerary> mapToItineraries(
-    OtpServerRequestContext serverContext,
+    Graph graph,
+    TransitService transitService,
+    StreetDetailsService streetDetailsService,
     RouteRequest request,
     List<StreetPath> paths
   ) {
     StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
-      new TransitServiceResolver(serverContext.transitService()),
-      serverContext.transitService().getTimeZone(),
-      serverContext.graph().streetNotesService,
-      serverContext.streetDetailsService(),
-      serverContext.graph().ellipsoidToGeoidDifference
+      new TransitServiceResolver(transitService),
+      transitService.getTimeZone(),
+      graph.streetNotesService,
+      streetDetailsService,
+      graph.ellipsoidToGeoidDifference
     );
     List<Itinerary> itineraries = new ArrayList<>();
     for (var path : paths) {

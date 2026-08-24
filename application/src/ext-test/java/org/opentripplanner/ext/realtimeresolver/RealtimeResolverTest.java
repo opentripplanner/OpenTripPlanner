@@ -17,27 +17,26 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 class RealtimeResolverTest {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
-  private final Route route1 = TimetableRepositoryForTest.route("route1").build();
-  private final Route route2 = TimetableRepositoryForTest.route("route2").build();
+  private final Route route1 = TransitRepositoryForTest.route("route1").build();
+  private final Route route2 = TransitRepositoryForTest.route("route2").build();
 
   private final RegularStop stop1 = testModel.stop("stop1", 1, 1).build();
   private final RegularStop stop2 = testModel.stop("stop2", 2, 1).build();
@@ -57,15 +56,17 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
     // Put an alert on stop3
+    var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
-      .addTimePeriod(new TimePeriod(0, 0))
+      .withCalendar(AlertCalendar.ofAlwaysActive())
       .build();
-    transitService.getTransitAlertService().setAlerts(List.of(alert));
+    transitAlertService.setAlerts(List.of(alert));
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
-      transitService
+      transitService,
+      transitAlertService
     );
 
     assertFalse(itinerariesWithRealtime.isEmpty());
@@ -93,12 +94,16 @@ class RealtimeResolverTest {
       .bus(route1, 1, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
 
-    var model = new TimetableRepository();
+    var model = new TransitRepository();
     model.index();
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      new TransitAlertServiceImpl()
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -120,7 +125,11 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      transitService,
+      new TransitAlertServiceImpl()
+    );
 
     assertEquals(1, itineraries.size());
 
@@ -164,28 +173,21 @@ class RealtimeResolverTest {
     List<TripPattern> patterns,
     LocalDate serviceDate
   ) {
-    var timetableRepository = new TimetableRepository();
+    var transitRepository = new TransitRepository();
     CalendarServiceData calendarServiceData = new CalendarServiceData();
 
     patterns.forEach(pattern -> {
-      timetableRepository.addTripPattern(pattern.getId(), pattern);
+      transitRepository.addTripPattern(pattern.getId(), pattern);
 
       var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
-      timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
+      transitRepository.getServiceCodes().put(pattern.getId(), serviceCode);
 
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    timetableRepository.updateCalendarServiceData(calendarServiceData);
-    timetableRepository.index();
+    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.index();
 
-    return new DefaultTransitService(timetableRepository) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
+    return new DefaultTransitService(transitRepository);
   }
 }

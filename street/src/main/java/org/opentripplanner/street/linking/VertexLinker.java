@@ -613,7 +613,7 @@ public class VertexLinker {
     var toBoundaries = originalEdge.getToVertex().listGeofencingBoundaries();
     if (!fromBoundaries.isEmpty() || !toBoundaries.isEmpty()) {
       var splitCoord = new Coordinate(x, y);
-      var containingZones = geofencingZoneService.zonesContaining(splitCoord);
+      var containingZones = geofencingZoneService.findZonesContaining(splitCoord);
       var boundaryZones = new HashSet<GeofencingZone>();
       for (var b : fromBoundaries) {
         boundaryZones.add(b.zone());
@@ -744,7 +744,7 @@ public class VertexLinker {
       return false;
     } else if (scope == Scope.PERMANENT) {
       // marking the new vertex as visibilityVertex enables direct connections to it
-      areaGroup.addVisibilityVertices(Set.of(newVertex));
+      areaGroup.addVisibilityVertex(newVertex);
     }
     return true;
   }

@@ -2,11 +2,10 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DATA_AVAILABLE;
 
-import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -15,22 +14,22 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * A request-scoped view over the {@link RealtimeVehicleRepository}.
+ * A request-scoped view over a {@link RealtimeVehicleRepositorySnapshot}.
  * <p>
- * A new instance should be created for each request, with the request's {@link TransitService},
- * so that the whole request sees one consistent timetable snapshot.
+ * A new instance should be created for each request, with the request's {@link TransitService}
+ * and a vehicle snapshot resolved from the same transaction scope, so that the whole request sees
+ * one consistent view of the realtime data.
  */
 public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
 
-  private final RealtimeVehicleRepository repository;
+  private final RealtimeVehicleRepositorySnapshot snapshot;
   private final TransitService transitService;
 
-  @Inject
   public DefaultRealtimeVehicleService(
-    RealtimeVehicleRepository repository,
+    RealtimeVehicleRepositorySnapshot snapshot,
     TransitService transitService
   ) {
-    this.repository = repository;
+    this.snapshot = snapshot;
     this.transitService = transitService;
   }
 
@@ -44,7 +43,7 @@ public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
     if (pattern.getOriginalTripPattern() != null) {
       pattern = pattern.getOriginalTripPattern();
     }
-    return repository.getRealtimeVehicles(pattern);
+    return snapshot.getRealtimeVehicles(pattern);
   }
 
   @Override

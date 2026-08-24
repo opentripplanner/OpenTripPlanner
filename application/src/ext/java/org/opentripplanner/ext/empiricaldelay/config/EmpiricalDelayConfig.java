@@ -12,7 +12,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class EmpiricalDelayConfig {
 
-  public static EmpiricalDelayParameters mapEmissionsConfig(
+  public static EmpiricalDelayParameters mapEmpiricalDelayConfig(
     String parameterName,
     NodeAdapter root
   ) {

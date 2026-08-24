@@ -2,6 +2,7 @@ package org.opentripplanner.street.graph.summary;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.NotImplementedException;
@@ -29,11 +30,12 @@ class StreetSummarizer {
   static String summarizeEdge(Edge e) {
     return switch (e) {
       case StreetEdge tpe -> String.format(
-        "%s → %s %s ♿%s",
+        "%s → %s %s ♿%s%s",
         summarizeVertex(e.getFromVertex()),
         summarizeVertex(e.getToVertex()),
         tpe.getPermission(),
-        summarizeBoolean(tpe.isWheelchairAccessible())
+        summarizeBoolean(tpe.isWheelchairAccessible()),
+        summarizeNoThru(tpe)
       );
       case TemporaryFreeEdge _ -> String.format(
         "%s → %s ALL",
@@ -103,6 +105,22 @@ class StreetSummarizer {
   private static String format(double value) {
     var s = DECIMAL_FORMAT.format(value);
     return "-0".equals(s) ? "0" : s;
+  }
+
+  /// Lists the traverse modes for which the edge is marked as no-thru-traffic, e.g. `" noThru=WALK,CAR"`.
+  /// Returns an empty string if the edge is not restricted for any mode.
+  private static String summarizeNoThru(StreetEdge e) {
+    var modes = new ArrayList<String>();
+    if (e.isWalkNoThruTraffic()) {
+      modes.add("WALK");
+    }
+    if (e.isBicycleNoThruTraffic()) {
+      modes.add("BICYCLE");
+    }
+    if (e.isMotorVehicleNoThruTraffic()) {
+      modes.add("CAR");
+    }
+    return modes.isEmpty() ? "" : " noThru=" + String.join(",", modes);
   }
 
   private static String summarizeBoolean(boolean b) {

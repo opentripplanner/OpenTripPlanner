@@ -8,7 +8,6 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.NO_SERVICE_ON_DATE
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -133,7 +132,7 @@ class RealtimeVehiclePatternMatcher {
     // need to convert the sucess to the correct type.
     var results = matchResults
       .stream()
-      .map(ignored -> UpdateSuccess.noWarnings())
+      .map(ignored -> UpdateSuccess.of())
       .toList();
     // needs to be put into a new list so the types are correct
     var updateResult = UpdateResult.of(results, errors);
@@ -372,7 +371,7 @@ class RealtimeVehiclePatternMatcher {
     }
 
     var serviceDate = Optional.of(vehiclePositionWithTripId.getTrip().getStartDate())
-      .map(Strings::emptyToNull)
+      .filter(s -> !s.isEmpty())
       .flatMap(ServiceDateUtils::parseStringToOptional)
       .orElseGet(() -> inferServiceDate(trip));
 

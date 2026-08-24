@@ -38,7 +38,7 @@ public class BicycleRoutingTest {
     );
     herrenbergGraph = model.graph();
 
-    model.timetableRepository().index();
+    model.transitRepository().index();
     herrenbergGraph.index();
   }
 
@@ -96,7 +96,16 @@ public class BicycleRoutingTest {
     var ctx = TestServerContext.ofGraph(graph);
 
     var router = new DefaultDirectStreetRouter();
-    var itineraries = router.route(ctx, request, linkingContext);
+    var itineraries = router.route(
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.streetLimitationParametersService(),
+      ctx.vehicleRentalService(),
+      ctx.streetDetailsService(),
+      ctx.dataOverlayParameterBindings(),
+      request,
+      linkingContext
+    );
 
     temporaryVerticesContainer.close();
 
