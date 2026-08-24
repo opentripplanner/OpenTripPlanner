@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -422,9 +423,9 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void matchesTripRunningInsidePeriod() {
     assertTrue(
-      matcher(TimePeriod.of(RUT_START.minusSeconds(60), RUT_END.plusSeconds(60))).match(
-        tripOnServiceDateRut
-      )
+      matcher(
+        TimePeriod.of(RUT_START.minus(Duration.ofMinutes(1)), RUT_END.plus(Duration.ofMinutes(1)))
+      ).match(tripOnServiceDateRut)
     );
   }
 
@@ -432,15 +433,15 @@ class TripOnServiceDateMatcherFactoryTest {
   void matchesTripOverlappingPeriod() {
     // The trip arrives one minute before the period ends
     assertTrue(
-      matcher(TimePeriod.of(RUT_END.minusSeconds(60), RUT_END.plusSeconds(3600))).match(
-        tripOnServiceDateRut
-      )
+      matcher(
+        TimePeriod.of(RUT_END.minus(Duration.ofMinutes(1)), RUT_END.plus(Duration.ofHours(1)))
+      ).match(tripOnServiceDateRut)
     );
     // The trip departs one minute after the period starts
     assertTrue(
-      matcher(TimePeriod.of(RUT_START.minusSeconds(3600), RUT_START.plusSeconds(60))).match(
-        tripOnServiceDateRut
-      )
+      matcher(
+        TimePeriod.of(RUT_START.minus(Duration.ofHours(1)), RUT_START.plus(Duration.ofMinutes(1)))
+      ).match(tripOnServiceDateRut)
     );
   }
 
@@ -459,7 +460,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void doesNotMatchTripOutsidePeriod() {
     assertFalse(
-      matcher(TimePeriod.of(RUT_END.plusSeconds(1), RUT_END.plusSeconds(3600))).match(
+      matcher(TimePeriod.of(RUT_END.plusSeconds(1), RUT_END.plus(Duration.ofHours(1)))).match(
         tripOnServiceDateRut
       )
     );
@@ -476,7 +477,9 @@ class TripOnServiceDateMatcherFactoryTest {
     runningTimeResolver = tripOnServiceDate ->
       tripOnServiceDate.equals(tripOnServiceDateRut) ? TimePeriod.of(RUT_START, null) : null;
 
-    assertTrue(matcher(TimePeriod.of(RUT_END.plusSeconds(3600), null)).match(tripOnServiceDateRut));
+    assertTrue(
+      matcher(TimePeriod.of(RUT_END.plus(Duration.ofHours(1)), null)).match(tripOnServiceDateRut)
+    );
     assertFalse(
       matcher(TimePeriod.of(null, RUT_START.minusSeconds(1))).match(tripOnServiceDateRut)
     );

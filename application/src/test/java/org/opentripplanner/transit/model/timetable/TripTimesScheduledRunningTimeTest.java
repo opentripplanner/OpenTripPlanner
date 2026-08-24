@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.StopTime;
@@ -30,8 +29,8 @@ class TripTimesScheduledRunningTimeTest {
     var period = subject.scheduledRunningTime(startOfService(LocalDate.of(2024, 6, 5)));
 
     assertThat(period).isNotNull();
-    assertThat(period.start()).hasValue(instant("2024-06-05T10:01+02:00"));
-    assertThat(period.end()).hasValue(instant("2024-06-05T11:25+02:00"));
+    assertThat(period.start()).hasValue(instant("2024-06-05T08:01:00Z"));
+    assertThat(period.end()).hasValue(instant("2024-06-05T09:25:00Z"));
   }
 
   @Test
@@ -44,8 +43,8 @@ class TripTimesScheduledRunningTimeTest {
     var period = subject.scheduledRunningTime(startOfService(LocalDate.of(2024, 6, 5)));
 
     assertThat(period).isNotNull();
-    assertThat(period.start()).hasValue(instant("2024-06-05T23:50+02:00"));
-    assertThat(period.end()).hasValue(instant("2024-06-06T00:30+02:00"));
+    assertThat(period.start()).hasValue(instant("2024-06-05T21:50:00Z"));
+    assertThat(period.end()).hasValue(instant("2024-06-05T22:30:00Z"));
   }
 
   @Test
@@ -60,8 +59,8 @@ class TripTimesScheduledRunningTimeTest {
     var period = subject.scheduledRunningTime(startOfService(LocalDate.of(2024, 3, 31)));
 
     assertThat(period).isNotNull();
-    assertThat(period.start()).hasValue(instant("2024-03-31T00:30+01:00"));
-    assertThat(period.end()).hasValue(instant("2024-03-31T10:00+02:00"));
+    assertThat(period.start()).hasValue(instant("2024-03-30T23:30:00Z"));
+    assertThat(period.end()).hasValue(instant("2024-03-31T08:00:00Z"));
   }
 
   @Test
@@ -90,7 +89,7 @@ class TripTimesScheduledRunningTimeTest {
   }
 
   private static Instant instant(String text) {
-    return OffsetDateTime.parse(text).toInstant();
+    return Instant.parse(text);
   }
 
   /**
