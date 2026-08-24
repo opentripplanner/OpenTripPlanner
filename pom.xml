@@ -85,7 +85,7 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
-        <plugin.spotless.version>2.44.5</plugin.spotless.version>
+        <plugin.spotless.version>3.10.0</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
