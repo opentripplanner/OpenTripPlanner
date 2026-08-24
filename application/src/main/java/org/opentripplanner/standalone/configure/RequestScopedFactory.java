@@ -9,6 +9,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -76,6 +77,8 @@ public interface RequestScopedFactory {
   OjpApiParameters ojpApiParameters();
 
   TriasApiParameters triasApiParameters();
+
+  RoutingService routingService();
 
   @Subcomponent.Builder
   interface Builder {

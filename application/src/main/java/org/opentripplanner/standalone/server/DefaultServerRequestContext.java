@@ -243,7 +243,28 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RoutingService routingService() {
-    return new DefaultRoutingService(this);
+    return new DefaultRoutingService(
+      transitService,
+      transitAlertService,
+      graph,
+      raptorConfig,
+      meterRegistry,
+      streetLimitationParametersService,
+      vehicleRentalService,
+      streetDetailsService,
+      transferService,
+      flexParameters,
+      rideHailingServices,
+      dataOverlayParameterBindings,
+      sorlandsbanenService,
+      viaTransferResolver,
+      carpoolingService,
+      emissionItineraryDecorator,
+      stopConsolidationService,
+      linkingContextFactory,
+      transitRoutingConfig,
+      transitRoutingConfig
+    );
   }
 
   @Override

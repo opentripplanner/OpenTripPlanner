@@ -11,6 +11,7 @@ import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -81,6 +82,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::linkingContextFactory, LinkingContextFactory.class);
     bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);
+    bridge(factory, RequestScopedFactory::routingService, RoutingService.class);
   }
 
   /**
