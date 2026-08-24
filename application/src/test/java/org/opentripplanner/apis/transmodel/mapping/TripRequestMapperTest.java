@@ -28,7 +28,7 @@ import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -83,7 +83,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   );
 
   private static final TripRequestMapper MAPPER = new TripRequestMapper(new DefaultFeedIdMapper());
-  private TransmodelRequestContext context;
+  private TransmodelGraphQLRequestContext context;
 
   static {
     var itinerary = newItinerary(Place.forStop(STOP1), time("11:00"))

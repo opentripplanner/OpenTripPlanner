@@ -32,7 +32,7 @@ public class TransmodelGraphQLPlanner {
   }
 
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     Locale locale;
     PlanResponse response;
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
@@ -65,7 +65,7 @@ public class TransmodelGraphQLPlanner {
 
   public DataFetcherResult<ViaRoutingResponse> planVia(DataFetchingEnvironment environment) {
     ViaRoutingResponse response;
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     Locale locale;
     try {
       var request = viaRequestMapper.createRouteViaRequest(environment);
@@ -83,7 +83,7 @@ public class TransmodelGraphQLPlanner {
       .build();
   }
 
-  private static Locale defaultLocale(TransmodelRequestContext ctx) {
+  private static Locale defaultLocale(TransmodelGraphQLRequestContext ctx) {
     return ctx.getDefaultRouteRequest().preferences().locale();
   }
 }

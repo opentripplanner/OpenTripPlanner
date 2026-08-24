@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -41,7 +41,7 @@ public class TripRequestMapper {
    * Create a RouteRequest from the input fields of the trip query arguments.
    */
   public RouteRequestBuilder createRequestBuilder(DataFetchingEnvironment environment) {
-    TransmodelRequestContext context = environment.getContext();
+    TransmodelGraphQLRequestContext context = environment.getContext();
     var requestBuilder = context.getDefaultRouteRequest().copyOf();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);

@@ -5,7 +5,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -53,7 +53,7 @@ public class EmpiricalDelayType {
   @Nullable
   public static EmpiricalDelay dataFetcherForTripTimeOnDate(DataFetchingEnvironment environment) {
     TripTimeOnDate parent = environment.getSource();
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     var service = ctx.getEmpiricalDelayService();
 
     if (parent == null || service == null) {

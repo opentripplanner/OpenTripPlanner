@@ -19,7 +19,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.mapping.GenericLocationMapper;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
@@ -193,7 +193,7 @@ public class RefetchTripPatternQuery {
   }
 
   private DataFetcherResult<RefetchResult> refetchJourney(DataFetchingEnvironment environment) {
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     var routeRequest = createRouteRequest(environment);
     List<String> legsIds = Objects.requireNonNull(environment.getArgument("legs"));
     var legs = legsIds

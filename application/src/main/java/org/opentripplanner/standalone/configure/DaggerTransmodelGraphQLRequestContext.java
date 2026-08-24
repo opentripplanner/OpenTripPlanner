@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
@@ -21,16 +21,16 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Production {@link TransmodelRequestContext}: every accessor delegates to the enclosing
+ * Production {@link TransmodelGraphQLRequestContext}: every accessor delegates to the enclosing
  * {@link RequestScopedFactory}.
  */
-final class DaggerTransmodelRequestContext implements TransmodelRequestContext {
+final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRequestContext {
 
   private final RequestScopedFactory factory;
   private NearbyPlaceFinder nearbyPlaceFinder;
   private NearbyStopFinder nearbyStopFinder;
 
-  DaggerTransmodelRequestContext(RequestScopedFactory factory) {
+  DaggerTransmodelGraphQLRequestContext(RequestScopedFactory factory) {
     this.factory = factory;
   }
 

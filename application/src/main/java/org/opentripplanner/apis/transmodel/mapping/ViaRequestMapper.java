@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -32,7 +32,7 @@ public class ViaRequestMapper {
    * Create a RouteViaRequest from the input fields of the viaTrip query arguments.
    */
   public RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
-    TransmodelRequestContext context = environment.getContext();
+    TransmodelGraphQLRequestContext context = environment.getContext();
     RouteRequest request = context.getDefaultRouteRequest();
 
     List<Map<String, Object>> viaInput = environment.getArgument("via");

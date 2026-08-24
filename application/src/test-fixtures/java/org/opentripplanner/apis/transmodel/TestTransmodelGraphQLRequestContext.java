@@ -20,10 +20,10 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * A plain, hand-built {@link TransmodelRequestContext} for tests that don't need (or want) a
+ * A plain, hand-built {@link TransmodelGraphQLRequestContext} for tests that don't need (or want) a
  * Dagger-assembled request scope.
  */
-public class TestTransmodelRequestContext implements TransmodelRequestContext {
+public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLRequestContext {
 
   private final RoutingService routingService;
   private final TransitService transitService;
@@ -38,7 +38,7 @@ public class TestTransmodelRequestContext implements TransmodelRequestContext {
   private final LinkingContextFactory linkingContextFactory;
   private final StreetLimitationParametersService streetLimitationParametersService;
 
-  public TestTransmodelRequestContext(
+  public TestTransmodelGraphQLRequestContext(
     RoutingService routingService,
     TransitService transitService,
     @Nullable TransitAlertService transitAlertService,

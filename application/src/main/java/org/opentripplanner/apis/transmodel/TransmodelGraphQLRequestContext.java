@@ -27,7 +27,7 @@ import org.opentripplanner.utils.lang.Sandbox;
  * lets tests substitute a plain, hand-built implementation (e.g. {@code
  * TestTransmodelGraphQLRequestContext}) without needing a Dagger component at all.
  */
-public interface TransmodelRequestContext {
+public interface TransmodelGraphQLRequestContext {
   RoutingService getRoutingService();
 
   TransitService getTransitService();
