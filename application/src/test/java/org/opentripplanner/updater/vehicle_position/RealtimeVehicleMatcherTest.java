@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_position;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
@@ -169,7 +170,7 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, vehicles(repository, pattern1).size());
+    assertThat(vehicles(repository, pattern1)).hasSize(1);
     var nextStop = vehicles(repository, pattern1).get(0).stop();
     assertEquals("F:stop-20", nextStop.get().stop().getId().toString());
   }
@@ -217,7 +218,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, vehicles(repository, pattern).size());
+    assertThat(vehicles(repository, pattern)).isEmpty();
 
     var matcher = new RealtimeVehiclePatternMatcher(
       TransitRepositoryForTest.FEED_ID,
@@ -248,7 +249,7 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(List.of(pos));
 
     var realtimeVehicles = vehicles(repository, pattern);
-    assertEquals(1, realtimeVehicles.size());
+    assertThat(realtimeVehicles).hasSize(1);
 
     var parsedVehicle = realtimeVehicles.get(0);
     assertEquals(tripId, parsedVehicle.trip().getId().getId());
@@ -270,7 +271,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, vehicles(repository, pattern).size());
+    assertThat(vehicles(repository, pattern)).isEmpty();
 
     // Map positions to trips in feed
     var matcher = new RealtimeVehiclePatternMatcher(
@@ -292,7 +293,7 @@ public class RealtimeVehicleMatcherTest {
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
     var realtimeVehicles = vehicles(repository, pattern);
-    assertEquals(1, realtimeVehicles.size());
+    assertThat(realtimeVehicles).hasSize(1);
 
     var parsedVehicle = realtimeVehicles.get(0);
     assertEquals(tripId, parsedVehicle.trip().getId().getId());
@@ -301,7 +302,7 @@ public class RealtimeVehicleMatcherTest {
 
     // if we have an empty list of updates then clear the positions from the previous update
     matcher.applyRealtimeVehicleUpdates(List.of());
-    assertEquals(0, vehicles(repository, pattern).size());
+    assertThat(vehicles(repository, pattern)).isEmpty();
   }
 
   private void testVehiclePositionOccupancy(VehiclePosition pos) {
@@ -319,7 +320,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, vehicles(repository, pattern).size());
+    assertThat(vehicles(repository, pattern)).isEmpty();
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
@@ -341,7 +342,7 @@ public class RealtimeVehicleMatcherTest {
 
     // Check that occupancy for the trip is as set in original position
     var realtimeVehicles = vehicles(repository, pattern);
-    assertEquals(1, realtimeVehicles.size());
+    assertThat(realtimeVehicles).hasSize(1);
     assertEquals(
       OccupancyStatus.FEW_SEATS_AVAILABLE,
       realtimeVehicles.get(0).occupancyStatus().orElseThrow()
@@ -380,7 +381,7 @@ public class RealtimeVehicleMatcherTest {
     var patternForTrip = Map.of(trip1, pattern1, trip2, pattern2);
 
     // an untouched pattern has no vehicles
-    assertEquals(0, vehicles(repository, pattern1).size());
+    assertThat(vehicles(repository, pattern1)).isEmpty();
 
     // Map positions to trips in feed
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
@@ -405,13 +406,13 @@ public class RealtimeVehicleMatcherTest {
     matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, vehicles(repository, pattern1).size());
-    assertEquals(1, vehicles(repository, pattern2).size());
+    assertThat(vehicles(repository, pattern1)).hasSize(1);
+    assertThat(vehicles(repository, pattern2)).hasSize(1);
 
     matcher.applyRealtimeVehicleUpdates(List.of(pos1));
-    assertEquals(1, vehicles(repository, pattern1).size());
+    assertThat(vehicles(repository, pattern1)).hasSize(1);
     // because there are no more updates for pattern2 we remove all positions
-    assertEquals(0, vehicles(repository, pattern2).size());
+    assertThat(vehicles(repository, pattern2)).isEmpty();
   }
 
   static Stream<Arguments> inferenceTestCases() {
