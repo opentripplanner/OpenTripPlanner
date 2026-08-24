@@ -14,14 +14,10 @@ import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.repository.DefaultTimetableRepository;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitService;
 
 class TripOnServiceDateImplTest {
 
@@ -65,10 +61,10 @@ class TripOnServiceDateImplTest {
       .createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();
-    var transitService = transitServiceWithUpdate(
-      env,
+    env.applyUpdate(
       RealTimeTripUpdate.of(tripData.tripPattern(), canceledTripTimes, SERVICE_DATE).build()
     );
+    var transitService = env.transitService();
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     var state = SUBJECT.realTimeTripState().get(dfEnv);
@@ -88,10 +84,10 @@ class TripOnServiceDateImplTest {
       .createRealTimeFromScheduledTimes()
       .withRealTimeUpdated()
       .build();
-    var transitService = transitServiceWithUpdate(
-      env,
+    env.applyUpdate(
       RealTimeTripUpdate.of(tripData.tripPattern(), delayedTripTimes, SERVICE_DATE).build()
     );
+    var transitService = env.transitService();
     var tosd = transitService.getTripOnServiceDate(id(TOSD_ID));
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     var state = SUBJECT.realTimeTripState().get(dfEnv);
@@ -116,18 +112,5 @@ class TripOnServiceDateImplTest {
       .build();
     var dfEnv = dataFetchingEnvironment(tosd, Map.of(), transitService);
     assertNull(SUBJECT.realTimeTripState().get(dfEnv));
-  }
-
-  private static TransitService transitServiceWithUpdate(
-    TransitTestEnvironment env,
-    RealTimeTripUpdate update
-  ) {
-    var repo = env.transitRepository();
-    var snapshot = new DefaultTimetableRepository(
-      repo.getRaptorTransitData(),
-      TripCalendars.empty()
-    );
-    snapshot.update(update);
-    return new DefaultTransitService(repo, snapshot.commit());
   }
 }

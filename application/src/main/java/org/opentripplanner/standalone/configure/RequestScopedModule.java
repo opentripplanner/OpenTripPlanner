@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
-import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
@@ -27,18 +26,12 @@ import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
-import org.opentripplanner.place.NearbyPlaceFinder;
-import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
-import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -189,7 +182,6 @@ public class RequestScopedModule {
   ) {
     return new DefaultRoutingService(
       transitService,
-      transitAlertService,
       graph,
       raptorConfig,
       Metrics.globalRegistry,
@@ -197,6 +189,7 @@ public class RequestScopedModule {
       vehicleRentalService,
       streetDetailsService,
       transferService,
+      transitAlertService,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,
@@ -210,6 +203,22 @@ public class RequestScopedModule {
       transitRoutingConfig,
       transitRoutingConfig
     );
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static RealtimeVehicleService realtimeVehicleService(
+    RepositoryHandle<
+      RealtimeVehicleRepositorySnapshot,
+      RealtimeVehicleRepository
+    > realtimeVehicleRepositoryHandle,
+    TransactionScope transactionScope,
+    TransitService transitService
+  ) {
+    var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
+      transactionScope
+    );
+    return new DefaultRealtimeVehicleService(realtimeVehicleSnapshot, transitService);
   }
 
   /**
@@ -248,53 +257,13 @@ public class RequestScopedModule {
   }
 
   /**
-   * Pre-assembled request context for the GTFS API's GraphQL data fetchers.
+   * Request context for the GTFS API's GraphQL data fetchers. Every accessor delegates to the
+   * enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data fetcher
+   * actually asks for it.
    */
   @Provides
   @HttpRequestScoped
-  static GtfsGraphQLRequestContext graphQLRequestContext(
-    RoutingService routingService,
-    TransitService transitService,
-    TransitAlertService transitAlertService,
-    RegularTransferService transferService,
-    FareService fareService,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleRepositoryHandle,
-    TransactionScope transactionScope,
-    @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
-    Graph graph,
-    LinkingContextFactory linkingContextFactory,
-    RouteRequest defaultRouteRequest
-  ) {
-    var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
-      transactionScope
-    );
-    RealtimeVehicleService realtimeVehicleService = new DefaultRealtimeVehicleService(
-      realtimeVehicleSnapshot,
-      transitService
-    );
-    NearbyPlaceFinder nearbyPlaceFinder = new StreetNearbyPlaceFinder(linkingContextFactory);
-    NearbyStopFinder nearbyStopFinder = graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-
-    return new GtfsGraphQLRequestContext(
-      routingService,
-      transitService,
-      transitAlertService,
-      transferService,
-      fareService,
-      vehicleRentalService,
-      vehicleParkingService,
-      realtimeVehicleService,
-      gtfsSchema,
-      nearbyPlaceFinder,
-      nearbyStopFinder,
-      defaultRouteRequest
-    );
+  static GtfsGraphQLRequestContext graphQLRequestContext(RequestScopedFactory factory) {
+    return new DaggerGtfsGraphQLRequestContext(factory);
   }
 }
