@@ -14,7 +14,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 class OsmParserTest {
 
-  public static final double EPSILON = 0.0000001;
+  public static final double EPSILON = 1e-7;
 
   @Test
   void testBinaryParser() {
