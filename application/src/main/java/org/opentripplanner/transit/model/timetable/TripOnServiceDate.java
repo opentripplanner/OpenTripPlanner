@@ -65,7 +65,8 @@ public class TripOnServiceDate
   }
 
   /**
-   * The id of the vehicle type planned to operate the trip.
+   * The id of the vehicle type planned to operate the trip on this service date, or the vehicle
+   * type of the trip itself if the service date has none of its own.
    */
   @Nullable
   public String getNetexVehicleTypeId() {
