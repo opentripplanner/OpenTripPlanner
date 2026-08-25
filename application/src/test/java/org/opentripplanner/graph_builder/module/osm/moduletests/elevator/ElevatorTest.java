@@ -77,7 +77,7 @@ class ElevatorTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of("12345", "KONE:12345"), edge.getIds());
+      assertEquals(Set.of("12345", "KONE:12345"), edge.ids());
     }
   }
 
@@ -109,7 +109,7 @@ class ElevatorTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of("12345", "KONE:12345"), edge.getIds());
+      assertEquals(Set.of("12345", "KONE:12345"), edge.ids());
     }
   }
 
@@ -138,7 +138,7 @@ class ElevatorTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of(), edge.getIds());
+      assertEquals(Set.of(), edge.ids());
     }
   }
 

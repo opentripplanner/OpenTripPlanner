@@ -834,9 +834,7 @@ public abstract class OsmEntity {
   public Set<String> getCompoundTagValues(List<CompoundRefTagGroup> tagGroups) {
     return tagGroups
       .stream()
-      .map(tagGroup -> tagGroup.compoundValue(this::getTag))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
+      .flatMap(tagGroup -> tagGroup.compoundValue(this::getTag).stream())
       .collect(Collectors.toSet());
   }
 

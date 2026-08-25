@@ -126,7 +126,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
    * The ids of the elevator, as extracted from OSM tags configured via the
    * {@code elevatorRefTags} build-config option. Will be used for #6533.
    */
-  public Set<String> getIds() {
+  public Set<String> ids() {
     return ids;
   }
 
