@@ -221,25 +221,38 @@ public class OsmEntityTest {
   }
 
   @Test
-  void getCompoundTagValuesSingleTagGroup() {
+  void getCompoundTagValueSingleTagGroup() {
     var osm = new OsmTestEntity("ref", "E1");
 
-    assertEquals(Set.of("E1"), osm.getCompoundTagValues(List.of(CompoundRefTagGroup.of("ref"))));
+    assertEquals(
+      Optional.of("E1"),
+      osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("ref")))
+    );
   }
 
   @Test
-  void getCompoundTagValuesUnionsMultipleGroupsAndSkipsMissingTags() {
+  void getCompoundTagValueUsesFirstGroupThatResolvesAndSkipsMissingTags() {
     var osm = new OsmTestEntity(Map.of("manufacturer", "KONE", "ref", "12345"));
 
     assertEquals(
-      Set.of("12345", "KONE:12345"),
-      osm.getCompoundTagValues(
+      Optional.of("KONE:12345"),
+      osm.getCompoundTagValue(
         List.of(
-          CompoundRefTagGroup.of("ref"),
+          CompoundRefTagGroup.of("missing"),
           CompoundRefTagGroup.of("manufacturer", "ref"),
-          CompoundRefTagGroup.of("missing")
+          CompoundRefTagGroup.of("ref")
         )
       )
+    );
+  }
+
+  @Test
+  void getCompoundTagValueEmptyWhenNoGroupResolves() {
+    var osm = new OsmTestEntity("ref", "12345");
+
+    assertEquals(
+      Optional.empty(),
+      osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("manufacturer", "ref")))
     );
   }
 

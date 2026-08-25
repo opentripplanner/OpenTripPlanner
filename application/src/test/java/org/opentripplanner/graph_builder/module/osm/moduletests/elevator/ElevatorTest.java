@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,7 +57,6 @@ class ElevatorTest {
     var node1 = node(1, new WgsCoordinate(2, 0));
     var elevatorNode = NodeBuilder.of(2, new WgsCoordinate(1, 0))
       .withTag("highway", "elevator")
-      .withTag("manufacturer", "KONE")
       .withTag("ref", "12345")
       .build();
     var provider = TestOsmProvider.of()
@@ -68,16 +68,14 @@ class ElevatorTest {
     OsmModuleTestFactory.of(provider)
       .withGraph(graph)
       .builder()
-      .withElevatorRefTags(
-        List.of(CompoundRefTagGroup.of("ref"), CompoundRefTagGroup.of("manufacturer", "ref"))
-      )
+      .withElevatorRefTags(List.of(CompoundRefTagGroup.of("ref")))
       .build()
       .buildGraph();
 
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of("12345", "KONE:12345"), edge.ids());
+      assertEquals(Optional.of("12345"), edge.id());
     }
   }
 
@@ -89,7 +87,6 @@ class ElevatorTest {
     var elevatorWay = OsmWay.of()
       .withId(1)
       .withTag("highway", "elevator")
-      .withTag("manufacturer", "KONE")
       .withTag("ref", "12345")
       .addNodeRef(1, 2)
       .build();
@@ -100,21 +97,19 @@ class ElevatorTest {
     OsmModuleTestFactory.of(provider)
       .withGraph(graph)
       .builder()
-      .withElevatorRefTags(
-        List.of(CompoundRefTagGroup.of("ref"), CompoundRefTagGroup.of("manufacturer", "ref"))
-      )
+      .withElevatorRefTags(List.of(CompoundRefTagGroup.of("ref")))
       .build()
       .buildGraph();
 
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of("12345", "KONE:12345"), edge.ids());
+      assertEquals(Optional.of("12345"), edge.id());
     }
   }
 
   @Test
-  void testElevatorRefTagsSkipsGroupWithMissingTag() {
+  void testElevatorRefTagsEmptyWhenNoGroupResolves() {
     var n1 = node(1, new WgsCoordinate(0, 1));
     var n2 = node(2, new WgsCoordinate(0, 2));
 
@@ -138,7 +133,7 @@ class ElevatorTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Set.of(), edge.ids());
+      assertEquals(Optional.empty(), edge.id());
     }
   }
 

@@ -57,7 +57,7 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                                                 |       `object`       | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)                          |       `double`       | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                                         |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
-| [elevatorRefTags](#elevatorRefTags)                                                         |      `object[]`      | Groups of OSM tags whose values are combined into elevator ids.                                                                                                | *Optional* |                                   |  2.10 |
+| [elevatorRefTags](#elevatorRefTags)                                                         |      `object[]`      | Groups of OSM tags whose values are combined into an elevator id.                                                                                              | *Optional* |                                   |  2.10 |
 |       [tagGroup](#elevatorRefTags_0_tagGroup)                                               |      `string[]`      | The ordered OSM tag keys whose values are combined into one id.                                                                                                | *Optional* |                                   |  2.10 |
 | [emission](sandbox/Emission.md)                                                             |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | empiricalDelay                                                                              |       `object`       | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
@@ -787,13 +787,13 @@ to specify your NED tile cache location.
 **Since version:** `2.10` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
-Groups of OSM tags whose values are combined into elevator ids.
+Groups of OSM tags whose values are combined into an elevator id.
 
 Each group is a list of one or more OSM tag keys. If every tag in a group is present
 on an elevator node/way, their values are joined with ':' (in the given order) into
 one id. A group with a single tag key produces a plain id. If any tag in a group is
-missing, that group produces no id. Configuring more than one group can produce more
-than one id for the same elevator.
+missing, that group produces no id. If more than one group is configured, the first
+one (in the given order) that produces an id is used as the elevator's id.
 
 <h3 id="elevatorRefTags_0_tagGroup">tagGroup</h3>
 

@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.Set;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -27,7 +26,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   private final double levels;
   private final int travelTime;
-  private final Set<String> ids;
+  private final String id;
 
   private ElevatorHopEdge(
     Vertex from,
@@ -36,14 +35,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Accessibility wheelchairAccessibility,
     double levels,
     int travelTime,
-    Set<String> ids
+    String id
   ) {
     super(from, to);
     this.permission = permission;
     this.wheelchairAccessibility = wheelchairAccessibility;
     this.levels = levels;
     this.travelTime = travelTime;
-    this.ids = Set.copyOf(ids);
+    this.id = id;
   }
 
   private ElevatorHopEdge(
@@ -52,15 +51,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairAccessibility
   ) {
-    this(
-      from,
-      to,
-      permission,
-      wheelchairAccessibility,
-      DEFAULT_LEVELS,
-      DEFAULT_TRAVEL_TIME,
-      Set.of()
-    );
+    this(from, to, permission, wheelchairAccessibility, DEFAULT_LEVELS, DEFAULT_TRAVEL_TIME, null);
   }
 
   public static void bidirectional(
@@ -70,10 +61,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Accessibility wheelchairBoarding,
     double levels,
     int travelTime,
-    Set<String> ids
+    String id
   ) {
-    createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime, ids);
-    createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime, ids);
+    createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime, id);
+    createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime, id);
   }
 
   public static ElevatorHopEdge createElevatorHopEdge(
@@ -91,7 +82,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       wheelchairAccessibility,
       levels,
       travelTime,
-      Set.of()
+      null
     );
   }
 
@@ -102,10 +93,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Accessibility wheelchairAccessibility,
     double levels,
     int travelTime,
-    Set<String> ids
+    String id
   ) {
     return connectToGraph(
-      new ElevatorHopEdge(from, to, permission, wheelchairAccessibility, levels, travelTime, ids)
+      new ElevatorHopEdge(from, to, permission, wheelchairAccessibility, levels, travelTime, id)
     );
   }
 
@@ -123,11 +114,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * The ids of the elevator, as extracted from OSM tags configured via the
+   * The id of the elevator, as extracted from OSM tags configured via the
    * {@code elevatorRefTags} build-config option. Will be used for #6533.
+   * <p>
+   * If multiple configured tag groups resolve to a value, the first one (in configured order)
+   * is used.
    */
-  public Set<String> ids() {
-    return ids;
+  public Optional<String> id() {
+    return Optional.ofNullable(id);
   }
 
   /**

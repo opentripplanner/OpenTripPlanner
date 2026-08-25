@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -193,7 +192,7 @@ class ElevatorProcessor {
         wheelchair,
         !node.isBicycleDenied(),
         (int) travelTime,
-        node.getCompoundTagValues(elevatorRefTags)
+        node.getCompoundTagValue(elevatorRefTags).orElse(null)
       );
       LOG.debug("Created elevator edges for node {}", node.getId());
     }
@@ -279,7 +278,7 @@ class ElevatorProcessor {
         wheelchair,
         !way.isBicycleDenied(),
         (int) travelTime,
-        way.getCompoundTagValues(elevatorRefTags)
+        way.getCompoundTagValue(elevatorRefTags).orElse(null)
       );
       LOG.debug("Created elevator edges for way {}", way.getId());
     }
@@ -318,7 +317,7 @@ class ElevatorProcessor {
     Accessibility wheelchair,
     boolean bicycleAllowed,
     int travelTime,
-    Set<String> ids
+    String id
   ) {
     // -1 because we loop over elevatorHopVertices two at a time
     for (int i = 0, vSize = elevatorHopVertices.size() - 1; i < vSize; i++) {
@@ -339,7 +338,7 @@ class ElevatorProcessor {
         wheelchair,
         Math.abs(toLevel.level() - fromLevel.level()),
         travelTime,
-        ids
+        id
       );
     }
   }

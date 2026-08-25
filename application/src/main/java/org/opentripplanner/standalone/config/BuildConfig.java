@@ -500,14 +500,14 @@ public class BuildConfig implements OtpDataStoreConfig {
     elevatorRefTags = root
       .of("elevatorRefTags")
       .since(V2_10)
-      .summary("Groups of OSM tags whose values are combined into elevator ids.")
+      .summary("Groups of OSM tags whose values are combined into an elevator id.")
       .description(
         """
         Each group is a list of one or more OSM tag keys. If every tag in a group is present
         on an elevator node/way, their values are joined with ':' (in the given order) into
         one id. A group with a single tag key produces a plain id. If any tag in a group is
-        missing, that group produces no id. Configuring more than one group can produce more
-        than one id for the same elevator."""
+        missing, that group produces no id. If more than one group is configured, the first
+        one (in the given order) that produces an id is used as the elevator's id."""
       )
       .asObjects(List.of(), node ->
         CompoundRefTagGroup.of(
