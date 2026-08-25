@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ContradictoryLevelAndInclineInfoForWay;
 import org.opentripplanner.graph_builder.issues.CouldNotApplyMultiLevelInfoToWay;
-import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;

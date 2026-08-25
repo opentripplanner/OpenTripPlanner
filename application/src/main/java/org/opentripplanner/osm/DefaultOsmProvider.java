@@ -9,7 +9,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
-import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;

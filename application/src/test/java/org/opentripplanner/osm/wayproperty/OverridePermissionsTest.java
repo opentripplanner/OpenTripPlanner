@@ -162,5 +162,4 @@ class OverridePermissionsTest {
     StreetTraversalPermission main,
     StreetTraversalPermission back
   ) {}
-
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.storage;
 
 import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 
@@ -43,7 +43,7 @@ import org.opentripplanner.streetadapter.VertexFactory;
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
  * more than once.
  */
-class VertexGenerator {
+public class VertexGenerator {
 
   private static final String NODE_LABEL_FORMAT = "osm:node:%d";
 
@@ -100,7 +100,7 @@ class VertexGenerator {
    * @return The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  IntersectionVertex getVertexForOsmNode(
+  public IntersectionVertex getVertexForOsmNode(
     OsmNode node,
     OsmEntity entity,
     LinearBarrierNodeType linearBarrierNodeType
@@ -254,15 +254,15 @@ class VertexGenerator {
    * Tracks OSM nodes which are decomposed into multiple graph vertices because they are
    * elevators. They can then be iterated over to build {@link ElevatorEdge} between them.
    */
-  Map<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes() {
+  public Map<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes() {
     return elevatorNodes;
   }
 
-  HashMap<OsmElevatorKey, OsmLevel> elevatorNodeLevels() {
+  public HashMap<OsmElevatorKey, OsmLevel> elevatorNodeLevels() {
     return elevatorNodeLevels;
   }
 
-  void initIntersectionNodes() {
+  public void initIntersectionNodes() {
     Set<Long> possibleIntersectionNodes = new HashSet<>();
     for (OsmWay way : osmdb.getWays()) {
       TLongList nodes = way.getNodeRefs();
@@ -287,7 +287,7 @@ class VertexGenerator {
     }
   }
 
-  Collection<OsmWay> getLinearBarriersAtNode(OsmNode node) {
+  public Collection<OsmWay> getLinearBarriersAtNode(OsmNode node) {
     return nodesInBarrierWays.get(node);
   }
 
@@ -296,7 +296,7 @@ class VertexGenerator {
    * the vertex is in. The null-indexed vertex, if exists, is the vertex which hasn't been split
    * for a particular area and is applicable for all linear crossing of the barrier.
    */
-  Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers() {
+  public Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers() {
     return splitVerticesOnBarriers;
   }
 
@@ -304,7 +304,7 @@ class VertexGenerator {
     return nodesInBarrierWays;
   }
 
-  void initNodesInBarrierWays() {
+  public void initNodesInBarrierWays() {
     for (OsmWay way : osmdb.getWays()) {
       if (way.isBarrier()) {
         TLongList nodes = way.getNodeRefs();
@@ -329,7 +329,7 @@ class VertexGenerator {
    * while it is still creating vertices. Use {@link #hasIntersectionVertex(long)} if you need to
    * know whether a vertex has actually been created.
    */
-  boolean isIntersectionNode(long nodeId) {
+  public boolean isIntersectionNode(long nodeId) {
     return intersectionNodes.containsKey(nodeId);
   }
 
@@ -343,7 +343,7 @@ class VertexGenerator {
    * de-duplicated away). Use this instead of {@link #isIntersectionNode(long)} when you need to
    * look up a vertex that must already exist.
    */
-  boolean hasIntersectionVertex(long nodeId) {
+  public boolean hasIntersectionVertex(long nodeId) {
     return intersectionNodes.get(nodeId) != null;
   }
 
@@ -351,7 +351,7 @@ class VertexGenerator {
    * Return the graph vertex already created for the given intersection node id. Throws an exception
    * if the node is not an intersection node, or a vertex hasn't been created for it yet.
    */
-  IntersectionVertex getIntersectionVertex(long nodeId) {
+  public IntersectionVertex getIntersectionVertex(long nodeId) {
     return Objects.requireNonNull(
       intersectionNodes.get(nodeId),
       "Intersection vertex %s not found.".formatted(nodeId)

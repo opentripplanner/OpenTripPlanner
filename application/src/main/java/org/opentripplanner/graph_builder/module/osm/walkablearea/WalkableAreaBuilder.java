@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.walkablearea;
 
 import static org.opentripplanner.graph_builder.module.osm.model.LinearBarrierNodeType.SPLIT;
 
@@ -22,11 +22,14 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.KeyValueCache;
+import org.opentripplanner.graph_builder.module.osm.SafetyValueApplier;
 import org.opentripplanner.graph_builder.module.osm.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.issues.UnconnectedArea;
 import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
 import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
 import org.opentripplanner.graph_builder.module.osm.model.Ring;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.VertexGenerator;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -55,7 +58,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
-class WalkableAreaBuilder {
+public class WalkableAreaBuilder {
 
   private final DataImportIssueStore issueStore;
   private final int maxAreaNodes;

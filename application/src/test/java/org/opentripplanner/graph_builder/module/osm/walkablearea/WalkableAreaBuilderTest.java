@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.walkablearea;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.stream.Collectors.toMap;
@@ -19,8 +19,11 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.SafetyValueApplier;
 import org.opentripplanner.graph_builder.module.osm.model.OsmArea;
 import org.opentripplanner.graph_builder.module.osm.model.OsmAreaGroup;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.VertexGenerator;
 import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;

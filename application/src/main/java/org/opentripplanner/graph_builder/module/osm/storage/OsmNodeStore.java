@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.storage;
 
 import gnu.trove.map.TLongByteMap;
 import gnu.trove.map.TLongLongMap;
