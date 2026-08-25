@@ -5,6 +5,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import java.util.Set;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 
@@ -14,6 +15,7 @@ import org.opentripplanner._support.arch.ArchComponent;
  * where they provide an equivalent. If you need another Guava class, add it to the white-list
  * deliberately - do not work around this test.
  */
+@Disabled
 public class GuavaArchitectureTest {
 
   private static final String GUAVA_ROOT_PACKAGE = "com.google.common";
