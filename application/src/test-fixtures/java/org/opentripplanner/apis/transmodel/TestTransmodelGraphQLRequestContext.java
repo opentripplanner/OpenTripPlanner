@@ -67,74 +67,74 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   }
 
   @Override
-  public RoutingService getRoutingService() {
+  public RoutingService routingService() {
     return routingService;
   }
 
   @Override
-  public TransitService getTransitService() {
+  public TransitService transitService() {
     return transitService;
   }
 
   @Nullable
   @Override
-  public TransitAlertService getTransitAlertService() {
+  public TransitAlertService transitAlertService() {
     return transitAlertService;
   }
 
   @Nullable
   @Override
-  public EmpiricalDelayService getEmpiricalDelayService() {
+  public EmpiricalDelayService empiricalDelayService() {
     return empiricalDelayService;
   }
 
   @Override
-  public RouteRequest getDefaultRouteRequest() {
+  public RouteRequest defaultRouteRequest() {
     return defaultRouteRequest;
   }
 
   @Override
-  public VehicleRentalService getVehicleRentalService() {
+  public VehicleRentalService vehicleRentalService() {
     return vehicleRentalService;
   }
 
   @Override
-  public VehicleParkingService getVehicleParkingService() {
+  public VehicleParkingService vehicleParkingService() {
     return vehicleParkingService;
   }
 
   @Override
-  public Graph getGraph() {
+  public Graph graph() {
     return graph;
   }
 
   @Override
-  public RegularTransferService getTransferService() {
+  public RegularTransferService transferService() {
     return transferService;
   }
 
   @Override
-  public StreetDetailsService getStreetDetailsService() {
+  public StreetDetailsService streetDetailsService() {
     return streetDetailsService;
   }
 
   @Override
-  public LinkingContextFactory getLinkingContextFactory() {
+  public LinkingContextFactory linkingContextFactory() {
     return linkingContextFactory;
   }
 
   @Override
-  public StreetLimitationParametersService getStreetLimitationParametersService() {
+  public StreetLimitationParametersService streetLimitationParametersService() {
     return streetLimitationParametersService;
   }
 
   @Override
-  public NearbyPlaceFinder getNearbyPlaceFinder() {
+  public NearbyPlaceFinder nearbyPlaceFinder() {
     return new StreetNearbyPlaceFinder(linkingContextFactory);
   }
 
   @Override
-  public NearbyStopFinder getNearbyStopFinder() {
+  public NearbyStopFinder nearbyStopFinder() {
     return graph.hasStreets
       ? StreetNearbyStopFinder.of(linkingContextFactory).build()
       : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);

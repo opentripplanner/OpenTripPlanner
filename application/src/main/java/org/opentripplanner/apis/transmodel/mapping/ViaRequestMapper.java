@@ -33,7 +33,7 @@ public class ViaRequestMapper {
    */
   public RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
     TransmodelGraphQLRequestContext context = environment.getContext();
-    RouteRequest request = context.getDefaultRouteRequest();
+    RouteRequest request = context.defaultRouteRequest();
 
     List<Map<String, Object>> viaInput = environment.getArgument("via");
     List<ViaLocationDeprecated> vias = viaInput

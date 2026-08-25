@@ -54,7 +54,7 @@ public class EmpiricalDelayType {
   public static EmpiricalDelay dataFetcherForTripTimeOnDate(DataFetchingEnvironment environment) {
     TripTimeOnDate parent = environment.getSource();
     TransmodelGraphQLRequestContext ctx = environment.getContext();
-    var service = ctx.getEmpiricalDelayService();
+    var service = ctx.empiricalDelayService();
 
     if (parent == null || service == null) {
       return null;

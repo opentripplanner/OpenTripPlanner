@@ -35,68 +35,68 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
   }
 
   @Override
-  public RoutingService getRoutingService() {
+  public RoutingService routingService() {
     return factory.routingService();
   }
 
   @Override
-  public TransitService getTransitService() {
+  public TransitService transitService() {
     return factory.transitService();
   }
 
   @Override
-  public TransitAlertService getTransitAlertService() {
+  public TransitAlertService transitAlertService() {
     return factory.transitAlertService();
   }
 
   @Nullable
   @Override
-  public EmpiricalDelayService getEmpiricalDelayService() {
+  public EmpiricalDelayService empiricalDelayService() {
     return factory.empiricalDelayService();
   }
 
   @Override
-  public RouteRequest getDefaultRouteRequest() {
+  public RouteRequest defaultRouteRequest() {
     return factory.defaultRouteRequest();
   }
 
   @Override
-  public VehicleRentalService getVehicleRentalService() {
+  public VehicleRentalService vehicleRentalService() {
     return factory.vehicleRentalService();
   }
 
   @Override
-  public VehicleParkingService getVehicleParkingService() {
+  public VehicleParkingService vehicleParkingService() {
     return factory.vehicleParkingService();
   }
 
   @Override
-  public Graph getGraph() {
+  public Graph graph() {
     return factory.graph();
   }
 
   @Override
-  public RegularTransferService getTransferService() {
+  public RegularTransferService transferService() {
     return factory.transferService();
   }
 
   @Override
-  public StreetDetailsService getStreetDetailsService() {
+  public StreetDetailsService streetDetailsService() {
     return factory.streetDetailsService();
   }
 
   @Override
-  public LinkingContextFactory getLinkingContextFactory() {
+  public LinkingContextFactory linkingContextFactory() {
     return factory.linkingContextFactory();
   }
 
   @Override
-  public StreetLimitationParametersService getStreetLimitationParametersService() {
+  public StreetLimitationParametersService streetLimitationParametersService() {
     return factory.streetLimitationParametersService();
   }
 
   @Override
-  public synchronized NearbyPlaceFinder getNearbyPlaceFinder() {
+  public synchronized NearbyPlaceFinder nearbyPlaceFinder() {
     if (nearbyPlaceFinder == null) {
       nearbyPlaceFinder = new StreetNearbyPlaceFinder(factory.linkingContextFactory());
     }
@@ -104,7 +104,7 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
   }
 
   @Override
-  public synchronized NearbyStopFinder getNearbyStopFinder() {
+  public synchronized NearbyStopFinder nearbyStopFinder() {
     if (nearbyStopFinder == null) {
       nearbyStopFinder = factory.graph().hasStreets
         ? StreetNearbyStopFinder.of(factory.linkingContextFactory()).build()

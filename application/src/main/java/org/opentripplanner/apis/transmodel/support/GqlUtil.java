@@ -34,29 +34,29 @@ public class GqlUtil {
   private GqlUtil() {}
 
   public static TransitService getTransitService(DataFetchingEnvironment environment) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getTransitService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).transitService();
   }
 
   public static TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getTransitAlertService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).transitAlertService();
   }
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getVehicleRentalService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).vehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(
     DataFetchingEnvironment environment
   ) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getVehicleParkingService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).vehicleParkingService();
   }
 
   public static NearbyPlaceFinder getNearbyPlaceFinder(DataFetchingEnvironment environment) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getNearbyPlaceFinder();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).nearbyPlaceFinder();
   }
 
   public static NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
-    return ((TransmodelGraphQLRequestContext) environment.getContext()).getNearbyStopFinder();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).nearbyStopFinder();
   }
 
   public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {

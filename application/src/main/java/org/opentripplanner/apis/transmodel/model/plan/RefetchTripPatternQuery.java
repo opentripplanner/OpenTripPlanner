@@ -213,13 +213,13 @@ public class RefetchTripPatternQuery {
     var to = mapLocation(environment.getArgument("to"));
 
     var refetcher = new RefetchItineraryService(
-      ctx.getGraph(),
-      ctx.getTransitService(),
-      ctx.getTransitAlertService(),
-      ctx.getTransferService(),
-      ctx.getStreetDetailsService(),
-      ctx.getLinkingContextFactory(),
-      ctx.getStreetLimitationParametersService()
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.transitAlertService(),
+      ctx.transferService(),
+      ctx.streetDetailsService(),
+      ctx.linkingContextFactory(),
+      ctx.streetLimitationParametersService()
     );
 
     try {

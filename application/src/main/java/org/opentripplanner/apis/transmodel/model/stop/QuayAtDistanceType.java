@@ -61,6 +61,6 @@ public class QuayAtDistanceType {
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<TransmodelGraphQLRequestContext>getContext().getTransitService();
+    return environment.<TransmodelGraphQLRequestContext>getContext().transitService();
   }
 }

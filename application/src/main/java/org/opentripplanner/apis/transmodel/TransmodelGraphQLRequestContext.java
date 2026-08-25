@@ -28,33 +28,33 @@ import org.opentripplanner.utils.lang.Sandbox;
  * TestTransmodelGraphQLRequestContext}) without needing a Dagger component at all.
  */
 public interface TransmodelGraphQLRequestContext {
-  RoutingService getRoutingService();
+  RoutingService routingService();
 
-  TransitService getTransitService();
+  TransitService transitService();
 
-  TransitAlertService getTransitAlertService();
+  TransitAlertService transitAlertService();
 
   @Nullable
   @Sandbox
-  EmpiricalDelayService getEmpiricalDelayService();
+  EmpiricalDelayService empiricalDelayService();
 
-  RouteRequest getDefaultRouteRequest();
+  RouteRequest defaultRouteRequest();
 
-  VehicleRentalService getVehicleRentalService();
+  VehicleRentalService vehicleRentalService();
 
-  VehicleParkingService getVehicleParkingService();
+  VehicleParkingService vehicleParkingService();
 
-  Graph getGraph();
+  Graph graph();
 
-  RegularTransferService getTransferService();
+  RegularTransferService transferService();
 
-  StreetDetailsService getStreetDetailsService();
+  StreetDetailsService streetDetailsService();
 
-  LinkingContextFactory getLinkingContextFactory();
+  LinkingContextFactory linkingContextFactory();
 
-  StreetLimitationParametersService getStreetLimitationParametersService();
+  StreetLimitationParametersService streetLimitationParametersService();
 
-  NearbyPlaceFinder getNearbyPlaceFinder();
+  NearbyPlaceFinder nearbyPlaceFinder();
 
-  NearbyStopFinder getNearbyStopFinder();
+  NearbyStopFinder nearbyStopFinder();
 }

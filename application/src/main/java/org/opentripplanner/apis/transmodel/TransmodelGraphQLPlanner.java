@@ -38,7 +38,7 @@ public class TransmodelGraphQLPlanner {
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
     try {
       var request = requestBuilder.buildRequest();
-      RoutingResponse res = ctx.getRoutingService().route(request);
+      RoutingResponse res = ctx.routingService().route(request);
       response = PlanResponse.of()
         .withPlan(res.getTripPlan())
         .withMetadata(res.getMetadata())
@@ -69,7 +69,7 @@ public class TransmodelGraphQLPlanner {
     Locale locale;
     try {
       var request = viaRequestMapper.createRouteViaRequest(environment);
-      response = ctx.getRoutingService().route(request);
+      response = ctx.routingService().route(request);
       locale = request.locale();
     } catch (InvalidRoutingInputException e) {
       throw new InvalidInputException(e.getMessage());
@@ -84,6 +84,6 @@ public class TransmodelGraphQLPlanner {
   }
 
   private static Locale defaultLocale(TransmodelGraphQLRequestContext ctx) {
-    return ctx.getDefaultRouteRequest().preferences().locale();
+    return ctx.defaultRouteRequest().preferences().locale();
   }
 }
