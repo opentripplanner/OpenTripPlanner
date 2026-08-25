@@ -66,6 +66,9 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   @Nullable
   private final String netexInternalPlanningCode;
 
+  @Nullable
+  private final String netexVehicleTypeId;
+
   Trip(TripBuilder builder) {
     super(builder.getId());
     // Required fields
@@ -93,6 +96,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     this.shapeId = builder.getShapeId();
     this.gtfsBlockId = builder.getGtfsBlockId();
     this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
+    this.netexVehicleTypeId = builder.getNetexVehicleTypeId();
   }
 
   public static TripBuilder of(FeedScopedId id) {
@@ -184,6 +188,14 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
+   * The id of the vehicle type planned to operate the trip.
+   */
+  @Nullable
+  public String getNetexVehicleTypeId() {
+    return netexVehicleTypeId;
+  }
+
+  /**
    * Default alteration for a trip.
    * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
@@ -220,6 +232,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
       Objects.equals(this.serviceId, other.serviceId) &&
       Objects.equals(this.netexInternalPlanningCode, other.netexInternalPlanningCode) &&
+      Objects.equals(this.netexVehicleTypeId, other.netexVehicleTypeId) &&
       Objects.equals(this.headsign, other.headsign) &&
       Objects.equals(this.gtfsBlockId, other.gtfsBlockId) &&
       Objects.equals(this.shapeId, other.shapeId) &&

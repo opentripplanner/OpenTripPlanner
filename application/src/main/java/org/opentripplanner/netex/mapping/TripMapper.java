@@ -107,6 +107,9 @@ class TripMapper {
 
     builder.withShortName(serviceJourney.getPublicCode());
     builder.withOperator(findOperator(serviceJourney));
+    builder.withNetexVehicleTypeId(
+      VehicleTypeRefMapper.mapVehicleTypeRef(serviceJourney.getVehicleTypeRef())
+    );
 
     if (serviceJourney.getTransportMode() != null) {
       NetexMainAndSubMode transitMode = null;

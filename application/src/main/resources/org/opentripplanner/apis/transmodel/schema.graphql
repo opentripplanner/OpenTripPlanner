@@ -197,6 +197,17 @@ type DatedServiceJourney {
   serviceJourney: ServiceJourney!
   "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
+  """
+  A reference to the vehicle operating the dated service journey, as reported by real-time
+  data.
+  """
+  vehicleRef: String
+  """
+  A reference to the type of vehicle to use on the dated service journey.
+  A vehicle type given for the operating day takes precedence over the one given for
+  the service journey.
+  """
+  vehicleTypeRef: String
 }
 
 "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
@@ -1352,6 +1363,8 @@ type ServiceJourney {
   situations: [PtSituationElement!]!
   transportMode: TransportMode
   transportSubmode: TransportSubmode
+  "A reference to the type of vehicle to use on the service journey."
+  vehicleTypeRef: String
   "Whether service journey is accessible with wheelchair."
   wheelchairAccessible: WheelchairBoarding
 }

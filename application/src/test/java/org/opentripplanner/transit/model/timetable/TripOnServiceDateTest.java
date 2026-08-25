@@ -19,6 +19,7 @@ class TripOnServiceDateTest {
   );
   public static final LocalDate SERVICE_DATE = LocalDate.now();
   public static final String TRIP_ID = "tripId";
+  private static final String NETEX_VEHICLE_TYPE_ID = "RUT:VehicleType:1";
   private static final TripOnServiceDate SUBJECT = TripOnServiceDate.of(
     FeedScopedIdForTestFactory.id(ID)
   )
@@ -26,6 +27,7 @@ class TripOnServiceDateTest {
     .withServiceDate(SERVICE_DATE)
     .withTripAlteration(TRIP_ALTERATION)
     .withReplacementFor(REPLACEMENT_FOR)
+    .withNetexVehicleTypeId(NETEX_VEHICLE_TYPE_ID)
     .build();
 
   @Test
@@ -40,6 +42,7 @@ class TripOnServiceDateTest {
     assertEquals(TRIP_ID, copy.getTrip().getId().getId());
     assertEquals(TRIP_ALTERATION, copy.getTripAlteration());
     assertEquals(REPLACEMENT_FOR, copy.getReplacementFor());
+    assertEquals(NETEX_VEHICLE_TYPE_ID, copy.getNetexVehicleTypeId());
   }
 
   @Test
@@ -51,6 +54,7 @@ class TripOnServiceDateTest {
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTripAlteration(TripAlteration.PLANNED).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withRealtimeExtraJourney(true).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withNetexVehicleTypeId("X").build()));
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()

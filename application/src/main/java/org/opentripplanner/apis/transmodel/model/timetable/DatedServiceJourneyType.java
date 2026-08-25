@@ -12,6 +12,7 @@ import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -21,6 +22,7 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -87,6 +89,33 @@ public class DatedServiceJourneyType {
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(environment -> tripOnServiceDate(environment).isExtraJourney())
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleTypeRef")
+          .type(Scalars.GraphQLString)
+          .description(
+            """
+            A reference to the type of vehicle to use on the dated service journey.
+            A vehicle type given for the operating day takes precedence over the one given for
+            the service journey.
+            """
+          )
+          .dataFetcher(environment -> tripOnServiceDate(environment).getNetexVehicleTypeId())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleRef")
+          .type(Scalars.GraphQLString)
+          .description(
+            """
+            A reference to the vehicle operating the dated service journey, as reported by real-time
+            data.
+            """
+          )
+          .dataFetcher(DatedServiceJourneyType::vehicleRef)
+          .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -223,6 +252,16 @@ public class DatedServiceJourneyType {
           .build()
       )
       .build();
+  }
+
+  @Nullable
+  private static String vehicleRef(DataFetchingEnvironment env) {
+    TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
+    TripTimes<?> tripTimes = GqlUtil.getTransitService(env)
+      .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
+      .orElse(null);
+
+    return tripTimes == null ? null : tripTimes.getVehicleId().orElse(null);
   }
 
   private static TripPattern tripPattern(DataFetchingEnvironment env) {
