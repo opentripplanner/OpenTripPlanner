@@ -34,14 +34,13 @@ public class TripOnServiceDateMatcherFactory {
   /**
    * Creates a matcher for TripOnServiceDates.
    *
-   * @param request the criteria for filtering TripOnServiceDates.
-   * @param patternResolver resolves the pattern of a trip on a service date, or {@code null} if it
-   *                        has no pattern.
-   * @param runningTimeResolver resolves the period of time a trip is running according to its
-   *                            schedule, from the departure from the first stop to the arrival at
-   *                            the last stop. Returns {@code null} if the running time cannot be
-   *                            resolved, in which case the trip never matches a running time
-   *                            filter.
+   * @param request             the criteria for filtering TripOnServiceDates.
+   * @param patternResolver     resolves the pattern of a trip on a service date, or {@code null} if
+   *                            it has no pattern.
+   * @param runningTimeResolver resolves a trip's runtime according to its schedule, from the
+   *                            departure from the first stop to the arrival at the last stop.
+   *                            Returns {@code null} if the running time cannot be resolved, in
+   *                            which case the trip never matches a running time filter.
    * @return a matcher for filtering TripOnServiceDates.
    */
   public static Matcher<TripOnServiceDate> of(

@@ -200,16 +200,16 @@ public sealed interface TripTimes<T extends TripTimes>
   int getNumStops();
 
   /**
-   * Resolves the period of time this trip is running on a service day, according to its schedule.
-   * The period starts at the scheduled departure from the first stop and ends at the scheduled
-   * arrival at the last stop.
+   * resolves a trip's runtime on a service day, according to its schedule. The period starts at the
+   * scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
    * <p>
    *
    * @param startOfService the start of the service day the trip is running on, see
-   *                       {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
-   * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip has
-   *         no stops or because the departure from the first stop or the arrival at the last stop is
-   *         missing or inconsistent.
+   *                       {@link
+   *                       org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
+   * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
+   * has no stops or because the departure from the first stop or the arrival at the last stop is
+   * missing or inconsistent.
    */
   @Nullable
   default TimePeriod scheduledRunningTime(Instant startOfService) {
