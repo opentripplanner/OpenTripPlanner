@@ -98,20 +98,20 @@ public class ApiTransitService {
    * Find the canceled stop calls at the given stop. A call is included if either the trip it
    * belongs to has been canceled, or the visit at this stop has been canceled (skipped). Only calls
    * whose trip's service date is within any of the given service date ranges are returned. If
-   * {@code runningTimePeriods} is non-null, only calls of trips which are scheduled to be running
-   * during one of the periods are returned. The {@code arrivalDeparture} parameter controls whether
-   * drop-off-only calls are included. Each call is paired with the {@link TripOnServiceDate} it
-   * belongs to, which is synthesized when no real one exists.
+   * {@code callTimePeriods} is non-null, only calls where the vehicle is scheduled to visit the
+   * stop during one of the periods are returned. The {@code arrivalDeparture} parameter controls
+   * whether drop-off-only calls are included. Each call is paired with the {@link TripOnServiceDate}
+   * it belongs to, which is synthesized when no real one exists.
    */
   public List<StopCallOnTripOnServiceDate> findCanceledStopCalls(
     StopLocation stop,
     List<LocalDateRange> serviceDateRanges,
-    @Nullable List<TimePeriod> runningTimePeriods,
+    @Nullable List<TimePeriod> callTimePeriods,
     ArrivalDeparture arrivalDeparture
   ) {
     var request = TripTimeOnDateRequest.of(List.of(stop))
       .withServiceDateRanges(serviceDateRanges)
-      .withIncludeRunningTimePeriods(runningTimePeriods)
+      .withIncludeCallTimePeriods(callTimePeriods)
       .withArrivalDeparture(arrivalDeparture)
       .withNumberOfDepartures(Integer.MAX_VALUE)
       .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)

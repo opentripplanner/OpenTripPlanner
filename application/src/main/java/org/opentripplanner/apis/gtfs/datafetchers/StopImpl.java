@@ -150,32 +150,22 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         ? List.of(LocalDateRange.ofUnbounded())
         : LocalDateRangeUtil.mapRanges(rawRanges);
       var arrivalDeparture = ArrivalDepartureMapper.map(args.getGraphQLArrivalDeparture());
-      var runningTimePeriods = OffsetDateTimeRangeUtil.mapRanges(
-        args.getGraphQLRunningTimeRanges(),
-        "runningTimeRanges"
+      var callTimePeriods = OffsetDateTimeRangeUtil.mapRanges(
+        args.getGraphQLTimeRanges(),
+        "timeRanges"
       );
       var service = new ApiTransitService(getTransitService(environment));
       return getValue(
         environment,
         stop ->
-          service.findCanceledStopCalls(
-            stop,
-            serviceDateRanges,
-            runningTimePeriods,
-            arrivalDeparture
-          ),
+          service.findCanceledStopCalls(stop, serviceDateRanges, callTimePeriods, arrivalDeparture),
         station ->
           station
             .getChildStops()
             .stream()
             .flatMap(stop ->
               service
-                .findCanceledStopCalls(
-                  stop,
-                  serviceDateRanges,
-                  runningTimePeriods,
-                  arrivalDeparture
-                )
+                .findCanceledStopCalls(stop, serviceDateRanges, callTimePeriods, arrivalDeparture)
                 .stream()
             )
             .collect(Collectors.toList())

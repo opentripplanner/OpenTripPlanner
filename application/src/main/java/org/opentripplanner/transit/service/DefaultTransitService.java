@@ -374,9 +374,9 @@ public class DefaultTransitService implements TransitService {
   }
 
   /**
-   * Resolves the period of time a trip is running on its service date according to its schedule.
-   * The period starts at the scheduled departure from the first stop and ends at the scheduled
-   * arrival at the last stop.
+   * Resolves a trip's runtime on its service date according to its schedule. The period starts at
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
+   * stop.
    *
    * @return {@code null} if the schedule of the trip cannot be resolved.
    */

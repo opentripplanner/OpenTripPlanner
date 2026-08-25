@@ -21,15 +21,15 @@ public class TripTimeOnDateRequestBuilder {
 
   private static final String INCLUDE_AGENCIES = "includeAgencies";
   private static final String INCLUDE_ROUTES = "includeRoutes";
-  private static final String INCLUDE_RUNNING_TIME_PERIODS = "includeRunningTimePeriods";
+  private static final String INCLUDE_CALL_TIME_PERIODS = "includeCallTimePeriods";
   private static final String EXCLUDE_AGENCIES = "excludeAgencies";
   private static final String INCLUDE_MODES = "includeModes";
   private static final String EXCLUDE_ROUTES = "excludeRoutes";
   private static final String EXCLUDE_MODES = "excludeModes";
   private final Collection<StopLocation> stopLocations;
   private CancellationPolicy cancellationPolicy = CancellationPolicy.NO_CANCELLATIONS;
-  private FilterValues<TimePeriod> includeRunningTimePeriods = FilterValues.ofNullIsEverything(
-    INCLUDE_RUNNING_TIME_PERIODS,
+  private FilterValues<TimePeriod> includeCallTimePeriods = FilterValues.ofNullIsEverything(
+    INCLUDE_CALL_TIME_PERIODS,
     null
   );
   private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
@@ -92,16 +92,16 @@ public class TripTimeOnDateRequestBuilder {
   }
 
   /**
-   * Only include trip times of trips which are running, according to their schedule, during one of
-   * the given periods. A trip is running from the scheduled departure from its first stop until the
-   * scheduled arrival at its last stop.
+   * Only include calls where the vehicle is scheduled to visit the stop during one of the given
+   * periods. The visit at a stop lasts from the scheduled arrival at the stop until the scheduled
+   * departure from it.
    */
-  public TripTimeOnDateRequestBuilder withIncludeRunningTimePeriods(
-    @Nullable Collection<TimePeriod> runningTimePeriods
+  public TripTimeOnDateRequestBuilder withIncludeCallTimePeriods(
+    @Nullable Collection<TimePeriod> callTimePeriods
   ) {
-    this.includeRunningTimePeriods = FilterValues.ofNullIsEverything(
-      INCLUDE_RUNNING_TIME_PERIODS,
-      runningTimePeriods
+    this.includeCallTimePeriods = FilterValues.ofNullIsEverything(
+      INCLUDE_CALL_TIME_PERIODS,
+      callTimePeriods
     );
     return this;
   }
@@ -175,7 +175,7 @@ public class TripTimeOnDateRequestBuilder {
       numberOfDepartures,
       sortOrder,
       cancellationPolicy,
-      includeRunningTimePeriods,
+      includeCallTimePeriods,
       includeAgencies,
       includeRoutes,
       excludeAgencies,

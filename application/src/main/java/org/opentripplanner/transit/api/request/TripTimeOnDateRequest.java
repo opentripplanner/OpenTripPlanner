@@ -28,7 +28,7 @@ public class TripTimeOnDateRequest {
 
   private final List<LocalDateRange> serviceDateRanges;
   private final CancellationPolicy cancellationPolicy;
-  private final FilterValues<TimePeriod> includeRunningTimePeriods;
+  private final FilterValues<TimePeriod> includeCallTimePeriods;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
@@ -50,7 +50,7 @@ public class TripTimeOnDateRequest {
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
     CancellationPolicy cancellationPolicy,
-    FilterValues<TimePeriod> includeRunningTimePeriods,
+    FilterValues<TimePeriod> includeCallTimePeriods,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
@@ -67,7 +67,7 @@ public class TripTimeOnDateRequest {
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
     this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
-    this.includeRunningTimePeriods = includeRunningTimePeriods;
+    this.includeCallTimePeriods = includeCallTimePeriods;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
@@ -115,12 +115,13 @@ public class TripTimeOnDateRequest {
   }
 
   /**
-   * The periods of time during which a trip has to be running, according to its schedule, for its
-   * calls to be included. A trip is running from the scheduled departure from its first stop until
-   * the scheduled arrival at its last stop.
+   * Limit the returned output to the defined periods of time based on when the vehicle is
+   * scheduled to visit the stop. At least one of the periods has to overlap with the visit at the
+   * stop, which lasts from the scheduled arrival at the stop until the scheduled departure from
+   * it.
    */
-  public FilterValues<TimePeriod> includeRunningTimePeriods() {
-    return includeRunningTimePeriods;
+  public FilterValues<TimePeriod> includeCallTimePeriods() {
+    return includeCallTimePeriods;
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {

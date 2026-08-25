@@ -5206,8 +5206,8 @@ public class GraphQLTypes {
   public static class GraphQLStopCanceledCallsArgs {
 
     private GraphQLArrivalDeparture arrivalDeparture;
-    private List<GraphQLOffsetDateTimeRangeInput> runningTimeRanges;
     private List<GraphQLLocalDateRangeInput> serviceDateRanges;
+    private List<GraphQLOffsetDateTimeRangeInput> timeRanges;
 
     public GraphQLStopCanceledCallsArgs(Map<String, Object> args) {
       if (args != null) {
@@ -5218,18 +5218,16 @@ public class GraphQLTypes {
             (String) args.get("arrivalDeparture")
           );
         }
-        if (args.get("runningTimeRanges") != null) {
-          this.runningTimeRanges = ((List<Map<String, Object>>) args.get(
-              "runningTimeRanges"
-            )).stream()
-            .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
-            .collect(Collectors.toList());
-        }
         if (args.get("serviceDateRanges") != null) {
           this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
               "serviceDateRanges"
             )).stream()
             .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("timeRanges") != null) {
+          this.timeRanges = ((List<Map<String, Object>>) args.get("timeRanges")).stream()
+            .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
             .collect(Collectors.toList());
         }
       }
@@ -5239,26 +5237,24 @@ public class GraphQLTypes {
       return this.arrivalDeparture;
     }
 
-    public List<GraphQLOffsetDateTimeRangeInput> getGraphQLRunningTimeRanges() {
-      return this.runningTimeRanges;
-    }
-
     public List<GraphQLLocalDateRangeInput> getGraphQLServiceDateRanges() {
       return this.serviceDateRanges;
+    }
+
+    public List<GraphQLOffsetDateTimeRangeInput> getGraphQLTimeRanges() {
+      return this.timeRanges;
     }
 
     public void setGraphQLArrivalDeparture(GraphQLArrivalDeparture arrivalDeparture) {
       this.arrivalDeparture = arrivalDeparture;
     }
 
-    public void setGraphQLRunningTimeRanges(
-      List<GraphQLOffsetDateTimeRangeInput> runningTimeRanges
-    ) {
-      this.runningTimeRanges = runningTimeRanges;
-    }
-
     public void setGraphQLServiceDateRanges(List<GraphQLLocalDateRangeInput> serviceDateRanges) {
       this.serviceDateRanges = serviceDateRanges;
+    }
+
+    public void setGraphQLTimeRanges(List<GraphQLOffsetDateTimeRangeInput> timeRanges) {
+      this.timeRanges = timeRanges;
     }
   }
 

@@ -2443,23 +2443,23 @@ type Stop implements Node & PlaceInterface {
     """
     arrivalDeparture: ArrivalDeparture = EITHER,
     """
-    Only include canceled calls whose trip is scheduled to be running during one of these time
-    ranges. A trip is considered to be running from its scheduled departure from the first stop
-    until its scheduled arrival at the last stop.
-        
-    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
-    value is `null`, no filtering is applied.
-        
-    If both `runningTimeRanges` and `serviceDateRanges` are defined, a call has to match both of
-    them to be returned.
-    """
-    runningTimeRanges: [OffsetDateTimeRangeInput!],
-    """
     Only include canceled calls whose trip's service date is within any of these date ranges.
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire
     transit service period are returned. Defining a range is recommended.
     """
-    serviceDateRanges: [LocalDateRangeInput!]
+    serviceDateRanges: [LocalDateRangeInput!],
+    """
+    Only include canceled calls where the vehicle is scheduled to visit this stop during one of
+    these time ranges. The visit at a stop lasts from the scheduled arrival at the stop until the
+    scheduled departure from it.
+        
+    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
+    value is `null`, no filtering is applied.
+        
+    If both `timeRanges` and `serviceDateRanges` are defined, a call has to match both of
+    them to be returned.
+    """
+    timeRanges: [OffsetDateTimeRangeInput!]
   ): [StopCallOnTripOnServiceDate!]!
   "The cluster which this stop is part of"
   cluster: Cluster @deprecated(reason : "Not implemented")

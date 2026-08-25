@@ -291,7 +291,7 @@ class ApiTransitServiceTest {
   }
 
   @Test
-  void canceledStopCallsFilteredByRunningTime() {
+  void canceledStopCallsFilteredByCallTime() {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
@@ -300,13 +300,26 @@ class ApiTransitServiceTest {
 
     var service = new ApiTransitService(env.transitService());
 
-    // The trip runs from 12:00 to 13:00 on the service date
+    // The vehicle visits STOP_B at 12:30 on the service date
     var overlapping = List.of(
-      TimePeriod.of(instant(LocalTime.of(12, 45)), instant(LocalTime.of(14, 0)))
+      TimePeriod.of(instant(LocalTime.of(12, 15)), instant(LocalTime.of(12, 45)))
     );
     assertThat(
       service.findCanceledStopCalls(STOP_B, SERVICE_DATE_RANGES, overlapping, ArrivalDeparture.BOTH)
     ).hasSize(1);
+
+    // The trip runs from 12:00 until 13:00 but the vehicle does not visit STOP_B during this range
+    var duringTripButNotAtStop = List.of(
+      TimePeriod.of(instant(LocalTime.of(12, 45)), instant(LocalTime.of(13, 0)))
+    );
+    assertThat(
+      service.findCanceledStopCalls(
+        STOP_B,
+        SERVICE_DATE_RANGES,
+        duringTripButNotAtStop,
+        ArrivalDeparture.BOTH
+      )
+    ).isEmpty();
 
     var notOverlapping = List.of(
       TimePeriod.of(instant(LocalTime.of(13, 30)), instant(LocalTime.of(14, 0)))
