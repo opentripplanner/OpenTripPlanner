@@ -116,6 +116,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Expose scheduled quay [#7739](https://github.com/opentripplanner/OpenTripPlanner/pull/7739)
 - Document the transaction framework and cleanup module test [#7894](https://github.com/opentripplanner/OpenTripPlanner/pull/7894)
 - Frequency-based vehicle position matching [#7927](https://github.com/opentripplanner/OpenTripPlanner/pull/7927)
+- Move per-network GBFS configuration into a shared gbfs section of otp-config.json [#7886](https://github.com/opentripplanner/OpenTripPlanner/pull/7886)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
