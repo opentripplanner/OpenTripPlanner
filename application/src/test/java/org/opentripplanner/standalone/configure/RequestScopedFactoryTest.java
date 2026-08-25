@@ -164,17 +164,15 @@ class RequestScopedFactoryTest {
     var requestOne = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isSameInstanceAs(requestOne.transitService());
     assertThat(requestOne.transactionScope()).isSameInstanceAs(requestOne.transactionScope());
-    assertThat(requestOne.graphQLRequestContext()).isSameInstanceAs(
-      requestOne.graphQLRequestContext()
-    );
-    assertThat(requestOne.graphQLRequestContext().transitService()).isSameInstanceAs(
+    assertThat(requestOne.gtfsRequestContext()).isSameInstanceAs(requestOne.gtfsRequestContext());
+    assertThat(requestOne.gtfsRequestContext().transitService()).isSameInstanceAs(
       requestOne.transitService()
     );
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isNotSameInstanceAs(requestTwo.transitService());
-    assertThat(requestOne.graphQLRequestContext()).isNotSameInstanceAs(
-      requestTwo.graphQLRequestContext()
+    assertThat(requestOne.gtfsRequestContext()).isNotSameInstanceAs(
+      requestTwo.gtfsRequestContext()
     );
   }
 
