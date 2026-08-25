@@ -4,7 +4,6 @@ import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -173,7 +172,7 @@ public class AtlantaFareService extends DefaultFareService {
    * values are not available therefore the default test price is used instead.
    */
   protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-    return calculateCost(fareType, Lists.newArrayList(leg), fareRules).orElse(Money.ZERO_USD);
+    return calculateCost(fareType, List.of(leg), fareRules).orElse(Money.ZERO_USD);
   }
 
   private static class TransferMeta {

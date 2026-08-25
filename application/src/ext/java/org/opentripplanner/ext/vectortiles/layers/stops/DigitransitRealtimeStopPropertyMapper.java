@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -39,16 +39,14 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
-    long currentTimeSeconds = currentTime.getEpochSecond();
-
-    Set<TransitAlert> stopAlerts = transitAlertService.getStopLocationsAlerts(
-      stop.getIdAndParentStationId()
-    );
-    boolean noServiceAlert = stopAlerts.stream().anyMatch(alert -> alert.noServiceAt(currentTime));
+    var stopAlerts = transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId());
+    boolean noServiceAlert = stopAlerts
+      .stream()
+      .anyMatch(alert -> alert.effect() == AlertEffect.NO_SERVICE && alert.isActiveAt(currentTime));
 
     var validAlerts = stopAlerts
       .stream()
-      .filter(alert -> alert.displayDuring(currentTimeSeconds, currentTimeSeconds))
+      .filter(alert -> alert.isActiveAt(currentTime))
       .toList();
 
     var mostSevereAlert = validAlerts

@@ -370,7 +370,7 @@ illegal itinerary.
 - **Zone-set tracking** on `State.currentGeofencingZones` — updated at boundary edges in
   `StateEditor.updateGeofencingZones()`. `isDropOffBannedByCurrentZones` /
   `isTraversalBannedByCurrentZones` resolve overlapping zones by priority. Business areas are
-  excluded from the initial set when `applyBusinessAreas` is false (see
+  excluded from the initial set when `requireDropOffInsideBusinessArea` is false (see
   `GeofencingZoneApplier.preResolveVertexZones`) so a disabled BA can't mask restrictive zones via
   priority resolution.
 - **Set-level traversal-ban guard** in `TraversalBanHandler.apply()`: any renting state inside a

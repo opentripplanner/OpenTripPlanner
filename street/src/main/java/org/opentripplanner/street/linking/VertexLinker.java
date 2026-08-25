@@ -744,7 +744,7 @@ public class VertexLinker {
       return false;
     } else if (scope == Scope.PERMANENT) {
       // marking the new vertex as visibilityVertex enables direct connections to it
-      areaGroup.addVisibilityVertices(Set.of(newVertex));
+      areaGroup.addVisibilityVertex(newVertex);
     }
     return true;
   }

@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import gnu.trove.list.TLongList;
-import gnu.trove.map.TLongObjectMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import org.locationtech.jts.algorithm.Orientation;
@@ -49,11 +49,11 @@ class Ring {
     jtsPolygon = calculateJtsPolygon();
   }
 
-  public Ring(TLongList osmNodes, TLongObjectMap<OsmNode> _nodes) {
+  public Ring(TLongList osmNodes, LongFunction<OsmNode> nodeById) {
     // The collection needs to be mutable, so collect into an ArrayList
     this(
       LongStream.of(osmNodes.toArray())
-        .mapToObj(_nodes::get)
+        .mapToObj(nodeById)
         .collect(Collectors.toCollection(ArrayList::new))
     );
   }

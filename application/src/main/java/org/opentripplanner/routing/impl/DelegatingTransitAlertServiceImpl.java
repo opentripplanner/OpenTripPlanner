@@ -126,12 +126,13 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndRouteAlerts(
     FeedScopedId stop,
     FeedScopedId route,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   ) {
     return transitAlertServices
       .stream()
       .map(transitAlertService ->
-        transitAlertService.getStopAndRouteAlerts(stop, route, stopConditions)
+        transitAlertService.getStopAndRouteAlerts(stop, route, stopConditions, direction)
       )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());

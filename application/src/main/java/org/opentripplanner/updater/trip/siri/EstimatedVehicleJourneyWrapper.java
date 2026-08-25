@@ -207,6 +207,18 @@ final class EstimatedVehicleJourneyWrapper {
     return Optional.ofNullable(journey.getOccupancy()).map(OccupancyMapper::mapOccupancyStatus);
   }
 
+  public List<JourneyRelationWrapper> journeyRelations() {
+    if (journey.getJourneyRelations() == null) {
+      return List.of();
+    }
+    return journey
+      .getJourneyRelations()
+      .getJourneyRelations()
+      .stream()
+      .map(relation -> new JourneyRelationWrapper(relation, calls))
+      .toList();
+  }
+
   Optional<String> dataSource() {
     return Optional.ofNullable(journey.getDataSource());
   }

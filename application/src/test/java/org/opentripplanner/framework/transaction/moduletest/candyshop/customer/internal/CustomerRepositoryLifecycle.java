@@ -1,6 +1,8 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.customer;
+package org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal;
 
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
 
 /**
  * This life-cycle will create a new mutable repository for each transaction and freeze it into a
@@ -13,11 +15,11 @@ public class CustomerRepositoryLifecycle
 
   @Override
   public CustomerRepository copyOnWrite(CustomerRepositorySnapshot snapshot) {
-    return snapshot.copyOnWrite();
+    return ((DefaultCustomerRepository) snapshot).copyOnWrite();
   }
 
   @Override
   public CustomerRepositorySnapshot freeze(CustomerRepository repository) {
-    return repository.freeze();
+    return ((DefaultCustomerRepository) repository).freeze();
   }
 }

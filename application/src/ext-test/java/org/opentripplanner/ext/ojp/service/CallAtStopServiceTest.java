@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -108,11 +109,13 @@ class CallAtStopServiceTest {
       }
 
       @Override
-      public List<NearbyStop> findNearbyStops(
+      public Collection<NearbyStop> findNearbyStops(
         Vertex vertex,
         RouteRequest routingRequest,
         StreetMode streetMode,
-        boolean reverseDirection
+        boolean reverseDirection,
+        Duration durationLimit,
+        int maxStopCount
       ) {
         return List.of();
       }

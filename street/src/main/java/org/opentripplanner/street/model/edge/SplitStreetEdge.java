@@ -1,7 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
-import com.google.common.collect.Iterators;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,11 +15,11 @@ public record SplitStreetEdge(StreetEdge head, StreetEdge tail) implements Itera
   @Override
   public Iterator<StreetEdge> iterator() {
     if (head == null && tail == null) {
-      return Iterators.forArray();
+      return Collections.emptyIterator();
     } else if (head != null && tail != null) {
-      return Iterators.forArray(head, tail);
+      return List.of(head, tail).iterator();
     } else {
-      return Iterators.singletonIterator(Objects.requireNonNullElse(head, tail));
+      return List.of(Objects.requireNonNullElse(head, tail)).iterator();
     }
   }
 }

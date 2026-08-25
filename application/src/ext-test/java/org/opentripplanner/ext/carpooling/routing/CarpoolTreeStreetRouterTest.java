@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -60,6 +63,15 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     );
 
     router = new CarpoolTreeStreetRouter();
+  }
+
+  /**
+   * Clears the interrupt flag so that a cancellation raised by one test cannot surface as a
+   * spurious {@link OTPRequestTimeoutException} in an unrelated test sharing the same thread.
+   */
+  @AfterEach
+  void clearInterruptFlag() {
+    Thread.interrupted();
   }
 
   @Test
@@ -183,6 +195,30 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
     var path = router.route(vertexA, vertexDisconnected);
     assertNull(path, "Should return null for unreachable vertex in the same graph");
+  }
+
+  /**
+   * The tree is built inside {@code route}, so a cancelled request surfaces there. A cancellation
+   * carries no verdict on whether the leg is routable: it must be raised as an exception rather
+   * than reported as a missing path, and it must leave nothing behind that would answer a later
+   * query for the same pair. A missing path is memoized — the pair is put in the path cache as
+   * {@code null} and every later query for it is answered from the cache without rebuilding the
+   * tree — so a cancelled call that entered that cache would make the pair permanently unroutable.
+   * The tree registration must survive for the same reason: consuming it leaves no tree to route
+   * the pair with.
+   */
+  @Test
+  void propagateCancellationInsteadOfReturningNull() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+
+    Thread.currentThread().interrupt();
+    assertThrows(OTPRequestTimeoutException.class, () -> router.route(vertexA, vertexC));
+    Thread.interrupted();
+
+    assertNotNull(
+      router.route(vertexA, vertexC),
+      "A cancelled call must leave behind neither a cached null nor a consumed registration"
+    );
   }
 
   @Test

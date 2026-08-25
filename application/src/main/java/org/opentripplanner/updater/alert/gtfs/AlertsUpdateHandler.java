@@ -9,6 +9,8 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,14 +18,17 @@ import java.util.Map;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -32,12 +37,13 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
  */
 public class AlertsUpdateHandler {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AlertsUpdateHandler.class);
   private static final int MISSING_INT_FIELD_VALUE = -1;
   private String feedId;
   private TransitAlertService transitAlertService;
 
   /** How long before the posted start of an event it should be displayed to users */
-  private long earlyStart;
+  private Duration earlyStart = Duration.ZERO;
 
   /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
   private final boolean fuzzyTripMatching;
@@ -57,7 +63,11 @@ public class AlertsUpdateHandler {
       }
       GtfsRealtime.Alert alert = entity.getAlert();
       String id = entity.getId();
-      alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
+      try {
+        alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
+      } catch (Exception e) {
+        LOG.warn("Failed to map GTFS-RT alert with id {}: {}", id, e.getMessage(), e);
+      }
     }
     transitAlertService.setAlerts(alerts);
   }
@@ -72,7 +82,7 @@ public class AlertsUpdateHandler {
     this.transitAlertService = transitAlertService;
   }
 
-  public void setEarlyStart(long earlyStart) {
+  public void setEarlyStart(Duration earlyStart) {
     this.earlyStart = earlyStart;
   }
 
@@ -89,19 +99,22 @@ public class AlertsUpdateHandler {
       .withCause(getAlertCauseForGtfsRtCause(alert.getCause()))
       .withEffect(getAlertEffectForGtfsRtEffect(alert.getEffect()));
 
-    ArrayList<TimePeriod> periods = new ArrayList<>();
     if (alert.getActivePeriodCount() > 0) {
+      ArrayList<TimePeriod> periods = new ArrayList<>();
       for (TimeRange activePeriod : alert.getActivePeriodList()) {
-        final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
-        final long start = activePeriod.hasStart() ? realStart - earlyStart : 0;
-        final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : TimePeriod.OPEN_ENDED;
-        periods.add(new TimePeriod(start, end));
+        final Instant start = activePeriod.hasStart()
+          ? Instant.ofEpochSecond(activePeriod.getStart()).minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.hasEnd()
+          ? Instant.ofEpochSecond(activePeriod.getEnd())
+          : null;
+        periods.add(TimePeriod.of(start, end));
       }
+      alertBuilder.withCalendar(AlertCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
+      alertBuilder.withCalendar(AlertCalendar.ofAlwaysActive());
     }
-    alertBuilder.addTimePeriods(periods);
 
     for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
       if (fuzzyTripMatching && informed.hasTrip()) {

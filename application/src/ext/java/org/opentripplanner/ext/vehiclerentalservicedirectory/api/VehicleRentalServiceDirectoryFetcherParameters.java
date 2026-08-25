@@ -1,44 +1,34 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**
  * Parameters for fetching vehicle rental services from a GBFS v3 manifest.json file.
  * The manifest can be loaded from a remote URL or a local file path.
+ * <p>
+ * Per-network settings are not configured here: they live in the shared {@code gbfs} section of
+ * {@code otp-config.json} and reach the fetcher as
+ * {@link org.opentripplanner.gbfs.network.GbfsNetworkOverrides}.
  */
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
-  public static final String DEFAULT_NETWORK_NAME = "default-network";
   private final URI url;
 
   private final HttpHeaders headers;
 
-  private final String language;
-
-  private final Map<String, NetworkParameters> parametersForNetwork;
-
   @Nullable
-  private final NetworkParameters defaultNetwork;
+  private final String language;
 
   public VehicleRentalServiceDirectoryFetcherParameters(
     URI url,
-    String language,
-    HttpHeaders headers,
-    Collection<NetworkParameters> networkParameters
+    @Nullable String language,
+    HttpHeaders headers
   ) {
     this.url = url;
     this.language = language;
     this.headers = headers;
-    this.parametersForNetwork = networkParameters
-      .stream()
-      .collect(Collectors.toMap(NetworkParameters::network, it -> it));
-    this.defaultNetwork = parametersForNetwork.get(DEFAULT_NETWORK_NAME);
   }
 
   /**
@@ -61,11 +51,8 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     return headers;
   }
 
+  @Nullable
   public String getLanguage() {
     return language;
-  }
-
-  public Optional<NetworkParameters> networkParameters(String network) {
-    return Optional.ofNullable(parametersForNetwork.getOrDefault(network, defaultNetwork));
   }
 }

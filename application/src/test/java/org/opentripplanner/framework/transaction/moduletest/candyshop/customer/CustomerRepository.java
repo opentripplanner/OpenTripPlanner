@@ -1,20 +1,7 @@
 package org.opentripplanner.framework.transaction.moduletest.candyshop.customer;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.AbstractRepository;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
 
-public class CustomerRepository extends AbstractRepository<Customer> {
-
-  public CustomerRepository(Map<Integer, Customer> entitiesById) {
-    super(entitiesById);
-  }
-
-  public CustomerRepository() {
-    this(new HashMap<>());
-  }
-
-  CustomerRepositorySnapshot freeze() {
-    return new CustomerRepositorySnapshot(copyOfEntitiesById());
-  }
+public interface CustomerRepository {
+  Customer save(Customer customer);
 }

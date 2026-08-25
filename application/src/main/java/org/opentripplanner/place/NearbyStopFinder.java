@@ -1,5 +1,6 @@
 package org.opentripplanner.place;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
@@ -15,12 +16,16 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public interface NearbyStopFinder {
   /**
    * Return all stops within a certain distance from the given vertex.
+   *
+   * @param maxStopCount The maximum stops to return. 0 means no limit.
    */
   Collection<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
     StreetMode streetMode,
-    boolean reverseDirection
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount
   );
 
   /**

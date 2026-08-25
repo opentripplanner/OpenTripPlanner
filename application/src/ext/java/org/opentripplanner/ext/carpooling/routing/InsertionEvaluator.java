@@ -129,7 +129,7 @@ public class InsertionEvaluator {
 
     GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
-      LOG.error("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
+      LOG.info("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
       return List.of();
     }
 
@@ -191,7 +191,7 @@ public class InsertionEvaluator {
   ) {
     GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
-      LOG.warn("Could not route baseline for trip {}", tripWithVertices.trip().getId());
+      LOG.info("Could not route baseline for trip {}", tripWithVertices.trip().getId());
       return null;
     }
 

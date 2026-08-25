@@ -7,8 +7,14 @@ import {
   NavigationControl,
   MapRef,
 } from 'react-map-gl/maplibre';
-import { AttributionControl, VectorTileSource } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+
+// maplibre-gl resolves its worker script relative to `import.meta.url` at runtime, which Vite
+// cannot statically detect and therefore never copies into the build output. Point it at the
+// worker asset Vite does bundle instead.
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
@@ -69,14 +75,14 @@ export function MapView({
     // in such a case we pan to the area that is specified in the tile bounds, which is
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
-      const source = map.getSource('stops') as VectorTileSource;
+      const source = map.getSource('stops') as maplibregl.VectorTileSource;
       map.fitBounds(source.bounds, { animate: false });
     }
   };
 
   const onLoad = (e: MapEvent) => {
     const map = e.target;
-    map.addControl(new AttributionControl(), 'bottom-left');
+    map.addControl(new maplibregl.AttributionControl(), 'bottom-left');
   };
 
   function handleMapLoad(e: MapEvent) {
@@ -96,7 +102,7 @@ export function MapView({
       <Map
         attributionControl={false}
         // @ts-ignore
-        mapLib={import('maplibre-gl')}
+        mapLib={maplibregl}
         // @ts-ignore
         mapStyle={styleUrl}
         onDblClick={onMapDoubleClick}

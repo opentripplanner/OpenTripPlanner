@@ -14,12 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -66,32 +67,34 @@ public class RealtimeStopsLayerTest {
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();
-    var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
-    var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
+    var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toInstant();
+    var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toInstant();
+    var calendar = AlertCalendar.of(TimePeriod.of(startDate, endDate));
     var alert = TransitAlert.of(id("alert-1"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withCalendar(calendar)
       .withEffect(AlertEffect.NO_SERVICE)
       .withSeverity(AlertSeverity.WARNING)
       .build();
     var severeAlert = TransitAlert.of(id("alert-2"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withCalendar(calendar)
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.WARNING)
       .build();
     var infoAlert = TransitAlert.of(id("alert-3"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(startDate, endDate))
+      .withCalendar(calendar)
       .withEffect(AlertEffect.MODIFIED_SERVICE)
       .withSeverity(AlertSeverity.INFO)
       .build();
 
-    var expiredStartDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(3).toEpochSecond();
-    var expiredEndDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(2).toEpochSecond();
+    var expiredStartDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(3).toInstant();
+    var expiredEndDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(2).toInstant();
+    var expiredCalendar = AlertCalendar.of(TimePeriod.of(expiredStartDate, expiredEndDate));
     var expiredAlert = TransitAlert.of(id("alert-4"))
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(expiredStartDate, expiredEndDate))
+      .withCalendar(expiredCalendar)
       .withEffect(AlertEffect.DETOUR)
       .withSeverity(AlertSeverity.SEVERE)
       .build();

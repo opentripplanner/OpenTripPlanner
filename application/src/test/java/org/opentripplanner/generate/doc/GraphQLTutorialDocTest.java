@@ -8,16 +8,17 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 
-import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.TemplateUtil;
+import org.opentripplanner.test.support.ResourceLoader;
 
 @GeneratesDocumentation
 public class GraphQLTutorialDocTest {
+
+  private static final ResourceLoader RESOURCES = ResourceLoader.of(GraphQLTutorialDocTest.class);
 
   private static final File TEMPLATE = new File(TEMPLATE_PATH, "GraphQL-Tutorial.md");
 
@@ -46,9 +47,9 @@ public class GraphQLTutorialDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private static String getGraphQlQuery(String resourceName) throws IOException {
-    var url = Resources.getResource("org/opentripplanner/apis/gtfs/queries/" + resourceName);
-    var query = TemplateUtil.graphQlExample(Resources.toString(url, StandardCharsets.UTF_8));
+  private static String getGraphQlQuery(String resourceName) {
+    var content = RESOURCES.fileToString("/org/opentripplanner/apis/gtfs/queries/" + resourceName);
+    var query = TemplateUtil.graphQlExample(content);
     assertNotNull(query);
     return query;
   }
