@@ -162,6 +162,12 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
     SORTED_SET(Collections.unmodifiableSortedSet(new TreeSet<Void>()).getClass()) {
       @Override
       Object toKryoSerializedObject(Object source) {
+        if (((SortedSet<?>) source).comparator() != null) {
+          throw new UnsupportedOperationException(
+            "Serializing a SortedSet with a custom comparator is not supported, " +
+              "the comparator would be lost on deserialization."
+          );
+        }
         return new ArrayList<>((Collection<?>) source);
       }
 
@@ -184,6 +190,12 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
     SORTED_MAP(Collections.unmodifiableSortedMap(new TreeMap<Void, Void>()).getClass()) {
       @Override
       Object toKryoSerializedObject(Object source) {
+        if (((SortedMap<?, ?>) source).comparator() != null) {
+          throw new UnsupportedOperationException(
+            "Serializing a SortedMap with a custom comparator is not supported, " +
+              "the comparator would be lost on deserialization."
+          );
+        }
         return new HashMap<>((Map<?, ?>) source);
       }
 

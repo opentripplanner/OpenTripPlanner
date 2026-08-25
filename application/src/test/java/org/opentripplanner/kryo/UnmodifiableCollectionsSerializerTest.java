@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.io.Output;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -64,6 +65,14 @@ class UnmodifiableCollectionsSerializerTest {
   }
 
   @Test
+  void writeRejectsSortedSetWithCustomComparator() {
+    var original = Collections.unmodifiableSortedSet(
+      new TreeSet<>(Comparator.<String>reverseOrder())
+    );
+    assertThrows(UnsupportedOperationException.class, () -> roundTrip(original));
+  }
+
+  @Test
   void roundTripUnmodifiableMap() {
     var original = Collections.unmodifiableMap(new HashMap<>(Map.of("a", 1, "b", 2)));
     var result = roundTrip(original);
@@ -82,6 +91,14 @@ class UnmodifiableCollectionsSerializerTest {
     assertThat(new ArrayList<>(result.keySet())).containsExactly("a", "b", "c").inOrder();
     assertThat(result).containsExactly("a", 1, "b", 2, "c", 3);
     assertThrows(UnsupportedOperationException.class, () -> result.put("d", 4));
+  }
+
+  @Test
+  void writeRejectsSortedMapWithCustomComparator() {
+    var original = Collections.unmodifiableSortedMap(
+      new TreeMap<String, Integer>(Comparator.<String>reverseOrder())
+    );
+    assertThrows(UnsupportedOperationException.class, () -> roundTrip(original));
   }
 
   @Test

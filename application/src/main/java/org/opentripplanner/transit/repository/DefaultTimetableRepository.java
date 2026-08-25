@@ -165,7 +165,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
   /**
    * The trip calendar. Since {@link TripCalendars} is immutable, the mutable (not
    * {@link #readOnly}) instance and the frozen snapshot produced by {@link #createSnapshot()} can
-   * safely share the exact same value: the mutable instance's future calls to
+   * safely share the exact same value: the mutable instance's calls to
    * {@link #getOrCreateServiceIdForDate} simply reassign this field to a new value, never touching
    * the one the snapshot captured.
    */
