@@ -32,6 +32,7 @@ import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripMapperTest {
 
@@ -39,6 +40,7 @@ class TripMapperTest {
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
   private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("S001");
+  private static final String VEHICLE_TYPE_REF = "RUT:VehicleType:1";
   private static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
@@ -106,6 +108,36 @@ class TripMapperTest {
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
+    assertNull(trip.getNetexVehicleTypeId());
+  }
+
+  @Test
+  void mapTripWithVehicleTypeRef() {
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
+      new SiteRepository(),
+      ISSUE_STORE
+    );
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
+
+    TripMapper tripMapper = new TripMapper(
+      ID_FACTORY,
+      ISSUE_STORE,
+      transitBuilder.getOperatorsById(),
+      transitBuilder.getRoutes(),
+      new HierarchicalMapById<>(),
+      new HierarchicalMap<>(),
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
+    );
+
+    ServiceJourney serviceJourney = createExampleServiceJourney();
+    serviceJourney.setLineRef(LINE_REF);
+    serviceJourney.setVehicleTypeRef(
+      createWrappedRef(VEHICLE_TYPE_REF, VehicleTypeRefStructure.class)
+    );
+
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
+
+    assertEquals(VEHICLE_TYPE_REF, trip.getNetexVehicleTypeId());
   }
 
   @Test
