@@ -1,14 +1,15 @@
 package org.opentripplanner.transit.service;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -36,79 +37,106 @@ class TransitRepositoryIndex {
   private static final Logger LOG = LoggerFactory.getLogger(TransitRepositoryIndex.class);
 
   // TODO: consistently key on model object or id string
-  private final Map<FeedScopedId, Agency> agencyForId = new HashMap<>();
-  private final Map<FeedScopedId, Operator> operatorForId = new HashMap<>();
+  private final Map<FeedScopedId, Agency> agencyForId;
+  private final Map<FeedScopedId, Operator> operatorForId;
 
-  private final Map<FeedScopedId, Trip> tripForId = new HashMap<>();
-  private final Map<FeedScopedId, Route> routeForId = new HashMap<>();
+  private final Map<FeedScopedId, Trip> tripForId;
+  private final Map<FeedScopedId, Route> routeForId;
 
-  private final Map<Trip, TripPattern> patternForTrip = new HashMap<>();
-  private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-  private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
+  private final Map<Trip, TripPattern> patternForTrip;
+  private final Multimap<Route, TripPattern> patternsForRoute;
+  private final Multimap<StopLocation, TripPattern> patternsForStop;
 
-  private Map<StopLocation, LocalDate> endOfServiceDateForStop = new HashMap<>();
-  private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay =
-    new HashMap<>();
+  private final Map<StopLocation, LocalDate> endOfServiceDateForStop;
+  private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay;
 
-  private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes = ArrayListMultimap.create();
+  private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes;
 
-  private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
+  private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId;
   private FlexIndex flexIndex = null;
 
   TransitRepositoryIndex(TransitRepository transitRepository) {
     LOG.info("Timetable repository index init...");
 
-    for (Agency agency : transitRepository.getAgencies()) {
-      this.agencyForId.put(agency.getId(), agency);
-    }
+    this.agencyForId = transitRepository
+      .getAgencies()
+      .stream()
+      .collect(Collectors.toUnmodifiableMap(Agency::getId, Function.identity()));
 
-    for (Operator operator : transitRepository.getOperators()) {
-      this.operatorForId.put(operator.getId(), operator);
-    }
+    this.operatorForId = transitRepository
+      .getOperators()
+      .stream()
+      .collect(Collectors.toUnmodifiableMap(Operator::getId, Function.identity()));
+
+    // tripForId and routeForId are amended further down by the flex-routing block below, so they
+    // stay mutable until the very end of the constructor, when they are made immutable.
+    Map<FeedScopedId, Trip> tripForIdBuilder = new HashMap<>();
+    Map<FeedScopedId, Route> routeForIdBuilder = new HashMap<>();
+    Map<Trip, TripPattern> patternForTripBuilder = new HashMap<>();
+    ImmutableListMultimap.Builder<Route, TripPattern> patternsForRouteBuilder =
+      ImmutableListMultimap.builder();
+    ImmutableListMultimap.Builder<StopLocation, TripPattern> patternsForStopBuilder =
+      ImmutableListMultimap.builder();
 
     for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
-      patternsForRoute.put(pattern.getRoute(), pattern);
+      patternsForRouteBuilder.put(pattern.getRoute(), pattern);
       pattern
         .scheduledTripsAsStream()
         .forEach(trip -> {
-          patternForTrip.put(trip, pattern);
-          tripForId.put(trip.getId(), trip);
+          patternForTripBuilder.put(trip, pattern);
+          tripForIdBuilder.put(trip.getId(), trip);
         });
       for (StopLocation stop : pattern.getStops()) {
-        patternsForStop.put(stop, pattern);
+        patternsForStopBuilder.put(stop, pattern);
       }
     }
+    this.patternForTrip = Map.copyOf(patternForTripBuilder);
+    this.patternsForRoute = patternsForRouteBuilder.build();
+    this.patternsForStop = patternsForStopBuilder.build();
+
+    ImmutableListMultimap.Builder<GroupOfRoutes, Route> routesForGroupOfRoutesBuilder =
+      ImmutableListMultimap.builder();
     for (Route route : patternsForRoute.asMap().keySet()) {
-      routeForId.put(route.getId(), route);
+      routeForIdBuilder.put(route.getId(), route);
       for (GroupOfRoutes groupOfRoutes : route.getGroupsOfRoutes()) {
-        routesForGroupOfRoutes.put(groupOfRoutes, route);
+        routesForGroupOfRoutesBuilder.put(groupOfRoutes, route);
       }
     }
-    for (GroupOfRoutes groupOfRoutes : routesForGroupOfRoutes.keySet()) {
-      groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
-    }
+    this.routesForGroupOfRoutes = routesForGroupOfRoutesBuilder.build();
+    this.groupOfRoutesForId = routesForGroupOfRoutes
+      .keySet()
+      .stream()
+      .collect(Collectors.toUnmodifiableMap(GroupOfRoutes::getId, Function.identity()));
 
-    for (TripOnServiceDate tripOnServiceDate : transitRepository.getAllTripsOnServiceDates()) {
-      tripOnServiceDateForTripAndDay.put(
-        new TripIdAndServiceDate(
-          tripOnServiceDate.getTrip().getId(),
-          tripOnServiceDate.getServiceDate()
-        ),
-        tripOnServiceDate
+    this.tripOnServiceDateForTripAndDay = transitRepository
+      .getAllTripsOnServiceDates()
+      .stream()
+      .collect(
+        Collectors.toUnmodifiableMap(
+          tripOnServiceDate ->
+            new TripIdAndServiceDate(
+              tripOnServiceDate.getTrip().getId(),
+              tripOnServiceDate.getServiceDate()
+            ),
+          Function.identity(),
+          // keep the last entry, matching the previous Map.put-based behaviour
+          (first, second) -> second
+        )
       );
-    }
 
-    initializeServiceData(transitRepository.getTripCalendar());
+    this.endOfServiceDateForStop = initializeServiceData(transitRepository.getTripCalendar());
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(transitRepository);
       for (Route route : flexIndex.getAllFlexRoutes()) {
-        routeForId.put(route.getId(), route);
+        routeForIdBuilder.put(route.getId(), route);
       }
       for (FlexTrip flexTrip : flexIndex.getAllFlexTrips()) {
-        tripForId.put(flexTrip.getId(), flexTrip.getTrip());
+        tripForIdBuilder.put(flexTrip.getId(), flexTrip.getTrip());
       }
     }
+    this.tripForId = Map.copyOf(tripForIdBuilder);
+    this.routeForId = Map.copyOf(routeForIdBuilder);
 
     LOG.info("Timetable repository index init complete.");
   }
@@ -131,7 +159,7 @@ class TransitRepositoryIndex {
   }
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop) {
-    return Collections.unmodifiableCollection(patternsForStop.get(stop));
+    return patternsForStop.get(stop);
   }
 
   /**
@@ -154,7 +182,7 @@ class TransitRepositoryIndex {
   }
 
   Collection<Trip> getAllTrips() {
-    return Collections.unmodifiableCollection(tripForId.values());
+    return tripForId.values();
   }
 
   Trip getTripForId(FeedScopedId tripId) {
@@ -176,7 +204,7 @@ class TransitRepositoryIndex {
   }
 
   Collection<Route> getAllRoutes() {
-    return Collections.unmodifiableCollection(routeForId.values());
+    return routeForId.values();
   }
 
   TripPattern getPatternForTrip(Trip trip) {
@@ -184,16 +212,16 @@ class TransitRepositoryIndex {
   }
 
   Collection<TripPattern> getPatternsForRoute(Route route) {
-    return Collections.unmodifiableCollection(patternsForRoute.get(route));
+    return patternsForRoute.get(route);
   }
 
   FlexIndex getFlexIndex() {
     return flexIndex;
   }
 
-  private void initializeServiceData(TripCalendars tripCalendar) {
+  private Map<StopLocation, LocalDate> initializeServiceData(TripCalendars tripCalendar) {
     if (tripCalendar == null) {
-      return;
+      return Map.of();
     }
     // Reconstruct set of all dates where service is defined, keeping track of which services
     // run on which days.
@@ -208,10 +236,10 @@ class TransitRepositoryIndex {
         }
       }
     }
-    initializeTheEndOfServiceDateForStop(endOfServiceDateForService);
+    return initializeTheEndOfServiceDateForStop(endOfServiceDateForService);
   }
 
-  private void initializeTheEndOfServiceDateForStop(
+  private Map<StopLocation, LocalDate> initializeTheEndOfServiceDateForStop(
     Map<FeedScopedId, LocalDate> endOfServiceDateForService
   ) {
     Map<StopLocation, LocalDate> endOfServiceDates = new HashMap<>();
@@ -231,15 +259,15 @@ class TransitRepositoryIndex {
           });
       }
     }
-    endOfServiceDateForStop = Map.copyOf(endOfServiceDates);
+    return Map.copyOf(endOfServiceDates);
   }
 
   Collection<GroupOfRoutes> getAllGroupOfRoutes() {
-    return Collections.unmodifiableCollection(groupOfRoutesForId.values());
+    return groupOfRoutesForId.values();
   }
 
   Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes) {
-    return Collections.unmodifiableCollection(routesForGroupOfRoutes.get(groupOfRoutes));
+    return routesForGroupOfRoutes.get(groupOfRoutes);
   }
 
   GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id) {
