@@ -8,6 +8,8 @@ import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
+import org.opentripplanner.gbfs.network.GeofencingZoneScope;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -46,6 +48,7 @@ public class VehicleRentalServiceDirectoryFetcher {
 
   public static List<GraphUpdater<?>> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     VertexLinker vertexLinker,
     VehicleRentalRepository repository
   ) {
@@ -68,20 +71,22 @@ public class VehicleRentalServiceDirectoryFetcher {
       repository,
       otpHttpClientFactory
     );
-    return serviceDirectory.createUpdatersFromManifest(parameters, manifest);
+    return serviceDirectory.createUpdatersFromManifest(parameters, overrides, manifest);
   }
 
   public List<GraphUpdater<?>> createUpdatersFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     GBFSManifest manifest
   ) {
     return fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
-      buildListOfNetworksFromManifest(parameters, manifest)
+      buildListOfNetworksFromManifest(parameters, overrides, manifest)
     );
   }
 
   private static List<GbfsVehicleRentalDataSourceParameters> buildListOfNetworksFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
+    GbfsNetworkOverrides overrides,
     GBFSManifest manifest
   ) {
     List<GbfsVehicleRentalDataSourceParameters> dataSources = new ArrayList<>();
@@ -95,29 +100,29 @@ public class VehicleRentalServiceDirectoryFetcher {
         continue;
       }
 
-      var config = parameters.networkParameters(networkName);
+      var config = overrides.forNetwork(networkName);
 
-      if (config.isPresent()) {
-        var networkParams = config.get();
-        dataSources.add(
-          new GbfsVehicleRentalDataSourceParameters(
-            gbfsUrl.get(),
-            parameters.getLanguage(),
-            networkParams.allowKeepingAtDestination(),
-            parameters.getHeaders(),
-            networkName,
-            networkParams.geofencingZones(),
-            // geofencingBusinessAreaBorders - default to true
-            true,
-            // overloadingAllowed - not part of GBFS, not supported here
-            false,
-            // rentalPickupType not supported
-            RentalPickupType.ALL
-          )
-        );
-      } else {
+      if (config.isEmpty()) {
         LOG.warn("Network not configured in OTP: {}", networkName);
+        continue;
       }
+
+      var networkParams = config.get();
+      dataSources.add(
+        new GbfsVehicleRentalDataSourceParameters(
+          gbfsUrl.get(),
+          parameters.getLanguage(),
+          networkParams.allowKeepingVehicleAtDestination(),
+          parameters.getHeaders(),
+          networkName,
+          networkParams.geofencingZoneScope() == GeofencingZoneScope.REALTIME,
+          networkParams.requireDropOffInsideBusinessArea(),
+          // overloadingAllowed - not part of GBFS, not supported here
+          false,
+          // rentalPickupType not supported
+          RentalPickupType.ALL
+        )
+      );
     }
     return dataSources;
   }
