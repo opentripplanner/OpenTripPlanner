@@ -285,7 +285,7 @@ class OsmAreaGroupTest {
   }
 
   private static OsmArea createArea(OsmWay closedWay) {
-    return new OsmArea(closedWay, List.of(closedWay), List.of(), NODES);
+    return new OsmArea(closedWay, List.of(closedWay), List.of(), NODES::get);
   }
 
   private static Multimap<OsmNode, OsmWay> generateBarrierMap(OsmWay... barriers) {

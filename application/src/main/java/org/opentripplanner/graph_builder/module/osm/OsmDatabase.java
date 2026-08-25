@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.collection.TroveUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
@@ -43,8 +44,8 @@ public class OsmDatabase {
   private final DataImportIssueStore issueStore;
   private final OsmLevelFactory osmLevelFactory;
 
-  /* Map of all nodes used in ways/areas keyed by their OSM ID */
-  private final TLongObjectMap<OsmNode> nodesById = new TLongObjectHashMap<>();
+  // Nodes used in ways/areas, keyed by their OSM ID. See OsmNodeStore for why this isn't a plain map.
+  private final OsmNodeStore nodes = new OsmNodeStore();
 
   /* Map of all bike parking nodes, keyed by their OSM ID */
   private final TLongObjectMap<OsmNode> bikeParkingNodes = new TLongObjectHashMap<>();
@@ -119,11 +120,19 @@ public class OsmDatabase {
     this.osmLevelFactory = new OsmLevelFactory(issueStore);
   }
 
-  public OsmNode getNode(Long nodeId) {
-    return nodesById.get(nodeId);
+  public OsmNode getNode(long nodeId) {
+    return nodes.get(nodeId);
   }
 
-  public OsmWay getWay(Long wayId) {
+  /**
+   * Returns just the coordinate of the given node. Cheaper than {@code getNode(nodeId).getCoordinate()}
+   * for call sites that don't need the node's tags or provider.
+   */
+  public Coordinate getNodeCoordinate(long nodeId) {
+    return nodes.getCoordinate(nodeId);
+  }
+
+  public OsmWay getWay(long wayId) {
     return waysById.get(wayId);
   }
 
@@ -131,12 +140,12 @@ public class OsmDatabase {
     return Collections.unmodifiableCollection(waysById.valueCollection());
   }
 
-  public boolean isAreaWay(Long wayId) {
+  public boolean isAreaWay(long wayId) {
     return areaWayIds.contains(wayId);
   }
 
-  public int nodeCount() {
-    return nodesById.size();
+  int nodeCount() {
+    return nodes.size();
   }
 
   public int wayCount() {
@@ -248,10 +257,7 @@ public class OsmDatabase {
       return;
     }
 
-    if (nodesById.containsKey(node.getId())) {
-      return;
-    }
-    nodesById.put(node.getId(), node);
+    nodes.add(node);
   }
 
   public void addWay(OsmWay way) {
@@ -385,12 +391,12 @@ public class OsmDatabase {
       TLongIterator longIterator = way.getNodeRefs().iterator();
       while (longIterator.hasNext()) {
         long nodeRef = longIterator.next();
-        if (!nodesById.containsKey(nodeRef)) {
+        if (!nodes.contains(nodeRef)) {
           continue AREA;
         }
       }
       try {
-        addArea(new OsmArea(way, List.of(way), Collections.emptyList(), nodesById));
+        addArea(new OsmArea(way, List.of(way), Collections.emptyList(), this::getNode));
         // do not keep the way used in an area, it creates duplicated edges from the basic
         // street graph and from the area processing
         waysById.remove(way.getId());
@@ -436,7 +442,7 @@ public class OsmDatabase {
         TLongIterator wayNodeIterator = way.getNodeRefs().iterator();
         while (wayNodeIterator.hasNext()) {
           long nodeId = wayNodeIterator.next();
-          if (nodesById.containsKey(nodeId)) {
+          if (nodes.contains(nodeId)) {
             TroveUtils.addToMapSet(areasForNode, nodeId, way);
           } else {
             // this area is missing some nodes, perhaps because it is on
@@ -452,7 +458,7 @@ public class OsmDatabase {
       }
       processedAreas.add(relation);
       try {
-        addArea(new OsmArea(relation, outerWays, innerWays, nodesById));
+        addArea(new OsmArea(relation, outerWays, innerWays, this::getNode));
       } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
       }
@@ -649,7 +655,7 @@ public class OsmDatabase {
     for (OsmRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
         case NODE -> {
-          var node = nodesById.get(member.getRef());
+          var node = getNode(member.getRef());
           if (node != null) {
             if (node.isPlatformAccess()) {
               platformNodes.add(node);
