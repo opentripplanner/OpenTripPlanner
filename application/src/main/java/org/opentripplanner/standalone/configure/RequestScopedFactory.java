@@ -100,7 +100,7 @@ public interface RequestScopedFactory {
 
   TransmodelGraphQLRequestContext transmodelRequestContext();
 
-  GtfsGraphQLRequestContext graphQLRequestContext();
+  GtfsGraphQLRequestContext gtfsRequestContext();
 
   @Subcomponent.Builder
   interface Builder {

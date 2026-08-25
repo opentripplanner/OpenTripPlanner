@@ -87,7 +87,7 @@ final class DaggerToJerseyBridge extends AbstractBinder {
       RequestScopedFactory::transmodelRequestContext,
       TransmodelGraphQLRequestContext.class
     );
-    bridge(factory, RequestScopedFactory::graphQLRequestContext, GtfsGraphQLRequestContext.class);
+    bridge(factory, RequestScopedFactory::gtfsRequestContext, GtfsGraphQLRequestContext.class);
   }
 
   /**

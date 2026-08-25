@@ -56,7 +56,7 @@ public class WarmupLauncher {
     var requestScopedFactory = requestScopedFactorySupplier.get();
     var schema = switch (parameters.api()) {
       case TRANSMODEL -> requestScopedFactory.transmodelGraphQLSchema().schema();
-      case GTFS -> requestScopedFactory.graphQLRequestContext().schema();
+      case GTFS -> requestScopedFactory.gtfsRequestContext().schema();
     };
     if (schema == null) {
       LOG.warn(
