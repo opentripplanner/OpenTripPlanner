@@ -606,7 +606,7 @@ type PtSituationElement {
   summary: [MultilingualString!]!
   "Period this situation is in effect"
   validityPeriod: ValidityPeriod @deprecated(reason : "Use validityPeriods instead")
-  "The validity periods this situation is in effect, sorted in chronological order. There is always at least one period."
+  "The periods in which this situation is valid, sorted in chronological order. There is always at least one period."
   validityPeriods: [ValidityPeriod!]!
   "Operator's version number for the situation element."
   version: Int

@@ -11,7 +11,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The validity of an alert, expressed as a non-empty set of {@link TimePeriod}s. The alert is valid
- * if any of the periods is valid. An alert always has at least one period: if the source data does
+ * if any of the periods are valid. An alert always has at least one period: if the source data does
  * not contain any validity information, the alert is {@link #ofAlwaysActive() always active}.
  */
 public final class AlertCalendar {
