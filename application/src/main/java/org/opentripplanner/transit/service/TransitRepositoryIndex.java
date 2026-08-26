@@ -118,9 +118,7 @@ class TransitRepositoryIndex {
               tripOnServiceDate.getTrip().getId(),
               tripOnServiceDate.getServiceDate()
             ),
-          Function.identity(),
-          // keep the last entry, matching the previous Map.put-based behaviour
-          (first, second) -> second
+          Function.identity()
         )
       );
 
