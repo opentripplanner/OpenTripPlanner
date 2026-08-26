@@ -183,9 +183,9 @@ public class GraphBuilder implements Runnable {
         factory.empiricalDelayGraphBuilder(),
         OTPFeature.EmpiricalDelay
       );
-
-      graphBuilder.addModuleOptional(factory.carPickupZoneGraphBuilder(), OTPFeature.CarPickupZone);
     }
+
+    graphBuilder.addModuleOptional(factory.carPickupZoneGraphBuilder(), OTPFeature.CarPickupZone);
 
     if (loadStreetGraph || dataSources.hasOsm()) {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());

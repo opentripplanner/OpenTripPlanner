@@ -124,6 +124,13 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public boolean hasTransitData() {
+    return hasOneOf(GTFS, NETEX);
+  }
+
+  /**
+   * Unlike {@link #hasTransitData()}, car pickup zone data never populates the TransitRepository.
+   */
+  public boolean hasTransitOrCarPickupZoneData() {
     return hasOneOf(GTFS, NETEX, CAR_PICKUP_ZONE);
   }
 
@@ -349,7 +356,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOsm() && !hasTransitData()) {
+      if (!hasOsm() && !hasTransitOrCarPickupZoneData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
@@ -370,7 +377,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasTransitData()) {
+      if (!hasTransitOrCarPickupZoneData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }
