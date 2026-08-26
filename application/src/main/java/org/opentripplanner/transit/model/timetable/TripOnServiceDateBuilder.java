@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.timetable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
@@ -16,8 +15,6 @@ public class TripOnServiceDateBuilder
   private TripAlteration tripAlteration;
   private boolean realtimeExtraJourney;
   private List<TripOnServiceDate> replacementFor = List.of();
-
-  @Nullable
   private String netexVehicleTypeId;
 
   TripOnServiceDateBuilder(FeedScopedId id) {
@@ -59,7 +56,7 @@ public class TripOnServiceDateBuilder
     return this;
   }
 
-  public TripOnServiceDateBuilder withNetexVehicleTypeId(@Nullable String netexVehicleTypeId) {
+  public TripOnServiceDateBuilder withNetexVehicleTypeId(String netexVehicleTypeId) {
     this.netexVehicleTypeId = netexVehicleTypeId;
     return this;
   }
@@ -84,7 +81,6 @@ public class TripOnServiceDateBuilder
     return replacementFor;
   }
 
-  @Nullable
   public String getNetexVehicleTypeId() {
     return netexVehicleTypeId;
   }
