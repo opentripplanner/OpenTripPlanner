@@ -816,7 +816,23 @@ type Leg {
   accessibilityScore: Float
   "For transit legs, the transit agency that operates the service used for this leg. For non-transit legs, `null`."
   agency: Agency
-  "Applicable alerts for this leg."
+  """
+  Applicable alerts for this leg. The following conditions lead to an alert being added to the leg:
+    
+  - The boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
+    For the itinerary's very first transit leg, alerts flagged as relevant to the first departure only are also included.
+  - The alighting stop: same stop/route/trip matching as above, restricted to alerts relevant to arrivals.
+  - Intermediate stops: stops the leg passes through without boarding or alighting. Only alerts flagged
+    as relevant to passing through are included, and each is checked against that specific stop's
+    scheduled time rather than the leg's overall time span.
+    If you wish to show _all_ alerts of the intermediate stops, you can list them, for example in
+    the `stopCalls` resolver, and list their alerts.
+  - The trip: alerts scoped to the entire trip (optionally limited to a specific service date).
+  - The route: alerts scoped to the whole route, independent of stop or direction.
+  - The agency: alerts scoped to the agency, applying across all of its routes and trips.
+  - Parent stations: for a stop that belongs to a station, alerts on the parent station are included
+    as well, if it is a boarding or alighting station.
+  """
   alerts: [Alert]
   """
   For transit leg, the offset from the scheduled arrival time of the alighting
