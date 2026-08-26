@@ -19,18 +19,21 @@ import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.AbstractRepository;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Entity;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.Customer;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositoryLifecycle;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal.CustomerRepositoryLifecycle;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal.DefaultCustomerRepository;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerEventHandler;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerOrderDomainEvent;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.event.OrderEventHandler;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.Order;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepositorySnapshot;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderService;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.order.internal.DefaultOrderRepository;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.order.internal.OrderRepositoryLifecycle;
+import org.opentripplanner.framework.transaction.moduletest.candyshop.order.model.Order;
 
 /**
  * This test demonstrates how the snapshot framework can be used with two repositories. The example
@@ -67,13 +70,13 @@ public class TransactionFrameworkTest {
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
   private RepositoryHandle<CustomerRepositorySnapshot, CustomerRepository> customerRepoHandler;
-  private RepositoryHandle<OrderRepositorySnapshot, OrderRepository> orderRepoHandler;
+  private RepositoryHandle<OrderService, OrderRepository> orderRepoHandler;
   private final List<TestEvent> eventLog = new ArrayList<>();
 
   @BeforeEach
   public void setUp() throws Exception {
-    CustomerRepository customerRepository = new CustomerRepository();
-    OrderRepository orderRepository = new OrderRepository();
+    CustomerRepository customerRepository = DefaultCustomerRepository.of();
+    OrderRepository orderRepository = DefaultOrderRepository.of();
 
     // Add PIPPI as initial/static data
     customerRepository.save(PIPPI.customer());
@@ -84,9 +87,9 @@ public class TransactionFrameworkTest {
       customerRepository,
       new CustomerRepositoryLifecycle()
     );
-    this.orderRepoHandler = registry.registerRepositorySnapshot(
-      orderRepository.freeze(orderRepository),
-      orderRepository
+    this.orderRepoHandler = registry.registerRepository(
+      orderRepository,
+      new OrderRepositoryLifecycle(orderRepository)
     );
   }
 
@@ -164,7 +167,7 @@ public class TransactionFrameworkTest {
   /**
    * Demonstrates the rollback contract difference between the two lifecycle strategies:
    * <ul>
-   *   <li>CustomerRepository uses copy-on-write via {@code ARepositoryLifecycle}: rollback
+   *   <li>CustomerRepository uses copy-on-write via {@code CustomerRepositoryLifecycle}: rollback
    *       discards the in-progress copy, so the next task starts from the last committed
    *       snapshot.</li>
    *   <li>OrderRepository returns {@code this} from {@code copyOnWrite}, so mutations written
@@ -193,9 +196,9 @@ public class TransactionFrameworkTest {
     var succeeding = updateManager.submit(c -> publishUsingRepositories(c, ANNIKA));
     succeeding.get();
 
-    // Customer repo rolled back cleanly: only the initial customer: PIPPI(1) & TOMMY(7).
-    // Order did NOT roll back: OderRepository.copyOnWrite returns the same mutable instance, so
-    // its state survives reset(). The order ANNIKA(13) leaked into the committed snapshot.
+    // Customer repo rolled back cleanly: only the initial customer: PIPPI(1) & ANNIKA(7).
+    // Order did NOT roll back: OrderRepository.copyOnWrite returns the same mutable instance, so
+    // its state survives reset(). The order TOMMY(13) leaked into the committed snapshot.
     assertState(SCOPE_TXN_2, List.of(PIPPI, ANNIKA), List.of(PIPPI, TOMMY, ANNIKA));
 
     updateManager.shutdown();
@@ -234,7 +237,7 @@ public class TransactionFrameworkTest {
     assertEntities(expOrders, TestEvent::orderId, scope, orderRepoHandler);
   }
 
-  private <E extends Entity, S extends AbstractRepository<E>> void assertEntities(
+  private <E extends Entity, S extends EntityIdProvider> void assertEntities(
     List<TestEvent> expEvents,
     Function<TestEvent, Integer> getId,
     TransactionScope scope,
@@ -286,7 +289,7 @@ public class TransactionFrameworkTest {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
       return customerName + " order " + orderDescription;
     }
   }

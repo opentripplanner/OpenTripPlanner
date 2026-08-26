@@ -8,4 +8,3 @@ recipeList:
   - org.openrewrite.staticanalysis.EmptyBlock
   - org.openrewrite.staticanalysis.StringLiteralEquality
   - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
-  - org.openrewrite.java.RemoveUnusedImports

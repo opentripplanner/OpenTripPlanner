@@ -187,6 +187,31 @@ public class TripTimeOnDate {
     return tripPattern.getStop(stopPosition);
   }
 
+  /**
+   * The scheduled stop for this call, equal to {@link #getStop()} unless the stop was changed by a
+   * real time update. Falls back to the real time stop when the patterns differ in size.
+   */
+  public StopLocation getScheduledStop(TripPattern scheduledTripPattern) {
+    if (tripPattern.numberOfStops() == scheduledTripPattern.numberOfStops()) {
+      return scheduledTripPattern.getStop(stopPosition);
+    }
+    // The number of stops is different. There must be extra stops in the tripPattern compared to
+    // the scheduledTripPattern.
+    if (isExtraCall()) {
+      // For extra calls we don't have a scheduled stop. Return the same stop as for realtime.
+      return getStop();
+    }
+    // The number of stops is different. There must be extra stops in tripPattern compared to scheduledTripPattern
+    var extraCallsBefore = (int) IntStream.range(0, stopPosition)
+      .filter(tripTimes::isExtraCall)
+      .count();
+    var scheduledPos = stopPosition - extraCallsBefore;
+    if (scheduledPos >= scheduledTripPattern.numberOfStops()) {
+      throw new IllegalStateException("Number of stops is inconsistent in scheduled trip pattern");
+    }
+    return scheduledTripPattern.getStop(scheduledPos);
+  }
+
   public int getStopPosition() {
     return stopPosition;
   }

@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
@@ -17,6 +18,7 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
+import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -27,6 +29,8 @@ public class GbfsConfigDocTest {
   private static final File OUT_FILE = new File(USER_DOC_PATH, "GBFS-Config.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
+  private static final String OTP_CONFIG_PATH = "standalone/config/" + OTP_CONFIG_FILENAME;
+  private static final String GBFS_NETWORKS_PLACEHOLDER = "gbfs-networks";
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
@@ -46,8 +50,21 @@ public class GbfsConfigDocTest {
       }
     }
 
+    template = replaceSection(template, GBFS_NETWORKS_PLACEHOLDER, gbfsNetworksDoc());
+
     writeFile(OUT_FILE, template);
     assertFileEquals(original, OUT_FILE);
+  }
+
+  /** The shared per-network configuration, which lives in otp-config.json. */
+  private String gbfsNetworksDoc() {
+    var json = jsonNodeFromResource(OTP_CONFIG_PATH);
+    var node = new OtpConfig(new NodeAdapter(json, OTP_CONFIG_PATH), false).root.child("gbfs");
+
+    DocBuilder buf = new DocBuilder();
+    addParameterSummaryTable(buf, node);
+    addDetailsSection(buf, node);
+    return buf.toString();
   }
 
   private NodeAdapter readConfig() {

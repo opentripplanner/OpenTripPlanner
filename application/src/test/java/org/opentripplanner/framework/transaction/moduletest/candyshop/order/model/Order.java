@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.order;
+package org.opentripplanner.framework.transaction.moduletest.candyshop.order.model;
 
 import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Entity;
 

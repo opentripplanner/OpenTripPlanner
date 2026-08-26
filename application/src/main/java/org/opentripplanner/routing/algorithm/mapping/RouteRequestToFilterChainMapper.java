@@ -2,17 +2,24 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RouteRequestToFilterChainMapper {
 
@@ -24,7 +31,12 @@ public class RouteRequestToFilterChainMapper {
 
   public static ItineraryListFilterChain createFilterChain(
     RouteRequest request,
-    OtpServerRequestContext context,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    List<RideHailingService> rideHailingServices,
+    @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable ItineraryListFilter taxiZoneDecorator,
+    @Nullable StopConsolidationService stopConsolidationService,
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
@@ -87,10 +99,7 @@ public class RouteRequestToFilterChainMapper {
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
       )
-      .withTransitAlerts(
-        context.transitAlertService(),
-        context.transitService()::findMultiModalStation
-      )
+      .withTransitAlerts(transitAlertService, transitService::findMultiModalStation)
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
@@ -102,28 +111,26 @@ public class RouteRequestToFilterChainMapper {
       builder.withTransitGroupPriority();
     }
 
-    if (!context.rideHailingServices().isEmpty()) {
+    if (!rideHailingServices.isEmpty()) {
       builder.withRideHailingDecoratingFilter(
-        new DecorateWithRideHailing(context.rideHailingServices(), request.journey().wheelchair())
+        new DecorateWithRideHailing(rideHailingServices, request.journey().wheelchair())
       );
     }
 
-    if (context.emissionItineraryDecorator() != null) {
-      builder.withEmissionItineraryDecorator(context.emissionItineraryDecorator());
+    if (emissionItineraryDecorator != null) {
+      builder.withEmissionItineraryDecorator(emissionItineraryDecorator);
     }
 
     if (
-      context.taxiZoneDecorator() != null &&
+      taxiZoneDecorator != null &&
       request.journey().modes().hasAccessOrEgressOrDirectMode(StreetMode.TAXI)
     ) {
-      builder.withTaxiZoneDecorator(context.taxiZoneDecorator());
+      builder.withTaxiZoneDecorator(taxiZoneDecorator);
     }
 
-    if (
-      context.stopConsolidationService() != null && context.stopConsolidationService().isActive()
-    ) {
+    if (stopConsolidationService != null && stopConsolidationService.isActive()) {
       builder.withConsolidatedStopNamesDecorator(
-        new DecorateConsolidatedStopNames(context.stopConsolidationService())
+        new DecorateConsolidatedStopNames(stopConsolidationService)
       );
     }
 

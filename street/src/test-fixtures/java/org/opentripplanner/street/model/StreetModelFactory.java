@@ -109,7 +109,7 @@ public class StreetModelFactory {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    AreaGroup AREA = new AreaGroup(null);
+    AreaGroup AREA = AreaGroup.of(null).build();
 
     return new AreaEdgeBuilder()
       .withFromVertex(vA)

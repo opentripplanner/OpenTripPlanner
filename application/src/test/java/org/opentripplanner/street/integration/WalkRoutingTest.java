@@ -70,7 +70,16 @@ class WalkRoutingTest {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var ctx = TestServerContext.ofGraph(graph);
-      return DirectStreetRouter.route(ctx, request, linkingContext);
+      return DirectStreetRouter.route(
+        ctx.graph(),
+        ctx.transitService(),
+        ctx.streetLimitationParametersService(),
+        ctx.vehicleRentalService(),
+        ctx.streetDetailsService(),
+        ctx.dataOverlayParameterBindings(),
+        request,
+        linkingContext
+      );
     }
   }
 }

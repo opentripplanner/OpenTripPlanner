@@ -6,10 +6,12 @@ import static org.opentripplanner.ext.dataoverlay.api.ParameterType.THRESHOLD;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.api.ParameterType;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,22 @@ public class DataOverlayContext implements ExtensionRequestContext {
     for (ParameterName paramName : requestParameters.listParameterNames()) {
       addParameter(paramName, parameterBindings, requestParameters);
     }
+  }
+
+  /**
+   * Builds the {@link ExtensionRequestContext} list for a request, given the app-singleton
+   * {@link DataOverlayParameterBindings}.
+   * <p/>
+   * @return an immutable list.
+   */
+  public static List<ExtensionRequestContext> listExtensionRequestContexts(
+    DataOverlayParameters dataOverlayRequest,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
+  ) {
+    if (OTPFeature.DataOverlay.isOn() && dataOverlayParameterBindings != null) {
+      return List.of(new DataOverlayContext(dataOverlayParameterBindings, dataOverlayRequest));
+    }
+    return List.of();
   }
 
   public Iterable<? extends Parameter> getParameters() {

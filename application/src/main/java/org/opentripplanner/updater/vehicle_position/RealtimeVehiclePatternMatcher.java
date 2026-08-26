@@ -17,7 +17,9 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatu
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -35,7 +38,9 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositi
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
@@ -67,7 +72,7 @@ class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
-  private Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
+  private final Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
@@ -381,10 +386,21 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.of(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
+    var scheduledTimetable = getStaticPattern.apply(trip).getScheduledTimetable();
     // the trip times are only used for mapping the GTFS-RT stop_sequence back to a stop.
     // because new trips without trip times are created for realtime-updated ones, we explicitly
     // look at the static trips for the stop_sequence->stop mapping
-    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+    var staticTripTimes = scheduledTimetable.getTripTimes(trip);
+
+    // no fixed trip found, try frequency-based one
+    if (
+      staticTripTimes == null &&
+      !scheduledTimetable.getFrequencyEntries().isEmpty() &&
+      vehiclePosition.getTrip().hasStartDate()
+    ) {
+      staticTripTimes = matchFrequencyTripTimes(vehiclePosition, scheduledTimetable);
+    }
+
     if (staticTripTimes == null) {
       throw UpdateException.of(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
@@ -398,6 +414,29 @@ class RealtimeVehiclePatternMatcher {
     );
 
     return new PatternAndRealtimeVehicle(pattern, newVehicle);
+  }
+
+  @Nullable
+  private static TripTimes matchFrequencyTripTimes(
+    VehiclePosition vehiclePosition,
+    Timetable scheduledTimetable
+  ) {
+    var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
+    var tripTimes = scheduledTimetable
+      .getFrequencyEntries()
+      .stream()
+      .map(FrequencyEntry::tripTimes)
+      .filter(e -> {
+        var start = e.getScheduledDepartureTime(0);
+        var startTime = LocalTime.ofSecondOfDay(start).truncatedTo(ChronoUnit.MINUTES);
+        return updateStartTime.equals(startTime);
+      })
+      .toList();
+    return switch (tripTimes.size()) {
+      case 0 -> null;
+      case 1 -> tripTimes.getFirst();
+      default -> throw UpdateException.of(null, UpdateErrorType.AMBIGIOUS_TRIP_REFERENCE);
+    };
   }
 
   private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}

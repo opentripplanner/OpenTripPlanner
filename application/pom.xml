@@ -311,7 +311,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>26.0</version>
+            <version>26.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -337,7 +337,7 @@
         <dependency>
             <groupId>com.hivemq</groupId>
             <artifactId>hivemq-mqtt-client</artifactId>
-            <version>1.3.17</version>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>io.github.ci-cmg</groupId>
@@ -497,18 +497,8 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <inputGlobs combine.children="append">
-                        <!-- Additional patterns specific to the application module -->
-                        <inputGlob>src/ext/java/**/*.java</inputGlob>
-                        <inputGlob>src/ext-test/java/**/*.java</inputGlob>
-                        <inputGlob>src/**/*.json</inputGlob>
-                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
-                        <inputGlob>!src/test/resources/org/opentripplanner/apis/vectortiles/style.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

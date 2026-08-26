@@ -12,19 +12,20 @@ auto-formatted using Prettier. If in doubt, check the Oxford Dictionary (America
 Try to arrange code by domain functionality, not technology. The main structure of a package should
 be `org.opentripplanner.<domain>.<component>.<sub-component>`.
 
-| Package                         | Description                                                                                                                                                                                                 |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `o.o.<domain>`                  | At the top level, we should divide OTP into "domains" like `apis`, `framework`, `transit`, `street`, `astar`, `raptor`, `feeds`, `updaters`, and `application`.                                             |
-| `component` and `sub-component` | A group of packages/classes that naturally belong together; think aggregate as in Domain-Driven Design.                                                                                                     |
-| `component.api`                 | Used for components to define the programing interface for the component. If present, (see Raptor) all outside dependencies to the component should be through the `api`.                                   |
-| `component.model`               | Used to create a model of Entities, ValueObjects, etc. If exposed outside the component, you should include an entry point like `xyz.model.XyzModel` and/or a Service (in `api` or component root package). |
-| `component.service`             | Implementation of a service like `DefaultTransitService`; may also contain use case-specific code. Note: The Service interface goes into the component root or `api`, not in the service package.           |
-| `component.configure`           | Component creation/orchestration. Put dependency injection code here, like the Dagger module.                                                                                                               |
-| `support`                       | Sometimes domain logic gets complicated; then extracting/isolating it helps. `support` is used internally in a component, not outside.                                                                      |
-| `framework`                     | (Abstract) building blocks internal to a domain/parent package. In some cases accessed outside the component; e.g., `OptAppException`, `TransitEntity`.                                                     |
-| `mapping`                       | Map between two domains/components.                                                                                                                                                                         |
-| `util`                          | General "util" functionality, often characterized by `static` methods. Dependencies to other OTP packages are NOT allowed; only third-party utils libraries.                                                |
-| `o.o.apis`                      | OTP external endpoints. Note! Many APIs are in the Sandbox where they are in the `o.o.ext` package.                                                                                                         |
+| Package                         | Description                                                                                                                                                                                                                |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `o.o.<domain>`                  | At the top level, we should divide OTP into "domains" like `apis`, `framework`, `transit`, `street`, `astar`, `raptor`, `feeds`, `updaters`, and `application`.                                                            |
+| `component` and `sub-component` | A group of packages/classes that naturally belong together; think aggregate as in Domain-Driven Design. The root should contain the access point, the `Service` and/or `Repository` interface.                             |
+| `component.api`                 | Used for components to define the programing interface for the component. If present, (see Raptor) all outside dependencies to the component should be through the `api`.                                                  |
+| `component.model`               | Used to create a model of Entities, ValueObjects, etc. If exposed outside the component, you should include an entry point like `xyz.model.XyzModel` and/or a Service (in `api` or component root package).                |
+| ~~component.service~~           | **Deprecated**, use `component.internal` instead.                                                                                                                                                                          |
+| `component.configure`           | Component creation/orchestration. Put dependency injection code here, like the Dagger module.                                                                                                                              |
+| `component.internal`            | Package-private implementation of the component, e.g. `Default*` classes implementing the interfaces in `api` or the component root. Never referenced from outside the component. May also contain use case-specific code. |
+| `support`                       | Sometimes domain logic gets complicated; then extracting/isolating it helps. `support` is used internally in a component, not outside.                                                                                     |
+| `framework`                     | (Abstract) building blocks internal to a domain/parent package. In some cases accessed outside the component; e.g., `OptAppException`, `TransitEntity`.                                                                    |
+| `mapping`                       | Map between two domains/components.                                                                                                                                                                                        |
+| `util`                          | General "util" functionality, often characterized by `static` methods. Dependencies to other OTP packages are NOT allowed; only third-party utils libraries.                                                               |
+| `o.o.apis`                      | OTP external endpoints. Note! Many APIs are in the Sandbox where they are in the `o.o.ext` package.                                                                                                                        |
 
 > **Note!** The above is the goal. The current package structure needs cleanup.
 
@@ -36,24 +37,24 @@ be `org.opentripplanner.<domain>.<component>.<sub-component>`.
 
 Here is a list of common prefixes used and what to expect.
 
-| Good method prefixes                                  | Description                                                                                                |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `stop() : Stop`                                       | Field accessor, equivalent to `getStop` as in the Java Bean standard.                                      |
-| `getStop(ID id) : Stop`                               | Get Stop by ID; throws exception if not found.                                                             |
-| `getStops(Collection<ID> id) : List/Collection<Stop>` | Get _all_ Stops by set of IDs; throws exception if not found.                                              |
-| `findStop(Criteria criteria) : Optional<Stop>`        | Find one or zero stops; return `Optional`.                                                                 |
-| `findStops(Criteria criteria) : List/Stream<Stop>`    | Find 0, 1, or many stops; return a Collection or Stream (List is preferred).                               |
-| `listStops() : List/Stream<Stop>`                     | List ALL stops in context; return a Collection or Stream (List is preferred).                              |
-| `initStop(Stop stop) : void`                          | Set property _once_; a second call throws an exception.                                                    |
-| `createStop(String name, ...) : Stop`                 | Factory methods for creating objects should start with `create` prefix.                                    |
-|                                                       | See (Builder Conventions)[RecordsPOJOsBuilders.md#builder-conventions] for creating objects with builders. |
-| `addStop(Stop stop) : void/Builder`                   | Add a Stop to a collection of Stops.                                                                       |
-| `addStops(Collection<Stop> stops) : void/Builder`     | Add set of Stops to existing set.                                                                          |
-| `withBike(Consumer<BikePref.Builder> body) : Builder` | For nested builders, use lambdas.                                                                          |
-| `withStop(Stop stop) : Builder`                       | Set Stop in builder, replacing existing value; return `this` builder.                                      |
-| `of(FeedScopedId id) : Builder`                       | Create new builder instance from `Stop` class.                                                             |
-| `copyOf() : Builder`                                  | Initialize a new builder instance from `Stop` instance with identical values.                              |
-| `build() : Stop`                                      | Finish building stop with a builder.                                                                       |
+| Good method prefixes                                              | Description                                                                                                |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `stop() : Stop`                                                   | Field accessor, equivalent to `getStop` as in the Java Bean standard.                                      |
+| `getStop(ID id) : Stop`                                           | Get Stop by ID; throws exception if not found.                                                             |
+| `getStops(Collection<ID> id) : Collection/Iterable/Stream<Stop>`  | Get _all_ Stops by set of IDs; throws exception if not found.                                              |
+| `findStop(Criteria criteria) : Optional<Stop>`                    | Find one or zero stops; return `Optional`.                                                                 |
+| `findStops(Criteria criteria) : Collection/Iterable/Stream<Stop>` | Find 0, 1, or many stops; return a Collection, Iterable or Stream (List is preferred).                     |
+| `listStops() : Collection/Iterable/Stream<Stop>`                  | List ALL stops in context; return a Collection, Iterable or Stream (List is preferred).                    |
+| `initStop(Stop stop) : void`                                      | Set property _once_; a second call throws an exception.                                                    |
+| `createStop(String name, ...) : Stop`                             | Factory methods for creating objects should start with `create` prefix.                                    |
+|                                                                   | See (Builder Conventions)[RecordsPOJOsBuilders.md#builder-conventions] for creating objects with builders. |
+| `addStop(Stop stop) : void/Builder`                               | Add a Stop to a collection of Stops.                                                                       |
+| `addStops(Collection<Stop> stops) : void/Builder`                 | Add set of Stops to existing set.                                                                          |
+| `withBike(Consumer<BikePref.Builder> body) : Builder`             | For nested builders, use lambdas.                                                                          |
+| `withStop(Stop stop) : Builder`                                   | Set Stop in builder, replacing existing value; return `this` builder.                                      |
+| `of(FeedScopedId id) : Builder`                                   | Create new builder instance from `Stop` class.                                                             |
+| `copyOf() : Builder`                                              | Initialize a new builder instance from `Stop` instance with identical values.                              |
+| `build() : Stop`                                                  | Finish building stop with a builder.                                                                       |
 
 These prefixes are also "allowed" but not preferred; they have some kind of negative "force" to
 them.

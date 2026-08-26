@@ -8,6 +8,7 @@ import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VIS
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -414,22 +415,27 @@ public class PlatformLinkingTest {
     closedGeom[platform.length] = closedGeom[0];
 
     Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
-    AreaGroup areaGroup = new AreaGroup(polygon);
 
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
+    Set<IntersectionVertex> visibilityVertices = new HashSet<>();
     for (int i : visible) {
-      areaGroup.addVisibilityVertices(Set.of(vertices.get(i)));
+      visibilityVertices.add(vertices.get(i));
     }
 
     // AreaGroup must include a valid Area which defines area attributes
-    Area area = new Area();
-    area.setName(new LocalizedString("test platform"));
-    area.setWalkSafety(0.5f);
-    area.setBicycleSafety(0.5f);
-    area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    area.setGeometry(polygon);
-    areaGroup.addArea(area);
+    Area area = Area.of()
+      .withName(new LocalizedString("test platform"))
+      .withWalkSafety(0.5f)
+      .withBicycleSafety(0.5f)
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withGeometry(polygon)
+      .build();
+
+    AreaGroup areaGroup = AreaGroup.of(polygon)
+      .withVisibilityVertices(visibilityVertices)
+      .addArea(area)
+      .build();
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
