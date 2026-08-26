@@ -10,8 +10,6 @@ import org.opentripplanner.apis.gtfs.configure.SchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
-import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneServiceModule;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
@@ -29,6 +27,8 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxizone.configure.TaxiZoneServiceModule;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.StreetDomain;
@@ -93,7 +93,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
     EmissionServiceModule.class,
-    CarPickupZoneServiceModule.class,
+    TaxiZoneServiceModule.class,
     EmpiricalDelayServiceModule.class,
     DeduplicatorServiceModule.class,
     GeocoderModule.class,
@@ -160,7 +160,7 @@ public interface ConstructApplicationFactory {
   EmissionRepository emissionRepository();
 
   @Nullable
-  CarPickupZoneRepository carPickupZoneRepository();
+  TaxiZoneRepository taxiZoneRepository();
 
   StreetDetailsRepository streetDetailsRepository();
 
@@ -239,7 +239,7 @@ public interface ConstructApplicationFactory {
     Builder emissionRepository(EmissionRepository emissionRepository);
 
     @BindsInstance
-    Builder carPickupZoneRepository(@Nullable CarPickupZoneRepository carPickupZoneRepository);
+    Builder taxiZoneRepository(@Nullable TaxiZoneRepository taxiZoneRepository);
 
     @BindsInstance
     Builder streetDetailsRepository(StreetDetailsRepository streetDetailsRepository);

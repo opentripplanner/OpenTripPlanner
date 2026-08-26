@@ -21,8 +21,8 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.filterchain.ext.CarPickupZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.ext.TaxiZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -92,7 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
-  private final ItineraryListFilter carPickupZoneDecorator;
+  private final ItineraryListFilter taxiZoneDecorator;
 
   private final StreetDetailsService streetDetailsService;
 
@@ -162,7 +162,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable CarpoolingService carpoolingService,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    @Nullable @CarPickupZoneDecorator ItineraryListFilter carPickupZoneDecorator,
+    @Nullable @TaxiZoneDecorator ItineraryListFilter taxiZoneDecorator,
     StreetDetailsService streetDetailsService,
     @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable LuceneIndex luceneIndex,
@@ -203,7 +203,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.carpoolingService = carpoolingService;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
-    this.carPickupZoneDecorator = carPickupZoneDecorator;
+    this.taxiZoneDecorator = taxiZoneDecorator;
     this.streetDetailsService = streetDetailsService;
     this.empiricalDelayService = empiricalDelayService;
     this.luceneIndex = luceneIndex;
@@ -381,8 +381,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   @Override
-  public ItineraryListFilter carPickupZoneDecorator() {
-    return carPickupZoneDecorator;
+  public ItineraryListFilter taxiZoneDecorator() {
+    return taxiZoneDecorator;
   }
 
   @Override

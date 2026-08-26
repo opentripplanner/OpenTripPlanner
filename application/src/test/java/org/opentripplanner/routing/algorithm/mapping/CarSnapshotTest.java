@@ -118,7 +118,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     expectRequestResponseToMatchSnapshot(request);
   }
 
-  @DisplayName("Direct TAXI (with walking both ends) - CarPickupZone enabled")
+  @DisplayName("Direct TAXI (with walking both ends) - TaxiZone enabled")
   @Test
   public void directTaxiWithWalking() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
@@ -130,9 +130,9 @@ public class CarSnapshotTest extends SnapshotTestBase {
       .withTo(p4)
       .buildRequest();
 
-    // TAXI only performs a CAR_PICKUP-style street search when the car-pickup-zone sandbox
+    // TAXI only performs a CAR_PICKUP-style street search when the taxi-zone sandbox
     // feature is enabled. Otherwise it defaults to (not yet implemented) flex taxi routing,
-    // returning no results - see directTaxiWithoutCarPickupZoneFeatureReturnsNoResults below.
-    OTPFeature.CarPickupZone.testOn(() -> expectRequestResponseToMatchSnapshot(request));
+    // returning no results.
+    OTPFeature.TaxiZone.testOn(() -> expectRequestResponseToMatchSnapshot(request));
   }
 }

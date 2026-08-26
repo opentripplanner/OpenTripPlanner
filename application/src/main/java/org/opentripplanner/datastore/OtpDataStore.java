@@ -1,7 +1,6 @@
 package org.opentripplanner.datastore;
 
 import static org.opentripplanner.datastore.api.FileType.CACHE;
-import static org.opentripplanner.datastore.api.FileType.CAR_PICKUP_ZONE;
 import static org.opentripplanner.datastore.api.FileType.CONFIG;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
@@ -11,6 +10,7 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -105,7 +105,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
-    addAll(findMultipleCompositeSources(List.of(), CAR_PICKUP_ZONE));
+    addAll(findMultipleCompositeSources(List.of(), TAXI_ZONE));
     addAll(findMultipleCompositeSources(config.empiricalDelayFiles(), EMPIRICAL_DATA));
     addAll(findMultipleSources(config.cacheFiles(), CACHE));
 

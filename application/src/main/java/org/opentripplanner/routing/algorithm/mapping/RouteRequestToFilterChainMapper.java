@@ -113,10 +113,10 @@ public class RouteRequestToFilterChainMapper {
     }
 
     if (
-      context.carPickupZoneDecorator() != null &&
+      context.taxiZoneDecorator() != null &&
       request.journey().modes().hasAccessOrEgressOrDirectMode(StreetMode.TAXI)
     ) {
-      builder.withCarPickupZoneDecorator(context.carPickupZoneDecorator());
+      builder.withTaxiZoneDecorator(context.taxiZoneDecorator());
     }
 
     if (

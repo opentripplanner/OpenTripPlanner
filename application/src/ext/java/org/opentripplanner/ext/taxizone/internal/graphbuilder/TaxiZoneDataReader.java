@@ -1,9 +1,9 @@
-package org.opentripplanner.ext.carpickupzone.internal.graphbuilder;
+package org.opentripplanner.ext.taxizone.internal.graphbuilder;
 
 import java.io.IOException;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
-import org.opentripplanner.ext.carpickupzone.graphbuilder.CarPickupZoneBuilder;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxizone.graphbuilder.TaxiZoneBuilder;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
@@ -13,26 +13,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads car pickup zone data from a GTFS Flex feed and stores the zones in the
- * {@link CarPickupZoneRepository}.
+ * Reads taxi zone data from a GTFS Flex feed and stores the zones in the
+ * {@link TaxiZoneRepository}.
  */
-public class CarPickupZoneDataReader {
+public class TaxiZoneDataReader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CarPickupZoneDataReader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TaxiZoneDataReader.class);
 
-  private final CarPickupZoneRepository carPickupZoneRepository;
+  private final TaxiZoneRepository taxiZoneRepository;
   private final DataImportIssueStore issueStore;
 
-  public CarPickupZoneDataReader(
-    CarPickupZoneRepository carPickupZoneRepository,
+  public TaxiZoneDataReader(
+    TaxiZoneRepository taxiZoneRepository,
     DataImportIssueStore issueStore
   ) {
-    this.carPickupZoneRepository = carPickupZoneRepository;
+    this.taxiZoneRepository = taxiZoneRepository;
     this.issueStore = issueStore;
   }
 
   /**
-   * Load car pickup zones from the given bundle and add them to the repository.
+   * Load taxi zones from the given bundle and add them to the repository.
    * Uses an isolated {@link SiteRepository} to avoid advancing the main model's stop index counter.
    */
   public void read(GtfsBundle bundle) throws IOException {
@@ -45,10 +45,10 @@ public class CarPickupZoneDataReader {
       bundle.parameters().stationTransferPreference()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder(dao);
-    var zones = CarPickupZoneBuilder.buildZones(
+    var zones = TaxiZoneBuilder.buildZones(
       FlexTripsMapper.createFlexTrips(mapper.getBuilder(), issueStore)
     );
-    carPickupZoneRepository.addZones(zones);
-    LOG.info("Loaded {} car pickup zone(s) from {}", zones.size(), bundle.feedInfo());
+    taxiZoneRepository.addZones(zones);
+    LOG.info("Loaded {} taxi zone(s) from {}", zones.size(), bundle.feedInfo());
   }
 }

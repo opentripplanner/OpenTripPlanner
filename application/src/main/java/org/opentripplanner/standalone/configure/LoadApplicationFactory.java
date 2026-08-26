@@ -6,8 +6,6 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
-import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneRepositoryModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionRepositoryModule;
@@ -16,6 +14,8 @@ import org.opentripplanner.ext.empiricaldelay.configure.EmpiricalDelayRepository
 import org.opentripplanner.ext.fares.configure.FareModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepositoryModule;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxizone.configure.TaxiZoneRepositoryModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -51,7 +51,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     StreetDetailsRepositoryModule.class,
     WorldEnvelopeRepositoryModule.class,
     EmissionRepositoryModule.class,
-    CarPickupZoneRepositoryModule.class,
+    TaxiZoneRepositoryModule.class,
     EmpiricalDelayRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     StreetRepositoryModule.class,
@@ -91,7 +91,7 @@ public interface LoadApplicationFactory {
   EmissionRepository emptyEmissionsDataModel();
 
   @Singleton
-  CarPickupZoneRepository emptyCarPickupZoneRepository();
+  TaxiZoneRepository emptyTaxiZoneRepository();
 
   @Singleton
   @Nullable

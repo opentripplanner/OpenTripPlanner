@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carpickupzone.model;
+package org.opentripplanner.ext.taxizone.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
-class CarPickupZoneLegTest implements PlanTestConstants {
+class TaxiZoneLegTest implements PlanTestConstants {
 
   private static final Route ROUTE = TransitRepositoryForTest.route("taxi-route")
     .withMode(TransitMode.TAXI)
@@ -45,100 +45,100 @@ class CarPickupZoneLegTest implements PlanTestConstants {
     return (StreetLeg) itinerary.legs().getFirst();
   }
 
-  private static CarPickupZoneLeg carPickupZoneLeg() {
-    var zone = new CarPickupZone(null, TRIP, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
-    return new CarPickupZoneLeg(driveLeg(), zone);
+  private static TaxiZoneLeg taxiZoneLeg() {
+    var zone = new TaxiZone(null, TRIP, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
+    return new TaxiZoneLeg(driveLeg(), zone);
   }
 
   @Test
   void modeComesFromZoneRoute() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(TransitMode.TAXI, leg.mode());
   }
 
   @Test
   void agencyComesFromZoneRoute() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(ROUTE.getAgency(), leg.agency());
   }
 
   @Test
   void routeComesFromZone() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(ROUTE, leg.route());
   }
 
   @Test
   void tripComesFromZone() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(TRIP, leg.trip());
   }
 
   @Test
   void isTransitLeg() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertTrue(leg.isTransitLeg());
   }
 
   @Test
   void serviceDateComesFromLegStartTime() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(leg.startTime().toLocalDate(), leg.serviceDate());
   }
 
   @Test
   void boardAndAlightStopPositionsAreFixed() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(0, leg.boardStopPosInPattern());
     assertEquals(1, leg.alightStopPosInPattern());
   }
 
   @Test
   void bookingInfoComesFromZone() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertEquals(PICKUP_BOOKING_INFO, leg.pickupBookingInfo());
     assertEquals(DROP_OFF_BOOKING_INFO, leg.dropOffBookingInfo());
   }
 
   @Test
   void withEmissionPerPersonRetainsType() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     var updated = leg.withEmissionPerPerson(Emission.ofCo2Gram(5));
-    var carPickupLeg = assertInstanceOf(CarPickupZoneLeg.class, updated);
-    assertEquals(leg.carPickupZone(), carPickupLeg.carPickupZone());
-    assertEquals(Emission.ofCo2Gram(5), carPickupLeg.emissionPerPerson());
+    var castLeg = assertInstanceOf(TaxiZoneLeg.class, updated);
+    assertEquals(leg.taxiZone(), castLeg.taxiZone());
+    assertEquals(Emission.ofCo2Gram(5), castLeg.emissionPerPerson());
   }
 
   @Test
   void withTimeShiftRetainsType() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     var updated = leg.withTimeShift(Duration.ofMinutes(5));
-    var carPickupLeg = assertInstanceOf(CarPickupZoneLeg.class, updated);
-    assertEquals(leg.carPickupZone(), carPickupLeg.carPickupZone());
+    var castLeg = assertInstanceOf(TaxiZoneLeg.class, updated);
+    assertEquals(leg.taxiZone(), castLeg.taxiZone());
   }
 
   @Test
-  void hasSameModeTrueForMatchingCarPickupZoneLeg() {
-    var leg = carPickupZoneLeg();
-    var other = carPickupZoneLeg();
+  void hasSameModeTrueForMatchingTaxiZoneLeg() {
+    var leg = taxiZoneLeg();
+    var other = taxiZoneLeg();
     assertTrue(leg.hasSameMode(other));
   }
 
   @Test
   void hasSameModeFalseForPlainStreetLeg() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     assertFalse(leg.hasSameMode(driveLeg()));
   }
 
   @Test
   void hasSameModeFalseForDifferentModeZoneLeg() {
-    var leg = carPickupZoneLeg();
+    var leg = taxiZoneLeg();
     var otherRoute = TransitRepositoryForTest.route("other-route")
       .withMode(TransitMode.CARPOOL)
       .build();
     var otherTrip = TransitRepositoryForTest.trip("other-trip").withRoute(otherRoute).build();
-    var otherZone = new CarPickupZone(null, otherTrip, null, null);
-    var other = new CarPickupZoneLeg(driveLeg(), otherZone);
+    var otherZone = new TaxiZone(null, otherTrip, null, null);
+    var other = new TaxiZoneLeg(driveLeg(), otherZone);
     assertFalse(leg.hasSameMode(other));
   }
 }

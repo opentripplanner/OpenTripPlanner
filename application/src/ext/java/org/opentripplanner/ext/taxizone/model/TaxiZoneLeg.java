@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carpickupzone.model;
+package org.opentripplanner.ext.taxizone.model;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -25,55 +25,51 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
- * A leg for a car pickup/drop-off decorated with a matched {@link CarPickupZone} provider (e.g. a
+ * A leg for a car pickup/drop-off decorated with a matched {@link TaxiZone} provider (e.g. a
  * taxi). It is physically a street/driving leg, but is modeled as a {@link TransitLeg} since it
  * carries route, agency and booking information from the matched provider.
  * <p>
  * The underlying street route data (geometry, distance, elevation, etc.) is delegated to the
  * wrapped {@link StreetLeg}.
  */
-public class CarPickupZoneLeg implements TransitLeg {
+public class TaxiZoneLeg implements TransitLeg {
 
   private final StreetLeg streetLeg;
-  private final CarPickupZone carPickupZone;
+  private final TaxiZone taxiZone;
   private final Set<TransitAlert> transitAlerts;
 
-  public CarPickupZoneLeg(StreetLeg streetLeg, CarPickupZone carPickupZone) {
-    this(streetLeg, carPickupZone, Set.of());
+  public TaxiZoneLeg(StreetLeg streetLeg, TaxiZone taxiZone) {
+    this(streetLeg, taxiZone, Set.of());
   }
 
-  private CarPickupZoneLeg(
-    StreetLeg streetLeg,
-    CarPickupZone carPickupZone,
-    Set<TransitAlert> transitAlerts
-  ) {
+  private TaxiZoneLeg(StreetLeg streetLeg, TaxiZone taxiZone, Set<TransitAlert> transitAlerts) {
     this.streetLeg = streetLeg.copyOf().build();
-    this.carPickupZone = carPickupZone;
+    this.taxiZone = taxiZone;
     this.transitAlerts = Set.copyOf(transitAlerts);
   }
 
-  public CarPickupZone carPickupZone() {
-    return carPickupZone;
+  public TaxiZone taxiZone() {
+    return taxiZone;
   }
 
   @Override
   public TransitMode mode() {
-    return carPickupZone.trip().getRoute().getMode();
+    return taxiZone.trip().getRoute().getMode();
   }
 
   @Override
   public Agency agency() {
-    return carPickupZone.trip().getRoute().getAgency();
+    return taxiZone.trip().getRoute().getAgency();
   }
 
   @Override
   public Route route() {
-    return carPickupZone.trip().getRoute();
+    return taxiZone.trip().getRoute();
   }
 
   @Override
   public Trip trip() {
-    return carPickupZone.trip();
+    return taxiZone.trip();
   }
 
   /**
@@ -87,8 +83,8 @@ public class CarPickupZoneLeg implements TransitLeg {
   }
 
   /**
-   * Car pickup zone trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.carpickupzone.graphbuilder.CarPickupZoneBuilder}), so these
+   * Taxi zone trips always consist of exactly one pickup stop and one drop-off stop (see
+   * {@link org.opentripplanner.ext.taxizone.graphbuilder.TaxiZoneBuilder}), so these
    * positions are fixed.
    */
   @Override
@@ -97,8 +93,8 @@ public class CarPickupZoneLeg implements TransitLeg {
   }
 
   /**
-   * Car pickup zone trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.carpickupzone.graphbuilder.CarPickupZoneBuilder}), so these
+   * Taxi zone trips always consist of exactly one pickup stop and one drop-off stop (see
+   * {@link org.opentripplanner.ext.taxizone.graphbuilder.TaxiZoneBuilder}), so these
    * positions are fixed.
    */
   @Override
@@ -109,13 +105,13 @@ public class CarPickupZoneLeg implements TransitLeg {
   @Override
   @Nullable
   public BookingInfo pickupBookingInfo() {
-    return carPickupZone.pickupBookingInfo();
+    return taxiZone.pickupBookingInfo();
   }
 
   @Override
   @Nullable
   public BookingInfo dropOffBookingInfo() {
-    return carPickupZone.dropOffBookingInfo();
+    return taxiZone.dropOffBookingInfo();
   }
 
   @Override
@@ -124,8 +120,8 @@ public class CarPickupZoneLeg implements TransitLeg {
   }
 
   @Override
-  public CarPickupZoneLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return new CarPickupZoneLeg(streetLeg, carPickupZone, alerts);
+  public TaxiZoneLeg decorateWithAlerts(Set<TransitAlert> alerts) {
+    return new TaxiZoneLeg(streetLeg, taxiZone, alerts);
   }
 
   @Override
@@ -223,26 +219,20 @@ public class CarPickupZoneLeg implements TransitLeg {
   @Nullable
   @Override
   public Leg withEmissionPerPerson(Emission emissionPerPerson) {
-    return new CarPickupZoneLeg(
+    return new TaxiZoneLeg(
       (StreetLeg) streetLeg.withEmissionPerPerson(emissionPerPerson),
-      carPickupZone,
+      taxiZone,
       transitAlerts
     );
   }
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return new CarPickupZoneLeg(
-      (StreetLeg) streetLeg.withTimeShift(duration),
-      carPickupZone,
-      transitAlerts
-    );
+    return new TaxiZoneLeg((StreetLeg) streetLeg.withTimeShift(duration), taxiZone, transitAlerts);
   }
 
   @Override
   public String toString() {
-    return (
-      "CarPickupZoneLeg{" + "streetLeg=" + streetLeg + ", carPickupZone=" + carPickupZone + '}'
-    );
+    return ("TaxiZoneLeg{" + "streetLeg=" + streetLeg + ", taxiZone=" + taxiZone + '}');
   }
 }

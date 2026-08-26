@@ -27,8 +27,8 @@ import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.filterchain.ext.CarPickupZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.ext.TaxiZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
@@ -263,9 +263,7 @@ class RequestScopedFactoryTest {
       );
 
       @BindsInstance
-      Builder carPickupZoneDecorator(
-        @Nullable @CarPickupZoneDecorator ItineraryListFilter carPickupZoneDecorator
-      );
+      Builder taxiZoneDecorator(@Nullable @TaxiZoneDecorator ItineraryListFilter taxiZoneDecorator);
 
       @BindsInstance
       Builder streetDetailsService(StreetDetailsService streetDetailsService);

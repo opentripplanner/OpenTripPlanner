@@ -193,7 +193,7 @@ public interface OtpServerRequestContext {
   ItineraryDecorator emissionItineraryDecorator();
 
   @Nullable
-  ItineraryListFilter carPickupZoneDecorator();
+  ItineraryListFilter taxiZoneDecorator();
 
   StreetDetailsService streetDetailsService();
 

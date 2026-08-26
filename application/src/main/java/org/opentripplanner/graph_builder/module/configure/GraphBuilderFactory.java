@@ -6,9 +6,6 @@ import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
-import org.opentripplanner.ext.carpickupzone.configure.CarPickupZoneGraphBuilderModule;
-import org.opentripplanner.ext.carpickupzone.internal.graphbuilder.CarPickupZoneGraphBuilder;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayParameterBindingsModule;
 import org.opentripplanner.ext.edgenaming.configure.EdgeNamerModule;
@@ -21,6 +18,9 @@ import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDel
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxizone.configure.TaxiZoneGraphBuilderModule;
+import org.opentripplanner.ext.taxizone.internal.graphbuilder.TaxiZoneGraphBuilder;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -61,7 +61,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     DataOverlayParameterBindingsModule.class,
     EdgeNamerModule.class,
     EmissionGraphBuilderModule.class,
-    CarPickupZoneGraphBuilderModule.class,
+    TaxiZoneGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
@@ -97,7 +97,7 @@ public interface GraphBuilderFactory {
   EmissionGraphBuilder emissionGraphBuilder();
 
   @Nullable
-  CarPickupZoneGraphBuilder carPickupZoneGraphBuilder();
+  TaxiZoneGraphBuilder taxiZoneGraphBuilder();
 
   @Nullable
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
@@ -161,7 +161,7 @@ public interface GraphBuilderFactory {
     Builder emissionRepository(@Nullable EmissionRepository emissionRepository);
 
     @BindsInstance
-    Builder carPickupZoneRepository(@Nullable CarPickupZoneRepository carPickupZoneRepository);
+    Builder taxiZoneRepository(@Nullable TaxiZoneRepository taxiZoneRepository);
 
     @BindsInstance
     Builder empiricalDelayRepository(@Nullable EmpiricalDelayRepository empiricalDelayRepository);

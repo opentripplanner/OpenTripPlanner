@@ -106,7 +106,7 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
-  private ItineraryListFilter carPickupZoneDecorator;
+  private ItineraryListFilter taxiZoneDecorator;
 
   @Sandbox
   private ItineraryDecorator stopConsolidationDecorator;
@@ -373,10 +373,10 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withCarPickupZoneDecorator(
+  public ItineraryListFilterChainBuilder withTaxiZoneDecorator(
     @Nullable ItineraryListFilter decoratorFilter
   ) {
-    this.carPickupZoneDecorator = decoratorFilter;
+    this.taxiZoneDecorator = decoratorFilter;
     return this;
   }
 
@@ -450,11 +450,11 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-      // Decorate and filter car pickup itineraries before transit-vs-street comparison so that
-      // uncoverable car pickup legs are removed before they can be used as the "best street"
+      // Decorate and filter taxi zone itineraries before transit-vs-street comparison so that
+      // uncoverable taxi zone legs are removed before they can be used as the "best street"
       // baseline, which would otherwise cause transit itineraries to be incorrectly removed.
-      if (carPickupZoneDecorator != null) {
-        filters.add(carPickupZoneDecorator);
+      if (taxiZoneDecorator != null) {
+        filters.add(taxiZoneDecorator);
       }
 
       // Filter transit itineraries by comparing against non-transit using generalized-cost

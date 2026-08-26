@@ -1,11 +1,11 @@
-package org.opentripplanner.ext.carpickupzone;
+package org.opentripplanner.ext.taxizone;
 
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZone;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
@@ -16,12 +16,12 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * <p>TODO: Multi-provider support. Currently only the first matching zone is used.
  * In the future all matching providers should be available so users can choose.
  */
-public class CarPickupZoneIndex {
+public class TaxiZoneIndex {
 
   private final STRtree index = new STRtree();
 
-  public CarPickupZoneIndex(List<CarPickupZone> zones) {
-    for (CarPickupZone zone : zones) {
+  public TaxiZoneIndex(List<TaxiZone> zones) {
+    for (TaxiZone zone : zones) {
       index.insert(zone.geometry().getEnvelopeInternal(), zone);
     }
   }
@@ -30,16 +30,16 @@ public class CarPickupZoneIndex {
    * Returns the first zone whose geometry contains both {@code pickup} and
    * {@code dropoff}. Returns an empty optional if no zone covers both endpoints.
    */
-  public Optional<CarPickupZone> findFirstZone(WgsCoordinate pickup, WgsCoordinate dropoff) {
+  public Optional<TaxiZone> findFirstZone(WgsCoordinate pickup, WgsCoordinate dropoff) {
     var gf = GeometryUtils.getGeometryFactory();
     Point pickupPoint = gf.createPoint(pickup.asJtsCoordinate());
     Point dropoffPoint = gf.createPoint(dropoff.asJtsCoordinate());
 
     Envelope envelope = new Envelope(pickup.asJtsCoordinate());
     @SuppressWarnings("unchecked")
-    List<CarPickupZone> candidates = index.query(envelope);
+    List<TaxiZone> candidates = index.query(envelope);
 
-    for (CarPickupZone zone : candidates) {
+    for (TaxiZone zone : candidates) {
       var geom = zone.geometry();
       if (geom.contains(pickupPoint) && geom.contains(dropoffPoint)) {
         return Optional.of(zone);

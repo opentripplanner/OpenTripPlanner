@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carpickupzone.internal.itinerary;
+package org.opentripplanner.ext.taxizone.internal.itinerary;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneIndex;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZone;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZoneLeg;
+import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
+import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
+class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
@@ -43,22 +43,22 @@ class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
     .withRoute(ZONE_ROUTE)
     .build();
 
-  private static final CarPickupZoneIndex MATCHING_INDEX = new CarPickupZoneIndex(
-    List.of(new CarPickupZone(ZONE_POLYGON, ZONE_TRIP, null, null))
+  private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
+    List.of(new TaxiZone(ZONE_POLYGON, ZONE_TRIP, null, null))
   );
-  private static final CarPickupZoneIndex EMPTY_INDEX = new CarPickupZoneIndex(List.of());
+  private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
 
   @Test
-  void driveLegWithinZoneIsReplacedWithCarPickupZoneLeg() {
+  void driveLegWithinZoneIsReplacedWithTaxiZoneLeg() {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new CarPickupZoneItineraryDecorator(MATCHING_INDEX);
+    var subject = new TaxiZoneItineraryDecorator(MATCHING_INDEX);
 
     var result = subject.filter(List.of(itinerary)).getFirst();
 
     assertFalse(result.isFlaggedForDeletion());
-    var leg = assertInstanceOf(CarPickupZoneLeg.class, result.legs().getFirst());
+    var leg = assertInstanceOf(TaxiZoneLeg.class, result.legs().getFirst());
     assertEquals(ZONE_ROUTE, leg.route());
   }
 
@@ -67,7 +67,7 @@ class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new CarPickupZoneItineraryDecorator(EMPTY_INDEX);
+    var subject = new TaxiZoneItineraryDecorator(EMPTY_INDEX);
 
     var result = subject.filter(List.of(itinerary)).getFirst();
 
@@ -77,9 +77,9 @@ class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
         .systemNotices()
         .stream()
         .map(SystemNotice::tag)
-        .anyMatch(CarPickupZoneItineraryDecorator.NO_CAR_PICKUP_ZONE_AVAILABLE::equals)
+        .anyMatch(TaxiZoneItineraryDecorator.NO_TAXI_ZONE_AVAILABLE::equals)
     );
-    assertFalse(result.legs().getFirst() instanceof CarPickupZoneLeg);
+    assertFalse(result.legs().getFirst() instanceof TaxiZoneLeg);
   }
 
   @Test
@@ -88,7 +88,7 @@ class CarPickupZoneItineraryDecoratorTest implements PlanTestConstants {
       .bus(21, T11_00, T11_10, PLACE_B)
       .build();
     var originalLeg = itinerary.legs().getFirst();
-    var subject = new CarPickupZoneItineraryDecorator(EMPTY_INDEX);
+    var subject = new TaxiZoneItineraryDecorator(EMPTY_INDEX);
 
     var result = subject.filter(List.of(itinerary)).getFirst();
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carpickupzone.graphbuilder;
+package org.opentripplanner.ext.taxizone.graphbuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-class CarPickupZoneBuilderTest {
+class TaxiZoneBuilderTest {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
@@ -60,7 +60,7 @@ class CarPickupZoneBuilderTest {
   @Test
   void validTripProducesZone() {
     var trip = unscheduledTrip(validStopTimes());
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertEquals(1, zones.size());
     var zone = zones.get(0);
@@ -78,7 +78,7 @@ class CarPickupZoneBuilderTest {
       .withStopTimes(stopTimes)
       .build();
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }
@@ -91,7 +91,7 @@ class CarPickupZoneBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }
@@ -100,7 +100,7 @@ class CarPickupZoneBuilderTest {
   void fullDayWindowIsAllowed() {
     var trip = unscheduledTrip(validStopTimes());
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertEquals(1, zones.size());
   }
@@ -114,7 +114,7 @@ class CarPickupZoneBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }
@@ -127,7 +127,7 @@ class CarPickupZoneBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }
@@ -141,7 +141,7 @@ class CarPickupZoneBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }
@@ -155,7 +155,7 @@ class CarPickupZoneBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = CarPickupZoneBuilder.buildZones(List.of(trip));
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
 
     assertTrue(zones.isEmpty());
   }

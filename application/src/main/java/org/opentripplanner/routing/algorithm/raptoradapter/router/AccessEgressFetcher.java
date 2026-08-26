@@ -128,8 +128,8 @@ class AccessEgressFetcher {
 
     // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
     //       implemented. Until then, return no access/egress for TAXI unless the
-    //       car-pickup-zone sandbox feature is enabled.
-    if (mode == StreetMode.TAXI && OTPFeature.CarPickupZone.isOff()) {
+    //       taxi-zone sandbox feature is enabled.
+    if (mode == StreetMode.TAXI && OTPFeature.TaxiZone.isOff()) {
       return List.of();
     }
 

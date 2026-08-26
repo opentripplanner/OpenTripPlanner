@@ -1,13 +1,13 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.CACHE;
-import static org.opentripplanner.datastore.api.FileType.CAR_PICKUP_ZONE;
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -128,10 +128,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /**
-   * Unlike {@link #hasTransitData()}, car pickup zone data never populates the TransitRepository.
+   * Unlike {@link #hasTransitData()}, taxi zone data never populates the TransitRepository.
    */
-  public boolean hasTransitOrCarPickupZoneData() {
-    return hasOneOf(GTFS, NETEX, CAR_PICKUP_ZONE);
+  public boolean hasTransitOrTaxiZoneData() {
+    return hasOneOf(GTFS, NETEX, TAXI_ZONE);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -158,8 +158,8 @@ public class GraphBuilderDataSources implements Closeable {
 
   public Iterable<
     ConfiguredCompositeDataSource<GtfsFeedParameters>
-  > getCarPickupZoneConfiguredDataSource() {
-    return ofStream(CAR_PICKUP_ZONE).map(this::mapCarPickupZoneFeed).toList();
+  > getTaxiZoneConfiguredDataSource() {
+    return ofStream(TAXI_ZONE).map(this::mapTaxiZoneFeed).toList();
   }
 
   public Iterable<
@@ -299,9 +299,7 @@ public class GraphBuilderDataSources implements Closeable {
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
-  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapCarPickupZoneFeed(
-    DataSource dataSource
-  ) {
+  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapTaxiZoneFeed(DataSource dataSource) {
     var p = buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build();
     return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
@@ -356,7 +354,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOsm() && !hasTransitOrCarPickupZoneData()) {
+      if (!hasOsm() && !hasTransitOrTaxiZoneData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
@@ -377,7 +375,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasTransitOrCarPickupZoneData()) {
+      if (!hasTransitOrTaxiZoneData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }

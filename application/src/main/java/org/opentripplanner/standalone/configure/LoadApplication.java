@@ -2,10 +2,10 @@ package org.opentripplanner.standalone.configure;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.carpickupzone.CarPickupZoneRepository;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -71,7 +71,7 @@ public class LoadApplication {
       obj.parkingRepository,
       obj.issueSummary,
       obj.emissionRepository,
-      obj.carPickupZoneRepository,
+      obj.taxiZoneRepository,
       obj.empiricalDelayRepository,
       obj.stopConsolidationRepository,
       obj.streetRepository,
@@ -91,7 +91,7 @@ public class LoadApplication {
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
-      factory.emptyCarPickupZoneRepository(),
+      factory.emptyTaxiZoneRepository(),
       factory.emptyEmpiricalDelayRepository(),
       factory.emptyStopConsolidationRepository(),
       factory.emptyStreetRepository(),
@@ -120,7 +120,7 @@ public class LoadApplication {
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
-    @Nullable CarPickupZoneRepository carPickupZoneRepository,
+    @Nullable TaxiZoneRepository taxiZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetRepository streetRepository,
@@ -138,7 +138,7 @@ public class LoadApplication {
       graphBuilderDataSources(),
       issueSummary,
       emissionRepository,
-      carPickupZoneRepository,
+      taxiZoneRepository,
       empiricalDelayRepository,
       parkingRepository,
       stopConsolidationRepository,

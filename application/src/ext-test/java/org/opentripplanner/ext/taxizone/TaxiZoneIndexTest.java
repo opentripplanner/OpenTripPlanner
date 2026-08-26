@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carpickupzone;
+package org.opentripplanner.ext.taxizone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZone;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-class CarPickupZoneIndexTest {
+class TaxiZoneIndexTest {
 
   private static final Polygon SQUARE_1 = Polygons.square(
     new Coordinate(0, 0),
@@ -41,13 +41,13 @@ class CarPickupZoneIndexTest {
   private static final WgsCoordinate INSIDE_SQUARE_2_B = new WgsCoordinate(28, 28);
   private static final WgsCoordinate OUTSIDE_ALL_ZONES = new WgsCoordinate(50, 50);
 
-  private static CarPickupZone zone(Polygon geometry, Trip trip) {
-    return new CarPickupZone(geometry, trip, null, null);
+  private static TaxiZone zone(Polygon geometry, Trip trip) {
+    return new TaxiZone(geometry, trip, null, null);
   }
 
   @Test
   void findsZoneCoveringBothPickupAndDropoff() {
-    var index = new CarPickupZoneIndex(List.of(zone(SQUARE_1, TRIP_1)));
+    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, TRIP_1)));
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B);
 
@@ -57,7 +57,7 @@ class CarPickupZoneIndexTest {
 
   @Test
   void returnsEmptyWhenDropoffOutsideZone() {
-    var index = new CarPickupZoneIndex(List.of(zone(SQUARE_1, TRIP_1)));
+    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, TRIP_1)));
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_2_A);
 
@@ -66,7 +66,7 @@ class CarPickupZoneIndexTest {
 
   @Test
   void returnsEmptyWhenNeitherPointInAnyZone() {
-    var index = new CarPickupZoneIndex(List.of(zone(SQUARE_1, TRIP_1), zone(SQUARE_2, TRIP_2)));
+    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, TRIP_1), zone(SQUARE_2, TRIP_2)));
 
     var result = index.findFirstZone(OUTSIDE_ALL_ZONES, OUTSIDE_ALL_ZONES);
 
@@ -75,7 +75,7 @@ class CarPickupZoneIndexTest {
 
   @Test
   void returnsEmptyForEmptyIndex() {
-    var index = new CarPickupZoneIndex(List.of());
+    var index = new TaxiZoneIndex(List.of());
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B);
 
@@ -84,7 +84,7 @@ class CarPickupZoneIndexTest {
 
   @Test
   void findsCorrectZoneAmongMultipleCandidates() {
-    var index = new CarPickupZoneIndex(List.of(zone(SQUARE_1, TRIP_1), zone(SQUARE_2, TRIP_2)));
+    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, TRIP_1), zone(SQUARE_2, TRIP_2)));
 
     var resultInSquare1 = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B);
     var resultInSquare2 = index.findFirstZone(INSIDE_SQUARE_2_A, INSIDE_SQUARE_2_B);

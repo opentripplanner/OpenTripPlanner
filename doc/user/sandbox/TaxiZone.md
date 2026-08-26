@@ -1,4 +1,4 @@
-# Car Pickup Zone
+# Taxi Zone
 
 ## Contact Info
 
@@ -6,13 +6,13 @@
 
 ## Documentation
 
-The car pickup zone module filters and decorates car pickup itineraries using spatial zone data
+The taxi zone module filters and decorates taxi itineraries using spatial zone data
 loaded from dedicated GTFS Flex feeds.
 
-For each driving-ish leg in a car pickup itinerary:
+For each driving-ish leg in a taxi itinerary:
 - If **no zone covers both the pickup and drop-off coordinates**, the itinerary is flagged for
   deletion and removed from the response.
-- If **a matching zone is found**, the generic driving leg is replaced with a `CarPickupZoneLeg`
+- If **a matching zone is found**, the generic driving leg is replaced with a `TaxiZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
 - The filter is only enabled when the request's access, egress, or direct mode is
   `TAXI` (see `RouteRequestToFilterChainMapper`).
@@ -23,11 +23,11 @@ For each driving-ish leg in a car pickup itinerary:
   against the itinerary's travel date, so a zone will decorate a leg regardless of the day of week
   or date range configured in `calendar.txt`/`calendar_dates.txt`.
 
-### Car Pickup Zone Data Files
+### Taxi Zone Data Files
 
-Car pickup zone data is provided as standard GTFS Flex zip files. Files are auto-discovered by
-filename: a file whose name contains `car_pickup_zone`, `car-pickup-zone`, or `carpickupzone`
-(case-insensitive) is classified as `CAR_PICKUP_ZONE` type and processed exclusively by this
+Taxi zone data is provided as standard GTFS Flex zip files. Files are auto-discovered by
+filename: a file whose name contains `taxi_zone`, `taxi-zone`, or `taxizone`
+(case-insensitive) is classified as `TAXI_ZONE` type and processed exclusively by this
 module. Such files are **not** added to normal transit or flex routing.
 
 Example graph directory layout:
@@ -36,7 +36,7 @@ Example graph directory layout:
 graph/
   build-config.json
   HSL-gtfs.zip
-  Taxi-carpickupzone.zip   ← auto-discovered as CAR_PICKUP_ZONE type
+  Taxi-zone.zip           ← auto-discovered as TAXI_ZONE type
 ```
 
 ### GTFS Data Requirements
@@ -58,14 +58,14 @@ a warning in the build report:
 
 ### GTFS API Modes
 
-To opt into car pickup zone matching, requests must use the `TAXI` mode
+To opt into taxi zone matching, requests must use the `TAXI` mode
 (`PlanAccessMode`, `PlanEgressMode`, or `PlanDirectMode`) for the relevant part of the journey.
 Internally this maps to the `TAXI` street mode, which behaves identically to
-`CAR_PICKUP` for routing purposes but additionally registers the car pickup zone itinerary filter.
+`CAR_PICKUP` for routing purposes but additionally registers the taxi zone itinerary filter.
 
 ### Decorated Leg Fields
 
-When a car pickup leg matches a zone, it is replaced by a `CarPickupZoneLeg`, which is modeled as
+When a taxi leg matches a zone, it is replaced by a `TaxiZoneLeg`, which is modeled as
 a transit leg, since it carries route/agency/booking information from the matched provider's flex
 trip. The physical street route (geometry, distance, elevation, etc.) of the original driving leg
 is preserved.
@@ -83,7 +83,7 @@ is preserved.
 | `dropOffBookingInfo`        | Booking info from stop 1 of the matched flex trip.             |
 
 Itineraries where the leg does not match any zone are tagged with the system notice
-`no-car-pickup-zone-available` and removed.
+`no-taxi-zone-available` and removed.
 
 ### Configuration
 
@@ -92,7 +92,7 @@ Enable the feature flag in `otp-config.json`:
 ```json
 // otp-config.json
 {
-  "CarPickupZone": true
+  "TaxiZone": true
 }
 ```
 

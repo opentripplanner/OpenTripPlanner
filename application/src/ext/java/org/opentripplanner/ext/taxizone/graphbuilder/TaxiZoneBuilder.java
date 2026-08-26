@@ -1,11 +1,11 @@
-package org.opentripplanner.ext.carpickupzone.graphbuilder;
+package org.opentripplanner.ext.taxizone.graphbuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.ext.carpickupzone.model.CarPickupZone;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -13,24 +13,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Converts a collection of {@link FlexTrip}s from a car pickup zone provider feed into
- * {@link CarPickupZone} objects. Trips that do not satisfy the data requirements are skipped
+ * Converts a collection of {@link FlexTrip}s from a taxi zone provider feed into
+ * {@link TaxiZone} objects. Trips that do not satisfy the data requirements are skipped
  * with a warning.
  */
-public class CarPickupZoneBuilder {
+public class TaxiZoneBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CarPickupZoneBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TaxiZoneBuilder.class);
   private static final int SECONDS_IN_DAY = 86_400;
 
-  private CarPickupZoneBuilder() {}
+  private TaxiZoneBuilder() {}
 
-  public static List<CarPickupZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
-    List<CarPickupZone> result = new ArrayList<>();
+  public static List<TaxiZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
+    List<TaxiZone> result = new ArrayList<>();
     for (FlexTrip<?, ?> flexTrip : flexTrips) {
-      if (isValidCarPickupZoneTrip(flexTrip)) {
+      if (isValidTaxiZoneTrip(flexTrip)) {
         var areaStop = (AreaStop) flexTrip.getStop(0);
         result.add(
-          new CarPickupZone(
+          new TaxiZone(
             areaStop.getGeometry(),
             flexTrip.getTrip(),
             flexTrip.getPickupBookingInfo(0),
@@ -42,7 +42,7 @@ public class CarPickupZoneBuilder {
     return result;
   }
 
-  private static boolean isValidCarPickupZoneTrip(FlexTrip<?, ?> flexTrip) {
+  private static boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
     return (
       isUnscheduledTrip(flexTrip) &&
       hasNoTimeRestrictions(flexTrip) &&
@@ -57,7 +57,7 @@ public class CarPickupZoneBuilder {
       return true;
     }
     LOG.warn(
-      "Skipping trip {} for car pickup zones: only UnscheduledTrip is supported; got {}",
+      "Skipping trip {} for taxi zones: only UnscheduledTrip is supported; got {}",
       flexTrip.getId(),
       flexTrip.getClass().getSimpleName()
     );
@@ -72,7 +72,7 @@ public class CarPickupZoneBuilder {
       boolean isFullDay = start == 0 && end == SECONDS_IN_DAY;
       if (hasWindow && !isFullDay) {
         LOG.warn(
-          "Skipping trip {} for car pickup zones: stop {} has a time restriction" +
+          "Skipping trip {} for taxi zones: stop {} has a time restriction" +
             " (start_pickup_dropoff_window / end_pickup_dropoff_window must not be set," +
             " or must span the full day 0:00:00-24:00:00)",
           flexTrip.getId(),
@@ -89,7 +89,7 @@ public class CarPickupZoneBuilder {
       return true;
     }
     LOG.warn(
-      "Skipping trip {} for car pickup zones: expected exactly 2 stop times " +
+      "Skipping trip {} for taxi zones: expected exactly 2 stop times " +
         "(one pickup stop and one drop-off stop), got {}",
       flexTrip.getId(),
       flexTrip.numberOfStops()
@@ -107,7 +107,7 @@ public class CarPickupZoneBuilder {
       return true;
     }
     LOG.warn(
-      "Skipping trip {} for car pickup zones: both stop times must reference the same " +
+      "Skipping trip {} for taxi zones: both stop times must reference the same " +
         "GTFS Flex area (location_id) with a geometry",
       flexTrip.getId()
     );
@@ -119,7 +119,7 @@ public class CarPickupZoneBuilder {
     PickDrop alightRule = flexTrip.getAlightRule(1);
     if (boardRule != PickDrop.CALL_AGENCY) {
       LOG.warn(
-        "Skipping trip {} for car pickup zones: stop 0 has pickup_type {} ({}); " +
+        "Skipping trip {} for taxi zones: stop 0 has pickup_type {} ({}); " +
           "must be 2 (CALL_AGENCY)",
         flexTrip.getId(),
         boardRule.ordinal(),
@@ -129,7 +129,7 @@ public class CarPickupZoneBuilder {
     }
     if (alightRule != PickDrop.CALL_AGENCY) {
       LOG.warn(
-        "Skipping trip {} for car pickup zones: stop 1 has drop_off_type {} ({}); " +
+        "Skipping trip {} for taxi zones: stop 1 has drop_off_type {} ({}); " +
           "must be 2 (CALL_AGENCY)",
         flexTrip.getId(),
         alightRule.ordinal(),
