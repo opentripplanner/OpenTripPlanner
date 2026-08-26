@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
@@ -28,6 +29,7 @@ import uk.org.siri.siri21.AffectedVehicleJourneyStructure;
 import uk.org.siri.siri21.AffectsScopeStructure;
 import uk.org.siri.siri21.DataFrameRefStructure;
 import uk.org.siri.siri21.DatedVehicleJourneyRef;
+import uk.org.siri.siri21.DirectionStructure;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.NetworkRefStructure;
@@ -259,6 +261,8 @@ public class AffectsMapper {
           }
           FeedScopedId affectedRoute = new FeedScopedId(feedId, lineRef.getValue());
 
+          var affectedDirections = mapDirections(line.getDirections());
+
           if (!affectedStops.isEmpty()) {
             for (AffectedStopPointStructure affectedStop : affectedStops) {
               FeedScopedId stop = getStop(
@@ -271,13 +275,20 @@ public class AffectsMapper {
               }
               EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
                 stop,
+                affectedRoute,
                 resolveStopConditions(affectedStop.getStopConditions()),
-                affectedRoute
+                affectedDirections
               );
               selectors.add(entitySelector);
             }
           } else {
-            selectors.add(new EntitySelector.Route(affectedRoute));
+            if (affectedDirections != null) {
+              for (var dir : affectedDirections) {
+                selectors.add(new EntitySelector.DirectionAndRoute(affectedRoute, dir));
+              }
+            } else {
+              selectors.add(new EntitySelector.Route(affectedRoute));
+            }
           }
         }
       } else {
@@ -291,6 +302,25 @@ public class AffectsMapper {
       }
     }
     return selectors;
+  }
+
+  @Nullable
+  private List<Direction> mapDirections(List<DirectionStructure> directionStructures) {
+    var res = directionStructures
+      .stream()
+      .flatMap(d -> mapDirection(d.getDirectionRef().getValue()).stream())
+      .toList();
+    return res.isEmpty() ? null : res;
+  }
+
+  private Optional<Direction> mapDirection(String directionRef) {
+    return switch (directionRef.toUpperCase()) {
+      case "INBOUND" -> Optional.of(Direction.INBOUND);
+      case "OUTBOUND" -> Optional.of(Direction.OUTBOUND);
+      case "CLOCKWISE" -> Optional.of(Direction.CLOCKWISE);
+      case "ANTICLOCKWISE" -> Optional.of(Direction.ANTICLOCKWISE);
+      default -> Optional.empty();
+    };
   }
 
   private List<EntitySelector> mapStopPoints(AffectsScopeStructure.StopPoints stopPoints) {

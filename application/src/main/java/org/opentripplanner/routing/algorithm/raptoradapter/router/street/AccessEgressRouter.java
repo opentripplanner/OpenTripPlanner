@@ -56,11 +56,18 @@ public class AccessEgressRouter {
     var originVertices = accessOrEgress.isAccess()
       ? linkingContext.findVertices(request.from())
       : linkingContext.findVertices(request.to());
-    var streetAccessEgress = StreetNearbyStopFinder.of(null, durationLimit, maxStopCount)
+    var streetAccessEgress = StreetNearbyStopFinder.of(null)
       .withIgnoreVertices(ignoreVertices)
       .withExtensionRequestContexts(extensionRequestContexts)
       .build()
-      .findNearbyStops(originVertices, request, streetMode, accessOrEgress.isEgress());
+      .findNearbyStops(
+        originVertices,
+        request,
+        streetMode,
+        accessOrEgress.isEgress(),
+        durationLimit,
+        maxStopCount
+      );
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);

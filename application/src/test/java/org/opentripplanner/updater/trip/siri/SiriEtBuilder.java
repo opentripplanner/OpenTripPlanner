@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +21,17 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.EstimatedVersionFrameStructure;
 import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri21.JourneyRelationStructure;
+import uk.org.siri.siri21.JourneyRelationTypeEnumeration;
+import uk.org.siri.siri21.JourneyRelationsStructure;
 import uk.org.siri.siri21.LineRef;
 import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.OperatorRefStructure;
 import uk.org.siri.siri21.QuayRefStructure;
 import uk.org.siri.siri21.RecordedCall;
+import uk.org.siri.siri21.RelatedJourney;
+import uk.org.siri.siri21.RelatedJourneyPartStructure;
 import uk.org.siri.siri21.StopAssignmentStructure;
 import uk.org.siri.siri21.StopPointRefStructure;
 import uk.org.siri.siri21.VehicleJourneyRef;
@@ -189,11 +195,103 @@ public class SiriEtBuilder {
   }
 
   public SiriEtBuilder withFramedVehicleJourneyRef(
+    String vehicleJourneyRef,
+    LocalDate serviceDate
+  ) {
+    return withFramedVehicleJourneyRef(b ->
+      b.withVehicleJourneyRef(vehicleJourneyRef).withServiceDate(serviceDate)
+    );
+  }
+
+  public SiriEtBuilder withFramedVehicleJourneyRef(
     Function<FramedVehicleRefBuilder, FramedVehicleRefBuilder> producer
   ) {
     var builder = new FramedVehicleRefBuilder();
     builder = producer.apply(builder);
     evj.setFramedVehicleJourneyRef(builder.build());
+    return this;
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    RegularStop fromStop,
+    RegularStop toStop,
+    String replacementJourney,
+    LocalDate serviceDate
+  ) {
+    return withPartialReplacement(
+      fromStop.getId().getId(),
+      null,
+      toStop.getId().getId(),
+      null,
+      replacementJourney,
+      serviceDate
+    );
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    RegularStop fromStop,
+    String startTime,
+    RegularStop toStop,
+    String endTime,
+    String replacementJourney,
+    LocalDate serviceDate
+  ) {
+    return withPartialReplacement(
+      fromStop.getId().getId(),
+      localTimeParser.zonedDateTime(startTime),
+      toStop.getId().getId(),
+      localTimeParser.zonedDateTime(endTime),
+      replacementJourney,
+      serviceDate
+    );
+  }
+
+  public SiriEtBuilder withPartialReplacement(
+    String fromStop,
+    @Nullable ZonedDateTime startTime,
+    String toStop,
+    @Nullable ZonedDateTime endTime,
+    String replacementJourney,
+    LocalDate serviceDate
+  ) {
+    var relations = evj.getJourneyRelations();
+    if (relations == null) {
+      relations = new JourneyRelationsStructure();
+      evj.setJourneyRelations(relations);
+    }
+
+    var part = new RelatedJourneyPartStructure();
+    var from = new StopPointRefStructure();
+    from.setValue(fromStop);
+    part.setFromStopPointRef(from);
+    var to = new StopPointRefStructure();
+    to.setValue(toStop);
+    part.setToStopPointRef(to);
+
+    if (startTime != null) {
+      part.setStartTime(startTime);
+    }
+    if (endTime != null) {
+      part.setEndTime(endTime);
+    }
+
+    var parts = new RelatedJourney.JourneyParts();
+    parts.getJourneyPartInfos().add(part);
+
+    var relatedJourney = new RelatedJourney();
+    var framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
+    framedVehicleJourneyRef.setDatedVehicleJourneyRef(replacementJourney);
+    var dataFrameRefStructure = new DataFrameRefStructure();
+    dataFrameRefStructure.setValue(serviceDate.toString());
+    framedVehicleJourneyRef.setDataFrameRef(dataFrameRefStructure);
+    relatedJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
+
+    var rel = new JourneyRelationStructure();
+    rel.setJourneyParts(parts);
+    rel.setJourneyRelationType(JourneyRelationTypeEnumeration.REPLACED_BY_JOURNEY);
+    rel.getRelatedJourneies().add(relatedJourney);
+    relations.getJourneyRelations().add(rel);
+
     return this;
   }
 

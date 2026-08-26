@@ -21,6 +21,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -155,7 +156,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     @Nullable CarpoolingService carpoolingService,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
-    @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     StreetDetailsService streetDetailsService,
     @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable LuceneIndex luceneIndex,
@@ -242,7 +243,28 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RoutingService routingService() {
-    return new DefaultRoutingService(this);
+    return new DefaultRoutingService(
+      transitService,
+      transitAlertService,
+      graph,
+      raptorConfig,
+      meterRegistry,
+      streetLimitationParametersService,
+      vehicleRentalService,
+      streetDetailsService,
+      transferService,
+      flexParameters,
+      rideHailingServices,
+      dataOverlayParameterBindings,
+      sorlandsbanenService,
+      viaTransferResolver,
+      carpoolingService,
+      emissionItineraryDecorator,
+      stopConsolidationService,
+      linkingContextFactory,
+      transitRoutingConfig,
+      transitRoutingConfig
+    );
   }
 
   @Override

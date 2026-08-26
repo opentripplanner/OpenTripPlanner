@@ -91,7 +91,7 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    EmissionRepository emissionRepository,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -222,7 +222,8 @@ public class ConstructApplication {
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
       factory.transitAlertService(),
-      routerConfig().updaterConfig()
+      routerConfig().updaterConfig(),
+      otpConfig().gbfsNetworks
     );
 
     // Start application warmup — runs routing queries to warm up the application
@@ -377,6 +378,7 @@ public class ConstructApplication {
     factory.metricsLogging();
   }
 
+  @Nullable
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
   }

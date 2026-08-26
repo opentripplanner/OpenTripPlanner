@@ -44,7 +44,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     Vertex location,
     WgsCoordinate coordinate
   ) {
-    var nearbyStopFinder = createNearbyStopFinder(radiusAsDuration);
+    var nearbyStopFinder = createNearbyStopFinder();
 
     var toStops = findNearbyStops(nearbyStopFinder, location, request, false);
     var fromStops = findNearbyStops(nearbyStopFinder, location, request, true);
@@ -73,14 +73,11 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
    * Factory method for creating a NearbyStopFinder. The linker will use streets if they are
    * available, or straight-line distance otherwise.
    */
-  private NearbyStopFinder createNearbyStopFinder(Duration radiusAsDuration) {
+  private NearbyStopFinder createNearbyStopFinder() {
     if (!graph.hasStreets) {
-      return new StraightLineNearbyStopFinder(
-        transitService::findRegularStopsByBoundingBox,
-        radiusAsDuration
-      );
+      return new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
     } else {
-      return StreetNearbyStopFinder.of(null, radiusAsDuration, 0).build();
+      return StreetNearbyStopFinder.of(null).build();
     }
   }
 
@@ -94,7 +91,14 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     boolean reverseDirection
   ) {
     var transferMode = request.journey().transfer().mode();
-    var r = finder.findNearbyStops(viaVertex, request, transferMode, reverseDirection);
+    var r = finder.findNearbyStops(
+      viaVertex,
+      request,
+      transferMode,
+      reverseDirection,
+      radiusAsDuration,
+      0
+    );
     return r
       .stream()
       .filter(it -> !transitService.getStopLocation(it.stopId).transfersNotAllowed())

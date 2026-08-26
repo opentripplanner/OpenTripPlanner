@@ -24,7 +24,9 @@ class PreparedAreaGroupTest {
   // A 10x10 square with a 2x2 hole in the centre (x,y in (4,6)).
   private static final Polygon SQUARE_WITH_HOLE = squareWithHole();
 
-  private final PreparedAreaGroup area = new PreparedAreaGroup(new AreaGroup(SQUARE_WITH_HOLE));
+  private final PreparedAreaGroup area = new PreparedAreaGroup(
+    AreaGroup.of(SQUARE_WITH_HOLE).build()
+  );
 
   @Test
   void containsInteriorSegment() {
@@ -68,15 +70,14 @@ class PreparedAreaGroupTest {
 
   @Test
   void exposesWrappedAreaGroup() {
-    var ag = new AreaGroup(SQUARE_WITH_HOLE);
+    var ag = AreaGroup.of(SQUARE_WITH_HOLE).build();
     assertSame(ag, new PreparedAreaGroup(ag).areaGroup());
   }
 
   @Test
   void singleAreaGroupReturnsItsOnlyArea() {
     var only = area(square(0, 10));
-    var g = new AreaGroup(square(0, 10));
-    g.addArea(only);
+    var g = AreaGroup.of(square(0, 10)).addArea(only).build();
     assertEquals(
       List.of(only),
       new PreparedAreaGroup(g).areasCrossedBy(GeometryUtils.makeLineString(1, 5, 4, 5))
@@ -116,9 +117,7 @@ class PreparedAreaGroupTest {
     // so only A is returned.
     var a = area(square(0, 10));
     var b = area(square(10, 20));
-    var g = new AreaGroup(square(0, 20));
-    g.addArea(a);
-    g.addArea(b);
+    var g = AreaGroup.of(square(0, 20)).addArea(a).addArea(b).build();
     assertEquals(
       List.of(a),
       new PreparedAreaGroup(g).areasCrossedBy(GeometryUtils.makeLineString(5, 5, 10, 5))
@@ -126,19 +125,19 @@ class PreparedAreaGroupTest {
   }
 
   private static AreaGroup group(Area... areas) {
-    var g = new AreaGroup(square(0, 16));
+    var builder = AreaGroup.of(square(0, 16));
     for (Area a : areas) {
-      g.addArea(a);
+      builder.addArea(a);
     }
-    return g;
+    return builder.build();
   }
 
   private static Area area(Polygon geometry) {
-    var a = new Area();
-    a.setGeometry(geometry);
-    a.setName(I18NString.of("area"));
-    a.setPermission(StreetTraversalPermission.PEDESTRIAN);
-    return a;
+    return Area.of()
+      .withGeometry(geometry)
+      .withName(I18NString.of("area"))
+      .withPermission(StreetTraversalPermission.PEDESTRIAN)
+      .build();
   }
 
   private static Polygon square(double minX, double maxX) {

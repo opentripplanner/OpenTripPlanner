@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alert.siri;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,9 +13,10 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -161,29 +162,23 @@ public class SiriAlertsUpdateHandler {
       alert.withVersion(situation.getVersion().getValue().intValue());
     }
 
-    ArrayList<TimePeriod> periods = new ArrayList<>();
     if (situation.getValidityPeriods().size() > 0) {
+      ArrayList<TimePeriod> periods = new ArrayList<>();
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
-        final long realStart = activePeriod.getStartTime() != null
-          ? getEpochSecond(activePeriod.getStartTime())
-          : 0;
-        final long start = activePeriod.getStartTime() != null
-          ? realStart - earlyStart.toSeconds()
-          : 0;
+        final Instant start = activePeriod.getStartTime() != null
+          ? activePeriod.getStartTime().toInstant().minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.getEndTime() != null
+          ? activePeriod.getEndTime().toInstant()
+          : null;
 
-        final long realEnd = activePeriod.getEndTime() != null
-          ? getEpochSecond(activePeriod.getEndTime())
-          : TimePeriod.OPEN_ENDED;
-        final long end = activePeriod.getEndTime() != null ? realEnd : TimePeriod.OPEN_ENDED;
-
-        periods.add(new TimePeriod(start, end));
+        periods.add(TimePeriod.of(start, end));
       }
+      alert.withCalendar(AlertCalendar.of(periods));
     } else {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-      periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
+      alert.withCalendar(AlertCalendar.ofAlwaysActive());
     }
-
-    alert.addTimePeriods(periods);
 
     if (situation.getPriority() != null) {
       alert.withPriority(situation.getPriority().intValue());
@@ -217,10 +212,6 @@ public class SiriAlertsUpdateHandler {
     }
 
     return alert.build();
-  }
-
-  private long getEpochSecond(ZonedDateTime startTime) {
-    return startTime.toEpochSecond();
   }
 
   /*

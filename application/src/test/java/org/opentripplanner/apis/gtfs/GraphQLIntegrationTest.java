@@ -48,6 +48,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -68,11 +69,11 @@ import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.api.PlaceAtDistance;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -465,9 +466,7 @@ class GraphQLIntegrationTest {
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
       .addEntity(entitySelector)
-      .addTimePeriod(
-        new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
-      )
+      .withCalendar(AlertCalendar.of(TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME)))
       .build();
     var stationAlert = TransitAlert.of(id("a-station-alert"))
       .withHeaderText(I18NString.of("Station closed"))

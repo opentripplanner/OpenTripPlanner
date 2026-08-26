@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -10,11 +11,12 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It is
+ * A TripTimes represents the arrival and departure times for a single trip in a Timetable. It is
  * carried along by States when routing to ensure that they have a consistent, fast view of the trip
  * when realtime updates have been applied. All times are expressed as seconds since midnight (as in
  * GTFS).
@@ -30,6 +32,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   private final BitSet extraCalls;
   private final BitSet hasArrived;
   private final BitSet hasDeparted;
+
+  /// Any parts of this trip that are marked as replaced by another trip in a realtime update.
+  private final List<PartialReplacedBy> partialReplacedBys;
 
   @Nullable
   private final I18NString tripHeadsign;
@@ -57,6 +62,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     hasDeparted = builder.hasDeparted();
     state = builder.state();
     vehicleId = builder.vehicleId();
+    partialReplacedBys = builder.partialReplacedBys();
     validateNonIncreasingTimes();
   }
 
@@ -77,6 +83,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.hasDeparted = original.hasDeparted;
     this.state = original.state;
     this.vehicleId = original.vehicleId;
+    this.partialReplacedBys = original.partialReplacedBys;
   }
 
   /**
@@ -99,6 +106,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.hasDeparted = original.hasDeparted;
     this.state = original.state;
     this.vehicleId = original.vehicleId;
+    this.partialReplacedBys = original.partialReplacedBys;
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -258,6 +266,28 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return scheduledTripTimes.getPickupBookingInfo(stopPos);
   }
 
+  @Override
+  public List<ReplacedByRelation> getArrivalReplacedByRelations(int stopPos) {
+    var result = new ArrayList<ReplacedByRelation>();
+    for (var replacedBy : this.partialReplacedBys) {
+      if (stopPos > replacedBy.fromPos() && stopPos <= replacedBy.toPos()) {
+        result.add(new ReplacedByRelation(replacedBy.replacedBy()));
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public List<ReplacedByRelation> getDepartureReplacedByRelations(int stopPos) {
+    var result = new ArrayList<ReplacedByRelation>();
+    for (var replacedBy : this.partialReplacedBys) {
+      if (stopPos >= replacedBy.fromPos() && stopPos < replacedBy.toPos()) {
+        result.add(new ReplacedByRelation(replacedBy.replacedBy()));
+      }
+    }
+    return result;
+  }
+
   /**
    * if a RealTimeTripTimes is constructed and no updates are applied, it is considered scheduled
    */
@@ -378,7 +408,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Objects.deepEquals(stopHeadsigns, that.stopHeadsigns) &&
       Objects.deepEquals(occupancyStatus, that.occupancyStatus) &&
       wheelchairAccessibility == that.wheelchairAccessibility &&
-      Objects.equals(state, that.state)
+      Objects.equals(state, that.state) &&
+      Objects.equals(partialReplacedBys, that.partialReplacedBys) &&
+      Objects.equals(vehicleId, that.vehicleId)
     );
   }
 
@@ -393,7 +425,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       Arrays.hashCode(stopHeadsigns),
       Arrays.hashCode(occupancyStatus),
       wheelchairAccessibility,
-      state
+      state,
+      partialReplacedBys,
+      vehicleId
     );
   }
 }

@@ -35,6 +35,21 @@ class ListUtilsTest {
     assertEquals(List.of(1, 2, 3, 5, 6, 7), combined);
   }
 
+  @Test
+  void partition() {
+    assertEquals(List.of(), ListUtils.partition(List.of(), 3));
+    assertEquals(List.of(List.of(1, 2, 3)), ListUtils.partition(List.of(1, 2, 3), 3));
+    assertEquals(
+      List.of(List.of(1, 2, 3), List.of(4, 5)),
+      ListUtils.partition(List.of(1, 2, 3, 4, 5), 3)
+    );
+    assertEquals(
+      List.of(List.of(1), List.of(2), List.of(3)),
+      ListUtils.partition(List.of(1, 2, 3), 1)
+    );
+    assertThrows(IllegalArgumentException.class, () -> ListUtils.partition(List.of(1), 0));
+  }
+
   private static String makeHello() {
     return new String("HELLO");
   }

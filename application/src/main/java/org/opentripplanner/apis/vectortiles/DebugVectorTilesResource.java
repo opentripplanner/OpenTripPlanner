@@ -182,7 +182,8 @@ public class DebugVectorTilesResource {
       GEOFENCING_ZONES.toVectorSourceLayer(geofencingSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       TRANSFERS.toVectorSourceLayer(transferSource),
-      debugUiConfig.additionalBackgroundLayers()
+      debugUiConfig.additionalBackgroundLayers(),
+      vehicleRentalService.listNetworks()
     );
   }
 

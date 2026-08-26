@@ -242,6 +242,8 @@ type EstimatedCall {
   aimedArrivalTime: DateTime!
   "Scheduled time of departure from quay. Not affected by read time updated"
   aimedDepartureTime: DateTime!
+  "Information about any trips replacing the current trip at the arrival of this call."
+  arrivalReplacedBy: [ReplacedByRelation!]!
   "Booking arrangements for this EstimatedCall."
   bookingArrangements: BookingArrangement
   "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by real-time data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
@@ -249,6 +251,8 @@ type EstimatedCall {
   "The date the estimated call is valid for."
   date: Date!
   datedServiceJourney: DatedServiceJourney
+  "Information about any trips replacing the current trip at the departure of this call."
+  departureReplacedBy: [ReplacedByRelation!]!
   destinationDisplay: DestinationDisplay
   "The typical delay for this trip on this day for this stop based on historical data."
   empiricalDelay: EmpiricalDelay
@@ -272,6 +276,8 @@ type EstimatedCall {
   realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
+  "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"
+  scheduledQuay: Quay!
   serviceJourney: ServiceJourney!
   "Estimated calls for the ServiceJourney on this date."
   serviceJourneyEstimatedCalls: SJEstimatedCalls!

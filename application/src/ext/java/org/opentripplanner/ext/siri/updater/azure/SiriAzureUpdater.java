@@ -11,7 +11,6 @@ import com.azure.messaging.servicebus.administration.ServiceBusAdministrationCli
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
@@ -325,7 +324,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      Preconditions.checkNotNull(
+      Objects.requireNonNull(
         fullyQualifiedNamespace,
         "fullyQualifiedNamespace must be set for FederatedIdentity authentication"
       );
@@ -333,7 +332,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         .fullyQualifiedNamespace(fullyQualifiedNamespace)
         .credential(new DefaultAzureCredentialBuilder().build());
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      Preconditions.checkNotNull(
+      Objects.requireNonNull(
         serviceBusUrl,
         "serviceBusUrl must be set for SharedAccessKey authentication"
       );

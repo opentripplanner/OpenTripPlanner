@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -212,6 +213,61 @@ class TripTimeOnDateTest {
       assertEquals(tripTimeOnDate.getStopPosition(), i);
       i++;
     }
+  }
+
+  @Test
+  void scheduledStop() {
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var scheduledStop = TEST_MODEL.stop("scheduled").build();
+    var realTimeStop = TEST_MODEL.stop("realtime").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, scheduledStop, stopC))
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+      .build();
+
+    var subject = new TripTimeOnDate(tripTimesFor(3), 1, realTimePattern);
+
+    assertEquals(realTimeStop, subject.getStop());
+    assertEquals(scheduledStop, subject.getScheduledStop(scheduledPattern));
+  }
+
+  @Test
+  void testScheduledStopForExtraCall() {
+    // The scheduled stop should fall back to the same stop as realtime
+    var route = TransitRepositoryForTest.route("R1").build();
+    var stopA = TEST_MODEL.stop("A").build();
+    var realTimeStop = TEST_MODEL.stop("realtime").build();
+    var stopC = TEST_MODEL.stop("C").build();
+
+    var shorterScheduledPattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, stopC))
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
+      .build();
+    var tripTimes = tripTimesFor(3)
+      .createRealTimeFromScheduledTimes()
+      .withExtraCall(1, true)
+      .build();
+
+    var first = new TripTimeOnDate(tripTimes, 0, realTimePattern);
+    var second = new TripTimeOnDate(tripTimes, 1, realTimePattern);
+    var third = new TripTimeOnDate(tripTimes, 2, realTimePattern);
+
+    assertEquals(stopA, first.getScheduledStop(shorterScheduledPattern));
+    assertEquals(realTimeStop, second.getScheduledStop(shorterScheduledPattern));
+    assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
+  }
+
+  private static TripTimes tripTimesFor(int stops) {
+    var trip = TransitRepositoryForTest.trip("123").build();
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
+    return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
 
   private List<String> mapTripTimeOnDateToStopId(List<TripTimeOnDate> tripTimes) {

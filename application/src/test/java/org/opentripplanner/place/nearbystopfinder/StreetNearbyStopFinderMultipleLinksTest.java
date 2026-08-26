@@ -61,10 +61,17 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
     // Max-stop-count should work correctly even though there are multiple links B <-> stopB
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 3;
-    var finder = StreetNearbyStopFinder.of(null, durationLimit, maxStopCount).build();
+    var finder = StreetNearbyStopFinder.of(null).build();
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetMode.WALK, false)
+      finder.findNearbyStops(
+        stopA,
+        RouteRequest.defaultValue(),
+        StreetMode.WALK,
+        false,
+        durationLimit,
+        maxStopCount
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(3);

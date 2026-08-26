@@ -1,5 +1,6 @@
 package org.opentripplanner.place.nearbystopfinder;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
@@ -61,7 +62,9 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     Vertex vertex,
     RouteRequest routingRequest,
     StreetMode streetMode,
-    boolean reverseDirection
+    boolean reverseDirection,
+    Duration durationLimit,
+    int maxStopCount
   ) {
     if (!(vertex instanceof TransitStopVertex stopVertex)) {
       throw new IllegalArgumentException(
@@ -79,7 +82,9 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
       vertex,
       routingRequest,
       streetMode,
-      reverseDirection
+      reverseDirection,
+      durationLimit,
+      maxStopCount
     );
 
     // Remove transfersNotAllowed stops BEFORE we filter in Pattern and Flex Trips

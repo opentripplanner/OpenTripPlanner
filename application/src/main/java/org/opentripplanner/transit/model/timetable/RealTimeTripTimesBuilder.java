@@ -3,8 +3,10 @@ package org.opentripplanner.transit.model.timetable;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_ARRIVAL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_DEPARTURE_TIME;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -18,6 +20,7 @@ public class RealTimeTripTimesBuilder {
   private final Integer[] departureTimes;
 
   private final StopRealTimeState[] stopRealTimeStates;
+  private final List<PartialReplacedBy> partialReplacedBys;
 
   private final BitSet extraCalls;
   private final BitSet hasArrived;
@@ -58,6 +61,7 @@ public class RealTimeTripTimesBuilder {
     Arrays.fill(occupancyStatus, OccupancyStatus.NO_DATA_AVAILABLE);
     hasArrived = new BitSet(numStops);
     hasDeparted = new BitSet(numStops);
+    partialReplacedBys = new ArrayList<>();
   }
 
   /**
@@ -355,6 +359,19 @@ public class RealTimeTripTimesBuilder {
       .withServiceCode(serviceCode)
       .build();
     return this;
+  }
+
+  public RealTimeTripTimesBuilder withPartialReplacedBy(
+    int fromStop,
+    int toStop,
+    TripOnServiceDate replacedBy
+  ) {
+    partialReplacedBys.add(new PartialReplacedBy(fromStop, toStop, replacedBy));
+    return this;
+  }
+
+  public List<PartialReplacedBy> partialReplacedBys() {
+    return List.copyOf(partialReplacedBys);
   }
 
   /**

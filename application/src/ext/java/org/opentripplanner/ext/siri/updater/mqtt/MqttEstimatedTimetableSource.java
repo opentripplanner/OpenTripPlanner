@@ -2,7 +2,6 @@ package org.opentripplanner.ext.siri.updater.mqtt;
 
 import static org.opentripplanner.utils.lang.StringUtils.hasNoValue;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedContext;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
@@ -84,17 +83,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   public MqttEstimatedTimetableSource(MqttSiriETUpdaterParameters parameters) {
     this.parameters = parameters;
 
-    ThreadFactory primingThreadFactory = new ThreadFactoryBuilder()
-      .setNameFormat("primingSiriMqttUpdater-%d")
-      .build();
+    ThreadFactory primingThreadFactory = Thread.ofPlatform()
+      .name("primingSiriMqttUpdater-", 0)
+      .factory();
     this.primingExecutor = Executors.newFixedThreadPool(
       parameters.numberOfPrimingWorkers(),
       primingThreadFactory
     );
 
-    ThreadFactory liveThreadFactory = new ThreadFactoryBuilder()
-      .setNameFormat("liveSiriMqttUpdater-%d")
-      .build();
+    ThreadFactory liveThreadFactory = Thread.ofPlatform().name("liveSiriMqttUpdater-", 0).factory();
     this.liveExecutor = Executors.newSingleThreadExecutor(liveThreadFactory);
 
     registerMetrics();

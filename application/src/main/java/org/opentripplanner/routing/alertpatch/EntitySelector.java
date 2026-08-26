@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.alertpatch;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -79,21 +80,26 @@ public sealed interface EntitySelector {
     }
   }
 
+  /// EntitySelector for a stop and a route. The stop can optionally be restricted to certain stopConditions
+  /// and the line can be restricted to certain directions.
+  ///
+  /// @param directions If set the selector will only match trips with one of the specified directions. An empty list will match nothing.
   record StopAndRoute(
     FeedScopedId stopId,
     FeedScopedId routeId,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    @Nullable List<Direction> directions
   ) implements EntitySelector {
     public StopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
-      this(stopId, routeId, Set.of());
+      this(stopId, routeId, Set.of(), null);
     }
 
     public StopAndRoute(
       FeedScopedId stopId,
-      Set<StopCondition> stopConditions,
-      FeedScopedId routeId
+      FeedScopedId routeId,
+      Set<StopCondition> stopConditions
     ) {
-      this(stopId, routeId, stopConditions);
+      this(stopId, routeId, stopConditions, null);
     }
 
     @Override
@@ -106,10 +112,15 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.StopAndRoute s)) {
         return false;
       }
+
+      var matchesDirection =
+        directions == null || (s.directions() != null && directions.containsAll(s.directions()));
+
       return (
         stopId.equals(s.stopId) &&
         routeId.equals(s.routeId) &&
-        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
+        matchesDirection
       );
     }
   }

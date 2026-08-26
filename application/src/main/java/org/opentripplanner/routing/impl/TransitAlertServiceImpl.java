@@ -108,12 +108,14 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndRouteAlerts(
     FeedScopedId stop,
     FeedScopedId route,
-    Set<StopCondition> stopConditions
+    Set<StopCondition> stopConditions,
+    Direction direction
   ) {
     EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
       stop,
       route,
-      stopConditions
+      stopConditions,
+      List.of(direction)
     );
     return findMatchingAlerts(entitySelector);
   }
