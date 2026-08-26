@@ -15,28 +15,21 @@ import org.opentripplanner.core.model.time.TimePeriod;
  * This is a general purpose API model which is not tied to any specific domain concept, so it can
  * be used whenever an open-ended range of instants needs to be returned by the GTFS GraphQL API.
  */
-public record OpenEndedOffsetDateTimeRange(
-  @Nullable OffsetDateTime start,
-  @Nullable OffsetDateTime end
-) {
+public record OffsetDateTimeRange(@Nullable OffsetDateTime start, @Nullable OffsetDateTime end) {
   /**
    * Orders the ranges chronologically: ranges with an open start come first and ranges with an open
    * end come last.
    */
-  public static final Comparator<OpenEndedOffsetDateTimeRange> CHRONOLOGICAL_ORDER =
-    Comparator.comparing(
-      OpenEndedOffsetDateTimeRange::start,
-      Comparator.nullsFirst(Comparator.naturalOrder())
-    ).thenComparing(
-      OpenEndedOffsetDateTimeRange::end,
-      Comparator.nullsLast(Comparator.naturalOrder())
-    );
+  public static final Comparator<OffsetDateTimeRange> CHRONOLOGICAL_ORDER = Comparator.comparing(
+    OffsetDateTimeRange::start,
+    Comparator.nullsFirst(Comparator.naturalOrder())
+  ).thenComparing(OffsetDateTimeRange::end, Comparator.nullsLast(Comparator.naturalOrder()));
 
   /**
    * Converts a {@link TimePeriod} into a range using the given time zone for the offsets.
    */
-  public static OpenEndedOffsetDateTimeRange of(TimePeriod period, ZoneId zoneId) {
-    return new OpenEndedOffsetDateTimeRange(
+  public static OffsetDateTimeRange of(TimePeriod period, ZoneId zoneId) {
+    return new OffsetDateTimeRange(
       period
         .start()
         .map(start -> OffsetDateTime.ofInstant(start, zoneId))

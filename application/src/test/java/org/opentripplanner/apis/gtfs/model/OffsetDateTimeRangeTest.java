@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.time.TimePeriod;
 
-class OpenEndedOffsetDateTimeRangeTest {
+class OffsetDateTimeRangeTest {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
   private static final Instant START = OffsetDateTime.parse(
@@ -19,7 +19,7 @@ class OpenEndedOffsetDateTimeRangeTest {
 
   @Test
   void convertBoundedPeriod() {
-    var subject = OpenEndedOffsetDateTimeRange.of(TimePeriod.of(START, END), ZONE_ID);
+    var subject = OffsetDateTimeRange.of(TimePeriod.of(START, END), ZONE_ID);
 
     assertThat(subject.start()).isEqualTo(OffsetDateTime.parse("2023-02-15T12:03:28+01:00"));
     assertThat(subject.end()).isEqualTo(OffsetDateTime.parse("2023-02-16T12:03:28+01:00"));
@@ -27,7 +27,7 @@ class OpenEndedOffsetDateTimeRangeTest {
 
   @Test
   void convertUnboundedPeriod() {
-    var subject = OpenEndedOffsetDateTimeRange.of(TimePeriod.ofUnbounded(), ZONE_ID);
+    var subject = OffsetDateTimeRange.of(TimePeriod.ofUnbounded(), ZONE_ID);
 
     assertThat(subject.start()).isNull();
     assertThat(subject.end()).isNull();
@@ -35,14 +35,14 @@ class OpenEndedOffsetDateTimeRangeTest {
 
   @Test
   void sortChronologically() {
-    var openStart = OpenEndedOffsetDateTimeRange.of(TimePeriod.of(null, START), ZONE_ID);
-    var bounded = OpenEndedOffsetDateTimeRange.of(TimePeriod.of(START, END), ZONE_ID);
-    var openEndFromStart = OpenEndedOffsetDateTimeRange.of(TimePeriod.of(START, null), ZONE_ID);
-    var openEnd = OpenEndedOffsetDateTimeRange.of(TimePeriod.of(END, null), ZONE_ID);
+    var openStart = OffsetDateTimeRange.of(TimePeriod.of(null, START), ZONE_ID);
+    var bounded = OffsetDateTimeRange.of(TimePeriod.of(START, END), ZONE_ID);
+    var openEndFromStart = OffsetDateTimeRange.of(TimePeriod.of(START, null), ZONE_ID);
+    var openEnd = OffsetDateTimeRange.of(TimePeriod.of(END, null), ZONE_ID);
 
     var sorted = List.of(openEnd, bounded, openEndFromStart, openStart)
       .stream()
-      .sorted(OpenEndedOffsetDateTimeRange.CHRONOLOGICAL_ORDER)
+      .sorted(OffsetDateTimeRange.CHRONOLOGICAL_ORDER)
       .toList();
 
     assertThat(sorted).containsExactly(openStart, bounded, openEndFromStart, openEnd).inOrder();

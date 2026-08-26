@@ -20,7 +20,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.apis.gtfs.mapping.AlertCauseMapper;
-import org.opentripplanner.apis.gtfs.model.OpenEndedOffsetDateTimeRange;
+import org.opentripplanner.apis.gtfs.model.OffsetDateTimeRange;
 import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
 import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
 import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
@@ -46,15 +46,15 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   private static final String FALLBACK_EMPTY_STRING = "";
 
   @Override
-  public DataFetcher<Iterable<OpenEndedOffsetDateTimeRange>> activityPeriods() {
+  public DataFetcher<Iterable<OffsetDateTimeRange>> activityPeriods() {
     return environment -> {
       var zoneId = getTransitService(environment).getTimeZone();
       return getSource(environment)
         .calendar()
         .timePeriods()
         .stream()
-        .map(period -> OpenEndedOffsetDateTimeRange.of(period, zoneId))
-        .sorted(OpenEndedOffsetDateTimeRange.CHRONOLOGICAL_ORDER)
+        .map(period -> OffsetDateTimeRange.of(period, zoneId))
+        .sorted(OffsetDateTimeRange.CHRONOLOGICAL_ORDER)
         .toList();
     };
   }

@@ -140,7 +140,7 @@ type Alert implements Node {
   least one period. A period without a start has always been active and a period without an
   end is active indefinitely.
   """
-  activityPeriods: [OpenEndedOffsetDateTimeRange!]!
+  activityPeriods: [OffsetDateTimeRange!]!
   """
   Agency affected by the disruption. Note that this value is present only if the
   disruption has an effect on all operations of the agency (e.g. in case of a strike).
@@ -1076,7 +1076,7 @@ The range is half-open, which means that the start is included in the range but 
 A `null` start means that the range extends indefinitely into the past and a `null` end means
 that it extends indefinitely into the future.
 """
-type OpenEndedOffsetDateTimeRange {
+type OffsetDateTimeRange {
   "The exclusive end of the range or `null` if the range has no end."
   end: OffsetDateTime
   "The inclusive start of the range or `null` if the range has no start."
