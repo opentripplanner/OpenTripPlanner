@@ -23,7 +23,6 @@ import org.opentripplanner.osm.wayproperty.specifier.Condition.Equals;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.Not;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 
 /**
  * This factory class provides a default collection of {@link WayProperties} that determine how OSM
@@ -421,38 +420,6 @@ public class OsmTagMapper {
   }
 
   static void populateNotesAndNames(WayPropertySetBuilder props) {
-    /* and the notes */
-    // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
-    // However they are not taken into account when passed to the translation function.
-    // props.createNotes("wheelchair:description=*", "{wheelchair:description}", StreetNotesService.WHEELCHAIR_MATCHER);
-    // TODO: The two entries below produce lots of spurious notes (because of OSM mapper comments)
-    // props.createNotes("note=*", "{note}", StreetNotesService.ALWAYS_MATCHER);
-    // props.createNotes("notes=*", "{notes}", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes(
-      "RLIS:bicycle=caution_area",
-      "note.caution",
-      StreetNotesService.BICYCLE_MATCHER
-    );
-    props.createNotes(
-      "CCGIS:bicycle=caution_area",
-      "note.caution",
-      StreetNotesService.BICYCLE_MATCHER
-    );
-    // TODO: Maybe we should apply the following notes only for car/bike
-    props.createNotes("surface=unpaved", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes(
-      "surface=compacted",
-      "note.unpaved_surface",
-      StreetNotesService.ALWAYS_MATCHER
-    );
-    props.createNotes("surface=ground", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes("surface=dirt", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes("surface=earth", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes("surface=grass", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes("surface=mud", "note.muddy_surface", StreetNotesService.ALWAYS_MATCHER);
-    props.createNotes("toll=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
-    props.createNotes("toll:motorcar=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
-
     /* and some names */
     // Basics
     props.createNames("highway=cycleway", "name.bike_path");

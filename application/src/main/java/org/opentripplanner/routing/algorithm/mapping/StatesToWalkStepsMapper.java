@@ -22,7 +22,6 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTr
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -55,7 +54,6 @@ public class StatesToWalkStepsMapper {
   );
 
   private final double ellipsoidToGeoidDifference;
-  private final StreetNotesService streetNotesService;
   private final VerticalTransportationUseFactory verticalTransportationUseFactory;
 
   private final List<State> states;
@@ -86,14 +84,12 @@ public class StatesToWalkStepsMapper {
   public StatesToWalkStepsMapper(
     List<State> states,
     WalkStep previousStep,
-    StreetNotesService streetNotesService,
     StreetDetailsService streetDetailsService,
     EntranceResolver entranceResolver,
     double ellipsoidToGeoidDifference
   ) {
     this.states = states;
     this.previous = previousStep;
-    this.streetNotesService = streetNotesService;
     this.entranceResolver = entranceResolver;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
     this.verticalTransportationUseFactory = new VerticalTransportationUseFactory(
@@ -329,9 +325,7 @@ public class StatesToWalkStepsMapper {
     }
 
     // increment the total length for this step
-    current
-      .addDistance(edge.getDistanceMeters())
-      .addStreetNotes(streetNotesService.getNotes(forwardState));
+    current.addDistance(edge.getDistanceMeters());
     lastAngle = DirectionUtils.getLastAngle(geom);
 
     current.addEdge(edge);
@@ -693,7 +687,6 @@ public class StatesToWalkStepsMapper {
           0,
           forwardState.getRequest().geoidElevation() ? -ellipsoidToGeoidDifference : 0
         )
-      )
-      .addStreetNotes(streetNotesService.getNotes(forwardState));
+      );
   }
 }

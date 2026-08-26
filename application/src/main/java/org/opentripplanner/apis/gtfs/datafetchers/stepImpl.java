@@ -4,10 +4,10 @@ import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.DirectionMapper;
-import org.opentripplanner.apis.gtfs.mapping.StreetNoteMapper;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.elevation.ElevationProfile.Step;
@@ -22,12 +22,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment ->
-      getSource(environment)
-        .getStreetNotes()
-        .stream()
-        .map(StreetNoteMapper::mapStreetNoteToAlert)
-        .toList();
+    return _ -> List.of();
   }
 
   @Override

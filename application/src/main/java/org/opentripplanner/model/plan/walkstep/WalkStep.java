@@ -3,14 +3,12 @@ package org.opentripplanner.model.plan.walkstep;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUse;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -40,8 +38,6 @@ public final class WalkStep {
   private final I18NString directionText;
   private final AbsoluteDirection absoluteDirection;
 
-  private final Set<StreetNote> streetNotes;
-
   private final boolean area;
   private final boolean nameIsDerived;
   private final double angle;
@@ -65,7 +61,6 @@ public final class WalkStep {
     RelativeDirection relativeDirection,
     AbsoluteDirection absoluteDirection,
     I18NString directionText,
-    Set<StreetNote> streetNotes,
     String highwayExit,
     @Nullable Entrance entrance,
     @Nullable VerticalTransportationUse verticalTransportationUse,
@@ -82,7 +77,6 @@ public final class WalkStep {
     this.relativeDirection = Objects.requireNonNull(relativeDirection);
     this.absoluteDirection = absoluteDirection;
     this.directionText = directionText;
-    this.streetNotes = Set.copyOf(Objects.requireNonNull(streetNotes));
     this.startLocation = Objects.requireNonNull(startLocation);
     this.nameIsDerived = nameIsDerived;
     this.angle = DoubleUtils.roundTo2Decimals(angle);
@@ -98,10 +92,6 @@ public final class WalkStep {
 
   public ElevationProfile getElevationProfile() {
     return elevationProfile;
-  }
-
-  public Set<StreetNote> getStreetNotes() {
-    return streetNotes;
   }
 
   /**
