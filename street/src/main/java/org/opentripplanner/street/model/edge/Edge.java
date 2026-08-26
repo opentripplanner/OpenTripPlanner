@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all
  * standard OTP edges are subclasses of this.
- * standard OTP edges are subclasses of this.
  */
 public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializable {
 

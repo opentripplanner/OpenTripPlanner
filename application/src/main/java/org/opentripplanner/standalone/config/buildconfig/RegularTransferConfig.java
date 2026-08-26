@@ -107,8 +107,8 @@ public class RegularTransferConfig {
         .description(
           """
           A car or a bike can cover a much larger distance than walking within the same duration.
-          Reusing this value would reduce the search radius, calculating less transfers and
-          decrease the graph memory usage.
+          Reusing this value would reduce the search radius, calculating fewer transfers and
+          decreases the graph memory usage.
 
           If it isn't known which stops actually allow cars/bikes, combine a lower value here with
           `carsAllowedStopMaxTransferDuration` or `bikesAllowedStopMaxTransferDuration` as a
