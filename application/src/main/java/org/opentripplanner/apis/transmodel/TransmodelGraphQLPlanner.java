@@ -84,6 +84,6 @@ public class TransmodelGraphQLPlanner {
   }
 
   private static Locale defaultLocale(TransmodelRequestContext ctx) {
-    return ctx.getServerContext().defaultRouteRequest().preferences().locale();
+    return ctx.getDefaultRouteRequest().preferences().locale();
   }
 }

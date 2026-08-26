@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.glassfish.grizzly.http.server.Request;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.TestServerContext;
-import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -18,19 +18,17 @@ class VectorTilesResourceTest {
   void tileJson() {
     // the Grizzly request is awful to instantiate, using Mockito
     var grizzlyRequest = Mockito.mock(Request.class);
-    var serverContext = TestServerContext.createServerContext(
-      new Graph(),
+    var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      TransferServiceTestFactory.defaultTransferRepository(),
-      new DefaultFareService()
+      TransferServiceTestFactory.defaultTransferRepository()
     );
     var resource = new VectorTilesResource(
-      serverContext.transitService(),
-      serverContext.vectorTileConfig(),
-      serverContext.worldEnvelopeService(),
-      serverContext.vehicleRentalService(),
-      serverContext.vehicleParkingService(),
-      serverContext.transitAlertService(),
+      transitService,
+      RouterConfig.DEFAULT.vectorTileConfig(),
+      TestServerContext.createWorldEnvelopeService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createVehicleParkingService(),
+      new TransitAlertServiceImpl(),
       grizzlyRequest,
       "default"
     );
