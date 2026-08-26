@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.model.Ring;
 import org.opentripplanner.osm.model.OsmNode;
 
 class RingTest {
