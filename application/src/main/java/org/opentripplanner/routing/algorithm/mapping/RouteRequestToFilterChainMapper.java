@@ -114,7 +114,7 @@ public class RouteRequestToFilterChainMapper {
 
     if (
       context.carPickupZoneDecorator() != null &&
-      hasAccessOrEgressMode(request, StreetMode.CAR_PICKUP)
+      request.journey().modes().hasAccessOrEgressOrDirectMode(StreetMode.TAXI)
     ) {
       builder.withCarPickupZoneDecorator(context.carPickupZoneDecorator());
     }
@@ -131,14 +131,9 @@ public class RouteRequestToFilterChainMapper {
   }
 
   private static double minBikeParkingDistance(RouteRequest request) {
-    if (hasAccessOrEgressMode(request, StreetMode.BIKE_TO_PARK)) {
+    if (request.journey().modes().hasAccessOrEgressMode(StreetMode.BIKE_TO_PARK)) {
       return request.preferences().itineraryFilter().minBikeParkingDistance();
     }
     return 0;
-  }
-
-  private static boolean hasAccessOrEgressMode(RouteRequest request, StreetMode mode) {
-    var modes = request.journey().modes();
-    return modes.accessMode == mode || modes.egressMode == mode;
   }
 }

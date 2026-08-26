@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -115,5 +116,23 @@ public class CarSnapshotTest extends SnapshotTestBase {
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
+  }
+
+  @DisplayName("Direct TAXI (with walking both ends) - CarPickupZone enabled")
+  @Test
+  public void directTaxiWithWalking() {
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb -> {
+        jb.withDirect(new StreetRequest(StreetMode.TAXI));
+        jb.withTransit(b -> b.disable());
+      })
+      .withFrom(p3)
+      .withTo(p4)
+      .buildRequest();
+
+    // TAXI only performs a CAR_PICKUP-style street search when the car-pickup-zone sandbox
+    // feature is enabled. Otherwise it defaults to (not yet implemented) flex taxi routing,
+    // returning no results - see directTaxiWithoutCarPickupZoneFeatureReturnsNoResults below.
+    OTPFeature.CarPickupZone.testOn(() -> expectRequestResponseToMatchSnapshot(request));
   }
 }

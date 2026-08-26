@@ -212,6 +212,12 @@ public class RoutingWorker {
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no direct itinerary for TAXI unless the
+    //       car-pickup-zone sandbox feature is enabled.
+    if (request.journey().direct().mode() == StreetMode.TAXI && OTPFeature.CarPickupZone.isOff()) {
+      return RoutingResult.empty();
+    }
 
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}

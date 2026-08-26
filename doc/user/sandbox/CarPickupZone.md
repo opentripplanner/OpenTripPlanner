@@ -14,12 +14,11 @@ For each driving-ish leg in a car pickup itinerary:
   deletion and removed from the response.
 - If **a matching zone is found**, the generic driving leg is replaced with a `CarPickupZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
-- The filter is only enabled when the request's access or egress mode is `CAR_PICKUP` (see
-  `RouteRequestToFilterChainMapper`).
+- The filter is only enabled when the request's access, egress, or direct mode is
+  `TAXI` (see `RouteRequestToFilterChainMapper`).
 
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
-- Possibly add CAR_PICKUP direct mode to GTFS API for enabling the car pickup zone decorator with only direct mode.
 - Calendar/service-date validation. The matched flex trip's `service_id` is currently not checked
   against the itinerary's travel date, so a zone will decorate a leg regardless of the day of week
   or date range configured in `calendar.txt`/`calendar_dates.txt`.
@@ -56,6 +55,13 @@ a warning in the build report:
    have a geometry. Trips with separate departure and arrival zones are not supported.
 5. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
    (CALL_AGENCY). `0` (SCHEDULED) and `3` (COORDINATE_WITH_DRIVER) are not accepted.
+
+### GTFS API Modes
+
+To opt into car pickup zone matching, requests must use the `TAXI` mode
+(`PlanAccessMode`, `PlanEgressMode`, or `PlanDirectMode`) for the relevant part of the journey.
+Internally this maps to the `TAXI` street mode, which behaves identically to
+`CAR_PICKUP` for routing purposes but additionally registers the car pickup zone itinerary filter.
 
 ### Decorated Leg Fields
 

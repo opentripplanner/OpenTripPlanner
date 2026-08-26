@@ -63,12 +63,16 @@ public class RequestModes {
     return DEFAULTS;
   }
 
-  public boolean contains(StreetMode streetMode) {
+  public boolean hasAccessOrEgressOrDirectMode(StreetMode streetMode) {
     return (
       streetMode.equals(accessMode) ||
       streetMode.equals(egressMode) ||
       streetMode.equals(directMode)
     );
+  }
+
+  public boolean hasAccessOrEgressMode(StreetMode streetMode) {
+    return streetMode.equals(accessMode) || streetMode.equals(egressMode);
   }
 
   @Override

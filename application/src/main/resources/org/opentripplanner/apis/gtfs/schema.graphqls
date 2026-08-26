@@ -3752,7 +3752,7 @@ enum PlanAccessMode {
   CAR
   """
   Getting dropped off by a car to a location that is accessible with a car.
-  Note, this can include walking after the drop-off.
+  Note, this can include walking before being picked up and/or after the drop-off.
   """
   CAR_DROP_OFF
   """
@@ -3782,6 +3782,11 @@ enum PlanAccessMode {
   scooter.
   """
   SCOOTER_RENTAL
+  """
+  Getting dropped off by a taxi at a location that is accessible with a car. Note, this can
+  include walking before being picked up and/or after the drop-off.
+  """
+  TAXI
   "Walking to a stop."
   WALK
 }
@@ -3837,6 +3842,11 @@ enum PlanDirectMode {
   """
   SCOOTER_RENTAL
   """
+  Traveling by taxi from the origin to the destination. Note, this can include walking before
+  the pickup or after the drop-off.
+  """
+  TAXI
+  """
   Walking from the origin to the destination. Note, this can include walking
   when it's needed to walk the bicycle.
   """
@@ -3866,7 +3876,7 @@ enum PlanEgressMode {
   CAR
   """
   Getting picked up by a car from a location that is accessible with a car.
-  Note, this can include walking before the pickup.
+  Note, this can include walking before the pickup and/or after being dropped off.
   """
   CAR_PICKUP
   """
@@ -3891,6 +3901,11 @@ enum PlanEgressMode {
   scooter.
   """
   SCOOTER_RENTAL
+  """
+  Getting picked up by a taxi from a location that is accessible with a car. Note, this can
+  include walking before the pickup and/or after being dropped off.
+  """
+  TAXI
   "Walking from a stop to the destination."
   WALK
 }

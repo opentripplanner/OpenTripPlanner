@@ -92,7 +92,7 @@ public class StateData implements Cloneable {
       // when cycling all the way or to a stop, you start on your own bike
       case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
       // when driving (not car rental) you start in your own car or your driver's car
-      case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAILING -> TraverseMode.CAR;
+      case CAR, CAR_TO_PARK, CAR_PICKUP, TAXI, CAR_HAILING -> TraverseMode.CAR;
     };
   }
 
@@ -121,7 +121,7 @@ public class StateData implements Cloneable {
 
     var baseCaseDatas = switch (request.mode()) {
       case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, CARPOOL, NOT_SET -> stateDatas;
-      case CAR_PICKUP, CAR_HAILING -> stateDatas
+      case CAR_PICKUP, TAXI, CAR_HAILING -> stateDatas
         .stream()
         .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
         .toList();

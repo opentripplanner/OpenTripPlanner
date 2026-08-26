@@ -126,6 +126,13 @@ class AccessEgressFetcher {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
     StreetMode mode = streetRequest.mode();
 
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no access/egress for TAXI unless the
+    //       car-pickup-zone sandbox feature is enabled.
+    if (mode == StreetMode.TAXI && OTPFeature.CarPickupZone.isOff()) {
+      return List.of();
+    }
+
     // Prepare access/egress lists
     var accessBuilder = request.copyOf();
 
