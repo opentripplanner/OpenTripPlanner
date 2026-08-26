@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.taxizone;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
@@ -28,9 +29,14 @@ public class TaxiZoneIndex {
 
   /**
    * Returns the first zone whose geometry contains both {@code pickup} and
-   * {@code dropoff}. Returns an empty optional if no zone covers both endpoints.
+   * {@code dropoff}, and whose GTFS calendar has {@code date} as a valid service date.
+   * Returns an empty optional if no zone covers both endpoints on that date.
    */
-  public Optional<TaxiZone> findFirstZone(WgsCoordinate pickup, WgsCoordinate dropoff) {
+  public Optional<TaxiZone> findFirstZone(
+    WgsCoordinate pickup,
+    WgsCoordinate dropoff,
+    LocalDate date
+  ) {
     var gf = GeometryUtils.getGeometryFactory();
     Point pickupPoint = gf.createPoint(pickup.asJtsCoordinate());
     Point dropoffPoint = gf.createPoint(dropoff.asJtsCoordinate());
@@ -41,7 +47,11 @@ public class TaxiZoneIndex {
 
     for (TaxiZone zone : candidates) {
       var geom = zone.geometry();
-      if (geom.contains(pickupPoint) && geom.contains(dropoffPoint)) {
+      if (
+        geom.contains(pickupPoint) &&
+        geom.contains(dropoffPoint) &&
+        zone.serviceDateRange().contains(date)
+      ) {
         return Optional.of(zone);
       }
     }

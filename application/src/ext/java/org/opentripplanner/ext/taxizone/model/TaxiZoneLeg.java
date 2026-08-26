@@ -73,9 +73,9 @@ public class TaxiZoneLeg implements TransitLeg {
   }
 
   /**
-   * There is no real GTFS calendar/service-date resolution available at itinerary-decoration
-   * time (this is a post-hoc filter, not part of the routing search), so the leg's own start
-   * date is used as a practical stand-in.
+   * The leg only exists because {@link org.opentripplanner.ext.taxizone.TaxiZoneIndex} already
+   * matched the {@link TaxiZone} against this exact date (see
+   * {@link TaxiZone#serviceDateRange()}).
    */
   @Override
   public LocalDate serviceDate() {

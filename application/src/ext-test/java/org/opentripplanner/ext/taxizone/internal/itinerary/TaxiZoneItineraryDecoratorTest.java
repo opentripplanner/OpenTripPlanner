@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
@@ -44,9 +45,34 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
     .build();
 
   private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
-    List.of(new TaxiZone(ZONE_POLYGON, ZONE_TRIP, null, null))
+    List.of(
+      new TaxiZone(
+        ZONE_POLYGON,
+        ZONE_TRIP,
+        null,
+        null,
+        LocalDateRange.ofInclusiveEnd(
+          TestItineraryBuilder.SERVICE_DAY,
+          TestItineraryBuilder.SERVICE_DAY
+        )
+      )
+    )
   );
   private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
+  private static final TaxiZoneIndex WRONG_DATE_INDEX = new TaxiZoneIndex(
+    List.of(
+      new TaxiZone(
+        ZONE_POLYGON,
+        ZONE_TRIP,
+        null,
+        null,
+        LocalDateRange.ofInclusiveEnd(
+          TestItineraryBuilder.SERVICE_DAY.plusDays(1),
+          TestItineraryBuilder.SERVICE_DAY.plusDays(1)
+        )
+      )
+    )
+  );
 
   @Test
   void driveLegWithinZoneIsReplacedWithTaxiZoneLeg() {
@@ -79,6 +105,19 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
         .map(SystemNotice::tag)
         .anyMatch(TaxiZoneItineraryDecorator.NO_TAXI_ZONE_AVAILABLE::equals)
     );
+    assertFalse(result.legs().getFirst() instanceof TaxiZoneLeg);
+  }
+
+  @Test
+  void driveLegOutsideZoneServiceDatesFlagsItineraryForDeletion() {
+    var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
+      .drive(T11_00, T11_10, PLACE_B)
+      .build();
+    var subject = new TaxiZoneItineraryDecorator(WRONG_DATE_INDEX);
+
+    var result = subject.filter(List.of(itinerary)).getFirst();
+
+    assertTrue(result.isFlaggedForDeletion());
     assertFalse(result.legs().getFirst() instanceof TaxiZoneLeg);
   }
 

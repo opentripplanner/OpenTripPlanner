@@ -61,7 +61,8 @@ public class TaxiZoneItineraryDecorator implements ItineraryListFilter {
 
     var taxiZoneOptional = zoneIndex.findFirstZone(
       streetLeg.from().coordinate,
-      streetLeg.to().coordinate
+      streetLeg.to().coordinate,
+      streetLeg.startTime().toLocalDate()
     );
     if (taxiZoneOptional.isEmpty()) {
       flagForDeletion(itinerary);

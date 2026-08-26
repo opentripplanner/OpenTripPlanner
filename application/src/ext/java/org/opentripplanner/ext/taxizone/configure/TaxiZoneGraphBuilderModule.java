@@ -9,6 +9,7 @@ import org.opentripplanner.ext.taxizone.internal.graphbuilder.TaxiZoneGraphBuild
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 @Module
 public class TaxiZoneGraphBuilderModule {
@@ -19,7 +20,8 @@ public class TaxiZoneGraphBuilderModule {
   static TaxiZoneGraphBuilder provideTaxiZoneGraphBuilder(
     GraphBuilderDataSources dataSources,
     @Nullable TaxiZoneRepository taxiZoneRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    BuildConfig config
   ) {
     if (OTPFeature.TaxiZone.isOff() || taxiZoneRepository == null) {
       return null;
@@ -27,7 +29,8 @@ public class TaxiZoneGraphBuilderModule {
     return new TaxiZoneGraphBuilder(
       dataSources.getTaxiZoneConfiguredDataSource(),
       taxiZoneRepository,
-      issueStore
+      issueStore,
+      config.getTransitServicePeriod()
     );
   }
 }
