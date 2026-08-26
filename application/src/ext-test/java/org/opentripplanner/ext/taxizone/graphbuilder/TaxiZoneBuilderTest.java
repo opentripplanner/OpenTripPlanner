@@ -15,6 +15,7 @@ import org.opentripplanner.model.FlexStopTimesFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -25,14 +26,17 @@ class TaxiZoneBuilderTest {
   private static final AreaStop AREA_1 = TEST_MODEL.areaStop("area-1").build();
   private static final AreaStop AREA_2 = TEST_MODEL.areaStop("area-2").build();
 
-  private static final Trip TRIP = TransitRepositoryForTest.trip("car-pickup").build();
+  private static final Trip TRIP = TransitRepositoryForTest.trip("car-pickup")
+    .withRoute(TransitRepositoryForTest.route("taxi-route").withMode(TransitMode.TAXI).build())
+    .build();
 
   private static StopTime fullDayAreaStop(
     AreaStop areaStop,
     PickDrop pickupType,
-    PickDrop dropOffType
+    PickDrop dropOffType,
+    Trip trip
   ) {
-    return FlexStopTimesFactory.area(areaStop, "00:00", "24:00", TRIP, pickupType, dropOffType);
+    return FlexStopTimesFactory.area(areaStop, "00:00", "24:00", trip, pickupType, dropOffType);
   }
 
   private static StopTime restrictedAreaStop(
@@ -45,8 +49,8 @@ class TaxiZoneBuilderTest {
 
   private static List<StopTime> validStopTimes() {
     return List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
     );
   }
 
@@ -84,6 +88,25 @@ class TaxiZoneBuilderTest {
   }
 
   @Test
+  void nonTaxiRouteTypeIsSkipped() {
+    var nonTaxiTrip = TransitRepositoryForTest.trip("bus-route")
+      .withRoute(TransitRepositoryForTest.route("bus-route").withMode(TransitMode.BUS).build())
+      .build();
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, nonTaxiTrip),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, nonTaxiTrip)
+    );
+    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-bus"))
+      .withTrip(nonTaxiTrip)
+      .withStopTimes(stopTimes)
+      .build();
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip));
+
+    assertTrue(zones.isEmpty());
+  }
+
+  @Test
   void boundedTimeRestrictionIsSkipped() {
     var stopTimes = List.of(
       restrictedAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
@@ -108,9 +131,9 @@ class TaxiZoneBuilderTest {
   @Test
   void wrongNumberOfStopsIsSkipped() {
     var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -122,8 +145,8 @@ class TaxiZoneBuilderTest {
   @Test
   void differentAreasIsSkipped() {
     var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.CALL_AGENCY)
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -136,8 +159,8 @@ class TaxiZoneBuilderTest {
   @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
   void invalidPickupTypeIsSkipped(PickDrop pickupType) {
     var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, pickupType, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY)
+      fullDayAreaStop(AREA_1, pickupType, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
     );
     var trip = unscheduledTrip(stopTimes);
 
@@ -150,8 +173,8 @@ class TaxiZoneBuilderTest {
   @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
   void invalidDropOffTypeIsSkipped(PickDrop dropOffType) {
     var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, dropOffType)
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, dropOffType, TRIP)
     );
     var trip = unscheduledTrip(stopTimes);
 

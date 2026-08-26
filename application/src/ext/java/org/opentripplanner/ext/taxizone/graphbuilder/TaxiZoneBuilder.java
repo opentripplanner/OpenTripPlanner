@@ -8,6 +8,7 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class TaxiZoneBuilder {
   private static boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
     return (
       isUnscheduledTrip(flexTrip) &&
+      hasTaxiRouteType(flexTrip) &&
       hasNoTimeRestrictions(flexTrip) &&
       hasTwoStops(flexTrip) &&
       hasSingleZone(flexTrip) &&
@@ -60,6 +62,19 @@ public class TaxiZoneBuilder {
       "Skipping trip {} for taxi zones: only UnscheduledTrip is supported; got {}",
       flexTrip.getId(),
       flexTrip.getClass().getSimpleName()
+    );
+    return false;
+  }
+
+  private static boolean hasTaxiRouteType(FlexTrip<?, ?> flexTrip) {
+    TransitMode mode = flexTrip.getTrip().getMode();
+    if (mode == TransitMode.TAXI) {
+      return true;
+    }
+    LOG.warn(
+      "Skipping trip {} for taxi zones: route mode is {}; must be TAXI (GTFS route_type 1500-1599)",
+      flexTrip.getId(),
+      mode
     );
     return false;
   }

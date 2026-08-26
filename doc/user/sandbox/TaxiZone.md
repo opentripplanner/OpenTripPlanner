@@ -46,14 +46,16 @@ a warning in the build report:
 
 1. The trip must be an unscheduled (demand-responsive) flex trip. Scheduled-deviated trips are
    not supported.
-2. No stop may have a meaningful time restriction (`start_pickup_dropoff_window` /
+2. The trip's route must have `route_type` `1500`-`1599` (the GTFS "Taxi Service" family, mapped
+   to OTP's `TAXI` transit mode). Trips on any other route type are skipped.
+3. No stop may have a meaningful time restriction (`start_pickup_dropoff_window` /
    `end_pickup_dropoff_window`). A full-day window (`0:00:00`–`24:00:00`) is accepted and treated
    as "always available". Any other bounded window causes the trip to be skipped.
-3. The trip must have exactly 2 stop times: stop 0 is the pickup stop and stop 1 is the
+4. The trip must have exactly 2 stop times: stop 0 is the pickup stop and stop 1 is the
    drop-off stop.
-4. Both stop times must reference the same GTFS Flex area (`location_id`) and that area must
+5. Both stop times must reference the same GTFS Flex area (`location_id`) and that area must
    have a geometry. Trips with separate departure and arrival zones are not supported.
-5. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
+6. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
    (CALL_AGENCY). `0` (SCHEDULED) and `3` (COORDINATE_WITH_DRIVER) are not accepted.
 
 ### GTFS API Modes
