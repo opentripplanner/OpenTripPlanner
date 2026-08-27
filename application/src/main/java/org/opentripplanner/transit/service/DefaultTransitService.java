@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
@@ -365,9 +366,38 @@ public class DefaultTransitService implements TransitService {
   public List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      this::findPattern
+      this::findPattern,
+      this::findScheduledRunningTime
     );
     return listCanceledTrips().stream().filter(matcher::match).toList();
+  }
+
+  /**
+   * Resolves a trip's runtime on its service date according to its schedule. The period starts at
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
+   * stop.
+   *
+   * @return {@code null} if the schedule of the trip cannot be resolved.
+   */
+  @Nullable
+  private TimePeriod findScheduledRunningTime(TripOnServiceDate tripOnServiceDate) {
+    var trip = tripOnServiceDate.getTrip();
+    var serviceDate = tripOnServiceDate.getServiceDate();
+    var pattern = findPattern(trip, serviceDate);
+    if (pattern == null) {
+      return null;
+    }
+    var tripTimes = findTimetable(pattern, serviceDate).getTripTimes(trip);
+    if (tripTimes == null) {
+      tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    }
+    if (tripTimes == null) {
+      return null;
+    }
+    ZoneId timeZone = trip.getRoute().getAgency().getTimezone();
+    return tripTimes.scheduledRunningTime(
+      ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant()
+    );
   }
 
   @Override
@@ -609,7 +639,8 @@ public class DefaultTransitService implements TransitService {
   public List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      this::findPattern
+      this::findPattern,
+      this::findScheduledRunningTime
     );
     return listTripsOnServiceDate().stream().filter(matcher::match).toList();
   }
