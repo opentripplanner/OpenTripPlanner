@@ -30,6 +30,8 @@ import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.ext.taxizone.config.TaxiZoneConfig;
+import org.opentripplanner.ext.taxizone.parameters.TaxiZoneParameters;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -173,6 +175,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
+  public final TaxiZoneParameters taxiZone;
   public final EmpiricalDelayParameters empiricalDelay;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
@@ -595,6 +598,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
+    taxiZone = TaxiZoneConfig.mapTaxiZoneConfig("taxiZone", root);
     empiricalDelay = EmpiricalDelayConfig.mapEmpiricalDelayConfig("empiricalDelay", root);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
@@ -661,6 +665,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   @Override
   public List<URI> emissionFiles() {
     return emission.emissionFiles();
+  }
+
+  @Override
+  public List<URI> taxiZoneFiles() {
+    return taxiZone.listFiles();
   }
 
   @Override

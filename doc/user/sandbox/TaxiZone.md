@@ -30,13 +30,33 @@ filename: a file whose name contains `taxi_zone`, `taxi-zone`, or `taxizone`
 (case-insensitive) is classified as `TAXI_ZONE` type and processed exclusively by this
 module. Such files are **not** added to normal transit or flex routing.
 
+Every taxi zone file, whether found by auto-discovery or configured explicitly, must have a
+corresponding entry in the `taxiZone.feeds` list in `build-config.json`, providing a `feedId` and the
+`source` URI. If a taxi zone file is present but has no matching `taxiZone.feeds` entry, graph
+building fails. In practice, this means you must always configure `taxiZone.feeds` explicitly,
+listing the exact same `source` that would otherwise be auto-discovered, plus its `feedId`.
+
 Example graph directory layout:
 
 ```
 graph/
   build-config.json
   HSL-gtfs.zip
-  Taxi-zone.zip           ← auto-discovered as TAXI_ZONE type
+  TaxiProvider-taxizone.zip           ← auto-discovered as TAXI_ZONE type
+```
+
+```JSON
+// build-config.json
+{
+  "taxiZone": {
+    "feeds": [
+      {
+        "feedId": "TaxiProvider",
+        "source": "TaxiProvider-taxizone.zip"
+      }
+    ]
+  }
+}
 ```
 
 ### GTFS Data Requirements
@@ -112,4 +132,6 @@ Enable the feature flag in `otp-config.json`:
 ### OTP 2.10
 
 - Initial implementation: spatial zone index, itinerary filtering, and leg decoration with
-  provider information from GTFS Flex data. Auto-discovery by filename pattern.
+  provider information from GTFS Flex data. Taxi zone files are auto-discovered by filename
+  pattern, but each discovered file requires a matching `feedId`/`source` entry in the
+  `taxiZone.feeds` build-config field.

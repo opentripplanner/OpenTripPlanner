@@ -105,7 +105,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
-    addAll(findMultipleCompositeSources(List.of(), TAXI_ZONE));
+    addAll(findMultipleCompositeSources(config.taxiZoneFiles(), TAXI_ZONE));
     addAll(findMultipleCompositeSources(config.empiricalDelayFiles(), EMPIRICAL_DATA));
     addAll(findMultipleSources(config.cacheFiles(), CACHE));
 

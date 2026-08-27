@@ -300,7 +300,18 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   private ConfiguredCompositeDataSource<GtfsFeedParameters> mapTaxiZoneFeed(DataSource dataSource) {
-    var p = buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build();
+    var feedId = buildConfig.taxiZone
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow()
+      .feedId();
+    var p = buildConfig.gtfsDefaults
+      .withFeedInfo()
+      .withFeedId(feedId)
+      .withSource(dataSource.uri())
+      .build();
     return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
