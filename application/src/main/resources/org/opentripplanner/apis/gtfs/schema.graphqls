@@ -137,8 +137,9 @@ type Agency implements Node {
 type Alert implements Node {
   """
   The periods of time when this alert is active, sorted chronologically. There is always at
-  least one period. A period without a start has always been active and a period without an
-  end is active indefinitely.
+  least one period. Each period has an inclusive start and an exclusive end. A period with an
+  unbounded start has always been active and a period with an unbounded end is active
+  indefinitely.
   """
   activityPeriods: [OffsetDateTimeRange!]!
   """
@@ -1070,16 +1071,16 @@ type Notice {
 }
 
 """
-A range of time which can be open in either direction.
+A range of time which can be unbounded in either direction.
 
-The range is half-open, which means that the start is included in the range but the end is not.
+The start of the range is inclusive and the end is exclusive.
 A `null` start means that the range extends indefinitely into the past and a `null` end means
 that it extends indefinitely into the future.
 """
 type OffsetDateTimeRange {
-  "The exclusive end of the range or `null` if the range has no end."
+  "The exclusive end of the range or `null` if the range is unbounded in the future."
   end: OffsetDateTime
-  "The inclusive start of the range or `null` if the range has no start."
+  "The inclusive start of the range or `null` if the range is unbounded in the past."
   start: OffsetDateTime
 }
 

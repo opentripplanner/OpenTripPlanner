@@ -66,10 +66,10 @@ public final class AlertCalendar {
   }
 
   /**
-   * The earliest start of all time periods, or empty if any period has an open start.
+   * The earliest start of all time periods, or empty if any period has an unbounded start.
    */
   public Optional<Instant> effectiveStart() {
-    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenStart)) {
+    if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedStart)) {
       return Optional.empty();
     }
     return timePeriods
@@ -80,10 +80,10 @@ public final class AlertCalendar {
   }
 
   /**
-   * The latest end of all time periods, or empty if any period is open-ended.
+   * The latest end of all time periods, or empty if any period has an unbounded end.
    */
   public Optional<Instant> effectiveEnd() {
-    if (timePeriods.stream().anyMatch(TimePeriod::hasOpenEnd)) {
+    if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedEnd)) {
       return Optional.empty();
     }
     return timePeriods

@@ -41,7 +41,7 @@ class AlertCalendarTest {
   }
 
   @Test
-  void openStartGivesNoEffectiveStart() {
+  void unboundedStartGivesNoEffectiveStart() {
     var subject = AlertCalendar.of(
       List.of(TimePeriod.of(null, END), TimePeriod.of(LATER_START, LATER_END))
     );
@@ -50,7 +50,7 @@ class AlertCalendarTest {
   }
 
   @Test
-  void openEndGivesNoEffectiveEnd() {
+  void unboundedEndGivesNoEffectiveEnd() {
     var subject = AlertCalendar.of(
       List.of(TimePeriod.of(START, END), TimePeriod.of(LATER_START, null))
     );

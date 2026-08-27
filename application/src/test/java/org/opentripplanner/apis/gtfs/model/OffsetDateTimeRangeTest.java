@@ -35,16 +35,18 @@ class OffsetDateTimeRangeTest {
 
   @Test
   void sortChronologically() {
-    var openStart = OffsetDateTimeRange.of(TimePeriod.of(null, START), ZONE_ID);
+    var unboundedStart = OffsetDateTimeRange.of(TimePeriod.of(null, START), ZONE_ID);
     var bounded = OffsetDateTimeRange.of(TimePeriod.of(START, END), ZONE_ID);
-    var openEndFromStart = OffsetDateTimeRange.of(TimePeriod.of(START, null), ZONE_ID);
-    var openEnd = OffsetDateTimeRange.of(TimePeriod.of(END, null), ZONE_ID);
+    var unboundedEndFromStart = OffsetDateTimeRange.of(TimePeriod.of(START, null), ZONE_ID);
+    var unboundedEnd = OffsetDateTimeRange.of(TimePeriod.of(END, null), ZONE_ID);
 
-    var sorted = List.of(openEnd, bounded, openEndFromStart, openStart)
+    var sorted = List.of(unboundedEnd, bounded, unboundedEndFromStart, unboundedStart)
       .stream()
       .sorted(OffsetDateTimeRange.CHRONOLOGICAL_ORDER)
       .toList();
 
-    assertThat(sorted).containsExactly(openStart, bounded, openEndFromStart, openEnd).inOrder();
+    assertThat(sorted)
+      .containsExactly(unboundedStart, bounded, unboundedEndFromStart, unboundedEnd)
+      .inOrder();
   }
 }

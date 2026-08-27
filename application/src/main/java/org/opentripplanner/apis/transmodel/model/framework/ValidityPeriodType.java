@@ -14,7 +14,9 @@ public class ValidityPeriodType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("startTime")
           .type(dateTimeScalar)
-          .description("Start of validity period. Will return 'null' if validity is open-ended.")
+          .description(
+            "The inclusive start of the validity period. Will return 'null' if the validity has an unbounded start."
+          )
           .dataFetcher(environment -> {
             ValidityPeriod period = environment.getSource();
             return period != null ? period.startTime() : null;
@@ -25,7 +27,9 @@ public class ValidityPeriodType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("endTime")
           .type(dateTimeScalar)
-          .description("End of validity period. Will return 'null' if validity is open-ended.")
+          .description(
+            "The exclusive end of the validity period. Will return 'null' if the validity has an unbounded end."
+          )
           .dataFetcher(environment -> {
             ValidityPeriod period = environment.getSource();
             return period != null ? period.endTime() : null;

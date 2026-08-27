@@ -564,9 +564,9 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A range of time which can be open in either direction.
+   * A range of time which can be unbounded in either direction.
    *
-   * The range is half-open, which means that the start is included in the range but the end is not.
+   * The start of the range is inclusive and the end is exclusive.
    * A `null` start means that the range extends indefinitely into the past and a `null` end means
    * that it extends indefinitely into the future.
    */

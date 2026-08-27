@@ -18,8 +18,8 @@ class TimePeriodTest {
     var subject = TimePeriod.of(START, END);
     assertThat(subject.start()).hasValue(START);
     assertThat(subject.end()).hasValue(END);
-    assertFalse(subject.hasOpenStart());
-    assertFalse(subject.hasOpenEnd());
+    assertFalse(subject.hasUnboundedStart());
+    assertFalse(subject.hasUnboundedEnd());
   }
 
   @Test
@@ -27,22 +27,22 @@ class TimePeriodTest {
     var subject = TimePeriod.ofUnbounded();
     assertThat(subject.start()).isEmpty();
     assertThat(subject.end()).isEmpty();
-    assertTrue(subject.hasOpenStart());
-    assertTrue(subject.hasOpenEnd());
+    assertTrue(subject.hasUnboundedStart());
+    assertTrue(subject.hasUnboundedEnd());
   }
 
   @Test
-  void openStart() {
+  void unboundedStart() {
     var subject = TimePeriod.of(null, END);
-    assertTrue(subject.hasOpenStart());
-    assertFalse(subject.hasOpenEnd());
+    assertTrue(subject.hasUnboundedStart());
+    assertFalse(subject.hasUnboundedEnd());
   }
 
   @Test
-  void openEnd() {
+  void unboundedEnd() {
     var subject = TimePeriod.of(START, null);
-    assertFalse(subject.hasOpenStart());
-    assertTrue(subject.hasOpenEnd());
+    assertFalse(subject.hasUnboundedStart());
+    assertTrue(subject.hasUnboundedEnd());
   }
 
   @Test
@@ -71,29 +71,29 @@ class TimePeriodTest {
   }
 
   @Test
-  void overlapsOpenStart() {
+  void overlapsUnboundedStart() {
     var subject = TimePeriod.of(null, END);
     assertTrue(subject.overlaps(TimePeriod.of(START.minusSeconds(2000), START.minusSeconds(1000))));
     assertFalse(subject.overlaps(TimePeriod.of(END.plusSeconds(100), END.plusSeconds(200))));
   }
 
   @Test
-  void overlapsOpenEnd() {
+  void overlapsUnboundedEnd() {
     var subject = TimePeriod.of(START, null);
     assertFalse(subject.overlaps(TimePeriod.of(START.minusSeconds(200), START.minusSeconds(100))));
     assertTrue(subject.overlaps(TimePeriod.of(END.plusSeconds(100), END.plusSeconds(200))));
   }
 
   @Test
-  void overlapsOpenBoundsOnOtherPeriod() {
+  void overlapsUnboundedBoundsOnOtherPeriod() {
     var subject = TimePeriod.of(START, END);
-    // other period is open-ended, starting before this period ends
+    // other period has an unbounded end, starting before this period ends
     assertTrue(subject.overlaps(TimePeriod.of(END.minusSeconds(100), null)));
-    // other period is open-ended, starting exactly at this period's end - exclusive
+    // other period has an unbounded end, starting exactly at this period's end - exclusive
     assertFalse(subject.overlaps(TimePeriod.of(END, null)));
-    // other period has an open start, ending after this period starts
+    // other period has an unbounded start, ending after this period starts
     assertTrue(subject.overlaps(TimePeriod.of(null, START.plusSeconds(1))));
-    // other period has an open start, ending exactly at this period's start. Because end
+    // other period has an unbounded start, ending exactly at this period's start. Because end
     // is exclusive, there is no overlap
     assertFalse(subject.overlaps(TimePeriod.of(null, START)));
     // other period is entirely unbounded
@@ -125,10 +125,10 @@ class TimePeriodTest {
   }
 
   @Test
-  void containsOpenStart() {
+  void containsUnboundedStart() {
     var subject = TimePeriod.of(null, END);
 
-    // far in the past is contained because the start is open
+    // far in the past is contained because the start is unbounded
     assertTrue(subject.contains(Instant.EPOCH));
     assertTrue(subject.contains(START));
     // exactly at the end - exclusive
@@ -137,14 +137,14 @@ class TimePeriodTest {
   }
 
   @Test
-  void containsOpenEnd() {
+  void containsUnboundedEnd() {
     var subject = TimePeriod.of(START, null);
 
     // before the start
     assertFalse(subject.contains(START.minusSeconds(1)));
     // exactly at the start - inclusive
     assertTrue(subject.contains(START));
-    // far in the future is contained because the end is open
+    // far in the future is contained because the end is unbounded
     assertTrue(subject.contains(END.plusSeconds(1_000_000)));
   }
 
