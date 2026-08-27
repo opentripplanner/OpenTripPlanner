@@ -28,11 +28,9 @@ public class GraphSummarizer {
     this.graph = graph;
   }
 
-  /**
-   * Converts the input to a string-based label and looks it up in the graph. Remember that there
-   * are other, non-string vertex labels for which this method will not work.
-   * @see VertexLabel
-   */
+  /// Converts the input to a string-based label and looks it up in the graph. Remember that there
+  /// are other, non-string vertex labels for which this method will not work.
+  /// @see VertexLabel
   @Nullable
   public Vertex getVertex(String label) {
     return graph.getVertex(VertexLabel.string(label));
@@ -50,11 +48,12 @@ public class GraphSummarizer {
     return graph.getVerticesOfType(TransitStopVertex.class);
   }
 
-  /**
-   * Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
-   * This is a different behavior than {@link Graph#listEdges()}, which only returns edges that are
-   * outgoing.
-   */
+  /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
+  /// This is a different behavior than [Graph#listEdges()], which only returns edges that are
+  /// outgoing.
+  ///
+  /// This is needed so that temporary link edges, whose from-vertex is not added to the graph's
+  /// collection of vertices, are included in the summary and can then be asserted against.
   public List<Edge> listEdges() {
     return distinctEdges().toList();
   }
@@ -102,6 +101,7 @@ public class GraphSummarizer {
     return graph;
   }
 
+  /// See [GraphSummarizer#listEdges()] on why both incoming and outgoing edges are returned.
   private Stream<Edge> distinctEdges() {
     return graph
       .getVertices()
