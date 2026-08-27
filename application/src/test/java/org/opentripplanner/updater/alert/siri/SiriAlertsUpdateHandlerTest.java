@@ -891,7 +891,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   @Test
-  public void testSiriSxWithOpenEndedValidity() {
+  public void testSiriSxWithUnboundedEndValidity() {
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -910,7 +910,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     period_1.setEndTime(ZonedDateTime.parse("2020-02-01T11:00:00+01:00"));
     ptSituation.getValidityPeriods().add(period_1);
 
-    // Add period with start-, but NO endtime - i.e. open-ended
+    // Add period with start-, but NO endtime - i.e. an unbounded end
     HalfOpenTimestampOutputRangeStructure period_2 = new HalfOpenTimestampOutputRangeStructure();
     period_2.setStartTime(ZonedDateTime.parse("2020-02-02T10:00:00+01:00"));
     period_2.setEndTime(null);
