@@ -1,5 +1,6 @@
 package org.opentripplanner.osm.model;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -38,7 +39,7 @@ public class CompoundRefTagGroupTest {
     var group = CompoundRefTagGroup.of("manufacturer", "ref");
     var tags = Map.of("manufacturer", " KONE ", "ref", " 12345 ");
 
-    assertEquals(Optional.of("KONE:12345"), group.compoundValue(tags::get));
+    assertThat(group.compoundValue(tags::get)).hasValue("KONE:12345");
   }
 
   @Test
