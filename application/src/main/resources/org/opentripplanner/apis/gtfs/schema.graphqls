@@ -3304,7 +3304,7 @@ type step {
   "The cardinal (compass) direction (e.g. north, northeast) taken when engaging this step."
   absoluteDirection: AbsoluteDirection
   "A list of alerts (e.g. construction, detours) applicable to the step."
-  alerts: [Alert]
+  alerts: [Alert] @deprecated(reason : "Not implemented")
   """
   This step is on an open area, such as a plaza or train platform,
   and thus the directions should say something like "cross".

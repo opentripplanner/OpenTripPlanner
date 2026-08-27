@@ -21,6 +21,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return _ -> List.of();
   }
