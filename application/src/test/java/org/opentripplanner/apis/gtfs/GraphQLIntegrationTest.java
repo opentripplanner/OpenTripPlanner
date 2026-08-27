@@ -184,7 +184,7 @@ class GraphQLIntegrationTest {
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static final int SERVICE_CODE = 0;
 
-  private static GraphQLRequestContext context;
+  private static GtfsGraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final VehicleParkingRepository PARKING_REPOSITORY =
@@ -552,7 +552,7 @@ class GraphQLIntegrationTest {
     );
 
     var routeRequest = RouteRequest.defaultValue();
-    context = new GraphQLRequestContext(
+    context = new GtfsGraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
       transitAlertService,

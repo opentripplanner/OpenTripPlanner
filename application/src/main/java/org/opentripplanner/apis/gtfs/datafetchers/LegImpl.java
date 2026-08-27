@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.dataloader.DataLoader;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
@@ -393,7 +393,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         var res = AlternativeLegs.getAlternativeLegs(
           environment.getSource(),
           numberOfLegs,
-          environment.<GraphQLRequestContext>getContext().transitService(),
+          environment.<GtfsGraphQLRequestContext>getContext().transitService(),
           direction,
           AlternativeLegsFilter.NO_FILTER,
           limitToExactOriginStop,
@@ -430,6 +430,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   private TransitService transitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 }

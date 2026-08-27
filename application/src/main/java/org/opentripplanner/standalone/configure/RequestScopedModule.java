@@ -7,15 +7,16 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
-import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
@@ -26,6 +27,11 @@ import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
+import org.opentripplanner.place.NearbyPlaceFinder;
+import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.ext.TaxiZoneDecorator;
@@ -41,19 +47,16 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.repository.TimetableRepository;
@@ -213,94 +216,89 @@ public class RequestScopedModule {
     );
   }
 
+  /**
+   * Pre-assembled request context for the Transmodel API's GraphQL data fetchers.
+   */
   @Provides
   @HttpRequestScoped
-  static OtpServerRequestContext serverRequestContext(
-    RouterConfig routerConfig,
-    DebugUiConfig debugUiConfig,
-    RaptorConfig<TripSchedule> raptorConfig,
-    Graph graph,
-    LinkingContextFactory linkingContextFactory,
-    VertexLinker vertexLinker,
-    TransactionScope transactionScope,
+  static TransmodelRequestContext transmodelRequestContext(
+    RoutingService routingService,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    RouteRequest defaultRequest,
-    VectorTileConfig vectorTileConfig,
-    GtfsApiParameters gtfsApiConfig,
-    TransmodelAPIParameters transmodelAPIParameters,
-    OjpApiParameters ojpApiParameters,
-    TriasApiParameters triasApiParameters,
+    @Nullable EmpiricalDelayService empiricalDelayService,
+    RouteRequest defaultRouteRequest,
+    VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
+    Graph graph,
     RegularTransferService transferService,
-    WorldEnvelopeService worldEnvelopeService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new TransmodelRequestContext(
+      routingService,
+      transitService,
+      transitAlertService,
+      empiricalDelayService,
+      defaultRouteRequest,
+      vehicleRentalService,
+      vehicleParkingService,
+      graph,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
+  }
+
+  /**
+   * Pre-assembled request context for the GTFS API's GraphQL data fetchers.
+   */
+  @Provides
+  @HttpRequestScoped
+  static GtfsGraphQLRequestContext graphQLRequestContext(
+    RoutingService routingService,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    FareService fareService,
+    VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     RepositoryHandle<
       RealtimeVehicleRepositorySnapshot,
       RealtimeVehicleRepository
     > realtimeVehicleRepositoryHandle,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    List<RideHailingService> rideHailingServices,
-    ViaCoordinateTransferFactory viaTransferResolver,
-    @Nullable CarpoolingService carpoolingService,
-    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
-    @Nullable StopConsolidationService stopConsolidationService,
-    StreetLimitationParametersService streetLimitationParametersService,
-    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    @Nullable @TaxiZoneDecorator ItineraryListFilter taxiZoneDecorator,
-    StreetDetailsService streetDetailsService,
+    TransactionScope transactionScope,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
-    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
-    @Nullable EmpiricalDelayService empiricalDelayService,
-    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable LuceneIndex luceneIndex,
-    FareService fareService
+    Graph graph,
+    LinkingContextFactory linkingContextFactory,
+    RouteRequest defaultRouteRequest
   ) {
-    var transitRoutingConfig = routerConfig.transitTuningConfig();
-    var flexParameters = routerConfig.flexParameters();
-
     var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
       transactionScope
     );
-
-    return new DefaultServerRequestContext(
-      debugUiConfig,
-      fareService,
-      flexParameters,
-      graph,
-      linkingContextFactory,
-      Metrics.globalRegistry,
-      ojpApiParameters,
-      raptorConfig,
+    RealtimeVehicleService realtimeVehicleService = new DefaultRealtimeVehicleService(
       realtimeVehicleSnapshot,
-      rideHailingServices,
-      defaultRequest,
-      streetLimitationParametersService,
-      transferService,
-      transactionScope,
-      transitRoutingConfig,
+      transitService
+    );
+    NearbyPlaceFinder nearbyPlaceFinder = new StreetNearbyPlaceFinder(linkingContextFactory);
+    NearbyStopFinder nearbyStopFinder = graph.hasStreets
+      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
+      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
+
+    return new GtfsGraphQLRequestContext(
+      routingService,
       transitService,
       transitAlertService,
-      triasApiParameters,
-      gtfsApiConfig,
-      vectorTileConfig,
-      vehicleParkingService,
+      transferService,
+      fareService,
       vehicleRentalService,
-      vertexLinker,
-      viaTransferResolver,
-      worldEnvelopeService,
-      // Optional Sandbox services
-      carpoolingService,
-      dataOverlayParameterBindings,
-      emissionItineraryDecorator,
-      taxiZoneDecorator,
-      streetDetailsService,
-      empiricalDelayService,
-      luceneIndex,
+      vehicleParkingService,
+      realtimeVehicleService,
       gtfsSchema,
-      transmodelSchema,
-      sorlandsbanenService,
-      stopConsolidationService,
-      transmodelAPIParameters
+      nearbyPlaceFinder,
+      nearbyStopFinder,
+      defaultRouteRequest
     );
   }
 }

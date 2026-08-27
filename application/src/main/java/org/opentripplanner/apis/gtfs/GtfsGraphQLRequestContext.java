@@ -10,11 +10,10 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
-public record GraphQLRequestContext(
+public record GtfsGraphQLRequestContext(
   RoutingService routingService,
   TransitService transitService,
   TransitAlertService transitAlertService,
@@ -28,23 +27,6 @@ public record GraphQLRequestContext(
   NearbyStopFinder nearbyStopFinder,
   RouteRequest defaultRouteRequest
 ) {
-  public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
-    return new GraphQLRequestContext(
-      context.routingService(),
-      context.transitService(),
-      context.transitAlertService(),
-      context.transferService(),
-      context.fareService(),
-      context.vehicleRentalService(),
-      context.vehicleParkingService(),
-      context.realtimeVehicleService(),
-      context.gtfsSchema(),
-      context.nearbyPlaceFinder(),
-      context.nearbyStopFinder(),
-      context.defaultRouteRequest()
-    );
-  }
-
   /**
    * Returns a clone of the default route request. The clone is necessary because one HTTP
    * request can lead to several GraphQL queries, for example through batch or alias queries.

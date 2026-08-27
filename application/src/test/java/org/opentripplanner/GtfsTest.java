@@ -22,7 +22,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -32,13 +31,13 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -47,6 +46,7 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -69,7 +69,7 @@ public abstract class GtfsTest {
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
   TransitAlertServiceImpl alertPatchServiceImpl;
-  public OtpServerRequestContext serverContext;
+  public RoutingService routingService;
 
   public abstract String getFeedName();
 
@@ -148,7 +148,7 @@ public abstract class GtfsTest {
     });
 
     // Route
-    RoutingResponse res = serverContext.routingService().route(builder.buildRequest());
+    RoutingResponse res = routingService.route(builder.buildRequest());
 
     // Assert itineraries
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
@@ -278,15 +278,14 @@ public abstract class GtfsTest {
     } catch (FileNotFoundException _) {} catch (Exception e) {
       throw new RuntimeException(e);
     }
-    serverContext = TestServerContext.createServerContext(
-      graph,
+    var transitService = new DefaultTransitService(
       transitRepository,
-      transferRepository,
-      new DefaultFareService(),
-      timetableHandle,
-      registry,
-      null,
-      null
+      timetableHandle.repositorySnapshot(registry.scope())
+    );
+    routingService = TestServerContext.createRoutingService(
+      graph,
+      transitService,
+      transferRepository
     );
   }
 }
