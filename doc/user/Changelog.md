@@ -118,6 +118,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Frequency-based vehicle position matching [#7927](https://github.com/opentripplanner/OpenTripPlanner/pull/7927)
 - Move per-network GBFS configuration into a shared gbfs section of otp-config.json [#7886](https://github.com/opentripplanner/OpenTripPlanner/pull/7886)
 - Compact node storage to reduce graph build memory [#7925](https://github.com/opentripplanner/OpenTripPlanner/pull/7925)
+- Add `runningTimeRanges` filter to canceled trips/calls queries in the GTFS API [#7899](https://github.com/opentripplanner/OpenTripPlanner/pull/7899)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
