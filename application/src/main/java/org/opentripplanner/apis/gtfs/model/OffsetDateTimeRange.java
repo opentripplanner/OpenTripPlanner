@@ -14,6 +14,8 @@ import org.opentripplanner.core.model.time.TimePeriod;
  * <p>
  * This is a general purpose API model which is not tied to any specific domain concept, so it can
  * be used whenever an open-ended range of instants needs to be returned by the GTFS GraphQL API.
+ * <p>
+ * TODO we can consider using this for use cases where the range is not open-ended both directions.
  */
 public record OffsetDateTimeRange(@Nullable OffsetDateTime start, @Nullable OffsetDateTime end) {
   /**
