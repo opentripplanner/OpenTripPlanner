@@ -7,10 +7,12 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -173,6 +175,14 @@ public sealed interface TripTimes<T extends TripTimes>
    */
   @Nullable
   I18NString getTripHeadsign();
+
+  /**
+   * @return the feed-scoped id of the vehicle operating this trip, as supplied by real-time updates.
+   * The feed scope is attached at ingestion time, consistent with how stop ids are scoped, so the
+   * value only correlates with vehicle positions from the same feed. Empty if no vehicle has been
+   * assigned or reported yet.
+   */
+  Optional<FeedScopedId> getVehicleId();
 
   /**
    * The headsign displayed by the vehicle, which may change at each stop position along the trip.

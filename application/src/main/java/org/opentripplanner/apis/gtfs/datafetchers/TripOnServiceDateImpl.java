@@ -5,6 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -14,10 +15,10 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.ReplacementForRelation;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -136,14 +137,14 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
         return null;
       }
       var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
-      if (tripTimes instanceof RealTimeTripTimes realTimeTripTimes) {
-        // The vehicle id is feed-scoped at ingestion time, consistent with how stop ids are scoped,
-        // so the exposed value already matches the FeedId:VehicleId format used by the
-        // vehicle-positions API. The scope is OTP-derived, not a property of the source data, and only
-        // correlates within the same feed.
-        return realTimeTripTimes.getVehicleId().map(FeedScopedId::toString).orElse(null);
-      }
-      return null;
+      // The vehicle id is feed-scoped at ingestion time, consistent with how stop ids are scoped,
+      // so the exposed value already matches the FeedId:VehicleId format used by the
+      // vehicle-positions API. The scope is OTP-derived, not a property of the source data, and only
+      // correlates within the same feed.
+      return Optional.ofNullable(tripTimes)
+        .flatMap(t -> ((TripTimes<?>) t).getVehicleId())
+        .map(FeedScopedId::toString)
+        .orElse(null);
     };
   }
 
