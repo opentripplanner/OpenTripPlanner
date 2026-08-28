@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -72,7 +72,7 @@ class ModifiedTripBuilderTest {
     .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
     .build();
 
-  private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("CAL_1");
+  private static final FeedScopedId SERVICE_ID = id("CAL_1");
 
   private static final Trip TRIP = TransitRepositoryForTest.trip("TRIP")
     .withRoute(ROUTE)
@@ -558,7 +558,7 @@ class ModifiedTripBuilderTest {
 
     var realTimeTimes = assertInstanceOf(RealTimeTripTimes.class, tripUpdate.tripTimes());
     assertTrue(realTimeTimes.getVehicleId().isPresent());
-    assertEquals("BUS-42", realTimeTimes.getVehicleId().get());
+    assertEquals(id("BUS-42"), realTimeTimes.getVehicleId().get());
   }
 
   @Test

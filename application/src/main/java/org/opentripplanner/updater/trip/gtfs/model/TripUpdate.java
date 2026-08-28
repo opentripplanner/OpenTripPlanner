@@ -152,9 +152,9 @@ public final class TripUpdate {
     return tripUpdate.hasVehicle() ? Optional.of(tripUpdate.getVehicle()) : Optional.empty();
   }
 
-  public Optional<String> vehicleId() {
+  public Optional<FeedScopedId> vehicleId() {
     return vehicle()
       .filter(v -> StringUtils.hasValue(v.getId()))
-      .map(GtfsRealtime.VehicleDescriptor::getId);
+      .map(v -> new FeedScopedId(feedId, v.getId()));
   }
 }

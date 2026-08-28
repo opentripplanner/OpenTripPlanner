@@ -2938,7 +2938,7 @@ type TripOnServiceDate {
   stopCalls: [StopCall!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
-  "Feed-scoped ID of the vehicle serving this trip, if provided by the real-time feed, in the format FeedId:VehicleId. The feed scope is derived from the trip, not from the real-time source, so it only correlates with vehicle positions from the same feed."
+  "Feed-scoped ID of the vehicle serving this trip, if provided by the real-time feed, in the format FeedId:VehicleId. The feed scope is taken from the trip and applied when the update is ingested, not from the real-time source, so it only correlates with vehicle positions from the same feed."
   vehicleId: String
 }
 
