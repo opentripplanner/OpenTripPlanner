@@ -817,7 +817,7 @@ type Leg {
   "For transit legs, the transit agency that operates the service used for this leg. For non-transit legs, `null`."
   agency: Agency
   """
-  Applicable alerts for this leg. The following conditions lead to an alert being added to the leg:
+  Applicable alerts for this leg. Alerts are added to the leg according to conditions on the following entities:
     
   - The boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
     For the itinerary's very first transit leg, alerts flagged as relevant to the first departure only are also included.
