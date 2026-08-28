@@ -820,7 +820,7 @@ type Leg {
   Applicable alerts for this leg. Alerts are added to the leg according to conditions on the following entities:
     
   - The boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
-    For the itinerary's very first transit leg, alerts flagged as relevant to the first departure only are also included.
+    If the boarding stop is on the very first transit leg of the itinerary, alerts relevant to the departure from that stop (time, location in case of detours, e.g. "The stop is temporarily moved") are also included.
   - The alighting stop: same stop/route/trip matching as above, restricted to alerts relevant to arrivals.
   - Intermediate stops: stops the leg passes through without boarding or alighting. Only alerts flagged
     as relevant to passing through are included, and each is checked against that specific stop's
