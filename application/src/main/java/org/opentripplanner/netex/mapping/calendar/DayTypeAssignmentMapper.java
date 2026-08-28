@@ -87,7 +87,12 @@ public class DayTypeAssignmentMapper {
     Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
-      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods, issueStore);
+      var mapper = new DayTypeAssignmentMapper(
+        dayType,
+        operatingDays,
+        operatingPeriods,
+        issueStore
+      );
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
@@ -188,13 +193,14 @@ public class DayTypeAssignmentMapper {
       LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
       LocalDateTime date = uicOperatingPeriod.getFromDate();
 
-      if(date != null){
+      if (date != null) {
         addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
+      } else {
+        issueStore.add(
+          "InvalidUicOperatingPeriod",
+          "Missing start date for UIC operating period " + uicOperatingPeriod.getId()
+        );
       }
-      else {
-        issueStore.add("InvalidUicOperatingPeriod", "Missing start date for UIC operating period " + uicOperatingPeriod.getId());
-      }
-
     }
   }
 
