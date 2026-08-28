@@ -67,7 +67,7 @@ class WgsCoordinateMapperTest {
   }
 
   @Test
-  void pos() {
+  void pos2Numbers() {
     SimplePoint_VersionStructure p;
     p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withPos(
@@ -77,5 +77,15 @@ class WgsCoordinateMapperTest {
     var coord = WgsCoordinateMapper.mapToDomain(p);
     assertEquals(LATITUDE_VALUE, coord.latitude(), EPSILON);
     assertEquals(LONGITUDE_VALUE, coord.longitude(), EPSILON);
+  }
+
+  @Test
+  void pos0Numbers() {
+    SimplePoint_VersionStructure p;
+    p = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(new DirectPositionType())
+    );
+
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 }
