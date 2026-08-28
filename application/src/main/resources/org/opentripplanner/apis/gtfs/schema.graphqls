@@ -820,13 +820,16 @@ type Leg {
   Applicable alerts for this leg. Alerts are added to the leg according to conditions on the following entities:
     
   - Boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
-    If the boarding stop is on the very first transit leg of the itinerary, alerts relevant to the departure from that stop (time, location in case of detours, e.g. "The stop is temporarily moved") are also included.
-  - Alighting stop: same stop/route/trip matching as above, restricted to alerts relevant to arrivals.
-  - Intermediate stops: stops the leg passes through without boarding or alighting. Only alerts flagged
-    as relevant to passing through are included, and each is checked against that specific stop's
-    scheduled time rather than the leg's overall time span.
-    If you wish to show _all_ alerts of the intermediate stops, you can list them, for example in
-    the `stopCalls` field, and list their alerts.
+    If the boarding stop is on the very first transit leg of the itinerary, alerts relevant to the
+    departure from that stop (time, location in case of detours, e.g. "The stop is temporarily moved")
+    are also included.
+  - Alighting stop: same stop/route/trip matching as above, and including alerts relevant to arrivals.
+  - Intermediate stops: stops the leg passes through (visits) without boarding or alighting.
+    Only alerts flagged as relevant to passing through (possible in SIRI, but not GTFS-RT) are
+    included, and each is checked against that specific stop's scheduled time rather than the leg's
+    overall time span.
+    If you wish to include _all_ alerts of the intermediate stops, you can list them, for example in
+    the `stopCalls` field, and then list their alerts.
   - Trip: alerts scoped to the entire trip (optionally limited to a specific service date).
   - Route: alerts scoped to the whole route, independent of stop or direction.
   - Agency: alerts scoped to the agency, applying across all of its routes and trips.
