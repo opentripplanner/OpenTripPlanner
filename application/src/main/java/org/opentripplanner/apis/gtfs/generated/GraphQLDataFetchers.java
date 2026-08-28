@@ -1110,6 +1110,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<TripTimeOnDate> start();
     public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
     public DataFetcher<Trip> trip();
+    public DataFetcher<String> vehicleId();
   }
 
   /**

@@ -9,10 +9,12 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.ReplacementForRelation;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -124,6 +126,25 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<Trip> trip() {
     return this::getTrip;
+  }
+
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return environment -> {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
+        return null;
+      }
+      var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
+      if (tripTimes instanceof RealTimeTripTimes realTimeTripTimes) {
+        // The vehicle id is feed-scoped at ingestion time, consistent with how stop ids are scoped,
+        // so the exposed value already matches the FeedId:VehicleId format used by the
+        // vehicle-positions API. The scope is OTP-derived, not a property of the source data, and only
+        // correlates within the same feed.
+        return realTimeTripTimes.getVehicleId().map(FeedScopedId::toString).orElse(null);
+      }
+      return null;
+    };
   }
 
   @Nullable
