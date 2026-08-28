@@ -21,11 +21,15 @@ class WgsCoordinateMapper {
     }
     LocationStructure loc = point.getLocation();
 
-    // This should not happen
-    if (loc.getLongitude() == null || loc.getLatitude() == null) {
+    if (loc.getLongitude() != null && loc.getLatitude() != null) {
+      return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
+    }
+    // seen in Italian NeTEx data
+    else if (loc.getPos() != null && loc.getPos().getValue().size() >= 2) {
+      var coordinates = loc.getPos().getValue();
+      return new WgsCoordinate(coordinates.getFirst(), coordinates.get(1));
+    } else {
       throw new IllegalArgumentException("Coordinate is not valid: " + loc);
     }
-    // Location is safe to process
-    return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
   }
 }
