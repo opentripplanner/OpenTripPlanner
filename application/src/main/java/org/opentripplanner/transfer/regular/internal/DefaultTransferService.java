@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTransferService implements RegularTransferService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RegularTransferService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferService.class);
 
   private final TransferRepository transferRepository;
 
