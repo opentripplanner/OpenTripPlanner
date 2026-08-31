@@ -36,6 +36,14 @@ class TransitAlertServiceImplTest {
   private static final TransitAlert BUS_STOP_ALERT = TransitAlert.of(id("bus_stop_alert"))
     .addEntity(new EntitySelector.Stop(id(BUS_STOP_ID)))
     .build();
+  private static final TransitAlert ACCIDENT_ALERT = TransitAlert.of(id("accident_alert"))
+    .addEntity(new EntitySelector.Stop(id(RAIL_P1_ID)))
+    .withCause(AlertCause.ACCIDENT)
+    .build();
+  private static final TransitAlert WEATHER_ALERT = TransitAlert.of(id("weather_alert"))
+    .addEntity(new EntitySelector.Stop(id(BUS_STOP_ID)))
+    .withCause(AlertCause.WEATHER)
+    .build();
 
   @Test
   void getStopAlerts() {
@@ -119,50 +127,42 @@ class TransitAlertServiceImplTest {
   @Test
   void findAlertsWithoutFiltersReturnsAll() {
     var iut = new TransitAlertServiceImpl();
-    var accidentAlert = stopAlert("accident_alert", RAIL_P1_ID, AlertCause.ACCIDENT);
-    var weatherAlert = stopAlert("weather_alert", BUS_STOP_ID, AlertCause.WEATHER);
-    iut.setAlerts(List.of(accidentAlert, weatherAlert));
+    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     assertThat(iut.findAlerts(TransitAlertRequest.of().build())).containsExactly(
-      accidentAlert,
-      weatherAlert
+      ACCIDENT_ALERT,
+      WEATHER_ALERT
     );
   }
 
   @Test
   void findAlertsSelectsMatchingCause() {
     var iut = new TransitAlertServiceImpl();
-    var accidentAlert = stopAlert("accident_alert", RAIL_P1_ID, AlertCause.ACCIDENT);
-    var weatherAlert = stopAlert("weather_alert", BUS_STOP_ID, AlertCause.WEATHER);
-    iut.setAlerts(List.of(accidentAlert, weatherAlert));
+    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = request(
       FilterRequest.<TransitAlertSelectRequest>of().addSelect(causeSelector(AlertCause.ACCIDENT))
     );
 
-    assertThat(iut.findAlerts(request)).containsExactly(accidentAlert);
+    assertThat(iut.findAlerts(request)).containsExactly(ACCIDENT_ALERT);
   }
 
   @Test
   void findAlertsExcludesMatchingCause() {
     var iut = new TransitAlertServiceImpl();
-    var accidentAlert = stopAlert("accident_alert", RAIL_P1_ID, AlertCause.ACCIDENT);
-    var weatherAlert = stopAlert("weather_alert", BUS_STOP_ID, AlertCause.WEATHER);
-    iut.setAlerts(List.of(accidentAlert, weatherAlert));
+    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = request(
       FilterRequest.<TransitAlertSelectRequest>of().addNot(causeSelector(AlertCause.ACCIDENT))
     );
 
-    assertThat(iut.findAlerts(request)).containsExactly(weatherAlert);
+    assertThat(iut.findAlerts(request)).containsExactly(WEATHER_ALERT);
   }
 
   @Test
   void findAlertsCombinesFiltersWithOr() {
     var iut = new TransitAlertServiceImpl();
-    var accidentAlert = stopAlert("accident_alert", RAIL_P1_ID, AlertCause.ACCIDENT);
-    var weatherAlert = stopAlert("weather_alert", BUS_STOP_ID, AlertCause.WEATHER);
-    iut.setAlerts(List.of(accidentAlert, weatherAlert));
+    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = TransitAlertRequest.of()
       .withFilters(
@@ -177,7 +177,7 @@ class TransitAlertServiceImplTest {
       )
       .build();
 
-    assertThat(iut.findAlerts(request)).containsExactly(accidentAlert, weatherAlert);
+    assertThat(iut.findAlerts(request)).containsExactly(ACCIDENT_ALERT, WEATHER_ALERT);
   }
 
   private static TransitAlertRequest request(
@@ -188,13 +188,6 @@ class TransitAlertServiceImplTest {
 
   private static TransitAlertSelectRequest causeSelector(AlertCause cause) {
     return TransitAlertSelectRequest.of().withCauses(List.of(cause)).build();
-  }
-
-  private static TransitAlert stopAlert(String alertId, String stopId, AlertCause cause) {
-    return TransitAlert.of(id(alertId))
-      .addEntity(new EntitySelector.Stop(id(stopId)))
-      .withCause(cause)
-      .build();
   }
 
   private static FeedScopedId id(String id) {
