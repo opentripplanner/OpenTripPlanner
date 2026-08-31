@@ -8,11 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
 import org.opentripplanner.apis.support.graphql.OtpDataFetcherExceptionHandler;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.slf4j.Logger;
@@ -87,7 +86,7 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
               agency { gtfsId name }
               alerts {
                 alertHeaderText alertDescriptionText
-                effectiveStartDate effectiveEndDate
+                activityPeriods { start end }
                 alertSeverityLevel
               }
               pickupBookingInfo {
@@ -110,16 +109,16 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
     """;
 
   private final GraphQL graphQL;
-  private final GraphQLRequestContext requestContext;
+  private final GtfsGraphQLRequestContext requestContext;
   private final ModeCombinations modeCombinations;
 
   GtfsWarmupQueryExecutor(
-    OtpServerRequestContext context,
+    GtfsGraphQLRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {
-    this.requestContext = GraphQLRequestContext.ofServerContext(context);
-    this.graphQL = GraphQL.newGraphQL(context.gtfsSchema())
+    this.requestContext = requestContext;
+    this.graphQL = GraphQL.newGraphQL(requestContext.schema())
       .defaultDataFetcherExceptionHandler(new OtpDataFetcherExceptionHandler())
       .build();
     this.modeCombinations = new ModeCombinations(accessModes, egressModes);

@@ -26,6 +26,8 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class BicycleRoutingTest {
 
@@ -93,15 +95,18 @@ public class BicycleRoutingTest {
     var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-    var ctx = TestServerContext.ofGraph(graph);
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
 
     var itineraries = DirectStreetRouter.route(
-      ctx.graph(),
-      ctx.transitService(),
-      ctx.streetLimitationParametersService(),
-      ctx.vehicleRentalService(),
-      ctx.streetDetailsService(),
-      ctx.dataOverlayParameterBindings(),
+      graph,
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
       request,
       linkingContext
     );

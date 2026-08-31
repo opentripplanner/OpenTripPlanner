@@ -184,7 +184,7 @@ class GraphQLIntegrationTest {
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static final int SERVICE_CODE = 0;
 
-  private static GraphQLRequestContext context;
+  private static GtfsGraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final VehicleParkingRepository PARKING_REPOSITORY =
@@ -473,6 +473,14 @@ class GraphQLIntegrationTest {
       .withDescriptionText(I18NString.of("This station is currently closed"))
       .withEffect(AlertEffect.NO_SERVICE)
       .addEntity(stationEntitySelector)
+      // deliberately unsorted and with open bounds to test the sorting of the activity periods
+      .withCalendar(
+        AlertCalendar.of(
+          TimePeriod.of(ALERT_END_TIME, null),
+          TimePeriod.of(ALERT_START_TIME, ALERT_END_TIME),
+          TimePeriod.of(null, ALERT_START_TIME)
+        )
+      )
       .build();
 
     // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
@@ -552,7 +560,7 @@ class GraphQLIntegrationTest {
     );
 
     var routeRequest = RouteRequest.defaultValue();
-    context = new GraphQLRequestContext(
+    context = new GtfsGraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
       transitAlertService,
