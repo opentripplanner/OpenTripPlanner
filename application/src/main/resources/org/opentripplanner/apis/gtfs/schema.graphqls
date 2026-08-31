@@ -200,12 +200,12 @@ type AlertConnection {
   """
   edges: [AlertEdge]
   """
-  Contains cursors to fetch more pages of trips.
+  Contains cursors to fetch more pages of alerts.
   Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   pageInfo: PageInfo!
   """
-  The total number of trips on service dates in this connection at the time of query execution (including the current and previous
+  The total number of alerts in this connection at the time of query execution (including the current and previous
   pages).
   Note, this number might not stay the same throughout the paging as alerts might be added or
   removed.
