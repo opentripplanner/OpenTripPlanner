@@ -70,6 +70,10 @@ class DefaultVehicleRentalServiceTest {
       .withGeometry(Polygons.OSLO)
       .noDropOff()
       .build();
-    repository.setGeofencingZoneIndex(network, new GeofencingZoneIndex(List.of(zone)));
+    repository.setGeofencingZoneIndex(
+      network,
+      new GeofencingZoneIndex(List.of(zone)),
+      List.of(zone)
+    );
   }
 }

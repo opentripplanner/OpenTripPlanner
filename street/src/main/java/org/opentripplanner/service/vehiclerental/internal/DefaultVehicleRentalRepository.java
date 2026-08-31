@@ -21,9 +21,8 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
  * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
  *
  * <p>The spatial indices are {@code transient} — JTS {@code STRtree} / {@code PreparedGeometry}
- * caches don't survive Kryo. Raw zones registered via the persisting
- * {@link #setGeofencingZoneIndex(String, GeofencingZoneIndex, Collection)} overload are stored
- * and used to rebuild the indices lazily on first access.
+ * caches don't survive Kryo — so the raw zones are kept and the indices are rebuilt lazily on
+ * first access after deserialization.
  *
  * <p>Both maps are keyed by network. A network has exactly one source of zones, so a later
  * registration replaces an earlier one rather than adding a second index alongside it.
@@ -33,10 +32,10 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 
-  /** Raw zones, by network, for sources whose state must survive serialization. */
-  private final Map<String, Set<GeofencingZone>> serializedZones = new ConcurrentHashMap<>();
+  /** Raw zones, by network. Only these survive serialization; the indices are rebuilt from them. */
+  private final Map<String, Set<GeofencingZone>> zonesByNetwork = new ConcurrentHashMap<>();
 
-  /** Rebuilt lazily from {@link #serializedZones} via {@link #indexes()} after deserialization. */
+  /** Rebuilt lazily from {@link #zonesByNetwork} via {@link #indexes()} after deserialization. */
   private transient volatile Map<String, GeofencingZoneIndex> geofencingZoneIndexes;
 
   @Inject
@@ -52,20 +51,14 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
     rentalPlaces.remove(vehicleRentalStationId);
   }
 
-  /** Realtime registration; not persisted. Used by the GBFS rental updater. */
   @Override
-  public void setGeofencingZoneIndex(String network, GeofencingZoneIndex index) {
-    indexes().put(network, index);
-  }
-
-  /** Graph-build registration; the raw zones are stored so the index can be rebuilt on load. */
   public void setGeofencingZoneIndex(
     String network,
     GeofencingZoneIndex index,
     Collection<GeofencingZone> zones
   ) {
     indexes().put(network, index);
-    serializedZones.put(network, Set.copyOf(zones));
+    zonesByNetwork.put(network, Set.copyOf(zones));
   }
 
   @Override
@@ -120,7 +113,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
     synchronized (this) {
       if (geofencingZoneIndexes == null) {
         var rebuilt = new ConcurrentHashMap<String, GeofencingZoneIndex>();
-        serializedZones.forEach((name, zones) -> rebuilt.put(name, new GeofencingZoneIndex(zones)));
+        zonesByNetwork.forEach((name, zones) -> rebuilt.put(name, new GeofencingZoneIndex(zones)));
         geofencingZoneIndexes = rebuilt;
       }
       return geofencingZoneIndexes;

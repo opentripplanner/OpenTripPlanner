@@ -15,7 +15,7 @@ import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
 import org.opentripplanner.gbfs.network.GeofencingZoneScope;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneApplier;
 import org.opentripplanner.street.Scope;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * enable it.
  *
  * <p>Computed zones and the spatial indices are registered on
- * {@link DefaultVehicleRentalRepository} via the setter that keeps the raw zones — they are
+ * {@link VehicleRentalRepository} together with the raw zones — they are
  * persisted via {@code SerializedGraphObject} so the runtime application sees them after
  * deserialization.
  */
@@ -50,13 +50,13 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
   private final Graph graph;
-  private final DefaultVehicleRentalRepository rentalRepository;
+  private final VehicleRentalRepository rentalRepository;
 
   public VehicleRentalGeofencingGraphBuilder(
     VehicleRentalGeofencingParameters parameters,
     GbfsNetworkOverrides overrides,
     Graph graph,
-    DefaultVehicleRentalRepository rentalRepository
+    VehicleRentalRepository rentalRepository
   ) {
     this.parameters = parameters;
     this.overrides = overrides;

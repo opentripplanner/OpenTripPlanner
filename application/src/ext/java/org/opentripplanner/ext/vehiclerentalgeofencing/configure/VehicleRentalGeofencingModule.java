@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 
@@ -35,7 +34,7 @@ public class VehicleRentalGeofencingModule {
       config.vehicleRentalGeofencing,
       overrides,
       graph,
-      (DefaultVehicleRentalRepository) rentalRepository
+      rentalRepository
     );
   }
 }

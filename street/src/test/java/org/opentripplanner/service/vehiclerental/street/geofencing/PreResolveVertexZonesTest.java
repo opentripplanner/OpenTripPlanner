@@ -52,8 +52,16 @@ class PreResolveVertexZonesTest {
   @Test
   void seedsOnlyTheVertexOwnNetworkWhenZonesOverlap() {
     var repository = new DefaultVehicleRentalRepository();
-    repository.setGeofencingZoneIndex(TIER, new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)));
-    repository.setGeofencingZoneIndex(VOI, new GeofencingZoneIndex(Set.of(VOI_NO_DROP_OFF)));
+    repository.setGeofencingZoneIndex(
+      TIER,
+      new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)),
+      Set.of(TIER_NO_DROP_OFF)
+    );
+    repository.setGeofencingZoneIndex(
+      VOI,
+      new GeofencingZoneIndex(Set.of(VOI_NO_DROP_OFF)),
+      Set.of(VOI_NO_DROP_OFF)
+    );
 
     var tierVertex = scooterInsideFrognerPark(TIER);
     var voiVertex = scooterInsideFrognerPark(VOI);
