@@ -118,19 +118,6 @@ public class TransitAlertSelectRequest {
       return this;
     }
 
-    /**
-     * Returns true if no criterion is set, in which case the selector would match everything.
-     */
-    public boolean isEmpty() {
-      return (
-        feeds == null &&
-        severityLevels == null &&
-        causes == null &&
-        effects == null &&
-        timePeriods == null
-      );
-    }
-
     public TransitAlertSelectRequest build() {
       return new TransitAlertSelectRequest(this);
     }
