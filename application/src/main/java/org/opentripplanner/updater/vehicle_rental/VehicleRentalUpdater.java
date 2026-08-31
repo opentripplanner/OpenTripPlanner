@@ -235,9 +235,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         tempEdgesByStation.remove(station);
       }
 
-      boolean zonesChanged = false;
-      if (!geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones)) {
-        zonesChanged = true;
+      boolean zonesChanged =
+        !geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones);
+      if (zonesChanged) {
         LOG.info("Computing geofencing zones for {}", nameForLogging);
         var start = System.currentTimeMillis();
 

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeed;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalNetworkDataSourceParameters;
@@ -44,7 +45,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   );
 
   /** The GBFS feed that must be published for a network to be worth loading here. */
-  private static final String GEOFENCING_ZONES_FEED = "geofencing_zones";
+  private static final String GEOFENCING_ZONES_FEED = GBFSFeed.Name.GEOFENCING_ZONES.value();
 
   private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
@@ -110,11 +111,6 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       }
       var parameters = override.get();
       if (parameters.geofencingZoneScope() != GeofencingZoneScope.PERMANENT) {
-        LOG.debug(
-          "Network {} is not in the permanent phase ({}), skipping",
-          network,
-          parameters.geofencingZoneScope()
-        );
         continue;
       }
 
@@ -137,7 +133,6 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       }
 
       if (!autoConfiguration.feedNames().contains(GEOFENCING_ZONES_FEED)) {
-        LOG.debug("Network {} publishes no geofencing zones, skipping", network);
         continue;
       }
 

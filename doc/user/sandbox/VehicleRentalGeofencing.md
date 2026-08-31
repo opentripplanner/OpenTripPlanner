@@ -15,11 +15,6 @@ Vehicles and stations remain real-time data, so a
 
 - Entur, Norway
 
-## Changelog
-
-- Initial implementation
-  [#7887](https://github.com/opentripplanner/OpenTripPlanner/pull/7887)
-
 ## Configuration
 
 There is no feature flag: the sandbox is activated by the presence of `vehicleRentalGeofencing` in
@@ -66,3 +61,8 @@ here applies the zones twice.
 
 Because the zones become part of the graph, changing an operator's zones requires a new graph build.
 Networks whose zones change often should stay in the `realtime` phase.
+
+## Changelog
+
+- Initial implementation
+  [#7887](https://github.com/opentripplanner/OpenTripPlanner/pull/7887)
