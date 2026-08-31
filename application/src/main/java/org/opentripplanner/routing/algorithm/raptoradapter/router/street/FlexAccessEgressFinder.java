@@ -18,9 +18,9 @@ import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FlexAccessEgressRouter {
+public class FlexAccessEgressFinder {
 
-  private FlexAccessEgressRouter() {}
+  private FlexAccessEgressFinder() {}
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
@@ -37,7 +37,7 @@ public class FlexAccessEgressRouter {
     OTPRequestTimeoutException.checkForTimeout();
 
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? StreetAccessEgressFinder.findAccessEgresses(
           request,
           StreetMode.WALK,
           extensionRequestContexts,
@@ -49,7 +49,7 @@ public class FlexAccessEgressRouter {
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? StreetAccessEgressFinder.findAccessEgresses(
           request,
           StreetMode.WALK,
           extensionRequestContexts,

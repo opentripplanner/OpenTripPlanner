@@ -3,7 +3,6 @@ package org.opentripplanner.ext.carpooling.service;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -193,15 +192,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *
    * @param request the routing request. Must have {@link StreetMode#CARPOOL} as the direct mode.
    * @return a list of carpool itineraries, or an empty list if no viable matches are found
-   *         or the direct mode is not CARPOOL
    * @throws RoutingValidationException if origin or destination coordinates are missing
    */
   @Override
   public List<Itinerary> routeDirect(RouteRequest request) throws RoutingValidationException {
-    if (!StreetMode.CARPOOL.equals(request.journey().direct().mode())) {
-      return Collections.emptyList();
-    }
-
     validateRequest(request);
 
     var carpoolingRequest = CarpoolingRequest.of(request);
@@ -357,8 +351,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * @param transitServiceResolver used for resolving stop locations and nearby stop search
    * @param transitSearchTimeZero the reference time for computing relative start/end times
    *        used by Raptor
-   * @return a list of {@link CarpoolAccessEgress} results for Raptor, or an empty list if the
-   *         request mode is not CARPOOL or no viable matches are found
+   * @return a list of {@link CarpoolAccessEgress} results for Raptor, or an empty list if no
+   *         viable matches are found
    * @throws RoutingValidationException if origin or destination coordinates are missing
    */
   @Override
@@ -369,18 +363,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     TransitServiceResolver transitServiceResolver,
     ZonedDateTime transitSearchTimeZero
   ) throws RoutingValidationException {
-    if (
-      !StreetMode.CARPOOL.equals(request.journey().access().mode()) && accessOrEgress.isAccess()
-    ) {
-      return Collections.emptyList();
-    }
-
-    if (
-      !StreetMode.CARPOOL.equals(request.journey().egress().mode()) && accessOrEgress.isEgress()
-    ) {
-      return Collections.emptyList();
-    }
-
     validateRequest(request);
     var carpoolingRequest = CarpoolingRequest.of(request, accessOrEgress);
 

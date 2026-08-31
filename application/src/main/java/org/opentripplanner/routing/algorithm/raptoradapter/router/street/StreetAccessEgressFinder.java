@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This uses a street search to find paths to all the access/egress stop within range
  */
-public class AccessEgressRouter {
+public class StreetAccessEgressFinder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StreetAccessEgressFinder.class);
 
   /**
    * Find accesses or egresses.

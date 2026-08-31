@@ -221,44 +221,6 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   @Test
-  void returnsEmptyWhenAccessModeIsNotCarpool() {
-    var request = RouteRequest.of()
-      .withFrom(GenericLocation.fromCoordinate(coordP2.latitude(), coordP2.longitude()))
-      .withTo(GenericLocation.fromCoordinate(coordP3.latitude(), coordP3.longitude()))
-      .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.WALK)))
-      .buildRequest();
-
-    var results = service.routeAccessEgress(
-      request,
-      new StreetRequest(StreetMode.WALK),
-      AccessEgressType.ACCESS,
-      transitServiceResolver,
-      SEARCH_TIME
-    );
-
-    assertTrue(results.isEmpty());
-  }
-
-  @Test
-  void returnsEmptyWhenEgressModeIsNotCarpool() {
-    var request = RouteRequest.of()
-      .withFrom(GenericLocation.fromCoordinate(coordP1.latitude(), coordP1.longitude()))
-      .withTo(GenericLocation.fromCoordinate(coordP2.latitude(), coordP2.longitude()))
-      .withJourney(j -> j.withEgress(new StreetRequest(StreetMode.WALK)))
-      .buildRequest();
-
-    var results = service.routeAccessEgress(
-      request,
-      new StreetRequest(StreetMode.WALK),
-      AccessEgressType.EGRESS,
-      transitServiceResolver,
-      SEARCH_TIME
-    );
-
-    assertTrue(results.isEmpty());
-  }
-
-  @Test
   void returnsEmptyWhenNoCarpoolTripsInRepository() {
     var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME);
 

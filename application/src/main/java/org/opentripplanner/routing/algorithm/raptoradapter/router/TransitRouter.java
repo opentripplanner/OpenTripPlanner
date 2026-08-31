@@ -10,10 +10,7 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.flex.FlexParameters;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
@@ -43,7 +40,6 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -59,9 +55,6 @@ public class TransitRouter {
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
-  private final FlexParameters flexParameters;
-  private final List<RideHailingService> rideHailingServices;
 
   @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
@@ -75,7 +68,8 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContext linkingContext;
-  private final CarpoolingService carpoolingService;
+  private final List<AccessEgressRouter> accessRouters;
+  private final List<AccessEgressRouter> egressRouters;
 
   private TransitRouter(
     RouteRequest request,
@@ -84,9 +78,6 @@ public class TransitRouter {
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
-    FlexParameters flexParameters,
-    List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
@@ -95,7 +86,8 @@ public class TransitRouter {
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService
+    List<AccessEgressRouter> accessRouters,
+    List<AccessEgressRouter> egressRouters
   ) {
     this.request = request;
     this.transitService = transitService;
@@ -103,9 +95,6 @@ public class TransitRouter {
     this.raptorConfig = raptorConfig;
     this.meterRegistry = meterRegistry;
     this.streetDetailsService = streetDetailsService;
-    this.transferService = transferService;
-    this.flexParameters = flexParameters;
-    this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
     this.sorlandsbanenService = sorlandsbanenService;
     this.transitGroupPriorityService = transitGroupPriorityService;
@@ -114,7 +103,8 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
     this.viaTransferResolver = viaTransferResolver;
     this.linkingContext = linkingContext;
-    this.carpoolingService = carpoolingService;
+    this.accessRouters = accessRouters;
+    this.egressRouters = egressRouters;
   }
 
   public static TransitRouterResult route(
@@ -124,9 +114,6 @@ public class TransitRouter {
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
-    FlexParameters flexParameters,
-    List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
@@ -135,7 +122,8 @@ public class TransitRouter {
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService
+    List<AccessEgressRouter> accessRouters,
+    List<AccessEgressRouter> egressRouters
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -144,9 +132,6 @@ public class TransitRouter {
       raptorConfig,
       meterRegistry,
       streetDetailsService,
-      transferService,
-      flexParameters,
-      rideHailingServices,
       dataOverlayParameterBindings,
       sorlandsbanenService,
       viaTransferResolver,
@@ -155,17 +140,14 @@ public class TransitRouter {
       additionalSearchDays,
       debugTimingAggregator,
       linkingContext,
-      carpoolingService
+      accessRouters,
+      egressRouters
     );
 
     return transitRouter.route();
   }
 
   private TransitRouterResult route() {
-    if (!request.journey().transit().enabled() || request.cannotReachTransit()) {
-      return new TransitRouterResult(List.of(), null);
-    }
-
     if (!transitService.transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
@@ -179,16 +161,10 @@ public class TransitRouter {
     var fetchAccessEgress = new AccessEgressFetcher(
       request,
       transitService,
-      graph,
-      transferService,
-      streetDetailsService,
-      flexParameters,
-      rideHailingServices,
       dataOverlayParameterBindings,
-      transitSearchTimeZero,
-      additionalSearchDays,
       linkingContext,
-      carpoolingService,
+      accessRouters,
+      egressRouters,
       requestTransitDataProvider
     );
 

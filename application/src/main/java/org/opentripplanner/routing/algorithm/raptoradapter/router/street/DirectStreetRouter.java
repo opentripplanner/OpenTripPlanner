@@ -41,9 +41,6 @@ public class DirectStreetRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    if (request.journey().direct().mode() == StreetMode.NOT_SET) {
-      return Collections.emptyList();
-    }
     OTPRequestTimeoutException.checkForTimeout();
     try {
       var maxCarSpeed = streetLimitationParametersService.maxCarSpeed();

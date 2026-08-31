@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -18,7 +17,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -35,16 +33,13 @@ public class DirectFlexRouter {
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext
   ) {
-    if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
-      return Collections.emptyList();
-    }
     OTPRequestTimeoutException.checkForTimeout();
     // Prepare access/egress transfers
     var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
       request.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
-    Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> accessStops = StreetAccessEgressFinder.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
@@ -53,7 +48,7 @@ public class DirectFlexRouter {
       0,
       linkingContext
     );
-    Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> egressStops = StreetAccessEgressFinder.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,

@@ -24,14 +24,16 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.DefaultAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.standalone.api.TestServerContext;
-import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -39,6 +41,7 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -234,6 +237,13 @@ class ScheduledDeviatedTripIntegrationTest {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
+      var transitServiceResolver = new TransitServiceResolver(transitService);
+      var accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
+      // The request uses the default (WALK) access/egress mode, so only the default,
+      // street-based router is applicable here.
+      List<AccessEgressRouter> routers = List.of(
+        new DefaultAccessEgressRouter(accessEgressMapper, List.of(), request)
+      );
       var result = TransitRouter.route(
         request,
         transitService,
@@ -241,9 +251,6 @@ class ScheduledDeviatedTripIntegrationTest {
         TestServerContext.createRaptorConfig(),
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
-        TransferServiceTestFactory.transferService(transferRepository),
-        RouterConfig.DEFAULT.flexParameters(),
-        List.of(),
         null,
         null,
         TestServerContext.createViaTransferResolver(graph, transitService),
@@ -252,7 +259,8 @@ class ScheduledDeviatedTripIntegrationTest {
         additionalSearchDays,
         new DebugTimingAggregator(),
         linkingContext,
-        null
+        routers,
+        routers
       );
 
       return result.getItineraries();

@@ -148,23 +148,6 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   }
 
   @Test
-  void returnsEmptyWhenDirectModeIsNotCarpool() {
-    var request = RouteRequest.of()
-      .withFrom(
-        GenericLocation.fromCoordinate(passengerPickup.latitude(), passengerPickup.longitude())
-      )
-      .withTo(
-        GenericLocation.fromCoordinate(passengerDropoff.latitude(), passengerDropoff.longitude())
-      )
-      .withJourney(j -> j.withDirect(new StreetRequest(StreetMode.WALK)))
-      .buildRequest();
-
-    var results = service.routeDirect(request);
-
-    assertTrue(results.isEmpty());
-  }
-
-  @Test
   void returnsEmptyWhenNoCarpoolTripsInRepository() {
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
 
