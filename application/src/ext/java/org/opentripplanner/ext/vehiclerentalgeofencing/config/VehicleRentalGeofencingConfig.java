@@ -46,10 +46,9 @@ public class VehicleRentalGeofencingConfig {
       c
         .of("url")
         .since(V2_10)
-        .summary("URL or file path of the GBFS v3 `manifest.json`.")
+        .summary("URL of the GBFS v3 `manifest.json`.")
         .description(
-          "Can be either a remote URL (http/https) or a local file path (file://). " +
-            "The manifest must conform to the GBFS v3.0 specification."
+          "A remote URL (http/https). The manifest must conform to the GBFS v3.0 specification."
         )
         .asUri(),
       c
