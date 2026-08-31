@@ -69,10 +69,10 @@ public class AlertsConnectionFilterMapper {
     }
     return TransitAlertSelectRequest.of()
       .withFeeds(requireNullOrNonEmpty(select.getGraphQLFeeds(), path + ".feeds"))
-      .withSeverityLevels(severities(select.getGraphQLSeverityLevels(), path))
-      .withCauses(causes(select.getGraphQLCauses(), path))
-      .withEffects(effects(select.getGraphQLEffects(), path))
-      .withTimePeriods(activePeriods(select.getGraphQLActivePeriods(), path))
+      .withSeverityLevels(severities(select.getGraphQLSeverityLevels(), path + ".severityLevels"))
+      .withCauses(causes(select.getGraphQLCauses(), path + ".causes"))
+      .withEffects(effects(select.getGraphQLEffects(), path + ".effects"))
+      .withTimePeriods(activePeriods(select.getGraphQLActivePeriods(), path + ".activePeriods"))
       .build();
   }
 
@@ -81,10 +81,10 @@ public class AlertsConnectionFilterMapper {
     @Nullable List<GraphQLAlertSeverityLevelType> values,
     String path
   ) {
-    var checked = requireNullOrNonEmpty(values, path + ".severityLevels");
-    return checked == null
+    requireNullOrNonEmpty(values, path);
+    return values == null
       ? null
-      : checked
+      : values
           .stream()
           .flatMap(s -> SeverityMapper.getAlertSeverities(s).stream())
           .toList();
@@ -95,8 +95,8 @@ public class AlertsConnectionFilterMapper {
     @Nullable List<GraphQLAlertCauseType> values,
     String path
   ) {
-    var checked = requireNullOrNonEmpty(values, path + ".causes");
-    return checked == null ? null : checked.stream().map(AlertCauseMapper::getAlertCause).toList();
+    requireNullOrNonEmpty(values, path);
+    return values == null ? null : values.stream().map(AlertCauseMapper::getAlertCause).toList();
   }
 
   @Nullable
@@ -104,10 +104,8 @@ public class AlertsConnectionFilterMapper {
     @Nullable List<GraphQLAlertEffectType> values,
     String path
   ) {
-    var checked = requireNullOrNonEmpty(values, path + ".effects");
-    return checked == null
-      ? null
-      : checked.stream().map(AlertEffectMapper::getAlertEffect).toList();
+    requireNullOrNonEmpty(values, path);
+    return values == null ? null : values.stream().map(AlertEffectMapper::getAlertEffect).toList();
   }
 
   @Nullable
@@ -115,10 +113,10 @@ public class AlertsConnectionFilterMapper {
     @Nullable List<GraphQLOffsetDateTimeRangeInput> ranges,
     String path
   ) {
-    var checked = requireNullOrNonEmpty(ranges, path + ".activePeriods");
-    return checked == null
+    requireNullOrNonEmpty(ranges, path);
+    return ranges == null
       ? null
-      : checked.stream().map(AlertsConnectionFilterMapper::activePeriod).toList();
+      : ranges.stream().map(AlertsConnectionFilterMapper::activePeriod).toList();
   }
 
   private static TimePeriod activePeriod(GraphQLOffsetDateTimeRangeInput range) {
