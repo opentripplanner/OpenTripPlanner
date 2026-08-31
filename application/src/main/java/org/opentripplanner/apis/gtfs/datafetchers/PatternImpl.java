@@ -13,12 +13,13 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPatternTripsOnServiceDateArgs;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
+import org.opentripplanner.apis.gtfs.support.time.OffsetDateTimeRangeUtil;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -260,6 +261,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       var args = new GraphQLTypes.GraphQLPatternCanceledTripsArgs(environment.getArguments());
 
       var serviceDateRanges = LocalDateRangeUtil.mapRanges(args.getGraphQLServiceDateRanges());
+      var runningTimePeriods = OffsetDateTimeRangeUtil.mapRanges(
+        args.getGraphQLRunningTimeRanges(),
+        "runningTimeRanges"
+      );
 
       var requestBuilder = TripOnServiceDateRequest.of().withIncludePatterns(
         FilterValues.ofEmptyIsEverything("patterns", List.of(pattern.getId()))
@@ -267,6 +272,11 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       if (serviceDateRanges != null) {
         requestBuilder.withIncludeServiceDateRanges(
           FilterValues.ofRequired("serviceDateRanges", serviceDateRanges)
+        );
+      }
+      if (runningTimePeriods != null) {
+        requestBuilder.withIncludeRunningTimePeriods(
+          FilterValues.ofRequired("runningTimeRanges", runningTimePeriods)
         );
       }
 
@@ -291,15 +301,15 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
+    return environment.<GtfsGraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitAlertService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitAlertService();
   }
 
   private TripPattern getSource(DataFetchingEnvironment environment) {

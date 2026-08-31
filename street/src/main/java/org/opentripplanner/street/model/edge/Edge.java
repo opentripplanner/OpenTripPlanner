@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
@@ -57,14 +56,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   /**
-   * Checks equivalency to another edge. Default implementation is trivial equality, but subclasses
-   * may want to do something more tricky.
-   */
-  public boolean isEquivalentTo(Edge e) {
-    return this == e;
-  }
-
-  /**
    * Returns true if this edge is the reverse of another.
    */
   public final boolean isReverseOf(Edge e) {
@@ -99,16 +90,22 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return edgeReachableFromGraph;
   }
 
+  /**
+   * Returns the identity hash code of this edge. Edges use object identity for equality, so the
+   * hash code is based on memory location rather than content. See {@link #equals(Object)}.
+   */
   @Override
   public int hashCode() {
-    return Objects.hash(fromv, tov);
+    return System.identityHashCode(this);
   }
 
   /**
-   * Implementing equals methods for edges is complicated. Implementing this to match the hashCode
-   * method causes problems. Leaving this comment here in case it helps someone in the future.
+   * Edges use object identity (reference equality) for {@code equals} and {@code hashCode}.
+   * This makes edge lookups in sets and maps efficient and avoids ambiguity during graph
+   * construction, where structurally similar edges may coexist.
    * <p>
-   * TODO figure out equals method for edges, e.g. unique long/int for each edge
+   * <strong>Do not use this method to test whether two edges represent the same street segment
+   * or share the same content.</strong>
    */
   @Override
   public boolean equals(Object o) {

@@ -48,8 +48,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
       issueStore.add(
         new ContradictoryLevelAndInclineInfoForWay(
           way,
-          osmdb.getNode(firstNodeRef).getCoordinate(),
-          osmdb.getNode(lastNodeRef).getCoordinate()
+          osmdb.getNodeCoordinate(firstNodeRef),
+          osmdb.getNodeCoordinate(lastNodeRef)
         )
       );
       // Default to level info in case of contradictory information. Ideally this should be from
@@ -134,8 +134,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
       issueStore.add(
         new CouldNotApplyMultiLevelInfoToWay(
           way,
-          osmdb.getNode(firstNodeRef).getCoordinate(),
-          osmdb.getNode(lastNodeRef).getCoordinate(),
+          osmdb.getNodeCoordinate(firstNodeRef),
+          osmdb.getNodeCoordinate(lastNodeRef),
           way.getNodeRefs().size()
         )
       );

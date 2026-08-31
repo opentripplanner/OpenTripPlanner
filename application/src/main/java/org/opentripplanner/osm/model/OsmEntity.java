@@ -998,6 +998,28 @@ public abstract class OsmEntity {
     return permission;
   }
 
+  /**
+   * Entities are considered equal if they have the same id and are of the same concrete type.
+   * OSM ids are only unique within a single entity type (a node and a way can share the same
+   * numeric id), and this needs to hold even when the same OSM entity is represented by several
+   * distinct (but equivalent) Java instances, as is done for {@link org.opentripplanner.osm.model.OsmNode}.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof OsmEntity other)) {
+      return false;
+    }
+    return getClass() == other.getClass() && id == other.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getClass(), id);
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("tags", tags).toString();

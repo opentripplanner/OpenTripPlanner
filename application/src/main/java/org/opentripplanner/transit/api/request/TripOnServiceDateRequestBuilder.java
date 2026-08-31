@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
@@ -45,6 +46,10 @@ public class TripOnServiceDateRequestBuilder {
   );
   private FilterValues<LocalDateRange> includeServiceDateRanges = FilterValues.ofEmptyIsEverything(
     "includeServiceDateRanges",
+    List.of()
+  );
+  private FilterValues<TimePeriod> includeRunningTimePeriods = FilterValues.ofEmptyIsEverything(
+    "includeRunningTimePeriods",
     List.of()
   );
   private List<FilterRequest<TripOnServiceDateSelectRequest>> filters = List.of();
@@ -106,6 +111,13 @@ public class TripOnServiceDateRequestBuilder {
     return this;
   }
 
+  public TripOnServiceDateRequestBuilder withIncludeRunningTimePeriods(
+    FilterValues<TimePeriod> runningTimePeriods
+  ) {
+    this.includeRunningTimePeriods = runningTimePeriods;
+    return this;
+  }
+
   public TripOnServiceDateRequestBuilder withFilters(
     List<FilterRequest<TripOnServiceDateSelectRequest>> filters
   ) {
@@ -117,6 +129,7 @@ public class TripOnServiceDateRequestBuilder {
     return new TripOnServiceDateRequest(
       includeServiceDates,
       includeServiceDateRanges,
+      includeRunningTimePeriods,
       includeAgencies,
       includeRoutes,
       includePatterns,

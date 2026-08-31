@@ -42,29 +42,21 @@ public class GqlUtil {
   }
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
-    return (
-      (TransmodelRequestContext) environment.getContext()
-    ).getServerContext().vehicleRentalService();
+    return ((TransmodelRequestContext) environment.getContext()).getVehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(
     DataFetchingEnvironment environment
   ) {
-    return (
-      (TransmodelRequestContext) environment.getContext()
-    ).getServerContext().vehicleParkingService();
+    return ((TransmodelRequestContext) environment.getContext()).getVehicleParkingService();
   }
 
   public static NearbyPlaceFinder getNearbyPlaceFinder(DataFetchingEnvironment environment) {
-    return (
-      (TransmodelRequestContext) environment.getContext()
-    ).getServerContext().nearbyPlaceFinder();
+    return ((TransmodelRequestContext) environment.getContext()).getNearbyPlaceFinder();
   }
 
   public static NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
-    return (
-      (TransmodelRequestContext) environment.getContext()
-    ).getServerContext().nearbyStopFinder();
+    return ((TransmodelRequestContext) environment.getContext()).getNearbyStopFinder();
   }
 
   public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {

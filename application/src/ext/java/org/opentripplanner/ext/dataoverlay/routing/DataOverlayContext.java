@@ -34,8 +34,6 @@ public class DataOverlayContext implements ExtensionRequestContext {
   /**
    * Builds the {@link ExtensionRequestContext} list for a request, given the app-singleton
    * {@link DataOverlayParameterBindings}.
-   * <p/>
-   * @return an immutable list.
    */
   public static List<ExtensionRequestContext> listExtensionRequestContexts(
     DataOverlayParameters dataOverlayRequest,
