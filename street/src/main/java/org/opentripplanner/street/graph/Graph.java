@@ -205,8 +205,12 @@ public class Graph implements Serializable {
 
   /**
    * Return all the edges in the graph. Derived from vertices on demand.
+   * <p>
+   * Note: Under concurrent modification this method may return edges that have been removed from
+   * the graph or not return edges that have been added to the graph after this method has been
+   * called.
    */
-  public Collection<Edge> getEdges() {
+  public Collection<Edge> listEdges() {
     Set<Edge> edges = new HashSet<>();
     for (Vertex v : this.getVertices()) {
       edges.addAll(v.getOutgoing());
@@ -214,19 +218,23 @@ public class Graph implements Serializable {
     return edges;
   }
 
-  public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
-    return this.getEdges()
-      .stream()
-      .filter(cls::isInstance)
-      .map(cls::cast)
-      .collect(Collectors.toList());
-  }
-
   /**
-   * Return only the StreetEdges in the graph.
+   * Lazily iterate over all edges of a certain type in the graph, without materializing an
+   * intermediate collection. Walks the vertices and yielding only the ones that are instances
+   * of {@code clazz}.
+   * <p>
+   * The iterable may contain duplicates and can only be iterated once.
+   * <p>
+   * Note: Under concurrent modification this method may return edges that have been removed from
+   * the graph or not return edges that have been added to the graph after this method has been
+   * called.
    */
-  public Collection<StreetEdge> getStreetEdges() {
-    return getEdgesOfType(StreetEdge.class);
+  public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
+    return this.vertices.values()
+      .stream()
+      .flatMap(v -> v.getOutgoing().stream())
+      .filter(clazz::isInstance)
+      .map(clazz::cast)::iterator;
   }
 
   public boolean containsVertex(Vertex v) {

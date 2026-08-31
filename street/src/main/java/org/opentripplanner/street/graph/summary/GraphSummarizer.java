@@ -28,11 +28,9 @@ public class GraphSummarizer {
     this.graph = graph;
   }
 
-  /**
-   * Converts the input to a string-based label and looks it up in the graph. Remember that there
-   * are other, non-string vertex labels for which this method will not work.
-   * @see VertexLabel
-   */
+  /// Converts the input to a string-based label and looks it up in the graph. Remember that there
+  /// are other, non-string vertex labels for which this method will not work.
+  /// @see VertexLabel
   @Nullable
   public Vertex getVertex(String label) {
     return graph.getVertex(VertexLabel.string(label));
@@ -50,22 +48,25 @@ public class GraphSummarizer {
     return graph.getVerticesOfType(TransitStopVertex.class);
   }
 
-  /**
-   * Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
-   * This is a different behavior than {@link Graph#getEdges()}, which only returns edges that are
-   * outgoing.
-   */
+  /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
+  /// This is a different behavior than [Graph#listEdges()], which only returns edges that are
+  /// outgoing.
+  ///
+  /// This is needed so that temporary link edges, whose from-vertex is not added to the graph's
+  /// collection of vertices, are included in the summary and can then be asserted against.
   public List<Edge> listEdges() {
-    return graph
-      .getVertices()
-      .stream()
-      .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
-      .distinct()
-      .toList();
+    return distinctEdges().toList();
   }
 
   public List<AreaEdge> listAreaEdges() {
-    return graph.getEdgesOfType(AreaEdge.class);
+    return findEdges(AreaEdge.class);
+  }
+
+  /**
+   * Return all edges of a certain type in the graph.
+   */
+  public <T extends Edge> List<T> findEdges(Class<T> cls) {
+    return distinctEdges().filter(cls::isInstance).map(cls::cast).toList();
   }
 
   public String geoJsonUrl() {
@@ -98,5 +99,14 @@ public class GraphSummarizer {
 
   public Graph graph() {
     return graph;
+  }
+
+  /// See [GraphSummarizer#listEdges()] on why both incoming and outgoing edges are returned.
+  private Stream<Edge> distinctEdges() {
+    return graph
+      .getVertices()
+      .stream()
+      .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
+      .distinct();
   }
 }
