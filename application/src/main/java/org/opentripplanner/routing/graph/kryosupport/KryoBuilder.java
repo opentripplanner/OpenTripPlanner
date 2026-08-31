@@ -27,6 +27,13 @@ import org.opentripplanner.standalone.config.RouterConfig;
 public final class KryoBuilder {
 
   /**
+   * Expected upper bound on the number of reference-tracked objects in a serialized graph. The
+   * Norway graph (2 GB on disk) holds ~59 million; overshooting only rounds the pre-sized tables
+   * up to the next power of two, while undershooting merely re-introduces some rehash churn.
+   */
+  private static final int EXPECTED_GRAPH_OBJECTS = 64_000_000;
+
+  /**
    * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same
    * configuration. This allows us to use identically configured instances for serialization and
    * deserialization.
@@ -40,7 +47,7 @@ public final class KryoBuilder {
   public static Kryo create() {
     // For generating a histogram of serialized classes with associated serializers:
     // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
-    Kryo kryo = new Kryo();
+    Kryo kryo = new Kryo(new PreSizedReferenceResolver(EXPECTED_GRAPH_OBJECTS));
     // Allow serialization of unrecognized classes, for which we haven't manually set up a serializer.
     // We might actually want to manually register a serializer for every class, to be safe.
     kryo.setRegistrationRequired(false);
