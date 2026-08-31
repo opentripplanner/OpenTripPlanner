@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -62,11 +60,8 @@ class GraphTest {
     g.addVertex(a);
     g.addVertex(b);
 
-    FreeEdge ee = FreeEdge.createFreeEdge(a, b);
-
-    List<Edge> edges = new ArrayList<>(g.listEdges());
-    assertEquals(1, edges.size());
-    assertEquals(ee, edges.get(0));
+    var ee = FreeEdge.createFreeEdge(a, b);
+    assertThat(g.listEdges()).containsExactlyElementsIn(Set.of(ee));
   }
 
   @Test
@@ -86,9 +81,7 @@ class GraphTest {
     expectedEdges.add(FreeEdge.createFreeEdge(c, b));
     expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<Edge> edges = new HashSet<>(g.listEdges());
-    assertEquals(4, edges.size());
-    assertEquals(expectedEdges, edges);
+    assertThat(g.listEdges()).containsExactlyElementsIn(expectedEdges);
   }
 
   @Test

@@ -49,7 +49,7 @@ public class GraphSummarizer {
   }
 
   /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
-  /// This is a different behavior than [Graph#listEdges()], which only returns edges that are
+  /// This is a different behavior than [Graph#listCopyOfEdges()], which only returns edges that are
   /// outgoing.
   ///
   /// This is needed so that temporary link edges, whose from-vertex is not added to the graph's

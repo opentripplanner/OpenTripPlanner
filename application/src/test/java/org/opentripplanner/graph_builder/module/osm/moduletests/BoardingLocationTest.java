@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
@@ -13,6 +12,7 @@ import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class BoardingLocationTest {
 
@@ -40,7 +40,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.listEdges());
+    var edges = ListUtils.ofIterable(graph.listEdges());
     assertThat(edges).hasSize(1);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
@@ -64,7 +64,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.listEdges());
+    var edges = ListUtils.ofIterable(graph.listEdges());
     assertThat(edges).hasSize(2);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
@@ -87,7 +87,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.listEdges());
+    var edges = ListUtils.ofIterable(graph.listEdges());
     assertThat(edges).hasSize(2);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
