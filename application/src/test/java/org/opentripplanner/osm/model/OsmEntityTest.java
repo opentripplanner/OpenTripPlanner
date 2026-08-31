@@ -1,5 +1,6 @@
 package org.opentripplanner.osm.model;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -224,18 +225,14 @@ public class OsmEntityTest {
   void getCompoundTagValueSingleTagGroup() {
     var osm = new OsmTestEntity("ref", "E1");
 
-    assertEquals(
-      Optional.of("E1"),
-      osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("ref")))
-    );
+    assertThat(osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("ref")))).hasValue("E1");
   }
 
   @Test
   void getCompoundTagValueUsesFirstGroupThatResolvesAndSkipsMissingTags() {
     var osm = new OsmTestEntity(Map.of("manufacturer", "KONE", "ref", "12345"));
 
-    assertEquals(
-      Optional.of("KONE:12345"),
+    assertThat(
       osm.getCompoundTagValue(
         List.of(
           CompoundRefTagGroup.of("missing"),
@@ -243,17 +240,16 @@ public class OsmEntityTest {
           CompoundRefTagGroup.of("ref")
         )
       )
-    );
+    ).hasValue("KONE:12345");
   }
 
   @Test
   void getCompoundTagValueEmptyWhenNoGroupResolves() {
     var osm = new OsmTestEntity("ref", "12345");
 
-    assertEquals(
-      Optional.empty(),
+    assertThat(
       osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("manufacturer", "ref")))
-    );
+    ).isEmpty();
   }
 
   @Test

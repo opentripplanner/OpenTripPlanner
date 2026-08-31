@@ -1,11 +1,9 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests.elevator;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
@@ -42,7 +40,7 @@ public class ElevatorIdTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Optional.of("12345"), edge.id());
+      assertThat(edge.id()).hasValue("12345");
     }
   }
 
@@ -71,7 +69,7 @@ public class ElevatorIdTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Optional.of("12345"), edge.id());
+      assertThat(edge.id()).hasValue("12345");
     }
   }
 
@@ -100,7 +98,7 @@ public class ElevatorIdTest {
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
-      assertEquals(Optional.empty(), edge.id());
+      assertThat(edge.id()).isEmpty();
     }
   }
 }

@@ -1,11 +1,8 @@
 package org.opentripplanner.osm.model;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 public class CompoundRefTagGroupTest {
@@ -15,7 +12,7 @@ public class CompoundRefTagGroupTest {
     var group = CompoundRefTagGroup.of("ref");
     var tags = Map.of("ref", "E1");
 
-    assertEquals(Optional.of("E1"), group.compoundValue(tags::get));
+    assertThat(group.compoundValue(tags::get)).hasValue("E1");
   }
 
   @Test
@@ -23,7 +20,7 @@ public class CompoundRefTagGroupTest {
     var group = CompoundRefTagGroup.of("manufacturer", "ref");
     var tags = Map.of("manufacturer", "KONE", "ref", "12345");
 
-    assertEquals(Optional.of("KONE:12345"), group.compoundValue(tags::get));
+    assertThat(group.compoundValue(tags::get)).hasValue("KONE:12345");
   }
 
   @Test
@@ -31,7 +28,7 @@ public class CompoundRefTagGroupTest {
     var group = CompoundRefTagGroup.of("manufacturer", "ref");
     var tags = Map.of("ref", "12345");
 
-    assertEquals(Optional.empty(), group.compoundValue(tags::get));
+    assertThat(group.compoundValue(tags::get)).isEmpty();
   }
 
   @Test
@@ -47,23 +44,20 @@ public class CompoundRefTagGroupTest {
     var group = CompoundRefTagGroup.of("ref", null, "  ", "manufacturer");
     var tags = Map.of("ref", "12345", "manufacturer", "KONE");
 
-    assertEquals(Optional.of("12345:KONE"), group.compoundValue(tags::get));
+    assertThat(group.compoundValue(tags::get)).hasValue("12345:KONE");
   }
 
   @Test
   void equalsAndHashCode() {
-    assertEquals(
-      CompoundRefTagGroup.of("manufacturer", "ref"),
+    assertThat(CompoundRefTagGroup.of("manufacturer", "ref")).isEqualTo(
       CompoundRefTagGroup.of("manufacturer", "ref")
     );
-    assertEquals(
-      CompoundRefTagGroup.of("manufacturer", "ref").hashCode(),
+    assertThat(CompoundRefTagGroup.of("manufacturer", "ref").hashCode()).isEqualTo(
       CompoundRefTagGroup.of("manufacturer", "ref").hashCode()
     );
-    assertNotEquals(
-      CompoundRefTagGroup.of("manufacturer", "ref"),
+    assertThat(CompoundRefTagGroup.of("manufacturer", "ref")).isNotEqualTo(
       CompoundRefTagGroup.of("ref", "manufacturer")
     );
-    assertNotEquals(CompoundRefTagGroup.of("ref"), CompoundRefTagGroup.of("manufacturer"));
+    assertThat(CompoundRefTagGroup.of("ref")).isNotEqualTo(CompoundRefTagGroup.of("manufacturer"));
   }
 }
