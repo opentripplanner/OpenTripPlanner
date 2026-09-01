@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.walkablearea;
+package org.opentripplanner.graph_builder.module.osm.internal.walkablearea;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.stream.Collectors.toMap;

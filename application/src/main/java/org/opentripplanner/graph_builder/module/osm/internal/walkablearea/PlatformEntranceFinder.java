@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.walkablearea;
+package org.opentripplanner.graph_builder.module.osm.internal.walkablearea;
 
 import java.util.Collection;
 import java.util.List;

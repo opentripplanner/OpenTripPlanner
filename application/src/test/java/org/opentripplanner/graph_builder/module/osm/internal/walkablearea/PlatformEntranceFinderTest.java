@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.walkablearea;
+package org.opentripplanner.graph_builder.module.osm.internal.walkablearea;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;

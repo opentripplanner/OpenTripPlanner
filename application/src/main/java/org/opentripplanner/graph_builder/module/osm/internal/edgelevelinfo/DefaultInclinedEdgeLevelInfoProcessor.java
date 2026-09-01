@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.edgelevelinfo;
+package org.opentripplanner.graph_builder.module.osm.internal.edgelevelinfo;
 
 import java.util.List;
 import java.util.Optional;
