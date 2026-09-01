@@ -29,7 +29,8 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
   private String siriCodespace;
   private Integer version;
   private final Set<EntitySelector> entities = new HashSet<>();
-  private AlertCalendar calendar = AlertCalendar.ofNeverActive();
+  /** If the source data has no validity information, the alert is always active. */
+  private AlertCalendar calendar = AlertCalendar.ofAlwaysActive();
 
   TransitAlertBuilder(FeedScopedId id) {
     super(id);

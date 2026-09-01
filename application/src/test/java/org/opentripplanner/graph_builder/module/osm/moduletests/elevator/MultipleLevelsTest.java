@@ -25,6 +25,8 @@ import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.streetadapter.VertexFactory;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 class MultipleLevelsTest {
 
@@ -44,7 +46,7 @@ class MultipleLevelsTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertEquals(edge.getLevels(), 0.0);
@@ -167,13 +169,12 @@ class MultipleLevelsTest {
 
     assertEquals(expectedEdgeSet, actualEdgeSet);
     int streetEdgeCount = 8;
-    assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.getEdges().size());
+    assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.listEdges().size());
 
-    graph
-      .getEdgesOfType(ElevatorHopEdge.class)
+    ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
       .stream()
       .forEach(edge -> elevatorHopEdgeLevels.put(edge, edge.getLevels()));
-    for (var edge : graph.getEdgesOfType(ElevatorHopEdge.class)) {
+    for (var edge : ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))) {
       assertEquals(edge.getLevels(), elevatorHopEdgeLevels.get(edge));
     }
   }
@@ -217,13 +218,13 @@ class MultipleLevelsTest {
       edgeSet,
       new HashSet<>(
         graph
-          .getEdges()
+          .listEdges()
           .stream()
           .map(edge -> convertEdgeToVertexLabelString(edge))
           .toList()
       )
     );
-    assertEquals(edgeSet.size(), graph.getEdges().size());
+    assertEquals(edgeSet.size(), graph.listEdges().size());
   }
 
   @Test
@@ -260,13 +261,13 @@ class MultipleLevelsTest {
       edgeSet,
       new HashSet<>(
         graph
-          .getEdges()
+          .listEdges()
           .stream()
           .map(edge -> convertEdgeToVertexLabelString(edge))
           .toList()
       )
     );
-    assertEquals(edgeSet.size(), graph.getEdges().size());
+    assertEquals(edgeSet.size(), graph.listEdges().size());
   }
 
   private void addElevatorBoardAndAlightEdges(
@@ -322,23 +323,17 @@ class MultipleLevelsTest {
   private Set<String> getActualEdgeSet(Graph graph) {
     Set<String> actualEdgeSet = new HashSet<>();
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorBoardEdge.class)
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorBoardEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorAlightEdge.class)
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorAlightEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );
     actualEdgeSet.addAll(
-      graph
-        .getEdgesOfType(ElevatorHopEdge.class)
-        .stream()
+      StreamUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
         .map(edge -> convertEdgeToVertexLabelString(edge))
         .toList()
     );

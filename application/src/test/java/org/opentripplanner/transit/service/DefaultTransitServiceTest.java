@@ -34,7 +34,6 @@ import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -188,10 +187,9 @@ class DefaultTransitServiceTest {
       List.of(firstDate, secondDate)
     );
 
-    var serviceCodes = transitRepository.getServiceCodes();
-    serviceCodes.put(SERVICE_ID, SERVICE_CODE);
-    serviceCodes.put(CALENDAR_ID, SERVICE_CODE);
-    serviceCodes.put(CALENDAR_ID_TWO, 1);
+    transitRepository.putServiceCode(SERVICE_ID, SERVICE_CODE);
+    transitRepository.putServiceCode(CALENDAR_ID, SERVICE_CODE);
+    transitRepository.putServiceCode(CALENDAR_ID_TWO, 1);
 
     transitRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     transitRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
@@ -203,7 +201,7 @@ class DefaultTransitServiceTest {
 
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      transitRepository.getTripCalendar()
     );
     TripTimes tripTimes = ScheduledTripTimes.of()
       .withTrip(TransitRepositoryForTest.trip("123").build())

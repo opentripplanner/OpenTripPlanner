@@ -86,7 +86,7 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
               agency { gtfsId name }
               alerts {
                 alertHeaderText alertDescriptionText
-                effectiveStartDate effectiveEndDate
+                activityPeriods { start end }
                 alertSeverityLevel
               }
               pickupBookingInfo {

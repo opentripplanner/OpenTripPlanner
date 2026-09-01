@@ -39,23 +39,6 @@ class AlertsConnectionOrderingTest {
   }
 
   @Test
-  void alertsWithoutEffectiveStartComeFirstWithinSeverity() {
-    var openStart = TransitAlert.of(id("open-start"))
-      .withSeverity(AlertSeverity.WARNING)
-      .withCalendar(AlertCalendar.of(TimePeriod.of(null, LATE)))
-      .build();
-    var neverActive = TransitAlert.of(id("never-active"))
-      .withSeverity(AlertSeverity.WARNING)
-      .withCalendar(AlertCalendar.ofNeverActive())
-      .build();
-    var early = alert("early", AlertSeverity.WARNING, EARLY);
-
-    assertThat(AlertsConnectionOrdering.sort(List.of(early, openStart, neverActive)))
-      .containsExactly(neverActive, openStart, early)
-      .inOrder();
-  }
-
-  @Test
   void alertWithoutSeverityIsTreatedAsUnknown() {
     var noSeverity = alert("no-severity", null, EARLY);
     var unknown = alert("unknown", AlertSeverity.UNKNOWN_SEVERITY, LATE);

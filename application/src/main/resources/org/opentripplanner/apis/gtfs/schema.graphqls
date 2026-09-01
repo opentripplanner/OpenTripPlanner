@@ -136,6 +136,13 @@ type Agency implements Node {
 "Alert of a current or upcoming disruption in public transportation"
 type Alert implements Node {
   """
+  The periods of time when this alert is active, sorted chronologically. There is always at
+  least one period. Each period has an inclusive start and an exclusive end. A period with an
+  unbounded start has always been active and a period with an unbounded end is active
+  indefinitely.
+  """
+  activityPeriods: [OffsetDateTimeRange!]!
+  """
   Agency affected by the disruption. Note that this value is present only if the
   disruption has an effect on all operations of the agency (e.g. in case of a strike).
   """
@@ -170,9 +177,9 @@ type Alert implements Node {
   "Url with more information in all different available languages"
   alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
-  effectiveEndDate: Long
+  effectiveEndDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"
-  effectiveStartDate: Long
+  effectiveStartDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Entities affected by the disruption."
   entities: [AlertEntity]
   "The feed in which this alert was published"
@@ -1102,6 +1109,20 @@ is known well ahead of time.
 type Notice {
   "Textual representation of the message"
   text: String
+}
+
+"""
+A range of time which can be unbounded in either direction.
+
+The start of the range is inclusive and the end is exclusive.
+A `null` start means that the range extends indefinitely into the past and a `null` end means
+that it extends indefinitely into the future.
+"""
+type OffsetDateTimeRange {
+  "The exclusive end of the range or `null` if the range is unbounded in the future."
+  end: OffsetDateTime
+  "The inclusive start of the range or `null` if the range is unbounded in the past."
+  start: OffsetDateTime
 }
 
 type OpeningHours {

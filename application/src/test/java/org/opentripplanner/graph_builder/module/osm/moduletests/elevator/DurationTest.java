@@ -12,6 +12,7 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class DurationTest {
 
@@ -24,7 +25,7 @@ class DurationTest {
 
     osmModule.buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));
@@ -48,7 +49,7 @@ class DurationTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.getTravelTime()).hasValue(Duration.ofSeconds(62));

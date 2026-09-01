@@ -24,6 +24,9 @@ public class StreetNoteMapper {
           TimePeriod.of(note.effectiveStartDate.toInstant(), note.effectiveEndDate.toInstant())
         )
       );
+    } else {
+      // A note without a validity period is always active.
+      alert.withCalendar(AlertCalendar.ofAlwaysActive());
     }
     return alert.build();
   }
