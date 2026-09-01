@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -31,20 +30,13 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.CarpoolAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.DefaultAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -66,7 +58,6 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +108,7 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
+  private final RouterSelector routerSelector;
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
@@ -179,6 +171,18 @@ public class RoutingWorker {
       request.journey().transit().priorityGroupsByAgency(),
       request.journey().transit().priorityGroupsGlobal()
     );
+    this.routerSelector = new RouterSelector(
+      request,
+      transitService,
+      graph,
+      transferService,
+      streetDetailsService,
+      flexParameters,
+      additionalSearchDays,
+      rideHailingServices,
+      carpoolingService,
+      transitSearchTimeZero
+    );
   }
 
   public RoutingResponse route() {
@@ -189,7 +193,12 @@ public class RoutingWorker {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       this.currentLinkingContext = createLinkingContext(temporaryVerticesContainer);
 
-      var routers = selectRouters();
+      List<Supplier<RoutingResult>> routers = routerSelector.selectRouters(
+        this::routeDirectStreet,
+        this::routeDirectFlex,
+        this::routeDirectCarpooling,
+        this::routeTransit
+      );
 
       if (OTPFeature.ParallelRouting.isOn()) {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
@@ -266,64 +275,6 @@ public class RoutingWorker {
       transitAlertService,
       pagingService
     );
-  }
-
-  /**
-   * Selects the router functions to run for this request: the direct-mode routers (street,
-   * flex, carpool) are grouped together since they all depend on the same
-   * {@code directRoutingApplies}/{@code directMode} guard, followed by the transit router.
-   * {@link DebugTimingAggregator} tracks each router's start/finish independently, so this
-   * dispatch order carries no timing implications. Each router's applicability (mode, feature
-   * flag, start-on-board, via-search, transit-enabled) is decided here, once, rather than being
-   * buried inside the individual {@code routeDirect*}/{@code routeTransit} methods - those
-   * become pure "run the router" methods with no guard clauses of their own.
-   * <p>
-   * Package-private for testing.
-   */
-  List<Supplier<RoutingResult>> selectRouters() {
-    List<Supplier<RoutingResult>> routers = new ArrayList<>();
-
-    // Start-on-board trip locations don't have street vertices, so direct routing doesn't apply.
-    if (!request.isStartOnBoardAccessRequest()) {
-      StreetMode directMode = request.journey().direct().mode();
-
-      // TODO: Add support for via search to the direct-street search and remove this.
-      //       The direct search is used to prune away silly transit results and it
-      //       would be nice to also support via as a feature in the direct-street search.
-      if (!request.isViaSearch()) {
-        // If no direct mode is set, then we set one. See FilterTransitWhenDirectModeIsEmpty.
-        var directModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-          directMode,
-          request.pageCursor() != null
-        );
-        StreetMode resolvedDirectMode = directModeHandler.resolveDirectMode();
-        if (resolvedDirectMode != StreetMode.NOT_SET) {
-          var directRequest = request
-            .copyOf()
-            .withJourney(jb ->
-              jb.withDirect(
-                new StreetRequest(resolvedDirectMode, request.journey().direct().rentalDuration())
-              )
-            )
-            .buildRequest();
-          routers.add(() ->
-            routeDirectStreet(directRequest, directModeHandler.removeWalkAllTheWayResults())
-          );
-        }
-      }
-      if (directMode == StreetMode.FLEXIBLE && OTPFeature.FlexRouting.isOn()) {
-        routers.add(this::routeDirectFlex);
-      }
-      if (directMode == StreetMode.CARPOOL && OTPFeature.CarPooling.isOn()) {
-        routers.add(this::routeDirectCarpooling);
-      }
-    }
-
-    if (request.journey().transit().enabled() && !request.cannotReachTransit()) {
-      routers.add(this::routeTransit);
-    }
-
-    return routers;
   }
 
   /**
@@ -414,49 +365,15 @@ public class RoutingWorker {
     }
   }
 
-  /**
-   * Selects the {@link AccessEgressRouter}s applicable to the given access/egress
-   * {@link StreetMode}. The default street-based router is always included; Flex/Carpool
-   * routers are additional contributions included only when the mode and corresponding
-   * feature flag match. This is the single place where access/egress mode-equality and
-   * feature-flag checks live.
-   * <p>
-   * Package-private for testing.
-   */
-  List<AccessEgressRouter> selectAccessEgressRouters(StreetMode mode) {
-    var transitServiceResolver = new TransitServiceResolver(transitService);
-    var accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
-    List<AccessEgressRouter> routers = new ArrayList<>();
-    routers.add(new DefaultAccessEgressRouter(accessEgressMapper, rideHailingServices, request));
-    if (mode == StreetMode.FLEXIBLE && OTPFeature.FlexRouting.isOn()) {
-      routers.add(
-        new FlexAccessEgressRouter(
-          transitService,
-          graph,
-          transferService,
-          streetDetailsService,
-          flexParameters,
-          additionalSearchDays
-        )
-      );
-    }
-    if (mode == StreetMode.CARPOOL && OTPFeature.CarPooling.isOn()) {
-      routers.add(
-        new CarpoolAccessEgressRouter(
-          carpoolingService,
-          transitServiceResolver,
-          transitSearchTimeZero
-        )
-      );
-    }
-    return routers;
-  }
-
   private RoutingResult routeTransit() {
     debugTimingAggregator.startedTransitRouting();
     try {
-      var accessRouters = selectAccessEgressRouters(request.journey().access().mode());
-      var egressRouters = selectAccessEgressRouters(request.journey().egress().mode());
+      var accessRouters = routerSelector.selectAccessEgressRouters(
+        request.journey().access().mode()
+      );
+      var egressRouters = routerSelector.selectAccessEgressRouters(
+        request.journey().egress().mode()
+      );
       var transitResults = TransitRouter.route(
         request,
         transitService,
