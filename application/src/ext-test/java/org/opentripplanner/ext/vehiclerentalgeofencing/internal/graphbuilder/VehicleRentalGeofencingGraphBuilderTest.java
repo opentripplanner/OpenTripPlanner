@@ -6,7 +6,6 @@ import static org.opentripplanner.gbfs.network.GeofencingZoneScope.PERMANENT;
 import static org.opentripplanner.gbfs.network.GeofencingZoneScope.REALTIME;
 
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
 import org.opentripplanner.gbfs.network.GeofencingZoneScope;
+import org.opentripplanner.test.support.ResourceLoader;
 
 /**
  * The test manifest lists two datasets:
@@ -27,9 +27,9 @@ import org.opentripplanner.gbfs.network.GeofencingZoneScope;
  */
 class VehicleRentalGeofencingGraphBuilderTest {
 
-  private static final URI MANIFEST = Path.of("src/test/resources/gbfs/manifest.json")
-    .toAbsolutePath()
-    .toUri();
+  private static final URI MANIFEST = ResourceLoader.of(
+    VehicleRentalGeofencingGraphBuilderTest.class
+  ).uri("/gbfs/manifest.json");
 
   @Test
   void selectsOnlyNetworksThatPublishGeofencingZones() {
