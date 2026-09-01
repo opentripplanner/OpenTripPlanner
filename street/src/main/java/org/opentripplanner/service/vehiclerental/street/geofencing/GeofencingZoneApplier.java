@@ -51,20 +51,14 @@ public class GeofencingZoneApplier {
    * Applies the restrictions described in the geofencing zones to edges, builds a spatial index,
    * and identifies boundary-crossing edges.
    */
-  public GeofencingZoneApplierResult applyGeofencingZones(
-    Collection<GeofencingZone> geofencingZones
-  ) {
-    var zoneIndex = new GeofencingZoneIndex(geofencingZones);
-
+  public Set<Vertex> applyGeofencingZones(Collection<GeofencingZone> geofencingZones) {
     var zonesWithGeometry = geofencingZones
       .stream()
       .filter(z -> z.geometry() != null)
       .filter(z -> requireDropOffInsideBusinessArea || !z.isBusinessArea())
       .toList();
 
-    var boundaryVertices = addBoundaryExtensions(zonesWithGeometry);
-
-    return new GeofencingZoneApplierResult(Set.copyOf(boundaryVertices), zoneIndex);
+    return Set.copyOf(addBoundaryExtensions(zonesWithGeometry));
   }
 
   /**

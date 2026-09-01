@@ -52,13 +52,12 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
   }
 
   @Override
-  public void setGeofencingZoneIndex(
-    String network,
-    GeofencingZoneIndex index,
-    Collection<GeofencingZone> zones
-  ) {
-    indexes().put(network, index);
-    zonesByNetwork.put(network, Set.copyOf(zones));
+  public void setGeofencingZones(String network, Collection<GeofencingZone> zones) {
+    var copy = Set.copyOf(zones);
+    // Index first: a reader between the two writes only ever consults indexes, and the reverse
+    // order would let a first-time rebuild build this network's index a second time.
+    indexes().put(network, new GeofencingZoneIndex(copy));
+    zonesByNetwork.put(network, copy);
   }
 
   @Override

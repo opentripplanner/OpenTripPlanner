@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 
 /**
  * The writable data store of vehicle rental information. Also exposes raw read access and
@@ -21,20 +20,16 @@ public interface VehicleRentalRepository extends GeofencingZoneService, Serializ
   void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId);
 
   /**
-   * Register a network's geofencing zones together with the index built from them. Called by the
+   * Register a network's geofencing zones. Called by the
    * vehicle rental updater and, for networks in the permanent scope, by the geofencing graph
    * builder. A network has exactly one source of zones, so re-registering with the same
    * {@code network} replaces the previous registration.
    *
-   * <p>The raw zones are kept because the index does not survive serialization; whether a
-   * registration ends up in the graph therefore depends on when it happens, not on how it is
-   * made. Only the graph build runs before the graph is written.
+   * <p>The zones are the only state kept; the spatial index used to query them is an
+   * implementation detail built from them here. Whether a registration ends up in the graph
+   * depends on when it happens: only the graph build runs before the graph is written.
    */
-  void setGeofencingZoneIndex(
-    String network,
-    GeofencingZoneIndex index,
-    Collection<GeofencingZone> zones
-  );
+  void setGeofencingZones(String network, Collection<GeofencingZone> zones);
 
   Collection<VehicleRentalPlace> listRentalPlaces();
 

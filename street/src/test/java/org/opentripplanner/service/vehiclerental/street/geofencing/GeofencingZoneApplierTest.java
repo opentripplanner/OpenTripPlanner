@@ -1,7 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street.geofencing;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdFactory.id;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
@@ -54,23 +53,23 @@ class GeofencingZoneApplierTest {
 
   @Test
   void interiorVertexHasNoBoundaryExtensions() {
-    var result = applier.applyGeofencingZones(List.of(zone, businessArea));
+    var boundaryVertices = applier.applyGeofencingZones(List.of(zone, businessArea));
 
     assertTrue(insideFrognerPark1.listGeofencingBoundaries().isEmpty());
-    assertFalse(result.boundaryVertices().contains(insideFrognerPark1));
+    assertFalse(boundaryVertices.contains(insideFrognerPark1));
   }
 
   @Test
   void boundaryVerticesGetExtensions() {
-    var result = applier.applyGeofencingZones(List.of(zone, businessArea));
+    var boundaryVertices = applier.applyGeofencingZones(List.of(zone, businessArea));
 
     // fromv (insideFrognerPark2) should have a boundary extension
     var boundaries = insideFrognerPark2.listGeofencingBoundaries();
     assertFalse(boundaries.isEmpty());
 
     // boundary vertices tracked for cleanup
-    assertTrue(result.boundaryVertices().contains(insideFrognerPark2));
-    assertTrue(result.boundaryVertices().contains(outsideFrognerPark1));
+    assertTrue(boundaryVertices.contains(insideFrognerPark2));
+    assertTrue(boundaryVertices.contains(outsideFrognerPark1));
     // fromv (inside) should have entering=false (exiting when traversing fromv→tov)
     var boundary = boundaries
       .stream()
@@ -78,20 +77,5 @@ class GeofencingZoneApplierTest {
       .findFirst()
       .orElseThrow();
     assertFalse(boundary.entering());
-  }
-
-  @Test
-  void zoneIndexContainsAppliedZones() {
-    var result = applier.applyGeofencingZones(List.of(zone, businessArea));
-
-    assertNotNull(result.zoneIndex());
-
-    // point inside Frogner Park should find the zone
-    var zones = result.zoneIndex().findZonesContaining(insideFrognerPark1.getCoordinate());
-    assertTrue(zones.contains(zone));
-
-    // point outside both should find neither restricted zone
-    var outsideZones = result.zoneIndex().findZonesContaining(outsideFrognerPark2.getCoordinate());
-    assertFalse(outsideZones.contains(zone));
   }
 }

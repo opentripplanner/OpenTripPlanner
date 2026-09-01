@@ -10,7 +10,6 @@ import org.opentripplanner.service.vehiclerental.model.TestGeofencingZoneBuilder
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 import org.opentripplanner.street.geometry.Polygons;
 
 class DefaultVehicleRentalServiceTest {
@@ -70,10 +69,6 @@ class DefaultVehicleRentalServiceTest {
       .withGeometry(Polygons.OSLO)
       .noDropOff()
       .build();
-    repository.setGeofencingZoneIndex(
-      network,
-      new GeofencingZoneIndex(List.of(zone)),
-      List.of(zone)
-    );
+    repository.setGeofencingZones(network, List.of(zone));
   }
 }

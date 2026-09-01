@@ -153,14 +153,14 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
       graph::findEdges,
       network.parameters().requireDropOffInsideBusinessArea()
     );
-    var result = applier.applyGeofencingZones(zones);
+    var boundaryVertices = applier.applyGeofencingZones(zones);
 
-    rentalRepository.setGeofencingZoneIndex(network.network(), result.zoneIndex(), zones);
+    rentalRepository.setGeofencingZones(network.network(), zones);
 
     LOG.info(
       "Applied {} geofencing zones with {} boundary vertices for network {}",
       zones.size(),
-      result.boundaryVertices().size(),
+      boundaryVertices.size(),
       network.network()
     );
   }

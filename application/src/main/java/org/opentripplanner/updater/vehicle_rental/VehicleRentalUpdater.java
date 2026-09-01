@@ -20,7 +20,6 @@ import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneApplier;
-import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.linking.LinkingDirection;
@@ -59,7 +58,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
   private final boolean requireDropOffInsideBusinessArea;
 
   private Set<Vertex> latestBoundaryVertices = Set.of();
-  private GeofencingZoneIndex latestZoneIndex;
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
   private final Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   private final Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
@@ -254,14 +252,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           env -> graph.findEdges(env, Scope.REQUEST),
           requireDropOffInsideBusinessArea
         );
-        var result = applier.applyGeofencingZones(geofencingZones);
-        latestBoundaryVertices = result.boundaryVertices();
-        latestZoneIndex = result.zoneIndex();
+        latestBoundaryVertices = applier.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
         // A network has one source of zones, so registering under it replaces any earlier index.
         // One updater serves one GBFS feed, so every zone here carries the same resolved system id.
         var network = geofencingZones.iterator().next().id().getFeedId();
-        service.setGeofencingZoneIndex(network, latestZoneIndex, geofencingZones);
+        service.setGeofencingZones(network, geofencingZones);
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);

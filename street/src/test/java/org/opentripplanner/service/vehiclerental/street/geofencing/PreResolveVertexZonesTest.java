@@ -32,11 +32,7 @@ class PreResolveVertexZonesTest {
   void seedsVerticesFromZonesRegisteredByAnotherPhase() {
     var repository = new DefaultVehicleRentalRepository();
     // Registered the way the geofencing graph builder registers zones during graph build.
-    repository.setGeofencingZoneIndex(
-      TIER,
-      new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)),
-      Set.of(TIER_NO_DROP_OFF)
-    );
+    repository.setGeofencingZones(TIER, Set.of(TIER_NO_DROP_OFF));
 
     var vertex = scooterInsideFrognerPark(TIER);
 
@@ -52,16 +48,8 @@ class PreResolveVertexZonesTest {
   @Test
   void seedsOnlyTheVertexOwnNetworkWhenZonesOverlap() {
     var repository = new DefaultVehicleRentalRepository();
-    repository.setGeofencingZoneIndex(
-      TIER,
-      new GeofencingZoneIndex(Set.of(TIER_NO_DROP_OFF)),
-      Set.of(TIER_NO_DROP_OFF)
-    );
-    repository.setGeofencingZoneIndex(
-      VOI,
-      new GeofencingZoneIndex(Set.of(VOI_NO_DROP_OFF)),
-      Set.of(VOI_NO_DROP_OFF)
-    );
+    repository.setGeofencingZones(TIER, Set.of(TIER_NO_DROP_OFF));
+    repository.setGeofencingZones(VOI, Set.of(VOI_NO_DROP_OFF));
 
     var tierVertex = scooterInsideFrognerPark(TIER);
     var voiVertex = scooterInsideFrognerPark(VOI);
