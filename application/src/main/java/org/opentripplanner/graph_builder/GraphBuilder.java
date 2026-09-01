@@ -186,9 +186,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
-    if (graph.hasStreets && graphBuilder.hasTransitData()) {
-      graphBuilder.addModule(factory.stopConnectivityModule());
-    }
+    graphBuilder.addModule(factory.stopConnectivityModule());
 
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 
