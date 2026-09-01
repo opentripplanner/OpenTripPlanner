@@ -191,9 +191,9 @@ mutually exclusive and zones cannot be applied twice.
     },
     "includeUnlistedNetworks" : false,
     "networks" : [
-      { "network" : "tier", "applyGeofencingZones" : "permanent" },
-      { "network" : "voi", "applyGeofencingZones" : "permanent", "requireDropOffInsideBusinessArea" : false },
-      { "network" : "oslobysykkel", "applyGeofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true },
+      { "network" : "tier", "applyGeofencingZones" : "graph-build" },
+      { "network" : "voi", "applyGeofencingZones" : "graph-build", "requireDropOffInsideBusinessArea" : false },
+      { "network" : "oslobysykkel", "applyGeofencingZones" : "serve", "allowKeepingVehicleAtDestination" : true },
       { "network" : "noisy-operator" }
     ]
   }
@@ -267,12 +267,12 @@ itinerary can only end with the vehicle parked at one.
 
 **Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
 **Path:** /gbfs/defaults   
-**Enum values:** `permanent` | `realtime` | `off`
+**Enum values:** `graph-build` | `serve` | `off`
 
 When this network's geofencing zones are computed and applied.
 
- - `permanent` The vehicle rental geofencing graph builder loads and applies the zones.
- - `realtime` The vehicle rental updater loads and applies the zones.
+ - `graph-build` The vehicle rental geofencing graph builder loads and applies the zones.
+ - `serve` The vehicle rental updater loads and applies the zones.
  - `off` The zones are not processed for this network. Use this to opt a single network out of a
    `defaults` block that enables them.
 
@@ -313,12 +313,12 @@ itinerary can only end with the vehicle parked at one.
 
 **Since version:** `2.10` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"off"`   
 **Path:** /gbfs/networks/[0]   
-**Enum values:** `permanent` | `realtime` | `off`
+**Enum values:** `graph-build` | `serve` | `off`
 
 When this network's geofencing zones are computed and applied.
 
- - `permanent` The vehicle rental geofencing graph builder loads and applies the zones.
- - `realtime` The vehicle rental updater loads and applies the zones.
+ - `graph-build` The vehicle rental geofencing graph builder loads and applies the zones.
+ - `serve` The vehicle rental updater loads and applies the zones.
  - `off` The zones are not processed for this network. Use this to opt a single network out of a
    `defaults` block that enables them.
 

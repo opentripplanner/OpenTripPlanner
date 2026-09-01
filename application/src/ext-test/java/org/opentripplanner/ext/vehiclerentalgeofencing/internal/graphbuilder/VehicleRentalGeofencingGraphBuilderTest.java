@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.gbfs.network.GeofencingZoneScope.OFF;
-import static org.opentripplanner.gbfs.network.GeofencingZoneScope.PERMANENT;
-import static org.opentripplanner.gbfs.network.GeofencingZoneScope.REALTIME;
+import static org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase.GRAPH_BUILD;
+import static org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase.OFF;
+import static org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase.SERVE;
 
 import java.net.URI;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
-import org.opentripplanner.gbfs.network.GeofencingZoneScope;
+import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 import org.opentripplanner.test.support.ResourceLoader;
 
 /**
@@ -33,14 +33,14 @@ class VehicleRentalGeofencingGraphBuilderTest {
 
   @Test
   void selectsOnlyNetworksThatPublishGeofencingZones() {
-    var selected = selectNetworks(allNetworks(PERMANENT));
+    var selected = selectNetworks(allNetworks(GRAPH_BUILD));
 
     assertThat(selected).containsExactly("tieroslo");
   }
 
   @Test
   void skipsNetworksThatAreNotConfigured() {
-    var overrides = new GbfsNetworkOverrides(defaults(PERMANENT), false, Map.of());
+    var overrides = new GbfsNetworkOverrides(defaults(GRAPH_BUILD), false, Map.of());
 
     assertThat(selectNetworks(overrides)).isEmpty();
   }
@@ -50,7 +50,7 @@ class VehicleRentalGeofencingGraphBuilderTest {
     var overrides = new GbfsNetworkOverrides(
       defaults(OFF),
       false,
-      Map.of("tieroslo", defaults(PERMANENT))
+      Map.of("tieroslo", defaults(GRAPH_BUILD))
     );
 
     assertThat(selectNetworks(overrides)).containsExactly("tieroslo");
@@ -58,7 +58,7 @@ class VehicleRentalGeofencingGraphBuilderTest {
 
   @Test
   void skipsNetworksInTheRealtimePhase() {
-    assertThat(selectNetworks(allNetworks(REALTIME))).isEmpty();
+    assertThat(selectNetworks(allNetworks(SERVE))).isEmpty();
   }
 
   @Test
@@ -85,11 +85,11 @@ class VehicleRentalGeofencingGraphBuilderTest {
   }
 
   /** Every dataset in the manifest is a candidate, in the given scope. */
-  private static GbfsNetworkOverrides allNetworks(GeofencingZoneScope scope) {
+  private static GbfsNetworkOverrides allNetworks(GeofencingZoneOtpPhase scope) {
     return new GbfsNetworkOverrides(defaults(scope), true, Map.of());
   }
 
-  private static GbfsNetworkParameters defaults(GeofencingZoneScope scope) {
+  private static GbfsNetworkParameters defaults(GeofencingZoneOtpPhase scope) {
     return new GbfsNetworkParameters(scope, true, false);
   }
 }

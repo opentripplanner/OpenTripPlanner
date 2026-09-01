@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
-import org.opentripplanner.gbfs.network.GeofencingZoneScope;
+import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -105,9 +105,9 @@ public class GbfsNetworksConfig {
       node
         .of("applyGeofencingZones")
         .since(V2_10)
-        .summary(GeofencingZoneScope.OFF.typeDescription())
-        .description(docEnumValueList(GeofencingZoneScope.values()))
-        .asEnum(defaults.geofencingZoneScope()),
+        .summary(GeofencingZoneOtpPhase.OFF.typeDescription())
+        .description(docEnumValueList(GeofencingZoneOtpPhase.values()))
+        .asEnum(defaults.geofencingZonePhase()),
       node
         .of("requireDropOffInsideBusinessArea")
         .since(V2_10)

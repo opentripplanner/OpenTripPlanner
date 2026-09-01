@@ -10,16 +10,16 @@ import java.util.Objects;
  * {@link GbfsNetworkOverrides}, and the same type describes the {@code defaults} block, which has
  * no network of its own.
  *
- * @param geofencingZoneScope the scope of this network's geofencing zones, i.e. which phase
+ * @param geofencingZonePhase the scope of this network's geofencing zones, i.e. which phase
  *   computes and applies them. Configured as {@code applyGeofencingZones}.
  * @param requireDropOffInsideBusinessArea whether a rented vehicle must be dropped off before
  *   leaving the operator's business area, i.e. whether the router forces a drop-off at its border.
- *   Has no effect when {@code geofencingZoneScope} is {@link GeofencingZoneScope#OFF}.
+ *   Has no effect when {@code geofencingZonePhase} is {@link GeofencingZoneOtpPhase#OFF}.
  * @param allowKeepingVehicleAtDestination whether a vehicle rented from a station may be kept at
  *   the destination rather than returned to another station
  */
 public record GbfsNetworkParameters(
-  GeofencingZoneScope geofencingZoneScope,
+  GeofencingZoneOtpPhase geofencingZonePhase,
   boolean requireDropOffInsideBusinessArea,
   boolean allowKeepingVehicleAtDestination
 ) {
@@ -27,12 +27,12 @@ public record GbfsNetworkParameters(
    * The values used when neither a {@code defaults} block nor a network entry specifies a field.
    */
   public static final GbfsNetworkParameters DEFAULT = new GbfsNetworkParameters(
-    GeofencingZoneScope.OFF,
+    GeofencingZoneOtpPhase.OFF,
     true,
     false
   );
 
   public GbfsNetworkParameters {
-    Objects.requireNonNull(geofencingZoneScope);
+    Objects.requireNonNull(geofencingZonePhase);
   }
 }

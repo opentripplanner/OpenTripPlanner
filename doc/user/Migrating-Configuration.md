@@ -50,7 +50,7 @@ router-config.json                            otp-config.json
       network: "default-network"      ------>     defaults { ... }
                                                   includeUnlistedNetworks: true
       network: "<other>"              ------>     networks[].network
-      geofencingZones: true           ------>     applyGeofencingZones: "realtime"
+      geofencingZones: true           ------>     applyGeofencingZones: "serve"
       geofencingZones: false          ------>     applyGeofencingZones: "off"
       allowKeepingVehicleAtDestination ----->     allowKeepingVehicleAtDestination
 ```
@@ -64,7 +64,7 @@ Three things to check when migrating:
   explicitly did not. Check listed networks that omit `requireDropOffInsideBusinessArea` or
   `allowKeepingVehicleAtDestination`.
 - `geofencingZones` becomes `applyGeofencingZones` and is no longer a boolean. It names when the
-  zones are computed and applied - `permanent`, `realtime` or `off` - so a network cannot have its
+  zones are computed and applied - `graph-build`, `serve` or `off` - so a network cannot have its
   zones applied twice.
 
 `geofencingBusinessAreaBorders` is renamed `requireDropOffInsideBusinessArea` and is configurable

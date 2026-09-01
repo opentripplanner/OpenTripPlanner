@@ -48,9 +48,9 @@ mutually exclusive and zones cannot be applied twice.
     },
     "includeUnlistedNetworks" : false,
     "networks" : [
-      { "network" : "tier", "applyGeofencingZones" : "permanent" },
-      { "network" : "voi", "applyGeofencingZones" : "permanent", "requireDropOffInsideBusinessArea" : false },
-      { "network" : "oslobysykkel", "applyGeofencingZones" : "realtime", "allowKeepingVehicleAtDestination" : true },
+      { "network" : "tier", "applyGeofencingZones" : "graph-build" },
+      { "network" : "voi", "applyGeofencingZones" : "graph-build", "requireDropOffInsideBusinessArea" : false },
+      { "network" : "oslobysykkel", "applyGeofencingZones" : "serve", "allowKeepingVehicleAtDestination" : true },
       { "network" : "noisy-operator" }
     ]
   }

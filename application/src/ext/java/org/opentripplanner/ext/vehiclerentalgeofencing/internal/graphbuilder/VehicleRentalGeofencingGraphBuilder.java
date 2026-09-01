@@ -13,7 +13,7 @@ import org.opentripplanner.gbfs.GbfsFeedLoaderAndMapper;
 import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
-import org.opentripplanner.gbfs.network.GeofencingZoneScope;
+import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * edges.
  * <p>
  * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the shared
- * {@code gbfs} configuration puts it in the {@link GeofencingZoneScope#PERMANENT} phase and its
+ * {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase and its
  * feed actually publishes a {@code geofencing_zones} feed. Zones are applied and indexed per
  * network, so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that
  * enable it.
@@ -110,7 +110,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
         continue;
       }
       var parameters = override.get();
-      if (parameters.geofencingZoneScope() != GeofencingZoneScope.PERMANENT) {
+      if (parameters.geofencingZonePhase() != GeofencingZoneOtpPhase.GRAPH_BUILD) {
         continue;
       }
 

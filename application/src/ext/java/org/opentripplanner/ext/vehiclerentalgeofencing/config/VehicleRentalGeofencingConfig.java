@@ -22,7 +22,7 @@ public class VehicleRentalGeofencingConfig {
       .description(
         """
         Discovers the networks a provider publishes from a GBFS v3 `manifest.json` and, for each
-        network configured with `"applyGeofencingZones": "permanent"` in the `gbfs` section of
+        network configured with `"applyGeofencingZones": "graph-build"` in the `gbfs` section of
         `otp-config.json`, loads its geofencing zones and applies them to the street graph during
         the graph build. This moves the cost of computing zone boundaries off the runtime path.
 

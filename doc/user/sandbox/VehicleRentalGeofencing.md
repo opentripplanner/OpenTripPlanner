@@ -41,17 +41,17 @@ The parameters are documented in full under
 The networks to load are discovered from the GBFS v3 `manifest.json`. A dataset is loaded when both
 of these hold:
 
-- the shared [`gbfs` configuration](../GBFS-Config.md) puts it in the permanent phase, with
-  `"applyGeofencingZones": "permanent"`, and
+- the shared [`gbfs` configuration](../GBFS-Config.md) puts it in the graph-build phase, with
+  `"applyGeofencingZones": "graph-build"`, and
 - its feed actually publishes a `geofencing_zones` feed, checked against the feed list in
   `gbfs.json` before anything is fetched.
 
-The second rule means a blanket `permanent` default in `defaults` picks up only the systems that
+The second rule means a blanket `graph-build` default in `defaults` picks up only the systems that
 have zones, so operators without them cost nothing but the feed list lookup.
 
 `applyGeofencingZones` is what decides which phase applies a network's zones, and the phases are
-mutually exclusive — a network set to `permanent` is skipped by the updater, and one set to
-`realtime` is skipped here, so zones are never applied twice.
+mutually exclusive — a network set to `graph-build` is skipped by the updater, and one set to
+`serve` is skipped here, so zones are never applied twice.
 
 ## Limitations
 
@@ -60,7 +60,7 @@ A GBFS updater configured directly under `updaters` in `router-config.json` does
 here applies the zones twice.
 
 Because the zones become part of the graph, changing an operator's zones requires a new graph build.
-Networks whose zones change often should stay in the `realtime` phase.
+Networks whose zones change often should stay in the `serve` phase.
 
 ## Changelog
 
