@@ -30,7 +30,7 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -155,7 +155,7 @@ class DatedServiceJourneyTypeTest {
     var repo = env.transitRepository();
     var snapshot = new DefaultTimetableRepository(
       repo.getRaptorTransitData(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     snapshot.update(update);
     return new DefaultTransitService(repo, snapshot.commit());
