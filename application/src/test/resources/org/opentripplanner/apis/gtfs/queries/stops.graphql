@@ -23,6 +23,9 @@
     }
     canceledCalls(
       serviceDateRanges: [{ start: "2024-08-08", end: "2024-08-10" }]
+      timeRanges: [
+        { start: "2024-08-08T00:00:00Z", end: "2024-08-11T00:00:00Z" }
+      ]
       arrivalDeparture: EITHER
     ) {
       tripOnServiceDate {

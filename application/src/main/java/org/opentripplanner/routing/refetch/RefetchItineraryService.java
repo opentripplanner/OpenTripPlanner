@@ -25,7 +25,6 @@ import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -58,18 +57,6 @@ public class RefetchItineraryService {
   private final LinkingContextFactory linkingContextFactory;
   private final StreetPathToLegsMapper streetPathToLegsMapper;
   private final StreetLimitationParametersService streetLimitationParametersService;
-
-  public RefetchItineraryService(OtpServerRequestContext serverContext) {
-    this(
-      serverContext.graph(),
-      serverContext.transitService(),
-      serverContext.transitAlertService(),
-      serverContext.transferService(),
-      serverContext.streetDetailsService(),
-      serverContext.linkingContextFactory(),
-      serverContext.streetLimitationParametersService()
-    );
-  }
 
   public RefetchItineraryService(
     Graph graph,

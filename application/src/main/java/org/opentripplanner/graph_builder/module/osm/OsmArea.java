@@ -3,11 +3,11 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.TLongObjectMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.LongFunction;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
@@ -36,7 +36,7 @@ class OsmArea {
     OsmEntity parent,
     List<OsmWay> outerRingWays,
     List<OsmWay> innerRingWays,
-    TLongObjectMap<OsmNode> nodes
+    LongFunction<OsmNode> nodeById
   ) {
     this.parent = parent;
     // ring assignment
@@ -51,10 +51,10 @@ class OsmArea {
     List<Ring> innerRings = new ArrayList<>();
     List<Ring> outerRings = new ArrayList<>();
     for (TLongList ring : innerRingNodes) {
-      innerRings.add(new Ring(ring, nodes));
+      innerRings.add(new Ring(ring, nodeById));
     }
     for (TLongList ring : outerRingNodes) {
-      outerRings.add(new Ring(ring, nodes));
+      outerRings.add(new Ring(ring, nodeById));
     }
 
     List<Ring> outermostRings = new ArrayList<>();

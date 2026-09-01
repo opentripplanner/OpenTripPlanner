@@ -12,34 +12,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
-import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
-import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -49,6 +47,7 @@ import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.CsvFileSupport;
 import org.opentripplanner.transit.speed_test.model.testcase.ExpectedResults;
@@ -79,7 +78,8 @@ public class SpeedTest {
   private final List<TestCaseDefinition> testCaseDefinitions;
   private final Map<String, ExpectedResults> expectedResultsByTcId;
   private final Map<SpeedTestProfile, TestCases> lastSampleResult = new HashMap<>();
-  private final OtpServerRequestContext serverContext;
+  private final RoutingService routingService;
+  private final TransitService transitService;
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
   private final CsvFileSupport tcIO;
@@ -110,8 +110,6 @@ public class SpeedTest {
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
-    var transitService = new DefaultTransitService(transitRepository);
-
     TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
@@ -125,7 +123,7 @@ public class SpeedTest {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.copyTripCalendarForRealTimeUpdates()
+      transitRepository.getTripCalendar()
     );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(
@@ -169,7 +167,9 @@ public class SpeedTest {
       streetUpdateManager,
       timetableHandle,
       new DelegatingTransitAlertServiceImpl(),
-      routerConfig.updaterConfig()
+      routerConfig.updaterConfig(),
+      // The speed test does not use GBFS vehicle rental.
+      GbfsNetworkOverrides.none()
     );
     if (transitRepository.getUpdaterManager() != null) {
       transitRepository.getUpdaterManager().startUpdaters();
@@ -182,50 +182,32 @@ public class SpeedTest {
 
     var vertexLinker = VertexLinkerTestFactory.of(graph);
 
-    // Creating raptor transit data should be integrated into the TransitRepository, but for now
-    // we do it manually here
-
     var transactionScope = registry.scope();
-    this.serverContext = new DefaultServerRequestContext(
-      DebugUiConfig.DEFAULT,
-      new DefaultFareService(),
-      routerConfig.flexParameters(),
-      graph,
-      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
-      timer.getRegistry(),
-      null,
-      raptorConfig,
-      realtimeVehicleHandle.repositorySnapshot(transactionScope),
-      List.of(),
-      routerConfig.routingRequestDefaults(),
-      TestServerContext.createStreetLimitationParametersService(),
-      TransferServiceTestFactory.transferService(transferRepository),
-      transactionScope,
-      routerConfig.transitTuningConfig(),
-      new DefaultTransitService(
-        transitRepository,
-        timetableHandle.repositorySnapshot(transactionScope)
-      ),
+    this.transitService = new DefaultTransitService(
+      transitRepository,
+      timetableHandle.repositorySnapshot(transactionScope)
+    );
+    this.routingService = new DefaultRoutingService(
+      this.transitService,
       new DelegatingTransitAlertServiceImpl(),
-      null,
-      null,
-      VectorTileConfig.DEFAULT,
-      TestServerContext.createVehicleParkingService(),
+      graph,
+      raptorConfig,
+      timer.getRegistry(),
+      TestServerContext.createStreetLimitationParametersService(),
       TestServerContext.createVehicleRentalService(),
-      vertexLinker,
-      TestServerContext.createViaTransferResolver(graph, transitService),
-      TestServerContext.createWorldEnvelopeService(),
-      null,
-      null,
-      null,
       TestServerContext.createStreetDetailsService(),
+      TransferServiceTestFactory.transferService(transferRepository),
+      routerConfig.flexParameters(),
+      List.of(),
+      null,
+      null,
+      TestServerContext.createViaTransferResolver(graph, this.transitService),
       null,
       null,
       null,
-      null,
-      null,
-      null,
-      null
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
+      routerConfig.transitTuningConfig(),
+      routerConfig.transitTuningConfig()
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);
@@ -367,7 +349,7 @@ public class SpeedTest {
       transitRepository.getTimeZone()
     );
     var routingRequest = speedTestRequest.toRouteRequest();
-    return serverContext.routingService().route(routingRequest);
+    return routingService.route(routingRequest);
   }
 
   /* setup helper methods */
@@ -422,7 +404,6 @@ public class SpeedTest {
    * Add "static" transit statistics and JVM memory usages to the "timers" logging.
    */
   private void updateTimersWithGlobalCounters() {
-    final var transitService = serverContext.transitService();
     timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
     timer.globalCount("transitdata_patterns", transitService.listTripPatterns().size());
     timer.globalCount("transitdata_trips", transitService.listTrips().size());

@@ -32,6 +32,7 @@ import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
+import org.opentripplanner.apis.gtfs.model.OffsetDateTimeRange;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -106,6 +107,7 @@ public class GraphQLDataFetchers {
 
   /** Alert of a current or upcoming disruption in public transportation */
   public interface GraphQLAlert {
+    public DataFetcher<Iterable<OffsetDateTimeRange>> activityPeriods();
     public DataFetcher<Agency> agency();
     public DataFetcher<GraphQLAlertCauseType> alertCause();
     public DataFetcher<String> alertDescriptionText();
@@ -559,6 +561,18 @@ public class GraphQLDataFetchers {
    */
   public interface GraphQLNotice {
     public DataFetcher<String> text();
+  }
+
+  /**
+   * A range of time which can be unbounded in either direction.
+   *
+   * The start of the range is inclusive and the end is exclusive.
+   * A `null` start means that the range extends indefinitely into the past and a `null` end means
+   * that it extends indefinitely into the future.
+   */
+  public interface GraphQLOffsetDateTimeRange {
+    public DataFetcher<java.time.OffsetDateTime> end();
+    public DataFetcher<java.time.OffsetDateTime> start();
   }
 
   public interface GraphQLOpeningHours {

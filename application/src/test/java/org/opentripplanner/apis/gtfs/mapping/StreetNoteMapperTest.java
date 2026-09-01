@@ -3,11 +3,11 @@ package org.opentripplanner.apis.gtfs.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 
@@ -45,7 +45,7 @@ class StreetNoteMapperTest {
     note.effectiveStartDate = null;
     note.effectiveEndDate = null;
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
-    assertEquals(Collections.emptyList(), alert.calendar().timePeriods());
+    assertEquals(AlertCalendar.ofAlwaysActive(), alert.calendar());
   }
 
   private static StreetNote note() {

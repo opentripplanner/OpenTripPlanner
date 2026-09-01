@@ -10,22 +10,6 @@ interface Layer {
 /** The group whose layers can be narrowed to a set of vehicle rental networks. */
 const RENTAL_GROUP = 'Rental';
 
-/**
- * MapLibre's legacy filter syntax names the property directly, as in ["in", "class", "StreetEdge"],
- * where the expression syntax wraps it: ["in", ["get", "class"], ["literal", [...]]]. The debug
- * style uses both - the rental vehicle and station layers are class-filtered in the legacy form,
- * the geofencing zone layers use expressions - and the two cannot be mixed inside one filter.
- */
-function isLegacyFilter(filter: unknown): boolean {
-  return Array.isArray(filter) && filter[0] === 'in' && typeof filter[1] === 'string';
-}
-
-function networkFilter(serverFilter: unknown, networks: Set<string>): unknown[] {
-  return isLegacyFilter(serverFilter)
-    ? ['in', 'network', ...networks]
-    : ['in', ['get', 'network'], ['literal', [...networks]]];
-}
-
 interface LayerControlProps {
   mapRef: MapRef | null;
   position: ControlPosition; // not used in inline styling, but you might use it if you want
@@ -140,12 +124,13 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         const serverFilter = serverFilters.current.get(layer.id);
 
         // setFilter replaces rather than merges, so the server's own filter - which selects the
-        // vehicle, station or zone type the layer draws - has to be reapplied alongside ours, in
-        // the same dialect: an expression cannot be combined with a legacy filter.
+        // vehicle, station or zone type the layer draws - has to be reapplied alongside ours. The
+        // debug style states every filter in MapLibre's expression syntax, so the two combine
+        // directly; a legacy filter could not be nested inside this one.
         const filter =
           networks.size === rentalNetworks.length
             ? serverFilter
-            : ['all', serverFilter, networkFilter(serverFilter, networks)];
+            : ['all', serverFilter, ['in', ['get', 'network'], ['literal', [...networks]]]];
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mapInstance.setFilter(layer.id, filter as any);

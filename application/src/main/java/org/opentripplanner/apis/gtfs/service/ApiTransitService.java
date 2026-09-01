@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.model.StopCallOnTripOnServiceDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
@@ -95,18 +97,21 @@ public class ApiTransitService {
   /**
    * Find the canceled stop calls at the given stop. A call is included if either the trip it
    * belongs to has been canceled, or the visit at this stop has been canceled (skipped). Only calls
-   * whose trip's service date is within any of the given service date ranges are returned. The
-   * {@code arrivalDeparture} parameter controls whether drop-off-only calls are included. Each
-   * call is paired with the {@link TripOnServiceDate} it belongs to, which is synthesized when no
-   * real one exists.
+   * whose trip's service date is within any of the given service date ranges are returned. If
+   * {@code callTimePeriods} is non-null, only calls where the vehicle is scheduled to visit the
+   * stop during one of the periods are returned. The {@code arrivalDeparture} parameter controls
+   * whether drop-off-only calls are included. Each call is paired with the {@link TripOnServiceDate}
+   * it belongs to, which is synthesized when no real one exists.
    */
   public List<StopCallOnTripOnServiceDate> findCanceledStopCalls(
     StopLocation stop,
     List<LocalDateRange> serviceDateRanges,
+    @Nullable List<TimePeriod> callTimePeriods,
     ArrivalDeparture arrivalDeparture
   ) {
     var request = TripTimeOnDateRequest.of(List.of(stop))
       .withServiceDateRanges(serviceDateRanges)
+      .withIncludeCallTimePeriods(callTimePeriods)
       .withArrivalDeparture(arrivalDeparture)
       .withNumberOfDepartures(Integer.MAX_VALUE)
       .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)

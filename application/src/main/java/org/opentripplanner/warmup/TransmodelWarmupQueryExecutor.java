@@ -8,7 +8,6 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.slf4j.Logger;
@@ -105,24 +104,18 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
     }
     """;
 
-  private final OtpServerRequestContext serverContext;
   private final TransmodelRequestContext requestContext;
   private final GraphQLSchema schema;
   private final ModeCombinations modeCombinations;
 
   TransmodelWarmupQueryExecutor(
-    OtpServerRequestContext context,
+    GraphQLSchema schema,
+    TransmodelRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {
-    this.serverContext = context;
-    this.schema = context.transmodelSchema();
-    this.requestContext = new TransmodelRequestContext(
-      context,
-      context.routingService(),
-      context.transitService(),
-      context.empiricalDelayService()
-    );
+    this.schema = schema;
+    this.requestContext = requestContext;
     this.modeCombinations = new ModeCombinations(accessModes, egressModes);
   }
 
@@ -133,7 +126,6 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
     var input = ExecutionInput.newExecutionInput()
       .query(QUERY)
       .context(requestContext)
-      .root(serverContext)
       .variables(variables)
       .build();
 

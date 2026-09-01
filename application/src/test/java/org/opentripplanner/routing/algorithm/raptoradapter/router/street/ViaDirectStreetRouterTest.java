@@ -35,6 +35,8 @@ import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class ViaDirectStreetRouterTest {
 
@@ -132,15 +134,18 @@ class ViaDirectStreetRouterTest {
       Set.of()
     );
 
-    var ctx = TestServerContext.ofGraph(new Graph());
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
 
     var itineraries = new ViaDirectStreetRouter().route(
-      ctx.graph(),
-      ctx.transitService(),
-      ctx.streetLimitationParametersService(),
-      ctx.vehicleRentalService(),
-      ctx.streetDetailsService(),
-      ctx.dataOverlayParameterBindings(),
+      new Graph(),
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
       request,
       linkingContext
     );

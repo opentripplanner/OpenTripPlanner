@@ -12,7 +12,9 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Instant;
 import java.util.AbstractMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -231,6 +233,7 @@ public class PtSituationElementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("validityPeriod")
           .type(validityPeriodType)
+          .deprecate("Use validityPeriods instead")
           .description("Period this situation is in effect")
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();
@@ -241,6 +244,39 @@ public class PtSituationElementType {
               ? alert.getEffectiveEndDate().toEpochMilli()
               : null;
             return new ValidityPeriod(startTime, endTime);
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("validityPeriods")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(validityPeriodType))))
+          .description(
+            "The periods in which this situation is valid, sorted in chronological order. " +
+              "There is always at least one period."
+          )
+          .dataFetcher(environment -> {
+            TransitAlert alert = environment.getSource();
+            return alert
+              .calendar()
+              .timePeriods()
+              .stream()
+              .map(period ->
+                new ValidityPeriod(
+                  period.start().map(Instant::toEpochMilli).orElse(null),
+                  period.end().map(Instant::toEpochMilli).orElse(null)
+                )
+              )
+              .sorted(
+                Comparator.comparing(
+                  ValidityPeriod::startTime,
+                  Comparator.nullsFirst(Comparator.naturalOrder())
+                ).thenComparing(
+                  ValidityPeriod::endTime,
+                  Comparator.nullsLast(Comparator.naturalOrder())
+                )
+              )
+              .toList();
           })
           .build()
       )

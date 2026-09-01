@@ -1,5 +1,6 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -64,7 +65,7 @@ class VehicleParkingHelperTest {
     new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertEquals(3, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
-    assertEquals(7, graph.getEdgesOfType(VehicleParkingEdge.class).size());
+    assertThat(graph.findEdges(VehicleParkingEdge.class)).hasSize(7);
   }
 
   private VehicleParking createParingWithEntrances(int entranceNumber) {

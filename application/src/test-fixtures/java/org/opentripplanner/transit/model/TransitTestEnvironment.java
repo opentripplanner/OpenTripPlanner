@@ -4,6 +4,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
@@ -17,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -71,7 +73,7 @@ public final class TransitTestEnvironment {
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.copyTripCalendarForRealTimeUpdates()
+      transitRepository.getTripCalendar()
     );
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -106,6 +108,25 @@ public final class TransitTestEnvironment {
    */
   public TransitService transitService() {
     return new DefaultTransitService(transitRepository, timetableSnapshot());
+  }
+
+  /**
+   * Applies a real-time update through the transaction framework, committing it to the timetable
+   * repository backing {@link #transitService()}, so that a subsequent call to that method
+   * returns a snapshot reflecting the update. The method will wait for the update to be applied
+   * before returning.
+   */
+  public void applyUpdate(RealTimeTripUpdate update) {
+    try {
+      var task = updateManager.submit(ctx -> {
+        TimetableRepository repository = ctx.repository(timetableHandle);
+        repository.update(update);
+      });
+      // Wait for task to commit - this allows us to proceed with the test
+      task.get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String feedId() {

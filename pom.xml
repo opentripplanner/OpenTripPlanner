@@ -58,12 +58,12 @@
 
 
     <properties>
-        <otp.serialization.version.id>271</otp.serialization.version.id>
+        <otp.serialization.version.id>274</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>34.4</geotools.version>
+        <geotools.version>34.5</geotools.version>
         <google.dagger.version>2.60.1</google.dagger.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jersey.version>3.1.12</jersey.version>
         <junit.version>6.1.2</junit.version>
@@ -71,7 +71,7 @@
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.6.1</logback.version>
         <lucene.version>10.5.0</lucene.version>
-        <micrometer.version>1.17.0</micrometer.version>
+        <micrometer.version>1.17.1</micrometer.version>
         <netex-java-model.version>2.0.15.3</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.35.1</protobuf.version>
@@ -85,9 +85,13 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
-        <plugin.prettier.version>0.22</plugin.prettier.version>
-        <plugin.prettier.goal>write</plugin.prettier.goal>
-        <plugin.prettier.skip>false</plugin.prettier.skip>
+        <plugin.spotless.version>3.10.0</plugin.spotless.version>
+        <plugin.spotless.goal>apply</plugin.spotless.goal>
+        <plugin.spotless.skip>false</plugin.spotless.skip>
+        <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
+             other; prettier-plugin-java only supports a limited range of prettier versions. -->
+        <prettier.version>3.8.3</prettier.version>
+        <prettier.java.version>2.7.7</prettier.java.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
@@ -116,25 +120,100 @@
                     <version>3.6.2</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.hubspot.maven.plugins</groupId>
-                    <artifactId>prettier-maven-plugin</artifactId>
-                    <version>${plugin.prettier.version}</version>
+                    <!--
+                      Spotless runs Prettier (with the prettier-java plugin) to format the code.
+                      Note! Spotless requires node/npm to be available on the PATH.
+
+                      The Prettier options are configured inline below. Spotless resolves the
+                      options up-front, without a file path, so a Prettier config file with
+                      'overrides' per file type would not work.
+                    -->
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${plugin.spotless.version}</version>
                     <configuration>
-                        <skip>${plugin.prettier.skip}</skip>
-                        <prettierJavaVersion>2.7.7</prettierJavaVersion>
-                        <inputGlobs>
-                            <inputGlob>src/main/java/**/*.java</inputGlob>
-                            <inputGlob>src/test/java/**/*.java</inputGlob>
-                            <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
-                            <inputGlob>src/main/java/**/*.md</inputGlob>
-                        </inputGlobs>
+                        <skip>${plugin.spotless.skip}</skip>
+                        <java>
+                            <includes>
+                                <include>src/main/java/**/*.java</include>
+                                <include>src/test/java/**/*.java</include>
+                                <include>src/test-fixtures/java/**/*.java</include>
+                                <!-- Sandbox source roots, only present in the application module -->
+                                <include>src/ext/java/**/*.java</include>
+                                <include>src/ext-test/java/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <!-- Some source directories contain npm projects (e.g. the GraphQL
+                                     Java code generator), never format their dependencies. -->
+                                <exclude>**/node_modules/**</exclude>
+                            </excludes>
+                            <!--
+                              Steps are applied in the order they are declared, so unused imports
+                              are removed before the code is formatted. The 'cleanthat' engine is
+                              used because it is based on JavaParser; the default
+                              'google-java-format' engine needs extra JVM flags to access internal
+                              JDK compiler classes.
+                            -->
+                            <removeUnusedImports>
+                                <engine>cleanthat-javaparser-unnecessaryimport</engine>
+                            </removeUnusedImports>
+                            <prettier>
+                                <devDependencies>
+                                    <prettier>${prettier.version}</prettier>
+                                    <prettier-plugin-java>${prettier.java.version}</prettier-plugin-java>
+                                </devDependencies>
+                                <config>
+                                    <plugins>prettier-plugin-java</plugins>
+                                    <parser>java</parser>
+                                    <printWidth>100</printWidth>
+                                    <tabWidth>2</tabWidth>
+                                    <useTabs>false</useTabs>
+                                    <endOfLine>lf</endOfLine>
+                                </config>
+                            </prettier>
+                        </java>
+                        <formats>
+                            <format>
+                                <includes>
+                                    <include>src/main/java/**/*.md</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/node_modules/**</exclude>
+                                </excludes>
+                                <prettier>
+                                    <devDependencies>
+                                        <prettier>${prettier.version}</prettier>
+                                    </devDependencies>
+                                    <config>
+                                        <parser>markdown</parser>
+                                        <proseWrap>always</proseWrap>
+                                        <printWidth>100</printWidth>
+                                    </config>
+                                </prettier>
+                            </format>
+                            <format>
+                                <includes>
+                                    <include>src/**/*.json</include>
+                                    <include>src/test/resources/org/opentripplanner/apis/**/*.graphql</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/node_modules/**</exclude>
+                                    <exclude>src/test/resources/org/opentripplanner/apis/vectortiles/style.json</exclude>
+                                </excludes>
+                                <prettier>
+                                    <devDependencies>
+                                        <prettier>${prettier.version}</prettier>
+                                    </devDependencies>
+                                </prettier>
+                            </format>
+                        </formats>
                     </configuration>
                     <executions>
                         <execution>
                             <id>prettier-format</id>
                             <phase>validate</phase>
                             <goals>
-                                <goal>${plugin.prettier.goal}</goal>
+                                <goal>${plugin.spotless.goal}</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -143,18 +222,38 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
                 <inherited>false</inherited>
                 <configuration>
-                    <inputGlobs>
-                        <inputGlob>*.md</inputGlob>
-                        <inputGlob>doc/**/*.md</inputGlob>
-                        <!-- Skip doc/user/**/*.md files. Many of these files are generated by
-                             JUnit tests and CI piplene. To avoid conflicts we skip these for now.
-                        -->
-                        <inputGlob>!doc/user/**/*.md</inputGlob>
-                    </inputGlobs>
+                    <!-- The root module only formats the Markdown documentation -->
+                    <java combine.self="override"/>
+                    <formats combine.self="override">
+                        <format>
+                            <includes>
+                                <include>*.md</include>
+                                <include>doc/**/*.md</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/node_modules/**</exclude>
+                                <!-- Skip doc/user/**/*.md files. Many of these files are generated
+                                     by JUnit tests and the CI pipeline. To avoid conflicts we skip
+                                     these for now.
+                                -->
+                                <exclude>doc/user/**/*.md</exclude>
+                            </excludes>
+                            <prettier>
+                                <devDependencies>
+                                    <prettier>${prettier.version}</prettier>
+                                </devDependencies>
+                                <config>
+                                    <parser>markdown</parser>
+                                    <proseWrap>always</proseWrap>
+                                    <printWidth>100</printWidth>
+                                </config>
+                            </prettier>
+                        </format>
+                    </formats>
                 </configuration>
             </plugin>
             <plugin>
@@ -402,7 +501,12 @@
                 <executions>
                     <execution>
                         <id>validate</id>
-                        <phase>validate</phase>
+                        <!--
+                          Checkstyle runs in 'process-sources', which is after the 'validate' phase
+                          used by Spotless. This way Spotless gets to auto-fix issues (like unused
+                          imports) before Checkstyle verifies the code.
+                        -->
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -633,7 +737,7 @@
             <id>prettierCheck</id>
             <properties>
                 <!-- In the CI environment we want to validate that code is formatted -->
-                <plugin.prettier.goal>check</plugin.prettier.goal>
+                <plugin.spotless.goal>check</plugin.spotless.goal>
             </properties>
         </profile>
         <profile>
@@ -649,7 +753,7 @@
                 </property>
             </activation>
             <properties>
-                <plugin.prettier.skip>true</plugin.prettier.skip>
+                <plugin.spotless.skip>true</plugin.spotless.skip>
             </properties>
         </profile>
         <profile>
@@ -737,7 +841,7 @@
             <properties>
                 <tests.includedGroups>integration</tests.includedGroups>
                 <tests.excludedGroups></tests.excludedGroups>
-                <plugin.prettier.skip>true</plugin.prettier.skip>
+                <plugin.spotless.skip>true</plugin.spotless.skip>
             </properties>
         </profile>
 

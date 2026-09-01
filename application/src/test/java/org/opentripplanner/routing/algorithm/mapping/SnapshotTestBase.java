@@ -42,17 +42,19 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.NarrowedTransitMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
@@ -74,7 +76,8 @@ public abstract class SnapshotTestBase {
 
   static final boolean VERBOSE = Boolean.getBoolean("otp.test.verbose");
 
-  protected OtpServerRequestContext serverContext;
+  protected TransitService transitService;
+  protected RoutingService routingService;
 
   public static void loadGraphBeforeClass(boolean withElevation) {
     if (withElevation) {
@@ -84,20 +87,19 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  protected OtpServerRequestContext serverContext() {
-    if (serverContext == null) {
+  private void ensureContextInitialized() {
+    if (routingService == null) {
       TestOtpModel model = getGraph();
-      serverContext = TestServerContext.createServerContext(
-        model.graph(),
+      transitService = TestServerContext.createTransitService(
         model.transitRepository(),
-        model.transferRepository(),
-        model.fareServiceFactory().makeFareService(),
-        null,
-        null
+        model.transferRepository()
+      );
+      routingService = TestServerContext.createRoutingService(
+        model.graph(),
+        transitService,
+        model.transferRepository()
       );
     }
-
-    return serverContext;
   }
 
   protected TestOtpModel getGraph() {
@@ -112,14 +114,13 @@ public abstract class SnapshotTestBase {
     int minute,
     int second
   ) {
-    OtpServerRequestContext serverContext = serverContext();
+    ensureContextInitialized();
 
-    var builder = serverContext
-      .defaultRouteRequest()
+    var builder = RouterConfig.DEFAULT.routingRequestDefaults()
       .copyOf()
       .withDateTime(
         LocalDateTime.of(year, month, day, hour, minute, second)
-          .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
+          .atZone(ZoneId.of(transitService.getTimeZone().getId()))
           .toInstant()
       )
       .withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)))
@@ -232,8 +233,9 @@ public abstract class SnapshotTestBase {
   }
 
   private List<Itinerary> retrieveItineraries(RouteRequest request) {
+    ensureContextInitialized();
     long startMillis = System.currentTimeMillis();
-    RoutingResponse response = serverContext.routingService().route(request);
+    RoutingResponse response = routingService.route(request);
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
 
@@ -242,15 +244,16 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        serverContext.transitService().getTimeZone()
+        transitService.getTimeZone()
       );
     }
     return itineraries;
   }
 
   private String createDebugUrlForRequest(RouteRequest request) {
+    ensureContextInitialized();
     var dateTime = Instant.ofEpochSecond(request.dateTime().getEpochSecond())
-      .atZone(serverContext().transitService().getTimeZone())
+      .atZone(transitService.getTimeZone())
       .toLocalDateTime();
 
     // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is not right

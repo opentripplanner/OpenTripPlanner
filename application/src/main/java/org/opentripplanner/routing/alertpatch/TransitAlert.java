@@ -185,7 +185,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   /**
    * Finds the first validity start from all timePeriods for this alert.
    *
-   * @return First start for this Alert, <code>null</code> if any period has an open start
+   * @return First start for this Alert, <code>null</code> if any period has an unbounded start
    */
   @Nullable
   public Instant getEffectiveStartDate() {
@@ -194,9 +194,9 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   /**
    * Finds the last validity end from all timePeriods for this alert. Returns <code>null</code>
-   * if the validity is open-ended
+   * if any period has an unbounded end.
    *
-   * @return Last end for this Alert, <code>null</code> if open-ended
+   * @return Last end for this Alert, <code>null</code> if any period has an unbounded end
    */
   @Nullable
   public Instant getEffectiveEndDate() {
