@@ -9,22 +9,22 @@
       "edges": [
         {
           "node": {
-            "id": "QWxlcnQ6RjpuZWl0aGVyLWhlYWRlci1ub3ItZGVzY3JpcHRpb24",
-            "headerDefault": "",
-            "headerDe": "",
-            "descriptionDefault": "",
-            "descriptionDe": "",
-            "urlDefault": null,
-            "urlDe": null
+            "id": "QWxlcnQ6Rjphbi1hbGVydA",
+            "headerDefault": "A header",
+            "headerDe": "A header",
+            "descriptionDefault": "A description",
+            "descriptionDe": "A description",
+            "urlDefault": "https://example.com",
+            "urlDe": "https://example.com"
           }
         },
         {
           "node": {
-            "id": "QWxlcnQ6Rjpuby1oZWFkZXI",
-            "headerDefault": "Second string",
-            "headerDe": "Zweite Zeichenabfolge",
-            "descriptionDefault": "Second string",
-            "descriptionDe": "Zweite Zeichenabfolge",
+            "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
+            "headerDefault": "Station closed",
+            "headerDe": "Station closed",
+            "descriptionDefault": "This station is currently closed",
+            "descriptionDe": "This station is currently closed",
             "urlDefault": null,
             "urlDe": null
           }

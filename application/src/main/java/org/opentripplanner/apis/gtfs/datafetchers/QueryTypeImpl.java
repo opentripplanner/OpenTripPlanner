@@ -36,6 +36,7 @@ import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapp
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
+import org.opentripplanner.apis.gtfs.support.sort.AlertsConnectionOrdering;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -121,7 +122,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       var args = new GraphQLTypes.GraphQLQueryTypeAlertsConnectionArgs(environment.getArguments());
       var request = AlertsConnectionFilterMapper.map(args.getGraphQLFilters());
       var alerts = getTransitAlertService(environment).findAlerts(request);
-      return new SimpleCountedListConnection<>(List.copyOf(alerts)).get(environment);
+      return new SimpleCountedListConnection<>(AlertsConnectionOrdering.sort(alerts)).get(
+        environment
+      );
     };
   }
 
