@@ -128,15 +128,15 @@ class AccessEgressFetcher {
       });
     }
 
-    var accessRequest = accessBuilder.buildRequest();
+    var routeRequest = accessBuilder.buildRequest();
 
     var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
-      accessRequest.preferences().system().dataOverlay(),
+      routeRequest.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
 
     var context = new AccessEgressRouterContext(
-      accessRequest,
+      routeRequest,
       streetRequest,
       type,
       dataOverlayContext,

@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.CarpoolAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.DefaultAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FlexAccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.RideHailingAccessEgressRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.TripLocation;
@@ -141,6 +142,18 @@ class RouterSelectorTest {
       assertThat(routers.get(0)).isInstanceOf(DefaultAccessEgressRouter.class);
       assertThat(routers.get(1)).isInstanceOf(CarpoolAccessEgressRouter.class);
     });
+  }
+
+  @Test
+  void carHailingAccessEgressWrapsDefaultRouter() {
+    var selector = selectorFor(baseRequest().buildRequest());
+
+    var routers = selector.selectAccessEgressRouters(StreetMode.CAR_HAILING);
+
+    // CAR_HAILING decorates (time-shifts) the same default street search, rather than adding an
+    // independent extra router the way Flex/Carpool do - so there is still only one entry.
+    assertThat(routers).hasSize(1);
+    assertThat(routers.get(0)).isInstanceOf(RideHailingAccessEgressRouter.class);
   }
 
   // --- selectRouters(...) ---

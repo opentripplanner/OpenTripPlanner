@@ -241,9 +241,7 @@ class ScheduledDeviatedTripIntegrationTest {
       var accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
       // The request uses the default (WALK) access/egress mode, so only the default,
       // street-based router is applicable here.
-      List<AccessEgressRouter> routers = List.of(
-        new DefaultAccessEgressRouter(accessEgressMapper, List.of(), request)
-      );
+      List<AccessEgressRouter> routers = List.of(new DefaultAccessEgressRouter(accessEgressMapper));
       var result = TransitRouter.route(
         request,
         transitService,

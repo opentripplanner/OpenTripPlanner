@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.CarpoolAccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.DefaultAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FlexAccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.RideHailingAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -122,11 +123,18 @@ class RouterSelector {
         );
       }
     }
-    if (directMode == StreetMode.FLEXIBLE && OTPFeature.FlexRouting.isOn()) {
-      routers.add(directFlexRunner);
-    }
-    if (directMode == StreetMode.CARPOOL && OTPFeature.CarPooling.isOn()) {
-      routers.add(directCarpoolRunner);
+    switch (directMode) {
+      case FLEXIBLE -> {
+        if (OTPFeature.FlexRouting.isOn()) {
+          routers.add(directFlexRunner);
+        }
+      }
+      case CARPOOL -> {
+        if (OTPFeature.CarPooling.isOn()) {
+          routers.add(directCarpoolRunner);
+        }
+      }
+      default -> {}
     }
   }
 
@@ -146,28 +154,41 @@ class RouterSelector {
   List<AccessEgressRouter> selectAccessEgressRouters(StreetMode mode) {
     var transitServiceResolver = new TransitServiceResolver(transitService);
     var accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
+    AccessEgressRouter defaultRouter = new DefaultAccessEgressRouter(accessEgressMapper);
     List<AccessEgressRouter> routers = new ArrayList<>();
-    routers.add(new DefaultAccessEgressRouter(accessEgressMapper, rideHailingServices, request));
-    if (mode == StreetMode.FLEXIBLE && OTPFeature.FlexRouting.isOn()) {
-      routers.add(
-        new FlexAccessEgressRouter(
-          transitService,
-          graph,
-          transferService,
-          streetDetailsService,
-          flexParameters,
-          additionalSearchDays
-        )
+
+    switch (mode) {
+      case CAR_HAILING -> routers.add(
+        new RideHailingAccessEgressRouter(defaultRouter, rideHailingServices)
       );
-    }
-    if (mode == StreetMode.CARPOOL && OTPFeature.CarPooling.isOn()) {
-      routers.add(
-        new CarpoolAccessEgressRouter(
-          carpoolingService,
-          transitServiceResolver,
-          transitSearchTimeZero
-        )
-      );
+      case FLEXIBLE -> {
+        routers.add(defaultRouter);
+        if (OTPFeature.FlexRouting.isOn()) {
+          routers.add(
+            new FlexAccessEgressRouter(
+              transitService,
+              graph,
+              transferService,
+              streetDetailsService,
+              flexParameters,
+              additionalSearchDays
+            )
+          );
+        }
+      }
+      case CARPOOL -> {
+        routers.add(defaultRouter);
+        if (OTPFeature.CarPooling.isOn()) {
+          routers.add(
+            new CarpoolAccessEgressRouter(
+              carpoolingService,
+              transitServiceResolver,
+              transitSearchTimeZero
+            )
+          );
+        }
+      }
+      default -> routers.add(defaultRouter);
     }
     return routers;
   }

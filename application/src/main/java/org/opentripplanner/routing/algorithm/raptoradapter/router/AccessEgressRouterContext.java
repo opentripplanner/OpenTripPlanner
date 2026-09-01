@@ -11,14 +11,14 @@ import org.opentripplanner.street.model.edge.ExtensionRequestContext;
  * The per-call inputs shared by every {@link AccessEgressRouter} for a single
  * {@link AccessEgressFetcher#fetchAccess()}/{@link AccessEgressFetcher#fetchEgress()} call.
  *
- * @param accessRequest       the request used for this access/egress search
+ * @param routeRequest        the request used for this access/egress search
  * @param streetRequest       the original, unmodified access or egress {@link StreetRequest}
  * @param type                whether this is an access or an egress search
  * @param dataOverlayContext  extension request contexts resolved from the data-overlay config
  * @param linkingContext      contains the temporary vertices for the request locations
  */
 record AccessEgressRouterContext(
-  RouteRequest accessRequest,
+  RouteRequest routeRequest,
   StreetRequest streetRequest,
   AccessEgressType type,
   Collection<ExtensionRequestContext> dataOverlayContext,

@@ -41,7 +41,7 @@ public class FlexAccessEgressRouter implements AccessEgressRouter {
   @Override
   public Collection<? extends RoutingAccessEgress> route(AccessEgressRouterContext context) {
     var flexAccessList = FlexAccessEgressFinder.routeAccessEgress(
-      context.accessRequest(),
+      context.routeRequest(),
       transitService,
       graph,
       transferService,

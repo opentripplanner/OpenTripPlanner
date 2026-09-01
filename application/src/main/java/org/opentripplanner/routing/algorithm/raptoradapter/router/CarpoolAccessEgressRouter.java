@@ -28,7 +28,7 @@ public class CarpoolAccessEgressRouter implements AccessEgressRouter {
   @Override
   public Collection<? extends RoutingAccessEgress> route(AccessEgressRouterContext context) {
     return carpoolingService.routeAccessEgress(
-      context.accessRequest(),
+      context.routeRequest(),
       context.streetRequest(),
       context.type(),
       transitServiceResolver,
