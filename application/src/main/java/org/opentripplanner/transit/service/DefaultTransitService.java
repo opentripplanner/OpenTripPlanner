@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
@@ -211,7 +212,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return transitRepository
+    return getTripCalendars()
       .getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
@@ -365,9 +366,38 @@ public class DefaultTransitService implements TransitService {
   public List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      this::findPattern
+      this::findPattern,
+      this::findScheduledRunningTime
     );
     return listCanceledTrips().stream().filter(matcher::match).toList();
+  }
+
+  /**
+   * Resolves a trip's runtime on its service date according to its schedule. The period starts at
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
+   * stop.
+   *
+   * @return {@code null} if the schedule of the trip cannot be resolved.
+   */
+  @Nullable
+  private TimePeriod findScheduledRunningTime(TripOnServiceDate tripOnServiceDate) {
+    var trip = tripOnServiceDate.getTrip();
+    var serviceDate = tripOnServiceDate.getServiceDate();
+    var pattern = findPattern(trip, serviceDate);
+    if (pattern == null) {
+      return null;
+    }
+    var tripTimes = findTimetable(pattern, serviceDate).getTripTimes(trip);
+    if (tripTimes == null) {
+      tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    }
+    if (tripTimes == null) {
+      return null;
+    }
+    ZoneId timeZone = trip.getRoute().getAgency().getTimezone();
+    return tripTimes.scheduledRunningTime(
+      ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant()
+    );
   }
 
   @Override
@@ -609,7 +639,8 @@ public class DefaultTransitService implements TransitService {
   public List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
       request,
-      this::findPattern
+      this::findPattern,
+      this::findScheduledRunningTime
     );
     return listTripsOnServiceDate().stream().filter(matcher::match).toList();
   }
@@ -645,16 +676,6 @@ public class DefaultTransitService implements TransitService {
     return listTrips().stream().filter(matcher::match).toList();
   }
 
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
-    return transitRepository.getOrCreateServiceIdForDate(serviceDate);
-  }
-
   @Override
   public RaptorTransitData getRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
@@ -669,7 +690,9 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TripCalendars getTripCalendars() {
-    return this.transitRepository.getTripCalendar();
+    return timetableSnapshot != null
+      ? timetableSnapshot.getTripCalendars()
+      : this.transitRepository.getTripCalendar();
   }
 
   @Override
@@ -737,12 +760,12 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public Set<LocalDate> listServiceDates() {
-    return Collections.unmodifiableSet(transitRepository.getServiceCodesRunningForDate().keySet());
+    return Collections.unmodifiableSet(getTripCalendars().getServiceCodesRunningForDate().keySet());
   }
 
   @Override
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return Collections.unmodifiableMap(transitRepository.getServiceCodesRunningForDate());
+    return Collections.unmodifiableMap(getTripCalendars().getServiceCodesRunningForDate());
   }
 
   @Override

@@ -136,6 +136,13 @@ type Agency implements Node {
 "Alert of a current or upcoming disruption in public transportation"
 type Alert implements Node {
   """
+  The periods of time when this alert is active, sorted chronologically. There is always at
+  least one period. Each period has an inclusive start and an exclusive end. A period with an
+  unbounded start has always been active and a period with an unbounded end is active
+  indefinitely.
+  """
+  activityPeriods: [OffsetDateTimeRange!]!
+  """
   Agency affected by the disruption. Note that this value is present only if the
   disruption has an effect on all operations of the agency (e.g. in case of a strike).
   """
@@ -170,9 +177,9 @@ type Alert implements Node {
   "Url with more information in all different available languages"
   alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
-  effectiveEndDate: Long
+  effectiveEndDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"
-  effectiveStartDate: Long
+  effectiveStartDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Entities affected by the disruption."
   entities: [AlertEntity]
   "The feed in which this alert was published"
@@ -1063,6 +1070,20 @@ type Notice {
   text: String
 }
 
+"""
+A range of time which can be unbounded in either direction.
+
+The start of the range is inclusive and the end is exclusive.
+A `null` start means that the range extends indefinitely into the past and a `null` end means
+that it extends indefinitely into the future.
+"""
+type OffsetDateTimeRange {
+  "The exclusive end of the range or `null` if the range is unbounded in the future."
+  end: OffsetDateTime
+  "The inclusive start of the range or `null` if the range is unbounded in the past."
+  start: OffsetDateTime
+}
+
 type OpeningHours {
   """
   Opening hours for the selected dates using the local time of the parking lot.
@@ -1118,6 +1139,18 @@ type Pattern implements Node {
   Avoid using this when fetching all patterns at once.
   """
   canceledTrips(
+    """
+    Only return canceled trips which are scheduled to be running during one of these time ranges.
+    A trip is considered to be running from its scheduled departure from the first stop until its
+    scheduled arrival at the last stop.
+        
+    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
+    value is `null`, no filtering is applied.
+        
+    If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+    them to be returned.
+    """
+    runningTimeRanges: [OffsetDateTimeRangeInput!],
     """
     Only return canceled trips whose service date falls within one of these ranges.
     An empty list or a list containing `null` is forbidden.  If this argument is not provided or its
@@ -2435,7 +2468,19 @@ type Stop implements Node & PlaceInterface {
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire
     transit service period are returned. Defining a range is recommended.
     """
-    serviceDateRanges: [LocalDateRangeInput!]
+    serviceDateRanges: [LocalDateRangeInput!],
+    """
+    Only include canceled calls where the vehicle is scheduled to visit this stop during one of
+    these time ranges. The visit at a stop lasts from the scheduled arrival at the stop until the
+    scheduled departure from it.
+        
+    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
+    value is `null`, no filtering is applied.
+        
+    If both `timeRanges` and `serviceDateRanges` are defined, a call has to match both of
+    them to be returned.
+    """
+    timeRanges: [OffsetDateTimeRangeInput!]
   ): [StopCallOnTripOnServiceDate!]!
   "The cluster which this stop is part of"
   cluster: Cluster @deprecated(reason : "Not implemented")
@@ -4498,6 +4543,15 @@ input CanceledTripsFilterSelectInput {
   "Canceled trips from these transit modes should be included/excluded."
   modes: [TransitMode!]
   """
+  Canceled trips are included/excluded based on if they are scheduled to be running during any of
+  these time ranges. A trip is considered to be running from its scheduled departure from the first
+  stop until its scheduled arrival at the last stop.
+    
+  If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+  them to be included/excluded.
+  """
+  runningTimeRanges: [OffsetDateTimeRangeInput!]
+  """
   Canceled trips are included/excluded based on if their service date (but not necessarily their running date)  is within any of these time
   ranges.
   """
@@ -4524,6 +4578,15 @@ input CanceledTripsSummaryFilterInput {
 input CanceledTripsSummaryFilterSelectInput {
   "Canceled trips from these transit modes should be included/excluded."
   modes: [TransitMode!]
+  """
+  Canceled trips are included/excluded based on if they are scheduled to be running during any of
+  these time ranges. A trip is considered to be running from its scheduled departure from the first
+  stop until its scheduled arrival at the last stop.
+    
+  If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+  them to be included/excluded.
+  """
+  runningTimeRanges: [OffsetDateTimeRangeInput!]
   """
   Canceled trips are included/excluded based on if their service date is within any of these time
   ranges.
@@ -4787,6 +4850,29 @@ input LocalDateRangeInput {
   dates that are before `end` are selected.
   """
   start: LocalDate
+}
+
+"""
+Filters an entity by a time range. Both ends of the range are optional which makes it possible
+to define a range which is open ended in either or both directions.
+"""
+input OffsetDateTimeRangeInput {
+  """
+  **Exclusive** end time of the filter. This means that an entity which is exactly at `end` is not
+  selected.
+    
+  If `null` this means that no end filter is applied and all entities that are after or at `start`
+  are selected.
+  """
+  end: OffsetDateTime
+  """
+  **Inclusive** start time of the filter. This means that an entity which is exactly at `start` is
+  selected.
+    
+  If `null` this means that no `start` filter is applied and all entities that are before `end` are
+  selected.
+  """
+  start: OffsetDateTime
 }
 
 """

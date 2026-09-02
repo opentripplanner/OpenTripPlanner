@@ -95,11 +95,10 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    List<AreaEdge> areaEdges = graph.getEdgesOfType(AreaEdge.class);
     HashSet<AreaGroup> areas = new HashSet<>();
     HashSet<Vertex> visibilityVertices = new HashSet<>();
 
-    for (AreaEdge ae : areaEdges) {
+    for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
       areas.add(ae.getArea());
     }
     for (AreaGroup a : areas) {

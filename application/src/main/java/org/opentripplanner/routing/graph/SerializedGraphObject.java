@@ -117,7 +117,7 @@ public class SerializedGraphObject implements Serializable {
     FareServiceFactory fareServiceFactory
   ) {
     this.graph = graph;
-    this.edges = graph.getEdges();
+    this.edges = graph.listEdges();
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;

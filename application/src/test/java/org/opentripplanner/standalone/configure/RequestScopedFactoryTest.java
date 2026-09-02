@@ -60,7 +60,7 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -85,7 +85,7 @@ class RequestScopedFactoryTest {
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     var timetableRepositoryHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,

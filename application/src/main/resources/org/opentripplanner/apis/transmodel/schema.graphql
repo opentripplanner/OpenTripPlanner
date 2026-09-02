@@ -611,7 +611,9 @@ type PtSituationElement {
   "Summary of situation in all different translations available"
   summary: [MultilingualString!]!
   "Period this situation is in effect"
-  validityPeriod: ValidityPeriod
+  validityPeriod: ValidityPeriod @deprecated(reason : "Use validityPeriods instead")
+  "The periods in which this situation is valid, sorted in chronological order. There is always at least one period."
+  validityPeriods: [ValidityPeriod!]!
   "Operator's version number for the situation element."
   version: Int
   "Timestamp when the situation element was updated."
@@ -1641,9 +1643,9 @@ type TripSearchData {
 }
 
 type ValidityPeriod {
-  "End of validity period. Will return 'null' if validity is open-ended."
+  "The exclusive end of the validity period. Will return 'null' if the validity has an unbounded end."
   endTime: DateTime
-  "Start of validity period"
+  "The inclusive start of the validity period. Will return 'null' if the validity has an unbounded start."
   startTime: DateTime
 }
 

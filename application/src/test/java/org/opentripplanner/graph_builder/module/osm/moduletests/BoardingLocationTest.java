@@ -40,7 +40,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.getEdges());
+    var edges = List.copyOf(graph.listEdges());
     assertThat(edges).hasSize(1);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
@@ -64,7 +64,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.getEdges());
+    var edges = List.copyOf(graph.listEdges());
     assertThat(edges).hasSize(2);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
@@ -87,7 +87,7 @@ class BoardingLocationTest {
       .build();
 
     osmModule.buildGraph();
-    var edges = List.copyOf(graph.getEdges());
+    var edges = List.copyOf(graph.listEdges());
     assertThat(edges).hasSize(2);
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());

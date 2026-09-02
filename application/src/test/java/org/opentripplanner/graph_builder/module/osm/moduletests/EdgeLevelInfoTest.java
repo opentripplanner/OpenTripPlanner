@@ -254,7 +254,7 @@ public class EdgeLevelInfoTest {
     StreetDetailsRepository streetDetailsRepository
   ) {
     return graph
-      .getEdges()
+      .listEdges()
       .stream()
       .flatMap(edge ->
         streetDetailsRepository
@@ -270,7 +270,7 @@ public class EdgeLevelInfoTest {
     StreetDetailsRepository streetDetailsRepository
   ) {
     return graph
-      .getEdges()
+      .listEdges()
       .stream()
       .flatMap(edge ->
         streetDetailsRepository
