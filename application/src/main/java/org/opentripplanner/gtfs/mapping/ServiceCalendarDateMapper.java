@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
 import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS ServiceCalendarDate into the OTP model. */

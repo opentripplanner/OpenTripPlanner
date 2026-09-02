@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
@@ -101,9 +100,12 @@ public class TimetableDataImport {
     return !flexTripForId.isEmpty();
   }
 
-  public void updateCalendarServiceData(CalendarServiceData data) {
+  /**
+   * Merge the scheduled calendar data of one feed into the trip calendars.
+   */
+  public void mergeTripCalendars(TripCalendars other) {
     assertModificationsAllowed();
-    tripCalendars = tripCalendars.merge(data);
+    tripCalendars = tripCalendars.merge(other);
   }
 
   /**

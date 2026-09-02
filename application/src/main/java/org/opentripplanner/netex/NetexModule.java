@@ -16,7 +16,6 @@ import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -24,6 +23,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VehicleParkingHelper;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -84,12 +84,15 @@ public class NetexModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     try {
-      var calendarServiceData = new CalendarServiceData();
+      var calendarsBuilder = TripCalendars.of();
 
       while (!netexBundles.isEmpty()) {
         TransitDataImportBuilder transitBuilder = loadNextBundle();
         transitBuilder.limitServiceDays(transitPeriodLimit);
-        calendarServiceData.add(transitBuilder.buildCalendarServiceData());
+        calendarsBuilder.addCalendars(
+          transitBuilder.getCalendarDates(),
+          transitBuilder.getCalendars()
+        );
 
         if (OTPFeature.FlexRouting.isOn()) {
           transitBuilder
@@ -119,10 +122,11 @@ public class NetexModule implements GraphBuilderModule {
         lots.forEach(linker::linkVehicleParkingToGraph);
       }
 
-      timetableDataImport.updateCalendarServiceData(calendarServiceData);
+      var tripCalendars = calendarsBuilder.build();
+      timetableDataImport.mergeTripCalendars(tripCalendars);
 
       TransitWithFutureDateValidator.validate(
-        calendarServiceData,
+        tripCalendars,
         issueStore,
         transitRepository.getTimeZone()
       );

@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -134,13 +134,13 @@ class ModifiedTripBuilderTest {
     timetableDataImport.addTripPattern(PATTERN.getId(), PATTERN);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    calendarServiceData.putServiceDatesForServiceId(
+    var calendarsBuilder = TripCalendars.of();
+    calendarsBuilder.putServiceDatesForServiceId(
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
     timetableDataImport.addNextServiceCodes(List.of(SERVICE_ID));
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
 
     // Create transit model index
     transitRepository.index();

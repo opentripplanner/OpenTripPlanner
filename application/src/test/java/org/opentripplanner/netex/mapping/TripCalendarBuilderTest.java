@@ -26,11 +26,11 @@ import org.entur.netex2.model.ServiceJourney;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
 
 public class TripCalendarBuilderTest {
 

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 class TripCalendarsTest {
 
@@ -98,9 +98,9 @@ class TripCalendarsTest {
   }
 
   private static TripCalendars calendarWithRange() {
-    CalendarServiceData data = new CalendarServiceData();
+    var data = TripCalendars.of();
     data.putServiceDatesForServiceId(id("CAL_1"), List.of(START, START.plusDays(1), END));
-    return TripCalendars.empty().merge(data);
+    return TripCalendars.empty().merge(data.build());
   }
 
   private static Consumer<TripCalendars> throwOnUpdate() {

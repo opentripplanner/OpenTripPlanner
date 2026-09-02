@@ -23,7 +23,6 @@ import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -31,6 +30,7 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
@@ -114,7 +114,7 @@ public class GtfsModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
 
     Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
 
@@ -141,13 +141,11 @@ public class GtfsModule implements GraphBuilderModule {
 
         builder.limitServiceDays(transitPeriodLimit);
 
-        calendarServiceData.add(builder.buildCalendarServiceData());
+        calendarsBuilder.addCalendars(builder.getCalendarDates(), builder.getCalendars());
 
-        calendarServiceData
-          .getServiceIds()
-          .forEach(sId ->
-            fareRulesData.putServiceIds(sId, calendarServiceData.getServiceDatesForServiceId(sId))
-          );
+        calendarsBuilder
+          .listServiceIds()
+          .forEach(sId -> fareRulesData.putServiceIds(sId, calendarsBuilder.listServiceDates(sId)));
 
         if (OTPFeature.FlexRouting.isOn()) {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
@@ -170,7 +168,7 @@ public class GtfsModule implements GraphBuilderModule {
           deduplicator,
           transitRepository,
           builder,
-          calendarServiceData.getServiceIds(),
+          calendarsBuilder.listServiceIds(),
           geometryProcessor,
           issueStore
         );
@@ -185,7 +183,7 @@ public class GtfsModule implements GraphBuilderModule {
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
-            calendarServiceData
+            calendarsBuilder
           ).run(dataImport.getTripPatterns());
         }
 
@@ -195,9 +193,10 @@ public class GtfsModule implements GraphBuilderModule {
       throw new RuntimeException(e);
     }
 
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    TripCalendars tripCalendars = calendarsBuilder.build();
+    timetableDataImport.mergeTripCalendars(tripCalendars);
     TransitWithFutureDateValidator.validate(
-      calendarServiceData,
+      tripCalendars,
       issueStore,
       transitRepository.getTimeZone()
     );

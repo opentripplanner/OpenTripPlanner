@@ -13,11 +13,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -76,8 +76,8 @@ class ScheduledTransitLegReferenceTest {
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
     // build transit data
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    var calendarsBuilder = TripCalendars.of();
+    timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
     for (var item : Map.of(
       SIMPLE_TRIP_ID,
       TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a),
@@ -113,10 +113,10 @@ class ScheduledTransitLegReferenceTest {
       if (item.getKey() == SIMPLE_TRIP_ID) {
         TRIP_ON_SERVICE_DATE_ID = tripOnServiceDateId;
       }
-      calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
+      calendarsBuilder.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     }
 
-    timetableDataImport.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.mergeTripCalendars(calendarsBuilder.build());
 
     transitRepository.index();
 

@@ -10,9 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -62,7 +62,7 @@ class ScheduledTimetableDataTest {
     var dataImport = new TimetableDataImport();
     var pattern = pattern("P1", trip("T1"));
     dataImport.addTripPattern(pattern.getId(), pattern);
-    dataImport.updateCalendarServiceData(calendarData());
+    dataImport.mergeTripCalendars(calendarData());
     dataImport.addNextServiceCodes(List.of(id("SID")));
 
     var subject = dataImport.toScheduledTimetableData();
@@ -108,9 +108,9 @@ class ScheduledTimetableDataTest {
       .build();
   }
 
-  private static CalendarServiceData calendarData() {
-    var data = new CalendarServiceData();
+  private static TripCalendars calendarData() {
+    var data = TripCalendars.of();
     data.putServiceDatesForServiceId(id("SID"), List.of(SERVICE_DATE));
-    return data;
+    return data.build();
   }
 }
