@@ -2,16 +2,16 @@ package org.opentripplanner.gtfs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
-import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -26,7 +26,7 @@ public class GtfsContextBuilder {
   private final String feedId;
 
   private final TransitDataImportBuilder transitBuilder;
-  private CalendarService calendarService = null;
+  private Set<FeedScopedId> serviceIds = null;
   private DataImportIssueStore issueStore = null;
   private Deduplicator deduplicator;
 
@@ -79,7 +79,10 @@ public class GtfsContextBuilder {
    */
   public GtfsContext build() {
     repairStopTimesAndGenerateTripPatterns();
-    return new GtfsContextImpl(feedId, transitBuilder.buildCalendarServiceData());
+    var tripCalendars = TripCalendars.of()
+      .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
+      .build();
+    return new GtfsContextImpl(feedId, tripCalendars);
   }
 
   /**
@@ -126,16 +129,18 @@ public class GtfsContextBuilder {
       transitBuilder,
       issueStore,
       deduplicator(),
-      calendarService().getServiceIds(),
+      serviceIds(),
       new GeometryProcessor(transitBuilder, 150, issueStore)
     ).run();
   }
 
-  private CalendarService calendarService() {
-    if (calendarService == null) {
-      calendarService = new CalendarServiceImpl(transitBuilder.buildCalendarServiceData());
+  private Set<FeedScopedId> serviceIds() {
+    if (serviceIds == null) {
+      serviceIds = TripCalendars.of()
+        .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
+        .listServiceIds();
     }
-    return calendarService;
+    return serviceIds;
   }
 
   private Deduplicator deduplicator() {
@@ -148,11 +153,11 @@ public class GtfsContextBuilder {
   private static class GtfsContextImpl implements GtfsContext {
 
     private final String feedId;
-    private final CalendarServiceData calendarServiceData;
+    private final TripCalendars tripCalendars;
 
-    private GtfsContextImpl(String feedId, CalendarServiceData calendarServiceData) {
+    private GtfsContextImpl(String feedId, TripCalendars tripCalendars) {
       this.feedId = feedId;
-      this.calendarServiceData = calendarServiceData;
+      this.tripCalendars = tripCalendars;
     }
 
     @Override
@@ -161,8 +166,8 @@ public class GtfsContextBuilder {
     }
 
     @Override
-    public CalendarServiceData getCalendarServiceData() {
-      return calendarServiceData;
+    public TripCalendars getTripCalendars() {
+      return tripCalendars;
     }
   }
 }

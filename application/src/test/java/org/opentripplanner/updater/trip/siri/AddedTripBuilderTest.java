@@ -21,11 +21,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -100,14 +100,14 @@ class AddedTripBuilderTest {
     TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     var cal_id = FeedScopedIdForTestFactory.id("CAL_1");
-    calendarServiceData.putServiceDatesForServiceId(
+    calendarsBuilder.putServiceDatesForServiceId(
       cal_id,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
     TRANSIT_MODEL.putServiceCode(cal_id, 0);
-    TRANSIT_MODEL.updateCalendarServiceData(calendarServiceData);
+    TRANSIT_MODEL.mergeTripCalendars(calendarsBuilder.build());
 
     // Create transit model index
     TRANSIT_MODEL.index();

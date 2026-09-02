@@ -30,6 +30,8 @@ o_o_standalone_config_IncludeFileDirectiveTest_part.json
 _site/
 build/
 !/application/src/build/
+!/application/src/main/java/org/opentripplanner/transit/model/calendar/build/
+!/application/src/test/java/org/opentripplanner/transit/model/calendar/build/
 dist/
 doc/user/_build/
 gen-java/

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +19,9 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -69,7 +70,11 @@ class NetexEpipBundleSmokeTest {
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
 
     // And then - smoke test service calendar
-    assetServiceCalendar(transitBuilder.buildCalendarServiceData());
+    assetServiceCalendar(
+      TripCalendars.of()
+        .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
+        .build()
+    );
   }
 
   /* private methods */
@@ -172,12 +177,18 @@ class NetexEpipBundleSmokeTest {
     assertEquals(tripServiceIds, Set.copyOf(serviceIds));
   }
 
-  private void assetServiceCalendar(CalendarServiceData cal) {
-    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
+  private void assetServiceCalendar(TripCalendars cal) {
+    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.listServiceIds());
     assertEquals(2, sIds.size());
-    FeedScopedId serviceId1 = sIds.getFirst();
 
-    List<LocalDate> dates = cal.getServiceDatesForServiceId(serviceId1);
+    // Service ids are auto-generated in file-processing order, which is not deterministic
+    // (see java.io.File#listFiles), so pick the calendar to assert on by its own content
+    // instead of relying on which generated id happens to be first.
+    List<LocalDate> dates = sIds
+      .stream()
+      .map(id -> cal.listServiceDates(id).stream().sorted().toList())
+      .min(Comparator.comparing(List::getFirst))
+      .orElseThrow();
 
     assertEquals("2023-02-02", dates.getFirst().toString());
     assertEquals("2023-12-08", dates.getLast().toString());

@@ -1,5 +1,5 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model.calendar;
+package org.opentripplanner.transit.model.calendar.build;
 
 import java.io.Serializable;
 import java.time.LocalDate;

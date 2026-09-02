@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,12 @@ import org.slf4j.LoggerFactory;
  * Immutable snapshot of the trip service calendar: which service ids exist, which dates they run
  * on, and the small integer service codes used by Raptor.
  * <p>
- * There is no builder: every modification (see {@link #merge}, {@link #withServiceCode},
- * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a new instance
- * rather than mutating this one, so callers that hold onto a {@code TripCalendars} keep seeing a
- * stable value even while another reference is evolving. A caller that needs a long-lived,
- * continuously-updated view (e.g. {@code DefaultTimetableRepository}'s write buffer) just holds a
- * plain mutable field and reassigns it as each method returns its result.
+ * Every modification (see {@link #merge}, {@link #withServiceCode},
+ * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a
+ * new instance rather than mutating this one, so callers that hold onto a {@code TripCalendars}
+ * keep seeing a stable value even while another reference is evolving. A caller that needs a
+ * long-lived, continuously-updated view (e.g. {@code DefaultTimetableRepository}'s write buffer)
+ * just holds a plain mutable field and reassigns it as each method returns its result.
  */
 public class TripCalendars implements Serializable {
 
@@ -59,6 +58,27 @@ public class TripCalendars implements Serializable {
     this.serviceCodes = serviceCodes;
     this.startDate = serviceIdsByDate.keySet().stream().min(LocalDate::compareTo).orElse(null);
     this.endDate = serviceIdsByDate.keySet().stream().max(LocalDate::compareTo).orElse(null);
+  }
+
+  TripCalendars(
+    Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId,
+    Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate
+  ) {
+    this(
+      Map.copyOf(serviceDatesByServiceId),
+      freezeServiceIds(serviceIdsByDate),
+      Collections.emptyMap(),
+      Collections.emptyMap()
+    );
+  }
+
+  /**
+   * Create a new {@link TripCalendarsBuilder} to accumulate scheduled calendar data - typically
+   * one {@link TripCalendarsBuilder#addCalendars} call per feed - before producing an immutable
+   * {@link TripCalendars} instance via {@link TripCalendarsBuilder#build()}.
+   */
+  public static TripCalendarsBuilder of() {
+    return new TripCalendarsBuilder();
   }
 
   /** An empty trip calendar, with no service ids registered. */
@@ -158,24 +178,26 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Merge scheduled calendar data into this calendar. Used during graph build only.
+   * Merge scheduled calendar data from {@code other} into this calendar. Used during graph build
+   * only, typically to fold in one {@link TripCalendarsBuilder}
+   * per feed.
    *
-   * @return a new instance with {@code data} merged in.
+   * @return a new instance with {@code other} merged in.
    */
-  public TripCalendars merge(CalendarServiceData data) {
+  public TripCalendars merge(TripCalendars other) {
     Map<FeedScopedId, List<LocalDate>> newServiceDatesByServiceId = new HashMap<>(
       serviceDatesByServiceId
     );
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = deepCopy(serviceIdsByDate);
-    for (FeedScopedId serviceId : data.getServiceIds()) {
-      List<LocalDate> dates = data
-        .getServiceDatesForServiceId(serviceId)
+    for (FeedScopedId serviceId : other.listServiceIds()) {
+      List<LocalDate> dates = other.serviceDatesByServiceId
+        .get(serviceId)
         .stream()
         .sorted()
         .toList();
       newServiceDatesByServiceId.put(serviceId, dates);
       for (LocalDate date : dates) {
-        newServiceIdsByDate.computeIfAbsent(date, d -> new HashSet<>()).add(serviceId);
+        newServiceIdsByDate.computeIfAbsent(date, _ -> new HashSet<>()).add(serviceId);
       }
     }
     return new TripCalendars(

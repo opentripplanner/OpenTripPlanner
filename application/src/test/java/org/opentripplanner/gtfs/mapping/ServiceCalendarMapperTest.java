@@ -64,7 +64,7 @@ public class ServiceCalendarMapperTest {
 
   @Test
   public void testMap() {
-    org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(CALENDAR);
+    org.opentripplanner.transit.model.calendar.build.ServiceCalendar result = subject.map(CALENDAR);
 
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals(MONDAY, result.getMonday());
@@ -88,7 +88,7 @@ public class ServiceCalendarMapperTest {
   public void testMapWithNulls() {
     ServiceCalendar input = new ServiceCalendar();
     input.setServiceId(AGENCY_AND_ID);
-    org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(input);
+    org.opentripplanner.transit.model.calendar.build.ServiceCalendar result = subject.map(input);
 
     assertEquals(0, result.getMonday());
     assertEquals(0, result.getTuesday());
@@ -104,8 +104,12 @@ public class ServiceCalendarMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.calendar.ServiceCalendar result1 = subject.map(CALENDAR);
-    org.opentripplanner.model.calendar.ServiceCalendar result2 = subject.map(CALENDAR);
+    org.opentripplanner.transit.model.calendar.build.ServiceCalendar result1 = subject.map(
+      CALENDAR
+    );
+    org.opentripplanner.transit.model.calendar.build.ServiceCalendar result2 = subject.map(
+      CALENDAR
+    );
 
     assertSame(result1, result2);
   }

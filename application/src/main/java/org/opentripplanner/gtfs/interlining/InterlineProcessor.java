@@ -15,13 +15,13 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
+import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -39,7 +39,7 @@ public class InterlineProcessor {
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed;
   private final LocalDate transitServiceStart;
   private final int daysInTransitService;
-  private final CalendarServiceData calendarServiceData;
+  private final TripCalendarsBuilder calendarsBuilder;
   private final Map<FeedScopedId, BitSet> daysOfServices = new HashMap<>();
 
   public InterlineProcessor(
@@ -47,18 +47,18 @@ public class InterlineProcessor {
     List<StaySeatedNotAllowed> staySeatedNotAllowed,
     int maxInterlineDistance,
     DataImportIssueStore issueStore,
-    CalendarServiceData calendarServiceData
+    TripCalendarsBuilder calendarsBuilder
   ) {
     this.transferService = transferService;
     this.staySeatedNotAllowed = staySeatedNotAllowed;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
-    this.transitServiceStart = calendarServiceData.getFirstDate().orElse(null);
-    this.daysInTransitService = calendarServiceData
-      .getLastDate()
+    this.transitServiceStart = calendarsBuilder.startDate().orElse(null);
+    this.daysInTransitService = calendarsBuilder
+      .endDate()
       .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
       .orElse(0);
-    this.calendarServiceData = calendarServiceData;
+    this.calendarsBuilder = calendarsBuilder;
   }
 
   public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
@@ -249,12 +249,10 @@ public class InterlineProcessor {
     BitSet daysForService = this.daysOfServices.get(serviceId);
     if (daysForService == null) {
       daysForService = new BitSet(daysInTransitService);
-      var serviceDates = calendarServiceData.getServiceDatesForServiceId(serviceId);
-      if (serviceDates != null) {
-        for (LocalDate serviceDate : serviceDates) {
-          int daysBetween = (int) ChronoUnit.DAYS.between(transitServiceStart, serviceDate);
-          daysForService.set(daysBetween);
-        }
+      var serviceDates = calendarsBuilder.listServiceDates(serviceId);
+      for (LocalDate serviceDate : serviceDates) {
+        int daysBetween = (int) ChronoUnit.DAYS.between(transitServiceStart, serviceDate);
+        daysForService.set(daysBetween);
       }
       daysOfServices.put(serviceId, daysForService);
     }

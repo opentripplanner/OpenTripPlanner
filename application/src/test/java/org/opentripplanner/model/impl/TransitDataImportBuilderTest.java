@@ -17,9 +17,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendar;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
 import org.opentripplanner.transit.model.network.Route;
 
 public class TransitDataImportBuilderTest {

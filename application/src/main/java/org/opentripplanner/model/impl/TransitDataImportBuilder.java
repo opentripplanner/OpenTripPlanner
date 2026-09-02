@@ -19,15 +19,13 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendar;
+import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -248,13 +246,6 @@ public class TransitDataImportBuilder {
 
   public EntityById<TripOnServiceDate> getTripOnServiceDates() {
     return tripOnServiceDates;
-  }
-
-  public CalendarServiceData buildCalendarServiceData() {
-    return CalendarServiceDataFactoryImpl.createCalendarServiceData(
-      getCalendarDates(),
-      getCalendars()
-    );
   }
 
   /**
