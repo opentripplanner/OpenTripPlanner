@@ -820,11 +820,7 @@ type Leg {
   Applicable alerts for this leg. Alerts are added to the leg according to conditions on the following entities:
     
   - Boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
-    If the boarding stop is on the very first transit leg of the itinerary, alerts relevant to the
-    the very first boarding of an itinerary from that stop (time, location in case of detours, e.g.
-    "The stop is temporarily moved") are also included.
-  - Alighting stop: same stop/route/trip matching as above, and including alerts relevant to alighting
-    at this stop.
+  - Alighting stop: same stop/route/trip matching as above.
   - Intermediate stops: stops the leg passes through (visits) without boarding or alighting.
     Only alerts flagged as relevant to passing through (possible in SIRI, but not GTFS-RT) are
     included, and each is checked against that specific stop's scheduled time rather than the leg's
