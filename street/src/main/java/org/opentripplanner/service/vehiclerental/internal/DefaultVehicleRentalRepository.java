@@ -15,16 +15,17 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone
  * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
  *
- * <p>The spatial indices are {@code transient} — JTS {@code STRtree} / {@code PreparedGeometry}
- * caches don't survive Kryo — so the raw zones are kept and the indices are rebuilt lazily on
- * first access after deserialization.
+ * <p>Lives only in the serve phase. Zones applied during the graph build are carried on the
+ * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied
+ * by an updater are indexed as they are registered.
  *
- * <p>Both maps are keyed by network. A network has exactly one source of zones, so a later
+ * <p>Indices are keyed by network. A network has exactly one source of zones, so a later
  * registration replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
@@ -32,14 +33,25 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 
-  /** Raw zones, by network. Only these survive serialization; the indices are rebuilt from them. */
-  private final Map<String, Set<GeofencingZone>> zonesByNetwork = new ConcurrentHashMap<>();
+  private final Map<String, GeofencingZoneIndex> geofencingZoneIndexes = new ConcurrentHashMap<>();
 
-  /** Rebuilt lazily from {@link #zonesByNetwork} via {@link #indexes()} after deserialization. */
-  private transient volatile Map<String, GeofencingZoneIndex> geofencingZoneIndexes;
-
+  /**
+   * Seeds the repository with the zones applied during the graph build, which the
+   * {@link Graph} carries out of the build phase, and indexes them.
+   */
   @Inject
-  public DefaultVehicleRentalRepository() {}
+  public DefaultVehicleRentalRepository(Graph graph) {
+    this(graph.vehicleRentalGeofencingZones());
+  }
+
+  public DefaultVehicleRentalRepository(Map<String, Set<GeofencingZone>> zonesByNetwork) {
+    zonesByNetwork.forEach(this::setGeofencingZones);
+  }
+
+  /** A repository with no zones, for tests and for a graph built without them. */
+  public DefaultVehicleRentalRepository() {
+    this(Map.of());
+  }
 
   @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
@@ -53,11 +65,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public void setGeofencingZones(String network, Collection<GeofencingZone> zones) {
-    var copy = Set.copyOf(zones);
-    // Index first: a reader between the two writes only ever consults indexes, and the reverse
-    // order would let a first-time rebuild build this network's index a second time.
-    indexes().put(network, new GeofencingZoneIndex(copy));
-    zonesByNetwork.put(network, copy);
+    geofencingZoneIndexes.put(network, new GeofencingZoneIndex(zones));
   }
 
   @Override
@@ -67,7 +75,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public Collection<String> listZoneNetworks() {
-    return Set.copyOf(indexes().keySet());
+    return Set.copyOf(geofencingZoneIndexes.keySet());
   }
 
   @Override
@@ -77,7 +85,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
-    return indexes()
+    return geofencingZoneIndexes
       .values()
       .stream()
       .flatMap(idx -> idx.findZonesContaining(coord).stream())
@@ -86,36 +94,21 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
-    var index = indexes().get(network);
+    var index = geofencingZoneIndexes.get(network);
     return index == null ? Set.of() : index.findZonesContaining(coord);
   }
 
   @Override
   public boolean hasIndexedZones() {
-    return !indexes().isEmpty();
+    return !geofencingZoneIndexes.isEmpty();
   }
 
   @Override
   public Set<GeofencingZone> listZones() {
     var zones = new HashSet<GeofencingZone>();
-    for (var idx : indexes().values()) {
+    for (var idx : geofencingZoneIndexes.values()) {
       zones.addAll(idx.listZones());
     }
     return zones;
-  }
-
-  private Map<String, GeofencingZoneIndex> indexes() {
-    var indexes = this.geofencingZoneIndexes;
-    if (indexes != null) {
-      return indexes;
-    }
-    synchronized (this) {
-      if (geofencingZoneIndexes == null) {
-        var rebuilt = new ConcurrentHashMap<String, GeofencingZoneIndex>();
-        zonesByNetwork.forEach((name, zones) -> rebuilt.put(name, new GeofencingZoneIndex(zones)));
-        geofencingZoneIndexes = rebuilt;
-      }
-      return geofencingZoneIndexes;
-    }
   }
 }

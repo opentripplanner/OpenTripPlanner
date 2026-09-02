@@ -12,7 +12,6 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
@@ -69,7 +68,6 @@ public class LoadApplication {
       obj.transferRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
-      obj.rentalRepository,
       obj.issueSummary,
       obj.emissionRepository,
       obj.empiricalDelayRepository,
@@ -89,7 +87,6 @@ public class LoadApplication {
       factory.emptyTransferRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
-      factory.emptyVehicleRentalRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
       factory.emptyEmpiricalDelayRepository(),
@@ -118,7 +115,6 @@ public class LoadApplication {
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
-    VehicleRentalRepository rentalRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
@@ -140,7 +136,6 @@ public class LoadApplication {
       emissionRepository,
       empiricalDelayRepository,
       parkingRepository,
-      rentalRepository,
       stopConsolidationRepository,
       streetRepository,
       fareServiceFactory

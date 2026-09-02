@@ -158,7 +158,6 @@ public class OTPMain {
         app.transferRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),
-        app.vehicleRentalRepository(),
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),

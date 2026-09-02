@@ -29,7 +29,6 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -96,7 +95,6 @@ public class SerializedGraphObject implements Serializable {
   public final FareServiceFactory fareServiceFactory;
   public final StreetRepository streetRepository;
   public final VehicleParkingRepository parkingRepository;
-  public final VehicleRentalRepository rentalRepository;
 
   public SerializedGraphObject(
     Graph graph,
@@ -107,7 +105,6 @@ public class SerializedGraphObject implements Serializable {
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
-    VehicleRentalRepository rentalRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
@@ -125,7 +122,6 @@ public class SerializedGraphObject implements Serializable {
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
-    this.rentalRepository = rentalRepository;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;

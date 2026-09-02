@@ -47,7 +47,6 @@ import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
@@ -146,9 +145,6 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
-
-    @BindsInstance
-    Builder vehicleRentalRepository(VehicleRentalRepository rentalRepository);
 
     @BindsInstance
     Builder fareServiceFactory(FareServiceFactory fareServiceFactory);

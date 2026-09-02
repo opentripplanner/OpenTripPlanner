@@ -1,6 +1,5 @@
 package org.opentripplanner.service.vehiclerental;
 
-import java.io.Serializable;
 import java.util.Collection;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -11,10 +10,10 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
  * geofencing zone queries (via {@link GeofencingZoneService}); the higher-level
  * {@link VehicleRentalService} provides typed views on top of this.
  * <p>
- * Geofencing zones may be written here during graph build, in which case the repository is saved
- * into the serialized graph object.
+ * This lives only in the serve phase. Zones applied during the graph build travel on the
+ * {@link org.opentripplanner.street.graph.Graph} and are indexed here when it is created.
  */
-public interface VehicleRentalRepository extends GeofencingZoneService, Serializable {
+public interface VehicleRentalRepository extends GeofencingZoneService {
   void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation);
 
   void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId);
@@ -25,9 +24,7 @@ public interface VehicleRentalRepository extends GeofencingZoneService, Serializ
    * builder. A network has exactly one source of zones, so re-registering with the same
    * {@code network} replaces the previous registration.
    *
-   * <p>The zones are the only state kept; the spatial index used to query them is an
-   * implementation detail built from them here. Whether a registration ends up in the graph
-   * depends on when it happens: only the graph build runs before the graph is written.
+   * <p>Only the index built from the zones is kept.
    */
   void setGeofencingZones(String network, Collection<GeofencingZone> zones);
 

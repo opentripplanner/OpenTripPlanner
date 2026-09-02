@@ -6,7 +6,6 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
-import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 
@@ -23,8 +22,7 @@ public class VehicleRentalGeofencingModule {
   static VehicleRentalGeofencingGraphBuilder provideVehicleRentalGeofencingGraphBuilder(
     BuildConfig config,
     GbfsNetworkOverrides overrides,
-    Graph graph,
-    VehicleRentalRepository rentalRepository
+    Graph graph
   ) {
     if (!config.vehicleRentalGeofencing.hasUrl()) {
       return null;
@@ -33,8 +31,7 @@ public class VehicleRentalGeofencingModule {
     return new VehicleRentalGeofencingGraphBuilder(
       config.vehicleRentalGeofencing,
       overrides,
-      graph,
-      rentalRepository
+      graph
     );
   }
 }

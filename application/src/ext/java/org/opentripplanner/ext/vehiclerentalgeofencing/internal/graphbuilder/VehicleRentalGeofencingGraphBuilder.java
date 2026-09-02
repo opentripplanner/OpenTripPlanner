@@ -15,7 +15,6 @@ import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
 import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneApplier;
 import org.opentripplanner.street.Scope;
@@ -29,14 +28,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The networks to load are discovered from a GBFS v3 manifest: a dataset is loaded when the shared
  * {@code gbfs} configuration puts it in the {@link GeofencingZoneOtpPhase#GRAPH_BUILD} phase and its
- * feed actually publishes a {@code geofencing_zones} feed. Zones are applied and indexed per
+ * feed actually publishes a {@code geofencing_zones} feed. Zones are applied per
  * network, so {@code requireDropOffInsideBusinessArea} takes effect for exactly the networks that
  * enable it.
  *
- * <p>Computed zones and the spatial indices are registered on
- * {@link VehicleRentalRepository} together with the raw zones — they are
- * persisted via {@code SerializedGraphObject} so the runtime application sees them after
- * deserialization.
+ * <p>The zones are recorded on the {@link Graph}, which carries them into the serialized graph.
+ * The serve phase indexes them when it creates the vehicle rental repository; nothing indexes
+ * them here, because nothing in the build reads them back.
  */
 public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
@@ -50,18 +48,15 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
   private final Graph graph;
-  private final VehicleRentalRepository rentalRepository;
 
   public VehicleRentalGeofencingGraphBuilder(
     VehicleRentalGeofencingParameters parameters,
     GbfsNetworkOverrides overrides,
-    Graph graph,
-    VehicleRentalRepository rentalRepository
+    Graph graph
   ) {
     this.parameters = parameters;
     this.overrides = overrides;
     this.graph = graph;
-    this.rentalRepository = rentalRepository;
   }
 
   @Override
@@ -155,7 +150,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     );
     var boundaryVertices = applier.applyGeofencingZones(zones);
 
-    rentalRepository.setGeofencingZones(network.network(), zones);
+    graph.setVehicleRentalGeofencingZones(network.network(), zones);
 
     LOG.info(
       "Applied {} geofencing zones with {} boundary vertices for network {}",
