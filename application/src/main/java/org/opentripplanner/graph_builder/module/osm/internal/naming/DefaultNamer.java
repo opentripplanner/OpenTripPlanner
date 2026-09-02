@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.services.osm;
+package org.opentripplanner.graph_builder.module.osm.internal.naming;
 
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;

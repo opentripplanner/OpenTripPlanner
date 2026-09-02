@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.graph_builder.module.osm.internal.naming.EdgeNamer;
 
 /**
  * @param boardingAreaRefTags    The ref tags to extract boarding locations from.

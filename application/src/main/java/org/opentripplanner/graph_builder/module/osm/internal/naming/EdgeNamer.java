@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.services.osm;
+package org.opentripplanner.graph_builder.module.osm.internal.naming;
 
 import java.util.Optional;
 import org.opentripplanner.core.model.i18n.I18NString;
