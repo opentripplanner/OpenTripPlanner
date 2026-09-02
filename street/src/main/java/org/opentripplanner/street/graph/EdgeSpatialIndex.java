@@ -2,6 +2,7 @@ package org.opentripplanner.street.graph;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -72,6 +73,20 @@ class EdgeSpatialIndex {
         realTimeEdgeIndex.query(envelope).stream()
       );
     };
+  }
+
+  /**
+   * Visit the candidate edges for the envelope in the indexes visible to the scope, without
+   * deduplication. See {@link HashGridSpatialIndex#forEachCandidate(Envelope, Consumer)}.
+   */
+  public void forEachCandidate(Envelope envelope, Scope scope, Consumer<? super Edge> consumer) {
+    switch (scope) {
+      case PERMANENT, REALTIME -> permanentEdgeIndex.forEachCandidate(envelope, consumer);
+      case REQUEST -> {
+        permanentEdgeIndex.forEachCandidate(envelope, consumer);
+        realTimeEdgeIndex.forEachCandidate(envelope, consumer);
+      }
+    }
   }
 
   public Set<Edge> queryAlongLineStrings(Collection<LineString> lineStrings, Scope scope) {
