@@ -26,7 +26,8 @@ class PathwayEdgeTest {
 
   @Test
   void zeroLength() {
-    // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
+    // if elevators have a traversal time and distance of 0 we cannot interpolate
+    // the distance
     // from the vertices as they most likely have identical coordinates
     var edge = PathwayEdge.createPathwayEdge(
       from,
@@ -132,6 +133,35 @@ class PathwayEdgeTest {
     assertEquals(300.0, state.getWeight());
   }
 
+  @Test
+  void wheelchairNegativeStepsTreatedAsStairs() {
+    var down = PathwayEdge.createPathwayEdge(
+      from,
+      to,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      -10,
+      0,
+      true
+    );
+    var up = PathwayEdge.createPathwayEdge(
+      from,
+      to,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      10,
+      0,
+      true
+    );
+
+    var downState = assertThatEdgeIsTraversable(down, true);
+    var upState = assertThatEdgeIsTraversable(up, true);
+
+    assertEquals(upState.getWeight(), downState.getWeight());
+  }
+
   static Stream<Arguments> slopeCases() {
     return Stream.of(
       // no extra cost
@@ -150,10 +180,13 @@ class PathwayEdgeTest {
   }
 
   /**
-   * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
-   * but rather the cost increases proportional to how much you go over the maximum.
+   * This makes sure that when you exceed the max slope in a wheelchair there
+   * isn't a hard cut-off
+   * but rather the cost increases proportional to how much you go over the
+   * maximum.
    * <p>
-   * In other words: 0.1 % over the limit only has a small cost but 2% over increases it
+   * In other words: 0.1 % over the limit only has a small cost but 2% over
+   * increases it
    * dramatically to the point where it's only used as a last resort.
    */
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
