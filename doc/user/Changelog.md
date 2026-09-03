@@ -121,6 +121,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add `runningTimeRanges` filter to canceled trips/calls queries in the GTFS API [#7899](https://github.com/opentripplanner/OpenTripPlanner/pull/7899)
 - Change APIs to properly support alerts with multiple active periods [#7926](https://github.com/opentripplanner/OpenTripPlanner/pull/7926)
 - Fix GTFS GraphQL API's stop call's real-time estimated times [#7953](https://github.com/opentripplanner/OpenTripPlanner/pull/7953)
+- Remove street notes feature [#7959](https://github.com/opentripplanner/OpenTripPlanner/pull/7959)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
