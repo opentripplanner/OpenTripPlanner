@@ -12,7 +12,6 @@ import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -254,7 +253,6 @@ public class DatedServiceJourneyType {
       .build();
   }
 
-  @Nullable
   private static String vehicleRef(DataFetchingEnvironment env) {
     TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
     TripTimes<?> tripTimes = GqlUtil.getTransitService(env)
