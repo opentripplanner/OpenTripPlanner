@@ -420,7 +420,6 @@ public class OsmTagMapper {
   }
 
   static void populateNames(WayPropertySetBuilder props) {
-    /* and some names */
     // Basics
     props.createNames("highway=cycleway", "name.bike_path");
     props.createNames("cycleway=track", "name.bike_path");
