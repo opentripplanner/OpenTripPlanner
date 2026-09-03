@@ -53,7 +53,7 @@ abstract class NetexParser<T> {
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
-    log.warn("Netex import - Element mapping is missing for {}.", typeName(rel));
+    log.warn("Netex import - Element mapping is missing for {}.", resolveXmlTypeName(rel));
   }
 
   /* static methods for logging unhandled elements - this ensure consistent logging. */
@@ -68,7 +68,7 @@ abstract class NetexParser<T> {
     if (rel instanceof Collection) {
       throw new IllegalArgumentException("Do not pass in collections to this method.");
     }
-    log.info("Netex import - Element skipped: {}", typeName(rel));
+    log.info("Netex import - Element skipped: {}", resolveXmlTypeName(rel));
   }
 
   /** Perform parsing and keep the parsed objects internally. */
@@ -77,7 +77,13 @@ abstract class NetexParser<T> {
   /** Add the result - the parsed objects - to the index. */
   abstract void setResultOnIndex(NetexEntityIndex netexIndex);
 
-  private static String typeName(Object rel) {
+  /**
+   * Resolve the type name of the element for printing in the log.
+   * <p>
+   * Generally this is just the Java class name, but JAXB sometimes wraps them in a JAXBElement which
+   * would log as "JAXBElement". In such a case, the class name of the wrapped object is returned.
+   */
+  private static String resolveXmlTypeName(Object rel) {
     if (rel instanceof JAXBElement<?> jaxb) {
       return jaxb.getDeclaredType().getName();
     } else {
