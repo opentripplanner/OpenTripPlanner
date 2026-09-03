@@ -17,7 +17,7 @@ public class WheelchairTest extends GtfsTest {
   public void test2b1() {
     Itinerary itinerary = plan(+1388530860L, "2b1", "2b2", true, false, null, "", "", 1);
 
-    validateLeg(itinerary.legs().getFirst(), 1388530980000L, 1388531040000L, "2b2", "2b1", null);
+    validateLeg(itinerary.legs().getFirst(), 1388530980000L, 1388531040000L, "2b2", "2b1");
 
     assertEquals("Stop 2b1 ~ BUS attr 0:03 0:04 ~ Stop 2b2 [C₁90]", itinerary.toStr());
   }

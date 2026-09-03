@@ -19,7 +19,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
@@ -58,9 +57,6 @@ import org.slf4j.LoggerFactory;
 public class Graph implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-
-  /** Attaches text notes to street edges, which do not affect routing. */
-  public final StreetNotesService streetNotesService = new StreetNotesService();
 
   // Ideally we could just get rid of vertex labels, but they're used in tests and graph building.
   private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
@@ -143,7 +139,6 @@ public class Graph implements Serializable {
   }
 
   public void removeEdge(Edge e, Scope scope) {
-    streetNotesService.removeStaticNotes(e);
     e.remove();
     if (streetIndex != null) {
       streetIndex.remove(e, scope);

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -26,9 +25,7 @@ import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
@@ -50,20 +47,17 @@ public class StreetPathToLegsMapper {
 
   private final SiteResolver siteResolver;
   private final ZoneId timeZone;
-  private final StreetNotesService streetNotesService;
   private final StreetDetailsService streetDetailsService;
   private final double ellipsoidToGeoidDifference;
 
   public StreetPathToLegsMapper(
     SiteResolver siteResolver,
     ZoneId timeZone,
-    StreetNotesService streetNotesService,
     StreetDetailsService streetDetailsService,
     double ellipsoidToGeoidDifference
   ) {
     this.siteResolver = siteResolver;
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
-    this.streetNotesService = streetNotesService;
     this.streetDetailsService = streetDetailsService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
@@ -316,7 +310,6 @@ public class StreetPathToLegsMapper {
     var statesToWalkStepsMapper = new StatesToWalkStepsMapper(
       states,
       previousStep,
-      streetNotesService,
       streetDetailsService,
       siteResolver,
       ellipsoidToGeoidDifference
@@ -357,25 +350,7 @@ public class StreetPathToLegsMapper {
       }
     }
 
-    addStreetNotes(leg, states);
-
     return leg.build();
-  }
-
-  /**
-   * Add mode and alerts fields to a {@link StreetLeg}.
-   *
-   * @param leg    The leg to add the mode and alerts to
-   * @param states The states that go with the leg
-   */
-  private void addStreetNotes(StreetLegBuilder leg, List<State> states) {
-    for (State state : states) {
-      Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
-
-      if (streetNotes != null) {
-        leg.withStreetNotes(streetNotes);
-      }
-    }
   }
 
   private ZonedDateTime getTimeWithDelay(State state, @Nullable Duration delay) {
