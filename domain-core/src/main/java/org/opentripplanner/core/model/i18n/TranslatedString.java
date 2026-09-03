@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
  * <p>
- * This can be translated street names, GTFS alerts and notes.
+ * This can be translated street names, GTFS alerts etc.
  *
  * @author Hannes Junnila
  */

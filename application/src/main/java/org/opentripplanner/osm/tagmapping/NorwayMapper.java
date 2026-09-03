@@ -641,7 +641,7 @@ class NorwayMapper extends OsmTagMapper {
     // 110 km/h
     props.setMaxPossibleCarSpeed(30.56f);
 
-    super.populateNotesAndNames(props);
+    super.populateNames(props);
 
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("cutting=*"), true);

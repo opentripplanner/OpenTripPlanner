@@ -406,7 +406,7 @@ public class OsmTagMapper {
       ofBicycleSafety(2)
     );
 
-    populateNotesAndNames(props);
+    populateNames(props);
 
     // slope overrides
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
@@ -419,7 +419,7 @@ public class OsmTagMapper {
     return props.build();
   }
 
-  static void populateNotesAndNames(WayPropertySetBuilder props) {
+  static void populateNames(WayPropertySetBuilder props) {
     /* and some names */
     // Basics
     props.createNames("highway=cycleway", "name.bike_path");
