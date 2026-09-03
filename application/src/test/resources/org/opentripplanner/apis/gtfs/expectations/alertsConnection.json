@@ -1,0 +1,35 @@
+{
+  "data": {
+    "alertsConnection": {
+      "totalCount": 5,
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
+      "edges": [
+        {
+          "node": {
+            "id": "QWxlcnQ6Rjphbi1hbGVydA",
+            "headerDefault": "A header",
+            "headerDe": "A header",
+            "descriptionDefault": "A description",
+            "descriptionDe": "A description",
+            "urlDefault": "https://example.com",
+            "urlDe": "https://example.com"
+          }
+        },
+        {
+          "node": {
+            "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
+            "headerDefault": "Station closed",
+            "headerDe": "Station closed",
+            "descriptionDefault": "This station is currently closed",
+            "descriptionDe": "This station is currently closed",
+            "urlDefault": null,
+            "urlDe": null
+          }
+        }
+      ]
+    }
+  }
+}

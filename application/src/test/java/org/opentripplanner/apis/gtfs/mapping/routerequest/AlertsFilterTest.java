@@ -1,6 +1,7 @@
-package org.opentripplanner.apis.gtfs.datafetchers;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.apis.gtfs.support.filter.AlertsFilter.filterAlerts;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
-public class QueryTypeImplTest {
+class AlertsFilterTest {
 
   private static FeedScopedId ROUTE_ID = new FeedScopedId("test", "foo");
 
@@ -52,7 +53,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(2, filteredAlerts.size());
   }
 
@@ -70,7 +71,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(AlertSeverity.SEVERE, filteredAlerts.get(0).severity());
   }
@@ -89,7 +90,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(AlertCause.UNKNOWN_CAUSE, filteredAlerts.get(0).cause());
   }
@@ -108,7 +109,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(AlertEffect.REDUCED_SERVICE, filteredAlerts.get(0).effect());
   }
@@ -141,7 +142,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(AlertSeverity.INFO, filteredAlerts.get(0).severity());
     assertEquals(AlertCause.UNKNOWN_CAUSE, filteredAlerts.get(0).cause());
@@ -154,7 +155,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(ROUTE_ID, filteredAlerts.get(0).getId());
   }
@@ -165,7 +166,7 @@ public class QueryTypeImplTest {
 
     var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
-    var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
+    var filteredAlerts = filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(STOP_ID, filteredAlerts.get(0).getId());
   }

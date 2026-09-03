@@ -196,6 +196,47 @@ type Alert implements Node {
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
 }
 
+"""
+A connection to a list of alerts that follows
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type AlertConnection {
+  """
+  Edges which contain the alerts. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  edges: [AlertEdge]
+  """
+  Contains cursors to fetch more pages of alerts.
+  Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  pageInfo: PageInfo!
+  """
+  The total number of alerts in this connection at the time of query execution (including the current and previous
+  pages).
+  Note, this number might not stay the same throughout the paging as alerts might be added or
+  removed.
+  """
+  totalCount: Int!
+}
+
+"""
+An edge for the alert connection. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type AlertEdge {
+  """
+  The cursor of the edge. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  cursor: String!
+  """
+  Alert as a node. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  node: Alert
+}
+
 "Arrival and departure time (not relative to midnight)."
 type ArrivalDepartureTime {
   "Arrival time as an ISO-8601-formatted datetime."
@@ -1425,7 +1466,33 @@ type QueryType {
     severityLevel: [AlertSeverityLevelType!],
     "Only return alerts affecting these stops"
     stop: [String!]
-  ): [Alert] @timingData
+  ): [Alert] @deprecated(reason : "Use alertsConnection or alerts fields within specific types instead.") @timingData
+  "Get all active alerts"
+  alertsConnection(
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `first` parameter.
+    """
+    after: String,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `last` parameter.
+    """
+    before: String,
+    "Can be used to filter the results. When paging, the filter should not be changed between pages."
+    filters: [AlertsFilterInput!],
+    """
+    Limits how many alerts are returned. This parameter is part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with
+    the `after` parameter.
+    """
+    first: Int,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `before` parameter.
+    """
+    last: Int
+  ): AlertConnection @timingData
   "Get a single bike park based on its ID, i.e. value of field `bikeParkId`"
   bikePark(id: String!): BikePark @deprecated(reason : "bikePark is deprecated. Use vehicleParking instead.") @timingData
   "Get all bike parks"
@@ -4403,6 +4470,50 @@ in the future. Currently only generic wheelchair preferences are available.
 input AccessibilityPreferencesInput {
   "Wheelchair related preferences. Note, currently this is the only accessibility mode that is available."
   wheelchair: WheelchairPreferencesInput
+}
+
+"""
+A collection of selectors for including or excluding alerts from the alerts search.
+An alert matches a filter if it matches at least one of the `include` selectors and none of the
+`exclude` selectors. When several filters are given, an alert matches if it matches any of them.
+"""
+input AlertsFilterInput @oneOf {
+  """
+  A list of selectors for excluding alerts.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  exclude: [AlertsFilterSelectInput!]
+  """
+  A list of selectors for including alerts.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  include: [AlertsFilterSelectInput!]
+}
+
+"""
+A single selector for alerts. The fields of a selector are combined with AND semantics: an alert
+must match all of the given fields. Each field is matched if the alert matches any of its values.
+Fields that are not set are ignored. An empty list is forbidden.
+"""
+input AlertsFilterSelectInput {
+  """
+  Matches alerts which are active during any of these time ranges. An alert matches if any of its
+  active periods overlaps any of the given ranges.
+  """
+  activePeriods: [OffsetDateTimeRangeInput!]
+  "Matches alerts which have any of these causes."
+  causes: [AlertCauseType!]
+  "Matches alerts which have any of these effects."
+  effects: [AlertEffectType!]
+  """
+  Matches alerts which belong to any of these feeds. The values are feed ids, i.e. the part
+  before the colon in an id such as `HSL:1234`.
+  """
+  feeds: [String!]
+  "Matches alerts which have any of these severity levels."
+  severityLevels: [AlertSeverityLevelType!]
 }
 
 "Preferences related to alighting from a transit vehicle."
