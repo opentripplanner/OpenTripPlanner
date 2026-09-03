@@ -3,12 +3,16 @@ package org.opentripplanner.apis.transmodel.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.apis.transmodel.model.EnumTypes.LEG_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.RELATIVE_DIRECTION;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.ROUTING_ERROR_CODE;
+import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.map;
 
 import graphql.GraphQLContext;
+import graphql.schema.GraphQLEnumType;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +23,7 @@ import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
 import org.opentripplanner.core.model.doc.DocumentedEnum;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 class EnumTypesTest {
 
@@ -103,6 +108,24 @@ class EnumTypesTest {
         .toList()
     );
     assertEquals(expected, values);
+  }
+
+  /**
+   * Carpool lines reach the API from GTFS route types 1551-1560. Before this mapping existed the
+   * mode could not be serialized, and a single carpool line made any query selecting
+   * {@code transportMode} fail. The mode enums are not exhaustive over {@link TransitMode}, so this
+   * test guards the one mode rather than the whole set.
+   */
+  @Test
+  void assertCarpoolIsMappedInBothModeEnums() {
+    assertEquals(TransitMode.CARPOOL, mappedValue(TRANSPORT_MODE, "carpool"));
+    assertEquals(TransitMode.CARPOOL, mappedValue(LEG_MODE, "carpool"));
+  }
+
+  private static Object mappedValue(GraphQLEnumType type, String apiName) {
+    var value = type.getValue(apiName);
+    assertNotNull(value, () -> "'%s' is not mapped in enum %s".formatted(apiName, type.getName()));
+    return value.getValue();
   }
 
   private enum Foo implements DocumentedEnum<Foo> {
