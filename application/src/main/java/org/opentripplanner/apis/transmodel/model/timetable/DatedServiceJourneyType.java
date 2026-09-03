@@ -21,7 +21,6 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -101,19 +100,6 @@ public class DatedServiceJourneyType {
             """
           )
           .dataFetcher(environment -> tripOnServiceDate(environment).getNetexVehicleTypeId())
-          .build()
-      )
-      .field(
-        GraphQLFieldDefinition.newFieldDefinition()
-          .name("vehicleRef")
-          .type(Scalars.GraphQLString)
-          .description(
-            """
-            A reference to the vehicle operating the dated service journey, as reported by real-time
-            data.
-            """
-          )
-          .dataFetcher(DatedServiceJourneyType::vehicleRef)
           .build()
       )
       .field(
@@ -251,15 +237,6 @@ public class DatedServiceJourneyType {
           .build()
       )
       .build();
-  }
-
-  private static String vehicleRef(DataFetchingEnvironment env) {
-    TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
-    TripTimes<?> tripTimes = GqlUtil.getTransitService(env)
-      .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
-      .orElse(null);
-
-    return tripTimes == null ? null : tripTimes.getVehicleId().orElse(null);
   }
 
   private static TripPattern tripPattern(DataFetchingEnvironment env) {

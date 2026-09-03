@@ -150,7 +150,10 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return tripHeadsign;
   }
 
-  @Override
+  /**
+   * @return the id of the vehicle operating this trip, as supplied by real-time updates. Empty if no
+   * vehicle has been assigned or reported yet.
+   */
   public Optional<String> getVehicleId() {
     return Optional.ofNullable(vehicleId);
   }

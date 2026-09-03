@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -89,14 +88,6 @@ public sealed interface TripTimes<T extends TripTimes>
 
   /** The trips whose arrivals and departures are represented by this class */
   Trip getTrip();
-
-  /**
-   * @return the id of the vehicle operating this trip, as supplied by real-time updates. Empty if no
-   * vehicle has been assigned or reported yet.
-   */
-  default Optional<String> getVehicleId() {
-    return Optional.empty();
-  }
 
   /**
    * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
