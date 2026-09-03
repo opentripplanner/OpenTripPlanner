@@ -171,6 +171,133 @@ public class GraphQLTypes {
     WARNING,
   }
 
+  public static class GraphQLAlertsFilterInput {
+
+    private List<GraphQLAlertsFilterSelectInput> exclude;
+    private List<GraphQLAlertsFilterSelectInput> include;
+
+    public GraphQLAlertsFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("exclude") != null) {
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude")).stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("include") != null) {
+          this.include = ((List<Map<String, Object>>) args.get("include")).stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLAlertsFilterSelectInput> getGraphQLExclude() {
+      return this.exclude;
+    }
+
+    public List<GraphQLAlertsFilterSelectInput> getGraphQLInclude() {
+      return this.include;
+    }
+
+    public void setGraphQLExclude(List<GraphQLAlertsFilterSelectInput> exclude) {
+      this.exclude = exclude;
+    }
+
+    public void setGraphQLInclude(List<GraphQLAlertsFilterSelectInput> include) {
+      this.include = include;
+    }
+  }
+
+  public static class GraphQLAlertsFilterSelectInput {
+
+    private List<GraphQLOffsetDateTimeRangeInput> activePeriods;
+    private List<GraphQLAlertCauseType> causes;
+    private List<GraphQLAlertEffectType> effects;
+    private List<String> feeds;
+    private List<GraphQLAlertSeverityLevelType> severityLevels;
+
+    public GraphQLAlertsFilterSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("activePeriods") != null) {
+          this.activePeriods = ((List<Map<String, Object>>) args.get("activePeriods")).stream()
+            .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("causes") != null) {
+          this.causes = ((List<Object>) args.get("causes")).stream()
+            .map(item ->
+              item instanceof GraphQLAlertCauseType
+                ? item
+                : GraphQLAlertCauseType.valueOf((String) item)
+            )
+            .map(GraphQLAlertCauseType.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("effects") != null) {
+          this.effects = ((List<Object>) args.get("effects")).stream()
+            .map(item ->
+              item instanceof GraphQLAlertEffectType
+                ? item
+                : GraphQLAlertEffectType.valueOf((String) item)
+            )
+            .map(GraphQLAlertEffectType.class::cast)
+            .collect(Collectors.toList());
+        }
+        this.feeds = (List<String>) args.get("feeds");
+        if (args.get("severityLevels") != null) {
+          this.severityLevels = ((List<Object>) args.get("severityLevels")).stream()
+            .map(item ->
+              item instanceof GraphQLAlertSeverityLevelType
+                ? item
+                : GraphQLAlertSeverityLevelType.valueOf((String) item)
+            )
+            .map(GraphQLAlertSeverityLevelType.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLOffsetDateTimeRangeInput> getGraphQLActivePeriods() {
+      return this.activePeriods;
+    }
+
+    public List<GraphQLAlertCauseType> getGraphQLCauses() {
+      return this.causes;
+    }
+
+    public List<GraphQLAlertEffectType> getGraphQLEffects() {
+      return this.effects;
+    }
+
+    public List<String> getGraphQLFeeds() {
+      return this.feeds;
+    }
+
+    public List<GraphQLAlertSeverityLevelType> getGraphQLSeverityLevels() {
+      return this.severityLevels;
+    }
+
+    public void setGraphQLActivePeriods(List<GraphQLOffsetDateTimeRangeInput> activePeriods) {
+      this.activePeriods = activePeriods;
+    }
+
+    public void setGraphQLCauses(List<GraphQLAlertCauseType> causes) {
+      this.causes = causes;
+    }
+
+    public void setGraphQLEffects(List<GraphQLAlertEffectType> effects) {
+      this.effects = effects;
+    }
+
+    public void setGraphQLFeeds(List<String> feeds) {
+      this.feeds = feeds;
+    }
+
+    public void setGraphQLSeverityLevels(List<GraphQLAlertSeverityLevelType> severityLevels) {
+      this.severityLevels = severityLevels;
+    }
+  }
+
   public static class GraphQLAlightPreferencesInput {
 
     private java.time.Duration slack;
@@ -2887,6 +3014,69 @@ public class GraphQLTypes {
 
     public void setGraphQLStop(List<String> stop) {
       this.stop = stop;
+    }
+  }
+
+  public static class GraphQLQueryTypeAlertsConnectionArgs {
+
+    private String after;
+    private String before;
+    private List<GraphQLAlertsFilterInput> filters;
+    private Integer first;
+    private Integer last;
+
+    public GraphQLQueryTypeAlertsConnectionArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        if (args.get("filters") != null) {
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterInput(o))
+            .collect(Collectors.toList());
+        }
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+      }
+    }
+
+    public String getGraphQLAfter() {
+      return this.after;
+    }
+
+    public String getGraphQLBefore() {
+      return this.before;
+    }
+
+    public List<GraphQLAlertsFilterInput> getGraphQLFilters() {
+      return this.filters;
+    }
+
+    public Integer getGraphQLFirst() {
+      return this.first;
+    }
+
+    public Integer getGraphQLLast() {
+      return this.last;
+    }
+
+    public void setGraphQLAfter(String after) {
+      this.after = after;
+    }
+
+    public void setGraphQLBefore(String before) {
+      this.before = before;
+    }
+
+    public void setGraphQLFilters(List<GraphQLAlertsFilterInput> filters) {
+      this.filters = filters;
+    }
+
+    public void setGraphQLFirst(Integer first) {
+      this.first = first;
+    }
+
+    public void setGraphQLLast(Integer last) {
+      this.last = last;
     }
   }
 

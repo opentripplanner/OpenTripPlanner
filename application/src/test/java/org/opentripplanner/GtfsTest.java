@@ -1,8 +1,6 @@
 package org.opentripplanner;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.street.model.StreetMode.NOT_SET;
 import static org.opentripplanner.street.model.StreetMode.WALK;
@@ -165,8 +163,7 @@ public abstract class GtfsTest {
     long startTime,
     long endTime,
     String toStopId,
-    String fromStopId,
-    String alert
+    String fromStopId
   ) {
     assertEquals(startTime, leg.startTime().toInstant().toEpochMilli());
     assertEquals(endTime, leg.endTime().toInstant().toEpochMilli());
@@ -177,13 +174,6 @@ public abstract class GtfsTest {
       assertEquals(fromStopId, leg.from().stop.getId().getId());
     } else {
       assertNull(leg.from().stop.getId());
-    }
-    if (alert != null) {
-      assertNotNull(leg.listStreetNotes());
-      assertEquals(1, leg.listStreetNotes().size());
-      assertEquals(alert, leg.listStreetNotes().iterator().next().note.toString());
-    } else {
-      assertThat(leg.listStreetNotes()).isEmpty();
     }
   }
 

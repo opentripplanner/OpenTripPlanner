@@ -1,23 +1,19 @@
 package org.opentripplanner.model.plan.walkstep;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUse;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 
 public class WalkStepBuilder {
 
-  private final Set<StreetNote> streetNotes = new HashSet<>();
   private I18NString directionText;
   private WgsCoordinate startLocation;
   private boolean nameIsDerived = false;
@@ -169,11 +165,6 @@ public class WalkStepBuilder {
     return verticalTransportationUse;
   }
 
-  public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {
-    this.streetNotes.addAll(notes);
-    return this;
-  }
-
   public I18NString directionText() {
     return directionText;
   }
@@ -199,7 +190,6 @@ public class WalkStepBuilder {
       relativeDirection,
       absoluteDirection,
       directionText,
-      streetNotes,
       exit,
       entrance,
       verticalTransportationUse,

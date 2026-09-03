@@ -64,7 +64,6 @@ public class DefaultDirectStreetRouter extends DirectStreetRouter {
     StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
       new TransitServiceResolver(transitService),
       transitService.getTimeZone(),
-      graph.streetNotesService,
       streetDetailsService,
       graph.ellipsoidToGeoidDifference
     );
