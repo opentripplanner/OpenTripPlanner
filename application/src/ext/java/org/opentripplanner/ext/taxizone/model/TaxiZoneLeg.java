@@ -229,6 +229,6 @@ public class TaxiZoneLeg implements Leg {
 
   @Override
   public String toString() {
-    return ("TaxiZoneLeg{" + "streetLeg=" + streetLeg + ", taxiZone=" + taxiZone + '}');
+    return "TaxiZoneLeg{" + "streetLeg=" + streetLeg + ", taxiZone=" + taxiZone + '}';
   }
 }

@@ -61,9 +61,13 @@ public class Polygons {
    * A rectangle polygon with the given two points as opposite corners.
    */
   public static Polygon square(Coordinate a, Coordinate b) {
-    return FAC.createPolygon(
-      new Coordinate[] { a, new Coordinate(a.x, b.y), b, new Coordinate(b.x, a.y), a }
-    );
+    return FAC.createPolygon(new Coordinate[] {
+      a,
+      new Coordinate(a.x, b.y),
+      b,
+      new Coordinate(b.x, a.y),
+      a,
+    });
   }
 
   public static org.geojson.Polygon toGeoJson(Polygon polygon) {

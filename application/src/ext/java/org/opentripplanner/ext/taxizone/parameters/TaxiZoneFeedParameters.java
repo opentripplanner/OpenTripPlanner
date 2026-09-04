@@ -8,8 +8,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Configuration parameters for a single taxi zone feed data source.
  */
-public record TaxiZoneFeedParameters(String feedId, URI source) implements
-  DataSourceConfig, Serializable {
+public record TaxiZoneFeedParameters(
+  String feedId,
+  URI source
+) implements DataSourceConfig, Serializable {
   @Override
   public String toString() {
     return ToStringBuilder.of(TaxiZoneFeedParameters.class)
