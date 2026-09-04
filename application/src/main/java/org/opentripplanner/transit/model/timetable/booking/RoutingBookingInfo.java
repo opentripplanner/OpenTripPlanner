@@ -155,16 +155,14 @@ public final class RoutingBookingInfo {
     }
 
     public Builder withLatestBookingTime(@Nullable BookingTime latestBookingTime) {
-      this.latestBookingTime = latestBookingTime == null
-        ? NOT_SET
-        : latestBookingTime.relativeTimeSeconds();
+      this.latestBookingTime =
+        latestBookingTime == null ? NOT_SET : latestBookingTime.relativeTimeSeconds();
       return this;
     }
 
     public Builder withMinimumBookingNotice(@Nullable Duration minimumBookingNotice) {
-      this.minimumBookingNotice = minimumBookingNotice == null
-        ? NOT_SET
-        : (int) minimumBookingNotice.toSeconds();
+      this.minimumBookingNotice =
+        minimumBookingNotice == null ? NOT_SET : (int) minimumBookingNotice.toSeconds();
       return this;
     }
 

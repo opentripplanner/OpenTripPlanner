@@ -13,7 +13,8 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropaga
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 
 public class TripUpdateGraphWriterRunnable
-  implements GraphWriterRunnable<TransitRealTimeUpdateContext> {
+  implements GraphWriterRunnable<TransitRealTimeUpdateContext>
+{
 
   private final UpdateIncrementality updateIncrementality;
 

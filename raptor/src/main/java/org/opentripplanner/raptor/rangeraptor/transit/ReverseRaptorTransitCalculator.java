@@ -17,7 +17,8 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   extends ReverseTransitCalculator<T>
-  implements RaptorTransitCalculator<T> {
+  implements RaptorTransitCalculator<T>
+{
 
   private final int latestArrivalTime;
   private final int searchWindowInSeconds;
@@ -43,10 +44,10 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   ) {
     this.latestArrivalTime = latestArrivalTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
-    this.earliestAcceptableDepartureTime = earliestAcceptableDepartureTime ==
-      RaptorConstants.TIME_NOT_SET
-      ? unreachedTime()
-      : earliestAcceptableDepartureTime;
+    this.earliestAcceptableDepartureTime =
+      earliestAcceptableDepartureTime == RaptorConstants.TIME_NOT_SET
+        ? unreachedTime()
+        : earliestAcceptableDepartureTime;
     this.iterationStep = iterationStep;
   }
 

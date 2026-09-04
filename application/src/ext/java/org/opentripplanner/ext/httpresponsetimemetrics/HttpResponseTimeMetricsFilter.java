@@ -37,7 +37,8 @@ import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
  * to ensure predictable metric cardinality.
  */
 public class HttpResponseTimeMetricsFilter
-  implements ContainerRequestFilter, ContainerResponseFilter {
+  implements ContainerRequestFilter, ContainerResponseFilter
+{
 
   static final String CLIENT_TAG = "client";
   static final String URI_TAG = "uri";

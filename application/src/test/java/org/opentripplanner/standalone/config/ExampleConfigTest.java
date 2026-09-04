@@ -56,7 +56,8 @@ public class ExampleConfigTest {
 
   @FilePatternSource(
     pattern = {
-      "test/performance/**/otp-config.json", "doc/user/examples/**/" + OTP_CONFIG_FILENAME,
+      "test/performance/**/otp-config.json",
+      "doc/user/examples/**/" + OTP_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")
@@ -88,8 +89,10 @@ public class ExampleConfigTest {
   private void testConfig(Path path, Consumer<NodeAdapter> buildConfig) {
     try {
       var json = Files.readString(path);
-      var replaced = EnvironmentVariableReplacer.insertVariables(json, json, ignored ->
-        "some-value"
+      var replaced = EnvironmentVariableReplacer.insertVariables(
+        json,
+        json,
+        ignored -> "some-value"
       );
       var node = JsonSupport.jsonNodeFromString(replaced);
       var a = new NodeAdapter(node, path.toString());

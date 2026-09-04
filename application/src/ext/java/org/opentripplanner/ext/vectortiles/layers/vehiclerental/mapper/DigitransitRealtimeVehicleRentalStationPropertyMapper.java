@@ -13,7 +13,8 @@ import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class DigitransitRealtimeVehicleRentalStationPropertyMapper
-  extends PropertyMapper<VehicleRentalStation> {
+  extends PropertyMapper<VehicleRentalStation>
+{
 
   private final I18NStringMapper i18NStringMapper;
 

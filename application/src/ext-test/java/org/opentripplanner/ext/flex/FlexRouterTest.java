@@ -56,7 +56,9 @@ class FlexRouterTest {
   @Test
   void runningDateToServiceDateAggregationWithFiltering() {
     var subject = setupEnvironment(
-      TripRequest.of().withIncludeRoutes(List.of(new FeedScopedId("F", ROUTE1))).build()
+      TripRequest.of()
+        .withIncludeRoutes(List.of(new FeedScopedId("F", ROUTE1)))
+        .build()
     );
 
     var dates = subject.flexServiceDates();

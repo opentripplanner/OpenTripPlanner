@@ -141,36 +141,30 @@ class PreparedAreaGroupTest {
   }
 
   private static Polygon square(double minX, double maxX) {
-    return GF.createPolygon(
-      new Coordinate[] {
-        new Coordinate(minX, 0),
-        new Coordinate(maxX, 0),
-        new Coordinate(maxX, 10),
-        new Coordinate(minX, 10),
-        new Coordinate(minX, 0),
-      }
-    );
+    return GF.createPolygon(new Coordinate[] {
+      new Coordinate(minX, 0),
+      new Coordinate(maxX, 0),
+      new Coordinate(maxX, 10),
+      new Coordinate(minX, 10),
+      new Coordinate(minX, 0),
+    });
   }
 
   private static Polygon squareWithHole() {
-    LinearRing shell = GF.createLinearRing(
-      new Coordinate[] {
-        new Coordinate(0, 0),
-        new Coordinate(10, 0),
-        new Coordinate(10, 10),
-        new Coordinate(0, 10),
-        new Coordinate(0, 0),
-      }
-    );
-    LinearRing hole = GF.createLinearRing(
-      new Coordinate[] {
-        new Coordinate(4, 4),
-        new Coordinate(6, 4),
-        new Coordinate(6, 6),
-        new Coordinate(4, 6),
-        new Coordinate(4, 4),
-      }
-    );
+    LinearRing shell = GF.createLinearRing(new Coordinate[] {
+      new Coordinate(0, 0),
+      new Coordinate(10, 0),
+      new Coordinate(10, 10),
+      new Coordinate(0, 10),
+      new Coordinate(0, 0),
+    });
+    LinearRing hole = GF.createLinearRing(new Coordinate[] {
+      new Coordinate(4, 4),
+      new Coordinate(6, 4),
+      new Coordinate(6, 6),
+      new Coordinate(4, 6),
+      new Coordinate(4, 4),
+    });
     return GF.createPolygon(shell, new LinearRing[] { hole });
   }
 }

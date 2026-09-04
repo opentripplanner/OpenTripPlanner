@@ -321,35 +321,40 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       GraphQLTypes.GraphQLInputFiltersInput filterByIds = args.getGraphQLFilterByIds();
 
       if (filterByIds != null) {
-        filterByStops = filterByIds.getGraphQLStops() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLStops())
-          : null;
-        filterByStations = filterByIds.getGraphQLStations() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLStations())
-          : null;
-        filterByRoutes = filterByIds.getGraphQLRoutes() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLRoutes())
-          : null;
+        filterByStops =
+          filterByIds.getGraphQLStops() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLStops())
+            : null;
+        filterByStations =
+          filterByIds.getGraphQLStations() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLStations())
+            : null;
+        filterByRoutes =
+          filterByIds.getGraphQLRoutes() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLRoutes())
+            : null;
         filterByBikeRentalStations = filterByIds.getGraphQLBikeRentalStations();
       }
 
-      List<TransitMode> filterByModes = args.getGraphQLFilterByModes() != null
-        ? args
-            .getGraphQLFilterByModes()
-            .stream()
-            .map(mode -> {
-              try {
-                return TransitMode.valueOf(mode.name());
-              } catch (IllegalArgumentException ignored) {
-                return null;
-              }
-            })
-            .filter(Objects::nonNull)
-            .toList()
-        : null;
-      List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
-        ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
-        : DEFAULT_PLACE_TYPES;
+      List<TransitMode> filterByModes =
+        args.getGraphQLFilterByModes() != null
+          ? args
+              .getGraphQLFilterByModes()
+              .stream()
+              .map(mode -> {
+                try {
+                  return TransitMode.valueOf(mode.name());
+                } catch (IllegalArgumentException ignored) {
+                  return null;
+                }
+              })
+              .filter(Objects::nonNull)
+              .toList()
+          : null;
+      List<PlaceType> filterByPlaceTypes =
+        args.getGraphQLFilterByPlaceTypes() != null
+          ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
+          : DEFAULT_PLACE_TYPES;
       List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
@@ -805,9 +810,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
       var fareService = getFareService(environment);
-      Map<FareType, Collection<FareRuleSet>> fareRules = fareService instanceof GtfsFaresService
-        ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
-        : ((DefaultFareService) fareService).getFareRulesPerType();
+      Map<FareType, Collection<FareRuleSet>> fareRules =
+        fareService instanceof GtfsFaresService
+          ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
+          : ((DefaultFareService) fareService).getFareRulesPerType();
 
       return fareRules
         .entrySet()

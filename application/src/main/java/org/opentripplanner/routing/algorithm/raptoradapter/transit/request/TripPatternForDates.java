@@ -27,7 +27,8 @@ public class TripPatternForDates
     RaptorRoute<TripSchedule>,
     RaptorTimeTable<TripSchedule>,
     RaptorTripPattern,
-    TripSearchTimetable<TripSchedule> {
+    TripSearchTimetable<TripSchedule>
+{
 
   private static final int FIRST_STOP_POS_IN_PATTERN = 0;
 

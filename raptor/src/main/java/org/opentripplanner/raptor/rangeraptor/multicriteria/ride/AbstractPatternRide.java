@@ -63,7 +63,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
   implements PatternRideView<T, McStopArrival<T>>
-  permits PatternRideC1, PatternRideC2 {
+  permits PatternRideC1, PatternRideC2
+{
 
   private final McStopArrival<T> prevArrival;
   private final int boardStopPosition;

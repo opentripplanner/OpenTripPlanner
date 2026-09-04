@@ -267,7 +267,11 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void compositeFilterSelectByAgency() {
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("RUT:1")))
+          .build()
+      )
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -284,7 +288,11 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void compositeFilterNotByAgency() {
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addNot(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
+      .addNot(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("RUT:1")))
+          .build()
+      )
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -302,8 +310,16 @@ class TripOnServiceDateMatcherFactoryTest {
   void compositeFilterSelectIsOrBetweenSelectors() {
     // Two selectors in select — a trip matching either one should pass
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("RUT:1")))
+          .build()
+      )
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("AKT:1")))
+          .build()
+      )
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -321,9 +337,21 @@ class TripOnServiceDateMatcherFactoryTest {
   void compositeFilterNotOverridesSelect() {
     // select RUT:1 and AKT:1, but not AKT:1 — AKT:1 should be excluded despite being selected
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
-      .addNot(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("RUT:1")))
+          .build()
+      )
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("AKT:1")))
+          .build()
+      )
+      .addNot(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("AKT:1")))
+          .build()
+      )
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -341,10 +369,18 @@ class TripOnServiceDateMatcherFactoryTest {
   void multipleFiltersAreOred() {
     // Two separate filters — a trip matching either filter should pass
     var filterRut = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("RUT:1")))
+          .build()
+      )
       .build();
     var filterAkt = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
+      .addSelect(
+        TripOnServiceDateSelectRequest.of()
+          .withAgencies(List.of(id("AKT:1")))
+          .build()
+      )
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filterRut, filterAkt)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(

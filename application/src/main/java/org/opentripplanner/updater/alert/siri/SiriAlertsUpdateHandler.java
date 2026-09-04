@@ -84,8 +84,9 @@ public class SiriAlertsUpdateHandler {
         int addedCounter = 0;
         int expiredCounter = 0;
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-          boolean expireSituation = (sxElement.getProgress() != null &&
-            sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
+          boolean expireSituation =
+            sxElement.getProgress() != null &&
+            sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED);
 
           if (sxElement.getSituationNumber() == null) {
             continue;
@@ -165,12 +166,12 @@ public class SiriAlertsUpdateHandler {
     if (situation.getValidityPeriods().size() > 0) {
       ArrayList<TimePeriod> periods = new ArrayList<>();
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
-        final Instant start = activePeriod.getStartTime() != null
-          ? activePeriod.getStartTime().toInstant().minus(earlyStart)
-          : null;
-        final Instant end = activePeriod.getEndTime() != null
-          ? activePeriod.getEndTime().toInstant()
-          : null;
+        final Instant start =
+          activePeriod.getStartTime() != null
+            ? activePeriod.getStartTime().toInstant().minus(earlyStart)
+            : null;
+        final Instant end =
+          activePeriod.getEndTime() != null ? activePeriod.getEndTime().toInstant() : null;
 
         periods.add(TimePeriod.of(start, end));
       }
@@ -184,9 +185,10 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
-      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
-      : null;
+    var fuzzyTripMatcher =
+      siriFuzzyTripMatcherCache != null
+        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
+        : null;
     alert.addEntites(
       new AffectsMapper(feedId, fuzzyTripMatcher, context.transitService()).mapAffects(
         situation.getAffects()

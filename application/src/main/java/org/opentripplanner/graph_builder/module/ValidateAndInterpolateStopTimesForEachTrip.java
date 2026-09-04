@@ -210,8 +210,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         case CABLE_CAR -> 30;
         case GONDOLA, FUNICULAR -> 50;
         default -> 200;
-      } /
-      3.6
+      } / 3.6
     );
   }
 

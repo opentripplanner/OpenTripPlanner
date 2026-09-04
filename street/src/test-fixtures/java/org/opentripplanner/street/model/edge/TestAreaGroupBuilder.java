@@ -62,9 +62,10 @@ public class TestAreaGroupBuilder {
     AreaGroup areaGroup,
     boolean back
   ) {
-    var geometry = GeometryUtils.getGeometryFactory().createLineString(
-      new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
-    );
+    var geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
+      from.getCoordinate(),
+      to.getCoordinate(),
+    });
     new AreaEdgeBuilder()
       .withFromVertex(from)
       .withToVertex(to)

@@ -53,9 +53,8 @@ public class PageCursorFactory {
     Instant lat,
     Duration searchWindow
   ) {
-    this.currentPageType = pageType == null
-      ? resolvePageTypeForTheFirstSearch(sortOrder)
-      : pageType;
+    this.currentPageType =
+      pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
     this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
       pageType,
       firstItineraryResultDeparture,

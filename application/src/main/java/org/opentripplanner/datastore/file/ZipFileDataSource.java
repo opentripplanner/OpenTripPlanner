@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ZipFileDataSource
   extends AbstractFileDataSource
-  implements CompositeDataSource, ZipFileEntryParent {
+  implements CompositeDataSource, ZipFileEntryParent
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipFileDataSource.class);
   private final Collection<DataSource> content = new ArrayList<>();

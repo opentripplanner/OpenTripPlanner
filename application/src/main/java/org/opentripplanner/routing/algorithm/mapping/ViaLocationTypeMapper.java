@@ -42,14 +42,12 @@ public class ViaLocationTypeMapper {
     List<ViaLocation> viaLocations,
     TemporaryStreetLocation location
   ) {
-    var isViaLocation = viaLocations
-      .stream()
-      .anyMatch(viaLocation ->
-        viaLocation
-          .coordinate()
-          .stream()
-          .anyMatch(coordinate -> coordinate.asJtsCoordinate().equals(location.getCoordinate()))
-      );
+    var isViaLocation = viaLocations.stream().anyMatch(viaLocation ->
+      viaLocation
+        .coordinate()
+        .stream()
+        .anyMatch(coordinate -> coordinate.asJtsCoordinate().equals(location.getCoordinate()))
+    );
     return isViaLocation ? ViaLocationType.VISIT : null;
   }
 }

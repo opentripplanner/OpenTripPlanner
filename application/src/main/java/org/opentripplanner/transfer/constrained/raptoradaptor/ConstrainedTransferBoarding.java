@@ -7,8 +7,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * A boarding event passed to Raptor to perform a boarding.
  */
-public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
-  implements RaptorBoardOrAlightEvent<T> {
+public class ConstrainedTransferBoarding<T extends RaptorTripSchedule> implements
+  RaptorBoardOrAlightEvent<T> {
 
   private final RaptorTransferConstraint constraint;
   private final int tripIndex;

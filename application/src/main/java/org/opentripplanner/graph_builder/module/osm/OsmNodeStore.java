@@ -160,14 +160,14 @@ class OsmNodeStore {
     }
     int latFixed = (int) Math.round(lat * FIXED_POINT_FACTOR);
     int lonFixed = (int) Math.round(lon * FIXED_POINT_FACTOR);
-    return (((long) latFixed) << 32) | (lonFixed & 0xFFFFFFFFL);
+    return ((long) latFixed << 32) | (lonFixed & 0xFFFFFFFFL);
   }
 
   private static double unpackLat(long packedCoordinate) {
-    return ((int) (packedCoordinate >> 32)) / FIXED_POINT_FACTOR;
+    return (int) (packedCoordinate >> 32) / FIXED_POINT_FACTOR;
   }
 
   private static double unpackLon(long packedCoordinate) {
-    return ((int) packedCoordinate) / FIXED_POINT_FACTOR;
+    return (int) packedCoordinate / FIXED_POINT_FACTOR;
   }
 }

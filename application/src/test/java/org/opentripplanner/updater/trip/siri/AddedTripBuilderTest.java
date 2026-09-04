@@ -582,14 +582,12 @@ class AddedTripBuilderTest {
   }
 
   @ParameterizedTest
-  @CsvSource(
-    {
-      "air,AIRPLANE,AIRPLANE,",
-      "bus,BUS,RAIL,railReplacementBus",
-      "rail,RAIL,RAIL,replacementRailService",
-      "ferry,FERRY,RAIL,",
-    }
-  )
+  @CsvSource({
+    "air,AIRPLANE,AIRPLANE,",
+    "bus,BUS,RAIL,railReplacementBus",
+    "rail,RAIL,RAIL,replacementRailService",
+    "ferry,FERRY,RAIL,",
+  })
   void testGetTransportMode(
     String siriMode,
     String internalMode,

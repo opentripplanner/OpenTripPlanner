@@ -94,7 +94,8 @@ public class JourneyPatternType {
               )
             );
 
-            return ((TripPattern) environment.getSource()).getScheduledTimetable()
+            return ((TripPattern) environment.getSource())
+              .getScheduledTimetable()
               .getTripTimes()
               .stream()
               .filter(times -> services.contains(times.getServiceCode()))

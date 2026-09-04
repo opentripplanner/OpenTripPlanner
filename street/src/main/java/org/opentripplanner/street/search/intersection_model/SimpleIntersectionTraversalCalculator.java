@@ -8,7 +8,8 @@ import org.opentripplanner.street.search.TraverseMode;
 
 public class SimpleIntersectionTraversalCalculator
   extends AbstractIntersectionTraversalCalculator
-  implements Serializable {
+  implements Serializable
+{
 
   private final DrivingDirection drivingDirection;
 

@@ -198,9 +198,9 @@ public class NodeAdapterTest {
       {error-message} Parameter: skim.albin. Source: Test.
       {error-message} Parameter: key. Source: Test.
       """.replace(
-          "{error-message}",
-          "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
-        ),
+        "{error-message}",
+        "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
+      ),
       log.toString()
     );
   }
@@ -321,7 +321,10 @@ public class NodeAdapterTest {
     assertEquals("[]", subject.of("missing-key").asFeedScopedIds(List.of()).toString());
     assertEquals(
       "[C:12]",
-      subject.of("missing-key").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
+      subject
+        .of("missing-key")
+        .asFeedScopedIds(List.of(new FeedScopedId("C", "12")))
+        .toString()
     );
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }

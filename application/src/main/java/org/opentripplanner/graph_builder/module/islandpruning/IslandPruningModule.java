@@ -216,10 +216,11 @@ public class IslandPruningModule implements GraphBuilderModule {
         int pruningThresholdWithStops = parameters.pruningThresholdIslandWithStops();
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
-          double sizeCoeff = (adaptivePruningFactor > 1.0)
-            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-              adaptivePruningDistance
-            : 1.0;
+          double sizeCoeff =
+            adaptivePruningFactor > 1.0
+              ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
+                adaptivePruningDistance
+              : 1.0;
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
@@ -232,10 +233,11 @@ public class IslandPruningModule implements GraphBuilderModule {
         //for islands without stops
         int pruningThresholdWithoutStops = parameters.pruningThresholdIslandWithoutStops();
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
-          double sizeCoeff = (adaptivePruningFactor > 1.0)
-            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-              adaptivePruningDistance
-            : 1.0;
+          double sizeCoeff =
+            adaptivePruningFactor > 1.0
+              ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
+                adaptivePruningDistance
+              : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
               stats.incrementModifiedIslands();

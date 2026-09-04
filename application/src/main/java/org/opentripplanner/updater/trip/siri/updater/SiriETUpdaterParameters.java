@@ -4,7 +4,8 @@ import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public interface SiriETUpdaterParameters
-  extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+  extends UrlUpdaterParameters, PollingGraphUpdaterParameters
+{
   String url();
 
   boolean blockReadinessUntilInitialized();

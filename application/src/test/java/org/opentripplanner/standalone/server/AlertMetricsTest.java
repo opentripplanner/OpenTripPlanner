@@ -41,9 +41,9 @@ class AlertMetricsTest {
     binder.recordMetrics();
 
     var expected = """
-      alerts(GAUGE)[feedId='F', severity='INFO']; value=1.0
-      alerts(GAUGE)[effect='DETOUR', feedId='F']; value=1.0
-      """.trim();
+    alerts(GAUGE)[feedId='F', severity='INFO']; value=1.0
+    alerts(GAUGE)[effect='DETOUR', feedId='F']; value=1.0
+    """.trim();
     assertEquals(expected, registry.getMetersAsString());
   }
 
