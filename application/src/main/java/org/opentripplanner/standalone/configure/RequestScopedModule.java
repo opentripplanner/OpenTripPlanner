@@ -32,6 +32,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -101,6 +102,28 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static RefetchItineraryService refetchItineraryService(
+    Graph graph,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
+  }
+
+  @Provides
+  @HttpRequestScoped
   static RouteRequest defaultRouteRequest(
     RouterConfig routerConfig,
     LauncherRequestDecorator launcherRequestDecorator
@@ -159,6 +182,7 @@ public class RequestScopedModule {
     TransitService transitService,
     TransitAlertService transitAlertService,
     RouteRequest defaultRequest,
+    RefetchItineraryService refetchItineraryService,
     VectorTileConfig vectorTileConfig,
     GtfsApiParameters gtfsApiConfig,
     TransmodelAPIParameters transmodelAPIParameters,
@@ -211,6 +235,7 @@ public class RequestScopedModule {
       transactionScope,
       transitRoutingConfig,
       transitService,
+      refetchItineraryService,
       transitAlertService,
       triasApiParameters,
       gtfsApiConfig,

@@ -11,6 +11,7 @@ import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -39,6 +40,8 @@ public interface RequestScopedFactory {
   TransactionScope transactionScope();
 
   TransitService transitService();
+
+  RefetchItineraryService refetchItineraryService();
 
   TransitAlertService transitAlertService();
 

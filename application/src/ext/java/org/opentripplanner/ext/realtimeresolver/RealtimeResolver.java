@@ -1,75 +1,80 @@
 package org.opentripplanner.ext.realtimeresolver;
 
 import java.util.List;
+import java.util.Objects;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 
 public class RealtimeResolver {
 
-  private final TransitService transitService;
-  private final TransitAlertService transitAlertService;
+  private final RefetchItineraryService refetchItineraryService;
 
-  public RealtimeResolver(TransitService transitService, TransitAlertService transitAlertService) {
-    this.transitService = transitService;
-    this.transitAlertService = transitAlertService;
+  public RealtimeResolver(RefetchItineraryService refetchItineraryService) {
+    this.refetchItineraryService = refetchItineraryService;
   }
 
   /**
-   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the
+   * original leg
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
-    TransitService transitService,
-    TransitAlertService transitAlertService
+    RefetchItineraryService refetchItineraryService,
+    RouteRequest routeRequest
   ) {
-    return new RealtimeResolver(transitService, transitAlertService).addRealtimeInfo(itineraries);
+    return new RealtimeResolver(refetchItineraryService).addRealtimeInfo(itineraries, routeRequest);
   }
 
-  private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::decorateItinerary).toList();
+  private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries, RouteRequest routeRequest) {
+    return itineraries
+      .stream()
+      .map(o -> decorateItinerary(o, routeRequest))
+      .toList();
   }
 
-  private Itinerary decorateItinerary(Itinerary it) {
-    // TODO Skip if leg does not contain transit
-    if (it.isFlaggedForDeletion()) {
-      return it;
-    }
-    return it.copyOf().transformLegs(this::mapLeg).build();
-  }
-
-  private Leg mapLeg(Leg leg) {
-    var ref = leg.legReference();
-    if (ref == null) {
-      return leg;
+  private Itinerary decorateItinerary(Itinerary itinerary, RouteRequest routeRequest) {
+    if (itinerary.isFlaggedForDeletion()) {
+      return itinerary;
     }
 
-    // Only ScheduledTransitLeg has leg references atm, so this check is just to be future-proof
-    if (!(leg.isScheduledTransitLeg())) {
-      return leg;
-    }
-    var realTimeLeg = ref.getLeg(transitService, transitAlertService);
-    if (realTimeLeg == null) {
-      return leg;
-    }
-    return combineReferenceWithOriginal(
-      realTimeLeg.asScheduledTransitLeg(),
-      leg.asScheduledTransitLeg()
+    List<LegReference> legReferences = itinerary
+      .legs()
+      .stream()
+      .map(Leg::legReference)
+      .filter(Objects::nonNull)
+      .toList();
+
+    GenericLocation fromLocation = getWalkingLocation(itinerary.legs().getFirst(), true);
+    GenericLocation toLocation = getWalkingLocation(itinerary.legs().getLast(), false);
+
+    Itinerary itinerary1 = refetchItineraryService.refetchItinerary(
+      fromLocation,
+      toLocation,
+      legReferences,
+      routeRequest
     );
+    return itinerary1;
   }
 
-  private static Leg combineReferenceWithOriginal(
-    ScheduledTransitLeg reference,
-    ScheduledTransitLeg original
-  ) {
-    return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
-      .withTransferToNextLeg(original.transferToNextLeg())
-      .withGeneralizedCost(original.generalizedCost())
-      .withAccessibilityScore(original.accessibilityScore())
-      .build();
+  private GenericLocation getWalkingLocation(Leg leg, boolean from) {
+    if (!leg.isWalkingLeg()) {
+      return null;
+    }
+
+    Place place = from ? leg.from() : leg.to();
+
+    if (place.stop != null) {
+      return GenericLocation.fromCoordinate(place.stop.getCoordinate());
+    }
+
+    return GenericLocation.fromCoordinate(
+      place.coordinate.latitude(),
+      place.coordinate.longitude()
+    );
   }
 }

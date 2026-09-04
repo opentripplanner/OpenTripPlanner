@@ -166,9 +166,8 @@ public class RoutingWorker {
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
-      serverContext.transitService(),
-      serverContext.transitAlertService(),
-      pagingService
+      pagingService,
+      serverContext.refetchItineraryService()
     );
   }
 

@@ -29,6 +29,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -71,6 +72,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RegularTransferService transferService;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
+  private final RefetchItineraryService refetchItineraryService;
   private final TransitAlertService transitAlertService;
   private final VectorTileConfig vectorTileConfig;
   private final VehicleParkingService vehicleParkingService;
@@ -145,6 +147,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TransactionScope transactionScope,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    RefetchItineraryService refetchItineraryService,
     TransitAlertService transitAlertService,
     TriasApiParameters triasApiParameters,
     GtfsApiParameters gtfsApiParameters,
@@ -182,6 +185,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transactionScope = transactionScope;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.refetchItineraryService = refetchItineraryService;
     this.transitAlertService = transitAlertService;
     this.transmodelSchema = transmodelSchema;
     this.triasApiParameters = triasApiParameters;
@@ -234,6 +238,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public TransitService transitService() {
     return transitService;
+  }
+
+  @Override
+  public RefetchItineraryService refetchItineraryService() {
+    return refetchItineraryService;
   }
 
   @Override

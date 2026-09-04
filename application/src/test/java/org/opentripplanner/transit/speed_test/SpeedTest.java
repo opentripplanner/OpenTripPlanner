@@ -26,9 +26,12 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -41,6 +44,8 @@ import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFacto
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -153,6 +158,7 @@ public class SpeedTest {
       threadFactory
     );
 
+    DelegatingTransitAlertServiceImpl transitAlertService = new DelegatingTransitAlertServiceImpl();
     UpdaterConfigurator.configure(
       graph,
       DeduplicatorService.NOOP,
@@ -168,7 +174,7 @@ public class SpeedTest {
       transitUpdateManager,
       streetUpdateManager,
       timetableHandle,
-      new DelegatingTransitAlertServiceImpl(),
+      transitAlertService,
       routerConfig.updaterConfig()
     );
     if (transitRepository.getUpdaterManager() != null) {
@@ -186,27 +192,47 @@ public class SpeedTest {
     // we do it manually here
 
     var transactionScope = registry.scope();
+    RegularTransferService transferService = TransferServiceTestFactory.transferService(
+      transferRepository
+    );
+    StreetDetailsService streetDetailsService = TestServerContext.createStreetDetailsService();
+    LinkingContextFactory linkingContextFactory = TestServerContext.createLinkingContextFactory(
+      graph,
+      vertexLinker,
+      transitService
+    );
+    StreetLimitationParametersService streetLimitationParametersService =
+      TestServerContext.createStreetLimitationParametersService();
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       new DefaultFareService(),
       routerConfig.flexParameters(),
       graph,
-      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
+      linkingContextFactory,
       timer.getRegistry(),
       null,
       raptorConfig,
       realtimeVehicleHandle.repositorySnapshot(transactionScope),
       List.of(),
       routerConfig.routingRequestDefaults(),
-      TestServerContext.createStreetLimitationParametersService(),
-      TransferServiceTestFactory.transferService(transferRepository),
+      streetLimitationParametersService,
+      transferService,
       transactionScope,
       routerConfig.transitTuningConfig(),
       new DefaultTransitService(
         transitRepository,
         timetableHandle.repositorySnapshot(transactionScope)
       ),
-      new DelegatingTransitAlertServiceImpl(),
+      new RefetchItineraryService(
+        graph,
+        transitService,
+        transitAlertService,
+        transferService,
+        streetDetailsService,
+        linkingContextFactory,
+        streetLimitationParametersService
+      ),
+      transitAlertService,
       null,
       null,
       VectorTileConfig.DEFAULT,
@@ -218,7 +244,7 @@ public class SpeedTest {
       null,
       null,
       null,
-      TestServerContext.createStreetDetailsService(),
+      streetDetailsService,
       null,
       null,
       null,
