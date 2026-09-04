@@ -407,6 +407,16 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeTransit() {
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no transit itinerary when access or egress is TAXI
+    //       unless the taxi-zone sandbox feature is enabled.
+    if (
+      request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) &&
+      OTPFeature.TaxiZone.isOff()
+    ) {
+      return RoutingResult.empty();
+    }
+
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
