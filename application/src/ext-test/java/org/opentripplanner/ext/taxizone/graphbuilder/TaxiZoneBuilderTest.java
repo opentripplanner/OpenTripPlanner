@@ -90,7 +90,7 @@ class TaxiZoneBuilderTest {
     assertEquals(1, zones.size());
     var zone = zones.get(0);
     assertEquals(AREA_1.getGeometry(), zone.geometry());
-    assertEquals(TRIP, zone.trip());
+    assertEquals(TRIP.getRoute(), zone.route());
     assertEquals(
       LocalDateRange.ofInclusiveEnd(SERVICE_DATE, SERVICE_DATE),
       zone.serviceDateRange()

@@ -20,7 +20,6 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
 
@@ -40,15 +39,11 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
 
   private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
 
-  private static final Trip ZONE_TRIP = TransitRepositoryForTest.trip("taxi-trip")
-    .withRoute(ZONE_ROUTE)
-    .build();
-
   private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
     List.of(
       new TaxiZone(
         ZONE_POLYGON,
-        ZONE_TRIP,
+        ZONE_ROUTE,
         null,
         null,
         LocalDateRange.ofInclusiveEnd(
@@ -63,7 +58,7 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
     List.of(
       new TaxiZone(
         ZONE_POLYGON,
-        ZONE_TRIP,
+        ZONE_ROUTE,
         null,
         null,
         LocalDateRange.ofInclusiveEnd(

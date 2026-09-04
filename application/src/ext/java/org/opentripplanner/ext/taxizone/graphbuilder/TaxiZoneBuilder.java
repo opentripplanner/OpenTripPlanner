@@ -45,7 +45,7 @@ public class TaxiZoneBuilder {
       result.add(
         new TaxiZone(
           areaStop.getGeometry(),
-          flexTrip.getTrip(),
+          flexTrip.getTrip().getRoute(),
           flexTrip.getPickupBookingInfo(0),
           flexTrip.getDropOffBookingInfo(1),
           serviceDateRange.get()

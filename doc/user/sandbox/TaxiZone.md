@@ -105,7 +105,6 @@ is preserved.
 |:-----------------------------|:--------------------------------------------------------------|
 | `agency`                    | Agency from the matched route.                                |
 | `route`                     | Route from the matched flex trip.                             |
-| `trip`                      | The matched flex trip.                                        |
 | `mode`                      | `TransitMode` from the matched route (e.g. `TAXI`).           |
 | `serviceDate`               | The leg's own start date, validated against the matched zone's resolved GTFS service period. |
 | `boardStopPosInPattern`     | Always `0` (the pickup stop).                                  |

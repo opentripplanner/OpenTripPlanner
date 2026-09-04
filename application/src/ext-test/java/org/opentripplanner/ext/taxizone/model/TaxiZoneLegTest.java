@@ -16,17 +16,12 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 class TaxiZoneLegTest implements PlanTestConstants {
 
   private static final Route ROUTE = TransitRepositoryForTest.route("taxi-route")
     .withMode(TransitMode.TAXI)
-    .build();
-
-  private static final Trip TRIP = TransitRepositoryForTest.trip("taxi-trip")
-    .withRoute(ROUTE)
     .build();
 
   private static final Place PLACE_A = Place.forStop(
@@ -49,7 +44,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
   private static TaxiZoneLeg taxiZoneLeg() {
     var zone = new TaxiZone(
       null,
-      TRIP,
+      ROUTE,
       PICKUP_BOOKING_INFO,
       DROP_OFF_BOOKING_INFO,
       LocalDateRange.ofUnbounded()
@@ -73,12 +68,6 @@ class TaxiZoneLegTest implements PlanTestConstants {
   void routeComesFromZone() {
     var leg = taxiZoneLeg();
     assertEquals(ROUTE, leg.route());
-  }
-
-  @Test
-  void tripComesFromZone() {
-    var leg = taxiZoneLeg();
-    assertEquals(TRIP, leg.trip());
   }
 
   @Test
@@ -143,8 +132,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
     var otherRoute = TransitRepositoryForTest.route("other-route")
       .withMode(TransitMode.CARPOOL)
       .build();
-    var otherTrip = TransitRepositoryForTest.trip("other-trip").withRoute(otherRoute).build();
-    var otherZone = new TaxiZone(null, otherTrip, null, null, LocalDateRange.ofUnbounded());
+    var otherZone = new TaxiZone(null, otherRoute, null, null, LocalDateRange.ofUnbounded());
     var other = new TaxiZoneLeg(driveLeg(), otherZone);
     assertFalse(leg.hasSameMode(other));
   }

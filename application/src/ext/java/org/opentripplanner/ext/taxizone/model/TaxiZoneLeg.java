@@ -21,7 +21,6 @@ import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
@@ -54,22 +53,17 @@ public class TaxiZoneLeg implements TransitLeg {
 
   @Override
   public TransitMode mode() {
-    return taxiZone.trip().getRoute().getMode();
+    return taxiZone.route().getMode();
   }
 
   @Override
   public Agency agency() {
-    return taxiZone.trip().getRoute().getAgency();
+    return taxiZone.route().getAgency();
   }
 
   @Override
   public Route route() {
-    return taxiZone.trip().getRoute();
-  }
-
-  @Override
-  public Trip trip() {
-    return taxiZone.trip();
+    return taxiZone.route();
   }
 
   /**
