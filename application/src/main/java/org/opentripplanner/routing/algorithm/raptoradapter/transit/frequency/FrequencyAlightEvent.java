@@ -8,8 +8,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 /**
  * Represents a result of a {@link TripFrequencyAlightSearch}, with materialized {@link TripTimes}
  */
-final class FrequencyAlightEvent<T extends DefaultTripSchedule>
-  extends FrequencyBoardOrAlightEvent<T> {
+final class FrequencyAlightEvent<T extends DefaultTripSchedule> extends FrequencyBoardOrAlightEvent<T> {
 
   public FrequencyAlightEvent(
     TripPatternForDates raptorTripPattern,

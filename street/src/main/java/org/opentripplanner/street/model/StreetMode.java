@@ -154,9 +154,9 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
 
   private static String GBFS_PREREQ = """
 
-    _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-    See [Configuring GBFS](GBFS-Config.md) on how to add one.
-    """;
+  _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
+  See [Configuring GBFS](GBFS-Config.md) on how to add one.
+  """;
 
   @Override
   public String enumValueDescription() {
@@ -177,18 +177,15 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       """;
       case BIKE_RENTAL -> """
       Taking a rented, shared-mobility bike for part or the entirety of the route.
-      """ +
-      GBFS_PREREQ;
+      """ + GBFS_PREREQ;
       case SCOOTER_RENTAL -> """
       Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
       This can include scooter rental at fixed locations or free-floating services.
-      """ +
-      GBFS_PREREQ;
+      """ + GBFS_PREREQ;
       case CAR_RENTAL -> """
       Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
       This can include car rental at fixed locations or free-floating services.
-      """ +
-      GBFS_PREREQ;
+      """ + GBFS_PREREQ;
       case CAR -> """
       Driving your own car the entirety of the route.
       This can be combined with transit, where will return routes with a [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component.

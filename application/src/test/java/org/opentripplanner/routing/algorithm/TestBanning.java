@@ -27,8 +27,16 @@ public class TestBanning {
     Collection<TripPattern> patterns = getTestPatterns();
 
     var filterRequest = TransitFilterRequest.of()
-      .addNot(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
-      .addNot(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
+      .addNot(
+        SelectRequest.of()
+          .withRoutes(List.of(id("RUT:Route:1")))
+          .build()
+      )
+      .addNot(
+        SelectRequest.of()
+          .withAgencies(List.of(id("RUT:Agency:2")))
+          .build()
+      )
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -43,8 +51,16 @@ public class TestBanning {
     Collection<TripPattern> patterns = getTestPatterns();
 
     var filterRequest = TransitFilterRequest.of()
-      .addSelect(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
-      .addSelect(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
+      .addSelect(
+        SelectRequest.of()
+          .withRoutes(List.of(id("RUT:Route:1")))
+          .build()
+      )
+      .addSelect(
+        SelectRequest.of()
+          .withAgencies(List.of(id("RUT:Agency:2")))
+          .build()
+      )
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);

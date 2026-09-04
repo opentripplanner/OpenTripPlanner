@@ -685,7 +685,7 @@ class UnscheduledTripTest {
 
     private static String timeToStr(int time, int start, int end) {
       return time == MISSING_VALUE
-        ? (TimeUtils.timeToStrCompact(start) + " - " + TimeUtils.timeToStrCompact(end))
+        ? TimeUtils.timeToStrCompact(start) + " - " + TimeUtils.timeToStrCompact(end)
         : TimeUtils.timeToStrCompact(time);
     }
 

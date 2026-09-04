@@ -45,7 +45,10 @@ final class TranslationHelper {
         // {<tableName>={""=[Translation@1, ..., Translation@Z]}}
         translationMap.put(
           tableName,
-          i.getValue().stream().collect(Collectors.groupingBy(t -> ""))
+          i
+            .getValue()
+            .stream()
+            .collect(Collectors.groupingBy(t -> ""))
         );
       } else {
         // will create with following structure:

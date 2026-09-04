@@ -229,7 +229,10 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   }
 
   static List<NearbyStop> sort(Collection<NearbyStop> stops) {
-    return stops.stream().sorted(Comparator.comparing(x -> x.distance)).toList();
+    return stops
+      .stream()
+      .sorted(Comparator.comparing(x -> x.distance))
+      .toList();
   }
 
   /**

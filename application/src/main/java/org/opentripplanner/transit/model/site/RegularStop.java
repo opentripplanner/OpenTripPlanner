@@ -23,7 +23,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  */
 public final class RegularStop
   extends StationElement<RegularStop, RegularStopBuilder>
-  implements StopLocation {
+  implements StopLocation
+{
 
   private final int index;
   private final String platformCode;

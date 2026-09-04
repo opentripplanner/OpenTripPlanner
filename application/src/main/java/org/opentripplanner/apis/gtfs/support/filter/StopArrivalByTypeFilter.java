@@ -46,12 +46,13 @@ public class StopArrivalByTypeFilter {
     } else {
       var allowed = types
         .stream()
-        .map(type ->
-          switch (type) {
-            case LOCATION -> StopType.FLEXIBLE_AREA;
-            case LOCATION_GROUP -> StopType.FLEXIBLE_GROUP;
-            case STOP -> StopType.REGULAR;
-          }
+        .map(
+          type ->
+            switch (type) {
+              case LOCATION -> StopType.FLEXIBLE_AREA;
+              case LOCATION_GROUP -> StopType.FLEXIBLE_GROUP;
+              case STOP -> StopType.REGULAR;
+            }
         )
         .collect(Collectors.toSet());
       return EnumSetUtils.unmodifiableEnumSet(allowed, StopType.class);

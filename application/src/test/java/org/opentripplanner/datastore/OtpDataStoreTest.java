@@ -159,12 +159,12 @@ public class OtpDataStoreTest {
         graph: '%s',
         buildReportDir: '%s'
         }""".formatted(
-          uri + OSM_FILENAME,
-          uri + GTFS_FILENAME,
-          uri + EMPIRICAL_DELAY,
-          uri + GRAPH_FILENAME,
-          uri + REPORT_FILENAME
-        )
+        uri + OSM_FILENAME,
+        uri + GTFS_FILENAME,
+        uri + EMPIRICAL_DELAY,
+        uri + GRAPH_FILENAME,
+        uri + REPORT_FILENAME
+      )
     );
 
     // Create build-config  and an unknown file in the 'baseDir'
@@ -269,19 +269,17 @@ public class OtpDataStoreTest {
 
     List<String> files = new ArrayList<>();
     for (FileType type : FileType.values()) {
-      store
-        .listExistingSourcesFor(type)
-        .forEach(s -> {
-          String p = s.path();
+      store.listExistingSourcesFor(type).forEach(s -> {
+        String p = s.path();
 
-          if (p.startsWith(baseDirPath)) {
-            // Add 1 to strip off path separator
-            p = "base:" + p.substring(baseDirPath.length() + 1);
-          } else if (p.startsWith(dataDirPath)) {
-            p = "data:" + p.substring(dataDirPath.length() + 1);
-          }
-          files.add(type.name() + " " + p);
-        });
+        if (p.startsWith(baseDirPath)) {
+          // Add 1 to strip off path separator
+          p = "base:" + p.substring(baseDirPath.length() + 1);
+        } else if (p.startsWith(dataDirPath)) {
+          p = "data:" + p.substring(dataDirPath.length() + 1);
+        }
+        files.add(type.name() + " " + p);
+      });
     }
     return files;
   }

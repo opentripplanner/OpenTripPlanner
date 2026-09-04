@@ -216,16 +216,14 @@ public class GraphStats {
     public void run() {
       LOG.info("counting number of trips per pattern...");
       try {
-        writer.writeRecord(
-          new String[] {
-            "nTripsInPattern",
-            "frequency",
-            "cumulativePatterns",
-            "empiricalDistPatterns",
-            "cumulativeTrips",
-            "empiricalDistTrips",
-          }
-        );
+        writer.writeRecord(new String[] {
+          "nTripsInPattern",
+          "frequency",
+          "cumulativePatterns",
+          "empiricalDistPatterns",
+          "cumulativeTrips",
+          "empiricalDistTrips",
+        });
         Collection<TripPattern> patterns = transitRepository.getAllTripPatterns();
         Multiset<Integer> counts = TreeMultiset.create();
         int nPatterns = patterns.size();
@@ -243,16 +241,14 @@ public class GraphStats {
         for (Multiset.Entry<Integer> count : counts.entrySet()) {
           cPatterns += count.getCount();
           cTrips += count.getCount() * count.getElement();
-          writer.writeRecord(
-            new String[] {
-              count.getElement().toString(),
-              Integer.toString(count.getCount()),
-              Integer.toString(cPatterns),
-              Double.toString(cPatterns / (double) nPatterns),
-              Integer.toString(cTrips),
-              Double.toString(cTrips / (double) nTrips),
-            }
-          );
+          writer.writeRecord(new String[] {
+            count.getElement().toString(),
+            Integer.toString(count.getCount()),
+            Integer.toString(cPatterns),
+            Double.toString(cPatterns / (double) nPatterns),
+            Integer.toString(cTrips),
+            Double.toString(cTrips / (double) nTrips),
+          });
         }
       } catch (IOException e) {
         LOG.error("Exception writing CSV: {}", e.getMessage());

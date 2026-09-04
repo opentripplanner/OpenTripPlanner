@@ -36,9 +36,7 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     );
   }
 
-  public static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
-    T
-  > ofCompareC1RelaxedOnC2Dominance(
+  public static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<T> ofCompareC1RelaxedOnC2Dominance(
     final RelaxFunction relaxC1,
     final DominanceFunction c2DominanceFunction
   ) {
@@ -82,7 +80,7 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   private static <T extends McStopArrival<?>> boolean compareC1(T l, T r) {
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l.arrivalTime() < r.arrivalTime() || l.round() < r.round() || l.c1() < r.c1());
+    return l.arrivalTime() < r.arrivalTime() || l.round() < r.round() || l.c1() < r.c1();
   }
 
   /**

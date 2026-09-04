@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>274</otp.serialization.version.id>
+        <otp.serialization.version.id>276</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.5</geotools.version>
@@ -69,7 +69,7 @@
         <junit.version>6.1.2</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.6.1</logback.version>
+        <logback.version>1.6.3</logback.version>
         <lucene.version>10.5.0</lucene.version>
         <micrometer.version>1.17.1</micrometer.version>
         <netex-java-model.version>2.0.15.3</netex-java-model.version>
@@ -90,8 +90,8 @@
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
              other; prettier-plugin-java only supports a limited range of prettier versions. -->
-        <prettier.version>3.8.3</prettier.version>
-        <prettier.java.version>2.7.7</prettier.java.version>
+        <prettier.version>3.9.6</prettier.version>
+        <prettier.java.version>2.10.3</prettier.java.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>

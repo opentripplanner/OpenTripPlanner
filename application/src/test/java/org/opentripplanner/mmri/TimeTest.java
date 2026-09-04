@@ -20,7 +20,7 @@ public class TimeTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388530980000L, 1388531040000L, "1g2", "1g1", null);
+    validateLeg(leg, 1388530980000L, 1388531040000L, "1g2", "1g1");
 
     assertEquals("Stop 1g1 ~ BUS bus 0:03 0:04 ~ Stop 1g2 [C₁90]", itinerary.toStr());
   }
@@ -31,7 +31,7 @@ public class TimeTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388530860000L, 1388530920000L, "1g2", "1g1", null);
+    validateLeg(leg, 1388530860000L, 1388530920000L, "1g2", "1g1");
 
     assertEquals("Stop 1g1 ~ BUS bus 0:01 0:02 ~ Stop 1g2 [C₁90]", itinerary.toStr());
   }
@@ -42,7 +42,7 @@ public class TimeTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388703780000L, 1388703840000L, "1g2", "1g1", null);
+    validateLeg(leg, 1388703780000L, 1388703840000L, "1g2", "1g1");
 
     assertEquals("Stop 1g1 ~ BUS bus 0:03 0:04 ~ Stop 1g2 [C₁90]", itinerary.toStr());
   }
@@ -53,7 +53,7 @@ public class TimeTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388703660000L, 1388703720000L, "1g2", "1g1", null);
+    validateLeg(leg, 1388703660000L, 1388703720000L, "1g2", "1g1");
 
     assertEquals("Stop 1g1 ~ BUS bus 0:01 0:02 ~ Stop 1g2 [C₁90]", itinerary.toStr());
   }

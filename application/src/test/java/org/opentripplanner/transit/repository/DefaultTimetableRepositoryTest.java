@@ -200,7 +200,10 @@ public class DefaultTimetableRepositoryTest {
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .withScheduledTimeTableBuilder(builder ->
         builder.addTripTimes(
-          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes(new int[] { 0, 1 }).build()
+          ScheduledTripTimes.of()
+            .withTrip(trip)
+            .withDepartureTimes(new int[] { 0, 1 })
+            .build()
         )
       )
       .build();

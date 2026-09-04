@@ -102,9 +102,10 @@ public class TextStroke implements Stroke {
               float x = lastX + next * dx * r;
               float y = lastY + next * dy * r;
               float advance = nextAdvance;
-              nextAdvance = currentChar < length - 1
-                ? glyphVector.getGlyphMetrics(currentChar + 1).getAdvance() * 0.5f
-                : 0;
+              nextAdvance =
+                currentChar < length - 1
+                  ? glyphVector.getGlyphMetrics(currentChar + 1).getAdvance() * 0.5f
+                  : 0;
               t.setToTranslation(x, y);
               t.rotate(angle);
               t.translate(-px - advance, -py + (height * factor) / 2.0f);

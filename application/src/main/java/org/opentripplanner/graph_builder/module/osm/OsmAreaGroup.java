@@ -156,8 +156,7 @@ class OsmAreaGroup {
               boolean blocksTraversal =
                 crossablePermissions.intersection(
                   Objects.requireNonNull(barrier).getPermission()
-                ) !=
-                crossablePermissions;
+                ) != crossablePermissions;
               boolean sharesEdgeWithBothAreas = !CollectionUtils.intersection(
                 barriersForArea.get(area1).get(barrier),
                 barriersForArea.get(area2).get(barrier)
@@ -270,7 +269,8 @@ class OsmAreaGroup {
    */
   public long cacheKey() {
     long hash = 1L;
-    long[] entityIds = this.areas.stream()
+    long[] entityIds = this.areas
+      .stream()
       .map(a -> a.parent)
       .mapToLong(OsmEntity::getId)
       .sorted()

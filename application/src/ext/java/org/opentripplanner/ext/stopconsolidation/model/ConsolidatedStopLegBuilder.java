@@ -6,7 +6,8 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class ConsolidatedStopLegBuilder
-  extends ScheduledTransitLegBuilder<ConsolidatedStopLegBuilder> {
+  extends ScheduledTransitLegBuilder<ConsolidatedStopLegBuilder>
+{
 
   private Place from;
   private Place to;

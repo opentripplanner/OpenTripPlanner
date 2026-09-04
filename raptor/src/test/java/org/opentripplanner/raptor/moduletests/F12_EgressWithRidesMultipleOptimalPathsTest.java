@@ -69,17 +69,15 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Free ~ A")
-      .withTimetables(
-        """
-        A     C
-        0:04  0:20
-        --
-        A     B
-        0:05  0:16
-        """
-      );
+    data.access("Free ~ A").withTimetables(
+      """
+      A     C
+      0:04  0:20
+      --
+      A     B
+      0:05  0:16
+      """
+    );
 
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));

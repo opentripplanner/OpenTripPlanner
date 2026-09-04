@@ -8,7 +8,8 @@ import org.opentripplanner.street.search.TraverseMode;
  * The duration of traversing an intersection is constant.
  */
 public class ConstantIntersectionTraversalCalculator
-  extends AbstractIntersectionTraversalCalculator {
+  extends AbstractIntersectionTraversalCalculator
+{
 
   private final double duration;
 

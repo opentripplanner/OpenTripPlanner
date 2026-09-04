@@ -30,7 +30,7 @@ public class InclinedEdgeLevelInfo implements Serializable {
       edge.getToVertex() instanceof OsmVertex toVertex &&
       edge.getFromVertex() instanceof OsmVertex fromVertex &&
       ((lowerVertexInfo.osmNodeId() == fromVertex.nodeId() &&
-          upperVertexInfo.osmNodeId() == toVertex.nodeId()) ||
+        upperVertexInfo.osmNodeId() == toVertex.nodeId()) ||
         (lowerVertexInfo.osmNodeId() == toVertex.nodeId() &&
           upperVertexInfo.osmNodeId() == fromVertex.nodeId()))
     );

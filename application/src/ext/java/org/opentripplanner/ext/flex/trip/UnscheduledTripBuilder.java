@@ -6,7 +6,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 public class UnscheduledTripBuilder
-  extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder> {
+  extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder>
+{
 
   private List<StopTime> stopTimes;
   private TimePenalty timePenalty = TimePenalty.NONE;

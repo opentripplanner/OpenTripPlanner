@@ -315,7 +315,9 @@ public class GraphSerializationTest {
       .build();
     repository.addEmpiricalDelayServiceCalendar(FEED_ID, cal);
     repository.addTripDelays(
-      TripDelays.of(A_TRIP_ID).with("serviceId", List.of(new EmpiricalDelay(2, 19))).build()
+      TripDelays.of(A_TRIP_ID)
+        .with("serviceId", List.of(new EmpiricalDelay(2, 19)))
+        .build()
     );
     return repository;
   }

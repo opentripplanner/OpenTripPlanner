@@ -4,7 +4,8 @@ package org.opentripplanner.transit.model.site;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 public final class BoardingAreaBuilder
-  extends StationElementBuilder<BoardingArea, BoardingAreaBuilder> {
+  extends StationElementBuilder<BoardingArea, BoardingAreaBuilder>
+{
 
   private RegularStop parentStop;
 

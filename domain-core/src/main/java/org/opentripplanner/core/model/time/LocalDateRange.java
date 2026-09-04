@@ -236,6 +236,6 @@ public final class LocalDateRange implements Serializable {
   public String toString() {
     var start = ServiceDateUtils.toString(inclusiveStart);
     var end = ServiceDateUtils.toString(exclusiveEnd);
-    return ("[" + start + ", " + end + ")");
+    return "[" + start + ", " + end + ")";
   }
 }

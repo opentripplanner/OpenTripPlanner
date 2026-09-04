@@ -9,8 +9,8 @@ import org.opentripplanner.astar.spi.SearchTerminationStrategy;
  * some criteria has been found. For example it can be used to limit a search to a maximum number of
  * stops.
  */
-public class MaxCountTerminationStrategy<State extends AStarState<State, ?, ?>>
-  implements SearchTerminationStrategy<State> {
+public class MaxCountTerminationStrategy<State extends AStarState<State, ?, ?>> implements
+  SearchTerminationStrategy<State> {
 
   private final int maxCount;
   private final Predicate<State> shouldIncreaseCount;

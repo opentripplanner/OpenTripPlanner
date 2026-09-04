@@ -68,7 +68,7 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
 
     requestBuilder.withMultiCriteria(mc ->
       mc
-        .withRelaxC1(value -> ((value * 110) / 100))
+        .withRelaxC1(value -> (value * 110) / 100)
         .withTransitPriorityCalculator(new TestGroupPriorityCalculator())
     );
 

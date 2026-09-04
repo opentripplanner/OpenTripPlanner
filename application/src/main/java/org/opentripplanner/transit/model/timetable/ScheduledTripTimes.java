@@ -134,7 +134,9 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public ScheduledTripTimes withAdjustedTimes(Duration shiftDelta) {
-    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
+    return copyOfNoDuplication()
+      .plusTimeShift((int) shiftDelta.toSeconds())
+      .build();
   }
 
   @Override
@@ -275,7 +277,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   @Override
   @Nullable
   public I18NString getHeadsign(final int stopPos) {
-    return (headsigns != null && headsigns[stopPos] != null)
+    return headsigns != null && headsigns[stopPos] != null
       ? headsigns[stopPos]
       : getTrip().getHeadsign();
   }

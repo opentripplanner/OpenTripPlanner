@@ -11,7 +11,8 @@ import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
  * purging expired data).
  */
 public class TimetableRepositoryLifecycle
-  implements RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository> {
+  implements RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository>
+{
 
   private final TimetableRepository buffer;
   private final boolean purgeExpiredData;

@@ -4,13 +4,13 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -19,7 +19,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
@@ -58,9 +57,6 @@ import org.slf4j.LoggerFactory;
 public class Graph implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-
-  /** Attaches text notes to street edges, which do not affect routing. */
-  public final StreetNotesService streetNotesService = new StreetNotesService();
 
   // Ideally we could just get rid of vertex labels, but they're used in tests and graph building.
   private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
@@ -143,7 +139,6 @@ public class Graph implements Serializable {
   }
 
   public void removeEdge(Edge e, Scope scope) {
-    streetNotesService.removeStaticNotes(e);
     e.remove();
     if (streetIndex != null) {
       streetIndex.remove(e, scope);
@@ -204,18 +199,21 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Return all the edges in the graph. Derived from vertices on demand.
+   * Lazily iterate over all the edges in the graph, derived from vertices on demand, without
+   * materializing an intermediate collection. Can be reused/iterated over multiple times.
    * <p>
-   * Note: Under concurrent modification this method may return edges that have been removed from
-   * the graph or not return edges that have been added to the graph after this method has been
-   * called.
+   * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
+   * required (e.g. serialization).
+   * <p>
+   * THREAD SAFTY - This method does not support concurent use. The behavior is undefined.
    */
-  public Collection<Edge> listEdges() {
-    Set<Edge> edges = new HashSet<>();
-    for (Vertex v : this.getVertices()) {
-      edges.addAll(v.getOutgoing());
-    }
-    return edges;
+  public Iterable<Edge> listEdges() {
+    return () ->
+      this.vertices
+        .values()
+        .stream()
+        .flatMap(v -> v.getOutgoing().stream())
+        .iterator();
   }
 
   /**
@@ -230,15 +228,13 @@ public class Graph implements Serializable {
    * called.
    */
   public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
-    return this.vertices.values()
-      .stream()
-      .flatMap(v -> v.getOutgoing().stream())
+    return StreamSupport.stream(listEdges().spliterator(), false)
       .filter(clazz::isInstance)
       .map(clazz::cast)::iterator;
   }
 
   public boolean containsVertex(Vertex v) {
-    return (v != null) && vertices.get(v.getLabel()) == v;
+    return v != null && vertices.get(v.getLabel()) == v;
   }
 
   public void remove(Vertex vertex) {

@@ -10,5 +10,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * @param id The id of the trip
  * @param serviceDate The service date of the trip
  */
-public record TripOnDateReferenceWithTripAndDate(FeedScopedId id, LocalDate serviceDate) implements
-  TripOnDateReference {}
+public record TripOnDateReferenceWithTripAndDate(
+  FeedScopedId id,
+  LocalDate serviceDate
+) implements TripOnDateReference {}

@@ -60,7 +60,7 @@ class GbfsVehicleStatusMapper {
         vehicle.getVehicleTypeId() != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
-        RentalVehicleType.PropulsionType.HUMAN &&
+          RentalVehicleType.PropulsionType.HUMAN &&
         rangeMeters == null
       ) {
         return null;

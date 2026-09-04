@@ -151,8 +151,7 @@ class ElevatorProcessor {
           .stream()
           .map(key -> verticeLevels.get(key))
           .distinct()
-          .count() ==
-        1
+          .count() == 1
       ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }

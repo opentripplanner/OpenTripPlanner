@@ -47,7 +47,8 @@ public class GraphQLTypes {
     public GraphQLAgencyAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLAgencyAlertType
                 ? item
@@ -171,6 +172,139 @@ public class GraphQLTypes {
     WARNING,
   }
 
+  public static class GraphQLAlertsFilterInput {
+
+    private List<GraphQLAlertsFilterSelectInput> exclude;
+    private List<GraphQLAlertsFilterSelectInput> include;
+
+    public GraphQLAlertsFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("exclude") != null) {
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("include") != null) {
+          this.include = ((List<Map<String, Object>>) args.get("include"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLAlertsFilterSelectInput> getGraphQLExclude() {
+      return this.exclude;
+    }
+
+    public List<GraphQLAlertsFilterSelectInput> getGraphQLInclude() {
+      return this.include;
+    }
+
+    public void setGraphQLExclude(List<GraphQLAlertsFilterSelectInput> exclude) {
+      this.exclude = exclude;
+    }
+
+    public void setGraphQLInclude(List<GraphQLAlertsFilterSelectInput> include) {
+      this.include = include;
+    }
+  }
+
+  public static class GraphQLAlertsFilterSelectInput {
+
+    private List<GraphQLOffsetDateTimeRangeInput> activePeriods;
+    private List<GraphQLAlertCauseType> causes;
+    private List<GraphQLAlertEffectType> effects;
+    private List<String> feeds;
+    private List<GraphQLAlertSeverityLevelType> severityLevels;
+
+    public GraphQLAlertsFilterSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("activePeriods") != null) {
+          this.activePeriods = ((List<Map<String, Object>>) args.get("activePeriods"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("causes") != null) {
+          this.causes = ((List<Object>) args.get("causes"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLAlertCauseType
+                ? item
+                : GraphQLAlertCauseType.valueOf((String) item)
+            )
+            .map(GraphQLAlertCauseType.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("effects") != null) {
+          this.effects = ((List<Object>) args.get("effects"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLAlertEffectType
+                ? item
+                : GraphQLAlertEffectType.valueOf((String) item)
+            )
+            .map(GraphQLAlertEffectType.class::cast)
+            .collect(Collectors.toList());
+        }
+        this.feeds = (List<String>) args.get("feeds");
+        if (args.get("severityLevels") != null) {
+          this.severityLevels = ((List<Object>) args.get("severityLevels"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLAlertSeverityLevelType
+                ? item
+                : GraphQLAlertSeverityLevelType.valueOf((String) item)
+            )
+            .map(GraphQLAlertSeverityLevelType.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLOffsetDateTimeRangeInput> getGraphQLActivePeriods() {
+      return this.activePeriods;
+    }
+
+    public List<GraphQLAlertCauseType> getGraphQLCauses() {
+      return this.causes;
+    }
+
+    public List<GraphQLAlertEffectType> getGraphQLEffects() {
+      return this.effects;
+    }
+
+    public List<String> getGraphQLFeeds() {
+      return this.feeds;
+    }
+
+    public List<GraphQLAlertSeverityLevelType> getGraphQLSeverityLevels() {
+      return this.severityLevels;
+    }
+
+    public void setGraphQLActivePeriods(List<GraphQLOffsetDateTimeRangeInput> activePeriods) {
+      this.activePeriods = activePeriods;
+    }
+
+    public void setGraphQLCauses(List<GraphQLAlertCauseType> causes) {
+      this.causes = causes;
+    }
+
+    public void setGraphQLEffects(List<GraphQLAlertEffectType> effects) {
+      this.effects = effects;
+    }
+
+    public void setGraphQLFeeds(List<String> feeds) {
+      this.feeds = feeds;
+    }
+
+    public void setGraphQLSeverityLevels(List<GraphQLAlertSeverityLevelType> severityLevels) {
+      this.severityLevels = severityLevels;
+    }
+  }
+
   public static class GraphQLAlightPreferencesInput {
 
     private java.time.Duration slack;
@@ -209,12 +343,14 @@ public class GraphQLTypes {
     public GraphQLBicycleParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
@@ -515,12 +651,14 @@ public class GraphQLTypes {
     public GraphQLCanceledTripsFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("exclude") != null) {
-          this.exclude = ((List<Map<String, Object>>) args.get("exclude")).stream()
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsFilterSelectInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("include") != null) {
-          this.include = ((List<Map<String, Object>>) args.get("include")).stream()
+          this.include = ((List<Map<String, Object>>) args.get("include"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsFilterSelectInput(o))
             .collect(Collectors.toList());
         }
@@ -553,7 +691,8 @@ public class GraphQLTypes {
     public GraphQLCanceledTripsFilterSelectInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("modes") != null) {
-          this.modes = ((List<Object>) args.get("modes")).stream()
+          this.modes = ((List<Object>) args.get("modes"))
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -561,16 +700,14 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("runningTimeRanges") != null) {
-          this.runningTimeRanges = ((List<Map<String, Object>>) args.get(
-              "runningTimeRanges"
-            )).stream()
+          this.runningTimeRanges = ((List<Map<String, Object>>) args.get("runningTimeRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("serviceDateRanges") != null) {
-          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
-              "serviceDateRanges"
-            )).stream()
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get("serviceDateRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
             .collect(Collectors.toList());
         }
@@ -612,12 +749,14 @@ public class GraphQLTypes {
     public GraphQLCanceledTripsSummaryFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("exclude") != null) {
-          this.exclude = ((List<Map<String, Object>>) args.get("exclude")).stream()
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsSummaryFilterSelectInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("include") != null) {
-          this.include = ((List<Map<String, Object>>) args.get("include")).stream()
+          this.include = ((List<Map<String, Object>>) args.get("include"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsSummaryFilterSelectInput(o))
             .collect(Collectors.toList());
         }
@@ -650,7 +789,8 @@ public class GraphQLTypes {
     public GraphQLCanceledTripsSummaryFilterSelectInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("modes") != null) {
-          this.modes = ((List<Object>) args.get("modes")).stream()
+          this.modes = ((List<Object>) args.get("modes"))
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -658,16 +798,14 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("runningTimeRanges") != null) {
-          this.runningTimeRanges = ((List<Map<String, Object>>) args.get(
-              "runningTimeRanges"
-            )).stream()
+          this.runningTimeRanges = ((List<Map<String, Object>>) args.get("runningTimeRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("serviceDateRanges") != null) {
-          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
-              "serviceDateRanges"
-            )).stream()
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get("serviceDateRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
             .collect(Collectors.toList());
         }
@@ -729,12 +867,14 @@ public class GraphQLTypes {
     public GraphQLCarParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
@@ -1076,7 +1216,8 @@ public class GraphQLTypes {
     public GraphQLFeedAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLFeedAlertType
                 ? item
@@ -1623,7 +1764,8 @@ public class GraphQLTypes {
     public GraphQLLegIntermediateStopsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("include") != null) {
-          this.include = ((List<Object>) args.get("include")).stream()
+          this.include = ((List<Object>) args.get("include"))
+            .stream()
             .map(item ->
               item instanceof GraphQLStopType ? item : GraphQLStopType.valueOf((String) item)
             )
@@ -1651,9 +1793,10 @@ public class GraphQLTypes {
     public GraphQLLegNextLegsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("destinationModesWithParentStation") != null) {
-          this.destinationModesWithParentStation = ((List<Object>) args.get(
-              "destinationModesWithParentStation"
-            )).stream()
+          this.destinationModesWithParentStation = (
+            (List<Object>) args.get("destinationModesWithParentStation")
+          )
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -1662,9 +1805,10 @@ public class GraphQLTypes {
         }
         this.numberOfLegs = (Integer) args.get("numberOfLegs");
         if (args.get("originModesWithParentStation") != null) {
-          this.originModesWithParentStation = ((List<Object>) args.get(
-              "originModesWithParentStation"
-            )).stream()
+          this.originModesWithParentStation = (
+            (List<Object>) args.get("originModesWithParentStation")
+          )
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -1712,9 +1856,10 @@ public class GraphQLTypes {
     public GraphQLLegPreviousLegsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("destinationModesWithParentStation") != null) {
-          this.destinationModesWithParentStation = ((List<Object>) args.get(
-              "destinationModesWithParentStation"
-            )).stream()
+          this.destinationModesWithParentStation = (
+            (List<Object>) args.get("destinationModesWithParentStation")
+          )
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -1723,9 +1868,10 @@ public class GraphQLTypes {
         }
         this.numberOfLegs = (Integer) args.get("numberOfLegs");
         if (args.get("originModesWithParentStation") != null) {
-          this.originModesWithParentStation = ((List<Object>) args.get(
-              "originModesWithParentStation"
-            )).stream()
+          this.originModesWithParentStation = (
+            (List<Object>) args.get("originModesWithParentStation")
+          )
+            .stream()
             .map(item ->
               item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
             )
@@ -1931,12 +2077,14 @@ public class GraphQLTypes {
     public GraphQLParkingFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("not") != null) {
-          this.not = ((List<Map<String, Object>>) args.get("not")).stream()
+          this.not = ((List<Map<String, Object>>) args.get("not"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterOperationInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("select") != null) {
-          this.select = ((List<Map<String, Object>>) args.get("select")).stream()
+          this.select = ((List<Map<String, Object>>) args.get("select"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterOperationInput(o))
             .collect(Collectors.toList());
         }
@@ -1986,7 +2134,8 @@ public class GraphQLTypes {
     public GraphQLPatternAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLPatternAlertType
                 ? item
@@ -2015,16 +2164,14 @@ public class GraphQLTypes {
     public GraphQLPatternCanceledTripsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("runningTimeRanges") != null) {
-          this.runningTimeRanges = ((List<Map<String, Object>>) args.get(
-              "runningTimeRanges"
-            )).stream()
+          this.runningTimeRanges = ((List<Map<String, Object>>) args.get("runningTimeRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("serviceDateRanges") != null) {
-          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
-              "serviceDateRanges"
-            )).stream()
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get("serviceDateRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
             .collect(Collectors.toList());
         }
@@ -2341,7 +2488,8 @@ public class GraphQLTypes {
     public GraphQLPlanModesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("direct") != null) {
-          this.direct = ((List<Object>) args.get("direct")).stream()
+          this.direct = ((List<Object>) args.get("direct"))
+            .stream()
             .map(item ->
               item instanceof GraphQLPlanDirectMode
                 ? item
@@ -2598,7 +2746,8 @@ public class GraphQLTypes {
     public GraphQLPlanTransitModesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("access") != null) {
-          this.access = ((List<Object>) args.get("access")).stream()
+          this.access = ((List<Object>) args.get("access"))
+            .stream()
             .map(item ->
               item instanceof GraphQLPlanAccessMode
                 ? item
@@ -2608,7 +2757,8 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("egress") != null) {
-          this.egress = ((List<Object>) args.get("egress")).stream()
+          this.egress = ((List<Object>) args.get("egress"))
+            .stream()
             .map(item ->
               item instanceof GraphQLPlanEgressMode
                 ? item
@@ -2618,7 +2768,8 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("transfer") != null) {
-          this.transfer = ((List<Object>) args.get("transfer")).stream()
+          this.transfer = ((List<Object>) args.get("transfer"))
+            .stream()
             .map(item ->
               item instanceof GraphQLPlanTransferMode
                 ? item
@@ -2628,7 +2779,8 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("transit") != null) {
-          this.transit = ((List<Map<String, Object>>) args.get("transit")).stream()
+          this.transit = ((List<Map<String, Object>>) args.get("transit"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLPlanTransitModePreferenceInput(o))
             .collect(Collectors.toList());
         }
@@ -2809,7 +2961,8 @@ public class GraphQLTypes {
     public GraphQLQueryTypeAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("cause") != null) {
-          this.cause = ((List<Object>) args.get("cause")).stream()
+          this.cause = ((List<Object>) args.get("cause"))
+            .stream()
             .map(item ->
               item instanceof GraphQLAlertCauseType
                 ? item
@@ -2819,7 +2972,8 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("effect") != null) {
-          this.effect = ((List<Object>) args.get("effect")).stream()
+          this.effect = ((List<Object>) args.get("effect"))
+            .stream()
             .map(item ->
               item instanceof GraphQLAlertEffectType
                 ? item
@@ -2831,7 +2985,8 @@ public class GraphQLTypes {
         this.feeds = (List<String>) args.get("feeds");
         this.route = (List<String>) args.get("route");
         if (args.get("severityLevel") != null) {
-          this.severityLevel = ((List<Object>) args.get("severityLevel")).stream()
+          this.severityLevel = ((List<Object>) args.get("severityLevel"))
+            .stream()
             .map(item ->
               item instanceof GraphQLAlertSeverityLevelType
                 ? item
@@ -2890,6 +3045,70 @@ public class GraphQLTypes {
 
     public void setGraphQLStop(List<String> stop) {
       this.stop = stop;
+    }
+  }
+
+  public static class GraphQLQueryTypeAlertsConnectionArgs {
+
+    private String after;
+    private String before;
+    private List<GraphQLAlertsFilterInput> filters;
+    private Integer first;
+    private Integer last;
+
+    public GraphQLQueryTypeAlertsConnectionArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        if (args.get("filters") != null) {
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertsFilterInput(o))
+            .collect(Collectors.toList());
+        }
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+      }
+    }
+
+    public String getGraphQLAfter() {
+      return this.after;
+    }
+
+    public String getGraphQLBefore() {
+      return this.before;
+    }
+
+    public List<GraphQLAlertsFilterInput> getGraphQLFilters() {
+      return this.filters;
+    }
+
+    public Integer getGraphQLFirst() {
+      return this.first;
+    }
+
+    public Integer getGraphQLLast() {
+      return this.last;
+    }
+
+    public void setGraphQLAfter(String after) {
+      this.after = after;
+    }
+
+    public void setGraphQLBefore(String before) {
+      this.before = before;
+    }
+
+    public void setGraphQLFilters(List<GraphQLAlertsFilterInput> filters) {
+      this.filters = filters;
+    }
+
+    public void setGraphQLFirst(Integer first) {
+      this.first = first;
+    }
+
+    public void setGraphQLLast(Integer last) {
+      this.last = last;
     }
   }
 
@@ -2963,7 +3182,8 @@ public class GraphQLTypes {
         this.after = (String) args.get("after");
         this.before = (String) args.get("before");
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsFilterInput(o))
             .collect(Collectors.toList());
         }
@@ -3020,7 +3240,8 @@ public class GraphQLTypes {
     public GraphQLQueryTypeCanceledTripsSummaryArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLCanceledTripsSummaryFilterInput(o))
             .collect(Collectors.toList());
         }
@@ -3312,14 +3533,16 @@ public class GraphQLTypes {
           (Map<String, Object>) args.get("filterByIds")
         );
         if (args.get("filterByModes") != null) {
-          this.filterByModes = ((List<Object>) args.get("filterByModes")).stream()
+          this.filterByModes = ((List<Object>) args.get("filterByModes"))
+            .stream()
             .map(item -> item instanceof GraphQLMode ? item : GraphQLMode.valueOf((String) item))
             .map(GraphQLMode.class::cast)
             .collect(Collectors.toList());
         }
         this.filterByNetwork = (List<String>) args.get("filterByNetwork");
         if (args.get("filterByPlaceTypes") != null) {
-          this.filterByPlaceTypes = ((List<Object>) args.get("filterByPlaceTypes")).stream()
+          this.filterByPlaceTypes = ((List<Object>) args.get("filterByPlaceTypes"))
+            .stream()
             .map(item ->
               item instanceof GraphQLFilterPlaceType
                 ? item
@@ -3593,9 +3816,8 @@ public class GraphQLTypes {
         this.heuristicStepsPerMainStep = (Integer) args.get("heuristicStepsPerMainStep");
         this.ignoreRealtimeUpdates = (Boolean) args.get("ignoreRealtimeUpdates");
         if (args.get("intermediatePlaces") != null) {
-          this.intermediatePlaces = ((List<Map<String, Object>>) args.get(
-              "intermediatePlaces"
-            )).stream()
+          this.intermediatePlaces = ((List<Map<String, Object>>) args.get("intermediatePlaces"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLInputCoordinatesInput(o))
             .collect(Collectors.toList());
         }
@@ -3633,7 +3855,8 @@ public class GraphQLTypes {
         this.toPlace = (String) args.get("toPlace");
         this.transferPenalty = (Integer) args.get("transferPenalty");
         if (args.get("transportModes") != null) {
-          this.transportModes = ((List<Map<String, Object>>) args.get("transportModes")).stream()
+          this.transportModes = ((List<Map<String, Object>>) args.get("transportModes"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLTransportModeInput(o))
             .collect(Collectors.toList());
         }
@@ -3642,7 +3865,8 @@ public class GraphQLTypes {
           (Map<String, Object>) args.get("unpreferred")
         );
         if (args.get("via") != null) {
-          this.via = ((List<Map<String, Object>>) args.get("via")).stream()
+          this.via = ((List<Map<String, Object>>) args.get("via"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLPlanViaLocationInput(o))
             .collect(Collectors.toList());
         }
@@ -4215,7 +4439,8 @@ public class GraphQLTypes {
         );
         this.searchWindow = (java.time.Duration) args.get("searchWindow");
         if (args.get("via") != null) {
-          this.via = ((List<Map<String, Object>>) args.get("via")).stream()
+          this.via = ((List<Map<String, Object>>) args.get("via"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLPlanViaLocationInput(o))
             .collect(Collectors.toList());
         }
@@ -4362,7 +4587,8 @@ public class GraphQLTypes {
     public GraphQLQueryTypeRentalVehiclesArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("formFactors") != null) {
-          this.formFactors = ((List<Object>) args.get("formFactors")).stream()
+          this.formFactors = ((List<Object>) args.get("formFactors"))
+            .stream()
             .map(item ->
               item instanceof GraphQLFormFactor ? item : GraphQLFormFactor.valueOf((String) item)
             )
@@ -4426,7 +4652,8 @@ public class GraphQLTypes {
           (Map<String, Object>) args.get("serviceDates")
         );
         if (args.get("transportModes") != null) {
-          this.transportModes = ((List<Object>) args.get("transportModes")).stream()
+          this.transportModes = ((List<Object>) args.get("transportModes"))
+            .stream()
             .map(item -> item instanceof GraphQLMode ? item : GraphQLMode.valueOf((String) item))
             .map(GraphQLMode.class::cast)
             .collect(Collectors.toList());
@@ -4953,7 +5180,8 @@ public class GraphQLTypes {
     public GraphQLRouteAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLRouteAlertType
                 ? item
@@ -5185,7 +5413,8 @@ public class GraphQLTypes {
     public GraphQLStopAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLStopAlertType
                 ? item
@@ -5222,14 +5451,14 @@ public class GraphQLTypes {
           );
         }
         if (args.get("serviceDateRanges") != null) {
-          this.serviceDateRanges = ((List<Map<String, Object>>) args.get(
-              "serviceDateRanges"
-            )).stream()
+          this.serviceDateRanges = ((List<Map<String, Object>>) args.get("serviceDateRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLLocalDateRangeInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("timeRanges") != null) {
-          this.timeRanges = ((List<Map<String, Object>>) args.get("timeRanges")).stream()
+          this.timeRanges = ((List<Map<String, Object>>) args.get("timeRanges"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLOffsetDateTimeRangeInput(o))
             .collect(Collectors.toList());
         }
@@ -5716,12 +5945,14 @@ public class GraphQLTypes {
     public GraphQLTransitFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("exclude") != null) {
-          this.exclude = ((List<Map<String, Object>>) args.get("exclude")).stream()
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLTransitFilterSelectInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("include") != null) {
-          this.include = ((List<Map<String, Object>>) args.get("include")).stream()
+          this.include = ((List<Map<String, Object>>) args.get("include"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLTransitFilterSelectInput(o))
             .collect(Collectors.toList());
         }
@@ -5830,7 +6061,8 @@ public class GraphQLTypes {
         this.alight = new GraphQLAlightPreferencesInput((Map<String, Object>) args.get("alight"));
         this.board = new GraphQLBoardPreferencesInput((Map<String, Object>) args.get("board"));
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLTransitFilterInput(o))
             .collect(Collectors.toList());
         }
@@ -6019,7 +6251,8 @@ public class GraphQLTypes {
     public GraphQLTripAlertsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("types") != null) {
-          this.types = ((List<Object>) args.get("types")).stream()
+          this.types = ((List<Object>) args.get("types"))
+            .stream()
             .map(item ->
               item instanceof GraphQLTripAlertType
                 ? item
@@ -6192,12 +6425,14 @@ public class GraphQLTypes {
     public GraphQLVehicleParkingInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+          this.filters = ((List<Map<String, Object>>) args.get("filters"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred"))
+            .stream()
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }

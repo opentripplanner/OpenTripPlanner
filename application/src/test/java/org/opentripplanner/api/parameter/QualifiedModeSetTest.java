@@ -85,9 +85,11 @@ class QualifiedModeSetTest {
 
   @Test
   void transitAndBikeRental() {
-    QualifiedModeSet modeSet = new QualifiedModeSet(
-      new String[] { "WALK", "RAIL", "BICYCLE_RENT" }
-    );
+    QualifiedModeSet modeSet = new QualifiedModeSet(new String[] {
+      "WALK",
+      "RAIL",
+      "BICYCLE_RENT",
+    });
     assertEquals(
       Set.of(
         new QualifiedMode("WALK"),

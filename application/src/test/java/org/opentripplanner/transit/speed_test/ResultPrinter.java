@@ -34,7 +34,7 @@ class ResultPrinter {
 
   public static String headerLine(String label) {
     // Make a header width is 100
-    int prefixLen = (100 - label.length() - 4);
+    int prefixLen = 100 - label.length() - 4;
     var buf = new StringBuilder(100);
     buf.append("- ".repeat(prefixLen / 2));
     if (label.length() % 2 == 1) {
@@ -193,7 +193,7 @@ class ResultPrinter {
   }
 
   private static String str(long value) {
-    return value < 10_000 ? Long.toString(value) : (value / 1000) + "'";
+    return value < 10_000 ? Long.toString(value) : value / 1000 + "'";
   }
 
   private static String formatLine(String label, int labelWidth, String column) {
@@ -235,6 +235,6 @@ class ResultPrinter {
   }
 
   private static String logLine(boolean enable, String label, String formatValues, Object... args) {
-    return enable ? (String.format("%n%-20s: ", label) + String.format(formatValues, args)) : "";
+    return enable ? String.format("%n%-20s: ", label) + String.format(formatValues, args) : "";
   }
 }

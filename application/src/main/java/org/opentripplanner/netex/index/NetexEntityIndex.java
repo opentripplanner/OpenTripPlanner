@@ -224,9 +224,10 @@ public class NetexEntityIndex {
       public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
         GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
 
-        String networkId = groupOfLines == null
-          ? groupOfLineOrNetworkId
-          : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
+        String networkId =
+          groupOfLines == null
+            ? groupOfLineOrNetworkId
+            : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
 
         return networkById.lookup(networkId);
       }
@@ -314,9 +315,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<
-        OperatingPeriod_VersionStructure
-      > getOperatingPeriodById() {
+      public ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById() {
         return operatingPeriodById;
       }
 
@@ -351,9 +350,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<
-        ServiceJourneyInterchange
-      > getServiceJourneyInterchangeById() {
+      public ReadOnlyHierarchicalMapById<ServiceJourneyInterchange> getServiceJourneyInterchangeById() {
         return serviceJourneyInterchangeById;
       }
 

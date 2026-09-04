@@ -157,7 +157,7 @@ public class ServiceDateUtils {
    * is negative.
    */
   public static int wholeDays(int seconds) {
-    return seconds < 0 ? 0 : (seconds / SECONDS_IN_A_DAY);
+    return seconds < 0 ? 0 : seconds / SECONDS_IN_A_DAY;
   }
 
   /**

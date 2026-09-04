@@ -16,7 +16,7 @@ public final class DirectionUtils {
   public static double getAzimuth(Coordinate a, Coordinate b) {
     double cosLat = Math.cos(Math.toRadians((a.y + b.y) / 2.0));
     // in degrees, we do not care about the units
-    double dY = (b.y - a.y);
+    double dY = b.y - a.y;
     // same
     double dX = (b.x - a.x) * cosLat;
     if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {

@@ -160,7 +160,9 @@ public class ToStringBuilderTest {
   public void addIntArray() {
     assertEquals(
       "ToStringBuilderTest{a: [1, 2, 3]}",
-      subject().addInts("a", new int[] { 1, 2, 3 }).toString()
+      subject()
+        .addInts("a", new int[] { 1, 2, 3 })
+        .toString()
     );
   }
 
@@ -169,11 +171,15 @@ public class ToStringBuilderTest {
     assertEquals("ToStringBuilderTest{a: null}", subject().addDoubles("a", null, 1.0).toString());
     assertEquals(
       "ToStringBuilderTest{b: [1.0, 3.0]}",
-      subject().addDoubles("b", new double[] { 1.0, 3.0 }, 1.0).toString()
+      subject()
+        .addDoubles("b", new double[] { 1.0, 3.0 }, 1.0)
+        .toString()
     );
     assertEquals(
       "ToStringBuilderTest{}",
-      subject().addDoubles("c", new double[] { 1.0, 1.0 }, 1.0).toString()
+      subject()
+        .addDoubles("c", new double[] { 1.0, 1.0 }, 1.0)
+        .toString()
     );
   }
 
@@ -183,7 +189,9 @@ public class ToStringBuilderTest {
     assertEquals("ToStringBuilderTest{}", subject().addCol("c", List.of()).toString());
     assertEquals(
       "ToStringBuilderTest{c: [1, 3.0, true]}",
-      subject().addCol("c", List.of(1, 3d, true)).toString()
+      subject()
+        .addCol("c", List.of(1, 3d, true))
+        .toString()
     );
   }
 
@@ -218,11 +226,15 @@ public class ToStringBuilderTest {
   public void addCollectionWithLimit() {
     assertEquals(
       "ToStringBuilderTest{c: [1, 2, 3]}",
-      subject().addCollection("c", List.of(1, 2, 3), 2).toString()
+      subject()
+        .addCollection("c", List.of(1, 2, 3), 2)
+        .toString()
     );
     assertEquals(
       "ToStringBuilderTest{c(2/4): [1, 2, ..]}",
-      subject().addCollection("c", List.of(1, 2, 3, 4), 2).toString()
+      subject()
+        .addCollection("c", List.of(1, 2, 3, 4), 2)
+        .toString()
     );
 
     // null element in list
@@ -240,7 +252,9 @@ public class ToStringBuilderTest {
   public void addColSize() {
     assertEquals(
       "ToStringBuilderTest{c: 3 items}",
-      subject().addColSize("c", List.of(1, 3, 7)).toString()
+      subject()
+        .addColSize("c", List.of(1, 3, 7))
+        .toString()
     );
     assertEquals("ToStringBuilderTest{}", subject().addColSize("c", null).toString());
   }
@@ -249,7 +263,9 @@ public class ToStringBuilderTest {
   public void addIntArraySize() {
     assertEquals(
       "ToStringBuilderTest{c: 2/3}",
-      subject().addIntArraySize("c", new int[] { 1, -1, 3 }, -1).toString()
+      subject()
+        .addIntArraySize("c", new int[] { 1, -1, 3 }, -1)
+        .toString()
     );
     assertEquals("ToStringBuilderTest{}", subject().addIntArraySize("c", null, -1).toString());
   }
@@ -342,7 +358,9 @@ public class ToStringBuilderTest {
     assertEquals("ToStringBuilderTest{d: 35s}", subject().addDurationSec("d", 35).toString());
     assertEquals(
       "ToStringBuilderTest{d: 1d2h50m45s}",
-      subject().addDurationSec("d", (int) D1d2h50m45s.toSeconds()).toString()
+      subject()
+        .addDurationSec("d", (int) D1d2h50m45s.toSeconds())
+        .toString()
     );
     assertEquals("ToStringBuilderTest{d: 2m5s}", subject().addDuration("d", D2m5s).toString());
     assertEquals("ToStringBuilderTest{}", subject().addDurationSec("d", 12, 12).toString());
