@@ -5,7 +5,7 @@ import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -104,13 +104,13 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
   }
   """;
 
-  private final TransmodelRequestContext requestContext;
+  private final TransmodelGraphQLRequestContext requestContext;
   private final GraphQLSchema schema;
   private final ModeCombinations modeCombinations;
 
   TransmodelWarmupQueryExecutor(
     GraphQLSchema schema,
-    TransmodelRequestContext requestContext,
+    TransmodelGraphQLRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {

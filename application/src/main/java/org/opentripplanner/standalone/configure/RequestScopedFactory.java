@@ -1,20 +1,25 @@
 package org.opentripplanner.standalone.configure;
 
 import dagger.Subcomponent;
+import graphql.schema.GraphQLSchema;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -23,6 +28,7 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -41,8 +47,6 @@ public interface RequestScopedFactory {
   TransactionScope transactionScope();
 
   TransitService transitService();
-
-  TransitAlertService transitAlertService();
 
   Graph graph();
 
@@ -79,9 +83,24 @@ public interface RequestScopedFactory {
 
   RoutingService routingService();
 
-  TransmodelRequestContext transmodelRequestContext();
+  TransitAlertService transitAlertService();
 
-  GtfsGraphQLRequestContext graphQLRequestContext();
+  FareService fareService();
+
+  RealtimeVehicleService realtimeVehicleService();
+
+  @Nullable
+  @GtfsSchema
+  GraphQLSchema gtfsSchema();
+
+  StreetLimitationParametersService streetLimitationParametersService();
+
+  @Nullable
+  EmpiricalDelayService empiricalDelayService();
+
+  TransmodelGraphQLRequestContext transmodelRequestContext();
+
+  GtfsGraphQLRequestContext gtfsRequestContext();
 
   @Subcomponent.Builder
   interface Builder {

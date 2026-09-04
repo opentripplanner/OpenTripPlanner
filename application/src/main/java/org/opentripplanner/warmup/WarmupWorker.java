@@ -47,7 +47,7 @@ class WarmupWorker implements Runnable {
         parameters.egressModes()
       );
       case GTFS -> new GtfsWarmupQueryExecutor(
-        requestScopedFactory.graphQLRequestContext(),
+        requestScopedFactory.gtfsRequestContext(),
         parameters.accessModes(),
         parameters.egressModes()
       );

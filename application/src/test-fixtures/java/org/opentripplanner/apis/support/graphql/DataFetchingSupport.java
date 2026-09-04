@@ -10,7 +10,7 @@ import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
-import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -45,7 +45,7 @@ public class DataFetchingSupport {
       .source(source)
       .arguments(arguments)
       .context(
-        new GtfsGraphQLRequestContext(
+        new TestGtfsGraphQLRequestContext(
           null,
           service,
           null,

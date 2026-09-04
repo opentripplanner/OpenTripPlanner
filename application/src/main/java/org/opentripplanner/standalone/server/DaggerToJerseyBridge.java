@@ -8,8 +8,8 @@ import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
@@ -82,8 +82,12 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);
     bridge(factory, RequestScopedFactory::routingService, RoutingService.class);
-    bridge(factory, RequestScopedFactory::transmodelRequestContext, TransmodelRequestContext.class);
-    bridge(factory, RequestScopedFactory::graphQLRequestContext, GtfsGraphQLRequestContext.class);
+    bridge(
+      factory,
+      RequestScopedFactory::transmodelRequestContext,
+      TransmodelGraphQLRequestContext.class
+    );
+    bridge(factory, RequestScopedFactory::gtfsRequestContext, GtfsGraphQLRequestContext.class);
   }
 
   /**

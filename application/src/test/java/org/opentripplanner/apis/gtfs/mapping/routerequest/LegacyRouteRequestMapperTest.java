@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
+import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
@@ -85,7 +86,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
         return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
       }
     );
-    CONTEXT = new GtfsGraphQLRequestContext(
+    CONTEXT = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
       new TransitAlertServiceImpl(),
