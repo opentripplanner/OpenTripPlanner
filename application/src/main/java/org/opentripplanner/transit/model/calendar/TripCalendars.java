@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,14 +74,23 @@ public class TripCalendars implements Serializable {
   }
 
   /**
+   * Create a new {@link TripCalendarsBuilder} with an unbounded period limit - see
+   * {@link #of(LocalDateRange)}.
+   */
+  public static TripCalendarsBuilder of() {
+    return of(LocalDateRange.ofUnbounded());
+  }
+
+  /**
    * Create a new {@link TripCalendarsBuilder} to accumulate scheduled calendar data - one
    * {@link TripCalendarsBuilder#addWeeklyCalendar} call per GTFS {@code calendar.txt} row, plus
    * one {@link TripCalendarsBuilder#addServiceDate}/{@link TripCalendarsBuilder#removeServiceDate}
    * call per {@code calendar_dates.txt} row (or NeTEx equivalent) - before producing an immutable
-   * {@link TripCalendars} instance via {@link TripCalendarsBuilder#build()}.
+   * {@link TripCalendars} instance via {@link TripCalendarsBuilder#build()}. Every date added is
+   * clipped to {@code periodLimit} as it is added.
    */
-  public static TripCalendarsBuilder of() {
-    return new TripCalendarsBuilder();
+  public static TripCalendarsBuilder of(LocalDateRange periodLimit) {
+    return new TripCalendarsBuilder(periodLimit);
   }
 
   /** An empty trip calendar, with no service ids registered. */

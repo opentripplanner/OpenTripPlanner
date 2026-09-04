@@ -33,11 +33,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
- * This test will create a Transit service builder and then limit the service period. The services
- * defined is in period [D0, D3] with D1 and D2 inside that period. Then the service pariod is
- * limited to [D0, D1] excluding services on D2 and D3.
+ * This test will create a Transit service builder with a limited service period. The services
+ * defined is in period [D0, D3] with D1 and D2 inside that period. The builder's period limit is
+ * [D2, D3], so calendar data outside of it is dropped as it is added.
  * <p>
- * All data related in the last part of the service should be removed after D1 until D3.
+ * All data related in the last part of the service should be removed after calling {@code build()}.
  */
 public class TransitDataImportBuilderLimitPeriodTest {
 
@@ -71,7 +71,11 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   @BeforeEach
   public void setUp() {
-    subject = new TransitDataImportBuilder(new SiteRepository(), DataImportIssueStore.NOOP);
+    subject = new TransitDataImportBuilder(
+      new SiteRepository(),
+      DataImportIssueStore.NOOP,
+      LocalDateRange.ofInclusiveEnd(D2, D3)
+    );
 
     // Add a service calendar that overlap with the period limit
     subject
@@ -113,11 +117,14 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   @Test
   public void testLimitPeriod() {
-    // Assert the test is set up as expected
-    assertEquals(
-      Set.of(SERVICE_C_IN, SERVICE_C_OUT, SERVICE_D_IN, SERVICE_D_OUT),
-      subject.tripCalendars().listServiceIds()
-    );
+    // Calendar data is filtered as it is added: SERVICE_C_OUT's period does not overlap [D2, D3],
+    // and SERVICE_D_OUT's only date (D1) falls outside it - neither was ever registered.
+    assertEquals(Set.of(SERVICE_C_IN, SERVICE_D_IN), subject.tripCalendars().listServiceIds());
+
+    // Trips/patterns referencing the dropped service ids are still present, until
+    // removeEntitiesWithInvalidReferences() below removes entities with no remaining valid
+    // service id (this is otherwise called by build(), but that also builds the SiteRepository,
+    // which this test's minimal fixture isn't set up for).
     assertEquals(4, subject.getTripsById().size());
     assertEquals(3, subject.getTripPatterns().get(STOP_PATTERN).size());
     assertEquals(2, patternInT1.scheduledTripsAsStream().count());
@@ -125,12 +132,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.scheduledTripsAsStream().count());
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
-    // Limit service to last half of month
-    subject.limitServiceDays(LocalDateRange.ofInclusiveEnd(D2, D3));
-
-    // Verify remaining service ids: SERVICE_C_OUT's period does not overlap [D2, D3], and
-    // SERVICE_D_OUT's only date (D1) falls outside it - both are dropped.
-    assertEquals(Set.of(SERVICE_C_IN, SERVICE_D_IN), subject.tripCalendars().listServiceIds());
+    subject.removeEntitiesWithInvalidReferences();
 
     // Verify trips
     EntityById<Trip> trips = subject.getTripsById();

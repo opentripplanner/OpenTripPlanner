@@ -124,7 +124,11 @@ public class GtfsModule implements GraphBuilderModule {
         feedIdsEncountered.put(feedId, gtfsBundle);
 
         GTFSToTransitDataImportMapper mapper = new GTFSToTransitDataImportMapper(
-          new TransitDataImportBuilder(transitRepository.getSiteRepository(), issueStore),
+          new TransitDataImportBuilder(
+            transitRepository.getSiteRepository(),
+            issueStore,
+            transitPeriodLimit
+          ),
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
@@ -134,8 +138,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         TransitDataImportBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
-
-        builder.limitServiceDays(transitPeriodLimit);
 
         builder
           .tripCalendars()

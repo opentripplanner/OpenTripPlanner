@@ -68,10 +68,9 @@ public class CalendarServiceBuilderTest {
     subject.registerDatesAndGetServiceId(Set.of(D1));
     subject.registerDatesAndGetServiceId(Set.of(D1, D2));
 
-    // When the transit period is limited to exclude D1
-    var calendarsBuilder = TripCalendars.of();
+    // When the calendars builder's period limit excludes D1
+    var calendarsBuilder = TripCalendars.of(LocalDateRange.ofInclusiveEnd(D2, D2));
     subject.addServiceCalendarsTo(calendarsBuilder);
-    calendarsBuilder.limitToPeriod(LocalDateRange.ofInclusiveEnd(D2, D2));
     var tripCalendars = calendarsBuilder.build();
 
     // Then the service that only ran on D1 is gone entirely, and the other one is trimmed to D2

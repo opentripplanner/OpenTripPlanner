@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,11 +19,18 @@ import org.opentripplanner.core.model.time.LocalDateRange;
  * {@link #addServiceDate}/{@link #removeServiceDate} call per {@code calendar_dates.txt} row (or
  * NeTEx equivalent) - before producing an immutable {@link TripCalendars}.
  * <p>
+ * Every date added is clipped to the {@code periodLimit} given at construction time. A weekly
+ * calendar whose period does not overlap {@code periodLimit} at all is dropped entirely; one that
+ * partially overlaps has its period intersected with it. A service date exception outside
+ * {@code periodLimit} is ignored.
+ * <p>
  * Unlike {@link TripCalendars} itself, this builder is a plain mutable accumulator: it is meant to
  * be queried (see {@link #listServiceIds()}, {@link #listServiceDates}, {@link #startDate()},
  * {@link #endDate()}) while a graph build module is still adding data to it, one feed at a time.
  */
 public class TripCalendarsBuilder {
+
+  private final LocalDateRange periodLimit;
 
   private final Map<FeedScopedId, WeeklyCalendar> weeklyCalendarsByServiceId = new HashMap<>();
   private final Map<FeedScopedId, Map<LocalDate, Boolean>> exceptionsByServiceId = new HashMap<>();
@@ -32,23 +38,17 @@ public class TripCalendarsBuilder {
   private final Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId = new HashMap<>();
   private final Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
-  /**
-   * Service ids currently represented in {@link #serviceDatesByServiceId} that were derived from
-   * {@link #weeklyCalendarsByServiceId}/{@link #exceptionsByServiceId} (as opposed to registered
-   * directly via {@link #putServiceDatesForServiceId}). Used by {@link #resolvePendingIfNeeded} to
-   * clean up stale entries for a service dropped entirely by {@link #limitToPeriod}.
-   */
-  private final Set<FeedScopedId> resolvedFromPending = new HashSet<>();
-
   private boolean dirty = false;
 
-  /** Use {@link TripCalendars#of()} to create a new instance. */
-  TripCalendarsBuilder() {}
+  /** Use {@link TripCalendars#of()}/{@link TripCalendars#of(LocalDateRange)} to create an instance. */
+  TripCalendarsBuilder(LocalDateRange periodLimit) {
+    this.periodLimit = periodLimit;
+  }
 
   /**
    * Register a recurring weekly service pattern for {@code serviceId}: it runs on each of the
    * given days of week within {@code period}. At most one weekly calendar can be registered per
-   * service id.
+   * service id, even if it falls entirely outside this builder's period limit.
    *
    * @throws MultipleCalendarsForServiceIdException if a weekly calendar was already registered
    * for this service id.
@@ -58,81 +58,60 @@ public class TripCalendarsBuilder {
     Set<DayOfWeek> daysOfWeek,
     LocalDateRange period
   ) {
-    if (
-      weeklyCalendarsByServiceId.putIfAbsent(
-        serviceId,
-        new WeeklyCalendar(Set.copyOf(daysOfWeek), period)
-      ) != null
-    ) {
+    if (weeklyCalendarsByServiceId.containsKey(serviceId)) {
       throw new MultipleCalendarsForServiceIdException(serviceId);
     }
-    dirty = true;
+    if (period.overlap(periodLimit)) {
+      weeklyCalendarsByServiceId.put(
+        serviceId,
+        new WeeklyCalendar(Set.copyOf(daysOfWeek), period.intersection(periodLimit))
+      );
+      dirty = true;
+    }
     return this;
   }
 
   /**
    * Register a service date exception: {@code serviceId} runs on {@code date}, in addition to any
-   * weekly calendar registered for it.
+   * weekly calendar registered for it. A no-op if {@code date} is {@code null} or outside this
+   * builder's period limit.
    */
   public TripCalendarsBuilder addServiceDate(FeedScopedId serviceId, LocalDate date) {
-    exceptionsByServiceId.computeIfAbsent(serviceId, id -> new HashMap<>()).put(date, Boolean.TRUE);
-    dirty = true;
+    if (date != null && periodLimit.contains(date)) {
+      exceptionsByServiceId
+        .computeIfAbsent(serviceId, id -> new HashMap<>())
+        .put(date, Boolean.TRUE);
+      dirty = true;
+    }
     return this;
   }
 
   /**
    * Register a service date exception: {@code serviceId} does not run on {@code date}, overriding
-   * any weekly calendar registered for it.
+   * any weekly calendar registered for it. A no-op if {@code date} is {@code null} or outside this
+   * builder's period limit.
    */
   public TripCalendarsBuilder removeServiceDate(FeedScopedId serviceId, LocalDate date) {
-    exceptionsByServiceId
-      .computeIfAbsent(serviceId, id -> new HashMap<>())
-      .put(date, Boolean.FALSE);
-    dirty = true;
+    if (date != null && periodLimit.contains(date)) {
+      exceptionsByServiceId
+        .computeIfAbsent(serviceId, id -> new HashMap<>())
+        .put(date, Boolean.FALSE);
+      dirty = true;
+    }
     return this;
   }
 
   /**
    * Register the given (already known) service dates directly for {@code serviceId}, bypassing
-   * the weekly-calendar/exception expansion done by {@link #addWeeklyCalendar}.
+   * the weekly-calendar/exception expansion done by {@link #addWeeklyCalendar}. Dates outside this
+   * builder's period limit are dropped; {@code serviceId} stays registered even if that leaves it
+   * with zero dates (e.g. NeTEx's empty-calendar placeholder).
    */
   public TripCalendarsBuilder putServiceDatesForServiceId(
     FeedScopedId serviceId,
     Collection<LocalDate> dates
   ) {
-    putServiceDates(serviceId, dates);
-    return this;
-  }
-
-  /**
-   * Trim every registered weekly calendar and service date exception to {@code period}: weekly
-   * calendars whose period does not overlap {@code period} at all are dropped, others have their
-   * period intersected with it; exceptions outside {@code period} are dropped. A no-op if
-   * {@code period} is unbounded.
-   */
-  public TripCalendarsBuilder limitToPeriod(LocalDateRange period) {
-    if (period.isUnbounded()) {
-      return this;
-    }
-    Iterator<Map.Entry<FeedScopedId, WeeklyCalendar>> weeklyIt = weeklyCalendarsByServiceId
-      .entrySet()
-      .iterator();
-    while (weeklyIt.hasNext()) {
-      Map.Entry<FeedScopedId, WeeklyCalendar> entry = weeklyIt.next();
-      WeeklyCalendar weekly = entry.getValue();
-      if (weekly.period().overlap(period)) {
-        entry.setValue(
-          new WeeklyCalendar(weekly.daysOfWeek(), weekly.period().intersection(period))
-        );
-      } else {
-        weeklyIt.remove();
-      }
-    }
-    for (Map<LocalDate, Boolean> exceptions : exceptionsByServiceId.values()) {
-      exceptions.keySet().removeIf(date -> !period.contains(date));
-    }
-    exceptionsByServiceId.values().removeIf(Map::isEmpty);
-    dirty = true;
+    putServiceDates(serviceId, dates.stream().filter(periodLimit::contains).toList());
     return this;
   }
 
@@ -186,18 +165,9 @@ public class TripCalendarsBuilder {
     pendingServiceIds.addAll(weeklyCalendarsByServiceId.keySet());
     pendingServiceIds.addAll(exceptionsByServiceId.keySet());
 
-    // A service previously resolved from pending data (e.g. a weekly calendar since dropped by
-    // limitToPeriod) is no longer represented in the pending maps at all - purge its stale entry.
-    Set<FeedScopedId> droppedServiceIds = new HashSet<>(resolvedFromPending);
-    droppedServiceIds.removeAll(pendingServiceIds);
-    for (FeedScopedId serviceId : droppedServiceIds) {
-      removeServiceDates(serviceId);
-      resolvedFromPending.remove(serviceId);
-    }
-
     for (FeedScopedId serviceId : pendingServiceIds) {
       // Clear any previously resolved dates for this service before recomputing, otherwise dates
-      // that no longer apply (e.g. trimmed off by limitToPeriod) would linger in serviceIdsByDate.
+      // that no longer apply (e.g. a since-overridden exception) would linger in serviceIdsByDate.
       removeServiceDates(serviceId);
 
       Set<LocalDate> activeDates = new HashSet<>();
@@ -216,7 +186,6 @@ public class TripCalendarsBuilder {
         });
       }
       putServiceDates(serviceId, activeDates);
-      resolvedFromPending.add(serviceId);
     }
     dirty = false;
   }
