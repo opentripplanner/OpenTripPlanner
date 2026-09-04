@@ -55,6 +55,7 @@ public class DayTypeAssignmentMapper {
   // Result data
   private final Set<LocalDate> dates = new HashSet<>();
   private final Set<LocalDate> datesToRemove = new HashSet<>();
+  private final DataImportIssueStore issueStore;
 
   /**
    * This is private to block instantiating this class from outside. This enforces thread-safety
@@ -63,11 +64,13 @@ public class DayTypeAssignmentMapper {
   private DayTypeAssignmentMapper(
     DayType dayType,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-    ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriods
+    ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriods,
+    DataImportIssueStore issueStore
   ) {
     this.dayType = dayType;
     this.operatingDays = operatingDays;
     this.operatingPeriods = operatingPeriods;
+    this.issueStore = issueStore;
   }
 
   /**
@@ -84,7 +87,12 @@ public class DayTypeAssignmentMapper {
     Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
-      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods);
+      var mapper = new DayTypeAssignmentMapper(
+        dayType,
+        operatingDays,
+        operatingPeriods,
+        issueStore
+      );
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
@@ -185,7 +193,14 @@ public class DayTypeAssignmentMapper {
       LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
       LocalDateTime date = uicOperatingPeriod.getFromDate();
 
-      addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
+      if (date != null) {
+        addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
+      } else {
+        issueStore.add(
+          "InvalidUicOperatingPeriod",
+          "Missing start date for UIC operating period " + uicOperatingPeriod.getId()
+        );
+      }
     }
   }
 

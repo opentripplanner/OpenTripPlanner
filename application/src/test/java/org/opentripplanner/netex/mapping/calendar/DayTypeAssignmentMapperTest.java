@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import static com.google.common.truth.Truth.assertThat;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -490,6 +491,32 @@ class DayTypeAssignmentMapperTest {
 
     // THEN - the valid-day-bits decide, the second day is skipped
     assertEquals("[2020-11-01, 2020-11-03]", toStr(result, DAY_TYPE_1));
+  }
+
+  @Test
+  void rejectUicPeriodWithoutStartDate() {
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    dayTypes.add(createDayTypeWithProperties(DAY_TYPE_1, new PropertyOfDay()));
+    periods.add(createUicOperatingPeriod(OP_1, null, D2020_11_03, "101"));
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    var issueStore = new DefaultDataImportIssueStore();
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      issueStore
+    );
+
+    assertEquals("[]", toStr(result, DAY_TYPE_1));
+
+    assertThat(issueStore.listIssues().stream().map(Object::toString)).contains(
+      "Issue{type: 'InvalidUicOperatingPeriod', message: 'Missing start date for UIC operating period OP-1'}"
+    );
   }
 
   /* private helper methods */
