@@ -57,7 +57,9 @@ class AlertsConnectionOrderingTest {
     var a = alert("a", AlertSeverity.WARNING, EARLY);
     var c = alert("c", AlertSeverity.WARNING, EARLY);
 
-    assertThat(AlertsConnectionOrdering.sort(List.of(c, b, a))).containsExactly(a, b, c).inOrder();
+    assertThat(AlertsConnectionOrdering.sort(List.of(c, b, a)))
+      .containsExactly(a, b, c)
+      .inOrder();
   }
 
   @Test

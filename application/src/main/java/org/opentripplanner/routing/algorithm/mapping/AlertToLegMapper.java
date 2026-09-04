@@ -129,8 +129,9 @@ public class AlertToLegMapper {
     totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
     // Filter alerts when there are multiple timePeriods for each alert
-    totalAlerts.removeIf(alert ->
-      !alert.isActiveDuring(TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant()))
+    totalAlerts.removeIf(
+      alert ->
+        !alert.isActiveDuring(TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant()))
     );
 
     if (totalAlerts.isEmpty()) {

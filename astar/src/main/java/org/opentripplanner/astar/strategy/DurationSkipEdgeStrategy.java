@@ -13,8 +13,7 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 public class DurationSkipEdgeStrategy<
   State extends AStarState<State, Edge, ?>,
   Edge extends AStarEdge<State, Edge, ?>
->
-  implements SkipEdgeStrategy<State, Edge> {
+> implements SkipEdgeStrategy<State, Edge> {
 
   private final double durationInSeconds;
 

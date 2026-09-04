@@ -9,7 +9,8 @@ import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
  * example divide lines into commercial and non-commercial groups.
  */
 public class GroupOfRoutesBuilder
-  extends AbstractEntityBuilder<GroupOfRoutes, GroupOfRoutesBuilder> {
+  extends AbstractEntityBuilder<GroupOfRoutes, GroupOfRoutesBuilder>
+{
 
   private String privateCode;
   private String shortName;

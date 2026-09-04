@@ -165,14 +165,15 @@ public class DebugStyleSpec {
 
     List<TileSource> extraRasterSources = extraLayers
       .stream()
-      .map(l ->
-        (TileSource) new RasterSource(
-          l.name(),
-          List.of(l.templateUrl()),
-          19,
-          l.tileSize(),
-          l.attribution()
-        )
+      .map(
+        l ->
+          (TileSource) new RasterSource(
+            l.name(),
+            List.of(l.templateUrl()),
+            19,
+            l.tileSize(),
+            l.attribution()
+          )
       )
       .toList();
     var allSources = ListUtils.combine(BACKGROUND_LAYERS, extraRasterSources, vectorSources);

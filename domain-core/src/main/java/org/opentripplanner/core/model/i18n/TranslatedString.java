@@ -146,7 +146,7 @@ public class TranslatedString implements I18NString, Serializable {
   @Override
   public boolean equals(Object other) {
     return (
-      (other instanceof TranslatedString) &&
+      other instanceof TranslatedString &&
       this.translations.equals(((TranslatedString) other).translations)
     );
   }

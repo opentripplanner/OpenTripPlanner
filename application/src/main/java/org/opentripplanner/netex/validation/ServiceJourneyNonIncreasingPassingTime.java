@@ -28,7 +28,8 @@ import org.rutebanken.netex.model.ServiceJourney;
  *  </ul>
  */
 class ServiceJourneyNonIncreasingPassingTime
-  extends AbstractHMapValidationRule<String, ServiceJourney> {
+  extends AbstractHMapValidationRule<String, ServiceJourney>
+{
 
   private StopTimeAdaptor invalidTimetabledPassingTimeInfo;
   private ErrorType errorType;

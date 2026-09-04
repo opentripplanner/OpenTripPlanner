@@ -21,8 +21,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * {@link org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments}
  * for more information.
  */
-public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
-  implements RangeRaptorWorker<T> {
+public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule> implements
+  RangeRaptorWorker<T> {
 
   private final List<RangeRaptorWorker<T>> children;
   private final ParetoComparator<RaptorPath<T>> comparator;

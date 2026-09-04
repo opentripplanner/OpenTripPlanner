@@ -42,16 +42,14 @@ public class DataImportIssueSummary implements Serializable {
     DataImportIssueSummary second
   ) {
     var combined = new HashMap<>(first.asMap());
-    second
-      .asMap()
-      .forEach((type, count) -> {
-        if (combined.containsKey(type)) {
-          var countSoFar = combined.get(type);
-          combined.put(type, count + countSoFar);
-        } else {
-          combined.put(type, count);
-        }
-      });
+    second.asMap().forEach((type, count) -> {
+      if (combined.containsKey(type)) {
+        var countSoFar = combined.get(type);
+        combined.put(type, count + countSoFar);
+      } else {
+        combined.put(type, count);
+      }
+    });
 
     return new DataImportIssueSummary(combined);
   }

@@ -250,9 +250,11 @@ public class OsmDatabase {
       carParkingNodes.put(node.getId(), node);
     }
     if (
-      !(waysNodeIds.contains(node.getId()) ||
+      !(
+        waysNodeIds.contains(node.getId()) ||
         areaNodeIds.contains(node.getId()) ||
-        node.isBoardingLocation())
+        node.isBoardingLocation()
+      )
     ) {
       return;
     }
@@ -285,12 +287,10 @@ public class OsmDatabase {
         singleWayAreas.add(way);
         areaWaysById.put(wayId, way);
         areaWayIds.add(wayId);
-        way
-          .getNodeRefs()
-          .forEach(node -> {
-            TroveUtils.addToMapSet(areasForNode, node, way);
-            return true;
-          });
+        way.getNodeRefs().forEach(node -> {
+          TroveUtils.addToMapSet(areasForNode, node, way);
+          return true;
+        });
       }
       return;
     }
@@ -425,8 +425,10 @@ public class OsmDatabase {
         continue;
       }
       if (
-        !(relation.isMultiPolygon() &&
-          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking()))
+        !(
+          relation.isMultiPolygon() &&
+          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking())
+        )
       ) {
         continue;
       }
@@ -500,18 +502,16 @@ public class OsmDatabase {
   }
 
   private void setNetworkForAllMembers(OsmRelation relation, String key) {
-    relation
-      .getMembers()
-      .forEach(member -> {
-        var isOsmWay = member.hasTypeWay();
-        var way = waysById.get(member.getRef());
-        // if it is an OSM way (rather than a node) and it doesn't already contain the tag
-        // we add it
-        if (way != null && isOsmWay && !way.hasTag(key)) {
-          var updatedWay = way.copy().withTag(key, "yes").build();
-          waysById.put(updatedWay.getId(), updatedWay);
-        }
-      });
+    relation.getMembers().forEach(member -> {
+      var isOsmWay = member.hasTypeWay();
+      var way = waysById.get(member.getRef());
+      // if it is an OSM way (rather than a node) and it doesn't already contain the tag
+      // we add it
+      if (way != null && isOsmWay && !way.hasTag(key)) {
+        var updatedWay = way.copy().withTag(key, "yes").build();
+        waysById.put(updatedWay.getId(), updatedWay);
+      }
+    });
   }
 
   /**

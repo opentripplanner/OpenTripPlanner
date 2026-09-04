@@ -11,7 +11,8 @@ import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.C
  * follow every task.
  */
 public class CustomerRepositoryLifecycle
-  implements RepositoryLifecycle<CustomerRepositorySnapshot, CustomerRepository> {
+  implements RepositoryLifecycle<CustomerRepositorySnapshot, CustomerRepository>
+{
 
   @Override
   public CustomerRepository copyOnWrite(CustomerRepositorySnapshot snapshot) {

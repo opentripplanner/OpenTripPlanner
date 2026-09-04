@@ -66,7 +66,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     assertEquals(-180, e3.getOutAngle());
 
     // Difference should be about 90.
-    int diff = (e1.getOutAngle() - e3.getInAngle());
+    int diff = e1.getOutAngle() - e3.getInAngle();
     assertEquals(90, diff);
 
     int turnAngle = calculateTurnAngle(e1, e3);

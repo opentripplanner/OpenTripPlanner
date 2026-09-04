@@ -90,8 +90,8 @@
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
              other; prettier-plugin-java only supports a limited range of prettier versions. -->
-        <prettier.version>3.8.3</prettier.version>
-        <prettier.java.version>2.7.7</prettier.java.version>
+        <prettier.version>3.9.6</prettier.version>
+        <prettier.java.version>2.10.3</prettier.java.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>

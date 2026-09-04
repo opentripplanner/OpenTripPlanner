@@ -94,12 +94,16 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     searchForTrip(TIME_A1, STOP_POS_0).assertTripFound().withIndex(TRIP_A).withBoardTime(TIME_A1);
 
     // Assert board next trip for: time + 1 second
-    searchForTrip(TIME_A1 + 1, STOP_POS_0).assertTripFound().withIndex(TRIP_B);
+    searchForTrip(TIME_A1 + 1, STOP_POS_0)
+      .assertTripFound()
+      .withIndex(TRIP_B);
 
     searchForTrip(TIME_A2, STOP_POS_1).assertTripFound().withIndex(TRIP_A).withBoardTime(TIME_A2);
 
     // Assert board next trip for: time + 1 second
-    searchForTrip(TIME_A2 + 1, STOP_POS_1).assertTripFound().withIndex(TRIP_B);
+    searchForTrip(TIME_A2 + 1, STOP_POS_1)
+      .assertTripFound()
+      .withIndex(TRIP_B);
   }
 
   @Test
@@ -158,7 +162,9 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
         .withBoardTime(tripBoardTime);
 
       // Search and find trip 'i' using the next trip index
-      searchForTrip(tripBoardTime, STOP_POS_0, i + 1).assertTripFound().withIndex(i);
+      searchForTrip(tripBoardTime, STOP_POS_0, i + 1)
+        .assertTripFound()
+        .withIndex(i);
 
       // Search with a time and index that together exclude trip 'i'
       searchForTrip(tripBoardTime, STOP_POS_0, i).assertNoTripFound();

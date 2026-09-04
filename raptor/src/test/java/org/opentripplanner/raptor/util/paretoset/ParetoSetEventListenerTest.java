@@ -9,9 +9,8 @@ public class ParetoSetEventListenerTest {
 
   // Given a set and function
 
-  private final TestParetoSetEventListener<TestVector> listener = new TestParetoSetEventListener<
-    TestVector
-  >();
+  private final TestParetoSetEventListener<TestVector> listener =
+    new TestParetoSetEventListener<TestVector>();
 
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private final ParetoSet<TestVector> subject = ParetoSet.of(

@@ -30,8 +30,8 @@ class TripPlanMapperTest {
 
     assertNotNull(tripPlan);
     assertEquals(DATETIME, tripPlan.date);
-    assertEquals(new WgsCoordinate(FROM.getCoordinate()), (tripPlan.from.coordinate));
-    assertEquals(new WgsCoordinate(TO.getCoordinate()), (tripPlan.to.coordinate));
+    assertEquals(new WgsCoordinate(FROM.getCoordinate()), tripPlan.from.coordinate);
+    assertEquals(new WgsCoordinate(TO.getCoordinate()), tripPlan.to.coordinate);
     assertTrue(tripPlan.itineraries.isEmpty());
   }
 }

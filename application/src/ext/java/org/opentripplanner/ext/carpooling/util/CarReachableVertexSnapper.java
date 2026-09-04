@@ -265,8 +265,7 @@ public final class CarReachableVertexSnapper {
         SphericalDistanceLibrary.fastDistance(
           originCoordinate,
           state.getVertex().getCoordinate()
-        ) >=
-        minCarEscapeMeters
+        ) >= minCarEscapeMeters
       ) {
         escaped[0] = true;
         return true;

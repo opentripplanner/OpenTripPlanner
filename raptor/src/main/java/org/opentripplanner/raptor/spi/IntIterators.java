@@ -72,7 +72,7 @@ public class IntIterators {
 
       @Override
       public int next() {
-        return i += increment;
+        return (i += increment);
       }
 
       @Override

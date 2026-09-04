@@ -18,9 +18,10 @@ public class TurnsTest {
   public void testIntersectionVertex() {
     GeometryFactory gf = new GeometryFactory();
 
-    LineString geometry = gf.createLineString(
-      new Coordinate[] { new Coordinate(-0.10, 0), new Coordinate(0, 0) }
-    );
+    LineString geometry = gf.createLineString(new Coordinate[] {
+      new Coordinate(-0.10, 0),
+      new Coordinate(0, 0),
+    });
 
     IntersectionVertex v1 = StreetModelForTest.intersectionVertex("v1", -0.10, 0);
     IntersectionVertex v2 = StreetModelForTest.intersectionVertex("v2", 0, 0);
@@ -35,9 +36,10 @@ public class TurnsTest {
       .withBack(true)
       .buildAndConnect();
 
-    LineString geometry2 = gf.createLineString(
-      new Coordinate[] { new Coordinate(0, 0), new Coordinate(-0.10, 0) }
-    );
+    LineString geometry2 = gf.createLineString(new Coordinate[] {
+      new Coordinate(0, 0),
+      new Coordinate(-0.10, 0),
+    });
 
     StreetEdge rightEdge = new StreetEdgeBuilder<>()
       .withFromVertex(v1)

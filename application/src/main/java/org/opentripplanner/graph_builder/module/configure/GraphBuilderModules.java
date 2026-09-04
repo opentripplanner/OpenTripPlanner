@@ -86,9 +86,7 @@ public class GraphBuilderModules {
     GraphBuildCacheManager cacheManager
   ) {
     List<OsmProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<
-      OsmExtractParameters
-    > osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
+    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
       providers.add(
         new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),

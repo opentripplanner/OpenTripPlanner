@@ -54,9 +54,13 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
       .withRoute(
         route(pattern("R2", STOP_D, STOP_E)).withTimetable(
           // Missed by 1 second
-          schedule().departures("00:03:59, 00:05:09").arrDepOffset(D10_s),
+          schedule()
+            .departures("00:03:59, 00:05:09")
+            .arrDepOffset(D10_s),
           // Exact match
-          schedule().departures("00:04:00, 00:05:10").arrDepOffset(D10_s)
+          schedule()
+            .departures("00:04:00, 00:05:10")
+            .arrDepOffset(D10_s)
         )
       )
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk

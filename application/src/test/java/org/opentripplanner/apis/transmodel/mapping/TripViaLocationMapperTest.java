@@ -31,9 +31,9 @@ class TripViaLocationMapperTest {
   private static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
   private static final String EXPECTED_IDS_AS_STRING = "[F:ID1, F:ID2]";
   private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH = """
-    Unfortunately the 'placeIds' is not required. Making it required would be a breaking change,
-    so wee just ignore it."
-    """;
+  Unfortunately the 'placeIds' is not required. Making it required would be a breaking change,
+  so wee just ignore it."
+  """;
 
   private static final TripViaLocationMapper MAPPER = new TripViaLocationMapper(
     new DefaultFeedIdMapper()

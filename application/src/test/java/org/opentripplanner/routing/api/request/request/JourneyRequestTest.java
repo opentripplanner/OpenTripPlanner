@@ -15,7 +15,11 @@ class JourneyRequestTest {
 
   private static final TransitRequest TRANSIT = TransitRequest.of()
     .withFilter(b ->
-      b.addSelect(SelectRequest.of().withRoutes(List.of(new FeedScopedId("F", "R:1"))).build())
+      b.addSelect(
+        SelectRequest.of()
+          .withRoutes(List.of(new FeedScopedId("F", "R:1")))
+          .build()
+      )
     )
     .build();
   private static final StreetRequest ACCESS = new StreetRequest(StreetMode.BIKE_TO_PARK);

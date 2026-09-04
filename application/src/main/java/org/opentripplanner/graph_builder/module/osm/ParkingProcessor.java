@@ -384,9 +384,7 @@ class ParkingProcessor {
     );
   }
 
-  private List<
-    VehicleParking.VehicleParkingEntranceCreator
-  > createParkingEntrancesFromAccessVertices(
+  private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
     Set<VertexAndName> accessVertices,
     I18NString vehicleParkingName,
     OsmEntity entity

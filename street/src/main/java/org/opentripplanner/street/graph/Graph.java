@@ -209,7 +209,8 @@ public class Graph implements Serializable {
    */
   public Iterable<Edge> listEdges() {
     return () ->
-      this.vertices.values()
+      this.vertices
+        .values()
         .stream()
         .flatMap(v -> v.getOutgoing().stream())
         .iterator();
@@ -233,7 +234,7 @@ public class Graph implements Serializable {
   }
 
   public boolean containsVertex(Vertex v) {
-    return (v != null) && vertices.get(v.getLabel()) == v;
+    return v != null && vertices.get(v.getLabel()) == v;
   }
 
   public void remove(Vertex vertex) {

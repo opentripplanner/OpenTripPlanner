@@ -40,7 +40,7 @@ public class OsmBoardingLocationVertex extends LabelledIntersectionVertex {
   }
 
   public boolean isConnectedToStreetNetwork() {
-    return (getOutgoing().size() + getIncoming().size()) > 0;
+    return getOutgoing().size() + getIncoming().size() > 0;
   }
 
   @Override

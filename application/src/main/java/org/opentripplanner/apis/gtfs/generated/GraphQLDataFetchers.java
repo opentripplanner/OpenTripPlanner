@@ -376,9 +376,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> entranceId();
     public DataFetcher<String> name();
     public DataFetcher<String> publicCode();
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
-    > wheelchairAccessible();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
   }
 
   /** A single use of an escalator. */
@@ -826,12 +824,8 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLRentalVehicleType {
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor
-    > formFactor();
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType
-    > propulsionType();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor> formFactor();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType> propulsionType();
   }
 
   public interface GraphQLRentalVehicleTypeCount {
@@ -965,9 +959,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> url();
     public DataFetcher<String> vehicleMode();
     public DataFetcher<Integer> vehicleType();
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
-    > wheelchairBoarding();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding();
     public DataFetcher<String> zoneId();
   }
 
@@ -1106,9 +1098,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Geometry> tripGeometry();
     public DataFetcher<String> tripHeadsign();
     public DataFetcher<String> tripShortName();
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
-    > wheelchairAccessible();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
   }
 
   /**

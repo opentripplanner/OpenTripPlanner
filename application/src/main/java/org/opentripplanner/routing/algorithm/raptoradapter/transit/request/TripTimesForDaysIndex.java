@@ -52,8 +52,7 @@ final class TripTimesForDaysIndex {
     this.tripIndex = new int[list
       .stream()
       .mapToInt(a -> a.length)
-      .sum() *
-    2];
+      .sum() * 2];
     int[] a;
 
     // 'day' is the current day index
@@ -150,7 +149,11 @@ final class TripTimesForDaysIndex {
     }
     var buf = new StringBuilder();
     for (int i = 0; i < tripIndex.length; i += 2) {
-      buf.append(tripIndex[i]).append(':').append(tripIndex[i + 1]).append(' ');
+      buf
+        .append(tripIndex[i])
+        .append(':')
+        .append(tripIndex[i + 1])
+        .append(' ');
     }
     return buf.substring(0, buf.length() - 1);
   }

@@ -192,13 +192,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
     for (var edge : graph.findEdges(getEnvelope(ts))) {
-      osmInfoGraphBuildService
-        .findPlatform(edge)
-        .ifPresent(platform -> {
-          if (matchesReference(stop, platform.references())) {
-            nearbyEdges.computeIfAbsent(platform, _ -> new ArrayList<>()).add(edge);
-          }
-        });
+      osmInfoGraphBuildService.findPlatform(edge).ifPresent(platform -> {
+        if (matchesReference(stop, platform.references())) {
+          nearbyEdges.computeIfAbsent(platform, _ -> new ArrayList<>()).add(edge);
+        }
+      });
     }
 
     return nearbyEdges

@@ -175,7 +175,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
     TripPatternForDate that = (TripPatternForDate) o;
 
-    return (tripPattern.equals(that.tripPattern) && serviceDate.equals(that.serviceDate));
+    return tripPattern.equals(that.tripPattern) && serviceDate.equals(that.serviceDate);
   }
 
   @Override

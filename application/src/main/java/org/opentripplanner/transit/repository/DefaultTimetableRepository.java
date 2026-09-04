@@ -656,8 +656,9 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     validateNotReadOnly();
-    return tripCalendars.getOrCreateServiceIdForDate(serviceDate, updated ->
-      this.tripCalendars = updated
+    return tripCalendars.getOrCreateServiceIdForDate(
+      serviceDate,
+      updated -> this.tripCalendars = updated
     );
   }
 
@@ -812,15 +813,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
       .values()
       .stream()
       .flatMap(timetables ->
-        timetables
-          .stream()
-          .flatMap(timetable ->
-            timetable
-              .getTripTimes()
-              .stream()
-              .filter(filter)
-              .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
-          )
+        timetables.stream().flatMap(timetable ->
+          timetable
+            .getTripTimes()
+            .stream()
+            .filter(filter)
+            .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
+        )
       )
       .collect(Collectors.toCollection(ArrayList::new));
   }

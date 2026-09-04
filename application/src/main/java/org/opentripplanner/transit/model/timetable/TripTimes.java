@@ -31,7 +31,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  */
 public sealed interface TripTimes<T extends TripTimes>
   extends Serializable, Comparable<TripTimes>
-  permits RealTimeTripTimes, ScheduledTripTimes {
+  permits RealTimeTripTimes, ScheduledTripTimes
+{
   /**
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.

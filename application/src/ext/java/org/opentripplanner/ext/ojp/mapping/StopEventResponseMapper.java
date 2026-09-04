@@ -104,8 +104,9 @@ public class StopEventResponseMapper {
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {
-    var bytes = (tripTimeOnDate.getStopTimeKey().toString() +
-      tripTimeOnDate.getServiceDay()).getBytes(StandardCharsets.UTF_8);
+    var bytes = (
+      tripTimeOnDate.getStopTimeKey().toString() + tripTimeOnDate.getServiceDay()
+    ).getBytes(StandardCharsets.UTF_8);
     return UUID.nameUUIDFromBytes(bytes).toString();
   }
 

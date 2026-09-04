@@ -265,7 +265,8 @@ public abstract class GtfsTest {
         })
         .get();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (FileNotFoundException _) {} catch (Exception e) {
+    } catch (FileNotFoundException _) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
     var transitService = new DefaultTransitService(

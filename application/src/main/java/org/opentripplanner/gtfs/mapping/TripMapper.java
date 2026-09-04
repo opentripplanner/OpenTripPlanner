@@ -84,12 +84,12 @@ class TripMapper {
     if (rhs.getSafeDurationFactor() == null && rhs.getSafeDurationOffset() == null) {
       return Optional.empty();
     } else {
-      var offset = rhs.getSafeDurationOffset() == null
-        ? Duration.ZERO
-        : Duration.ofSeconds(rhs.getSafeDurationOffset().longValue());
-      var factor = rhs.getSafeDurationFactor() == null
-        ? 1d
-        : rhs.getSafeDurationFactor().doubleValue();
+      var offset =
+        rhs.getSafeDurationOffset() == null
+          ? Duration.ZERO
+          : Duration.ofSeconds(rhs.getSafeDurationOffset().longValue());
+      var factor =
+        rhs.getSafeDurationFactor() == null ? 1d : rhs.getSafeDurationFactor().doubleValue();
       return Optional.of(TimePenalty.of(offset, factor));
     }
   }

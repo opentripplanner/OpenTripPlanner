@@ -49,18 +49,20 @@ class StopTimesMapper {
     }
 
     // Fallback to other time, if one doesn't exist
-    var aimedArrivalTime = call.getAimedArrivalTime() != null
-      ? call.getAimedArrivalTime()
-      : call.getAimedDepartureTime();
+    var aimedArrivalTime =
+      call.getAimedArrivalTime() != null
+        ? call.getAimedArrivalTime()
+        : call.getAimedDepartureTime();
 
     var aimedArrivalTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
       startOfService,
       aimedArrivalTime
     );
 
-    var aimedDepartureTime = call.getAimedDepartureTime() != null
-      ? call.getAimedDepartureTime()
-      : call.getAimedArrivalTime();
+    var aimedDepartureTime =
+      call.getAimedDepartureTime() != null
+        ? call.getAimedDepartureTime()
+        : call.getAimedArrivalTime();
 
     var aimedDepartureTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
       startOfService,

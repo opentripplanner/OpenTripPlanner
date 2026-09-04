@@ -37,18 +37,16 @@ class BufferedEdgeProcessor {
     );
 
     final AtomicInteger namesApplied = new AtomicInteger(0);
-    unnamedEdges
-      .parallelStream()
-      .forEach(edgeOnLevel -> {
-        var buffer = preciseBufferFactory.preciseBuffer(edgeOnLevel.edge().getGeometry());
-        if (assigner.assignNameToEdge(edgeOnLevel, buffer)) {
-          namesApplied.incrementAndGet();
-        }
+    unnamedEdges.parallelStream().forEach(edgeOnLevel -> {
+      var buffer = preciseBufferFactory.preciseBuffer(edgeOnLevel.edge().getGeometry());
+      if (assigner.assignNameToEdge(edgeOnLevel, buffer)) {
+        namesApplied.incrementAndGet();
+      }
 
-        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
-        // noinspection Convert2MethodRef
-        progress.step(m -> logger.info(m));
-      });
+      // Keep lambda! A method-ref would cause incorrect class and line number to be logged
+      // noinspection Convert2MethodRef
+      progress.step(m -> logger.info(m));
+    });
 
     logger.info(
       "Assigned names to {} of {} {} ({}%)",
