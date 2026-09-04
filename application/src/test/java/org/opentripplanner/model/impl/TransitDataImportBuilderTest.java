@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.common.collect.ImmutableList;
@@ -17,8 +18,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
@@ -26,6 +25,7 @@ public class TransitDataImportBuilderTest {
 
   private static final String FEED_ID = TransitRepositoryForTest.FEED_ID;
   private static final FeedScopedId SERVICE_WEEKDAYS_ID = FeedScopedIdForTestFactory.id("weekdays");
+  private static final LocalDate EXCLUDED_DATE = LocalDate.of(2017, 8, 31);
 
   private static TransitDataImportBuilder subject;
 
@@ -36,21 +36,25 @@ public class TransitDataImportBuilderTest {
 
   @Test
   public void testGetAllCalendarDates() {
-    Collection<ServiceCalendarDate> calendarDates = subject.getCalendarDates();
-
-    assertEquals(1, calendarDates.size());
-    assertEquals(
-      "ServiceCalendarDate{serviceId: F:weekdays, date: 2017-08-31, exception: 2}",
-      first(calendarDates).toString()
+    // The exclusion date added in createBuilder() should not be an active service date.
+    assertFalse(
+      subject.tripCalendars().listServiceDates(SERVICE_WEEKDAYS_ID).contains(EXCLUDED_DATE)
     );
   }
 
   @Test
   public void testGetAllCalendars() {
-    Collection<ServiceCalendar> calendars = subject.getCalendars();
-
-    assertEquals(2, calendars.size());
-    assertEquals("ServiceCalendar{F:alldays [1111111]}", first(calendars).toString());
+    assertEquals(
+      "[F:alldays, F:weekdays]",
+      subject
+        .tripCalendars()
+        .listServiceIds()
+        .stream()
+        .map(Object::toString)
+        .sorted()
+        .toList()
+        .toString()
+    );
   }
 
   @Test
@@ -99,14 +103,10 @@ public class TransitDataImportBuilderTest {
     ).getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
-    builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
+    builder.tripCalendars().removeServiceDate(SERVICE_WEEKDAYS_ID, EXCLUDED_DATE);
     builder.getFeedInfos().add(FeedInfoTestFactory.dummyForTest(FEED_ID));
 
     return builder;
-  }
-
-  private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
-    return new ServiceCalendarDate(serviceId, LocalDate.of(2017, 8, 31), 2);
   }
 
   private static <T> T first(Collection<? extends T> c) {

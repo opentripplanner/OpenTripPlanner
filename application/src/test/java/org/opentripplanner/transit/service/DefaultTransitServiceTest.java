@@ -26,7 +26,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.api.model.FilterValues;
@@ -34,6 +33,7 @@ import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -173,19 +173,16 @@ class DefaultTransitServiceTest {
     transitRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
     var thirdDate = LocalDate.of(2025, 7, 2);
 
-    calendarServiceData.putServiceDatesForServiceId(
+    calendarsBuilder.putServiceDatesForServiceId(
       CALENDAR_ID,
       List.of(firstDate, secondDate, thirdDate, SERVICE_DATE)
     );
-    calendarServiceData.putServiceDatesForServiceId(
-      CALENDAR_ID_TWO,
-      List.of(firstDate, secondDate)
-    );
+    calendarsBuilder.putServiceDatesForServiceId(CALENDAR_ID_TWO, List.of(firstDate, secondDate));
 
     transitRepository.putServiceCode(SERVICE_ID, SERVICE_CODE);
     transitRepository.putServiceCode(CALENDAR_ID, SERVICE_CODE);
@@ -195,7 +192,7 @@ class DefaultTransitServiceTest {
     transitRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
     transitRepository.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.mergeTripCalendars(calendarsBuilder.build());
 
     transitRepository.index();
 

@@ -14,8 +14,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -41,9 +41,9 @@ class FlexIndexTest {
 
     LocalDate serviceDate = LocalDate.of(2025, 2, 28);
     LocalDate nextDay = serviceDate.plusDays(1);
-    CalendarServiceData calendarData = new CalendarServiceData();
-    calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    repo.updateCalendarServiceData(calendarData);
+    var calendarsBuilder = TripCalendars.of();
+    calendarsBuilder.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
+    repo.mergeTripCalendars(calendarsBuilder.build());
 
     FlexIndex index = new FlexIndex(repo);
 
@@ -81,10 +81,10 @@ class FlexIndexTest {
 
     repo.addFlexTrip(flexTrip.getId(), flexTrip);
 
-    LocalDate serviceDate = LocalDate.of(2025, 2, 28);
-    CalendarServiceData calendarData = new CalendarServiceData();
-    calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    repo.updateCalendarServiceData(calendarData);
+    var serviceDate = LocalDate.of(2025, 2, 28);
+    var calendarsBuilder = TripCalendars.of();
+    calendarsBuilder.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
+    repo.mergeTripCalendars(calendarsBuilder.build());
 
     FlexIndex index = new FlexIndex(repo);
 
@@ -92,7 +92,7 @@ class FlexIndexTest {
     assertEquals(1, tripsOnServiceDay.size(), "Should have 1 trip on service day");
     assertEquals(serviceDate, tripsOnServiceDay.iterator().next().serviceDate());
 
-    LocalDate nextDay = serviceDate.plusDays(1);
+    var nextDay = serviceDate.plusDays(1);
     Collection<FlexTripForDate> tripsOnNextDay = index.getFlexTripsForRunningDate(nextDay);
     assertEquals(1, tripsOnNextDay.size(), "Should have 1 trip on next day");
     assertEquals(serviceDate, tripsOnNextDay.iterator().next().serviceDate());

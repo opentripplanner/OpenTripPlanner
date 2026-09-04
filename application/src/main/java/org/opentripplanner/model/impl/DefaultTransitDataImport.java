@@ -14,6 +14,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -49,7 +50,7 @@ class DefaultTransitDataImport implements TransitDataImport {
 
   private final Collection<Pathway> pathways;
 
-  private final Collection<FeedScopedId> serviceIds;
+  private final TripCalendars tripCalendars;
 
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
@@ -76,7 +77,7 @@ class DefaultTransitDataImport implements TransitDataImport {
     this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
-    this.serviceIds = immutableList(builder.findAllServiceIds());
+    this.tripCalendars = builder.tripCalendars().build();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
@@ -125,7 +126,12 @@ class DefaultTransitDataImport implements TransitDataImport {
 
   @Override
   public Collection<FeedScopedId> getAllServiceIds() {
-    return serviceIds;
+    return tripCalendars.listServiceIds();
+  }
+
+  @Override
+  public TripCalendars getTripCalendars() {
+    return tripCalendars;
   }
 
   @Override
@@ -165,7 +171,7 @@ class DefaultTransitDataImport implements TransitDataImport {
 
   @Override
   public boolean hasActiveTransit() {
-    return serviceIds.size() > 0;
+    return !tripCalendars.isEmpty();
   }
 
   /**

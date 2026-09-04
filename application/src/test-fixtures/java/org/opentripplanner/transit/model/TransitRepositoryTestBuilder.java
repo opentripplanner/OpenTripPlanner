@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -85,14 +85,14 @@ public class TransitRepositoryTestBuilder {
       transitRepository.addTripOnServiceDate(tripOnServiceDate);
     }
 
-    var calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     int serviceCodeCounter = 0;
     for (var serviceCode : serviceCodes.values()) {
-      calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
+      calendarsBuilder.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
       transitRepository.putServiceCode(serviceCode.id(), serviceCodeCounter);
       serviceCodeCounter += 1;
     }
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.mergeTripCalendars(calendarsBuilder.build());
 
     transitRepository.getAllTripPatterns().forEach(pattern -> {
       pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());

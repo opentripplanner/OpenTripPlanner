@@ -28,7 +28,6 @@ import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -46,6 +45,7 @@ import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -95,7 +95,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
     TIMETABLE_REPOSITORY = new TransitRepository(siteRepository);
     TIMETABLE_REPOSITORY.initTimeZone(ZoneIds.STOCKHOLM);
-    var calendarServiceData = new CalendarServiceData();
+    var calendarServiceData = TripCalendars.of();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
       TIMETABLE_REPOSITORY.addTripPattern(pattern.getId(), pattern);
@@ -108,7 +108,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    TIMETABLE_REPOSITORY.updateCalendarServiceData(calendarServiceData);
+    TIMETABLE_REPOSITORY.mergeTripCalendars(calendarServiceData.build());
     TIMETABLE_REPOSITORY.index();
   }
 
