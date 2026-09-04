@@ -6,6 +6,7 @@ import org.mobilitydata.gbfs.v3_0.gbfs.GBFSFeed;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalNetworkDataSourceParameters;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.GbfsAutoConfiguration;
@@ -14,6 +15,7 @@ import org.opentripplanner.gbfs.manifest.GbfsManifestLoader;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.gbfs.network.GbfsNetworkParameters;
 import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneApplier;
@@ -48,15 +50,18 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   private final VehicleRentalGeofencingParameters parameters;
   private final GbfsNetworkOverrides overrides;
   private final Graph graph;
+  private final DataImportIssueStore issueStore;
 
   public VehicleRentalGeofencingGraphBuilder(
     VehicleRentalGeofencingParameters parameters,
     GbfsNetworkOverrides overrides,
-    Graph graph
+    Graph graph,
+    DataImportIssueStore issueStore
   ) {
     this.parameters = parameters;
     this.overrides = overrides;
     this.graph = graph;
+    this.issueStore = issueStore;
   }
 
   @Override
@@ -67,17 +72,30 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     if (
       manifest == null || manifest.getData() == null || manifest.getData().getDatasets() == null
     ) {
-      LOG.warn("No datasets found in GBFS manifest {}", parameters.url());
-      return;
+      // The manifest is what the build config names, so a build that cannot read it was
+      // misconfigured or run against a broken endpoint. Failing is louder than a graph that is
+      // silently missing every network's zones.
+      throw new OtpAppException(
+        "Unable to build graph, no datasets found in the GBFS manifest " + parameters.url()
+      );
     }
 
     try (var httpClientFactory = new OtpHttpClientFactory()) {
-      var networks = selectNetworks(manifest, overrides, parameters.headers(), httpClientFactory);
+      var networks = selectNetworks(
+        manifest,
+        overrides,
+        parameters.headers(),
+        httpClientFactory,
+        issueStore
+      );
       for (var network : networks) {
         try {
           applyNetwork(network, httpClientFactory);
         } catch (Exception e) {
+          // One operator's feed is third-party data referenced by the manifest, not something the
+          // build config named. Record it and leave the rest of the graph buildable.
           LOG.error("Failed to load geofencing zones for network {}", network.network(), e);
+          issueStore.add(new GeofencingZonesNotApplied(network.network(), e.toString()));
         }
       }
     }
@@ -92,7 +110,8 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
     GBFSManifest manifest,
     GbfsNetworkOverrides overrides,
     HttpHeaders headers,
-    OtpHttpClientFactory clientFactory
+    OtpHttpClientFactory clientFactory,
+    DataImportIssueStore issueStore
   ) {
     var selected = new ArrayList<SelectedNetwork>();
 
@@ -124,6 +143,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
         );
       } catch (Exception e) {
         LOG.error("Failed to fetch the GBFS auto-configuration file for network {}", network, e);
+        issueStore.add(new GeofencingFeedUnavailable(network, url.get(), e.toString()));
         continue;
       }
 
@@ -178,6 +198,13 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
 
     if (!loaderAndMapper.update()) {
       LOG.warn("Failed to update GBFS feed for network {}", network.network());
+      issueStore.add(
+        new GeofencingFeedUnavailable(
+          network.network(),
+          network.autoConfiguration().url().toString(),
+          "the GBFS feed could not be read"
+        )
+      );
       return List.of();
     }
 

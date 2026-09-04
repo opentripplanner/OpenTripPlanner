@@ -53,6 +53,17 @@ have zones, so operators without them cost nothing but the feed list lookup.
 mutually exclusive — a network set to `graph-build` is skipped by the updater, and one set to
 `serve` is skipped here, so zones are never applied twice.
 
+## When loading fails
+
+The manifest is what `build-config.json` names, so a build that cannot read it **fails**. The
+alternative would be a graph that is silently missing every network's zones, which routes vehicles
+without the restrictions the operator publishes.
+
+An individual network is third-party data referenced by the manifest, so a network that cannot be
+read is recorded in the build issue report and the build continues. That network is then routable
+without its zones, and the updater does not compute them either, because the phases are mutually
+exclusive. Check the report after a build if a network's restrictions appear to be missing.
+
 ## Limitations
 
 A GBFS updater configured directly under `updaters` in `router-config.json` does not read the shared
