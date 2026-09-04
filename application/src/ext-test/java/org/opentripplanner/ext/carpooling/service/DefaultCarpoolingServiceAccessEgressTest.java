@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -770,12 +771,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
    * walking endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
    */
   @Test
-  void accessItinerary_appendsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
+  void accessItinerary_expandsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
     var departureTime = SEARCH_TIME.plusMinutes(30);
     var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime);
     var trip = new CarpoolTripBuilder(baseTrip)
       .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
       )
       .build();
     context.upsertTrip(trip);
@@ -821,7 +822,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     assertNotNull(bookingInfo);
 
     assertEquals(
-      expectedAugmentedUrl(
+      expectedExpandedUrl(
         "https://book.example.com",
         carpoolLeg.from().coordinate,
         carpoolLeg.to().coordinate

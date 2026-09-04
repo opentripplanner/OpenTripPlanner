@@ -3,7 +3,9 @@ package org.opentripplanner.ext.carpooling.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expandedCoordinate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
@@ -15,7 +17,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
@@ -66,6 +67,10 @@ class CarpoolItineraryMapperTest {
 
   private static final WgsCoordinate PICKUP = new WgsCoordinate(59.910000, 10.750000);
   private static final WgsCoordinate DROPOFF = new WgsCoordinate(59.920000, 10.760000);
+
+  /** What {@code {from}} and {@code {to}} expand to for {@link #PICKUP} / {@link #DROPOFF}. */
+  private static final String PICKUP_COORD = expandedCoordinate(PICKUP);
+  private static final String DROPOFF_COORD = expandedCoordinate(DROPOFF);
 
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int PICKUP_POSITION = 1;
@@ -125,48 +130,106 @@ class CarpoolItineraryMapperTest {
   }
 
   @Test
-  void urlOnly_addsOnlineAndAppendsPickupAndDropoffCoordinatesToUrl() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com").build();
+  void urlOnly_addsOnlineAndExpandsPickupAndDropoffCoordinatesIntoUrl() {
+    var contact = ContactInfo.of()
+      .withBookingUrl(bookingUrlTemplate("https://book.example.com"))
+      .build();
 
     var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
 
     assertNotNull(info);
     assertEquals(EnumSet.of(BookingMethod.ONLINE), info.bookingMethods());
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", PICKUP, DROPOFF),
+      expectedExpandedUrl("https://book.example.com", PICKUP, DROPOFF),
       info.getContactInfo().getBookingUrl()
     );
   }
 
   /**
-   * Guards against the easy bug of unconditionally appending {@code ?from_coordinate=…}, which
-   * would yield an invalid double-{@code ?} URL when the provider's booking URL already carries
-   * its own query string (e.g. tracking parameters). The coordinate parameters must be appended
-   * with {@code &} in that case.
+   * A booking URL carrying neither placeholder is the provider declining to receive the
+   * passenger's coordinates, so the URL must reach the API byte-for-byte as published — no
+   * coordinate parameters invented on the provider's behalf, and no normalisation applied by the
+   * {@link java.net.URI} round-trip that validates it.
    */
   @Test
-  void urlWithExistingQueryString_usesAmpersandSeparator() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/?ref=foo").build();
+  void urlWithoutPlaceholders_isPassedThroughUnchanged() {
+    var url = "https://book.example.com/trip/42?ref=foo#bookform";
+    var contact = ContactInfo.of().withBookingUrl(url).build();
 
     var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
 
     assertNotNull(info);
-    var expected = String.format(
-      Locale.ROOT,
-      "https://book.example.com/?ref=foo&from_coordinate=%.6f,%.6f&to_coordinate=%.6f,%.6f",
-      PICKUP.latitude(),
-      PICKUP.longitude(),
-      DROPOFF.latitude(),
-      DROPOFF.longitude()
+    assertEquals(EnumSet.of(BookingMethod.ONLINE), info.bookingMethods());
+    assertEquals(url, info.getContactInfo().getBookingUrl());
+  }
+
+  /**
+   * The two placeholders are independent: a provider wanting only the pickup publishes only
+   * {@code {from}}, and the rest of its URL — including a query that never mentions
+   * {@code {to}} — must survive untouched.
+   */
+  @Test
+  void urlWithOnlyFromPlaceholder_expandsItAndLeavesTheRestAlone() {
+    var contact = ContactInfo.of()
+      .withBookingUrl("https://book.example.com/trip/42?pickup={from}&ref=foo")
+      .build();
+
+    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
+
+    assertNotNull(info);
+    assertEquals(
+      "https://book.example.com/trip/42?pickup=" + PICKUP_COORD + "&ref=foo",
+      info.getContactInfo().getBookingUrl()
     );
-    assertEquals(expected, info.getContactInfo().getBookingUrl());
+  }
+
+  /**
+   * Placeholders are expanded wherever the provider puts them — path segment, query or fragment,
+   * a single-page booking app routing on the {@code #fragment} included — and at every
+   * occurrence, because expansion is a plain substitution on the published URL rather than a
+   * rebuild of the URI's components.
+   */
+  @Test
+  void placeholders_areExpandedInEveryComponentAndAtEveryOccurrence() {
+    var contact = ContactInfo.of()
+      .withBookingUrl("https://book.example.com/book/{from}/to/{to}?pickup={from}#at/{to}")
+      .build();
+
+    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
+
+    assertNotNull(info);
+    assertEquals(
+      "https://book.example.com/book/" +
+        PICKUP_COORD +
+        "/to/" +
+        DROPOFF_COORD +
+        "?pickup=" +
+        PICKUP_COORD +
+        "#at/" +
+        DROPOFF_COORD,
+      info.getContactInfo().getBookingUrl()
+    );
+  }
+
+  /**
+   * Placeholder names are case-sensitive, so {@code {From}} is not expanded and its leftover
+   * braces get the URL dropped along with {@link BookingMethod#ONLINE}, rather than handed to the
+   * user with a literal {@code {From}} in it.
+   */
+  @Test
+  void urlWithUnrecognisedPlaceholder_dropsUrl() {
+    var contact = ContactInfo.of()
+      .withBookingUrl("https://book.example.com/trip/42?pickup={From}")
+      .build();
+
+    assertNull(CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF));
   }
 
   @Test
   void phoneAndUrl_addsBothMethodsAndOnlyRewritesUrl() {
     var contact = ContactInfo.of()
       .withPhoneNumber("+4712345678")
-      .withBookingUrl("https://book.example.com")
+      .withBookingUrl(bookingUrlTemplate("https://book.example.com"))
       .build();
 
     var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
@@ -176,36 +239,12 @@ class CarpoolItineraryMapperTest {
       EnumSet.of(BookingMethod.CALL_OFFICE, BookingMethod.ONLINE),
       info.bookingMethods()
     );
-    var augmented = info.getContactInfo();
-    assertEquals("+4712345678", augmented.getPhoneNumber());
+    var expanded = info.getContactInfo();
+    assertEquals("+4712345678", expanded.getPhoneNumber());
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", PICKUP, DROPOFF),
-      augmented.getBookingUrl()
+      expectedExpandedUrl("https://book.example.com", PICKUP, DROPOFF),
+      expanded.getBookingUrl()
     );
-  }
-
-  /**
-   * Pins down the URL with a {@code #fragment}: the appended coordinate parameters must end up
-   * in the query (before the fragment), not inside the fragment. The string-level
-   * {@code url.contains("?")} predicate doesn't catch this — switching to {@link java.net.URI}
-   * parsing does, because the fragment is split off the URL before it can swallow the params.
-   */
-  @Test
-  void urlWithFragment_appendsParamsBeforeFragment() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/page#bookform").build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    var expected = String.format(
-      Locale.ROOT,
-      "https://book.example.com/page?from_coordinate=%.6f,%.6f&to_coordinate=%.6f,%.6f#bookform",
-      PICKUP.latitude(),
-      PICKUP.longitude(),
-      DROPOFF.latitude(),
-      DROPOFF.longitude()
-    );
-    assertEquals(expected, info.getContactInfo().getBookingUrl());
   }
 
   /**

@@ -67,6 +67,45 @@ carpool trips. The system maps SIRI-ET data as follows:
 
 The system supports multi-stop trips where drivers have already accepted multiple passengers.
 
+#### Booking URL templates
+
+A trip's `PublicContact/Url` is treated as a URL template. OTP expands two placeholders in it
+before returning the URL on the carpool leg's booking information:
+
+| Placeholder | Expanded with                                                        |
+| ----------- | -------------------------------------------------------------------- |
+| `{from}`    | The carpool **boarding** point — where the passenger gets in the car |
+| `{to}`      | The carpool **alighting** point — where the passenger gets out       |
+
+Each is replaced by `latitude,longitude` at six decimals, for example
+`59.911491,10.750184`. These are the points on the driver's route, which are generally *not* the
+passenger's requested origin and destination (the passenger walks to and from them) and not the
+driver's own origin and destination.
+
+So a provider publishing
+
+```
+https://example.com/book/ENT:ServiceJourney:1?pickup={from}&dropoff={to}
+```
+
+receives
+
+```
+https://example.com/book/ENT:ServiceJourney:1?pickup=59.911491,10.750184&dropoff=59.933077,10.784618
+```
+
+Notes:
+
+- **The provider owns the URL.** OTP does not choose the parameter names, their order, or where in
+  the URL the coordinates land. Placeholders are expanded wherever they appear — query string,
+  path segment or fragment — and every occurrence is expanded.
+- **Both placeholders are optional.** A URL containing neither is passed through unchanged, so a
+  provider that does not want the passenger's coordinates simply publishes a plain URL.
+- **Names are case-sensitive.** `{From}` is not recognised, and since curly braces are not legal
+  URI characters, its leftover braces make the expanded URL unparseable — OTP then logs the
+  problem, drops the URL, and omits the `ONLINE` booking method rather than returning a link that
+  cannot be opened. The same applies to any booking URL that is not a valid URI once expanded.
+
 ## Features
 
 ### Trip Matching
