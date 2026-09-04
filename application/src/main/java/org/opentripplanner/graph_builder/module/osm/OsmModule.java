@@ -200,7 +200,8 @@ public class OsmModule implements GraphBuilderModule {
       osmdb,
       vertexGenerator,
       graph,
-      streetDetailsRepository
+      streetDetailsRepository,
+      params.elevatorRefTags()
     );
 
     buildBasicGraph(osmdb, vertexGenerator, elevatorProcessor);
