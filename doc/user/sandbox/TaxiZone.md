@@ -17,8 +17,9 @@ For each driving-ish leg in a taxi itinerary:
   model).
 - If **a matching zone is found**, the generic driving leg is replaced with a `TaxiZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
-- The filter is only enabled when the request's access, egress, or direct mode is
-  `TAXI` (see `RouteRequestToFilterChainMapper`).
+- Decoration is only applied when the request's access, egress, or direct mode is `TAXI`. It is
+  performed directly by `TaxiRouter`, invoked from `TransitRouter` (for access/egress legs) and
+  `DirectStreetRouter` (for direct legs) — there is no itinerary filter-chain step involved.
 
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
@@ -92,25 +93,30 @@ other GTFS-scheduled service.
 To opt into taxi zone matching, requests must use the `TAXI` mode
 (`PlanAccessMode`, `PlanEgressMode`, or `PlanDirectMode`) for the relevant part of the journey.
 Internally this maps to the `TAXI` street mode, which behaves identically to
-`CAR_PICKUP` for routing purposes but additionally registers the taxi zone itinerary filter.
+`CAR_PICKUP` for routing purposes but additionally triggers taxi zone decoration (see above).
 
 ### Decorated Leg Fields
 
-When a taxi leg matches a zone, it is replaced by a `TaxiZoneLeg`, which is modeled as
-a transit leg, since it carries route/agency/booking information from the matched provider's flex
-trip. The physical street route (geometry, distance, elevation, etc.) of the original driving leg
-is preserved.
+When a taxi leg matches a zone, it is replaced by a `TaxiZoneLeg`. It implements the plain `Leg`
+interface directly (**not** `TransitLeg`), even though it carries route/agency/booking
+information from the matched provider's flex trip. This means `transitLeg`/`isTransit` is
+`false` in the API for a taxi leg, and the itinerary's own `isTransit`-based fields are
+unaffected by it. The physical street route (geometry, distance, elevation, steps, generalized
+cost, emissions, fare offers, etc.) of the original driving leg is preserved by delegating to the
+wrapped street leg.
 
-| Field                       | Source                                                       |
-|:-----------------------------|:--------------------------------------------------------------|
-| `agency`                    | Agency from the matched route.                                |
-| `route`                     | Route from the matched flex trip.                             |
-| `mode`                      | `TransitMode` from the matched route (e.g. `TAXI`).           |
-| `serviceDate`               | The leg's own start date, validated against the matched zone's resolved GTFS service period. |
-| `boardStopPosInPattern`     | Always `0` (the pickup stop).                                  |
-| `alightStopPosInPattern`    | Always `1` (the drop-off stop).                                |
-| `pickupBookingInfo`         | Booking info from stop 0 of the matched flex trip.             |
-| `dropOffBookingInfo`        | Booking info from stop 1 of the matched flex trip.             |
+| Field (GTFS GraphQL / Transmodel) | Source                                                       |
+|:-----------------------------------|:--------------------------------------------------------------|
+| `transitLeg` / n\/a                | Always `false` — `TaxiZoneLeg` is not a `TransitLeg`.          |
+| `agency` / `authority`             | Agency from the matched route.                                |
+| `route` / `line`                   | Route from the matched flex trip.                              |
+| `mode`                              | `TransitMode` from the matched route (e.g. `TAXI`), resolved via an explicit `instanceof TaxiZoneLeg` branch in `LegImpl`/`LegType`, since it isn't a `TransitLeg`. |
+| `serviceDate`                      | The leg's own start date, validated against the matched zone's resolved GTFS service period. |
+| `boardStopPosInPattern`            | Always `0` (the pickup stop).                                  |
+| `alightStopPosInPattern`           | Always `1` (the drop-off stop).                                |
+| `pickupBookingInfo`                | Booking info from stop 0 of the matched flex trip.             |
+| `dropOffBookingInfo`               | Booking info from stop 1 of the matched flex trip.             |
+| `trip`, `tripOnServiceDate`, `alerts`, `stopCalls` | Not applicable — fall back to the `Leg` interface's defaults (`null`/empty), since there is no scheduled trip driving the leg. |
 
 Itineraries where the leg does not match any zone are tagged with the system notice
 `no-taxi-zone-available` and removed.
