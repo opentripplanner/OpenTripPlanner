@@ -3,19 +3,23 @@ package org.opentripplanner.transit.model.calendar;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
@@ -80,6 +84,29 @@ public class TripCalendarsBuilderTest {
     // Test exclusion of serviceCalendarDate
     Set<FeedScopedId> servicesOnMonday = tripCalendars.listServiceIdsOnServiceDate(A_MONDAY);
     assertEquals("[F:weekdays]", servicesOnMonday.toString());
+  }
+
+  @Test
+  public void addWeeklyCalendarTwiceForSameServiceIdThrowsEvenWhenFirstCalendarIsOutsidePeriodLimit() {
+    // The period limit excludes the first calendar's period entirely, so it is never stored -
+    // but a service id may still only have one weekly calendar registered against it.
+    LocalDateRange periodLimit = LocalDateRange.ofInclusiveEnd(A_MONDAY, A_MONDAY);
+    TripCalendarsBuilder subject = TripCalendars.of(periodLimit);
+    FeedScopedId serviceId = id("duplicate");
+
+    subject.addWeeklyCalendar(
+      serviceId,
+      EnumSet.allOf(DayOfWeek.class),
+      LocalDateRange.ofInclusiveEnd(A_FRIDAY, A_FRIDAY)
+    );
+
+    assertThrows(MultipleCalendarsForServiceIdException.class, () ->
+      subject.addWeeklyCalendar(
+        serviceId,
+        EnumSet.allOf(DayOfWeek.class),
+        LocalDateRange.ofInclusiveEnd(A_MONDAY, A_MONDAY)
+      )
+    );
   }
 
   private static GtfsContext createCtxBuilder() throws IOException {

@@ -31,6 +31,7 @@ public class TripCalendarsBuilder {
 
   private final LocalDateRange periodLimit;
 
+  private final Set<FeedScopedId> registeredWeeklyCalendarServiceIds = new HashSet<>();
   private final Map<FeedScopedId, WeeklyCalendar> weeklyCalendarsByServiceId = new HashMap<>();
   private final Map<FeedScopedId, Map<LocalDate, Boolean>> exceptionsByServiceId = new HashMap<>();
 
@@ -57,7 +58,7 @@ public class TripCalendarsBuilder {
     Set<DayOfWeek> daysOfWeek,
     LocalDateRange period
   ) {
-    if (weeklyCalendarsByServiceId.containsKey(serviceId)) {
+    if (!registeredWeeklyCalendarServiceIds.add(serviceId)) {
       throw new MultipleCalendarsForServiceIdException(serviceId);
     }
     if (period.overlap(periodLimit)) {
