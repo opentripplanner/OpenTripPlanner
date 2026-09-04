@@ -177,10 +177,24 @@ public class TripCalendars implements Serializable {
     return serviceCodesRunningForDate;
   }
 
+  /**
+   * The earliest service date across all service ids, or empty if there are none.
+   * <p>
+   * This is the actual earliest date any service runs on - not the build-config
+   * {@code transitServiceStart} passed to {@link TripCalendarsBuilder}. If the scheduled data
+   * covers a shorter period than that configured limit, this value reflects the shorter,
+   * actual period. See {@link #merge} for why this is effectively fixed once the graph build
+   * completes.
+   */
   public Optional<LocalDate> startDate() {
     return Optional.ofNullable(startDate);
   }
 
+  /**
+   * The latest service date across all service ids, or empty if there are none. See
+   * {@link #startDate()} for how this relates to the configured build-config period, and
+   * {@link #merge} for why it is effectively fixed once graph build completes.
+   */
   public Optional<LocalDate> endDate() {
     return Optional.ofNullable(endDate);
   }
@@ -191,8 +205,10 @@ public class TripCalendars implements Serializable {
 
   /**
    * Merge scheduled calendar data from {@code other} into this calendar. Used during graph build
-   * only, typically to fold in one {@link TripCalendarsBuilder}
-   * per feed.
+   * only, typically to fold in one {@link TripCalendarsBuilder} per feed.
+   * <p>
+   * <strong>Do not call this from realtime updates</strong> - the behaviour is undefined. Use
+   * {@link #getOrCreateServiceIdForDate} instead.
    *
    * @return a new instance with {@code other} merged in.
    */
