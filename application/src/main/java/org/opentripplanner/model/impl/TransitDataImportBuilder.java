@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +23,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendar;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -65,9 +64,7 @@ public class TransitDataImportBuilder {
 
   private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
-  private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
-
-  private final List<ServiceCalendar> calendars = new ArrayList<>();
+  private final TripCalendarsBuilder tripCalendars = TripCalendars.of();
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -132,12 +129,14 @@ public class TransitDataImportBuilder {
     return agenciesById;
   }
 
-  public List<ServiceCalendarDate> getCalendarDates() {
-    return calendarDates;
-  }
-
-  public List<ServiceCalendar> getCalendars() {
-    return calendars;
+  /**
+   * The builder used to accumulate scheduled calendar data for this feed - one
+   * {@link TripCalendarsBuilder#addWeeklyCalendar} call per GTFS {@code calendar.txt} row, plus
+   * one {@link TripCalendarsBuilder#addServiceDate}/{@link TripCalendarsBuilder#removeServiceDate}
+   * call per {@code calendar_dates.txt} row (or NeTEx equivalent).
+   */
+  public TripCalendarsBuilder tripCalendars() {
+    return tripCalendars;
   }
 
   public List<FeedInfo> getFeedInfos() {
@@ -280,24 +279,10 @@ public class TransitDataImportBuilder {
 
     LOG.warn("Limiting transit service days to time period: {}", periodLimit);
 
-    int orgSize = calendarDates.size();
-    calendarDates.removeIf(c -> !periodLimit.contains(c.getDate()));
-    logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
+    int orgSize = tripCalendars.listServiceIds().size();
+    tripCalendars.limitToPeriod(periodLimit);
+    logRemove("ServiceId", orgSize, tripCalendars.listServiceIds().size(), "Outside time period.");
 
-    List<ServiceCalendar> keepCal = new ArrayList<>();
-    for (ServiceCalendar calendar : calendars) {
-      if (calendar.getPeriod().overlap(periodLimit)) {
-        calendar.setPeriod(calendar.getPeriod().intersection(periodLimit));
-        keepCal.add(calendar);
-      }
-    }
-
-    orgSize = calendars.size();
-    if (orgSize != keepCal.size()) {
-      calendars.clear();
-      calendars.addAll(keepCal);
-      logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
-    }
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
   }
@@ -310,17 +295,10 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * Find all serviceIds in both CalendarServices and CalendarServiceDates.
+   * Find all serviceIds registered on {@link #tripCalendars()}.
    */
   Set<FeedScopedId> findAllServiceIds() {
-    Set<FeedScopedId> serviceIds = new HashSet<>();
-    for (ServiceCalendar calendar : getCalendars()) {
-      serviceIds.add(calendar.getServiceId());
-    }
-    for (ServiceCalendarDate date : getCalendarDates()) {
-      serviceIds.add(date.getServiceId());
-    }
-    return serviceIds;
+    return tripCalendars.listServiceIds();
   }
 
   private static void logRemove(String type, int orgSize, int newSize, String reason) {

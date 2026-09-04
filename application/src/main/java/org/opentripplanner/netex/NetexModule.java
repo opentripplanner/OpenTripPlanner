@@ -84,15 +84,11 @@ public class NetexModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     try {
-      var calendarsBuilder = TripCalendars.of();
+      TripCalendars tripCalendars = TripCalendars.empty();
 
       while (!netexBundles.isEmpty()) {
         TransitDataImportBuilder transitBuilder = loadNextBundle();
         transitBuilder.limitServiceDays(transitPeriodLimit);
-        calendarsBuilder.addCalendars(
-          transitBuilder.getCalendarDates(),
-          transitBuilder.getCalendars()
-        );
 
         if (OTPFeature.FlexRouting.isOn()) {
           transitBuilder
@@ -120,9 +116,10 @@ public class NetexModule implements GraphBuilderModule {
         parkingRepository.updateVehicleParking(lots, List.of());
         var linker = new VehicleParkingHelper(graph);
         lots.forEach(linker::linkVehicleParkingToGraph);
+
+        tripCalendars = tripCalendars.merge(otpService.getTripCalendars());
       }
 
-      var tripCalendars = calendarsBuilder.build();
       timetableDataImport.mergeTripCalendars(tripCalendars);
 
       TransitWithFutureDateValidator.validate(

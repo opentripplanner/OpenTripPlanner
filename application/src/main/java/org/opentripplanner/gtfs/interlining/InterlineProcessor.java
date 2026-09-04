@@ -21,7 +21,7 @@ import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -39,7 +39,7 @@ public class InterlineProcessor {
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed;
   private final LocalDate transitServiceStart;
   private final int daysInTransitService;
-  private final TripCalendarsBuilder calendarsBuilder;
+  private final TripCalendars tripCalendars;
   private final Map<FeedScopedId, BitSet> daysOfServices = new HashMap<>();
 
   public InterlineProcessor(
@@ -47,18 +47,18 @@ public class InterlineProcessor {
     List<StaySeatedNotAllowed> staySeatedNotAllowed,
     int maxInterlineDistance,
     DataImportIssueStore issueStore,
-    TripCalendarsBuilder calendarsBuilder
+    TripCalendars tripCalendars
   ) {
     this.transferService = transferService;
     this.staySeatedNotAllowed = staySeatedNotAllowed;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
-    this.transitServiceStart = calendarsBuilder.startDate().orElse(null);
-    this.daysInTransitService = calendarsBuilder
+    this.transitServiceStart = tripCalendars.startDate().orElse(null);
+    this.daysInTransitService = tripCalendars
       .endDate()
       .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
       .orElse(0);
-    this.calendarsBuilder = calendarsBuilder;
+    this.tripCalendars = tripCalendars;
   }
 
   public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
@@ -249,7 +249,7 @@ public class InterlineProcessor {
     BitSet daysForService = this.daysOfServices.get(serviceId);
     if (daysForService == null) {
       daysForService = new BitSet(daysInTransitService);
-      var serviceDates = calendarsBuilder.listServiceDates(serviceId);
+      var serviceDates = tripCalendars.listServiceDates(serviceId);
       for (LocalDate serviceDate : serviceDates) {
         int daysBetween = (int) ChronoUnit.DAYS.between(transitServiceStart, serviceDate);
         daysForService.set(daysBetween);

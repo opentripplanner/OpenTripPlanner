@@ -1,26 +1,24 @@
 package org.opentripplanner.transit.model.calendar;
 
-import static java.util.stream.Collectors.groupingBy;
-
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.model.calendar.build.MultipleCalendarsForServiceIdException;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendar;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.core.model.time.LocalDateRange;
 
 /**
  * Mutable builder used during graph build to accumulate scheduled calendar data - typically one
- * {@link #addCalendars} call per feed - before producing an immutable {@link TripCalendars}.
+ * {@link #addWeeklyCalendar} call per GTFS {@code calendar.txt} row, plus one
+ * {@link #addServiceDate}/{@link #removeServiceDate} call per {@code calendar_dates.txt} row (or
+ * NeTEx equivalent) - before producing an immutable {@link TripCalendars}.
  * <p>
  * Unlike {@link TripCalendars} itself, this builder is a plain mutable accumulator: it is meant to
  * be queried (see {@link #listServiceIds()}, {@link #listServiceDates}, {@link #startDate()},
@@ -28,87 +26,75 @@ import org.slf4j.LoggerFactory;
  */
 public class TripCalendarsBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TripCalendarsBuilder.class);
+  private final Map<FeedScopedId, WeeklyCalendar> weeklyCalendarsByServiceId = new HashMap<>();
+  private final Map<FeedScopedId, Map<LocalDate, Boolean>> exceptionsByServiceId = new HashMap<>();
 
   private final Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId = new HashMap<>();
   private final Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
+
+  /**
+   * Service ids currently represented in {@link #serviceDatesByServiceId} that were derived from
+   * {@link #weeklyCalendarsByServiceId}/{@link #exceptionsByServiceId} (as opposed to registered
+   * directly via {@link #putServiceDatesForServiceId}). Used by {@link #resolvePendingIfNeeded} to
+   * clean up stale entries for a service dropped entirely by {@link #limitToPeriod}.
+   */
+  private final Set<FeedScopedId> resolvedFromPending = new HashSet<>();
+
+  private boolean dirty = false;
 
   /** Use {@link TripCalendars#of()} to create a new instance. */
   TripCalendarsBuilder() {}
 
   /**
-   * Expand the given GTFS/NeTEx calendars and calendar date exceptions into active service dates,
-   * and add them to this builder. We perform this calculation in the timezone of the host jvm,
-   * which may be different than the timezone of an agency with the specified service id. To my
-   * knowledge, the calculation should work the same, which is to say I can't immediately think of
-   * any cases where the service dates would be computed incorrectly.
+   * Register a recurring weekly service pattern for {@code serviceId}: it runs on each of the
+   * given days of week within {@code period}. At most one weekly calendar can be registered per
+   * service id.
+   *
+   * @throws MultipleCalendarsForServiceIdException if a weekly calendar was already registered
+   * for this service id.
    */
-  public TripCalendarsBuilder addCalendars(
-    Collection<ServiceCalendarDate> calendarDates,
-    Collection<ServiceCalendar> serviceCalendars
+  public TripCalendarsBuilder addWeeklyCalendar(
+    FeedScopedId serviceId,
+    Set<DayOfWeek> daysOfWeek,
+    LocalDateRange period
   ) {
-    Map<FeedScopedId, List<ServiceCalendarDate>> calendarDatesByServiceId = calendarDates
-      .stream()
-      .collect(groupingBy(ServiceCalendarDate::getServiceId));
-    Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId = serviceCalendars
-      .stream()
-      .collect(groupingBy(ServiceCalendar::getServiceId));
-
-    Set<FeedScopedId> serviceIds = new HashSet<>();
-    serviceIds.addAll(calendarDatesByServiceId.keySet());
-    serviceIds.addAll(calendarsByServiceId.keySet());
-
-    for (FeedScopedId serviceId : serviceIds) {
-      Set<LocalDate> activeDates = new HashSet<>();
-
-      ServiceCalendar calendar = findCalendarForServiceId(calendarsByServiceId, serviceId);
-      if (calendar != null) {
-        addDatesFromCalendar(calendar, activeDates);
-      }
-
-      List<ServiceCalendarDate> dates = calendarDatesByServiceId.get(serviceId);
-      if (dates != null) {
-        for (ServiceCalendarDate cd : dates) {
-          addAndRemoveDatesFromCalendarDate(cd, activeDates);
-        }
-      }
-
-      putServiceDates(serviceId, activeDates);
+    if (
+      weeklyCalendarsByServiceId.putIfAbsent(
+        serviceId,
+        new WeeklyCalendar(Set.copyOf(daysOfWeek), period)
+      ) != null
+    ) {
+      throw new MultipleCalendarsForServiceIdException(serviceId);
     }
+    dirty = true;
     return this;
   }
 
   /**
-   * @return all service ids added to this builder so far.
+   * Register a service date exception: {@code serviceId} runs on {@code date}, in addition to any
+   * weekly calendar registered for it.
    */
-  public Set<FeedScopedId> listServiceIds() {
-    return serviceDatesByServiceId.keySet();
+  public TripCalendarsBuilder addServiceDate(FeedScopedId serviceId, LocalDate date) {
+    exceptionsByServiceId.computeIfAbsent(serviceId, id -> new HashMap<>()).put(date, Boolean.TRUE);
+    dirty = true;
+    return this;
   }
 
   /**
-   * @return the service dates registered so far for the given service id, sorted ascending.
+   * Register a service date exception: {@code serviceId} does not run on {@code date}, overriding
+   * any weekly calendar registered for it.
    */
-  public List<LocalDate> listServiceDates(FeedScopedId serviceId) {
-    return serviceDatesByServiceId.getOrDefault(serviceId, List.of());
-  }
-
-  /**
-   * @return the earliest service date registered so far, across all service ids.
-   */
-  public Optional<LocalDate> startDate() {
-    return serviceIdsByDate.keySet().stream().min(LocalDate::compareTo);
-  }
-
-  /**
-   * @return the latest service date registered so far, across all service ids.
-   */
-  public Optional<LocalDate> endDate() {
-    return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
+  public TripCalendarsBuilder removeServiceDate(FeedScopedId serviceId, LocalDate date) {
+    exceptionsByServiceId
+      .computeIfAbsent(serviceId, id -> new HashMap<>())
+      .put(date, Boolean.FALSE);
+    dirty = true;
+    return this;
   }
 
   /**
    * Register the given (already known) service dates directly for {@code serviceId}, bypassing
-   * the calendar/calendar-date expansion done by {@link #addCalendars}.
+   * the weekly-calendar/exception expansion done by {@link #addWeeklyCalendar}.
    */
   public TripCalendarsBuilder putServiceDatesForServiceId(
     FeedScopedId serviceId,
@@ -119,12 +105,120 @@ public class TripCalendarsBuilder {
   }
 
   /**
+   * Trim every registered weekly calendar and service date exception to {@code period}: weekly
+   * calendars whose period does not overlap {@code period} at all are dropped, others have their
+   * period intersected with it; exceptions outside {@code period} are dropped. A no-op if
+   * {@code period} is unbounded.
+   */
+  public TripCalendarsBuilder limitToPeriod(LocalDateRange period) {
+    if (period.isUnbounded()) {
+      return this;
+    }
+    Iterator<Map.Entry<FeedScopedId, WeeklyCalendar>> weeklyIt = weeklyCalendarsByServiceId
+      .entrySet()
+      .iterator();
+    while (weeklyIt.hasNext()) {
+      Map.Entry<FeedScopedId, WeeklyCalendar> entry = weeklyIt.next();
+      WeeklyCalendar weekly = entry.getValue();
+      if (weekly.period().overlap(period)) {
+        entry.setValue(
+          new WeeklyCalendar(weekly.daysOfWeek(), weekly.period().intersection(period))
+        );
+      } else {
+        weeklyIt.remove();
+      }
+    }
+    for (Map<LocalDate, Boolean> exceptions : exceptionsByServiceId.values()) {
+      exceptions.keySet().removeIf(date -> !period.contains(date));
+    }
+    exceptionsByServiceId.values().removeIf(Map::isEmpty);
+    dirty = true;
+    return this;
+  }
+
+  /**
+   * @return all service ids added to this builder so far.
+   */
+  public Set<FeedScopedId> listServiceIds() {
+    resolvePendingIfNeeded();
+    return serviceDatesByServiceId.keySet();
+  }
+
+  /**
+   * @return the service dates registered so far for the given service id, sorted ascending.
+   */
+  public List<LocalDate> listServiceDates(FeedScopedId serviceId) {
+    resolvePendingIfNeeded();
+    return serviceDatesByServiceId.getOrDefault(serviceId, List.of());
+  }
+
+  /**
+   * @return the earliest service date registered so far, across all service ids.
+   */
+  public Optional<LocalDate> startDate() {
+    resolvePendingIfNeeded();
+    return serviceIdsByDate.keySet().stream().min(LocalDate::compareTo);
+  }
+
+  /**
+   * @return the latest service date registered so far, across all service ids.
+   */
+  public Optional<LocalDate> endDate() {
+    resolvePendingIfNeeded();
+    return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
+  }
+
+  /**
    * Freeze the data accumulated so far into an immutable {@link TripCalendars} snapshot. No
    * service codes are registered yet - see {@link TripCalendars#withServiceCode} and
    * {@link TripCalendars#initializeServiceCodesRunningForDate}.
    */
   public TripCalendars build() {
+    resolvePendingIfNeeded();
     return new TripCalendars(serviceDatesByServiceId, serviceIdsByDate);
+  }
+
+  private void resolvePendingIfNeeded() {
+    if (!dirty) {
+      return;
+    }
+    Set<FeedScopedId> pendingServiceIds = new HashSet<>();
+    pendingServiceIds.addAll(weeklyCalendarsByServiceId.keySet());
+    pendingServiceIds.addAll(exceptionsByServiceId.keySet());
+
+    // A service previously resolved from pending data (e.g. a weekly calendar since dropped by
+    // limitToPeriod) is no longer represented in the pending maps at all - purge its stale entry.
+    Set<FeedScopedId> droppedServiceIds = new HashSet<>(resolvedFromPending);
+    droppedServiceIds.removeAll(pendingServiceIds);
+    for (FeedScopedId serviceId : droppedServiceIds) {
+      removeServiceDates(serviceId);
+      resolvedFromPending.remove(serviceId);
+    }
+
+    for (FeedScopedId serviceId : pendingServiceIds) {
+      // Clear any previously resolved dates for this service before recomputing, otherwise dates
+      // that no longer apply (e.g. trimmed off by limitToPeriod) would linger in serviceIdsByDate.
+      removeServiceDates(serviceId);
+
+      Set<LocalDate> activeDates = new HashSet<>();
+      WeeklyCalendar weekly = weeklyCalendarsByServiceId.get(serviceId);
+      if (weekly != null) {
+        addDatesFromWeeklyCalendar(weekly, activeDates);
+      }
+      Map<LocalDate, Boolean> exceptions = exceptionsByServiceId.get(serviceId);
+      if (exceptions != null) {
+        exceptions.forEach((date, added) -> {
+          if (added) {
+            activeDates.add(date);
+          } else {
+            activeDates.remove(date);
+          }
+        });
+      }
+      putServiceDates(serviceId, activeDates);
+      resolvedFromPending.add(serviceId);
+    }
+    dirty = false;
   }
 
   private void putServiceDates(FeedScopedId serviceId, Collection<LocalDate> activeDates) {
@@ -135,53 +229,39 @@ public class TripCalendarsBuilder {
     }
   }
 
-  private static ServiceCalendar findCalendarForServiceId(
-    Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId,
-    FeedScopedId serviceId
-  ) {
-    List<ServiceCalendar> calendars = calendarsByServiceId.get(serviceId);
-    if (calendars == null || calendars.isEmpty()) {
-      return null;
+  /** Remove any previously resolved dates for {@code serviceId} from both maps. */
+  private void removeServiceDates(FeedScopedId serviceId) {
+    List<LocalDate> oldDates = serviceDatesByServiceId.remove(serviceId);
+    if (oldDates == null) {
+      return;
     }
-    if (calendars.size() == 1) {
-      return calendars.getFirst();
+    for (LocalDate date : oldDates) {
+      Set<FeedScopedId> ids = serviceIdsByDate.get(date);
+      if (ids != null) {
+        ids.remove(serviceId);
+        if (ids.isEmpty()) {
+          serviceIdsByDate.remove(date);
+        }
+      }
     }
-    throw new MultipleCalendarsForServiceIdException(serviceId);
   }
 
-  private static void addDatesFromCalendar(ServiceCalendar calendar, Set<LocalDate> activeDates) {
-    LocalDate startDate = calendar.getPeriod().getStartInclusive();
-    LocalDate endDate = calendar.getPeriod().getEndInclusive();
+  private static void addDatesFromWeeklyCalendar(
+    WeeklyCalendar weekly,
+    Set<LocalDate> activeDates
+  ) {
+    if (weekly.daysOfWeek().isEmpty()) {
+      return;
+    }
+    LocalDate startDate = weekly.period().getStartInclusive();
+    LocalDate endDate = weekly.period().getEndInclusive();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-      if (
-        switch (date.getDayOfWeek()) {
-          case MONDAY -> calendar.getMonday() == 1;
-          case TUESDAY -> calendar.getTuesday() == 1;
-          case WEDNESDAY -> calendar.getWednesday() == 1;
-          case THURSDAY -> calendar.getThursday() == 1;
-          case FRIDAY -> calendar.getFriday() == 1;
-          case SATURDAY -> calendar.getSaturday() == 1;
-          case SUNDAY -> calendar.getSunday() == 1;
-        }
-      ) {
+      if (weekly.daysOfWeek().contains(date.getDayOfWeek())) {
         activeDates.add(date);
       }
     }
   }
 
-  private static void addAndRemoveDatesFromCalendarDate(
-    ServiceCalendarDate calendarDate,
-    Set<LocalDate> activeDates
-  ) {
-    LocalDate serviceDate = calendarDate.getDate();
-    switch (calendarDate.getExceptionType()) {
-      case ServiceCalendarDate.EXCEPTION_TYPE_ADD -> activeDates.add(serviceDate);
-      case ServiceCalendarDate.EXCEPTION_TYPE_REMOVE -> activeDates.remove(serviceDate);
-      default -> LOG.warn(
-        "Unknown CalendarDate exception type: {}",
-        calendarDate.getExceptionType()
-      );
-    }
-  }
+  private record WeeklyCalendar(Set<DayOfWeek> daysOfWeek, LocalDateRange period) {}
 }
