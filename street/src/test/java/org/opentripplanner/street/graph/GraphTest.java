@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -82,6 +83,23 @@ class GraphTest {
     expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
     assertThat(g.listEdges()).containsExactlyElementsIn(expectedEdges);
+  }
+
+  @Test
+  void testListEdgesCanBeIteratedMoreThanOnce() {
+    Graph g = new Graph();
+    var a = intersectionVertex("A", 5, 5);
+    var b = intersectionVertex("B", 6, 6);
+    var e = FreeEdge.createFreeEdge(a, b);
+
+    g.addVertex(a);
+    g.addVertex(b);
+
+    Iterable<Edge> edges = g.listEdges();
+
+    // Make sure the Iterable creates a new iterator every time it is called
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
   }
 
   @Test
