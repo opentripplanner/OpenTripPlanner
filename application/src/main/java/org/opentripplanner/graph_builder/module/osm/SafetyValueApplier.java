@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * provide a {@link org.opentripplanner.astar.spi.RemainingWeightHeuristic}
  * that incorporates walk and bike safety in its lower bound.
  */
-class SafetyValueApplier {
+public class SafetyValueApplier {
 
   private static final Logger LOG = LoggerFactory.getLogger(SafetyValueApplier.class);
 
@@ -30,7 +30,7 @@ class SafetyValueApplier {
    */
   private float bestWalkSafety = 1.0f;
 
-  SafetyValueApplier(Graph graph) {
+  public SafetyValueApplier(Graph graph) {
     this.graph = graph;
   }
 
@@ -54,7 +54,7 @@ class SafetyValueApplier {
     return bestWalkSafety;
   }
 
-  void applyWayProperties(
+  public void applyWayProperties(
     @Nullable StreetEdge street,
     @Nullable StreetEdge backStreet,
     WayProperties forwardWayData,
