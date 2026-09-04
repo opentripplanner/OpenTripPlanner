@@ -51,9 +51,8 @@ public class CalendarServiceBuilder {
 
   /**
    * Register every service calendar accumulated so far in {@code calendars}, one
-   * {@link TripCalendarsBuilder#addServiceDate} call per date, so a subsequent
-   * {@link TripCalendarsBuilder#limitToPeriod} still applies to these dates the same way it does
-   * for GTFS calendar_dates.
+   * {@link TripCalendarsBuilder#addServiceDate} call per date, so {@code calendars}'s period limit
+   * is applied to these dates the same way it is for GTFS calendar_dates.
    * <p/>
    * THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
    */
