@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,7 +31,7 @@ public class GraphReportBuilder {
       GraphReportBuilder::firstLetterToLowerCase
     );
 
-    var edgeTypes = countValues(graph.getEdges(), GraphReportBuilder::firstLetterToLowerCase);
+    var edgeTypes = countValues(graph.listEdges(), GraphReportBuilder::firstLetterToLowerCase);
     var vertexTypes = countValues(graph.getVertices(), GraphReportBuilder::firstLetterToLowerCase);
 
     return new GraphStats(
@@ -52,15 +51,16 @@ public class GraphReportBuilder {
     return Character.toLowerCase(className.charAt(0)) + className.substring(1);
   }
 
-  private static <T> TypeStats countValues(Collection<T> input, Function<T, String> classify) {
+  private static <T> TypeStats countValues(Iterable<T> input, Function<T, String> classify) {
     Map<String, Integer> result = new HashMap<>();
-    input.forEach(item -> {
+    int total = 0;
+    for (T item : input) {
       var classification = classify.apply(item);
       var count = result.getOrDefault(classification, 0);
       result.put(classification, ++count);
-    });
-
-    return new TypeStats(input.size(), result);
+      ++total;
+    }
+    return new TypeStats(total, result);
   }
 
   public record GraphStats(StreetStats street, TransitStats transit) {}

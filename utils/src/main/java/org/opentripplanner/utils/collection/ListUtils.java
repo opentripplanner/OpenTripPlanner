@@ -28,6 +28,28 @@ public class ListUtils {
   }
 
   /**
+   * Put all elements in the iterable into a list.
+   * <p>
+   * Note: This is inefficient - do not use it in hot code paths and try to iterate instead.
+   */
+  public static <T> List<T> ofIterable(Iterable<T> iterable) {
+    var ret = new ArrayList<T>();
+    iterable.forEach(ret::add);
+    return ret;
+  }
+
+  /**
+   * Count the number of elements in the iterable.
+   */
+  public static int countIterable(Iterable<?> iterable) {
+    int count = 0;
+    for (var _ : iterable) {
+      count++;
+    }
+    return count;
+  }
+
+  /**
    * Combine a number of collections into a single list.
    */
   @SafeVarargs

@@ -1,10 +1,10 @@
 package org.opentripplanner.street.graph;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +53,7 @@ class GraphTest {
   }
 
   @Test
-  void testGetEdgesOneEdge() {
+  void testListEdgesOneEdge() {
     Graph g = new Graph();
     Vertex a = intersectionVertex("A", 5, 5);
     Vertex b = intersectionVertex("B", 6, 6);
@@ -61,15 +61,12 @@ class GraphTest {
     g.addVertex(a);
     g.addVertex(b);
 
-    FreeEdge ee = FreeEdge.createFreeEdge(a, b);
-
-    List<Edge> edges = new ArrayList<>(g.getEdges());
-    assertEquals(1, edges.size());
-    assertEquals(ee, edges.get(0));
+    var ee = FreeEdge.createFreeEdge(a, b);
+    assertThat(g.listEdges()).containsExactlyElementsIn(Set.of(ee));
   }
 
   @Test
-  void testGetEdgesMultiple() {
+  void testListEdgesMultiple() {
     Graph g = new Graph();
     Vertex a = intersectionVertex("A", 5, 5);
     Vertex b = intersectionVertex("B", 6, 6);
@@ -85,9 +82,24 @@ class GraphTest {
     expectedEdges.add(FreeEdge.createFreeEdge(c, b));
     expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<Edge> edges = new HashSet<>(g.getEdges());
-    assertEquals(4, edges.size());
-    assertEquals(expectedEdges, edges);
+    assertThat(g.listEdges()).containsExactlyElementsIn(expectedEdges);
+  }
+
+  @Test
+  void testListEdgesCanBeIteratedMoreThanOnce() {
+    Graph g = new Graph();
+    var a = intersectionVertex("A", 5, 5);
+    var b = intersectionVertex("B", 6, 6);
+    var e = FreeEdge.createFreeEdge(a, b);
+
+    g.addVertex(a);
+    g.addVertex(b);
+
+    Iterable<Edge> edges = g.listEdges();
+
+    // Make sure the Iterable creates a new iterator every time it is called
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
   }
 
   @Test
@@ -103,8 +115,7 @@ class GraphTest {
     allEdges.add(FreeEdge.createFreeEdge(c, b));
     allEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
-    assertEquals(0, edges.size());
+    assertThat(g.findEdges(StreetEdge.class)).isEmpty();
   }
 
   @Test
@@ -124,9 +135,32 @@ class GraphTest {
     allStreetEdges.add(edge(c, b, 1.0));
     allStreetEdges.add(edge(c, a, 1.0));
 
-    Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
-    assertEquals(4, edges.size());
-    assertEquals(allStreetEdges, edges);
+    assertThat(g.findEdges(StreetEdge.class)).containsExactlyElementsIn(allStreetEdges);
+  }
+
+  @Test
+  void iterateEdgesFiltersByType() {
+    Graph g = new Graph();
+    StreetVertex a = intersectionVertex("A", 5, 5);
+    StreetVertex b = intersectionVertex("B", 6, 6);
+    StreetVertex c = intersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
+
+    StreetEdge streetEdge = edge(a, b, 1.0);
+    FreeEdge freeEdge = FreeEdge.createFreeEdge(b, c);
+
+    assertThat(g.findEdges(StreetEdge.class)).containsExactly(streetEdge);
+    assertThat(g.findEdges(FreeEdge.class)).containsExactly(freeEdge);
+    assertThat(g.findEdges(Edge.class)).containsExactly(streetEdge, freeEdge);
+  }
+
+  @Test
+  void iterateEdgesEmptyGraph() {
+    Graph g = new Graph();
+    assertThat(g.findEdges(Edge.class)).isEmpty();
   }
 
   /**

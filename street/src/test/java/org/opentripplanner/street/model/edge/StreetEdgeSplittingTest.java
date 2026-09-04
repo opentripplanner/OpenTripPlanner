@@ -73,10 +73,14 @@ class StreetEdgeSplittingTest {
       var sp0 = s0.splitDestructively(sv0);
       var sp1 = s1.splitDestructively(sv1);
 
-      // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
-      // have the same values
-      assertEquals(sp0.head().getDistanceMeters(), sp1.tail().getDistanceMeters(), 0.0000001);
-      assertEquals(sp0.tail().getDistanceMeters(), sp1.head().getDistanceMeters(), 0.0000001);
+      // distances are expressed internally as whole millimeters, but the split fraction for the
+      // forward and back edges is computed independently from their (forward vs. reversed)
+      // geometries. SphericalDistanceLibrary.distance(a, b) is not perfectly bit-symmetric under
+      // swapping a and b, so the two independent millimeter roundings can occasionally differ by
+      // 1 mm (0.001 m). Use an epsilon slightly larger than that to avoid flakiness while still
+      // catching real regressions.
+      assertEquals(sp0.head().getDistanceMeters(), sp1.tail().getDistanceMeters(), 0.0011);
+      assertEquals(sp0.tail().getDistanceMeters(), sp1.head().getDistanceMeters(), 0.0011);
       assertFalse(sp0.head().isBack());
       assertFalse(sp0.tail().isBack());
       assertTrue(sp1.head().isBack());
