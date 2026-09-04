@@ -5,7 +5,6 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.osm.internal.naming.DefaultNamer;
-import org.opentripplanner.graph_builder.module.osm.internal.naming.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;

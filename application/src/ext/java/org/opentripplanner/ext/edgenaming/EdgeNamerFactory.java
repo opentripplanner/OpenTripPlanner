@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.edgenaming;
 
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.internal.naming.DefaultNamer;
-import org.opentripplanner.graph_builder.module.osm.internal.naming.EdgeNamer;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 

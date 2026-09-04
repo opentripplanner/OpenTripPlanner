@@ -1,7 +1,8 @@
-package org.opentripplanner.graph_builder.module.osm.internal.edgelevelinfo;
+package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.graph_builder.module.osm.internal.edgelevelinfo.NoopInclinedEdgeLevelInfoProcessor;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
