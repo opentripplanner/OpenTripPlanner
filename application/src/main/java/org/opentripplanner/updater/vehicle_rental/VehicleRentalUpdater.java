@@ -20,7 +20,6 @@ import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneApplier;
-import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.linking.LinkingDirection;
@@ -59,7 +58,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
   private final boolean requireDropOffInsideBusinessArea;
 
   private Set<Vertex> latestBoundaryVertices = Set.of();
-  private GeofencingZoneIndex latestZoneIndex;
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
   private final Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   private final Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
@@ -177,6 +175,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     public void run(StreetRealTimeUpdateContext context) {
       // Apply stations to graph
       Set<FeedScopedId> stationSet = new HashSet<>();
+      // Vertices created by this update. Only these need their zones resolved, unless the zones
+      // themselves changed, in which case every vertex of this network is resolved again below.
+      List<VehicleRentalPlaceVertex> newVertices = new ArrayList<>();
 
       /* add any new stations and update vehicle counts for existing stations */
       for (VehicleRentalPlace station : stations) {
@@ -209,6 +210,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           VehicleRentalEdge.createRentalEdgesForStation(vehicleRentalVertex, station, tempEdges);
           verticesByStation.put(station.id(), vehicleRentalVertex);
           tempEdgesByStation.put(station.id(), tempEdges);
+          newVertices.add(vehicleRentalVertex);
         } else {
           vehicleRentalVertex.setStation(station);
         }
@@ -231,7 +233,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         tempEdgesByStation.remove(station);
       }
 
-      if (!geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones)) {
+      boolean zonesChanged =
+        !geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones);
+      if (zonesChanged) {
         LOG.info("Computing geofencing zones for {}", nameForLogging);
         var start = System.currentTimeMillis();
 
@@ -248,17 +252,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           env -> graph.findEdges(env, Scope.REQUEST),
           requireDropOffInsideBusinessArea
         );
-        var result = applier.applyGeofencingZones(geofencingZones);
-        latestBoundaryVertices = result.boundaryVertices();
-        latestZoneIndex = result.zoneIndex();
+        latestBoundaryVertices = applier.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
-        service.setGeofencingZoneIndex(nameForLogging, latestZoneIndex);
-
-        GeofencingZoneApplier.preResolveVertexZones(
-          verticesByStation.values(),
-          latestZoneIndex,
-          requireDropOffInsideBusinessArea
-        );
+        // A network has one source of zones, so registering under it replaces any earlier index.
+        // One updater serves one GBFS feed, so every zone here carries the same resolved system id.
+        var network = geofencingZones.iterator().next().id().getFeedId();
+        service.setGeofencingZones(network, geofencingZones);
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);
@@ -269,6 +268,18 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           nameForLogging
         );
       }
+
+      // Seed from the repository rather than from the zones computed above: a network in the
+      // permanent phase has an index there, rebuilt from the graph, but computes none here.
+      //
+      // Only vertices created by this update need resolving - a vertex keeps the zones it was
+      // given, and the vehicles that persist between updates keep their vertex. When the zones
+      // themselves changed, every vertex of this network is resolved again instead.
+      GeofencingZoneApplier.preResolveVertexZones(
+        zonesChanged ? verticesByStation.values() : newVertices,
+        service,
+        requireDropOffInsideBusinessArea
+      );
     }
   }
 

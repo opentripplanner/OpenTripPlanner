@@ -30,6 +30,8 @@ import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -174,6 +176,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
   public final EmpiricalDelayParameters empiricalDelay;
+  public final VehicleRentalGeofencingParameters vehicleRentalGeofencing;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -596,6 +599,10 @@ public class BuildConfig implements OtpDataStoreConfig {
     this.dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     this.emission = EmissionConfig.mapEmissionsConfig("emission", root);
     this.empiricalDelay = EmpiricalDelayConfig.mapEmpiricalDelayConfig("empiricalDelay", root);
+    this.vehicleRentalGeofencing = VehicleRentalGeofencingConfig.mapConfig(
+      "vehicleRentalGeofencing",
+      root
+    );
     this.netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     this.gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     this.transitFeeds = TransitFeedConfig.mapTransitFeeds(

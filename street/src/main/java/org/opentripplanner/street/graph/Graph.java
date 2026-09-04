@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -68,6 +69,15 @@ public class Graph implements Serializable {
 
   /** The convex hull of all the graph vertices. Generated at the time the Graph is built. */
   private Geometry convexHull = null;
+
+  /**
+   * Vehicle rental geofencing zones applied to the street graph during the graph build, by network.
+   * The boundary markers derived from them live on the vertices; these are the zones themselves,
+   * kept so the serve phase can index them for containment queries. Networks whose zones are
+   * applied by an updater instead are absent here.
+   */
+  private final Map<String, Set<GeofencingZone>> vehicleRentalGeofencingZones =
+    new ConcurrentHashMap<>();
 
   /** True if OSM data was loaded into this Graph. */
   public boolean hasStreets = false;
@@ -350,6 +360,19 @@ public class Graph implements Serializable {
    */
   public Geometry getConvexHull() {
     return convexHull;
+  }
+
+  /**
+   * Records the geofencing zones applied for a rental network during the graph build. Replaces any
+   * earlier registration for the same network, which has exactly one source of zones.
+   */
+  public void setVehicleRentalGeofencingZones(String network, Collection<GeofencingZone> zones) {
+    vehicleRentalGeofencingZones.put(network, Set.copyOf(zones));
+  }
+
+  /** The geofencing zones applied during the graph build, by rental network. */
+  public Map<String, Set<GeofencingZone>> vehicleRentalGeofencingZones() {
+    return Map.copyOf(vehicleRentalGeofencingZones);
   }
 
   public void initEllipsoidToGeoidDifference(double value, double lat, double lon) {
