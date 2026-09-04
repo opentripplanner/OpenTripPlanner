@@ -184,6 +184,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   private boolean isStairs() {
-    return steps > 0;
+    return steps != 0;
   }
 }
