@@ -1,17 +1,16 @@
 package org.opentripplanner.netex.mapping.calendar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 public class CalendarServiceBuilderTest {
 
@@ -40,7 +39,7 @@ public class CalendarServiceBuilderTest {
   }
 
   @Test
-  public void createServiceCalendar() {
+  public void addServiceCalendarsTo() {
     // Given
     var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
 
@@ -50,15 +49,35 @@ public class CalendarServiceBuilderTest {
     subject.registerDatesAndGetServiceId(Set.of(D2, D1));
 
     // When
-    Collection<ServiceCalendarDate> list = subject.createServiceCalendar();
+    var calendars = TripCalendars.of();
+    subject.addServiceCalendarsTo(calendars);
+    var tripCalendars = calendars.build();
 
     // Then
-    assertServiceDateExistInList(list, EXP_SID_1, D1);
-    assertServiceDateExistInList(list, EXP_SID_2, D2);
-    assertServiceDateExistInList(list, EXP_SID_3, D1);
-    assertServiceDateExistInList(list, EXP_SID_3, D2);
+    assertEquals(Set.of(D1), tripCalendars.listServiceDates(EXP_SID_1));
+    assertEquals(Set.of(D2), tripCalendars.listServiceDates(EXP_SID_2));
+    assertEquals(Set.of(D1, D2), tripCalendars.listServiceDates(EXP_SID_3));
+  }
 
-    assertEquals(4, list.size());
+  @Test
+  public void addServiceCalendarsToIsLimitedByPeriod() {
+    // Given
+    var subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
+
+    // A service running on D1 only, and one running on both D1 and D2
+    subject.registerDatesAndGetServiceId(Set.of(D1));
+    subject.registerDatesAndGetServiceId(Set.of(D1, D2));
+
+    // When the transit period is limited to exclude D1
+    var calendarsBuilder = TripCalendars.of();
+    subject.addServiceCalendarsTo(calendarsBuilder);
+    calendarsBuilder.limitToPeriod(LocalDateRange.ofInclusiveEnd(D2, D2));
+    var tripCalendars = calendarsBuilder.build();
+
+    // Then the service that only ran on D1 is gone entirely, and the other one is trimmed to D2
+    assertEquals(Set.of(), tripCalendars.listServiceIdsOnServiceDate(D1));
+    assertEquals(Set.of(D2), tripCalendars.listServiceDates(EXP_SID_2));
+    assertEquals(Set.of(EXP_SID_2), tripCalendars.listServiceIds());
   }
 
   @Test
@@ -66,28 +85,5 @@ public class CalendarServiceBuilderTest {
     CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
     assertEquals(FeedScopedIdForTestFactory.id("S000001"), subject.createServiceId());
     assertEquals(FeedScopedIdForTestFactory.id("S000002"), subject.createServiceId());
-  }
-
-  private void assertServiceDateExistInList(
-    Collection<ServiceCalendarDate> list,
-    FeedScopedId serviceId,
-    LocalDate serviceDate
-  ) {
-    for (ServiceCalendarDate it : list) {
-      if (serviceId.equals(it.getServiceId()) && serviceDate.equals(it.getDate())) {
-        return;
-      }
-    }
-    fail(
-      "Unable fo find service date. " +
-        "ServiceId=" +
-        serviceId +
-        ", " +
-        "date=" +
-        serviceDate +
-        ", " +
-        "list=" +
-        list
-    );
   }
 }

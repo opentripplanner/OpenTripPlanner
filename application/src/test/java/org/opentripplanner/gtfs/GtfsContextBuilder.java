@@ -79,9 +79,7 @@ public class GtfsContextBuilder {
    */
   public GtfsContext build() {
     repairStopTimesAndGenerateTripPatterns();
-    var tripCalendars = TripCalendars.of()
-      .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
-      .build();
+    var tripCalendars = transitBuilder.tripCalendars().build();
     return new GtfsContextImpl(feedId, tripCalendars);
   }
 
@@ -136,9 +134,7 @@ public class GtfsContextBuilder {
 
   private Set<FeedScopedId> serviceIds() {
     if (serviceIds == null) {
-      serviceIds = TripCalendars.of()
-        .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
-        .listServiceIds();
+      serviceIds = transitBuilder.tripCalendars().listServiceIds();
     }
     return serviceIds;
   }

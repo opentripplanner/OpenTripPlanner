@@ -1,18 +1,13 @@
 package org.opentripplanner.netex.mapping.calendar;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendar;
-import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
+import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
 
 /**
  * This class is responsible for creating a service calendar and generating service ids for each
@@ -22,7 +17,11 @@ import org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate;
  */
 public class CalendarServiceBuilder {
 
-  static final FeedScopedId EMPTY_SERVICE_ID = new FeedScopedId("CAL-SERVICE", "EMPTY");
+  /**
+   * Used for trips expected to be added from realtime updates or DSJs which are replaced, and
+   * where we want to keep the original DSJ.
+   */
+  public static final FeedScopedId EMPTY_SERVICE_ID = new FeedScopedId("CAL-SERVICE", "EMPTY");
 
   private final FeedScopedIdFactory scopedIdFactory;
   private final Map<Set<LocalDate>, FeedScopedId> serviceCalendar = new ConcurrentHashMap<>();
@@ -51,26 +50,19 @@ public class CalendarServiceBuilder {
   }
 
   /**
-   * Generate service calendar.
+   * Register every service calendar accumulated so far in {@code calendars}, one
+   * {@link TripCalendarsBuilder#addServiceDate} call per date, so a subsequent
+   * {@link TripCalendarsBuilder#limitToPeriod} still applies to these dates the same way it does
+   * for GTFS calendar_dates.
    * <p/>
    * THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
    */
-  public Collection<ServiceCalendarDate> createServiceCalendar() {
-    List<ServiceCalendarDate> dates = new ArrayList<>();
-
-    for (Map.Entry<Set<LocalDate>, FeedScopedId> it : serviceCalendar.entrySet()) {
-      for (LocalDate serviceDate : it.getKey()) {
-        dates.add(ServiceCalendarDate.create(it.getValue(), serviceDate));
+  public void addServiceCalendarsTo(TripCalendarsBuilder calendars) {
+    serviceCalendar.forEach((dates, serviceId) -> {
+      for (LocalDate date : dates) {
+        calendars.addServiceDate(serviceId, date);
       }
-    }
-    return dates;
-  }
-
-  public ServiceCalendar createEmptyCalendar() {
-    ServiceCalendar emptyCalendar = new ServiceCalendar();
-    emptyCalendar.setServiceId(EMPTY_SERVICE_ID);
-    emptyCalendar.setPeriod(LocalDateRange.ofUnbounded());
-    return emptyCalendar;
+    });
   }
 
   /**

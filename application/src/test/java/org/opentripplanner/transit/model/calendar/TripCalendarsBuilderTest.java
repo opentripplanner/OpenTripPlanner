@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.calendar.build;
+package org.opentripplanner.transit.model.calendar;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.transit.model.calendar.build.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,7 +22,6 @@ import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripCalendarsBuilderTest {
@@ -94,18 +92,10 @@ public class TripCalendarsBuilderTest {
       .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
-    builder.getCalendarDates().add(removeMondayFromAlldays());
+    builder.tripCalendars().removeServiceDate(SERVICE_ALLDAYS_ID, LocalDate.of(2009, 1, 5));
     builder.getFeedInfos().add(FeedInfoTestFactory.dummyForTest(TransitRepositoryForTest.FEED_ID));
 
     return ctxBuilder.build();
-  }
-
-  private static ServiceCalendarDate removeMondayFromAlldays() {
-    return new ServiceCalendarDate(
-      SERVICE_ALLDAYS_ID,
-      LocalDate.of(2009, 1, 5),
-      EXCEPTION_TYPE_REMOVE
-    );
   }
 
   private static <T> List<T> sort(Collection<? extends T> c) {

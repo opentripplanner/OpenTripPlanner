@@ -104,7 +104,13 @@ public class GtfsModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    var calendarsBuilder = TripCalendars.of();
+    // TODO - Cleanup the mapping and use of service-id. A GTFS feed service-id is NOT the same as
+    //        the OTP domain model service-id.
+    //        See https://github.com/opentripplanner/OpenTripPlanner/issues/7972.
+    //        This applies to the body of this method and related code, e.g. fares and
+    //        InterlineProcessor.
+
+    TripCalendars tripCalendars = TripCalendars.empty();
 
     Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
 
@@ -131,11 +137,12 @@ public class GtfsModule implements GraphBuilderModule {
 
         builder.limitServiceDays(transitPeriodLimit);
 
-        calendarsBuilder.addCalendars(builder.getCalendarDates(), builder.getCalendars());
-
-        calendarsBuilder
+        builder
+          .tripCalendars()
           .listServiceIds()
-          .forEach(sId -> fareRulesData.putServiceIds(sId, calendarsBuilder.listServiceDates(sId)));
+          .forEach(sId ->
+            fareRulesData.putServiceIds(sId, builder.tripCalendars().listServiceDates(sId))
+          );
 
         if (OTPFeature.FlexRouting.isOn()) {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
@@ -157,7 +164,7 @@ public class GtfsModule implements GraphBuilderModule {
           deduplicator,
           transitRepository,
           builder,
-          calendarsBuilder.listServiceIds(),
+          builder.tripCalendars().listServiceIds(),
           geometryProcessor,
           issueStore
         );
@@ -172,17 +179,18 @@ public class GtfsModule implements GraphBuilderModule {
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
-            calendarsBuilder
+            dataImport.getTripCalendars()
           ).run(dataImport.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesData);
+
+        tripCalendars = tripCalendars.merge(dataImport.getTripCalendars());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    TripCalendars tripCalendars = calendarsBuilder.build();
     transitRepository.mergeTripCalendars(tripCalendars);
     TransitWithFutureDateValidator.validate(
       tripCalendars,

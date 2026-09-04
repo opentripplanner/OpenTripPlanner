@@ -80,11 +80,7 @@ public class NetexNordicBundleSmokeTest {
     assertNoticeAssignments(otpModel.getNoticeAssignments());
 
     // And then - smoke test service calendar
-    assetServiceCalendar(
-      TripCalendars.of()
-        .addCalendars(transitBuilder.getCalendarDates(), transitBuilder.getCalendars())
-        .build()
-    );
+    assetServiceCalendar(transitBuilder.tripCalendars().build());
   }
 
   /* private methods */

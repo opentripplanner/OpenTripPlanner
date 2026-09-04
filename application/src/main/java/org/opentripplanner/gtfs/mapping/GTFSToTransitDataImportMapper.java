@@ -196,8 +196,8 @@ public class GTFSToTransitDataImportMapper {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
-    builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
-    builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
+    serviceCalendarDateMapper.map(data.getAllCalendarDates(), builder.tripCalendars());
+    serviceCalendarMapper.map(data.getAllCalendars(), builder.tripCalendars());
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     routeNetworkAssignmentMapper.map(data.getAllRouteNetworkAssignments());

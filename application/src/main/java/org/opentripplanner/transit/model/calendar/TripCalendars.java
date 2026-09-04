@@ -73,8 +73,10 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Create a new {@link TripCalendarsBuilder} to accumulate scheduled calendar data - typically
-   * one {@link TripCalendarsBuilder#addCalendars} call per feed - before producing an immutable
+   * Create a new {@link TripCalendarsBuilder} to accumulate scheduled calendar data - one
+   * {@link TripCalendarsBuilder#addWeeklyCalendar} call per GTFS {@code calendar.txt} row, plus
+   * one {@link TripCalendarsBuilder#addServiceDate}/{@link TripCalendarsBuilder#removeServiceDate}
+   * call per {@code calendar_dates.txt} row (or NeTEx equivalent) - before producing an immutable
    * {@link TripCalendars} instance via {@link TripCalendarsBuilder#build()}.
    */
   public static TripCalendarsBuilder of() {
