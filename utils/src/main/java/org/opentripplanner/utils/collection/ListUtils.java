@@ -39,6 +39,17 @@ public class ListUtils {
   }
 
   /**
+   * Count the number of elements in the iterable.
+   */
+  public static int countIterable(Iterable<?> iterable) {
+    int count = 0;
+    for (var _ : iterable) {
+      count++;
+    }
+    return count;
+  }
+
+  /**
    * Combine a number of collections into a single list.
    */
   @SafeVarargs

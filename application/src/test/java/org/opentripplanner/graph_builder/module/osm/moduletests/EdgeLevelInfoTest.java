@@ -6,6 +6,7 @@ import static org.opentripplanner.osm.model.NodeBuilder.node;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
@@ -253,9 +254,7 @@ public class EdgeLevelInfoTest {
     Graph graph,
     StreetDetailsRepository streetDetailsRepository
   ) {
-    return graph
-      .listEdges()
-      .stream()
+    return StreamSupport.stream(graph.listEdges().spliterator(), false)
       .flatMap(edge ->
         streetDetailsRepository
           .findInclinedEdgeLevelInfo(edge)
@@ -269,9 +268,7 @@ public class EdgeLevelInfoTest {
     Graph graph,
     StreetDetailsRepository streetDetailsRepository
   ) {
-    return graph
-      .listEdges()
-      .stream()
+    return StreamSupport.stream(graph.listEdges().spliterator(), false)
       .flatMap(edge ->
         streetDetailsRepository
           .findHorizontalEdgeLevelInfo(edge)

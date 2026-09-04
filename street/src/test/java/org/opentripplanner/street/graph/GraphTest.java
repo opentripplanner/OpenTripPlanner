@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,11 +61,8 @@ class GraphTest {
     g.addVertex(a);
     g.addVertex(b);
 
-    FreeEdge ee = FreeEdge.createFreeEdge(a, b);
-
-    List<Edge> edges = new ArrayList<>(g.listEdges());
-    assertEquals(1, edges.size());
-    assertEquals(ee, edges.get(0));
+    var ee = FreeEdge.createFreeEdge(a, b);
+    assertThat(g.listEdges()).containsExactlyElementsIn(Set.of(ee));
   }
 
   @Test
@@ -86,9 +82,24 @@ class GraphTest {
     expectedEdges.add(FreeEdge.createFreeEdge(c, b));
     expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
-    Set<Edge> edges = new HashSet<>(g.listEdges());
-    assertEquals(4, edges.size());
-    assertEquals(expectedEdges, edges);
+    assertThat(g.listEdges()).containsExactlyElementsIn(expectedEdges);
+  }
+
+  @Test
+  void testListEdgesCanBeIteratedMoreThanOnce() {
+    Graph g = new Graph();
+    var a = intersectionVertex("A", 5, 5);
+    var b = intersectionVertex("B", 6, 6);
+    var e = FreeEdge.createFreeEdge(a, b);
+
+    g.addVertex(a);
+    g.addVertex(b);
+
+    Iterable<Edge> edges = g.listEdges();
+
+    // Make sure the Iterable creates a new iterator every time it is called
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
+    assertThat(edges).containsExactlyElementsIn(List.of(e));
   }
 
   @Test
