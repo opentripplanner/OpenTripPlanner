@@ -22,6 +22,7 @@ import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.fares.ItineraryFareDataLoader;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
+import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.fare.FareOffer;
@@ -222,6 +223,9 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       if (leg instanceof CarpoolLeg cl) {
         return cl.mode().name();
+      }
+      if (leg instanceof TaxiZoneLeg tzl) {
+        return tzl.mode().name();
       }
       throw new IllegalStateException("Unhandled leg type: " + leg);
     };

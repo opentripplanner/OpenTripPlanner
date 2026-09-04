@@ -73,7 +73,19 @@ class TaxiZoneLegTest implements PlanTestConstants {
   @Test
   void isTransitLeg() {
     var leg = taxiZoneLeg();
-    assertTrue(leg.isTransitLeg());
+    assertFalse(leg.isTransitLeg());
+  }
+
+  @Test
+  void isStreetLeg() {
+    var leg = taxiZoneLeg();
+    assertTrue(leg.isStreetLeg());
+  }
+
+  @Test
+  void listTransitAlertsIsEmpty() {
+    var leg = taxiZoneLeg();
+    assertTrue(leg.listTransitAlerts().isEmpty());
   }
 
   @Test

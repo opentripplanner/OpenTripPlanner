@@ -11,7 +11,6 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
@@ -25,26 +24,21 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * A leg for a car pickup/drop-off decorated with a matched {@link TaxiZone} provider (e.g. a
- * taxi). It is physically a street/driving leg, but is modeled as a {@link TransitLeg} since it
- * carries route, agency and booking information from the matched provider.
+ * taxi). It is physically a street/driving leg, and is modeled as a plain {@link Leg} (not a
+ * {@link org.opentripplanner.model.plan.TransitLeg}) even though it carries route, agency and
+ * booking information from the matched provider.
  * <p>
  * The underlying street route data (geometry, distance, elevation, etc.) is delegated to the
  * wrapped {@link StreetLeg}.
  */
-public class TaxiZoneLeg implements TransitLeg {
+public class TaxiZoneLeg implements Leg {
 
   private final StreetLeg streetLeg;
   private final TaxiZone taxiZone;
-  private final Set<TransitAlert> transitAlerts;
 
   public TaxiZoneLeg(StreetLeg streetLeg, TaxiZone taxiZone) {
-    this(streetLeg, taxiZone, Set.of());
-  }
-
-  private TaxiZoneLeg(StreetLeg streetLeg, TaxiZone taxiZone, Set<TransitAlert> transitAlerts) {
     this.streetLeg = streetLeg.copyOf().build();
     this.taxiZone = taxiZone;
-    this.transitAlerts = Set.copyOf(transitAlerts);
   }
 
   public TaxiZone taxiZone() {
@@ -52,6 +46,20 @@ public class TaxiZoneLeg implements TransitLeg {
   }
 
   @Override
+  public boolean isTransitLeg() {
+    return false;
+  }
+
+  @Override
+  public boolean isStreetLeg() {
+    return true;
+  }
+
+  @Override
+  public boolean hasSameMode(Leg other) {
+    return other instanceof TaxiZoneLeg tzl && mode().equals(tzl.mode());
+  }
+
   public TransitMode mode() {
     return taxiZone.route().getMode();
   }
@@ -110,12 +118,7 @@ public class TaxiZoneLeg implements TransitLeg {
 
   @Override
   public Set<TransitAlert> listTransitAlerts() {
-    return transitAlerts;
-  }
-
-  @Override
-  public TaxiZoneLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return new TaxiZoneLeg(streetLeg, taxiZone, alerts);
+    return Set.of();
   }
 
   @Override
@@ -215,14 +218,13 @@ public class TaxiZoneLeg implements TransitLeg {
   public Leg withEmissionPerPerson(Emission emissionPerPerson) {
     return new TaxiZoneLeg(
       (StreetLeg) streetLeg.withEmissionPerPerson(emissionPerPerson),
-      taxiZone,
-      transitAlerts
+      taxiZone
     );
   }
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return new TaxiZoneLeg((StreetLeg) streetLeg.withTimeShift(duration), taxiZone, transitAlerts);
+    return new TaxiZoneLeg((StreetLeg) streetLeg.withTimeShift(duration), taxiZone);
   }
 
   @Override
