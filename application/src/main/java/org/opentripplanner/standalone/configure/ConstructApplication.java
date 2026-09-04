@@ -9,6 +9,7 @@ import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
@@ -92,6 +93,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiZoneRepository taxiZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -130,6 +132,7 @@ public class ConstructApplication {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
+      .taxiZoneRepository(taxiZoneRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -175,6 +178,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
+      factory.taxiZoneRepository(),
       factory.empiricalDelayRepository(),
       factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
@@ -381,6 +385,11 @@ public class ConstructApplication {
   @Nullable
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
+  }
+
+  @Nullable
+  public TaxiZoneRepository taxiZoneRepository() {
+    return factory.taxiZoneRepository();
   }
 
   public StreetDetailsRepository streetDetailsRepository() {

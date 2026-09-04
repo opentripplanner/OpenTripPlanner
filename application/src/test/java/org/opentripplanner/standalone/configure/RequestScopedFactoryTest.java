@@ -22,6 +22,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
@@ -242,6 +243,9 @@ class RequestScopedFactoryTest {
 
       @BindsInstance
       Builder carpoolingService(@Nullable CarpoolingService carpoolingService);
+
+      @BindsInstance
+      Builder taxiZoneService(@Nullable TaxiZoneService taxiZoneService);
 
       @BindsInstance
       Builder dataOverlayParameterBindings(

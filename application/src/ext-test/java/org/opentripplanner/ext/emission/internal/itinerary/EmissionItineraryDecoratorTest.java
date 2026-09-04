@@ -7,22 +7,28 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
+import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
@@ -59,6 +65,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   private Itinerary car;
   // No emissions
   private Itinerary flex;
+  // Apply route emissions via TaxiZoneLeg
+  private Itinerary taxi;
 
   private Itinerary combinedWithFlex;
   private Itinerary combinedNoFlex;
@@ -76,6 +84,21 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     rail = newItinerary(A).rail(3, START_TIME, END_TIME, B).build();
     car = newItinerary(A).drive(START_TIME, END_TIME, B).build();
     flex = newItinerary(A).flex(START_TIME, END_TIME, B).build();
+
+    var taxiRoute = ENV_BUILDER.route("TAXI1", b -> b.withMode(TransitMode.TAXI));
+    var taxiZone = new TaxiZone(null, taxiRoute, null, null, LocalDateRange.ofUnbounded());
+    var driveLeg = (StreetLeg) newItinerary(A)
+      .drive(START_TIME, END_TIME, B)
+      .build()
+      .legs()
+      .getFirst();
+    var taxiZoneLeg = new TaxiZoneLeg(driveLeg, taxiZone);
+    taxi = newItinerary(A)
+      .drive(START_TIME, END_TIME, B)
+      .build()
+      .copyOf()
+      .withLegs(List.of(taxiZoneLeg))
+      .build();
 
     int t0 = START_TIME;
     combinedWithFlex = newItinerary(A)
@@ -101,6 +124,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
     routeEmissions.put(routeA.getId(), Emission.ofCo2Gram(0.01));
     routeEmissions.put(routeB.getId(), Emission.ZERO);
+    routeEmissions.put(taxiRoute.getId(), Emission.ofCo2Gram(0.02));
     repository.addRouteEmissions(routeEmissions);
 
     // Set trip emissions for rail - using trip-pattern emission
@@ -171,6 +195,14 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     var it = subject.decorate(flex);
     assertNull(it.emissionPerPerson());
     assertNull(it.legs().getFirst().emissionPerPerson());
+  }
+
+  @Test
+  void decorateTaxiZoneLegUsingRouteEmission() {
+    var subject = new EmissionItineraryDecorator(emissionService);
+    var it = subject.decorate(taxi);
+    assertEmission(1380, it.emissionPerPerson());
+    assertEmission(1380, it.legs().getFirst().emissionPerPerson());
   }
 
   @Test

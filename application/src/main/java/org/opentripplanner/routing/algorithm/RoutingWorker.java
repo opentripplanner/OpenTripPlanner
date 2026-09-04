@@ -16,6 +16,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
@@ -101,6 +102,9 @@ public class RoutingWorker {
   private final CarpoolingService carpoolingService;
 
   @Nullable
+  private final TaxiZoneService taxiZoneService;
+
+  @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
@@ -132,6 +136,7 @@ public class RoutingWorker {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
@@ -157,6 +162,7 @@ public class RoutingWorker {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
@@ -307,6 +313,12 @@ public class RoutingWorker {
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no direct itinerary for TAXI unless the
+    //       taxi-zone sandbox feature is enabled.
+    if (request.journey().direct().mode() == StreetMode.TAXI && OTPFeature.TaxiZone.isOff()) {
+      return RoutingResult.empty();
+    }
 
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
@@ -334,6 +346,7 @@ public class RoutingWorker {
           streetLimitationParametersService,
           vehicleRentalService,
           streetDetailsService,
+          taxiZoneService,
           dataOverlayParameterBindings,
           directBuilder.buildRequest(),
           linkingContext()
@@ -394,6 +407,16 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeTransit() {
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no transit itinerary when access or egress is TAXI
+    //       unless the taxi-zone sandbox feature is enabled.
+    if (
+      request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) &&
+      OTPFeature.TaxiZone.isOff()
+    ) {
+      return RoutingResult.empty();
+    }
+
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
@@ -414,7 +437,8 @@ public class RoutingWorker {
         additionalSearchDays,
         debugTimingAggregator,
         linkingContext(),
-        carpoolingService
+        carpoolingService,
+        taxiZoneService
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       var itineraries = transitResults.getItineraries();

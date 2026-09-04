@@ -20,6 +20,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
@@ -92,6 +93,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final @Nullable EmissionRepository emissionRepository;
+  public final @Nullable TaxiZoneRepository taxiZoneRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
   public final StreetRepository streetRepository;
@@ -110,6 +112,7 @@ public class SerializedGraphObject implements Serializable {
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiZoneRepository taxiZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,
     FareServiceFactory fareServiceFactory
@@ -127,6 +130,7 @@ public class SerializedGraphObject implements Serializable {
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
     this.emissionRepository = emissionRepository;
+    this.taxiZoneRepository = taxiZoneRepository;
     this.empiricalDelayRepository = empiricalDelayRepository;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();

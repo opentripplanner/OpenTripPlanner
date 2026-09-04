@@ -3,6 +3,7 @@ package org.opentripplanner.core.model.time;
 import static java.time.LocalDate.MAX;
 import static java.time.LocalDate.MIN;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * {@code null} is accepted in all factory method parameters and is treated as unbounded (equivalent
  * to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
  */
-public final class LocalDateRange {
+public final class LocalDateRange implements Serializable {
 
   private static final LocalDateRange UNBOUNDED = new LocalDateRange(MIN, MAX);
 
