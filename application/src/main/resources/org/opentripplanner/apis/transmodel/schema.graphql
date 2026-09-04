@@ -2070,6 +2070,7 @@ enum TransportMode {
   air
   bus
   cableway
+  carpool
   coach
   funicular
   lift
