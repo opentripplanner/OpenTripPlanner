@@ -21,12 +21,8 @@ import org.rutebanken.netex.model.ValidBetween;
 
 class NetexVersionHelperTest {
 
-  private static final EntityInVersionStructure E_VER_1 =
-    new EntityInVersionStructure().withVersion("1");
-  private static final EntityInVersionStructure E_VER_2 =
-    new EntityInVersionStructure().withVersion("2");
-  private static final EntityInVersionStructure E_VER_ANY =
-    new EntityInVersionStructure().withVersion("any");
+  private static final EntityInVersionStructure E_VER_1 = versionedEntity("1");
+  private static final EntityInVersionStructure E_VER_2 = versionedEntity("2");
 
   @Test
   void versionOfTest() {
@@ -35,7 +31,7 @@ class NetexVersionHelperTest {
 
   @Test
   void any() {
-    assertEquals(-1, versionOf(E_VER_ANY));
+    assertEquals(-1, versionOf(versionedEntity("any")));
   }
 
   @Test
@@ -51,13 +47,16 @@ class NetexVersionHelperTest {
   }
 
   @Test
+  void veryLargeVersion() {
+    assertEquals(20260819234001d, versionOf(versionedEntity("20260819234001")));
+  }
+
+  @Test
   void comparingVersionTest() {
     // Given a comparator (subject under test)
     Comparator<EntityInVersionStructure> subject = comparingVersion();
     // And a entity with version as the E_VER_1 entity
-    EntityInVersionStructure sameVersionAs_E_VER_1 = new EntityInVersionStructure().withVersion(
-      "1"
-    );
+    EntityInVersionStructure sameVersionAs_E_VER_1 = versionedEntity("1");
 
     // Then expect equals versions to return zero
     assertEquals(0, subject.compare(E_VER_1, sameVersionAs_E_VER_1));
@@ -101,5 +100,9 @@ class NetexVersionHelperTest {
     assertEquals(may2nd, firstValidDateTime(List.of(pFrom2ndTo3rd), may2nd));
     assertEquals(may3rd, firstValidDateTime(List.of(pFrom2ndTo3rd), may3rd));
     assertNull(firstValidDateTime(List.of(pFrom2ndTo3rd), may4th));
+  }
+
+  private static EntityInVersionStructure versionedEntity(String any) {
+    return new EntityInVersionStructure().withVersion(any);
   }
 }

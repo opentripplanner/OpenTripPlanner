@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.support;
 
-import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.comparingDouble;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -39,11 +39,11 @@ public class NetexVersionHelper {
    * defines this as follows: "Use "any" if the VERSION is unknown (note that this will trigger NeTEx's
    * XML automatic consistency check)."
    */
-  public static int versionOf(EntityInVersionStructure e) {
+  public static double versionOf(EntityInVersionStructure e) {
     if (e.getVersion().equals(ANY)) {
       return UNKNOWN_VERSION;
     } else {
-      return Integer.parseInt(e.getVersion());
+      return Double.parseDouble(e.getVersion());
     }
   }
 
@@ -51,8 +51,8 @@ public class NetexVersionHelper {
    * Return the latest (maximum) version number for the given {@code list} of elements. If no
    * elements exist in the collection {@code -1} is returned.
    */
-  public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
-    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
+  public static double latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
+    return list.stream().mapToDouble(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
   }
 
   /**
@@ -69,7 +69,7 @@ public class NetexVersionHelper {
    * Return a comparator to compare {@link EntityInVersionStructure} elements by <b>version</b>.
    */
   public static <T extends EntityInVersionStructure> Comparator<T> comparingVersion() {
-    return comparingInt(NetexVersionHelper::versionOf);
+    return comparingDouble(NetexVersionHelper::versionOf);
   }
 
   /**
