@@ -41,6 +41,11 @@ public class StreetPath {
     this(new GraphPath<>(endState));
   }
 
+  // TODO don't expose edges
+  public List<Edge> edges() {
+    return edges;
+  }
+
   /// The start of the path in seconds
   public Instant startTime() {
     return states.getFirst().getTime();

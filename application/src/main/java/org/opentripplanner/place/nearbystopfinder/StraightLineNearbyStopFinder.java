@@ -43,7 +43,7 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );
       if (distance < radiusMeters) {
-        NearbyStop sd = new NearbyStop(it.getId(), distance, null, null);
+        NearbyStop sd = new NearbyStop(it.getId(), distance, List.of(), List.of());
         stopsFound.add(sd);
       }
     }

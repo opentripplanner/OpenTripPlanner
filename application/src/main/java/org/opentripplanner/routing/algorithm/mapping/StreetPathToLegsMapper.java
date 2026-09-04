@@ -103,28 +103,19 @@ public class StreetPathToLegsMapper {
    * generates a new leg. Note, walking a bike does not cause a new leg to be generated. The legs
    * are returned in the order they are traversed in the path.
    *
-   * @param startTime The legs are time shifted to so that the first leg starts at this time and the
-   *                  next legs have the same delay as the first leg. If this is null, no time
-   *                  shifting happens.
+   * @param delay The legs are time shifted with this delay, if it's not {@code null}.
    */
-  public List<Leg> map(StreetPath path, RouteRequest request, @Nullable ZonedDateTime startTime) {
-    return map(path, request.listViaLocations(), startTime);
+  public List<Leg> map(StreetPath path, RouteRequest request, @Nullable Duration delay) {
+    return map(path, request.listViaLocations(), delay);
   }
 
-  public List<Leg> map(
-    StreetPath path,
-    List<ViaLocation> viaLocations,
-    @Nullable ZonedDateTime startTime
-  ) {
+  public List<Leg> map(StreetPath path, List<ViaLocation> viaLocations, @Nullable Duration delay) {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     var subPaths = slicePath(path);
     if (subPaths.isEmpty()) {
       return List.of();
     }
-    var delay = startTime != null
-      ? Duration.between(subPaths.getFirst().startTime(), startTime)
-      : null;
     for (var subPath : subPaths) {
       if (
         OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
