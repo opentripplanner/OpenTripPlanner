@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -25,8 +24,8 @@ import org.opentripplanner.core.model.time.LocalDateRange;
  * {@code periodLimit} is ignored.
  * <p>
  * Unlike {@link TripCalendars} itself, this builder is a plain mutable accumulator: it is meant to
- * be queried (see {@link #listServiceIds()}, {@link #listServiceDates}, {@link #startDate()},
- * {@link #endDate()}) while a graph build module is still adding data to it, one feed at a time.
+ * be queried (see {@link #listServiceIds()}, {@link #listServiceDates}) while a graph build module
+ * is still adding data to it, one feed at a time.
  */
 public class TripCalendarsBuilder {
 
@@ -129,22 +128,6 @@ public class TripCalendarsBuilder {
   public List<LocalDate> listServiceDates(FeedScopedId serviceId) {
     resolvePendingIfNeeded();
     return serviceDatesByServiceId.getOrDefault(serviceId, List.of());
-  }
-
-  /**
-   * @return the earliest service date registered so far, across all service ids.
-   */
-  public Optional<LocalDate> startDate() {
-    resolvePendingIfNeeded();
-    return serviceIdsByDate.keySet().stream().min(LocalDate::compareTo);
-  }
-
-  /**
-   * @return the latest service date registered so far, across all service ids.
-   */
-  public Optional<LocalDate> endDate() {
-    resolvePendingIfNeeded();
-    return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
   }
 
   /**
