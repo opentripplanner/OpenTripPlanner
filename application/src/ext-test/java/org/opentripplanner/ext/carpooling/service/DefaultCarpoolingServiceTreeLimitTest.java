@@ -50,10 +50,10 @@ class DefaultCarpoolingServiceTreeLimitTest {
       stop(Duration.ofMinutes(40))
     );
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(
-      trip,
-      new Duration[] { Duration.ofMinutes(60), Duration.ofMinutes(100) }
-    );
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
+      Duration.ofMinutes(60),
+      Duration.ofMinutes(100),
+    });
 
     assertEquals(2, limits.length);
     // Leg 0 allowance = min(downstream budgets) = min(5, 40) = 5.
@@ -78,10 +78,10 @@ class DefaultCarpoolingServiceTreeLimitTest {
       stop(Duration.ofMinutes(2))
     );
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(
-      trip,
-      new Duration[] { Duration.ofMinutes(5), Duration.ofMinutes(5) }
-    );
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
+      Duration.ofMinutes(5),
+      Duration.ofMinutes(5),
+    });
 
     var leg = expectedLimit(Duration.ofMinutes(5), Duration.ofMinutes(2));
     assertEquals(leg, limits[0]);
@@ -96,10 +96,9 @@ class DefaultCarpoolingServiceTreeLimitTest {
   void twoWaypointTripSizesTheSingleLeg() {
     var trip = trip(stop(BUDGET), stop(BUDGET));
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(
-      trip,
-      new Duration[] { Duration.ofMinutes(60) }
-    );
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
+      Duration.ofMinutes(60),
+    });
 
     assertEquals(1, limits.length);
     assertEquals(expectedLimit(Duration.ofMinutes(60), BUDGET), limits[0]);
@@ -112,10 +111,9 @@ class DefaultCarpoolingServiceTreeLimitTest {
     // request could expand a multi-hour street tree.
     var trip = trip(stop(BUDGET), stop(BUDGET));
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(
-      trip,
-      new Duration[] { Duration.ofHours(4) }
-    );
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
+      Duration.ofHours(4),
+    });
 
     assertEquals(CarpoolTrip.MAX_TRIP_DURATION, limits[0]);
   }

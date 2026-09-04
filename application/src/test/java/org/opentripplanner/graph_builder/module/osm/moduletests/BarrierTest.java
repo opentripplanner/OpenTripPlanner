@@ -39,7 +39,12 @@ public class BarrierTest {
       List.of(way, barrier),
       Set.of(1, 2, 3, 4, 98, 99)
         .stream()
-        .map(id -> OsmNode.of().withId(id).withLatLon((double) id / 1000, 0).build())
+        .map(id ->
+          OsmNode.of()
+            .withId(id)
+            .withLatLon((double) id / 1000, 0)
+            .build()
+        )
         .toList()
     );
 

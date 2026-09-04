@@ -40,7 +40,7 @@ public final class TimeScalarFactory {
           .name("dayOffset")
           .description("Number of days offset from base line time")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment -> ((Integer) environment.getSource()) / SECONDS_PER_DAY)
+          .dataFetcher(environment -> (Integer) environment.getSource() / SECONDS_PER_DAY)
           .build()
       )
       .build();
@@ -55,9 +55,7 @@ public final class TimeScalarFactory {
           @Override
           public String serialize(Object input) {
             if (input instanceof Integer) {
-              return (LocalTime.ofSecondOfDay(((Integer) input % SECONDS_PER_DAY))).format(
-                FORMATTER
-              );
+              return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
             }
             return null;
           }

@@ -525,9 +525,10 @@ public class PlatformLinkingTest {
     AreaGroup area,
     String nameString
   ) {
-    LineString line = GEOMETRY_FACTORY.createLineString(
-      new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
-    );
+    LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] {
+      v1.getCoordinate(),
+      v2.getCoordinate(),
+    });
     I18NString name = new LocalizedString(nameString);
     return new AreaEdgeBuilder()
       .withFromVertex(v1)

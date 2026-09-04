@@ -54,13 +54,11 @@ public class FlexIndex {
           LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
           FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
 
-          serviceDate
-            .datesUntil(maxDate.plusDays(1))
-            .forEach(runningDate -> {
-              flexTripsRunningOnDate
-                .computeIfAbsent(runningDate, d -> new ArrayList<>())
-                .add(flexTripForDate);
-            });
+          serviceDate.datesUntil(maxDate.plusDays(1)).forEach(runningDate -> {
+            flexTripsRunningOnDate
+              .computeIfAbsent(runningDate, d -> new ArrayList<>())
+              .add(flexTripForDate);
+          });
         });
     }
 

@@ -5,7 +5,8 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
 public class FareAttributeBuilder
-  extends AbstractEntityBuilder<FareAttribute, FareAttributeBuilder> {
+  extends AbstractEntityBuilder<FareAttribute, FareAttributeBuilder>
+{
 
   private FeedScopedId agency;
   private Money price;

@@ -108,7 +108,7 @@ public final class Gram implements Serializable, Comparable<Gram> {
       return value / GRAM_PRECISION + "g";
     }
     if (Math.abs(value) > 1000) {
-      return (value / 1000.0) + "g";
+      return value / 1000.0 + "g";
     }
     return value + "mg";
   }

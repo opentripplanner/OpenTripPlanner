@@ -31,13 +31,13 @@ public class AssertSpeedTestSetup {
           "transitServiceEnd":        %s (%s)
 
         """.formatted(
-            numberOfPatternForTestDate,
-            config.testDate(),
-            buildConfig.transitServiceStart,
-            OtpFileNames.BUILD_CONFIG_FILENAME,
-            buildConfig.transitServiceEnd,
-            OtpFileNames.BUILD_CONFIG_FILENAME
-          )
+          numberOfPatternForTestDate,
+          config.testDate(),
+          buildConfig.transitServiceStart,
+          OtpFileNames.BUILD_CONFIG_FILENAME,
+          buildConfig.transitServiceEnd,
+          OtpFileNames.BUILD_CONFIG_FILENAME
+        )
       );
     }
   }

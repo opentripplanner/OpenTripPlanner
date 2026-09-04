@@ -199,9 +199,8 @@ public class VertexLinker {
     Scope scope,
     BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
-      ? new DisposableEdgeCollection(graph, scope)
-      : null;
+    DisposableEdgeCollection tempEdges =
+      scope != Scope.PERMANENT ? new DisposableEdgeCollection(graph, scope) : null;
 
     try {
       // Expanding-envelope search: try each radius step (smallest first) and stop at the first that
@@ -559,9 +558,10 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    var newEdges = scope == Scope.PERMANENT
-      ? originalEdge.splitDestructively(v)
-      : originalEdge.splitNonDestructively(v, direction);
+    var newEdges =
+      scope == Scope.PERMANENT
+        ? originalEdge.splitDestructively(v)
+        : originalEdge.splitNonDestructively(v, direction);
 
     if (scope != Scope.PERMANENT) {
       newEdges.forEach(tempEdges::addEdge);

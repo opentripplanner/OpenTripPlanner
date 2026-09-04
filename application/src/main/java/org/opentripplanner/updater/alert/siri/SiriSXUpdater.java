@@ -26,7 +26,8 @@ import uk.org.siri.siri21.Siri;
 
 public class SiriSXUpdater
   extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-  implements TransitAlertProvider {
+  implements TransitAlertProvider
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final int RETRY_MAX_ATTEMPTS = 3;
@@ -190,14 +191,14 @@ public class SiriSXUpdater
       LOG.info(
         "Retryable exception while reading SIRI feed from {} after {} ms",
         url,
-        (System.currentTimeMillis() - t1)
+        System.currentTimeMillis() - t1
       );
       throw e;
     } catch (Exception e) {
       LOG.error(
         "Non-retryable exception while reading SIRI feed from {} after {} ms",
         url,
-        (System.currentTimeMillis() - t1)
+        System.currentTimeMillis() - t1
       );
     }
     return Optional.empty();

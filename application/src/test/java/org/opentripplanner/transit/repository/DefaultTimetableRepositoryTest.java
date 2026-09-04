@@ -28,7 +28,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -79,7 +79,7 @@ public class DefaultTimetableRepositoryTest {
   void testUniqueDirtyTimetablesAfterMultipleUpdates() {
     DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
@@ -139,7 +139,7 @@ public class DefaultTimetableRepositoryTest {
   void testClear() {
     DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
@@ -200,7 +200,10 @@ public class DefaultTimetableRepositoryTest {
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .withScheduledTimeTableBuilder(builder ->
         builder.addTripTimes(
-          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes(new int[] { 0, 1 }).build()
+          ScheduledTripTimes.of()
+            .withTrip(trip)
+            .withDepartureTimes(new int[] { 0, 1 })
+            .build()
         )
       )
       .build();
@@ -225,7 +228,7 @@ public class DefaultTimetableRepositoryTest {
       realTimeAddedReplacedByTripOnServiceDateById,
       new HashMap<>(Map.of(tripIdAndServiceDate, tripOnServiceDate)),
       patternsForStop,
-      new DefaultTripCalendars(),
+      TripCalendars.empty(),
       RaptorTransitDataTestFactory.empty(),
       false,
       new TimetableUpdateMapper()
@@ -253,7 +256,7 @@ public class DefaultTimetableRepositoryTest {
   private static DefaultTimetableRepository createCommittedSnapshot() {
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     return timetableSnapshot.commit(true);
   }

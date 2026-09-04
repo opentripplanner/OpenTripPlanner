@@ -261,13 +261,15 @@ public class OsmOpeningHoursParser {
         return openingHoursBuilder;
       }
       DayOfWeek startDayOfWeek = DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getStartDay(), null);
-      DayOfWeek endDayOfWeek = weekDayRange.getEndDay() != null
-        ? DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getEndDay(), null)
-        : null;
+      DayOfWeek endDayOfWeek =
+        weekDayRange.getEndDay() != null
+          ? DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getEndDay(), null)
+          : null;
       java.time.Month startMonth = MONTH_MAP.getOrDefault(startDate.getMonth(), null);
-      java.time.Month endMonth = endDate != null && endDate.getMonth() != null
-        ? MONTH_MAP.getOrDefault(endDate.getMonth(), null)
-        : null;
+      java.time.Month endMonth =
+        endDate != null && endDate.getMonth() != null
+          ? MONTH_MAP.getOrDefault(endDate.getMonth(), null)
+          : null;
       openingHoursBuilder.on(startMonth, endMonth, startDayOfWeek, endDayOfWeek);
     }
     return openingHoursBuilder;
@@ -501,20 +503,21 @@ public class OsmOpeningHoursParser {
    * Logs unhandled rule either with {@link Logger} or stores it in {@link DataImportIssueStore}.
    */
   private void logUnhandled(Rule rule, String ohTag, String id, String link) {
-    var message = link != null
-      ? String.format(
-          "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
-          rule,
-          ohTag,
-          id,
-          link
-        )
-      : String.format(
-          "Rule %s is unhandled in the opening hours definition %s for %s",
-          rule,
-          ohTag,
-          id
-        );
+    var message =
+      link != null
+        ? String.format(
+            "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
+            rule,
+            ohTag,
+            id,
+            link
+          )
+        : String.format(
+            "Rule %s is unhandled in the opening hours definition %s for %s",
+            rule,
+            ohTag,
+            id
+          );
     if (issueStore != null) {
       issueStore.add("UnhandledOHRule", message);
     } else {

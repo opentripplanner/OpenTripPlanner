@@ -1,13 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +63,6 @@ public class SafetyValueApplier {
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-    Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
-
     boolean motorVehicleNoThrough =
       tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
     boolean bicycleNoThrough = tagMapperForWay.isBicycleThroughTrafficExplicitlyDisallowed(way);
@@ -92,11 +88,6 @@ public class SafetyValueApplier {
           bestWalkSafety,
           street
         );
-      }
-      if (notes != null) {
-        for (var it : notes) {
-          graph.streetNotesService.addStaticNote(street, it.note(), it.matcher());
-        }
       }
       street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       street.setBicycleNoThruTraffic(bicycleNoThrough);
@@ -124,11 +115,6 @@ public class SafetyValueApplier {
         );
       }
       backStreet.setWalkSafetyFactor((float) walkSafety);
-      if (notes != null) {
-        for (var it : notes) {
-          graph.streetNotesService.addStaticNote(backStreet, it.note(), it.matcher());
-        }
-      }
       backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
       backStreet.setWalkNoThruTraffic(walkNoThrough);

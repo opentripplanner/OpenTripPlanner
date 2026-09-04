@@ -217,7 +217,7 @@ public class OsmArea {
         newRing.addAll(ring);
         newFirstEndpoint = firstEndpoint;
       }
-      if (newRing.get(newRing.size() - 1) == (newRing.get(0))) {
+      if (newRing.get(newRing.size() - 1) == newRing.get(0)) {
         // ring closure
         closedRings.add(newRing);
         // if we're out of endpoints, then we have succeeded

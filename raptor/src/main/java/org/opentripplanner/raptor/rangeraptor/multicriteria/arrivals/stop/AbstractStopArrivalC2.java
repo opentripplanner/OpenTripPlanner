@@ -9,7 +9,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 abstract sealed class AbstractStopArrivalC2<T extends RaptorTripSchedule>
   extends McStopArrival<T>
-  permits AccessStopArrivalC2, TransitStopArrivalC2, TransferStopArrivalC2 {
+  permits AccessStopArrivalC2, TransitStopArrivalC2, TransferStopArrivalC2
+{
 
   private final int c2;
 

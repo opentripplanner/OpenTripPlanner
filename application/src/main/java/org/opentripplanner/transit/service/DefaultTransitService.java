@@ -212,7 +212,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return transitRepository
+    return getTripCalendars()
       .getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
@@ -676,16 +676,6 @@ public class DefaultTransitService implements TransitService {
     return listTrips().stream().filter(matcher::match).toList();
   }
 
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
-    return transitRepository.getOrCreateServiceIdForDate(serviceDate);
-  }
-
   @Override
   public RaptorTransitData getRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
@@ -700,7 +690,9 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TripCalendars getTripCalendars() {
-    return this.transitRepository.getTripCalendar();
+    return timetableSnapshot != null
+      ? timetableSnapshot.getTripCalendars()
+      : this.transitRepository.getTripCalendar();
   }
 
   @Override
@@ -737,8 +729,9 @@ public class DefaultTransitService implements TransitService {
       .getSiteRepository()
       .findRegularStops(request.envelope());
 
-    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(request, stop ->
-      !findPatterns(stop, true).isEmpty()
+    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
+      request,
+      stop -> !findPatterns(stop, true).isEmpty()
     );
     return stops.stream().filter(matcher::match).toList();
   }
@@ -768,12 +761,12 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public Set<LocalDate> listServiceDates() {
-    return Collections.unmodifiableSet(transitRepository.getServiceCodesRunningForDate().keySet());
+    return Collections.unmodifiableSet(getTripCalendars().getServiceCodesRunningForDate().keySet());
   }
 
   @Override
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return Collections.unmodifiableMap(transitRepository.getServiceCodesRunningForDate());
+    return Collections.unmodifiableMap(getTripCalendars().getServiceCodesRunningForDate());
   }
 
   @Override

@@ -42,10 +42,10 @@ public class StopConsolidationDocTest {
     var joined = String.join("\n", lines);
 
     var csvExample = """
-      ```
-      %s
-      ```
-      """.formatted(joined);
+    ```
+    %s
+    ```
+    """.formatted(joined);
 
     template = replaceSection(template, "config", updaterDoc(node));
     template = replaceSection(template, "file", csvExample);

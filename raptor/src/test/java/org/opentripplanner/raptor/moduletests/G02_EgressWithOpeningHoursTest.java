@@ -46,17 +46,15 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Free ~ A")
-      .withTimetables(
-        """
-        A      B
-        00:10  00:20
-        00:20  00:30
-        00:30  00:40
-        24:20  24:30
-        """
-      );
+    data.access("Free ~ A").withTimetables(
+      """
+      A      B
+      00:10  00:20
+      00:20  00:30
+      00:30  00:40
+      24:20  24:30
+      """
+    );
 
     requestBuilder
       .searchParams()

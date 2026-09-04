@@ -220,7 +220,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
     return (
       stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
       stateData.mayKeepRentedVehicleAtDestination ==
-      state.stateData.mayKeepRentedVehicleAtDestination
+        state.stateData.mayKeepRentedVehicleAtDestination
     );
   }
 
@@ -276,8 +276,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !request.mode().includesRenting() ||
-        (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+        !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
@@ -407,7 +406,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
           );
         }
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
-        var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
+        var stationVertex = (VehicleRentalPlaceVertex) orig.vertex;
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,

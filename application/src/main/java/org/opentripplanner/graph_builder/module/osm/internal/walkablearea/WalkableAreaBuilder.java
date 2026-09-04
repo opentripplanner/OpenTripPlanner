@@ -232,14 +232,12 @@ public class WalkableAreaBuilder {
       if (visibilityCache != null) {
         double[][] pairs = surviving
           .stream()
-          .map(e ->
-            new double[] {
-              e.getFromVertex().getX(),
-              e.getFromVertex().getY(),
-              e.getToVertex().getX(),
-              e.getToVertex().getY(),
-            }
-          )
+          .map(e -> new double[] {
+            e.getFromVertex().getX(),
+            e.getFromVertex().getY(),
+            e.getToVertex().getX(),
+            e.getToVertex().getY(),
+          })
           .toArray(double[][]::new);
         visibilityCache.put(cacheKey, pairs);
       }

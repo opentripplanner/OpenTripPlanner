@@ -15,7 +15,8 @@ import org.opentripplanner.utils.lang.Units;
  */
 abstract sealed class AbstractLinearFunction<T>
   implements Serializable
-  permits CostLinearFunction, TimePenalty {
+  permits CostLinearFunction, TimePenalty
+{
 
   private final T constant;
 

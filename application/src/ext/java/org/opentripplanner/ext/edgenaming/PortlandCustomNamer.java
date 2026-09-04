@@ -75,27 +75,25 @@ class PortlandCustomNamer implements EdgeNamer {
   public void recordEdges(OsmWay way, StreetEdgePair edgePair, OsmDatabase osmdb) {
     final boolean isHighwayLink = isHighwayLink(way);
     final boolean isLowerLink = isLowerLink(way);
-    edgePair
-      .asIterable()
-      .forEach(edge -> {
-        if (!edge.nameIsDerived()) {
-          // this edge already has a real name so there is nothing to do
-          return;
+    edgePair.asIterable().forEach(edge -> {
+      if (!edge.nameIsDerived()) {
+        // this edge already has a real name so there is nothing to do
+        return;
+      }
+      if (isHighwayLink) {
+        if (edge.isBack()) {
+          nameByDestination.add(edge);
+        } else {
+          nameByOrigin.add(edge);
         }
-        if (isHighwayLink) {
-          if (edge.isBack()) {
-            nameByDestination.add(edge);
-          } else {
-            nameByOrigin.add(edge);
-          }
-        } else if (isLowerLink) {
-          if (edge.isBack()) {
-            nameByOrigin.add(edge);
-          } else {
-            nameByDestination.add(edge);
-          }
+      } else if (isLowerLink) {
+        if (edge.isBack()) {
+          nameByOrigin.add(edge);
+        } else {
+          nameByDestination.add(edge);
         }
-      });
+      }
+    });
   }
 
   @Override

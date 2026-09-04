@@ -20,7 +20,7 @@ public class UnplannedChangesTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1", null);
+    validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1");
 
     assertEquals("Stop 3b1 ~ BUS bus 0:11 0:12 ~ Stop 3b2 [C₁90]", itinerary.toStr());
   }
@@ -31,7 +31,7 @@ public class UnplannedChangesTest extends GtfsTest {
 
     Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
-    validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1", null);
+    validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1");
 
     assertEquals("Stop 3b1 ~ BUS bus 0:11 0:12 ~ Stop 3b2 [C₁90]", itinerary.toStr());
   }

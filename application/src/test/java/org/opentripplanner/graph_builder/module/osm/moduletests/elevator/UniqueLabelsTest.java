@@ -16,7 +16,11 @@ class UniqueLabelsTest {
   @ParameterizedTest
   @CsvSource(
     value = {
-      "1, 2, 3, 4", "1, 1, 1, 1", "0, 1, 1, null", "null, null, 1, null", "null, null, null, null",
+      "1, 2, 3, 4",
+      "1, 1, 1, 1",
+      "0, 1, 1, null",
+      "null, null, 1, null",
+      "null, null, null, null",
     },
     nullValues = "null"
   )

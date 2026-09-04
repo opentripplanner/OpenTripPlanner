@@ -211,8 +211,7 @@ public final class ItineraryFilterPreferences {
       Double.compare(
         that.groupedOtherThanSameLegsMaxCostMultiplier,
         groupedOtherThanSameLegsMaxCostMultiplier
-      ) ==
-      0 &&
+      ) == 0 &&
       Double.compare(that.groupSimilarityKeepOne, groupSimilarityKeepOne) == 0 &&
       Double.compare(that.groupSimilarityKeepThree, groupSimilarityKeepThree) == 0 &&
       Double.compare(that.minBikeParkingDistance, minBikeParkingDistance) == 0 &&

@@ -17,7 +17,8 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class DefaultOsmInfoGraphBuildRepository
-  implements OsmInfoGraphBuildRepository, Serializable {
+  implements OsmInfoGraphBuildRepository, Serializable
+{
 
   private final Map<Edge, Platform> platforms = new HashMap<>();
   private final Map<Area, Platform> areaPlatforms = new HashMap<>();

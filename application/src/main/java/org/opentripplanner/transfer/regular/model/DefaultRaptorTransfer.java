@@ -63,9 +63,8 @@ public final class DefaultRaptorTransfer implements RaptorTransfer {
   public String toString() {
     String duration = DurationUtils.durationToStr(durationInSeconds());
     var modes = transfer.getModes();
-    var modesAsString = modes.size() == 1
-      ? modes.stream().findFirst().get().toString()
-      : modes.toString();
+    var modesAsString =
+      modes.size() == 1 ? modes.stream().findFirst().get().toString() : modes.toString();
     return String.format(
       "%s %s %s ~ %d",
       modesAsString,
