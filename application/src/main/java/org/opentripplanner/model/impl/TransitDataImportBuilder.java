@@ -64,7 +64,7 @@ public class TransitDataImportBuilder {
 
   private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
-  private final TripCalendarsBuilder tripCalendars = TripCalendars.of();
+  private final TripCalendarsBuilder tripCalendars;
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -118,9 +118,29 @@ public class TransitDataImportBuilder {
 
   private final DataImportIssueStore issueStore;
 
+  /**
+   * Create a builder with no transit period limit - see
+   * {@link #TransitDataImportBuilder(SiteRepository, DataImportIssueStore, LocalDateRange)}.
+   */
   public TransitDataImportBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
+    this(siteRepository, issueStore, LocalDateRange.ofUnbounded());
+  }
+
+  /**
+   * @param transitPeriodLimit dates outside this period are dropped as calendar data is added
+   * (see build-config's {@code transitServiceStart}/{@code transitServiceEnd}).
+   */
+  public TransitDataImportBuilder(
+    SiteRepository siteRepository,
+    DataImportIssueStore issueStore,
+    LocalDateRange transitPeriodLimit
+  ) {
     this.siteRepositoryBuilder = siteRepository.withContext();
     this.issueStore = issueStore;
+    this.tripCalendars = TripCalendars.of(transitPeriodLimit);
+    if (!transitPeriodLimit.isUnbounded()) {
+      LOG.info("Limiting transit service to time period: {}", transitPeriodLimit);
+    }
   }
 
   /* Accessors */
@@ -262,29 +282,14 @@ public class TransitDataImportBuilder {
     return stopsByScheduledStopPoints;
   }
 
-  public TransitDataImport build() {
-    return new DefaultTransitDataImport(this);
-  }
-
   /**
-   * Limit the transit service to a time period removing calendar dates and services outside the
-   * period. If a service is start before and/or ends after the period then the service is modified
-   * to match the period.
+   * Build the {@link TransitDataImport}. Since calendar data is clipped to this builder's transit
+   * period limit as it is added (see the constructor), any trip/stopTime/pattern/transfer/
+   * tripOnServiceDate left referencing a service id with no remaining dates is removed first.
    */
-  public void limitServiceDays(LocalDateRange periodLimit) {
-    if (periodLimit.isUnbounded()) {
-      LOG.info("Limiting transit service is skipped, the period is unbounded.");
-      return;
-    }
-
-    LOG.warn("Limiting transit service days to time period: {}", periodLimit);
-
-    int orgSize = tripCalendars.listServiceIds().size();
-    tripCalendars.limitToPeriod(periodLimit);
-    logRemove("ServiceId", orgSize, tripCalendars.listServiceIds().size(), "Outside time period.");
-
+  public TransitDataImport build() {
     removeEntitiesWithInvalidReferences();
-    LOG.info("Limiting transit service days to time period complete.");
+    return new DefaultTransitDataImport(this);
   }
 
   /**
@@ -312,7 +317,7 @@ public class TransitDataImportBuilder {
    * Check all relations and remove entities which reference none existing entries. This may happen
    * as a result of inconsistent data or by deliberate removal of elements in the builder.
    */
-  private void removeEntitiesWithInvalidReferences() {
+  void removeEntitiesWithInvalidReferences() {
     removeTripsWithNoneExistingServiceIds();
     removeStopTimesForNoneExistingTrips();
     fixOrRemovePatternsWhichReferenceNoneExistingTrips();

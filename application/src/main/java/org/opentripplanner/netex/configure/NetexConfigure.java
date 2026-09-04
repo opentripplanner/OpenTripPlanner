@@ -52,7 +52,8 @@ public class NetexConfigure {
     for (ConfiguredCompositeDataSource<NetexFeedParameters> it : netexSources) {
       var transitServiceBuilder = new TransitDataImportBuilder(
         transitRepository.getSiteRepository(),
-        issueStore
+        issueStore,
+        buildConfig.getTransitServicePeriod()
       );
       netexBundles.add(netexBundle(transitServiceBuilder, it));
     }
@@ -66,7 +67,6 @@ public class NetexConfigure {
       streetDetailsRepository,
       issueStore,
       buildConfig.getSubwayAccessTimeSeconds(),
-      buildConfig.getTransitServicePeriod(),
       netexBundles
     );
   }
