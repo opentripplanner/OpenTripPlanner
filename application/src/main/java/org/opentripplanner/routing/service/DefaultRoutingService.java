@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -18,7 +19,6 @@ import org.opentripplanner.routing.algorithm.RequestPreProcessor;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.RoutingWorkerRequest;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
@@ -77,10 +77,10 @@ public class DefaultRoutingService implements RoutingService {
   private final CarpoolingService carpoolingService;
 
   @Nullable
-  private final ItineraryDecorator emissionItineraryDecorator;
+  private final TaxiZoneService taxiZoneService;
 
   @Nullable
-  private final ItineraryListFilter taxiZoneDecorator;
+  private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
   private final StopConsolidationService stopConsolidationService;
@@ -103,8 +103,8 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
-    @Nullable ItineraryListFilter taxiZoneDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
@@ -125,8 +125,8 @@ public class DefaultRoutingService implements RoutingService {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
-    this.taxiZoneDecorator = taxiZoneDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.transitTuningParameters = transitTuningParameters;
@@ -180,8 +180,8 @@ public class DefaultRoutingService implements RoutingService {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiZoneService,
       emissionItineraryDecorator,
-      taxiZoneDecorator,
       stopConsolidationService,
       linkingContextFactory,
       transitTuningParameters,

@@ -23,6 +23,7 @@ import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
@@ -34,9 +35,7 @@ import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.ext.TaxiZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -184,8 +183,8 @@ public class RequestScopedModule {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    @Nullable @TaxiZoneDecorator ItineraryListFilter taxiZoneDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitRoutingConfig transitRoutingConfig
@@ -206,8 +205,8 @@ public class RequestScopedModule {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiZoneService,
       emissionItineraryDecorator,
-      taxiZoneDecorator,
       stopConsolidationService,
       linkingContextFactory,
       // transitRoutingConfig implements 2 roles; hence the repetition below

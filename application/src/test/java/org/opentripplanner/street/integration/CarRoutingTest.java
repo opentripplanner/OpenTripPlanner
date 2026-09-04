@@ -156,6 +156,7 @@ public class CarRoutingTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       null,
+      null,
       request,
       linkingContext
     );

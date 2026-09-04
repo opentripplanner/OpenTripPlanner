@@ -14,7 +14,6 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -35,7 +34,6 @@ public class RouteRequestToFilterChainMapper {
     TransitAlertService transitAlertService,
     List<RideHailingService> rideHailingServices,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
-    @Nullable ItineraryListFilter taxiZoneDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
@@ -119,13 +117,6 @@ public class RouteRequestToFilterChainMapper {
 
     if (emissionItineraryDecorator != null) {
       builder.withEmissionItineraryDecorator(emissionItineraryDecorator);
-    }
-
-    if (
-      taxiZoneDecorator != null &&
-      request.journey().modes().hasAccessOrEgressOrDirectMode(StreetMode.TAXI)
-    ) {
-      builder.withTaxiZoneDecorator(taxiZoneDecorator);
     }
 
     if (stopConsolidationService != null && stopConsolidationService.isActive()) {

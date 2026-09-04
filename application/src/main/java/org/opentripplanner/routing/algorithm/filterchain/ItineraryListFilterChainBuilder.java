@@ -106,9 +106,6 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
-  private ItineraryListFilter taxiZoneDecorator;
-
-  @Sandbox
   private ItineraryDecorator stopConsolidationDecorator;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
@@ -373,13 +370,6 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withTaxiZoneDecorator(
-    @Nullable ItineraryListFilter decoratorFilter
-  ) {
-    this.taxiZoneDecorator = decoratorFilter;
-    return this;
-  }
-
   public ItineraryListFilterChainBuilder withConsolidatedStopNamesDecorator(
     @Nullable ItineraryDecorator decorator
   ) {
@@ -450,13 +440,6 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-      // Decorate and filter taxi zone itineraries before transit-vs-street comparison so that
-      // uncoverable taxi zone legs are removed before they can be used as the "best street"
-      // baseline, which would otherwise cause transit itineraries to be incorrectly removed.
-      if (taxiZoneDecorator != null) {
-        filters.add(taxiZoneDecorator);
-      }
-
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
         removeTransitIfStreetOnlyIsBetter = new RemoveTransitIfStreetOnlyIsBetter(

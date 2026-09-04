@@ -107,6 +107,7 @@ public class BicycleRoutingTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       null,
+      null,
       request,
       linkingContext
     );

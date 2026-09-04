@@ -16,6 +16,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
@@ -26,7 +27,6 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -102,10 +102,10 @@ public class RoutingWorker {
   private final CarpoolingService carpoolingService;
 
   @Nullable
-  private final ItineraryDecorator emissionItineraryDecorator;
+  private final TaxiZoneService taxiZoneService;
 
   @Nullable
-  private final ItineraryListFilter taxiZoneDecorator;
+  private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
   private final StopConsolidationService stopConsolidationService;
@@ -136,8 +136,8 @@ public class RoutingWorker {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
-    @Nullable ItineraryListFilter taxiZoneDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
@@ -162,8 +162,8 @@ public class RoutingWorker {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
-    this.taxiZoneDecorator = taxiZoneDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.raptorTuningParameters = raptorTuningParameters;
@@ -230,7 +230,6 @@ public class RoutingWorker {
         transitAlertService,
         rideHailingServices,
         emissionItineraryDecorator,
-        taxiZoneDecorator,
         stopConsolidationService,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
@@ -347,6 +346,7 @@ public class RoutingWorker {
           streetLimitationParametersService,
           vehicleRentalService,
           streetDetailsService,
+          taxiZoneService,
           dataOverlayParameterBindings,
           directBuilder.buildRequest(),
           linkingContext()
@@ -427,7 +427,8 @@ public class RoutingWorker {
         additionalSearchDays,
         debugTimingAggregator,
         linkingContext(),
-        carpoolingService
+        carpoolingService,
+        taxiZoneService
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       var itineraries = transitResults.getItineraries();

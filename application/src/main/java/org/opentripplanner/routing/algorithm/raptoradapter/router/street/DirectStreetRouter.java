@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
+import org.opentripplanner.ext.taxizone.routing.TaxiRouter;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
@@ -37,6 +39,7 @@ public class DirectStreetRouter {
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     RouteRequest request,
     LinkingContext linkingContext
@@ -81,11 +84,15 @@ public class DirectStreetRouter {
         );
         itinerary.ifPresent(itineraries::add);
       }
-      return ItinerariesHelper.decorateItinerariesWithRequestData(
+      var decoratedItineraries = ItinerariesHelper.decorateItinerariesWithRequestData(
         itineraries,
         request.journey().wheelchair(),
         request.preferences().wheelchair()
       );
+      if (taxiZoneService != null && request.journey().direct().mode() == StreetMode.TAXI) {
+        return new TaxiRouter(taxiZoneService).decorate(decoratedItineraries);
+      }
+      return decoratedItineraries;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
     }

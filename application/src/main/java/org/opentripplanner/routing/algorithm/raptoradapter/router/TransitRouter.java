@@ -15,6 +15,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
+import org.opentripplanner.ext.taxizone.routing.TaxiRouter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -43,6 +45,7 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -75,7 +78,12 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LinkingContext linkingContext;
+
+  @Nullable
   private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final TaxiZoneService taxiZoneService;
 
   private TransitRouter(
     RouteRequest request,
@@ -95,7 +103,8 @@ public class TransitRouter {
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService
   ) {
     this.request = request;
     this.transitService = transitService;
@@ -115,6 +124,7 @@ public class TransitRouter {
     this.viaTransferResolver = viaTransferResolver;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
   }
 
   public static TransitRouterResult route(
@@ -135,7 +145,8 @@ public class TransitRouter {
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -155,7 +166,8 @@ public class TransitRouter {
       additionalSearchDays,
       debugTimingAggregator,
       linkingContext,
-      carpoolingService
+      carpoolingService,
+      taxiZoneService
     );
 
     return transitRouter.route();
@@ -281,6 +293,12 @@ public class TransitRouter {
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
+
+    if (
+      taxiZoneService != null && request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI)
+    ) {
+      itineraries = new TaxiRouter(taxiZoneService).decorate(itineraries);
+    }
 
     debugTimingAggregator.finishedItineraryCreation();
 

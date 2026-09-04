@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.taxizone.internal.itinerary;
+package org.opentripplanner.ext.taxizone.routing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.core.model.time.LocalDateRange;
-import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
+import org.opentripplanner.ext.taxizone.internal.DefaultTaxiZoneService;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.model.SystemNotice;
@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
-class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
+class TaxiRouterTest implements PlanTestConstants {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
@@ -39,7 +39,7 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
 
   private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
 
-  private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
+  private static final DefaultTaxiZoneService MATCHING_SERVICE = new DefaultTaxiZoneService(
     List.of(
       new TaxiZone(
         ZONE_POLYGON,
@@ -53,8 +53,8 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
       )
     )
   );
-  private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
-  private static final TaxiZoneIndex WRONG_DATE_INDEX = new TaxiZoneIndex(
+  private static final DefaultTaxiZoneService EMPTY_SERVICE = new DefaultTaxiZoneService(List.of());
+  private static final DefaultTaxiZoneService WRONG_DATE_SERVICE = new DefaultTaxiZoneService(
     List.of(
       new TaxiZone(
         ZONE_POLYGON,
@@ -74,9 +74,9 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new TaxiZoneItineraryDecorator(MATCHING_INDEX);
+    var subject = new TaxiRouter(MATCHING_SERVICE);
 
-    var result = subject.filter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary)).getFirst();
 
     assertFalse(result.isFlaggedForDeletion());
     var leg = assertInstanceOf(TaxiZoneLeg.class, result.legs().getFirst());
@@ -88,9 +88,9 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new TaxiZoneItineraryDecorator(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_SERVICE);
 
-    var result = subject.filter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary)).getFirst();
 
     assertTrue(result.isFlaggedForDeletion());
     assertTrue(
@@ -98,7 +98,7 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
         .systemNotices()
         .stream()
         .map(SystemNotice::tag)
-        .anyMatch(TaxiZoneItineraryDecorator.NO_TAXI_ZONE_AVAILABLE::equals)
+        .anyMatch(TaxiRouter.NO_TAXI_ZONE_AVAILABLE::equals)
     );
     assertFalse(result.legs().getFirst() instanceof TaxiZoneLeg);
   }
@@ -108,9 +108,9 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new TaxiZoneItineraryDecorator(WRONG_DATE_INDEX);
+    var subject = new TaxiRouter(WRONG_DATE_SERVICE);
 
-    var result = subject.filter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary)).getFirst();
 
     assertTrue(result.isFlaggedForDeletion());
     assertFalse(result.legs().getFirst() instanceof TaxiZoneLeg);
@@ -122,9 +122,9 @@ class TaxiZoneItineraryDecoratorTest implements PlanTestConstants {
       .bus(21, T11_00, T11_10, PLACE_B)
       .build();
     var originalLeg = itinerary.legs().getFirst();
-    var subject = new TaxiZoneItineraryDecorator(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_SERVICE);
 
-    var result = subject.filter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary)).getFirst();
 
     assertFalse(result.isFlaggedForDeletion());
     assertEquals(originalLeg, result.legs().getFirst());

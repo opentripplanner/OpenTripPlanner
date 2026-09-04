@@ -22,15 +22,14 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.ext.TaxiZoneDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
@@ -246,6 +245,9 @@ class RequestScopedFactoryTest {
       Builder carpoolingService(@Nullable CarpoolingService carpoolingService);
 
       @BindsInstance
+      Builder taxiZoneService(@Nullable TaxiZoneService taxiZoneService);
+
+      @BindsInstance
       Builder dataOverlayParameterBindings(
         @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
       );
@@ -262,9 +264,6 @@ class RequestScopedFactoryTest {
       Builder emissionItineraryDecorator(
         @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator
       );
-
-      @BindsInstance
-      Builder taxiZoneDecorator(@Nullable @TaxiZoneDecorator ItineraryListFilter taxiZoneDecorator);
 
       @BindsInstance
       Builder streetDetailsService(StreetDetailsService streetDetailsService);
