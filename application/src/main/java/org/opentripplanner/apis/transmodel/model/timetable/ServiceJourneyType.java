@@ -153,6 +153,18 @@ public class ServiceJourneyType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleTypeRef")
+          .type(Scalars.GraphQLString)
+          .description(
+            """
+            A reference to the type of vehicle to use on the service journey.
+            """
+          )
+          .dataFetcher(environment -> trip(environment).getNetexVehicleTypeId())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPattern")
           .description(
             """

@@ -90,6 +90,20 @@ public class DatedServiceJourneyType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleTypeRef")
+          .type(Scalars.GraphQLString)
+          .description(
+            """
+            A reference to the type of vehicle to use on the dated service journey.
+            A vehicle type given for the operating day takes precedence over the one given for
+            the service journey.
+            """
+          )
+          .dataFetcher(environment -> tripOnServiceDate(environment).getNetexVehicleTypeId())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("replacementFor")
           .description("List of the dated service journeys this dated service journeys replaces")
           .deprecate("Use replacementForRelation")
