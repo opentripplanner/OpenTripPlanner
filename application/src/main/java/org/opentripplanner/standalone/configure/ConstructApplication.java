@@ -220,6 +220,7 @@ public class ConstructApplication {
       carpoolTripVertexResolver(),
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
+      factory.transitRepositoryRegistry(),
       factory.timetableRepositoryHandle(),
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
