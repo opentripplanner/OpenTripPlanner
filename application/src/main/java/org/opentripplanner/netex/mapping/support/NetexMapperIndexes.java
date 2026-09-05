@@ -25,7 +25,7 @@ public class NetexMapperIndexes {
   private final Multimap<String, Station> stationsByMultiModalStationRfs;
   private final Map<String, StopTime> stopTimesByNetexId;
   private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySjId;
-  private NetexMapperIndexes parent;
+  private final NetexMapperIndexes parent;
 
   public NetexMapperIndexes(NetexEntityIndexReadOnlyView index, NetexMapperIndexes parent) {
     this.parent = parent;
@@ -41,11 +41,14 @@ public class NetexMapperIndexes {
         ? parent.datedServiceJourneysBySjId
         : indexDSJBySJId(index.getDatedServiceJourneys());
 
+      // should not be a global list otherwise this would contain the ids of _all_
+      // TimetabledPassingTime instances in the entire feed. (7 million in Norway)
+      this.stopTimesByNetexId = new HashMap<>(parent.stopTimesByNetexId);
+
       // Feed global instances. These fields contain mapping from a netex id to a OTP domain
       // model object, hence we are not adding a lot of data to memory - only the id to object
       // mapping.
       this.stationsByMultiModalStationRfs = parent.stationsByMultiModalStationRfs;
-      this.stopTimesByNetexId = parent.stopTimesByNetexId;
     }
   }
 
