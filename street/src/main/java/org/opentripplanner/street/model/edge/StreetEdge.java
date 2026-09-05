@@ -710,7 +710,7 @@ public class StreetEdge
       elevationExtension != null ? elevationExtension.partial(fromDistance, toDistance) : null;
 
     StreetElevationExtensionBuilder.of(seb)
-      .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
+      .withDistanceInMeters(toDistance - fromDistance)
       .withElevationProfile(partialElevationProfileFromParent)
       .build()
       .ifPresent(seb::withElevationExtension);
