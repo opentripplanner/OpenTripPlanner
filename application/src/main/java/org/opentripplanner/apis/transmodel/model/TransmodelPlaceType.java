@@ -4,6 +4,7 @@ public enum TransmodelPlaceType {
   QUAY,
   STOP_PLACE,
   BICYCLE_RENT,
+  VEHICLE_RENT,
   BIKE_PARK,
   CAR_PARK,
 }
