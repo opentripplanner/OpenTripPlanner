@@ -11,15 +11,19 @@ loaded from dedicated GTFS Flex feeds.
 
 For each driving-ish leg in a taxi itinerary:
 - If **no zone covers both the pickup and drop-off coordinates on the leg's travel date**, the
-  itinerary is flagged for deletion and removed from the response. A zone only matches on dates
-  within its resolved GTFS service period (a single contiguous date range, trimmed to the
-  configured `transitServiceStart`/`transitServiceEnd` window, same as the rest of the transit
-  model).
+  itinerary is removed from the response. A zone only matches on dates within its resolved GTFS
+  service period (a single contiguous date range, trimmed to the configured
+  `transitServiceStart`/`transitServiceEnd` window, same as the rest of the transit model).
 - If **a matching zone is found**, the generic driving leg is replaced with a `TaxiZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
-- Decoration is only applied when the request's access, egress, or direct mode is `TAXI`. It is
-  performed directly by `TaxiRouter`, invoked from `TransitRouter` (for access/egress legs) and
-  `DirectStreetRouter` (for direct legs) — there is no itinerary filter-chain step involved.
+- Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
+  when the feature flag is on and a `TaxiZoneService` is configured (see Configuration). It is
+  performed by `TaxiRouter` via `TaxiZoneService.decorateAndFilter(...)`, invoked directly by
+  `TransitRouter` (for access/egress legs) and by `RoutingWorker.routeDirectTaxi()` →
+  `TaxiZoneService.routeDirect(...)` (for direct legs, which internally reuses the same
+  taxi-agnostic `DirectStreetRouter` used for all other direct street routing) — there is no
+  itinerary filter-chain step involved. If the flag is off or no service is configured, direct
+  `TAXI` requests return no itineraries rather than falling back to undecorated street routing.
 
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
@@ -118,8 +122,7 @@ wrapped street leg.
 | `dropOffBookingInfo`               | Booking info from stop 1 of the matched flex trip.             |
 | `trip`, `tripOnServiceDate`, `alerts`, `stopCalls` | Not applicable — fall back to the `Leg` interface's defaults (`null`/empty), since there is no scheduled trip driving the leg. |
 
-Itineraries where the leg does not match any zone are tagged with the system notice
-`no-taxi-zone-available` and removed.
+Itineraries where the leg does not match any zone are removed from the response.
 
 ### Configuration
 
