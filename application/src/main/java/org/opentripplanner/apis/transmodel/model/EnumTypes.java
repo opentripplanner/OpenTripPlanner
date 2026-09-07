@@ -497,6 +497,7 @@ public class EnumTypes {
     .value("trolleybus", TransitMode.TROLLEYBUS)
     .value("monorail", TransitMode.MONORAIL)
     .value("coach", TransitMode.COACH)
+    .value("carpool", TransitMode.CARPOOL)
     .value("unknown", "unknown")
     .build();
 
