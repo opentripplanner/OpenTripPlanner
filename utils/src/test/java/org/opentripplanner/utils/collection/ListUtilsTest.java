@@ -83,7 +83,9 @@ class ListUtilsTest {
 
   @Test
   void ofIterableList() {
-    assertThat(ListUtils.ofIterable(List.of(1, 2, 3))).containsExactly(1, 2, 3).inOrder();
+    assertThat(ListUtils.ofIterable(List.of(1, 2, 3)))
+      .containsExactly(1, 2, 3)
+      .inOrder();
   }
 
   @Test

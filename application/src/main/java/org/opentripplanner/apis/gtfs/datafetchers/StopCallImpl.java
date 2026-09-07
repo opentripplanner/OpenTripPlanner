@@ -27,13 +27,15 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         return null;
       }
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
-      var estimatedArrival = scheduledArrival == null
-        ? null
-        : EstimatedTime.of(scheduledArrival, tripTime.getArrivalDelay());
+      var estimatedArrival =
+        scheduledArrival == null
+          ? null
+          : EstimatedTime.of(scheduledArrival, tripTime.getArrivalDelay());
       var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
-      var estimatedDeparture = scheduledDeparture == null
-        ? null
-        : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
+      var estimatedDeparture =
+        scheduledDeparture == null
+          ? null
+          : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
       return new CallRealTime(estimatedArrival, estimatedDeparture);
     };
   }

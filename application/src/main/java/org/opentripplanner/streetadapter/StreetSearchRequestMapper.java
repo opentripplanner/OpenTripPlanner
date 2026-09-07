@@ -103,8 +103,7 @@ public class StreetSearchRequestMapper {
   // private methods
 
   private static void mapWheelchair(WheelchairRequest.Builder b, WheelchairPreferences wheelchair) {
-    b
-      .withStop(mapAccessibility(wheelchair.stop()))
+    b.withStop(mapAccessibility(wheelchair.stop()))
       .withElevator(mapAccessibility(wheelchair.elevator()))
       .withMaxSlope(wheelchair.maxSlope())
       .withSlopeExceededReluctance(wheelchair.slopeExceededReluctance())
@@ -123,8 +122,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapWalk(WalkRequest.Builder b, WalkPreferences pref) {
-    b
-      .withSpeed(pref.speed())
+    b.withSpeed(pref.speed())
       .withReluctance(pref.reluctance())
       .withStairsReluctance(pref.stairsReluctance())
       .withStairsTimeFactor(pref.stairsTimeFactor())
@@ -137,8 +135,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapBike(BikeRequest.Builder b, BikePreferences preferences) {
-    b
-      .withReluctance(preferences.reluctance())
+    b.withReluctance(preferences.reluctance())
       .withSpeed(preferences.speed())
       .withParking(b2 -> mapParking(b2, preferences.parking()))
       .withRental(b2 -> mapRental(b2, preferences.rental()))
@@ -158,8 +155,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapCar(CarRequest.Builder b, CarPreferences car) {
-    b
-      .withReluctance(car.reluctance())
+    b.withReluctance(car.reluctance())
       .withParking(b2 -> mapParking(b2, car.parking()))
       .withRental(b2 -> mapRental(b2, car.rental()))
       .withPickupTime(car.pickupTime())
@@ -169,8 +165,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapScooter(ScooterRequest.Builder b, ScooterPreferences scooter) {
-    b
-      .withSpeed(scooter.speed())
+    b.withSpeed(scooter.speed())
       .withReluctance(scooter.reluctance())
       .withRental(b2 -> mapRental(b2, scooter.rental()))
       .withOptimizeType(scooter.optimizeType())
@@ -182,8 +177,7 @@ public class StreetSearchRequestMapper {
     VehicleWalkingRequest.Builder b,
     VehicleWalkingPreferences walking
   ) {
-    b
-      .withSpeed(walking.speed())
+    b.withSpeed(walking.speed())
       .withReluctance(walking.reluctance())
       .withStairsReluctance(walking.stairsReluctance())
       .withMountDismountCost(walking.mountDismountCost())
@@ -191,8 +185,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapRental(RentalRequest.Builder b, VehicleRentalPreferences rental) {
-    b
-      .withPickupTime(rental.pickupTime())
+    b.withPickupTime(rental.pickupTime())
       .withPickupCost(rental.pickupCost())
       .withDropOffTime(rental.dropOffTime())
       .withDropOffCost(rental.dropOffCost())
@@ -209,8 +202,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapParking(ParkingRequest.Builder b, VehicleParkingPreferences pref) {
-    b
-      .withUnpreferredTagCost(pref.unpreferredVehicleParkingTagCost())
+    b.withUnpreferredTagCost(pref.unpreferredVehicleParkingTagCost())
       .withFilter(mapParkingFilter(pref.filter()))
       .withPreferred(mapParkingFilter(pref.preferred()))
       .withTime(pref.time())
@@ -230,8 +222,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static void mapElevator(ElevatorRequest.Builder b, ElevatorPreferences elevator) {
-    b
-      .withBoardCost(elevator.boardCost())
+    b.withBoardCost(elevator.boardCost())
       .withBoardSlack(elevator.boardSlack())
       .withHopTime(elevator.hopTime())
       .withReluctance(elevator.reluctance())

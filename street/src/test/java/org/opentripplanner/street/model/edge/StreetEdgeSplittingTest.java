@@ -31,9 +31,10 @@ class StreetEdgeSplittingTest {
     for (double delta = 0; delta <= 2; delta += 0.005) {
       StreetVertex v0 = intersectionVertex("zero", x, y);
       StreetVertex v1 = intersectionVertex("one", x + delta, y + delta);
-      LineString geom = gf.createLineString(
-        new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
-      );
+      LineString geom = gf.createLineString(new Coordinate[] {
+        v0.getCoordinate(),
+        v1.getCoordinate(),
+      });
       double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
       StreetEdge s0 = new StreetEdgeBuilder<>()
         .withFromVertex(v0)

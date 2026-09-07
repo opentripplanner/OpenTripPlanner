@@ -37,7 +37,7 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
    */
   @Override
   public V lookup(K key) {
-    return (localContainsKey(key) || isRoot()) ? localGet(key) : parent.lookup(key);
+    return localContainsKey(key) || isRoot() ? localGet(key) : parent.lookup(key);
   }
 
   /**

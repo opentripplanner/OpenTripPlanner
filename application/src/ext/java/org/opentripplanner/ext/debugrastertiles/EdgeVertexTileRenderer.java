@@ -237,8 +237,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
   }
 
   public interface EdgeVertexRenderer {
-    Comparator<Vertex> DEFAULT_VERTEX_COMPARATOR = Comparator.comparing((Vertex v) ->
-      v instanceof StreetVertex
+    Comparator<Vertex> DEFAULT_VERTEX_COMPARATOR = Comparator.comparing(
+      (Vertex v) -> v instanceof StreetVertex
     ).reversed();
     Comparator<Edge> DEFAULT_EDGE_COMPARATOR = Comparator.comparing(
       (Edge e) -> e.getGeometry() != null

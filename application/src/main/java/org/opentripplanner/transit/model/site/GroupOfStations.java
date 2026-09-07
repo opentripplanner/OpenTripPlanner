@@ -16,7 +16,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  */
 public class GroupOfStations
   extends AbstractTransitEntity<GroupOfStations, GroupOfStationsBuilder>
-  implements StopLocationsGroup {
+  implements StopLocationsGroup
+{
 
   private final Set<StopLocationsGroup> childStations;
   private final I18NString name;
@@ -50,7 +51,8 @@ public class GroupOfStations
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream()
+    return this.childStations
+      .stream()
       .flatMap(s -> s.getChildStops().stream())
       .toList();
   }

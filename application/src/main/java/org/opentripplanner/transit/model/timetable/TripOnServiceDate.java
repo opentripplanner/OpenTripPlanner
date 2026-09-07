@@ -11,7 +11,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * or an instance of a generic trip on a certain service date.
  */
 public class TripOnServiceDate
-  extends AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder> {
+  extends AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder>
+{
 
   private final Trip trip;
   private final LocalDate serviceDate;

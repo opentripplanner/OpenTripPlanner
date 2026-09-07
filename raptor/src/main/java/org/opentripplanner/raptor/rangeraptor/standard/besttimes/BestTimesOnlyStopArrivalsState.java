@@ -21,8 +21,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
-  implements StopArrivalsState<T> {
+public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implements
+  StopArrivalsState<T> {
 
   private final BestTimes bestTimes;
   private final SimpleBestNumberOfTransfers bestNumberOfTransfers;

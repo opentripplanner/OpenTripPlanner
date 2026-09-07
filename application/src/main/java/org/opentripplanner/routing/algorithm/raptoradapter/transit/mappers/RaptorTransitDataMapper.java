@@ -123,28 +123,26 @@ public class RaptorTransitDataMapper {
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 
     // THIS CODE RUNS IN PARALLEL
-    allServiceDates
-      .parallelStream()
-      .forEach(serviceDate -> {
-        // Create a List to hold the values for this iteration. The results are then added
-        // to the common synchronized list at the end.
-        List<TripPatternForDate> values = new ArrayList<>();
+    allServiceDates.parallelStream().forEach(serviceDate -> {
+      // Create a List to hold the values for this iteration. The results are then added
+      // to the common synchronized list at the end.
+      List<TripPatternForDate> values = new ArrayList<>();
 
-        // This nested loop could be quite inefficient.
-        // Maybe determine in advance which patterns are running on each service and day.
-        for (TripPattern oldTripPattern : allTripPatterns) {
-          TripPatternForDate tripPatternForDate = tripPatternForDateMapper.map(
-            oldTripPattern.getScheduledTimetable(),
-            serviceDate
-          );
-          if (tripPatternForDate != null) {
-            values.add(tripPatternForDate);
-          }
+      // This nested loop could be quite inefficient.
+      // Maybe determine in advance which patterns are running on each service and day.
+      for (TripPattern oldTripPattern : allTripPatterns) {
+        TripPatternForDate tripPatternForDate = tripPatternForDateMapper.map(
+          oldTripPattern.getScheduledTimetable(),
+          serviceDate
+        );
+        if (tripPatternForDate != null) {
+          values.add(tripPatternForDate);
         }
-        if (!values.isEmpty()) {
-          tripPatternForDates.addAll(values);
-        }
-      });
+      }
+      if (!values.isEmpty()) {
+        tripPatternForDates.addAll(values);
+      }
+    });
     // END PARALLEL CODE
 
     return keyByRunningPeriodDates(tripPatternForDates);

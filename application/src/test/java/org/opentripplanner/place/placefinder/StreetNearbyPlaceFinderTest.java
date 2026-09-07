@@ -111,16 +111,16 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
           street(C, D, 100, StreetTraversalPermission.ALL);
 
           tripPattern(
-            TP1 = TripPattern.of(FeedScopedIdForTestFactory.id("TP1"))
+            (TP1 = TripPattern.of(FeedScopedIdForTestFactory.id("TP1"))
               .withRoute(R1)
               .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
-              .build()
+              .build())
           );
           tripPattern(
-            TP2 = TripPattern.of(FeedScopedIdForTestFactory.id("TP2"))
+            (TP2 = TripPattern.of(FeedScopedIdForTestFactory.id("TP2"))
               .withRoute(R2)
               .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
-              .build()
+              .build())
           );
         }
       }

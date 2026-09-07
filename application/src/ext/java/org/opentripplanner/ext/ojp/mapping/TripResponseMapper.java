@@ -84,17 +84,15 @@ public class TripResponseMapper {
   }
 
   private TripResultStructure mapItinerary(Itinerary itinerary) {
-    return new TripResultStructure()
-      .withId(tripId(itinerary))
-      .withTrip(
-        new TripStructure()
-          .withId(tripId(itinerary))
-          .withDuration(Duration.between(itinerary.startTime(), itinerary.endTime()))
-          .withTransfers(itinerary.legs().size() - 1)
-          .withStartTime(new XmlDateTime(itinerary.startTime()))
-          .withEndTime(new XmlDateTime(itinerary.endTime()))
-          .withLeg(mapLegs(itinerary))
-      );
+    return new TripResultStructure().withId(tripId(itinerary)).withTrip(
+      new TripStructure()
+        .withId(tripId(itinerary))
+        .withDuration(Duration.between(itinerary.startTime(), itinerary.endTime()))
+        .withTransfers(itinerary.legs().size() - 1)
+        .withStartTime(new XmlDateTime(itinerary.startTime()))
+        .withEndTime(new XmlDateTime(itinerary.endTime()))
+        .withLeg(mapLegs(itinerary))
+    );
   }
 
   private List<LegStructure> mapLegs(Itinerary itinerary) {

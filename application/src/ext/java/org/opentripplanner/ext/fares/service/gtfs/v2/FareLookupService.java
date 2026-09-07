@@ -77,7 +77,8 @@ class FareLookupService implements Serializable {
    * exist.
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
-    var rules = this.legRules.stream()
+    var rules = this.legRules
+      .stream()
       .filter(r -> legMatchesRule(leg, r))
       .collect(Collectors.toUnmodifiableSet());
     var containsPriorities = rules.stream().anyMatch(r -> r.priority().isPresent());
@@ -98,7 +99,8 @@ class FareLookupService implements Serializable {
     if (legs.size() < 2) {
       return Set.of();
     }
-    return this.transferRules.stream()
+    return this.transferRules
+      .stream()
       .filter(transferPredicate)
       .filter(FareTransferRule::isFree)
       .filter(r -> TimeLimitEvaluator.withinTimeLimit(r, legs.getFirst(), legs.getLast()))
@@ -126,7 +128,8 @@ class FareLookupService implements Serializable {
     List<TransitLeg> tail,
     Predicate<FareTransferRule> transferPredicate
   ) {
-    Set<TransferMatch> transfers = this.transferRules.stream()
+    Set<TransferMatch> transfers = this.transferRules
+      .stream()
       .filter(transferPredicate)
       .flatMap(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());

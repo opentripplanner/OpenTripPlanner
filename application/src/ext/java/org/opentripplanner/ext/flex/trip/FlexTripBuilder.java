@@ -4,8 +4,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public abstract class FlexTripBuilder<T extends FlexTrip<T, B>, B extends FlexTripBuilder<T, B>>
-  extends AbstractEntityBuilder<T, B> {
+public abstract class FlexTripBuilder<
+  T extends FlexTrip<T, B>,
+  B extends FlexTripBuilder<T, B>
+> extends AbstractEntityBuilder<T, B> {
 
   private Trip trip;
 

@@ -90,7 +90,7 @@ public class QuayType {
               .build()
           )
           .dataFetcher(env ->
-            (((StopLocation) env.getSource()).getName().toString(GqlUtil.getLocale(env)))
+            ((StopLocation) env.getSource()).getName().toString(GqlUtil.getLocale(env))
           )
           .build()
       )
@@ -98,14 +98,14 @@ public class QuayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> (((StopLocation) env.getSource()).getLat()))
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getLat())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> (((StopLocation) env.getSource()).getLon()))
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getLon())
           .build()
       )
       .field(
@@ -142,7 +142,7 @@ public class QuayType {
           .description("Whether this quay is suitable for wheelchair boarding.")
           .dataFetcher(env ->
             Objects.requireNonNullElse(
-              (((StopLocation) env.getSource()).getWheelchairAccessibility()),
+              ((StopLocation) env.getSource()).getWheelchairAccessibility(),
               Accessibility.NO_INFORMATION
             )
           )
@@ -164,7 +164,7 @@ public class QuayType {
           .description(
             "Public code used to identify this quay within the stop place. For instance a platform code."
           )
-          .dataFetcher(env -> (((StopLocation) env.getSource()).getPlatformCode()))
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getPlatformCode())
           .build()
       )
       .field(
@@ -305,9 +305,8 @@ public class QuayType {
             StopLocation stop = environment.getSource();
 
             Long startTimeInput = environment.getArgument("startTime");
-            Instant startTime = startTimeInput != null
-              ? Instant.ofEpochMilli(startTimeInput)
-              : Instant.now();
+            Instant startTime =
+              startTimeInput != null ? Instant.ofEpochMilli(startTimeInput) : Instant.now();
 
             List<Map<String, ?>> filtersInput = environment.getArgument("filters");
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);

@@ -81,10 +81,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
       parameters.sourceParameters().url()
     );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
-    this.requireDropOffInsideBusinessArea = parameters.sourceParameters() instanceof
-        GbfsVehicleRentalDataSourceParameters gbfs
-      ? gbfs.requireDropOffInsideBusinessArea()
-      : true;
+    this.requireDropOffInsideBusinessArea =
+      parameters.sourceParameters() instanceof GbfsVehicleRentalDataSourceParameters gbfs
+        ? gbfs.requireDropOffInsideBusinessArea()
+        : true;
 
     // Creation of network linker library will not modify the graph
     this.linker = vertexLinker;
@@ -158,7 +158,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
   }
 
   private class VehicleRentalGraphWriterRunnable
-    implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
+    implements GraphWriterRunnable<StreetRealTimeUpdateContext>
+  {
 
     private final List<VehicleRentalPlace> stations;
     private final Set<GeofencingZone> geofencingZones;
@@ -198,13 +199,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
             // Copy reference to pass into lambda
             var vrv = vehicleRentalVertex;
             unlinkedPlaceThrottle.throttle(() ->
-              // the toString includes the text "Bike rental station"
-              LOG.warn(
-                "VehicleRentalPlace is unlinked for {}: {}  {}",
-                nameForLogging,
-                vrv,
-                unlinkedPlaceThrottle.setupInfo()
-              )
+              LOG
+                // the toString includes the text "Bike rental station"
+                .warn(
+                  "VehicleRentalPlace is unlinked for {}: {}  {}",
+                  nameForLogging,
+                  vrv,
+                  unlinkedPlaceThrottle.setupInfo()
+                )
             );
           }
           VehicleRentalEdge.createRentalEdgesForStation(vehicleRentalVertex, station, tempEdges);

@@ -33,7 +33,7 @@ public class EmpiricalDelayType {
             "The median/50% percentile. This value is in the middle of the distribution."
           )
           .type(TransmodelScalars.DURATION_SCALAR)
-          .dataFetcher(e -> (empiricalDelay(e).p50()))
+          .dataFetcher(e -> empiricalDelay(e).p50())
           .build()
       )
       .field(
@@ -43,7 +43,7 @@ public class EmpiricalDelayType {
             "The 90% percentile. 90% of the values in the distribution is better and 10% is more delayed."
           )
           .type(TransmodelScalars.DURATION_SCALAR)
-          .dataFetcher(e -> (empiricalDelay(e).p90()))
+          .dataFetcher(e -> empiricalDelay(e).p90())
           .build()
       )
       .build();

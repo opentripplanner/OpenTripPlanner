@@ -206,7 +206,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
           .setPushConfig(pushConfig)
           .setMessageRetentionDuration(
             // How long will an unprocessed message be kept - minimum 10 minutes
-            com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
+            com.google.protobuf.Duration.newBuilder()
+              .setSeconds(600)
+              .build()
           )
           .setExpirationPolicy(
             ExpirationPolicy.newBuilder()
@@ -269,23 +271,21 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       final long t1 = System.currentTimeMillis();
       var serviceDelivery = fetchAndParseInitialData();
       final long t2 = System.currentTimeMillis();
-      LOG.info("Fetching and parsing initial data - finished after {} ms", (t2 - t1));
-      serviceDelivery
-        .map(serviceDeliveryConsumer)
-        .ifPresent(future -> {
-          try {
-            future.get();
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-          } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-          }
-        });
+      LOG.info("Fetching and parsing initial data - finished after {} ms", t2 - t1);
+      serviceDelivery.map(serviceDeliveryConsumer).ifPresent(future -> {
+        try {
+          future.get();
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+          throw new RuntimeException(e);
+        }
+      });
 
       LOG.info(
         "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
-        (System.currentTimeMillis() - t2),
+        System.currentTimeMillis() - t2,
         MESSAGE_COUNTER.get(),
         UPDATE_COUNTER.get(),
         FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),

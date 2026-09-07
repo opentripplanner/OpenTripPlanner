@@ -185,14 +185,12 @@ class EstimatedVehicleJourneyWrapperTest {
   @Test
   void additionalReplacedDatedVehicleJourneyRefs() {
     var journey = builder().buildEstimatedVehicleJourney();
-    journey
-      .getAdditionalVehicleJourneyReves()
-      .add(
-        new SiriEtBuilder.FramedVehicleRefBuilder()
-          .withVehicleJourneyRef("REPLACED:2")
-          .withServiceDate(LocalDate.of(2024, 5, 7))
-          .build()
-      );
+    journey.getAdditionalVehicleJourneyReves().add(
+      new SiriEtBuilder.FramedVehicleRefBuilder()
+        .withVehicleJourneyRef("REPLACED:2")
+        .withServiceDate(LocalDate.of(2024, 5, 7))
+        .build()
+    );
 
     var result = EstimatedVehicleJourneyWrapper.of(
       journey

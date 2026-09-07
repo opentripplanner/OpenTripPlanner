@@ -17,7 +17,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  */
 public class GroupStop
   extends AbstractTransitEntity<GroupStop, GroupStopBuilder>
-  implements StopLocation {
+  implements StopLocation
+{
 
   private final int index;
   private final List<StopLocation> stopLocations;

@@ -45,7 +45,7 @@ public class NarrowedTransitMode {
   }
 
   public boolean isMainModeOnly() {
-    return (this.subMode == null && this.replacement == ReplacementRequirement.IGNORED);
+    return this.subMode == null && this.replacement == ReplacementRequirement.IGNORED;
   }
 
   public MainAndSubMode toMainAndSubMode() {

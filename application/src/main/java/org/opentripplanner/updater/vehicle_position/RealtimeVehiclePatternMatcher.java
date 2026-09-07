@@ -354,9 +354,8 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.noTripId(INVALID_INPUT_STRUCTURE);
     }
 
-    var vehiclePositionWithTripId = fuzzyTripMatcher == null
-      ? vehiclePosition
-      : fuzzilySetTrip(vehiclePosition);
+    var vehiclePositionWithTripId =
+      fuzzyTripMatcher == null ? vehiclePosition : fuzzilySetTrip(vehiclePosition);
 
     var tripId = vehiclePositionWithTripId.getTrip().getTripId();
 

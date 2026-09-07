@@ -125,7 +125,7 @@ public class ListUtils {
    * called.
    */
   public static <T> List<T> nullSafeImmutableList(@Nullable Collection<T> c) {
-    return (c == null) ? List.of() : List.copyOf(c);
+    return c == null ? List.of() : List.copyOf(c);
   }
 
   /**

@@ -47,7 +47,7 @@ class ThrottleTest {
       .parallelStream()
       .forEach(i ->
         subject.throttle(() ->
-          System.err.printf(Locale.ROOT, "%d ms%n", (System.currentTimeMillis() - start))
+          System.err.printf(Locale.ROOT, "%d ms%n", System.currentTimeMillis() - start)
         )
       );
     /*

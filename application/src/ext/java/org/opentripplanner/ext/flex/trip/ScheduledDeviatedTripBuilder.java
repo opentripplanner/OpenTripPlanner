@@ -5,7 +5,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 
 public class ScheduledDeviatedTripBuilder
-  extends FlexTripBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> {
+  extends FlexTripBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder>
+{
 
   private List<StopTime> stopTimes;
 

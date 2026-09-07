@@ -65,7 +65,7 @@ class TestUtils implements RaptorTestConstants {
       null,
       0.0,
       filter,
-      (new RaptorTestConstants() {})::stopIndexToName
+      new RaptorTestConstants() {}::stopIndexToName
     );
   }
 

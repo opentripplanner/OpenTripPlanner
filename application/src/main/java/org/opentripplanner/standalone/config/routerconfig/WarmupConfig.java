@@ -115,8 +115,16 @@ public final class WarmupConfig {
     String noun
   ) {
     var node = parent.of(name).since(V2_10).summary(summary).asObject();
-    double lat = node.of("lat").since(V2_10).summary("Latitude of the " + noun + ".").asDouble();
-    double lon = node.of("lon").since(V2_10).summary("Longitude of the " + noun + ".").asDouble();
+    double lat = node
+      .of("lat")
+      .since(V2_10)
+      .summary("Latitude of the " + noun + ".")
+      .asDouble();
+    double lon = node
+      .of("lon")
+      .since(V2_10)
+      .summary("Longitude of the " + noun + ".")
+      .asDouble();
     return new WgsCoordinate(lat, lon);
   }
 }

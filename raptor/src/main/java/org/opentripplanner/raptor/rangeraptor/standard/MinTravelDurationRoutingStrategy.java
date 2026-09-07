@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T> {
+public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule> implements
+  RoutingStrategy<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MinTravelDurationRoutingStrategy.class);
 

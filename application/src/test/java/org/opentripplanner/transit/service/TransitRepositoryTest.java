@@ -68,9 +68,9 @@ class TransitRepositoryTest {
           new GtfsFareServiceFactory(),
           null
         ),
-      ("The graph contains agencies with different time zones. " +
+      "The graph contains agencies with different time zones. " +
         "Please configure the one to be used in the " +
-        BUILD_CONFIG_FILENAME)
+        BUILD_CONFIG_FILENAME
     );
   }
 

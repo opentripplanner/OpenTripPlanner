@@ -37,9 +37,10 @@ final class EstimatedVehicleJourneyWrapper {
   private EstimatedVehicleJourneyWrapper(EstimatedVehicleJourney journey, List<CallWrapper> calls) {
     this.journey = journey;
     this.calls = calls;
-    this.code = journey.getEstimatedVehicleJourneyCode() != null
-      ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
-      : null;
+    this.code =
+      journey.getEstimatedVehicleJourneyCode() != null
+        ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
+        : null;
   }
 
   /* Construction and validation */

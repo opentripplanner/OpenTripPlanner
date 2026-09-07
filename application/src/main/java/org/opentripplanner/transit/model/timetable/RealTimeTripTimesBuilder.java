@@ -304,8 +304,8 @@ public class RealTimeTripTimesBuilder {
   }
 
   public @Nullable I18NString[] stopHeadsigns() {
-    var result = scheduledTripTimes.copyHeadsigns(() ->
-      new I18NString[scheduledTripTimes.getNumStops()]
+    var result = scheduledTripTimes.copyHeadsigns(
+      () -> new I18NString[scheduledTripTimes.getNumStops()]
     );
     for (var i = 0; i < result.length; i++) {
       if (stopHeadsigns[i] != null) {

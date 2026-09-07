@@ -80,7 +80,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     synchronized (this) {
       int n = outgoing.length;
       outgoing = removeEdge(outgoing, edge);
-      return (outgoing.length < n);
+      return outgoing.length < n;
     }
   }
 
@@ -95,7 +95,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     synchronized (this) {
       int n = incoming.length;
       incoming = removeEdge(incoming, edge);
-      return (incoming.length < n);
+      return incoming.length < n;
     }
   }
 

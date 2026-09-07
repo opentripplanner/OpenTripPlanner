@@ -35,7 +35,7 @@ public class GeoJSONCoordinatesScalar {
         @Override
         public List<List<Double>> serialize(Object input) {
           if (input instanceof Coordinate[]) {
-            Coordinate[] coordinates = ((Coordinate[]) input);
+            Coordinate[] coordinates = (Coordinate[]) input;
             List<List<Double>> coordinateList = new ArrayList<>();
             for (Coordinate coordinate : coordinates) {
               List<Double> coordinatePair = new ArrayList<>();
