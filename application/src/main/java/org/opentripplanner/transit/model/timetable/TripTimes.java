@@ -177,10 +177,8 @@ public sealed interface TripTimes<T extends TripTimes>
   I18NString getTripHeadsign();
 
   /**
-   * @return the feed-scoped id of the vehicle operating this trip, as supplied by real-time updates.
-   * The feed scope is attached at ingestion time, consistent with how stop ids are scoped, so the
-   * value only correlates with vehicle positions from the same feed. Empty if no vehicle has been
-   * assigned or reported yet.
+   * @return the id of the vehicle operating this trip, as supplied by real-time updates, or empty
+   * if no vehicle has been reported.
    */
   Optional<FeedScopedId> getVehicleId();
 

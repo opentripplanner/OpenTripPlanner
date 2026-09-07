@@ -137,10 +137,6 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
         return null;
       }
       var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
-      // The vehicle id is feed-scoped at ingestion time, consistent with how stop ids are scoped,
-      // so the exposed value already matches the FeedId:VehicleId format used by the
-      // vehicle-positions API. The scope is OTP-derived, not a property of the source data, and only
-      // correlates within the same feed.
       return Optional.ofNullable(tripTimes)
         .flatMap(t -> ((TripTimes<?>) t).getVehicleId())
         .map(FeedScopedId::toString)

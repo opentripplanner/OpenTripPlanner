@@ -349,6 +349,10 @@ public class RealTimeTripTimesBuilder {
     return vehicleId;
   }
 
+  /**
+   * Sets the id of the vehicle operating this trip. Callers should scope the id to the trip's feed,
+   * as real-time sources report the bare vehicle reference without a feed of their own.
+   */
   public RealTimeTripTimesBuilder withVehicleId(@Nullable FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
     return this;

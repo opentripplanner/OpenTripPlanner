@@ -151,12 +151,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return tripHeadsign;
   }
 
-  /**
-   * @return the feed-scoped id of the vehicle operating this trip, as supplied by real-time updates.
-   * The feed scope is attached at ingestion time, consistent with how stop ids are scoped, so the
-   * value only correlates with vehicle positions from the same feed. Empty if no vehicle has been
-   * assigned or reported yet.
-   */
+  @Override
   public Optional<FeedScopedId> getVehicleId() {
     return Optional.ofNullable(vehicleId);
   }
