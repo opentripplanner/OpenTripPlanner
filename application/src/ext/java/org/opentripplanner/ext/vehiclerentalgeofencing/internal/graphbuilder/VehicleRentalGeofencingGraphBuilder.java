@@ -102,7 +102,7 @@ public class VehicleRentalGeofencingGraphBuilder implements GraphBuilderModule {
   }
 
   /**
-   * The networks from the manifest that are configured for the permanent phase and publish
+   * The networks from the manifest that are configured for the graph build phase and publish
    * geofencing zones. Static and package private so the selection rules can be tested without a
    * graph or a repository.
    */

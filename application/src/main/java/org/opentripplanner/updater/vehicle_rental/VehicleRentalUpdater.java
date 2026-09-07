@@ -270,7 +270,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
       }
 
       // Seed from the repository rather than from the zones computed above: a network in the
-      // permanent phase has an index there, rebuilt from the graph, but computes none here.
+      // graph build phase has an index there, rebuilt from the graph, but computes none here.
       //
       // Only vertices created by this update need resolving - a vertex keeps the zones it was
       // given, and the vehicles that persist between updates keep their vertex. When the zones

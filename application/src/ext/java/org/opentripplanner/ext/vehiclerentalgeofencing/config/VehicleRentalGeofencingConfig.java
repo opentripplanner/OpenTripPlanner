@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vehiclerentalgeofencing.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -11,6 +12,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class VehicleRentalGeofencingConfig {
 
+  @Nullable
   public static VehicleRentalGeofencingParameters mapConfig(
     String parameterName,
     NodeAdapter root
@@ -39,7 +41,7 @@ public class VehicleRentalGeofencingConfig {
       .asObject();
 
     if (c.isEmpty()) {
-      return new VehicleRentalGeofencingParameters(null, null, HttpHeaders.empty());
+      return null;
     }
 
     return new VehicleRentalGeofencingParameters(

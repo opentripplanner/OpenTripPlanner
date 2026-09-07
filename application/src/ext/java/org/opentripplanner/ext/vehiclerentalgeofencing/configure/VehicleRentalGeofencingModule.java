@@ -14,8 +14,8 @@ import org.opentripplanner.street.graph.Graph;
 public class VehicleRentalGeofencingModule {
 
   /**
-   * The sandbox is activated by the presence of a manifest url in the build config; returning
-   * {@code null} here leaves the module out of the graph build.
+   * The sandbox is activated by the presence of the {@code vehicleRentalGeofencing} section in the
+   * build config; returning {@code null} here leaves the module out of the graph build.
    */
   @Provides
   @Singleton
@@ -26,7 +26,7 @@ public class VehicleRentalGeofencingModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    if (!config.vehicleRentalGeofencing.hasUrl()) {
+    if (config.vehicleRentalGeofencing == null) {
       return null;
     }
 

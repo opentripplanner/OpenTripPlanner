@@ -176,7 +176,10 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
   public final EmpiricalDelayParameters empiricalDelay;
+
+  @Nullable
   public final VehicleRentalGeofencingParameters vehicleRentalGeofencing;
+
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
