@@ -16,7 +16,6 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -159,11 +158,6 @@ public class TaxiZoneLeg implements Leg {
   @Override
   public List<WalkStep> listWalkSteps() {
     return streetLeg.listWalkSteps();
-  }
-
-  @Override
-  public Set<StreetNote> listStreetNotes() {
-    return streetLeg.listStreetNotes();
   }
 
   @Override
