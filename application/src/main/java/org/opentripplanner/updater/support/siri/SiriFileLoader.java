@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.Siri;
@@ -59,6 +60,15 @@ public class SiriFileLoader implements SiriLoader {
   @Override
   public Optional<Siri> fetchETFeed(String requestorRef) {
     return fetchFeed();
+  }
+
+  /**
+   * Each file is processed as a separate message and is expected to contain a delta, just like a
+   * message received from a real SIRI server.
+   */
+  @Override
+  public UpdateIncrementality incrementality() {
+    return UpdateIncrementality.DIFFERENTIAL;
   }
 
   @SuppressWarnings("ResultOfMethodCallIgnored")

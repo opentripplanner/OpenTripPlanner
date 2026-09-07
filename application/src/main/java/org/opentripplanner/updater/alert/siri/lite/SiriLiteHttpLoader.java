@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.support.siri.SiriHelper;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.slf4j.Logger;
@@ -45,6 +46,15 @@ public class SiriLiteHttpLoader implements SiriLoader {
   @Override
   public Optional<Siri> fetchETFeed(String ignored) {
     return fetchFeed();
+  }
+
+  /**
+   * Every request returns the complete data set, so alerts that are no longer present have been
+   * removed at the source.
+   */
+  @Override
+  public UpdateIncrementality incrementality() {
+    return UpdateIncrementality.FULL_DATASET;
   }
 
   private Optional<Siri> fetchFeed() {

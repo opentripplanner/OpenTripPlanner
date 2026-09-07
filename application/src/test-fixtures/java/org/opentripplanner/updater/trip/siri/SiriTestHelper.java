@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.siri;
 
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
 
 import java.time.LocalDate;
 import java.util.List;

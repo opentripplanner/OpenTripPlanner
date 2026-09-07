@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.FEED_ID;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
@@ -22,7 +23,8 @@ import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -61,7 +63,6 @@ public class RealtimeStopsLayerTest {
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository);
-    var transitAlertService = new TransitAlertServiceImpl();
 
     Route route = TransitRepositoryForTest.route("route").build();
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
@@ -99,7 +100,12 @@ public class RealtimeStopsLayerTest {
       .withSeverity(AlertSeverity.SEVERE)
       .build();
 
-    transitAlertService.setAlerts(List.of(alert, severeAlert, infoAlert, expiredAlert));
+    var transitAlertRepository = new DefaultTransitAlertRepository();
+    transitAlertRepository.replaceAlerts(
+      FEED_ID,
+      List.of(alert, severeAlert, infoAlert, expiredAlert)
+    );
+    var transitAlertService = new DefaultTransitAlertService(transitAlertRepository.freeze());
 
     // TODO Why is these 2 lines here - the test works without them?
     var itineraries = List.of(itinerary);

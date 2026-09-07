@@ -25,21 +25,21 @@ import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 
 public class AlertsUpdateHandlerTest {
 
   private AlertsUpdateHandler handler;
 
-  private final TransitAlertService service = new TransitAlertServiceImpl();
+  private final DefaultTransitAlertRepository repository = new DefaultTransitAlertRepository();
 
   @BeforeEach
   public void setUp() {
     handler = new AlertsUpdateHandler(false);
     handler.setFeedId("1");
     handler.setEarlyStart(Duration.ofSeconds(5));
-    handler.setTransitAlertService(service);
   }
 
   @Test
@@ -93,8 +93,8 @@ public class AlertsUpdateHandlerTest {
       .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(invalidAlert).setId("1"))
       .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(validAlert).setId("2"))
       .build();
-    handler.update(message, null);
-    assertThat(service.getAllAlerts()).hasSize(1);
+    handler.update(message, null, repository);
+    assertThat(service().getAllAlerts()).hasSize(1);
   }
 
   @Test
@@ -520,9 +520,13 @@ public class AlertsUpdateHandlerTest {
       .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))
       .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(alert).setId("1"))
       .build();
-    handler.update(message, null);
-    Collection<TransitAlert> alerts = service.getAllAlerts();
+    handler.update(message, null, repository);
+    Collection<TransitAlert> alerts = service().getAllAlerts();
     assertEquals(1, alerts.size());
     return alerts.iterator().next();
+  }
+
+  private TransitAlertService service() {
+    return new DefaultTransitAlertService(repository.freeze());
   }
 }

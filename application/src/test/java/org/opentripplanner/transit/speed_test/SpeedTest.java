@@ -26,11 +26,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
+import org.opentripplanner.service.transitalert.internal.TransitAlertRepositoryLifecycle;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -134,6 +136,12 @@ public class SpeedTest {
           LocalDate::now
         )
       );
+    var transitAlertRepository = new DefaultTransitAlertRepository();
+    var alertRegistry = TransactionFactory.createRepositoryRegistry();
+    var transitAlertHandle = alertRegistry.registerRepository(
+      transitAlertRepository,
+      new TransitAlertRepositoryLifecycle()
+    );
     var realtimeVehicleHandle = registry.registerRepository(
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()
@@ -150,6 +158,11 @@ public class SpeedTest {
       TransactionFactory.createRepositoryRegistry(),
       threadFactory
     );
+    var alertUpdateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
+      "speedtest-alert",
+      alertRegistry,
+      threadFactory
+    );
 
     UpdaterConfigurator.configure(
       graph,
@@ -164,9 +177,11 @@ public class SpeedTest {
       null,
       null,
       transitUpdateManager,
+      alertUpdateManager,
       streetUpdateManager,
+      registry,
       timetableHandle,
-      new DelegatingTransitAlertServiceImpl(),
+      transitAlertHandle,
       routerConfig.updaterConfig(),
       // The speed test does not use GBFS vehicle rental.
       GbfsNetworkOverrides.none()
@@ -189,7 +204,7 @@ public class SpeedTest {
     );
     this.routingService = new DefaultRoutingService(
       this.transitService,
-      new DelegatingTransitAlertServiceImpl(),
+      new DefaultTransitAlertService(transitAlertHandle.repositorySnapshot(alertRegistry.scope())),
       graph,
       raptorConfig,
       timer.getRegistry(),

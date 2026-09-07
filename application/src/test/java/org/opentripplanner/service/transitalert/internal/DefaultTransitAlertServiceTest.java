@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.service.transitalert.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +14,7 @@ import org.opentripplanner.transit.api.request.TransitAlertRequest;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TransitAlertSelectRequest;
 
-class TransitAlertServiceImplTest {
+class DefaultTransitAlertServiceTest {
 
   private static final String FEED_ID = "GB";
   private static final String RAIL_STATION_ID = "910GSTPX";
@@ -89,12 +89,11 @@ class TransitAlertServiceImplTest {
 
   @Test
   void getStopLocationsAlertsDeduplicatesAlerts() {
-    var iut = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(id("multi_stop_alert"))
       .addEntity(new EntitySelector.Stop(id(RAIL_P1_ID)))
       .addEntity(new EntitySelector.Stop(id(RAIL_STATION_ID)))
       .build();
-    iut.setAlerts(List.of(alert));
+    var iut = serviceWith(List.of(alert));
 
     // the same alert matches both ids, but it is returned only once
     assertThat(
@@ -118,16 +117,19 @@ class TransitAlertServiceImplTest {
     assertThat(iut.getStopLocationsAlerts(List.of())).isEmpty();
   }
 
-  private static TransitAlertServiceImpl serviceWithStopAlerts() {
-    var service = new TransitAlertServiceImpl();
-    service.setAlerts(List.of(RAIL_STATION_ALERT, RAIL_STOP_ALERT, BUS_STOP_ALERT));
-    return service;
+  private static DefaultTransitAlertService serviceWithStopAlerts() {
+    return serviceWith(List.of(RAIL_STATION_ALERT, RAIL_STOP_ALERT, BUS_STOP_ALERT));
+  }
+
+  private static DefaultTransitAlertService serviceWith(List<TransitAlert> alerts) {
+    var repository = new DefaultTransitAlertRepository();
+    repository.replaceAlerts(FEED_ID, alerts);
+    return new DefaultTransitAlertService(repository.freeze());
   }
 
   @Test
   void findAlertsWithoutFiltersReturnsAll() {
-    var iut = new TransitAlertServiceImpl();
-    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
+    var iut = serviceWith(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     assertThat(iut.findAlerts(TransitAlertRequest.of().build())).containsExactly(
       ACCIDENT_ALERT,
@@ -137,8 +139,7 @@ class TransitAlertServiceImplTest {
 
   @Test
   void findAlertsSelectsMatchingCause() {
-    var iut = new TransitAlertServiceImpl();
-    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
+    var iut = serviceWith(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = request(
       FilterRequest.<TransitAlertSelectRequest>of().addSelect(causeSelector(AlertCause.ACCIDENT))
@@ -149,8 +150,7 @@ class TransitAlertServiceImplTest {
 
   @Test
   void findAlertsExcludesMatchingCause() {
-    var iut = new TransitAlertServiceImpl();
-    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
+    var iut = serviceWith(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = request(
       FilterRequest.<TransitAlertSelectRequest>of().addNot(causeSelector(AlertCause.ACCIDENT))
@@ -161,8 +161,7 @@ class TransitAlertServiceImplTest {
 
   @Test
   void findAlertsCombinesFiltersWithOr() {
-    var iut = new TransitAlertServiceImpl();
-    iut.setAlerts(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
+    var iut = serviceWith(List.of(ACCIDENT_ALERT, WEATHER_ALERT));
 
     var request = TransitAlertRequest.of()
       .withFilters(

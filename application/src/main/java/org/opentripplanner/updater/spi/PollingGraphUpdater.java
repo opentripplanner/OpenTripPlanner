@@ -135,9 +135,14 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
    * This is the sole way for polling updater implementations to submit real-time update tasks,
    * while technical details about the execution of these tasks
    * (frequency, concurrency, waiting, ...) are encapsulated in this parent class.
+   *
+   * @return the {@link Future} of the submitted task. In a write domain with atomic commits the
+   *         future completes exceptionally if the task failed and was rolled back, which lets an
+   *         updater of an incremental feed re-fetch the data it just lost.
    */
-  protected final void updateGraph(GraphWriterRunnable<C> task) {
+  protected final Future<?> updateGraph(GraphWriterRunnable<C> task) {
     previousTask = saveResultOnGraph.execute(task);
+    return previousTask;
   }
 
   /**

@@ -9,7 +9,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.transitalert.TransitAlertService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Timetable;

@@ -2,14 +2,18 @@ package org.opentripplanner.updater;
 
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -43,8 +47,8 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   /**
    * Create the bridge for the transit write domain. Each task checks out the mutable
    * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
-   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot
-   * to be published at commit.
+   * resolved lazily: only tasks that actually apply vehicle updates cause a new snapshot of it to
+   * be published at commit.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
@@ -65,6 +69,28 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   }
 
   /**
+   * Create the bridge for the alert write domain. The alerts have a writer thread of their own, so
+   * an alert task must not touch the timetable write buffer: the transit data it reads is resolved
+   * from the transit domain's last committed timetable snapshot, through a fresh
+   * {@link org.opentripplanner.framework.transaction.api.TransactionScope} per task.
+   */
+  public static GraphWriterService<AlertRealTimeUpdateContext> forAlertDomain(
+    UpdateManager updateManager,
+    RepositoryHandle<TransitAlertRepositorySnapshot, TransitAlertRepository> transitAlertHandle,
+    RepositoryRegistry transitRepositoryRegistry,
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
+    TransitRepository transitRepository
+  ) {
+    return new GraphWriterService<>(updateManager, ctx -> {
+      var timetableSnapshot = timetableHandle.repositorySnapshot(transitRepositoryRegistry.scope());
+      return new DefaultAlertRealTimeUpdateContext(
+        () -> ctx.repository(transitAlertHandle),
+        new DefaultTransitService(transitRepository, timetableSnapshot)
+      );
+    });
+  }
+
+  /**
    * Create the bridge for the street write domain.
    */
   public static GraphWriterService<StreetRealTimeUpdateContext> forStreetDomain(
@@ -82,7 +108,11 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
       try {
         runnable.run(context);
       } catch (Exception e) {
+        // The exception is logged here, because the Future returned by submit() is often not
+        // observed by the updater. It is rethrown so that the UpdateManager can roll the
+        // transaction back - in the write domains that commit atomically.
         LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
+        throw e instanceof RuntimeException re ? re : new RuntimeException(e);
       }
     });
   }

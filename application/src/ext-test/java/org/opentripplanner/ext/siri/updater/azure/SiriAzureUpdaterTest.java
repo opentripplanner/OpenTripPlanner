@@ -26,6 +26,7 @@ import org.mockito.ArgumentCaptor;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryException;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
@@ -55,9 +56,9 @@ class SiriAzureUpdaterTest {
 
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
     spy(
-      new SiriAzureUpdater(
+      new SiriAzureUpdater<>(
         mockConfig,
-        new SiriAzureMessageHandler() {
+        new SiriAzureMessageHandler<TransitRealTimeUpdateContext>() {
           @Override
           public void setup(
             WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
@@ -68,17 +69,20 @@ class SiriAzureUpdaterTest {
           public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
             return null;
           }
-        }
+        },
+        WriteDomain.TRANSIT
       )
     );
 
     task = mock(Runnable.class);
   }
 
-  private SiriAzureUpdater createUpdater(SiriAzureUpdaterParameters config) {
-    return new SiriAzureUpdater(
+  private SiriAzureUpdater<TransitRealTimeUpdateContext> createUpdater(
+    SiriAzureUpdaterParameters config
+  ) {
+    return new SiriAzureUpdater<>(
       config,
-      new SiriAzureMessageHandler() {
+      new SiriAzureMessageHandler<TransitRealTimeUpdateContext>() {
         @Override
         public void setup(
           WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
@@ -89,13 +93,14 @@ class SiriAzureUpdaterTest {
         public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
           return null;
         }
-      }
+      },
+      WriteDomain.TRANSIT
     );
   }
 
   @Test
   void testRun_SetsPrimedOnSuccess() throws Exception {
-    SiriAzureUpdater workingUpdater = spy(createUpdater(mockConfig));
+    SiriAzureUpdater<TransitRealTimeUpdateContext> workingUpdater = spy(createUpdater(mockConfig));
 
     // Ensure updater uses mocked retry
     doReturn(otpRetry).when(workingUpdater).createOtpRetry(anyString());
@@ -119,7 +124,7 @@ class SiriAzureUpdaterTest {
     listAppender.start();
     logger.addAppender(listAppender);
 
-    SiriAzureUpdater failingUpdater = spy(createUpdater(mockConfig));
+    SiriAzureUpdater<TransitRealTimeUpdateContext> failingUpdater = spy(createUpdater(mockConfig));
 
     doThrow(new RuntimeException("Setup failed")).when(task).run();
 
@@ -137,7 +142,7 @@ class SiriAzureUpdaterTest {
    */
   @Test
   void testSequentialStartupStepExecution() throws Exception {
-    SiriAzureUpdater sequenceUpdater = spy(createUpdater(mockConfig));
+    SiriAzureUpdater<TransitRealTimeUpdateContext> sequenceUpdater = spy(createUpdater(mockConfig));
 
     doReturn(otpRetry).when(sequenceUpdater).createOtpRetry(anyString());
 
@@ -160,7 +165,7 @@ class SiriAzureUpdaterTest {
     listAppender.start();
     logger.addAppender(listAppender);
 
-    SiriAzureUpdater errorUpdater = spy(createUpdater(mockConfig));
+    SiriAzureUpdater<TransitRealTimeUpdateContext> errorUpdater = spy(createUpdater(mockConfig));
 
     doReturn(otpRetry).when(errorUpdater).createOtpRetry(anyString());
 

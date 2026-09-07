@@ -15,7 +15,9 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
 /**
@@ -23,6 +25,10 @@ import org.opentripplanner.transit.service.DefaultTransitService;
  * boundary correctly
  */
 class AlternativeLegsTest extends GtfsTest {
+
+  private static final TransitAlertService NO_ALERTS = new DefaultTransitAlertService(
+    new DefaultTransitAlertRepository().freeze()
+  );
 
   private static final FeedScopedId STOP_ID_B = new FeedScopedId(FEED_ID, "B");
   private static final FeedScopedId STOP_ID_C = new FeedScopedId(FEED_ID, "C");
@@ -46,7 +52,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, NO_ALERTS);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -79,7 +85,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, NO_ALERTS);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -112,7 +118,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_Y,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, NO_ALERTS);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -139,7 +145,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_B,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, NO_ALERTS);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,

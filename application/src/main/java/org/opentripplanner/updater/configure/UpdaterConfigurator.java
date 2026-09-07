@@ -14,12 +14,14 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServic
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
-import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -31,7 +33,6 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -81,12 +82,18 @@ public class UpdaterConfigurator {
 
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager transitUpdateManager;
+  private final UpdateManager alertUpdateManager;
   private final UpdateManager streetUpdateManager;
+  private final RepositoryRegistry transitRepositoryRegistry;
   private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
   > timetableRepositoryHandle;
-  private final DelegatingTransitAlertServiceImpl transitAlertService;
+
+  private final RepositoryHandle<
+    TransitAlertRepositorySnapshot,
+    TransitAlertRepository
+  > transitAlertRepositoryHandle;
 
   @Nullable
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
@@ -105,9 +112,14 @@ public class UpdaterConfigurator {
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
+    UpdateManager alertUpdateManager,
     UpdateManager streetUpdateManager,
+    RepositoryRegistry transitRepositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    DelegatingTransitAlertServiceImpl transitAlertService,
+    RepositoryHandle<
+      TransitAlertRepositorySnapshot,
+      TransitAlertRepository
+    > transitAlertRepositoryHandle,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
@@ -120,11 +132,13 @@ public class UpdaterConfigurator {
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.transitUpdateManager = transitUpdateManager;
+    this.alertUpdateManager = alertUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
+    this.transitRepositoryRegistry = transitRepositoryRegistry;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
-    this.transitAlertService = transitAlertService;
+    this.transitAlertRepositoryHandle = transitAlertRepositoryHandle;
     this.gbfsNetworkOverrides = gbfsNetworkOverrides;
   }
 
@@ -142,9 +156,14 @@ public class UpdaterConfigurator {
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
+    UpdateManager alertUpdateManager,
     UpdateManager streetUpdateManager,
+    RepositoryRegistry transitRepositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
-    DelegatingTransitAlertServiceImpl transitAlertService,
+    RepositoryHandle<
+      TransitAlertRepositorySnapshot,
+      TransitAlertRepository
+    > transitAlertRepositoryHandle,
     UpdatersParameters updatersParameters,
     GbfsNetworkOverrides gbfsNetworkOverrides
   ) {
@@ -159,9 +178,11 @@ public class UpdaterConfigurator {
       carpoolingRepository,
       carpoolTripVertexResolver,
       transitUpdateManager,
+      alertUpdateManager,
       streetUpdateManager,
+      transitRepositoryRegistry,
       timetableRepositoryHandle,
-      transitAlertService,
+      transitAlertRepositoryHandle,
       updatersParameters,
       gbfsNetworkOverrides
     ).configure();
@@ -179,30 +200,34 @@ public class UpdaterConfigurator {
       )
     );
 
-    // Register the alert service of each updater that provides one into the application-wide
-    // aggregating alert service.
-    for (var it : updaters) {
-      if (it instanceof TransitAlertProvider provider) {
-        transitAlertService.addDelegate(provider.getTransitAlertService());
-      }
-    }
-
     var transitWriterService = GraphWriterService.forTransitDomain(
       transitUpdateManager,
       timetableRepositoryHandle,
       realtimeVehicleRepositoryHandle,
       transitRepository
     );
+    var alertWriterService = GraphWriterService.forAlertDomain(
+      alertUpdateManager,
+      transitAlertRepositoryHandle,
+      transitRepositoryRegistry,
+      timetableRepositoryHandle,
+      transitRepository
+    );
     var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);
     var updaterManager = new GraphUpdaterManager(
       new WriteToGraphCallbacks()
         .with(WriteDomain.TRANSIT, transitWriterService)
+        .with(WriteDomain.ALERT, alertWriterService)
         .with(WriteDomain.STREET, streetWriterService),
       () -> {
         try {
           transitWriterService.stop();
         } finally {
-          streetWriterService.stop();
+          try {
+            alertWriterService.stop();
+          } finally {
+            streetWriterService.stop();
+          }
         }
       },
       updaters

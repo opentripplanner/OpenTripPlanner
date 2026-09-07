@@ -17,7 +17,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.RoutingService;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -27,6 +26,8 @@ import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFacto
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -120,7 +121,7 @@ public class TestServerContext {
 
     return new DefaultRoutingService(
       transitService,
-      new TransitAlertServiceImpl(),
+      new DefaultTransitAlertService(new DefaultTransitAlertRepository().freeze()),
       graph,
       raptorConfig,
       Metrics.globalRegistry,

@@ -43,6 +43,30 @@ public abstract class TransactionModule {
 
   @Provides
   @Singleton
+  @AlertDomain
+  public static RepositoryRegistry alertRepositoryRegistry() {
+    return TransactionFactory.createRepositoryRegistry();
+  }
+
+  /**
+   * The alert domain commits atomically after each task: an alert update is cheap to publish -
+   * unlike a timetable update it does not re-index Raptor - so there is nothing to gain from
+   * batching commits, and an atomic commit is what gives a failed alert task a rollback.
+   */
+  @Provides
+  @Singleton
+  @AlertDomain
+  public static UpdateManager alertUpdateManager(@AlertDomain RepositoryRegistry registry) {
+    var threadFactory = Thread.ofPlatform().name("alertWriter").factory();
+    return TransactionFactory.createUpdateManagerWithAtomicCommits(
+      "alert",
+      registry,
+      threadFactory
+    );
+  }
+
+  @Provides
+  @Singleton
   @StreetDomain
   public static RepositoryRegistry streetRepositoryRegistry() {
     return TransactionFactory.createRepositoryRegistry();

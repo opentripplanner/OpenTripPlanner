@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.Siri;
@@ -62,6 +63,15 @@ public class SiriHttpLoader implements SiriLoader {
     String etServiceRequest = SiriHelper.createETServiceRequestAsXml(requestorRef, previewInterval);
     requestTimer.serviceRequestCreated();
     return fetchFeed(etServiceRequest, requestTimer, requestorRef);
+  }
+
+  /**
+   * The server only returns the situations and estimated timetables that changed since the
+   * previous request with the same requestor ref.
+   */
+  @Override
+  public UpdateIncrementality incrementality() {
+    return UpdateIncrementality.DIFFERENTIAL;
   }
 
   private Optional<Siri> fetchFeed(

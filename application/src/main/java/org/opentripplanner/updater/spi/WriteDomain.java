@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.spi;
 
+import org.opentripplanner.updater.AlertRealTimeUpdateContext;
 import org.opentripplanner.updater.StreetRealTimeUpdateContext;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 
@@ -12,11 +13,18 @@ import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 public final class WriteDomain<C> {
 
   /**
-   * Timetable data, alerts and realtime vehicles.
+   * Timetable data and realtime vehicles.
    */
   public static final WriteDomain<TransitRealTimeUpdateContext> TRANSIT = new WriteDomain<>(
     "TRANSIT"
   );
+
+  /**
+   * The transit alerts. They have a write domain of their own so that every alert update task can
+   * be committed - or rolled back - on its own, without forcing the timetable to publish a new
+   * snapshot at the same rate.
+   */
+  public static final WriteDomain<AlertRealTimeUpdateContext> ALERT = new WriteDomain<>("ALERT");
 
   /**
    * The street graph and the vehicle-rental and vehicle-parking repositories.

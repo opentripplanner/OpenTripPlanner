@@ -46,6 +46,17 @@ example, one for transit data and one for street data. A `Transaction` is always
 one `UpdateManager`; repositories registered on different registries are versioned independently,
 and are updated in parallel, by two different writer threads.
 
+OTP currently wires three domains, see `TransactionModule`:
+
+| Domain    | Commit mode | Repositories                 | Why                                                                                                                                                                             |
+| --------- | ----------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TRANSIT` | Periodic    | Timetable, realtime vehicles | Publishing a timetable snapshot re-indexes Raptor, so commits are batched (`maxSnapshotFrequency`). A failed task is not rolled back.                                           |
+| `ALERT`   | Atomic      | Transit alerts               | An alert snapshot is cheap to publish, so every task is committed — or rolled back — on its own. This keeps a partially applied SIRI-SX delivery out of the published snapshot. |
+| `STREET`  | Atomic      | (none yet)                   | A dedicated writer thread so rental/parking work does not delay timetable updates.                                                                                              |
+
+Because a `TransactionScope` can only resolve repositories of its own registry, a request that reads
+both timetables and alerts captures one scope per registry — see `RequestScopedModule`.
+
 ## Read Path
 
 A request obtains a consistent view across every registered repository with two calls:

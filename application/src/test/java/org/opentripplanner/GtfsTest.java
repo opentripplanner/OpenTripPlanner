@@ -35,7 +35,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -48,9 +48,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
@@ -66,7 +66,7 @@ public abstract class GtfsTest {
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
-  TransitAlertServiceImpl alertPatchServiceImpl;
+  DefaultTransitAlertRepository alertRepository;
   public RoutingService routingService;
 
   public abstract String getFeedName();
@@ -237,8 +237,7 @@ public abstract class GtfsTest {
       new Deduplicator(),
       LocalDate::now
     );
-    alertPatchServiceImpl = new TransitAlertServiceImpl();
-    alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
+    alertRepository = new DefaultTransitAlertRepository();
     alertsUpdateHandler.setFeedId(FEED_ID);
 
     try {
@@ -264,7 +263,7 @@ public abstract class GtfsTest {
             );
         })
         .get();
-      alertsUpdateHandler.update(feedMessage, null);
+      alertsUpdateHandler.update(feedMessage, null, alertRepository);
     } catch (FileNotFoundException _) {
     } catch (Exception e) {
       throw new RuntimeException(e);

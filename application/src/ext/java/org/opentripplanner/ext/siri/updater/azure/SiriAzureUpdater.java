@@ -32,9 +32,8 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.retry.OtpRetryException;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.updater.AlertRealTimeUpdateContext;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
-import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -50,7 +49,7 @@ import uk.org.siri.siri21.Siri;
  * communicating with the azure service bus and delegates to SiriAzureETUpdater and
  * SiriAzureSXUpdater for ET and SX specific stuff.
  */
-public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
+public class SiriAzureUpdater<C> implements GraphUpdater<C> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAzureUpdater.class);
   private final String updaterType;
@@ -74,7 +73,9 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
   private static final int ERROR_RETRY_WAIT_SECONDS = 5;
   private static final int MAX_ATTEMPTS = 5;
 
-  protected final SiriAzureMessageHandler messageHandler;
+  protected final SiriAzureMessageHandler<C> messageHandler;
+
+  private final WriteDomain<C> writeDomain;
 
   /**
    * The URL used to fetch all initial updates, null means don't fetch initial data
@@ -87,8 +88,13 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
    */
   private final int timeout;
 
-  SiriAzureUpdater(SiriAzureUpdaterParameters config, SiriAzureMessageHandler messageHandler) {
+  SiriAzureUpdater(
+    SiriAzureUpdaterParameters config,
+    SiriAzureMessageHandler<C> messageHandler,
+    WriteDomain<C> writeDomain
+  ) {
     this.messageHandler = Objects.requireNonNull(messageHandler);
+    this.writeDomain = Objects.requireNonNull(writeDomain);
 
     try {
       this.dataInitializationUrl = config.buildDataInitializationUrl().orElse(null);
@@ -124,53 +130,30 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     }
   }
 
-  public static SiriAzureUpdater createETUpdater(
+  public static SiriAzureUpdater<TransitRealTimeUpdateContext> createETUpdater(
     SiriAzureETUpdaterParameters config,
     SiriRealTimeTripUpdateAdapter adapter
   ) {
     var messageHandler = new SiriAzureETUpdater(config, adapter);
-    return new SiriAzureUpdater(config, messageHandler);
+    return new SiriAzureUpdater<>(config, messageHandler, WriteDomain.TRANSIT);
   }
 
-  public static SiriAzureUpdater createSXUpdater(
+  public static SiriAzureUpdater<AlertRealTimeUpdateContext> createSXUpdater(
     SiriAzureSXUpdaterParameters config,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     var messageHandler = new SiriAzureSXUpdater(config, siriFuzzyTripMatcherCache);
-    return new SxWrapper(config, messageHandler);
-  }
-
-  /**
-   * This wrapper class is a SiriAzureUpdater that implements the TransitAlertProvider interface so
-   * it can be registered to handle SX messages. It delegates the actual SIRI-SX message processing
-   * to the contained SiriAzureSXUpdater.
-   */
-  public static class SxWrapper extends SiriAzureUpdater implements TransitAlertProvider {
-
-    SxWrapper(SiriAzureUpdaterParameters config, SiriAzureSXUpdater messageHandler) {
-      super(config, messageHandler);
-    }
-
-    /**
-     * Implements the TransitAlertProvider interface to allow this updater to be detected as a
-     * source of transit alerts. This method delegates to the internal SiriAzureSXUpdater
-     *
-     * @return TransitAlertService from the SiriAzureSXUpdater
-     */
-    @Override
-    public TransitAlertService getTransitAlertService() {
-      return ((SiriAzureSXUpdater) messageHandler).getTransitAlertService();
-    }
+    return new SiriAzureUpdater<>(config, messageHandler, WriteDomain.ALERT);
   }
 
   @Override
-  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
+  public void setup(WriteToGraphCallback<C> writeToGraphCallback) {
     this.messageHandler.setup(writeToGraphCallback);
   }
 
   @Override
-  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
-    return WriteDomain.TRANSIT;
+  public WriteDomain<C> writeDomain() {
+    return writeDomain;
   }
 
   @Override

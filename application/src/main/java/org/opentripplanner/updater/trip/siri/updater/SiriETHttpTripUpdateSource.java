@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.updater;
 
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.UpdateIncrementality.FULL_DATASET;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -10,8 +10,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.support.siri.SiriLoader;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

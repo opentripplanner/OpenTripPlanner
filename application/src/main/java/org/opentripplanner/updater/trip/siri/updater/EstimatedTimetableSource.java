@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri.updater;
 
 import java.util.Optional;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.UpdateIncrementality;
 import uk.org.siri.siri21.Siri;
 
 /**

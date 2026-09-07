@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.updater.mqtt;
 
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.UpdateIncrementality.FULL_DATASET;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
@@ -21,11 +21,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteDomain;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
