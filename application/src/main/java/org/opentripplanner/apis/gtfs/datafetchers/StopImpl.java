@@ -146,9 +146,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return environment -> {
       var args = new GraphQLTypes.GraphQLStopCanceledCallsArgs(environment.getArguments());
       var rawRanges = args.getGraphQLServiceDateRanges();
-      var serviceDateRanges = rawRanges == null
-        ? List.of(LocalDateRange.ofUnbounded())
-        : LocalDateRangeUtil.mapRanges(rawRanges);
+      var serviceDateRanges =
+        rawRanges == null
+          ? List.of(LocalDateRange.ofUnbounded())
+          : LocalDateRangeUtil.mapRanges(rawRanges);
       var arrivalDeparture = ArrivalDepartureMapper.map(args.getGraphQLArrivalDeparture());
       var callTimePeriods = OffsetDateTimeRangeUtil.mapRanges(
         args.getGraphQLTimeRanges(),
@@ -535,8 +536,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   @Override
   public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairAccessibility, station ->
-        null
+      var boarding = getValue(
+        environment,
+        StopLocation::getWheelchairAccessibility,
+        station -> null
       );
       return GraphQLUtils.toGraphQL(boarding);
     };

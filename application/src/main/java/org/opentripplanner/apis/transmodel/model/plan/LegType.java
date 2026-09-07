@@ -84,8 +84,10 @@ public class LegType {
           .description("The aimed date and time this leg starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
-            // startTime is already adjusted for real-time - need to subtract delay to get aimed time
-            leg(env).startTime().minusSeconds(leg(env).departureDelay())
+            leg(env)
+              .startTime()
+              // startTime is already adjusted for real-time - need to subtract delay to get aimed time
+              .minusSeconds(leg(env).departureDelay())
           )
           .build()
       )
@@ -298,7 +300,9 @@ public class LegType {
           )
           .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
-            Optional.of((Leg) environment.getSource()).map(Leg::serviceDate).orElse(null)
+            Optional.of((Leg) environment.getSource())
+              .map(Leg::serviceDate)
+              .orElse(null)
           )
           .build()
       )
@@ -314,13 +318,11 @@ public class LegType {
             if (stops == null || stops.isEmpty()) {
               return List.of();
             } else {
-              return (
-                stops
-                  .stream()
-                  .map(stop -> stop.place.stop)
-                  .filter(Objects::nonNull)
-                  .collect(Collectors.toList())
-              );
+              return stops
+                .stream()
+                .map(stop -> stop.place.stop)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
             }
           })
           .build()

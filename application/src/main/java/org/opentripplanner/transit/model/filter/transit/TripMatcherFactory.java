@@ -75,7 +75,7 @@ public class TripMatcherFactory {
       new ContainsMatcher<>(
         "serviceDate",
         t -> serviceDateProvider.apply(t.getServiceId()),
-        new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
+        new EqualityMatcher<>("serviceDate", date, dateToMatch -> dateToMatch)
       );
   }
 }

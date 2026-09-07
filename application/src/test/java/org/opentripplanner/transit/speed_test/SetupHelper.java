@@ -18,11 +18,12 @@ import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 class SetupHelper {
 
   static LoadModel loadGraph(File baseDir, @Nullable URI path) {
-    File file = path == null
-      ? OtpDataStore.graphFile(baseDir)
-      : path.isAbsolute()
-        ? new File(path)
-        : new File(baseDir, path.getPath());
+    File file =
+      path == null
+        ? OtpDataStore.graphFile(baseDir)
+        : path.isAbsolute()
+          ? new File(path)
+          : new File(baseDir, path.getPath());
     SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
     Graph graph = serializedGraphObject.graph;
 

@@ -73,9 +73,10 @@ public class GtfsGraphQLAPI {
         .build();
     }
 
-    Locale locale = headers.getAcceptableLanguages().size() > 0
-      ? headers.getAcceptableLanguages().get(0)
-      : defaultRouteRequest.preferences().locale();
+    Locale locale =
+      headers.getAcceptableLanguages().size() > 0
+        ? headers.getAcceptableLanguages().get(0)
+        : defaultRouteRequest.preferences().locale();
 
     String query = (String) jsonParameters.get("query");
     Object queryVariables = jsonParameters.getOrDefault("variables", null);
@@ -122,9 +123,10 @@ public class GtfsGraphQLAPI {
     @Context UriInfo uriInfo,
     @Context GtfsGraphQLRequestContext requestContext
   ) {
-    Locale locale = headers.getAcceptableLanguages().size() > 0
-      ? headers.getAcceptableLanguages().get(0)
-      : defaultRouteRequest.preferences().locale();
+    Locale locale =
+      headers.getAcceptableLanguages().size() > 0
+        ? headers.getAcceptableLanguages().get(0)
+        : defaultRouteRequest.preferences().locale();
     return GtfsGraphQLIndex.getGraphQLResponse(
       query,
       null,

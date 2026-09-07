@@ -5,12 +5,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class IslandPruningUtils {
 
-  static Graph buildOsmGraph(File osmFile, IslandPruningParameters parameters) {
+  static GraphSummarizer buildOsmGraph(File osmFile, IslandPruningParameters parameters) {
     try {
       var graph = new Graph();
       var osmProvider = new DefaultOsmProvider(osmFile, true);
@@ -25,7 +26,7 @@ class IslandPruningUtils {
 
       prune(graph, parameters);
 
-      return graph;
+      return new GraphSummarizer(graph);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

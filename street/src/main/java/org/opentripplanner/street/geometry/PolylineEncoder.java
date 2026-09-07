@@ -132,9 +132,9 @@ public class PolylineEncoder {
   private static String encodeSignedNumber(int num) {
     int sgn_num = num << 1;
     if (num < 0) {
-      sgn_num = ~(sgn_num);
+      sgn_num = ~sgn_num;
     }
-    return (encodeNumber(sgn_num));
+    return encodeNumber(sgn_num);
   }
 
   /**
@@ -163,12 +163,12 @@ public class PolylineEncoder {
 
     while (num >= 0x20) {
       int nextValue = (0x20 | (num & 0x1f)) + 63;
-      encodeString.append((char) (nextValue));
+      encodeString.append((char) nextValue);
       num >>= 5;
     }
 
     num += 63;
-    encodeString.append((char) (num));
+    encodeString.append((char) num);
 
     return encodeString.toString();
   }

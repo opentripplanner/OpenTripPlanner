@@ -25,7 +25,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
   implements StopArrivalState<T>
-  permits EgressStopArrivalState {
+  permits EgressStopArrivalState
+{
 
   /**
    * Used to initialize all none-time-based attributes.
@@ -186,7 +187,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
     return boardStopPosition == NOT_SET
       ? null
       : trip.pattern().debugInfo() +
-        " @" +
-        TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
+          " @" +
+          TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
   }
 }

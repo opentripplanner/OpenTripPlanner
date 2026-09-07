@@ -32,27 +32,27 @@ public class OtpBadgeGenerator {
   private static final int TEXT_INSET = 5;
   private static final int FONT_WIDTH = 82;
   private static final String TEMPLATE = """
-    <svg width="{{svgWidth}}" height="20" viewBox="0 0 {{width}} 200"
-        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{{label}}: {{body}}">
-      <title>{{label}}: {{body}}</title>
-      <linearGradient id="grad1" x2="0" y2="100%">
-        <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
-        <stop offset="1" stop-opacity=".1"/>
-      </linearGradient>
-      <mask id="mask1"><rect width="{{width}}" height="200" rx="30" fill="#FFF"/></mask>
-      <g mask="url(#mask1)">
-        <rect width="{{labelWidth}}" height="200" fill="{{labelBgColor}}"/>
-        <rect width="{{versionWidth}}" height="200" fill="#2179BF" x="{{labelWidth}}"/>
-        <rect width="{{width}}" height="200" fill="url(#grad1)"/>
-      </g>
-      <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
-        <text x="60" y="148" textLength="{{labelLength}}" fill="#000" opacity="0.25">{{label}}</text>
-        <text x="50" y="138" textLength="{{labelLength}}">{{label}}</text>
-        <text x="{{versionOffsetA}}" y="148" textLength="{{versionLength}}" fill="#000" opacity="0.25">{{body}}</text>
-        <text x="{{versionOffsetB}}" y="138" textLength="{{versionLength}}">{{body}}</text>
-      </g>
-    </svg>
-    """;
+  <svg width="{{svgWidth}}" height="20" viewBox="0 0 {{width}} 200"
+      xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{{label}}: {{body}}">
+    <title>{{label}}: {{body}}</title>
+    <linearGradient id="grad1" x2="0" y2="100%">
+      <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
+      <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+    <mask id="mask1"><rect width="{{width}}" height="200" rx="30" fill="#FFF"/></mask>
+    <g mask="url(#mask1)">
+      <rect width="{{labelWidth}}" height="200" fill="{{labelBgColor}}"/>
+      <rect width="{{versionWidth}}" height="200" fill="#2179BF" x="{{labelWidth}}"/>
+      <rect width="{{width}}" height="200" fill="url(#grad1)"/>
+    </g>
+    <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
+      <text x="60" y="148" textLength="{{labelLength}}" fill="#000" opacity="0.25">{{label}}</text>
+      <text x="50" y="138" textLength="{{labelLength}}">{{label}}</text>
+      <text x="{{versionOffsetA}}" y="148" textLength="{{versionLength}}" fill="#000" opacity="0.25">{{body}}</text>
+      <text x="{{versionOffsetB}}" y="138" textLength="{{versionLength}}">{{body}}</text>
+    </g>
+  </svg>
+  """;
 
   /**
    * A color is valid if it is a:
@@ -73,7 +73,7 @@ public class OtpBadgeGenerator {
    * label it should.
    */
   public static boolean isValidLabel(String label) {
-    return (label.length() <= 120 && LABEL_PATTERN.matcher(label).matches());
+    return label.length() <= 120 && LABEL_PATTERN.matcher(label).matches();
   }
 
   /**

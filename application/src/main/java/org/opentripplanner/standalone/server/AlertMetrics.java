@@ -72,10 +72,10 @@ public class AlertMetrics implements MeterBinder {
       .stream()
       .collect(
         ImmutableListMultimap.<
-            TransitAlert,
-            AlertTags,
-            TransitAlert
-          >flatteningToImmutableListMultimap(AlertTags::of, Stream::of)
+          TransitAlert,
+          AlertTags,
+          TransitAlert
+        >flatteningToImmutableListMultimap(AlertTags::of, Stream::of)
       );
     return taggedAlerts
       .keySet()

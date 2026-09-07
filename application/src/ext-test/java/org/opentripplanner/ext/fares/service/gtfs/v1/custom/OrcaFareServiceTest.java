@@ -180,7 +180,7 @@ public class OrcaFareServiceTest {
 
     // Check for transfer status - transfers are when this leg has fare products but pays no additional cost
     // (i.e., fare = 0 for this leg because it's covered by a previous fare product)
-    var hasTransfer = (fare == 0 && !legFareProducts.isEmpty());
+    var hasTransfer = fare == 0 && !legFareProducts.isEmpty();
 
     assertEquals(hasXfer, hasTransfer, "Incorrect transfer leg fare product status.");
   }
@@ -834,8 +834,8 @@ public class OrcaFareServiceTest {
       .withGtfsType(transitMode)
       .build();
 
-    int start = (int) (T11_00 + (startTimeMins * 60));
-    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
+    int start = (int) (T11_00 + startTimeMins * 60);
+    int end = (int) (T11_00 + (startTimeMins + 12) * 60);
     return newItinerary(Place.forStop(firstStop), start)
       .transit(route, tripId, start, end, 5, 7, Place.forStop(lastStop), null, null, null)
       .build();

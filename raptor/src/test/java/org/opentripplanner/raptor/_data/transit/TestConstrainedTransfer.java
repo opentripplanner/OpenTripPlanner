@@ -9,7 +9,8 @@ import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class TestConstrainedTransfer
-  implements RaptorConstrainedTransfer, RaptorBoardOrAlightEvent<TestTripSchedule> {
+  implements RaptorConstrainedTransfer, RaptorBoardOrAlightEvent<TestTripSchedule>
+{
 
   private final TestTransferConstraint transferConstraint;
   private final TestTripSchedule sourceTrip;

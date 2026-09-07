@@ -13,7 +13,8 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  */
 public class GroupOfRoutes
   extends AbstractTransitEntity<GroupOfRoutes, GroupOfRoutesBuilder>
-  implements LogInfo {
+  implements LogInfo
+{
 
   private final String name;
   private final String privateCode;

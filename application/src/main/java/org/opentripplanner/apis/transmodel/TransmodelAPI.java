@@ -29,11 +29,11 @@ public class TransmodelAPI {
 
   // Note, the blank line at the end is intended
   private static final String SCHEMA_DOC_HEADER = """
-    # THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
-    # This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
-    # OTP configured default-values injected.
+  # THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
+  # This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
+  # OTP configured default-values injected.
 
-    """;
+  """;
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 

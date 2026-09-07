@@ -25,7 +25,8 @@ import java.util.function.BiFunction;
  */
 public class InjectCustomDocumentation
   extends GraphQLTypeVisitorStub
-  implements GraphQLTypeVisitor {
+  implements GraphQLTypeVisitor
+{
 
   private final CustomDocumentation customDocumentation;
 

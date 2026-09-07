@@ -18,7 +18,8 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  * within a zone becomes a separate GeofencingZone with its own priority.
  */
 class GbfsGeofencingZoneMapper
-  extends org.opentripplanner.gbfs.GbfsGeofencingZoneMapper<GBFSFeature, GBFSRule> {
+  extends org.opentripplanner.gbfs.GbfsGeofencingZoneMapper<GBFSFeature, GBFSRule>
+{
 
   public GbfsGeofencingZoneMapper(String systemId) {
     super(systemId);

@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetEdge
   extends Edge
-  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
+  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -214,7 +215,7 @@ public class StreetEdge
       case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
     };
 
-    return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
+    return isStairs() ? speed / preferences.walk().stairsTimeFactor() : speed;
   }
 
   /**
@@ -705,9 +706,8 @@ public class StreetEdge
     seb.withWalkSafetyFactor(walkSafetyFactor);
     seb.withCarSpeed(carSpeed);
 
-    var partialElevationProfileFromParent = elevationExtension != null
-      ? elevationExtension.partial(fromDistance, toDistance)
-      : null;
+    var partialElevationProfileFromParent =
+      elevationExtension != null ? elevationExtension.partial(fromDistance, toDistance) : null;
 
     StreetElevationExtensionBuilder.of(seb)
       .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
@@ -730,8 +730,10 @@ public class StreetEdge
       : builder.millimeterLength();
     if (
       lengthInMillimeter == 0 &&
-      !(getFromVertex() instanceof BarrierPassThroughVertex ||
-        getToVertex() instanceof BarrierPassThroughVertex)
+      !(
+        getFromVertex() instanceof BarrierPassThroughVertex ||
+        getToVertex() instanceof BarrierPassThroughVertex
+      )
     ) {
       LOG.warn(
         "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
@@ -935,9 +937,8 @@ public class StreetEdge
     double time = effectiveTimeDistance / speed;
 
     double weight;
-    var optimizeType = mode == TraverseMode.BICYCLE
-      ? req.bike().optimizeType()
-      : req.scooter().optimizeType();
+    var optimizeType =
+      mode == TraverseMode.BICYCLE ? req.bike().optimizeType() : req.scooter().optimizeType();
     switch (optimizeType) {
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS ->
@@ -951,9 +952,10 @@ public class StreetEdge
           propulsion,
           electricAssistSlopeSensitivity
         );
-        var triangle = mode == TraverseMode.BICYCLE
-          ? req.bike().optimizeTriangle()
-          : req.scooter().optimizeTriangle();
+        var triangle =
+          mode == TraverseMode.BICYCLE
+            ? req.bike().optimizeTriangle()
+            : req.scooter().optimizeTriangle();
         weight = quick * triangle.time() + slope * triangle.slope() + safety * triangle.safety();
         weight /= speed;
       }
@@ -1041,7 +1043,7 @@ public class StreetEdge
     } else {
       if (walkingBike) {
         // take slopes into account when walking bikes
-        time = weight = (getEffectiveBikeDistance() / speed);
+        time = weight = getEffectiveBikeDistance() / speed;
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;

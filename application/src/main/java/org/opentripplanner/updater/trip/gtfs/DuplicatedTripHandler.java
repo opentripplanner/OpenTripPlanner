@@ -52,7 +52,7 @@ class DuplicatedTripHandler {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
 
-    var serviceId = transitService.getOrCreateServiceIdForDate(tripUpdate.startDate());
+    var serviceId = buffer.getOrCreateServiceIdForDate(tripUpdate.startDate());
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }

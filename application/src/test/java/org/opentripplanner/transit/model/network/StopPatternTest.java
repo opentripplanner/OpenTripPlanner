@@ -101,7 +101,10 @@ class StopPatternTest {
 
     assertEquals(List.of(s1, s2, s3), pattern.getStops());
 
-    var updated = pattern.copyOf().replaceStops(Map.of(0, s4, 2, s4)).build();
+    var updated = pattern
+      .copyOf()
+      .replaceStops(Map.of(0, s4, 2, s4))
+      .build();
     assertEquals(List.of(s4, s2, s4), updated.getStops());
   }
 

@@ -4,6 +4,7 @@ public enum OtpVersion {
   /** @deprecated Replace this and remove when not in use. */
   @Deprecated
   NA("na"),
+
   V1_5("1.5"),
   V2_0("2.0"),
   V2_1("2.1"),

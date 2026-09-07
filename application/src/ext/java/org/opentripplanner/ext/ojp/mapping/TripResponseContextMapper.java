@@ -74,8 +74,8 @@ class TripResponseContextMapper {
 
   private static Stream<StopLocation> stopLocations(Leg leg) {
     var fromTo = Stream.of(leg.from().stop, leg.to().stop);
-    var intermediate = StreamUtils.ofNullableCollection(leg.listIntermediateStops()).map(sa ->
-      sa.place.stop
+    var intermediate = StreamUtils.ofNullableCollection(leg.listIntermediateStops()).map(
+      sa -> sa.place.stop
     );
     return Stream.concat(fromTo, intermediate);
   }

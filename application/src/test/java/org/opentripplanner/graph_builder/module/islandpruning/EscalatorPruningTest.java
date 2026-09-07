@@ -17,7 +17,7 @@ class EscalatorPruningTest {
     );
     assertTrue(
       graph
-        .getStreetEdges()
+        .listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

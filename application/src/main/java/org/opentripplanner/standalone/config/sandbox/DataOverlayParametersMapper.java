@@ -12,8 +12,7 @@ public class DataOverlayParametersMapper {
     var builder = new DataOverlayParametersBuilder();
 
     for (String param : DataOverlayParameters.parametersAsString()) {
-      c
-        .of(param)
+      c.of(param)
         .since(NA)
         .summary("TODO")
         .asDoubleOptional()

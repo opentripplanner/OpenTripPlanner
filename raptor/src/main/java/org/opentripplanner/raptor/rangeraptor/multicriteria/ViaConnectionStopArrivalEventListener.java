@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  * performance - we do it here and for the moment does not support pass-through for stops
  * where alighting is forbidden.
  */
-public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
-  implements ParetoSetEventListener<ArrivalView<T>> {
+public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule> implements
+  ParetoSetEventListener<ArrivalView<T>> {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     ViaConnectionStopArrivalEventListener.class

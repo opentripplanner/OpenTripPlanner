@@ -128,7 +128,9 @@ class DeleteResultHandlerTest {
       this.numItineraries = numItineraries;
       this.i1 = newItinerary(A, T11_06).walk(D2_m, E).build();
       this.i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
-      this.i3 = newItinerary(A).bus(20, T11_33, T11_33 + D1_m, E).build();
+      this.i3 = newItinerary(A)
+        .bus(20, T11_33, T11_33 + D1_m, E)
+        .build();
       addSystemNotice(i2, i2Tag);
       addSystemNotice(i3, i3Tag);
       this.expected = expected(List.of(i1, i2, i3), expected);
@@ -151,7 +153,7 @@ class DeleteResultHandlerTest {
     @Override
     public String toString() {
       // Include test input, not expected
-      return ("n:" + numItineraries + " tags: na " + tag(i2) + " " + tag(i3));
+      return "n:" + numItineraries + " tags: na " + tag(i2) + " " + tag(i3);
     }
 
     private static void addSystemNotice(Itinerary it, String tag) {

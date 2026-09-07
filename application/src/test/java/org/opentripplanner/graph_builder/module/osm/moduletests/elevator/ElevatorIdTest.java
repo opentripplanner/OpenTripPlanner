@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm.moduletests.elevator;
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
@@ -37,7 +38,7 @@ public class ElevatorIdTest {
       .build()
       .buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.id()).hasValue("12345");
@@ -66,7 +67,7 @@ public class ElevatorIdTest {
       .build()
       .buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.id()).hasValue("12345");
@@ -95,7 +96,7 @@ public class ElevatorIdTest {
       .build()
       .buildGraph();
 
-    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var edges = ImmutableList.copyOf(graph.findEdges(ElevatorHopEdge.class));
     assertThat(edges).hasSize(2);
     for (var edge : edges) {
       assertThat(edge.id()).isEmpty();

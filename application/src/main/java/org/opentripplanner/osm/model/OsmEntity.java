@@ -206,11 +206,11 @@ public abstract class OsmEntity {
   }
 
   public static boolean isFalse(String tagValue) {
-    return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
+    return "no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue);
   }
 
   public static boolean isTrue(String tagValue) {
-    return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    return "yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue);
   }
 
   /**
@@ -586,7 +586,7 @@ public abstract class OsmEntity {
       // get the translated value, if exists
       for (String lang : i18n.keySet()) {
         String i18nTag = getTag(defKey + ":" + lang);
-        i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
+        i18n.get(lang).append(i18nTag != null ? i18nTag : defTag != null ? defTag : "");
       }
     }
     for (StringBuffer sb : i18n.values()) {
@@ -882,7 +882,7 @@ public abstract class OsmEntity {
    */
   public boolean isLink() {
     String highway = getTag("highway");
-    return highway != null && highway.endsWith(("_link"));
+    return highway != null && highway.endsWith("_link");
   }
 
   public boolean isElevator() {

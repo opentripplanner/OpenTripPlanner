@@ -68,9 +68,7 @@ public class AddTransitEntitiesToTimetable {
   private void addServices(TransitRepository transitRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : dataImport.getAllServiceIds()) {
-      transitRepository
-        .getServiceCodes()
-        .put(serviceId, transitRepository.getServiceCodes().size());
+      transitRepository.putServiceCode(serviceId, transitRepository.getServiceCodes().size());
     }
   }
 

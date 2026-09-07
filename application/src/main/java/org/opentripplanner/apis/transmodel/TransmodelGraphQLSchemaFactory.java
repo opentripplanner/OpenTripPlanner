@@ -941,13 +941,12 @@ public class TransmodelGraphQLSchemaFactory {
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
-              filterByStops = idMapper.parseListNullSafe(((List<String>) filterByIds.get("quays")));
-              filterByRoutes = idMapper.parseListNullSafe(
-                ((List<String>) filterByIds.get("lines"))
-              );
-              filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
-                ? (List<String>) filterByIds.get("bikeRentalStations")
-                : List.of();
+              filterByStops = idMapper.parseListNullSafe((List<String>) filterByIds.get("quays"));
+              filterByRoutes = idMapper.parseListNullSafe((List<String>) filterByIds.get("lines"));
+              filterByBikeRentalStations =
+                filterByIds.get("bikeRentalStations") != null
+                  ? (List<String>) filterByIds.get("bikeRentalStations")
+                  : List.of();
             }
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
@@ -1476,7 +1475,7 @@ public class TransmodelGraphQLSchemaFactory {
             }
 
             if (environment.getArgument("codespaces") instanceof List) {
-              codespaces.addAll((environment.getArgument("codespaces")));
+              codespaces.addAll(environment.getArgument("codespaces"));
             }
 
             if (!codespaces.isEmpty()) {

@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
 
 /**

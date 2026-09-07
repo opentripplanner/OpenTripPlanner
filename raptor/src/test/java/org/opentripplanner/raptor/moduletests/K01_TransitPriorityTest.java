@@ -83,8 +83,8 @@ public class K01_TransitPriorityTest {
       .timetable(true);
 
     requestBuilder.withMultiCriteria(mc ->
-      // Raptor cost 9000 ~= 90 seconds slack
       mc
+        // Raptor cost 9000 ~= 90 seconds slack
         .withRelaxC1(value -> value + C1_SLACK_90_s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );

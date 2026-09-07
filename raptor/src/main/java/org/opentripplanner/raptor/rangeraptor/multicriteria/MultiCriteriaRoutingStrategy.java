@@ -31,8 +31,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 public class MultiCriteriaRoutingStrategy<
   T extends RaptorTripSchedule,
   R extends AbstractPatternRide<T>
->
-  implements RoutingStrategy<T> {
+> implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedBoardingSupport<T> boardingSupport;

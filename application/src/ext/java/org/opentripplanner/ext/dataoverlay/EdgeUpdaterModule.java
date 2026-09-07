@@ -3,6 +3,8 @@ package org.opentripplanner.ext.dataoverlay;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * This class allows updating the graph with the grid data from generic .nc file in accordance with
@@ -31,7 +33,7 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
     GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(
       dataFile,
       timeFormat,
-      graph.getStreetEdges()
+      ListUtils.ofIterable(graph.findEdges(StreetEdge.class))
     );
     genericEdgeUpdater.updateEdges();
   }

@@ -93,7 +93,7 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
      */
     if (
       a.backEdge != b.getBackEdge() &&
-      (a.backEdge instanceof StreetEdge) &&
+      a.backEdge instanceof StreetEdge &&
       a.getBackMode() != null &&
       a.getBackMode().isDrivingIsh() &&
       a.getRequest().isCloseToStartOrEnd(a.getVertex())
@@ -163,8 +163,8 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
 
       final double EPSILON = 1e-4;
       return (
-        a.getElapsedTimeSeconds() <= (b.getElapsedTimeSeconds() + EPSILON) &&
-        a.getWeight() <= (b.getWeight() + EPSILON)
+        a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds() + EPSILON &&
+        a.getWeight() <= b.getWeight() + EPSILON
       );
     }
   }

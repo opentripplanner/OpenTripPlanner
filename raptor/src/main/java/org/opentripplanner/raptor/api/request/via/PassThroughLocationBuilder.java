@@ -3,7 +3,8 @@ package org.opentripplanner.raptor.api.request.via;
 import java.util.stream.IntStream;
 
 public final class PassThroughLocationBuilder
-  extends AbstractViaLocationBuilder<PassThroughLocationBuilder> {
+  extends AbstractViaLocationBuilder<PassThroughLocationBuilder>
+{
 
   public PassThroughLocationBuilder(String label) {
     super(label);

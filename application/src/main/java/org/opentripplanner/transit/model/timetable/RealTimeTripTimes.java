@@ -238,7 +238,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   @Override
   public boolean isRealTimeUpdated(int stopPos) {
-    return (state.hasAnyUpdates() && !isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA));
+    return state.hasAnyUpdates() && !isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA);
   }
 
   /**

@@ -12,7 +12,8 @@ public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
   @Override
   public DataFetcher<String> currency() {
     return environment ->
-      ((FareRuleSet) environment.getSource()).getFareAttribute()
+      ((FareRuleSet) environment.getSource())
+        .getFareAttribute()
         .getPrice()
         .currency()
         .getCurrencyCode();
@@ -42,7 +43,8 @@ public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
       symbols.setDecimalSeparator('.');
       format.setDecimalFormatSymbols(symbols);
       String price = format.format(
-        ((FareRuleSet) environment.getSource()).getFareAttribute()
+        ((FareRuleSet) environment.getSource())
+          .getFareAttribute()
           .getPrice()
           .fractionalAmount()
           .floatValue()

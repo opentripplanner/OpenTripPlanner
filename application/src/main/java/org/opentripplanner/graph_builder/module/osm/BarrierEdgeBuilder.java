@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -15,11 +14,11 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
-public class BarrierEdgeBuilder {
+class BarrierEdgeBuilder {
 
   private final EdgeNamer edgeNamer;
 
-  public BarrierEdgeBuilder(EdgeNamer edgeNamer) {
+  BarrierEdgeBuilder(EdgeNamer edgeNamer) {
     this.edgeNamer = edgeNamer;
   }
 
@@ -55,8 +54,12 @@ public class BarrierEdgeBuilder {
     }
 
     var vs = vertices.toArray(new OsmVertex[0]);
-    var inDegrees = Arrays.stream(vs).map(Vertex::getDegreeIn).toArray(Integer[]::new);
-    var outDegrees = Arrays.stream(vs).map(Vertex::getDegreeOut).toArray(Integer[]::new);
+    var inDegrees = Arrays.stream(vs)
+      .map(Vertex::getDegreeIn)
+      .toArray(Integer[]::new);
+    var outDegrees = Arrays.stream(vs)
+      .map(Vertex::getDegreeOut)
+      .toArray(Integer[]::new);
     for (var i = 0; i < vs.length; ++i) {
       for (var j = 0; j < vs.length; ++j) {
         if (i != j) {

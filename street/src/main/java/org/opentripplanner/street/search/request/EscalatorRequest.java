@@ -53,7 +53,7 @@ public class EscalatorRequest {
       return false;
     }
     EscalatorRequest that = (EscalatorRequest) o;
-    return (doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed));
+    return doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed);
   }
 
   @Override

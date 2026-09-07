@@ -41,7 +41,7 @@ public class RemoveBikeRentalWithMostlyWalking implements RemoveItineraryFlagger
 
       double totalDistance = itinerary.distanceMeters();
       return (
-        bikeRentalDistance != 0 && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
+        bikeRentalDistance != 0 && bikeRentalDistance / totalDistance <= bikeRentalDistanceRatio
       );
     };
   }

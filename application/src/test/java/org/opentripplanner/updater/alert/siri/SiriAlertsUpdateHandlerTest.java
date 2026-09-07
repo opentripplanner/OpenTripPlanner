@@ -190,9 +190,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     assertFalse(
-      ((EntitySelector.Stop) entitySelector).stopConditions().contains(
-        StopCondition.EXCEPTIONAL_STOP
-      )
+      ((EntitySelector.Stop) entitySelector)
+        .stopConditions()
+        .contains(StopCondition.EXCEPTIONAL_STOP)
     );
     assertFalse(
       StopConditionsHelper.matchesStopCondition(
@@ -990,7 +990,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     PtSituationElement element = new PtSituationElement();
     element.setCreationTime(ZonedDateTime.now());
     element.setProgress(WorkflowStatusEnumeration.OPEN);
-    if ((startTime != null) || (endTime != null)) {
+    if (startTime != null || endTime != null) {
       HalfOpenTimestampOutputRangeStructure period = new HalfOpenTimestampOutputRangeStructure();
 
       if (startTime != null) {
@@ -1259,7 +1259,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     for (EntitySelector entity : transitAlert.entities()) {
       if (!foundMatch) {
         if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
-          foundMatch = stopAndRoute.equals((new EntityKey.StopAndRoute(stopId, routeOrTripId)));
+          foundMatch = stopAndRoute.equals(new EntityKey.StopAndRoute(stopId, routeOrTripId));
         } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
           foundMatch =
             stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&

@@ -180,7 +180,7 @@ class RealtimeResolverTest {
       transitRepository.addTripPattern(pattern.getId(), pattern);
 
       var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
-      transitRepository.getServiceCodes().put(pattern.getId(), serviceCode);
+      transitRepository.putServiceCode(pattern.getId(), serviceCode);
 
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
