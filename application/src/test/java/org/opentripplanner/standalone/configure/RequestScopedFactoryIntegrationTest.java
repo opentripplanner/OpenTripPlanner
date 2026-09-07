@@ -36,5 +36,11 @@ class RequestScopedFactoryIntegrationTest {
     assertThat(requestOne.gtfsRequestContext()).isNotSameInstanceAs(
       requestTwo.gtfsRequestContext()
     );
+    assertThat(requestOne.gtfsRequestContext().schema()).isSameInstanceAs(
+      requestTwo.gtfsRequestContext().schema()
+    );
+    assertThat(requestOne.transmodelGraphQLSchema()).isSameInstanceAs(
+      requestTwo.transmodelGraphQLSchema()
+    );
   }
 }

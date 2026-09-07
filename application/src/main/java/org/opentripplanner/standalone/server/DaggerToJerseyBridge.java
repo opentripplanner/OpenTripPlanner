@@ -77,7 +77,11 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::vectorTileConfig, VectorTileConfig.class);
     bridge(factory, RequestScopedFactory::gtfsApiParameters, GtfsApiParameters.class);
     bridge(factory, RequestScopedFactory::transmodelAPIParameters, TransmodelAPIParameters.class);
-    bridge(factory, RequestScopedFactory::transmodelGraphQLSchema, TransmodelGraphQLSchema.class);
+    bridge(
+      factory,
+      f -> new TransmodelGraphQLSchema(f.transmodelGraphQLSchema()),
+      TransmodelGraphQLSchema.class
+    );
     bridge(factory, RequestScopedFactory::linkingContextFactory, LinkingContextFactory.class);
     bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);

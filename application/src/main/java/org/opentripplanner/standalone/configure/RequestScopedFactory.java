@@ -8,7 +8,7 @@ import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
-import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
@@ -73,7 +73,9 @@ public interface RequestScopedFactory {
 
   TransmodelAPIParameters transmodelAPIParameters();
 
-  TransmodelGraphQLSchema transmodelGraphQLSchema();
+  @Nullable
+  @TransmodelSchema
+  GraphQLSchema transmodelGraphQLSchema();
 
   LinkingContextFactory linkingContextFactory();
 

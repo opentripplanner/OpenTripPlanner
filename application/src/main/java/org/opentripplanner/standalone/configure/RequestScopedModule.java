@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -10,8 +9,6 @@ import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
-import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
-import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -122,14 +119,6 @@ public class RequestScopedModule {
   @HttpRequestScoped
   static TransmodelAPIParameters transmodelAPIParameters(RouterConfig routerConfig) {
     return routerConfig.transmodelApi();
-  }
-
-  @Provides
-  @HttpRequestScoped
-  static TransmodelGraphQLSchema transmodelGraphQLSchema(
-    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema
-  ) {
-    return new TransmodelGraphQLSchema(transmodelSchema);
   }
 
   @Provides
