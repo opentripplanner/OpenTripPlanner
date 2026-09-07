@@ -205,7 +205,6 @@ public class BarrierRoutingTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       null,
-      null,
       request,
       linkingContext
     );

@@ -195,8 +195,9 @@ public class RoutingWorker {
           var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex());
           var r3 = CompletableFuture.supplyAsync(() -> routeTransit());
           var r4 = CompletableFuture.supplyAsync(() -> routeDirectCarpooling());
+          var r5 = CompletableFuture.supplyAsync(() -> routeDirectTaxi());
 
-          result.merge(r1.join(), r2.join(), r3.join(), r4.join());
+          result.merge(r1.join(), r2.join(), r3.join(), r4.join(), r5.join());
         } catch (CompletionException e) {
           RoutingValidationException.unwrapAndRethrowCompletionException(e);
         }
@@ -205,7 +206,8 @@ public class RoutingWorker {
           routeDirectStreet(),
           routeDirectFlex(),
           routeTransit(),
-          routeDirectCarpooling()
+          routeDirectCarpooling(),
+          routeDirectTaxi()
         );
       }
     } catch (RoutingValidationException e) {
@@ -313,10 +315,7 @@ public class RoutingWorker {
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
-    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
-    //       implemented. Until then, return no direct itinerary for TAXI unless the
-    //       taxi-zone sandbox feature is enabled.
-    if (request.journey().direct().mode() == StreetMode.TAXI && OTPFeature.TaxiZone.isOff()) {
+    if (request.journey().direct().mode() == StreetMode.TAXI) {
       return RoutingResult.empty();
     }
 
@@ -346,7 +345,6 @@ public class RoutingWorker {
           streetLimitationParametersService,
           vehicleRentalService,
           streetDetailsService,
-          taxiZoneService,
           dataOverlayParameterBindings,
           directBuilder.buildRequest(),
           linkingContext()
@@ -403,6 +401,35 @@ public class RoutingWorker {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectCarpoolRouter();
+    }
+  }
+
+  private RoutingResult routeDirectTaxi() {
+    // Start-on-board trip locations don't have street vertices, so direct routing is not applicable
+    if (request.isStartOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
+    // See the equivalent TODO in routeDirectStreet() for why via search is not supported here.
+    if (request.isViaSearch()) {
+      return RoutingResult.empty();
+    }
+    if (request.journey().direct().mode() != StreetMode.TAXI) {
+      return RoutingResult.ok(List.of());
+    }
+    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
+    //       implemented. Until then, return no direct itinerary for TAXI unless the
+    //       taxi-zone sandbox feature is enabled and a taxi-zone provider is configured.
+    if (taxiZoneService == null) {
+      return RoutingResult.empty();
+    }
+    debugTimingAggregator.startedDirectTaxiRouter();
+    try {
+      var itineraries = taxiZoneService.routeDirect(transitService, request, linkingContext());
+      return RoutingResult.ok(itineraries);
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
+    } finally {
+      debugTimingAggregator.finishedDirectTaxiRouter();
     }
   }
 

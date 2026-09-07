@@ -16,7 +16,6 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.taxizone.TaxiZoneService;
-import org.opentripplanner.ext.taxizone.routing.TaxiRouter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -297,7 +296,7 @@ public class TransitRouter {
     if (
       taxiZoneService != null && request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI)
     ) {
-      itineraries = new TaxiRouter(taxiZoneService).decorate(itineraries);
+      itineraries = taxiZoneService.decorateAndFilter(itineraries);
     }
 
     debugTimingAggregator.finishedItineraryCreation();

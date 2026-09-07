@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
- * A leg for a car pickup/drop-off decorated with a matched {@link TaxiZone} provider (e.g. a
+ * A car pickup/drop-off style leg decorated with a matched {@link TaxiZone} provider (e.g. a
  * taxi). It is physically a street/driving leg, and is modeled as a plain {@link Leg} (not a
  * {@link org.opentripplanner.model.plan.TransitLeg}) even though it carries route, agency and
  * booking information from the matched provider.

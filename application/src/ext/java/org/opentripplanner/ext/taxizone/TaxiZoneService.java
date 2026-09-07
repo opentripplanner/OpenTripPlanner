@@ -1,18 +1,29 @@
 package org.opentripplanner.ext.taxizone;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import org.opentripplanner.ext.taxizone.model.TaxiZone;
-import org.opentripplanner.street.geometry.WgsCoordinate;
+import java.util.List;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Service for looking up which taxi zone provider covers a given pickup-dropoff coordinate pair.
+ * Service for decorating and routing itineraries with taxi zone information.
  */
 public interface TaxiZoneService {
   /**
-   * Returns the first zone whose geometry contains both {@code pickup} and {@code dropoff}, and
-   * whose GTFS calendar has {@code date} as a valid service date. Returns an empty optional if no
-   * zone covers both endpoints on that date.
+   * Decorates the driving-ish legs of the given itineraries with taxi zone information, replacing
+   * them with {@link org.opentripplanner.ext.taxizone.model.TaxiZoneLeg}s. Itineraries whose
+   * driving-ish legs have no matching taxi zone provider are removed from the result.
    */
-  Optional<TaxiZone> findZone(WgsCoordinate pickup, WgsCoordinate dropoff, LocalDate date);
+  List<Itinerary> decorateAndFilter(List<Itinerary> itineraries);
+
+  /**
+   * Produces direct (non-transit) taxi itineraries for the given request, using ordinary street
+   * routing and decorating the result with taxi zone information.
+   */
+  List<Itinerary> routeDirect(
+    TransitService transitService,
+    RouteRequest request,
+    LinkingContext linkingContext
+  );
 }
