@@ -61,9 +61,8 @@ public class GeometryProcessor {
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
-    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0
-      ? maxStopToShapeSnapDistance
-      : 150;
+    this.maxStopToShapeSnapDistance =
+      maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
     this.issueStore = issueStore;
   }
 
@@ -383,10 +382,8 @@ public class GeometryProcessor {
       }
       // we found one!
       // best match may be the split segment with the previous stop, in this case we need to load the full segment
-      IndexedLineSegment matchedSegment = prevSegment != null &&
-        bestMatch.index == prevSegment.index
-        ? prevSegment
-        : bestMatch;
+      IndexedLineSegment matchedSegment =
+        prevSegment != null && bestMatch.index == prevSegment.index ? prevSegment : bestMatch;
       prevSegmentFraction = matchedSegment.fraction(stopCoord);
       LinearLocation location = new LinearLocation(0, bestMatch.index, prevSegmentFraction);
       locations.add(location);

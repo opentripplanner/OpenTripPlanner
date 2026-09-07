@@ -27,6 +27,8 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class CarRoutingTest {
 
@@ -142,15 +144,18 @@ public class CarRoutingTest {
     var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-    var ctx = TestServerContext.ofGraph(graph);
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
 
     var itineraries = DirectStreetRouter.route(
-      ctx.graph(),
-      ctx.transitService(),
-      ctx.streetLimitationParametersService(),
-      ctx.vehicleRentalService(),
-      ctx.streetDetailsService(),
-      ctx.dataOverlayParameterBindings(),
+      graph,
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
       request,
       linkingContext
     );
@@ -158,15 +163,13 @@ public class CarRoutingTest {
 
     // make sure that we only get CAR legs
     itineraries.forEach(i ->
-      i
-        .legs()
-        .forEach(l -> {
-          if (l instanceof StreetLeg stLeg) {
-            assertEquals(TraverseMode.CAR, stLeg.getMode());
-          } else {
-            fail("Expected StreetLeg (CAR): " + l);
-          }
-        })
+      i.legs().forEach(l -> {
+        if (l instanceof StreetLeg stLeg) {
+          assertEquals(TraverseMode.CAR, stLeg.getMode());
+        } else {
+          fail("Expected StreetLeg (CAR): " + l);
+        }
+      })
     );
     Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.of(legGeometry).points();

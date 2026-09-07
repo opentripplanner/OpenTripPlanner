@@ -118,7 +118,7 @@ public class ConstructApplication {
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
     );
-    var scheduledTripCalendars = transitRepository.copyTripCalendarForRealTimeUpdates();
+    var scheduledTripCalendars = transitRepository.getTripCalendar();
 
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder

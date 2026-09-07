@@ -43,11 +43,9 @@ public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilte
 
   @Override
   public String typeDescription() {
-    return (
-      """
-      Enable this to attach a system notice to itineraries instead of removing them. This is very
-      convenient when tuning the itinerary-filter-chain."""
-    );
+    return """
+    Enable this to attach a system notice to itineraries instead of removing them. This is very
+    convenient when tuning the itinerary-filter-chain.""";
   }
 
   @Override

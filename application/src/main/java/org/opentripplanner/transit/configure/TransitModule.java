@@ -12,7 +12,7 @@ import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -50,7 +50,7 @@ public abstract class TransitModule {
     TransitRepository transitRepository,
     @TransitDomain RepositoryRegistry repositoryRegistry,
     RaptorTransitData scheduledRaptorTransitData,
-    DefaultTripCalendars tripCalendars
+    TripCalendars tripCalendars
   ) {
     var buffer = new DefaultTimetableRepository(scheduledRaptorTransitData, tripCalendars);
     var lifecycle = new TimetableRepositoryLifecycle(buffer, parameters.purgeExpiredData(), () ->

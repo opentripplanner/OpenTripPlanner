@@ -14,8 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class EgressStopArrivalState<T extends RaptorTripSchedule>
-  extends DefaultStopArrivalState<T> {
+final class EgressStopArrivalState<T extends RaptorTripSchedule> extends DefaultStopArrivalState<T> {
 
   private final int round;
   private final int stop;

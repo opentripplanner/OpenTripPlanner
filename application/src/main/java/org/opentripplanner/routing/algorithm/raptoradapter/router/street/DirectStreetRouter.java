@@ -67,7 +67,6 @@ public class DirectStreetRouter {
       final StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
         new TransitServiceResolver(transitService),
         transitService.getTimeZone(),
-        graph.streetNotesService,
         streetDetailsService,
         graph.ellipsoidToGeoidDifference
       );

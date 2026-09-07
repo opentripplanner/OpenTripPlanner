@@ -83,19 +83,17 @@ public class SpeedTestTimer {
 
     // record the lowest percentile of times
     //noinspection NullableProblems
-    registry
-      .config()
-      .meterFilter(
-        new MeterFilter() {
-          @Override
-          public DistributionStatisticConfig configure(
-            Meter.Id id,
-            DistributionStatisticConfig config
-          ) {
-            return DistributionStatisticConfig.builder().percentiles(0.01).build().merge(config);
-          }
+    registry.config().meterFilter(
+      new MeterFilter() {
+        @Override
+        public DistributionStatisticConfig configure(
+          Meter.Id id,
+          DistributionStatisticConfig config
+        ) {
+          return DistributionStatisticConfig.builder().percentiles(0.01).build().merge(config);
         }
-      );
+      }
+    );
   }
 
   public MeterRegistry getRegistry() {

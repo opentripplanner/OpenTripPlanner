@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.filter.transit;
 
+import java.time.Instant;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -41,6 +43,10 @@ public class TripTimeOnDateMatcherFactory {
     expr.atLeastOneMatch(request.includeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.atLeastOneMatch(request.includeModes(), TripTimeOnDateMatcherFactory::mode);
+    expr.atLeastOneMatch(
+      request.includeCallTimePeriods(),
+      TripTimeOnDateMatcherFactory::callTimePeriod
+    );
     expr.matchesNone(request.excludeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
     expr.matchesNone(request.excludeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.matchesNone(request.excludeModes(), TripTimeOnDateMatcherFactory::mode);
@@ -93,5 +99,34 @@ public class TripTimeOnDateMatcherFactory {
 
   private static Matcher<TripTimeOnDate> mode(TransitMode mode) {
     return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getMode());
+  }
+
+  /**
+   * Matches calls where the vehicle is scheduled to visit the stop during the given period. The
+   * visit lasts from the scheduled arrival at the stop until the scheduled departure from it, and
+   * the period is half-open, meaning that its end is exclusive. Calls without scheduled times, for
+   * example flexible ones, never match.
+   */
+  private static Matcher<TripTimeOnDate> callTimePeriod(TimePeriod period) {
+    return new GenericUnaryMatcher<>("callTimePeriod", call -> {
+      if (call.getServiceDayMidnight() == TripTimeOnDate.UNDEFINED || !call.hasScheduledTimes()) {
+        return false;
+      }
+      return visitOverlaps(period, call.scheduledArrival(), call.scheduledDeparture());
+    });
+  }
+
+  /**
+   * Returns {@code true} if the visit at the stop, lasting from {@code arrival} to
+   * {@code departure} (both inclusive), overlaps the given period. A visit which lasts no time at
+   * all matches if the period contains the instant of the visit.
+   */
+  private static boolean visitOverlaps(TimePeriod period, Instant arrival, Instant departure) {
+    boolean afterStart = period
+      .start()
+      .map(start -> !departure.isBefore(start))
+      .orElse(true);
+    boolean beforeEnd = period.end().map(arrival::isBefore).orElse(true);
+    return afterStart && beforeEnd;
   }
 }

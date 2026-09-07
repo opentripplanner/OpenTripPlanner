@@ -136,6 +136,13 @@ type Agency implements Node {
 "Alert of a current or upcoming disruption in public transportation"
 type Alert implements Node {
   """
+  The periods of time when this alert is active, sorted chronologically. There is always at
+  least one period. Each period has an inclusive start and an exclusive end. A period with an
+  unbounded start has always been active and a period with an unbounded end is active
+  indefinitely.
+  """
+  activityPeriods: [OffsetDateTimeRange!]!
+  """
   Agency affected by the disruption. Note that this value is present only if the
   disruption has an effect on all operations of the agency (e.g. in case of a strike).
   """
@@ -170,9 +177,9 @@ type Alert implements Node {
   "Url with more information in all different available languages"
   alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
-  effectiveEndDate: Long
+  effectiveEndDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"
-  effectiveStartDate: Long
+  effectiveStartDate: Long @deprecated(reason : "Use `activityPeriods` instead.")
   "Entities affected by the disruption."
   entities: [AlertEntity]
   "The feed in which this alert was published"
@@ -187,6 +194,47 @@ type Alert implements Node {
   stop: Stop @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected stops.\nUse entities instead.")
   "Trip affected by the disruption"
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
+}
+
+"""
+A connection to a list of alerts that follows
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type AlertConnection {
+  """
+  Edges which contain the alerts. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  edges: [AlertEdge]
+  """
+  Contains cursors to fetch more pages of alerts.
+  Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  pageInfo: PageInfo!
+  """
+  The total number of alerts in this connection at the time of query execution (including the current and previous
+  pages).
+  Note, this number might not stay the same throughout the paging as alerts might be added or
+  removed.
+  """
+  totalCount: Int!
+}
+
+"""
+An edge for the alert connection. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type AlertEdge {
+  """
+  The cursor of the edge. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  cursor: String!
+  """
+  Alert as a node. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  node: Alert
 }
 
 "Arrival and departure time (not relative to midnight)."
@@ -816,7 +864,23 @@ type Leg {
   accessibilityScore: Float
   "For transit legs, the transit agency that operates the service used for this leg. For non-transit legs, `null`."
   agency: Agency
-  "Applicable alerts for this leg."
+  """
+  Applicable alerts for this leg. Alerts are added to the leg according to conditions on the following entities:
+    
+  - Boarding stop: alerts scoped to that stop, or to that stop combined with the leg's route or trip.
+  - Alighting stop: same stop/route/trip matching as above.
+  - Intermediate stops: stops the leg passes through (visits) without boarding or alighting.
+    Only alerts flagged as relevant to passing through (possible in SIRI, but not GTFS-RT) are
+    included, and each is checked against that specific stop's scheduled time rather than the leg's
+    overall time span.
+    If you wish to include _all_ alerts of the intermediate stops, you can list them, for example in
+    the `stopCalls` field, and then list their alerts.
+  - Trip: alerts scoped to the entire trip (optionally limited to a specific service date).
+  - Route: alerts scoped to the whole route, independent of stop or direction.
+  - Agency: alerts scoped to the agency, applying across all of its routes and trips.
+  - Parent stations: for a stop that belongs to a station, alerts on the parent station are included
+    as well, if it is a boarding or alighting station.
+  """
   alerts: [Alert]
   """
   For transit leg, the offset from the scheduled arrival time of the alighting
@@ -1063,6 +1127,20 @@ type Notice {
   text: String
 }
 
+"""
+A range of time which can be unbounded in either direction.
+
+The start of the range is inclusive and the end is exclusive.
+A `null` start means that the range extends indefinitely into the past and a `null` end means
+that it extends indefinitely into the future.
+"""
+type OffsetDateTimeRange {
+  "The exclusive end of the range or `null` if the range is unbounded in the future."
+  end: OffsetDateTime
+  "The inclusive start of the range or `null` if the range is unbounded in the past."
+  start: OffsetDateTime
+}
+
 type OpeningHours {
   """
   Opening hours for the selected dates using the local time of the parking lot.
@@ -1118,6 +1196,18 @@ type Pattern implements Node {
   Avoid using this when fetching all patterns at once.
   """
   canceledTrips(
+    """
+    Only return canceled trips which are scheduled to be running during one of these time ranges.
+    A trip is considered to be running from its scheduled departure from the first stop until its
+    scheduled arrival at the last stop.
+        
+    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
+    value is `null`, no filtering is applied.
+        
+    If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+    them to be returned.
+    """
+    runningTimeRanges: [OffsetDateTimeRangeInput!],
     """
     Only return canceled trips whose service date falls within one of these ranges.
     An empty list or a list containing `null` is forbidden.  If this argument is not provided or its
@@ -1376,7 +1466,33 @@ type QueryType {
     severityLevel: [AlertSeverityLevelType!],
     "Only return alerts affecting these stops"
     stop: [String!]
-  ): [Alert] @timingData
+  ): [Alert] @deprecated(reason : "Use alertsConnection or alerts fields within specific types instead.") @timingData
+  "Get all active alerts"
+  alertsConnection(
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `first` parameter.
+    """
+    after: String,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `last` parameter.
+    """
+    before: String,
+    "Can be used to filter the results. When paging, the filter should not be changed between pages."
+    filters: [AlertsFilterInput!],
+    """
+    Limits how many alerts are returned. This parameter is part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with
+    the `after` parameter.
+    """
+    first: Int,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `before` parameter.
+    """
+    last: Int
+  ): AlertConnection @timingData
   "Get a single bike park based on its ID, i.e. value of field `bikeParkId`"
   bikePark(id: String!): BikePark @deprecated(reason : "bikePark is deprecated. Use vehicleParking instead.") @timingData
   "Get all bike parks"
@@ -2435,7 +2551,19 @@ type Stop implements Node & PlaceInterface {
     If omitted (or `null`), no service date filter is applied and canceled calls across the entire
     transit service period are returned. Defining a range is recommended.
     """
-    serviceDateRanges: [LocalDateRangeInput!]
+    serviceDateRanges: [LocalDateRangeInput!],
+    """
+    Only include canceled calls where the vehicle is scheduled to visit this stop during one of
+    these time ranges. The visit at a stop lasts from the scheduled arrival at the stop until the
+    scheduled departure from it.
+        
+    An empty list or a list containing `null` is forbidden. If this argument is not provided or its
+    value is `null`, no filtering is applied.
+        
+    If both `timeRanges` and `serviceDateRanges` are defined, a call has to match both of
+    them to be returned.
+    """
+    timeRanges: [OffsetDateTimeRangeInput!]
   ): [StopCallOnTripOnServiceDate!]!
   "The cluster which this stop is part of"
   cluster: Cluster @deprecated(reason : "Not implemented")
@@ -3261,7 +3389,7 @@ type step {
   "The cardinal (compass) direction (e.g. north, northeast) taken when engaging this step."
   absoluteDirection: AbsoluteDirection
   "A list of alerts (e.g. construction, detours) applicable to the step."
-  alerts: [Alert]
+  alerts: [Alert] @deprecated(reason : "Not implemented")
   """
   This step is on an open area, such as a plaza or train platform,
   and thus the directions should say something like "cross".
@@ -4346,6 +4474,50 @@ input AccessibilityPreferencesInput {
   wheelchair: WheelchairPreferencesInput
 }
 
+"""
+A collection of selectors for including or excluding alerts from the alerts search.
+An alert matches a filter if it matches at least one of the `include` selectors and none of the
+`exclude` selectors. When several filters are given, an alert matches if it matches any of them.
+"""
+input AlertsFilterInput @oneOf {
+  """
+  A list of selectors for excluding alerts.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  exclude: [AlertsFilterSelectInput!]
+  """
+  A list of selectors for including alerts.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  include: [AlertsFilterSelectInput!]
+}
+
+"""
+A single selector for alerts. The fields of a selector are combined with AND semantics: an alert
+must match all of the given fields. Each field is matched if the alert matches any of its values.
+Fields that are not set are ignored. An empty list is forbidden.
+"""
+input AlertsFilterSelectInput {
+  """
+  Matches alerts which are active during any of these time ranges. An alert matches if any of its
+  active periods overlaps any of the given ranges.
+  """
+  activePeriods: [OffsetDateTimeRangeInput!]
+  "Matches alerts which have any of these causes."
+  causes: [AlertCauseType!]
+  "Matches alerts which have any of these effects."
+  effects: [AlertEffectType!]
+  """
+  Matches alerts which belong to any of these feeds. The values are feed ids, i.e. the part
+  before the colon in an id such as `HSL:1234`.
+  """
+  feeds: [String!]
+  "Matches alerts which have any of these severity levels."
+  severityLevels: [AlertSeverityLevelType!]
+}
+
 "Preferences related to alighting from a transit vehicle."
 input AlightPreferencesInput {
   "What is the required minimum time alighting from a vehicle."
@@ -4485,6 +4657,15 @@ input CanceledTripsFilterSelectInput {
   "Canceled trips from these transit modes should be included/excluded."
   modes: [TransitMode!]
   """
+  Canceled trips are included/excluded based on if they are scheduled to be running during any of
+  these time ranges. A trip is considered to be running from its scheduled departure from the first
+  stop until its scheduled arrival at the last stop.
+    
+  If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+  them to be included/excluded.
+  """
+  runningTimeRanges: [OffsetDateTimeRangeInput!]
+  """
   Canceled trips are included/excluded based on if their service date (but not necessarily their running date)  is within any of these time
   ranges.
   """
@@ -4511,6 +4692,15 @@ input CanceledTripsSummaryFilterInput {
 input CanceledTripsSummaryFilterSelectInput {
   "Canceled trips from these transit modes should be included/excluded."
   modes: [TransitMode!]
+  """
+  Canceled trips are included/excluded based on if they are scheduled to be running during any of
+  these time ranges. A trip is considered to be running from its scheduled departure from the first
+  stop until its scheduled arrival at the last stop.
+    
+  If both `runningTimeRanges` and `serviceDateRanges` are defined, a trip has to match both of
+  them to be included/excluded.
+  """
+  runningTimeRanges: [OffsetDateTimeRangeInput!]
   """
   Canceled trips are included/excluded based on if their service date is within any of these time
   ranges.
@@ -4774,6 +4964,29 @@ input LocalDateRangeInput {
   dates that are before `end` are selected.
   """
   start: LocalDate
+}
+
+"""
+Filters an entity by a time range. Both ends of the range are optional which makes it possible
+to define a range which is open ended in either or both directions.
+"""
+input OffsetDateTimeRangeInput {
+  """
+  **Exclusive** end time of the filter. This means that an entity which is exactly at `end` is not
+  selected.
+    
+  If `null` this means that no end filter is applied and all entities that are after or at `start`
+  are selected.
+  """
+  end: OffsetDateTime
+  """
+  **Inclusive** start time of the filter. This means that an entity which is exactly at `start` is
+  selected.
+    
+  If `null` this means that no `start` filter is applied and all entities that are before `end` are
+  selected.
+  """
+  start: OffsetDateTime
 }
 
 """

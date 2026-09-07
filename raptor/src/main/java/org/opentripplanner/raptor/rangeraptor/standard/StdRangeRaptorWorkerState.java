@@ -29,8 +29,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
-  implements StdWorkerState<T> {
+public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> implements
+  StdWorkerState<T> {
 
   /**
    * The best times to reach each stop, whether via a transfer or via transit directly. This is the

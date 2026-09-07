@@ -36,11 +36,9 @@ public final class GtfsFaresService implements FareService {
    * Add a complex set of fare products for a specific leg;
    */
   private static void addLegProducts(Multimap<Leg, FareOffer> legProducts, ItineraryFare fares) {
-    legProducts
-      .entries()
-      .forEach(e -> {
-        fares.addFareProduct(e.getKey(), e.getValue());
-      });
+    legProducts.entries().forEach(e -> {
+      fares.addFareProduct(e.getKey(), e.getValue());
+    });
   }
 
   public DefaultFareService faresV1() {

@@ -28,7 +28,10 @@ enum BinaryOperator {
   }
 
   <T> String colToString(Collection<T> values) {
-    return values.stream().map(Objects::toString).collect(Collectors.joining(" " + token + " "));
+    return values
+      .stream()
+      .map(Objects::toString)
+      .collect(Collectors.joining(" " + token + " "));
   }
 
   <T> String toString(T a, T b) {

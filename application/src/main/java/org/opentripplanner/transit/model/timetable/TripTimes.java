@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.model.timetable.TimetableValidationErr
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -30,7 +33,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  */
 public sealed interface TripTimes<T extends TripTimes>
   extends Serializable, Comparable<TripTimes>
-  permits RealTimeTripTimes, ScheduledTripTimes {
+  permits RealTimeTripTimes, ScheduledTripTimes
+{
   /**
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.
@@ -204,6 +208,39 @@ public sealed interface TripTimes<T extends TripTimes>
   List<String> getHeadsignVias(int stopPos);
 
   int getNumStops();
+
+  /**
+   * resolves a trip's runtime on a service day, according to its schedule. The period starts at the
+   * scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
+   * <p>
+   *
+   * @param startOfService the start of the service day the trip is running on, see
+   *                       {@link
+   *                       org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
+   * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
+   * has no stops or because the departure from the first stop or the arrival at the last stop is
+   * missing or inconsistent.
+   */
+  @Nullable
+  default TimePeriod scheduledRunningTime(Instant startOfService) {
+    int numStops = getNumStops();
+    if (numStops == 0) {
+      return null;
+    }
+    int departure = getScheduledDepartureTime(0);
+    int arrival = getScheduledArrivalTime(numStops - 1);
+    if (
+      departure == StopTime.MISSING_VALUE ||
+      arrival == StopTime.MISSING_VALUE ||
+      departure > arrival
+    ) {
+      return null;
+    }
+    return TimePeriod.of(
+      startOfService.plusSeconds(departure),
+      startOfService.plusSeconds(arrival)
+    );
+  }
 
   /**
    * When creating trip times, or wrapping them in updates, we could potentially imply negative

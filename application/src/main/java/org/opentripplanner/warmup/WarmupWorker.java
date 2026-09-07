@@ -3,7 +3,7 @@ package org.opentripplanner.warmup;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Supplier;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.warmup.api.WarmupParameters;
@@ -34,19 +34,20 @@ class WarmupWorker implements Runnable {
 
   WarmupWorker(
     WarmupParameters parameters,
-    OtpServerRequestContext serverContext,
+    RequestScopedFactory requestScopedFactory,
     Supplier<GraphUpdaterStatus> updaterStatusProvider
   ) {
     this.parameters = parameters;
     this.updaterStatusProvider = updaterStatusProvider;
     this.queryStrategy = switch (parameters.api()) {
       case TRANSMODEL -> new TransmodelWarmupQueryExecutor(
-        serverContext,
+        requestScopedFactory.transmodelGraphQLSchema().schema(),
+        requestScopedFactory.transmodelRequestContext(),
         parameters.accessModes(),
         parameters.egressModes()
       );
       case GTFS -> new GtfsWarmupQueryExecutor(
-        serverContext,
+        requestScopedFactory.graphQLRequestContext(),
         parameters.accessModes(),
         parameters.egressModes()
       );

@@ -33,7 +33,7 @@ class GtfsGraphQLIndex {
     int maxResolves,
     int timeoutMs,
     Locale locale,
-    GraphQLRequestContext requestContext,
+    GtfsGraphQLRequestContext requestContext,
     Iterable<Tag> tracingTags
   ) {
     Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
@@ -84,7 +84,7 @@ class GtfsGraphQLIndex {
     int maxResolves,
     int timeoutMs,
     Locale locale,
-    GraphQLRequestContext requestContext,
+    GtfsGraphQLRequestContext requestContext,
     Iterable<Tag> tracingTags
   ) {
     ExecutionResult executionResult = getGraphQLExecutionResult(

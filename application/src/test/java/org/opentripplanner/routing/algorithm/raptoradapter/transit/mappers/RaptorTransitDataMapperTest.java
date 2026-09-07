@@ -35,10 +35,22 @@ class RaptorTransitDataMapperTest {
     .build();
 
   private final RegularStop STOP_0 = testModel.stop("ID-" + 1).build();
-  private final RegularStop STOP_1 = testModel.stop("ID-" + 2).withParentStation(STATION_A).build();
-  private final RegularStop STOP_2 = testModel.stop("ID-" + 3).withParentStation(STATION_B).build();
-  private final RegularStop STOP_3 = testModel.stop("ID-" + 4).withParentStation(STATION_C).build();
-  private final RegularStop STOP_4 = testModel.stop("ID-" + 5).withParentStation(STATION_D).build();
+  private final RegularStop STOP_1 = testModel
+    .stop("ID-" + 2)
+    .withParentStation(STATION_A)
+    .build();
+  private final RegularStop STOP_2 = testModel
+    .stop("ID-" + 3)
+    .withParentStation(STATION_B)
+    .build();
+  private final RegularStop STOP_3 = testModel
+    .stop("ID-" + 4)
+    .withParentStation(STATION_C)
+    .build();
+  private final RegularStop STOP_4 = testModel
+    .stop("ID-" + 5)
+    .withParentStation(STATION_D)
+    .build();
   private final List<StopLocation> STOPS = Arrays.asList(STOP_0, STOP_1, STOP_2, STOP_3, STOP_4);
 
   @Test

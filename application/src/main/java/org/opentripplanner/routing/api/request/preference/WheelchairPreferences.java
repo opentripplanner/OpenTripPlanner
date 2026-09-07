@@ -243,7 +243,8 @@ public class WheelchairPreferences implements Serializable {
     }
 
     public Builder withElevator(Consumer<AccessibilityPreferences.Builder> body) {
-      this.elevator = this.elevator.copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
+      this.elevator = this.elevator
+        .copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
         .apply(body)
         .build();
       return this;

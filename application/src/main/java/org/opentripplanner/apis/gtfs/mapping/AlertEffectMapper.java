@@ -30,4 +30,23 @@ public class AlertEffectMapper {
       case ACCESSIBILITY_ISSUE -> GraphQLAlertEffectType.ACCESSIBILITY_ISSUE;
     };
   }
+
+  /**
+   * Returns the internal {@link AlertEffect} for a GraphQL API effect.
+   */
+  public static AlertEffect getAlertEffect(GraphQLAlertEffectType effect) {
+    return switch (effect) {
+      case NO_SERVICE -> AlertEffect.NO_SERVICE;
+      case REDUCED_SERVICE -> AlertEffect.REDUCED_SERVICE;
+      case SIGNIFICANT_DELAYS -> AlertEffect.SIGNIFICANT_DELAYS;
+      case DETOUR -> AlertEffect.DETOUR;
+      case ADDITIONAL_SERVICE -> AlertEffect.ADDITIONAL_SERVICE;
+      case MODIFIED_SERVICE -> AlertEffect.MODIFIED_SERVICE;
+      case OTHER_EFFECT -> AlertEffect.OTHER_EFFECT;
+      case UNKNOWN_EFFECT -> AlertEffect.UNKNOWN_EFFECT;
+      case STOP_MOVED -> AlertEffect.STOP_MOVED;
+      case NO_EFFECT -> AlertEffect.NO_EFFECT;
+      case ACCESSIBILITY_ISSUE -> AlertEffect.ACCESSIBILITY_ISSUE;
+    };
+  }
 }

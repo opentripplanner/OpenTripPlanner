@@ -70,7 +70,7 @@ public class MaxStopCountLimit {
 
     var that = (MaxStopCountLimit) o;
 
-    return (defaultLimit == that.defaultLimit && limitsForModes.equals(that.limitsForModes));
+    return defaultLimit == that.defaultLimit && limitsForModes.equals(that.limitsForModes);
   }
 
   @Override

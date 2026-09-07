@@ -28,7 +28,8 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  */
 public class OptimizedPathTail<T extends RaptorTripSchedule>
   extends PathBuilder<T>
-  implements TransferOptimized {
+  implements TransferOptimized
+{
 
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
@@ -51,13 +52,13 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   ) {
     super(slackProvider, iterationDepartureTime, costCalculator, stopNameResolver, null);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
-    this.stopPriorityCostCalculator = (stopBoardAlightTransferCosts != null &&
-        extraStopBoardAlightCostsFactor > 0.01)
-      ? new StopPriorityCostCalculator(
-          extraStopBoardAlightCostsFactor,
-          stopBoardAlightTransferCosts
-        )
-      : null;
+    this.stopPriorityCostCalculator =
+      stopBoardAlightTransferCosts != null && extraStopBoardAlightCostsFactor > 0.01
+        ? new StopPriorityCostCalculator(
+            extraStopBoardAlightCostsFactor,
+            stopBoardAlightTransferCosts
+          )
+        : null;
   }
 
   private OptimizedPathTail(OptimizedPathTail<T> other) {

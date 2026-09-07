@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.route;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -648,6 +650,80 @@ class TripTimeOnDateMatcherFactoryTest {
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
   }
 
+  @Test
+  void includeCallTimePeriodOverlapping() {
+    var request = request()
+      .withIncludeCallTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(9)),
+            Instant.EPOCH.plus(Duration.ofHours(11))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    // The vehicle visits the first stop at 10:00 after the epoch
+    assertTrue(matcher.match(tripTimeOnDate(ROUTE_1)));
+  }
+
+  @Test
+  void includeCallTimePeriodNotOverlapping() {
+    var request = request()
+      .withIncludeCallTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(11)),
+            Instant.EPOCH.plus(Duration.ofHours(12))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
+  }
+
+  @Test
+  void includeCallTimePeriodMatchesVisitAtStopAndNotWholeTrip() {
+    // The trip runs from 10:00 to 10:05, so the period is within the trip's running time but the
+    // vehicle visits neither of the stops during it.
+    var request = request()
+      .withIncludeCallTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
+            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(4))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1, 0)));
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1, 1)));
+  }
+
+  @Test
+  void includeCallTimePeriodMatchesLaterStopOnly() {
+    // The period only contains the visit at the second stop at 10:05
+    var request = request()
+      .withIncludeCallTimePeriods(
+        List.of(
+          TimePeriod.of(
+            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
+            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(10))
+          )
+        )
+      )
+      .build();
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1, 0)));
+    assertTrue(matcher.match(tripTimeOnDate(ROUTE_1, 1)));
+  }
+
   private static TripTimeOnDateRequestBuilder request() {
     return TripTimeOnDateRequest.of(List.of(STOP)).withTime(Instant.EPOCH);
   }
@@ -658,13 +734,17 @@ class TripTimeOnDateMatcherFactoryTest {
       .build();
   }
 
-  private static TripTimeOnDate tripTimeOnDate(Route route1) {
-    final TripPattern pattern = pattern(route1);
+  private static TripTimeOnDate tripTimeOnDate(Route route) {
+    return tripTimeOnDate(route, 0);
+  }
+
+  private static TripTimeOnDate tripTimeOnDate(Route route, int stopPosition) {
+    final TripPattern pattern = pattern(route);
     var tripTimes = ScheduledTripTimes.of()
-      .withTrip(TransitRepositoryForTest.trip("t1").withRoute(route1).build())
+      .withTrip(TransitRepositoryForTest.trip("t1").withRoute(route).build())
       .withArrivalTimes("10:00 10:05")
       .withDepartureTimes("10:00 10:05")
       .build();
-    return new TripTimeOnDate(tripTimes, 0, pattern, DATE, Instant.EPOCH);
+    return new TripTimeOnDate(tripTimes, stopPosition, pattern, DATE, Instant.EPOCH);
   }
 }

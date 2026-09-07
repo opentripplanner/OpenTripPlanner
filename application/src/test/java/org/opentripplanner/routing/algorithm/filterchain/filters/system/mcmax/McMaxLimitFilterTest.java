@@ -72,9 +72,7 @@ class McMaxLimitFilterTest {
 
   static List<List<TestRow>> filterTestCases() {
     return List.of(
-      List.of(
-        /* Should not fail for an empty list of itineraries*/
-      ),
+      List.of(/* Should not fail for an empty list of itineraries*/),
       List.of(
         // Test minNumItinerariesLimit = 2
         row(EXP_KEEP, COST_LOW, TX_1, GROUP_A, "Best in everything"),

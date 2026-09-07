@@ -86,9 +86,8 @@ class TimetableHelper {
       tripTimesBuilder.withExtraCall(index, true);
     }
 
-    OccupancyStatus callOccupancy = call.getOccupancy() != null
-      ? call.getOccupancy()
-      : journeyOccupancy;
+    OccupancyStatus callOccupancy =
+      call.getOccupancy() != null ? call.getOccupancy() : journeyOccupancy;
 
     if (callOccupancy != null) {
       tripTimesBuilder.withOccupancyStatus(index, callOccupancy);

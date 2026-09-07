@@ -9,7 +9,6 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -38,7 +37,6 @@ class StreetPathToLegsMapperTest {
     return new StreetPathToLegsMapper(
       new NoopSiteResolver(),
       ZoneIds.UTC,
-      new StreetNotesService(),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       1
     );

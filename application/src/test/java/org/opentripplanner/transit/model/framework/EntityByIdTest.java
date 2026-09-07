@@ -95,7 +95,8 @@ public class EntityByIdTest {
   }
 
   private static class TestEntityBuilder
-    extends AbstractEntityBuilder<TestEntity, TestEntityBuilder> {
+    extends AbstractEntityBuilder<TestEntity, TestEntityBuilder>
+  {
 
     TestEntityBuilder(TestEntity testEntity) {
       super(testEntity);

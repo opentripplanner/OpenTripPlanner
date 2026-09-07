@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -214,6 +216,95 @@ class CanceledTripsFilterMapperTest {
     );
     assertEquals(
       "Service date range filter must be either null or have at least one entry.",
+      exception.getMessage()
+    );
+  }
+
+  @Test
+  void testIncludeWithRunningTimeRanges() {
+    var start = OffsetDateTime.parse("2026-06-01T10:00:00+02:00");
+    var end = OffsetDateTime.parse("2026-06-01T12:00:00+02:00");
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(
+        Map.of(
+          "include",
+          List.of(Map.of("runningTimeRanges", List.of(Map.of("start", start, "end", end))))
+        )
+      )
+    );
+
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(getEnvironment(args));
+    assertThat(request.filters()).hasSize(1);
+    var include = request.filters().getFirst().select().getFirst();
+    assertThat(include.runningTimePeriods().get()).containsExactly(
+      TimePeriod.of(start.toInstant(), end.toInstant())
+    );
+  }
+
+  @Test
+  void testExcludeWithOpenEndedRunningTimeRange() {
+    var start = OffsetDateTime.parse("2026-07-01T00:00:00Z");
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(
+        Map.of("exclude", List.of(Map.of("runningTimeRanges", List.of(Map.of("start", start)))))
+      )
+    );
+
+    var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(getEnvironment(args));
+    assertThat(request.filters()).hasSize(1);
+    var exclude = request.filters().getFirst().not().getFirst();
+    assertThat(exclude.runningTimePeriods().get()).containsExactly(
+      TimePeriod.of(start.toInstant(), null)
+    );
+  }
+
+  @Test
+  void testEmptyRunningTimeRanges() {
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(Map.of("include", List.of(Map.of("runningTimeRanges", List.of()))))
+    );
+    var environment = getEnvironment(args);
+    var exception = assertThrows(InvalidInputException.class, () ->
+      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    );
+    assertEquals(
+      "Time range filter 'filters.*.runningTimeRanges' must be either null or have at least one entry.",
+      exception.getMessage()
+    );
+  }
+
+  @Test
+  void testRunningTimeRangeWithStartAfterEnd() {
+    Map<String, Object> args = Map.of(
+      "filters",
+      List.of(
+        Map.of(
+          "include",
+          List.of(
+            Map.of(
+              "runningTimeRanges",
+              List.of(
+                Map.of(
+                  "start",
+                  OffsetDateTime.parse("2026-06-02T10:00:00Z"),
+                  "end",
+                  OffsetDateTime.parse("2026-06-01T10:00:00Z")
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+    var environment = getEnvironment(args);
+    var exception = assertThrows(InvalidInputException.class, () ->
+      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    );
+    assertEquals(
+      "The start of the time range 'filters.*.runningTimeRanges' must not be after its end.",
       exception.getMessage()
     );
   }

@@ -38,10 +38,10 @@ class AbstractCsvParserTest {
   private static final String VALID_DATA =
     FILE_HEADER +
     """
-      F:1, 1, 28.0, 1, 2025-10-31
-      F:2, 2, 38.0, 0, 20250101
-      F:3, 3, 48.0, 1, 2025-02-28
-      """;
+    F:1, 1, 28.0, 1, 2025-10-31
+    F:2, 2, 38.0, 0, 20250101
+    F:3, 3, 48.0, 1, 2025-02-28
+    """;
 
   @Test
   void headersDoesNotExistForEmptyFile() {

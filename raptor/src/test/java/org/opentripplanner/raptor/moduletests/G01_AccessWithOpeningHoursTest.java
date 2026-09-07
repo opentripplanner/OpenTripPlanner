@@ -62,14 +62,14 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     data
       .withTimetables(
         """
-          B      E
-          00:15  00:30
-          00:20  00:35
-          00:25  00:40
-          00:30  00:45
-          24:15  24:30
-          24:20  24:35
-          """ +
+        B      E
+        00:15  00:30
+        00:20  00:35
+        00:25  00:40
+        00:30  00:45
+        24:15  24:30
+        24:20  24:35
+        """ +
           // Not within time-limit 24:42 (need 2 min for egress)
           "24:25  24:40"
       )

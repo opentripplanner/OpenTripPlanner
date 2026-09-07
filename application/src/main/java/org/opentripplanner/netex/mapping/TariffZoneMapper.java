@@ -44,7 +44,7 @@ class TariffZoneMapper {
    */
   FareZone findAndMapTariffZone(TariffZoneRef ref) {
     var tariffZone = tariffZonesById.lookup(ref, startOfPeriod);
-    return (tariffZone == null) ? null : mapTariffZone(tariffZone);
+    return tariffZone == null ? null : mapTariffZone(tariffZone);
   }
 
   /**

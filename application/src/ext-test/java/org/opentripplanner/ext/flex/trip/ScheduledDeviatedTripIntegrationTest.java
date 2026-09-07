@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
+import io.micrometer.core.instrument.Metrics;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
@@ -28,15 +28,17 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -96,11 +98,9 @@ class ScheduledDeviatedTripIntegrationTest {
   void flexTripInTransitMode() {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(
-      graph,
+    var transitService = TestServerContext.createTransitService(
       transitRepository,
-      transferRepository,
-      new DefaultFareService()
+      transferRepository
     );
 
     // from zone 3 to zone 2
@@ -113,7 +113,7 @@ class ScheduledDeviatedTripIntegrationTest {
       "Zone 1 - PUBLIX Super Market,Zone 1 Collection Point"
     );
 
-    var itineraries = getItineraries(from, to, serverContext);
+    var itineraries = getItineraries(from, to, transitService);
 
     assertEquals(2, itineraries.size());
 
@@ -145,11 +145,9 @@ class ScheduledDeviatedTripIntegrationTest {
   void intermediateEstimatedCallsSkipFlexWindowStops() {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(
-      graph,
+    var transitService = TestServerContext.createTransitService(
       transitRepository,
-      transferRepository,
-      new DefaultFareService()
+      transferRepository
     );
 
     var from = GenericLocation.fromStopId(
@@ -161,7 +159,7 @@ class ScheduledDeviatedTripIntegrationTest {
       "Zone 1 - PUBLIX Super Market,Zone 1 Collection Point"
     );
 
-    var leg = getItineraries(from, to, serverContext).get(0).legs().get(0);
+    var leg = getItineraries(from, to, transitService).get(0).legs().get(0);
 
     // The flexible-area stop is exposed as an intermediate stop on the leg ...
     var intermediateStopIds = leg
@@ -212,7 +210,7 @@ class ScheduledDeviatedTripIntegrationTest {
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
-    OtpServerRequestContext serverContext
+    TransitService transitService
   ) {
     var zoneId = ZoneIds.NEW_YORK;
     var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
@@ -226,24 +224,29 @@ class ScheduledDeviatedTripIntegrationTest {
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
 
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+    var linkingContextFactory = TestServerContext.createLinkingContextFactory(
+      graph,
+      vertexLinker,
+      transitService
+    );
+
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var linkingRequest = LinkingContextRequestMapper.map(request);
-      var linkingContext = serverContext
-        .linkingContextFactory()
-        .create(temporaryVerticesContainer, linkingRequest);
+      var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var result = TransitRouter.route(
         request,
-        serverContext.transitService(),
-        serverContext.graph(),
-        serverContext.raptorConfig(),
-        serverContext.meterRegistry(),
-        serverContext.streetDetailsService(),
-        serverContext.transferService(),
-        serverContext.flexParameters(),
-        serverContext.rideHailingServices(),
-        serverContext.dataOverlayParameterBindings(),
-        serverContext.sorlandsbanenService(),
-        serverContext.viaTransferResolver(),
+        transitService,
+        graph,
+        TestServerContext.createRaptorConfig(),
+        Metrics.globalRegistry,
+        TestServerContext.createStreetDetailsService(),
+        TransferServiceTestFactory.transferService(transferRepository),
+        RouterConfig.DEFAULT.flexParameters(),
+        List.of(),
+        null,
+        null,
+        TestServerContext.createViaTransferResolver(graph, transitService),
         TransitGroupPriorityService.empty(),
         transitStartOfTime,
         additionalSearchDays,

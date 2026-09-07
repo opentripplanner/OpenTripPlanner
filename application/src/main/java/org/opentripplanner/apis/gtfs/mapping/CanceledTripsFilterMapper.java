@@ -1,7 +1,9 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,16 +12,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.support.time.OffsetDateTimeRangeUtil;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.utils.collection.CollectionUtils;
+import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public class CanceledTripsFilterMapper {
+
+  private static final String RUNNING_TIME_RANGES = "runningTimeRanges";
+  private static final String RUNNING_TIME_RANGES_PATH = "filters.*.runningTimeRanges";
 
   public static TripOnServiceDateRequest mapToTripOnServiceDateRequest(
     DataFetchingEnvironment env
@@ -57,7 +65,8 @@ public class CanceledTripsFilterMapper {
   private static TripOnServiceDateSelectRequest toSelectRequest(List<Map<String, Object>> inputs) {
     var modes = toTransitModes(inputs);
     var serviceDateRanges = toServiceDateRanges(inputs);
-    if (modes == null && serviceDateRanges == null) {
+    var runningTimePeriods = toRunningTimePeriods(inputs);
+    if (modes == null && serviceDateRanges == null && runningTimePeriods == null) {
       return null;
     }
 
@@ -67,6 +76,9 @@ public class CanceledTripsFilterMapper {
     }
     if (serviceDateRanges != null) {
       builder.withServiceDateRanges(serviceDateRanges);
+    }
+    if (runningTimePeriods != null) {
+      builder.withRunningTimePeriods(runningTimePeriods);
     }
     return builder.build();
   }
@@ -141,6 +153,54 @@ public class CanceledTripsFilterMapper {
       localDate(rangeInput.get("start"), "filters.*.serviceDateRanges.start"),
       localDate(rangeInput.get("end"), "filters.*.serviceDateRanges.end")
     );
+  }
+
+  @Nullable
+  private static List<TimePeriod> toRunningTimePeriods(List<Map<String, Object>> inputs) {
+    if (inputs == null) {
+      return null;
+    }
+    var periods = inputs
+      .stream()
+      .flatMap(input -> {
+        var rangeInputs = mapList(input.get(RUNNING_TIME_RANGES), RUNNING_TIME_RANGES_PATH);
+        if (rangeInputs == null) {
+          return Stream.<TimePeriod>of();
+        }
+        OffsetDateTimeRangeUtil.requireNonEmpty(rangeInputs, RUNNING_TIME_RANGES_PATH);
+        return rangeInputs.stream().map(CanceledTripsFilterMapper::mapTimePeriod);
+      })
+      .toList();
+
+    return periods.isEmpty() ? null : periods;
+  }
+
+  private static TimePeriod mapTimePeriod(Map<String, Object> rangeInput) {
+    return OffsetDateTimeRangeUtil.mapRange(
+      offsetDateTime(rangeInput.get("start"), RUNNING_TIME_RANGES_PATH + ".start"),
+      offsetDateTime(rangeInput.get("end"), RUNNING_TIME_RANGES_PATH + ".end"),
+      RUNNING_TIME_RANGES_PATH
+    );
+  }
+
+  @Nullable
+  private static OffsetDateTime offsetDateTime(@Nullable Object value, String path) {
+    if (value == null) {
+      return null;
+    }
+    return switch (value) {
+      case OffsetDateTime offsetDateTime -> offsetDateTime;
+      case String stringValue -> parseOffsetDateTime(stringValue, path);
+      default -> throw new InvalidInputException("Expected OffsetDateTime at '" + path + "'.");
+    };
+  }
+
+  private static OffsetDateTime parseOffsetDateTime(String value, String path) {
+    try {
+      return OffsetDateTimeParser.parseLeniently(value);
+    } catch (ParseException e) {
+      throw new InvalidInputException("Expected OffsetDateTime at '" + path + "'.");
+    }
   }
 
   private static TransitMode mapTransitMode(Object value) {

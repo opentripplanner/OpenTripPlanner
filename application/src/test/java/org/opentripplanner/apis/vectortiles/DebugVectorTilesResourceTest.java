@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.vectortiles.model.LayerType;
-import org.opentripplanner.ext.fares.service.NoopFareServiceFactory;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -29,20 +29,20 @@ class DebugVectorTilesResourceTest {
 
   @Test
   void tileJson() {
-    var serverContext = TestServerContext.createServerContext(
-      new Graph(),
+    var graph = new Graph();
+    var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
+    var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      TransferServiceTestFactory.defaultTransferRepository(),
-      new NoopFareServiceFactory().makeFareService()
+      transferRepository
     );
     var resource = new DebugVectorTilesResource(
-      serverContext.transitService(),
-      serverContext.graph(),
-      serverContext.debugUiConfig(),
-      serverContext.worldEnvelopeService(),
-      serverContext.vehicleRentalService(),
-      serverContext.streetDetailsService(),
-      serverContext.transferService()
+      transitService,
+      graph,
+      DebugUiConfig.DEFAULT,
+      TestServerContext.createWorldEnvelopeService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      TransferServiceTestFactory.transferService(transferRepository)
     );
     var req = HttpForTest.containerRequest();
     var tileJson = resource.getTileJson(req.getUriInfo(), req, "l1,l2");

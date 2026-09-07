@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -26,9 +25,7 @@ import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
@@ -50,20 +47,17 @@ public class StreetPathToLegsMapper {
 
   private final SiteResolver siteResolver;
   private final ZoneId timeZone;
-  private final StreetNotesService streetNotesService;
   private final StreetDetailsService streetDetailsService;
   private final double ellipsoidToGeoidDifference;
 
   public StreetPathToLegsMapper(
     SiteResolver siteResolver,
     ZoneId timeZone,
-    StreetNotesService streetNotesService,
     StreetDetailsService streetDetailsService,
     double ellipsoidToGeoidDifference
   ) {
     this.siteResolver = siteResolver;
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
-    this.streetNotesService = streetNotesService;
     this.streetDetailsService = streetDetailsService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
@@ -88,8 +82,8 @@ public class StreetPathToLegsMapper {
   public static boolean isFloatingRentalDropoff(State state) {
     return (
       !state.isRentingVehicle() &&
-      (state.getBackState() != null &&
-        state.getBackState().getVehicleRentalState() == RENTING_FLOATING)
+      state.getBackState() != null &&
+      state.getBackState().getVehicleRentalState() == RENTING_FLOATING
     );
   }
 
@@ -128,9 +122,8 @@ public class StreetPathToLegsMapper {
     if (subPaths.isEmpty()) {
       return List.of();
     }
-    var delay = startTime != null
-      ? Duration.between(subPaths.getFirst().startTime(), startTime)
-      : null;
+    var delay =
+      startTime != null ? Duration.between(subPaths.getFirst().startTime(), startTime) : null;
     for (var subPath : subPaths) {
       if (
         OTPFeature.FlexRouting.isOn() && subPath.states().get(1).backEdge instanceof FlexTripEdge
@@ -215,28 +208,30 @@ public class StreetPathToLegsMapper {
    * @param states The states that go with the leg
    */
   private static TraverseMode resolveMode(List<State> states) {
-    return states
-      .stream()
-      // The first state is part of the previous leg
-      .skip(1)
-      .map(state -> {
-        var mode = state.currentMode();
+    return (
+      states
+        .stream()
+        // The first state is part of the previous leg
+        .skip(1)
+        .map(state -> {
+          var mode = state.currentMode();
 
-        if (mode != null) {
-          // Resolve correct mode if renting vehicle
-          if (state.isRentingVehicle()) {
-            return state.stateData.rentalVehicleFormFactor.traverseMode;
-          } else {
-            return mode;
+          if (mode != null) {
+            // Resolve correct mode if renting vehicle
+            if (state.isRentingVehicle()) {
+              return state.stateData.rentalVehicleFormFactor.traverseMode;
+            } else {
+              return mode;
+            }
           }
-        }
 
-        return null;
-      })
-      .filter(Objects::nonNull)
-      .findFirst()
-      // Fallback to walking
-      .orElse(TraverseMode.WALK);
+          return null;
+        })
+        .filter(Objects::nonNull)
+        .findFirst()
+        // Fallback to walking
+        .orElse(TraverseMode.WALK)
+    );
   }
 
   /**
@@ -316,7 +311,6 @@ public class StreetPathToLegsMapper {
     var statesToWalkStepsMapper = new StatesToWalkStepsMapper(
       states,
       previousStep,
-      streetNotesService,
       streetDetailsService,
       siteResolver,
       ellipsoidToGeoidDifference
@@ -357,25 +351,7 @@ public class StreetPathToLegsMapper {
       }
     }
 
-    addStreetNotes(leg, states);
-
     return leg.build();
-  }
-
-  /**
-   * Add mode and alerts fields to a {@link StreetLeg}.
-   *
-   * @param leg    The leg to add the mode and alerts to
-   * @param states The states that go with the leg
-   */
-  private void addStreetNotes(StreetLegBuilder leg, List<State> states) {
-    for (State state : states) {
-      Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
-
-      if (streetNotes != null) {
-        leg.withStreetNotes(streetNotes);
-      }
-    }
   }
 
   private ZonedDateTime getTimeWithDelay(State state, @Nullable Duration delay) {

@@ -31,4 +31,24 @@ public class AlertCauseMapper {
       case MEDICAL_EMERGENCY -> GraphQLAlertCauseType.MEDICAL_EMERGENCY;
     };
   }
+
+  /**
+   * Returns the internal {@link AlertCause} for a GraphQL API cause.
+   */
+  public static AlertCause getAlertCause(GraphQLAlertCauseType cause) {
+    return switch (cause) {
+      case UNKNOWN_CAUSE -> AlertCause.UNKNOWN_CAUSE;
+      case OTHER_CAUSE -> AlertCause.OTHER_CAUSE;
+      case TECHNICAL_PROBLEM -> AlertCause.TECHNICAL_PROBLEM;
+      case STRIKE -> AlertCause.STRIKE;
+      case DEMONSTRATION -> AlertCause.DEMONSTRATION;
+      case ACCIDENT -> AlertCause.ACCIDENT;
+      case HOLIDAY -> AlertCause.HOLIDAY;
+      case WEATHER -> AlertCause.WEATHER;
+      case MAINTENANCE -> AlertCause.MAINTENANCE;
+      case CONSTRUCTION -> AlertCause.CONSTRUCTION;
+      case POLICE_ACTIVITY -> AlertCause.POLICE_ACTIVITY;
+      case MEDICAL_EMERGENCY -> AlertCause.MEDICAL_EMERGENCY;
+    };
+  }
 }

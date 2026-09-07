@@ -8,7 +8,6 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
 import org.slf4j.Logger;
@@ -19,110 +18,104 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelWarmupQueryExecutor.class);
 
   static final String QUERY = """
-    query(
-      $fromLat: Float!, $fromLon: Float!,
-      $toLat: Float!, $toLon: Float!,
-      $arriveBy: Boolean!,
-      $accessMode: StreetMode!, $egressMode: StreetMode!
+  query(
+    $fromLat: Float!, $fromLon: Float!,
+    $toLat: Float!, $toLon: Float!,
+    $arriveBy: Boolean!,
+    $accessMode: StreetMode!, $egressMode: StreetMode!
+  ) {
+    trip(
+      from: { coordinates: { latitude: $fromLat, longitude: $fromLon } }
+      to: { coordinates: { latitude: $toLat, longitude: $toLon } }
+      arriveBy: $arriveBy
+      modes: { accessMode: $accessMode, egressMode: $egressMode }
     ) {
-      trip(
-        from: { coordinates: { latitude: $fromLat, longitude: $fromLon } }
-        to: { coordinates: { latitude: $toLat, longitude: $toLon } }
-        arriveBy: $arriveBy
-        modes: { accessMode: $accessMode, egressMode: $egressMode }
-      ) {
-        metadata { searchWindowUsed nextDateTime prevDateTime }
-        nextPageCursor
-        previousPageCursor
-        routingErrors { code description inputField }
-        tripPatterns {
+      metadata { searchWindowUsed nextDateTime prevDateTime }
+      nextPageCursor
+      previousPageCursor
+      routingErrors { code description inputField }
+      tripPatterns {
+        aimedStartTime expectedStartTime
+        aimedEndTime expectedEndTime
+        duration distance streetDistance generalizedCost
+        systemNotices { tag text }
+        legs {
+          mode transportSubmode
+          duration distance generalizedCost
           aimedStartTime expectedStartTime
           aimedEndTime expectedEndTime
-          duration distance streetDistance generalizedCost
-          systemNotices { tag text }
-          legs {
-            mode transportSubmode
-            duration distance generalizedCost
-            aimedStartTime expectedStartTime
-            aimedEndTime expectedEndTime
-            realtime ride walkingBike
-            fromPlace {
-              name
-              quay {
-                id name publicCode
-                tariffZones { id name }
-                stopPlace { id name parent { id name } }
-              }
+          realtime ride walkingBike
+          fromPlace {
+            name
+            quay {
+              id name publicCode
+              tariffZones { id name }
+              stopPlace { id name parent { id name } }
             }
-            toPlace {
-              name
-              quay { id name publicCode }
-            }
-            fromEstimatedCall {
-              aimedDepartureTime expectedDepartureTime realtime cancellation
-              destinationDisplay { frontText }
-              notices { id text publicCode }
-              situations { situationNumber }
-            }
-            toEstimatedCall {
-              aimedArrivalTime expectedArrivalTime
-            }
-            intermediateEstimatedCalls {
-              aimedDepartureTime expectedDepartureTime
-              quay { id name }
-            }
-            line {
-              id publicCode name
-              presentation { colour textColour }
-              authority { id name }
-              operator { id name }
-              notices { id text publicCode }
-            }
-            datedServiceJourney { id operatingDay }
-            serviceJourney {
-              id privateCode
-              journeyPattern { id name notices { id text } }
-              notices { id text }
-            }
-            situations {
-              situationNumber severity priority
-              summary { value language }
-              description { value language }
-              advice { value language }
-              validityPeriod { startTime endTime }
-              infoLinks { uri label }
-            }
-            bookingArrangements {
-              bookingMethods
-              bookingContact { phone email url }
-            }
-            pointsOnLink { points length }
-            interchangeFrom { staySeated guaranteed maximumWaitTime priority }
-            interchangeTo { staySeated guaranteed }
           }
+          toPlace {
+            name
+            quay { id name publicCode }
+          }
+          fromEstimatedCall {
+            aimedDepartureTime expectedDepartureTime realtime cancellation
+            destinationDisplay { frontText }
+            notices { id text publicCode }
+            situations { situationNumber }
+          }
+          toEstimatedCall {
+            aimedArrivalTime expectedArrivalTime
+          }
+          intermediateEstimatedCalls {
+            aimedDepartureTime expectedDepartureTime
+            quay { id name }
+          }
+          line {
+            id publicCode name
+            presentation { colour textColour }
+            authority { id name }
+            operator { id name }
+            notices { id text publicCode }
+          }
+          datedServiceJourney { id operatingDay }
+          serviceJourney {
+            id privateCode
+            journeyPattern { id name notices { id text } }
+            notices { id text }
+          }
+          situations {
+            situationNumber severity priority
+            summary { value language }
+            description { value language }
+            advice { value language }
+            validityPeriod { startTime endTime }
+            infoLinks { uri label }
+          }
+          bookingArrangements {
+            bookingMethods
+            bookingContact { phone email url }
+          }
+          pointsOnLink { points length }
+          interchangeFrom { staySeated guaranteed maximumWaitTime priority }
+          interchangeTo { staySeated guaranteed }
         }
       }
     }
-    """;
+  }
+  """;
 
-  private final OtpServerRequestContext serverContext;
   private final TransmodelRequestContext requestContext;
   private final GraphQLSchema schema;
   private final ModeCombinations modeCombinations;
 
   TransmodelWarmupQueryExecutor(
-    OtpServerRequestContext context,
+    GraphQLSchema schema,
+    TransmodelRequestContext requestContext,
     List<StreetMode> accessModes,
     List<StreetMode> egressModes
   ) {
-    this.serverContext = context;
-    this.schema = context.transmodelSchema();
-    this.requestContext = new TransmodelRequestContext(
-      context,
-      context.routingService(),
-      context.transitService(),
-      context.empiricalDelayService()
-    );
+    this.schema = schema;
+    this.requestContext = requestContext;
     this.modeCombinations = new ModeCombinations(accessModes, egressModes);
   }
 
@@ -133,7 +126,6 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
     var input = ExecutionInput.newExecutionInput()
       .query(QUERY)
       .context(requestContext)
-      .root(serverContext)
       .variables(variables)
       .build();
 

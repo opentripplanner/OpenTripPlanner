@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.apis.support.TracingUtils;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +29,11 @@ public class TransmodelAPI {
 
   // Note, the blank line at the end is intended
   private static final String SCHEMA_DOC_HEADER = """
-    # THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
-    # This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
-    # OTP configured default-values injected.
+  # THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
+  # This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
+  # OTP configured default-values injected.
 
-    """;
+  """;
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
@@ -76,7 +75,7 @@ public class TransmodelAPI {
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
     @Context HttpHeaders headers,
-    @Context OtpServerRequestContext serverContext
+    @Context TransmodelRequestContext requestContext
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -105,7 +104,7 @@ public class TransmodelAPI {
     String operationName = (String) queryParameters.getOrDefault("operationName", null);
     return index.executeGraphQL(
       query,
-      serverContext,
+      requestContext,
       variables,
       operationName,
       maxNumberOfResultFields,
@@ -118,11 +117,11 @@ public class TransmodelAPI {
   public Response getGraphQL(
     String query,
     @Context HttpHeaders headers,
-    @Context OtpServerRequestContext serverContext
+    @Context TransmodelRequestContext requestContext
   ) {
     return index.executeGraphQL(
       query,
-      serverContext,
+      requestContext,
       null,
       null,
       maxNumberOfResultFields,

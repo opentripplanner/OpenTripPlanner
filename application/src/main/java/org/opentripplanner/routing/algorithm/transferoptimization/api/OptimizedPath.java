@@ -19,7 +19,8 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
  */
 public class OptimizedPath<T extends RaptorTripSchedule>
   extends Path<T>
-  implements TransferOptimized {
+  implements TransferOptimized
+{
 
   private final int transferPriorityCost;
   private final int waitTimeOptimizedCost;

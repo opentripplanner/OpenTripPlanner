@@ -65,12 +65,12 @@ class PlaceMapper {
     if (domain.stop != null) {
       api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
       api.stopCode = domain.stop.getCode();
-      api.platformCode = domain.stop instanceof RegularStop
-        ? ((RegularStop) domain.stop).getPlatformCode()
-        : null;
-      api.zoneId = domain.stop instanceof RegularStop
-        ? ((RegularStop) domain.stop).getFirstZoneAsString()
-        : null;
+      api.platformCode =
+        domain.stop instanceof RegularStop ? ((RegularStop) domain.stop).getPlatformCode() : null;
+      api.zoneId =
+        domain.stop instanceof RegularStop
+          ? ((RegularStop) domain.stop).getFirstZoneAsString()
+          : null;
     }
 
     if (domain.coordinate != null) {

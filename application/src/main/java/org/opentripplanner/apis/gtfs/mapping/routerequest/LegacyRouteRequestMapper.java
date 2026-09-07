@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -38,7 +38,7 @@ public class LegacyRouteRequestMapper {
 
   public static RouteRequest toRouteRequest(
     DataFetchingEnvironment environment,
-    GraphQLRequestContext context
+    GtfsGraphQLRequestContext context
   ) {
     var request = context.defaultRouteRequest().copyOf();
 

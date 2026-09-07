@@ -15,9 +15,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * Everything from the main result is kept, and any additional rail results from the alternative
  * search are added.
  */
-class MergePaths<T extends RaptorTripSchedule>
-  implements
-    BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> {
+class MergePaths<T extends RaptorTripSchedule> implements
+  BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> {
 
   @Override
   public Collection<RaptorPath<T>> apply(

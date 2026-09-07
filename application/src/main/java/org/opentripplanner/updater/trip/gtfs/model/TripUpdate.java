@@ -90,16 +90,18 @@ public final class TripUpdate {
   }
 
   public FeedScopedId tripId() {
-    return tripDescriptor
-      .tripId()
-      .map(id -> new FeedScopedId(feedId, id))
-      // this should never happen because an empty trip id will lead to an exception in the
-      // constructor.
-      .orElseThrow(() ->
-        new IllegalStateException(
-          "Trip ID is missing from trip update. This indicates a programming error."
+    return (
+      tripDescriptor
+        .tripId()
+        .map(id -> new FeedScopedId(feedId, id))
+        // this should never happen because an empty trip id will lead to an exception in the
+        // constructor.
+        .orElseThrow(() ->
+          new IllegalStateException(
+            "Trip ID is missing from trip update. This indicates a programming error."
+          )
         )
-      );
+    );
   }
 
   public void validate() throws DataValidationException, UpdateException {

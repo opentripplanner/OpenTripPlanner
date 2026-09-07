@@ -42,8 +42,7 @@ public class TripRequestMapper {
    */
   public RouteRequestBuilder createRequestBuilder(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    var serverContext = context.getServerContext();
-    var requestBuilder = serverContext.defaultRouteRequest().copyOf();
+    var requestBuilder = context.getDefaultRouteRequest().copyOf();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 

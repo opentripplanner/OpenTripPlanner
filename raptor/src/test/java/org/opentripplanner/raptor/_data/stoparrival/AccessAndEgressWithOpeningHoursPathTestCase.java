@@ -375,7 +375,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
   }
 
   private static int costL1ReverseIncWait(int prevArrivalTime) {
-    int waitTime = (prevArrivalTime - L1_END) + BOARD_SLACK;
+    int waitTime = prevArrivalTime - L1_END + BOARD_SLACK;
     return toRaptorCost(waitTime * WAIT_RELUCTANCE) + L1_C1_EX_WAIT;
   }
 }

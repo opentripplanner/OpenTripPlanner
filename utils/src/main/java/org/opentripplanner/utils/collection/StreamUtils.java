@@ -2,6 +2,7 @@ package org.opentripplanner.utils.collection;
 
 import java.util.Collection;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
 public class StreamUtils {
@@ -15,5 +16,12 @@ public class StreamUtils {
     } else {
       return value.stream();
     }
+  }
+
+  /**
+   * Converts the given {@code Iterable} into a sequential {@code Stream}.
+   */
+  public static <T> Stream<T> ofIterable(Iterable<T> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false);
   }
 }

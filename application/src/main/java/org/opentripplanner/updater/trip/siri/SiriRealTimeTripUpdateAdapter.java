@@ -50,9 +50,10 @@ public class SiriRealTimeTripUpdateAdapter {
    */
   public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     var transitService = new DefaultTransitService(transitRepository, buffer);
-    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
-      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, transitService)
-      : null;
+    var fuzzyTripMatcher =
+      siriFuzzyTripMatcherCache != null
+        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, transitService)
+        : null;
     return new SiriRealTimeUpdateHandler(
       transitService,
       buffer,

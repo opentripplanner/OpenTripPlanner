@@ -108,9 +108,9 @@ public class StopPlaceType {
               .build()
           )
           .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getName().toString(
-                GqlUtil.getLocale(environment)
-              ))
+            ((MonoOrMultiModalStation) environment.getSource())
+              .getName()
+              .toString(GqlUtil.getLocale(environment))
           )
           .build()
       )
@@ -118,18 +118,14 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getLat())
-          )
+          .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getLat())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getLon())
-          )
+          .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getLon())
           .build()
       )
       .field(
@@ -179,7 +175,8 @@ public class StopPlaceType {
           .description("The transport modes of quays under this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_MODE))
           .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+            ((MonoOrMultiModalStation) environment.getSource())
+              .getChildStops()
               .stream()
               .map(StopLocation::getVehicleType)
               .filter(Objects::nonNull)
@@ -193,7 +190,8 @@ public class StopPlaceType {
           .description("The transport submode serviced by this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_SUBMODE))
           .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+            ((MonoOrMultiModalStation) environment.getSource())
+              .getChildStops()
               .stream()
               .map(StopLocation::getNetexVehicleSubmode)
               .filter(it -> it != SubMode.UNKNOWN)
@@ -255,7 +253,7 @@ public class StopPlaceType {
           .description("Returns parent stop for this stop")
           .type(new GraphQLTypeReference(NAME))
           .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getParentStation())
+            ((MonoOrMultiModalStation) environment.getSource()).getParentStation()
           )
           .build()
       )
@@ -264,7 +262,8 @@ public class StopPlaceType {
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
           .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+            ((MonoOrMultiModalStation) environment.getSource())
+              .getChildStops()
               .stream()
               .flatMap(s -> s.getFareZones().stream())
               .distinct()

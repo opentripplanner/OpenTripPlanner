@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.repository;
 
 import java.time.LocalDate;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 
 /**
- * The mutable repository for the realtime-updated timetables. It is managed by the transaction
- * framework: trip updaters obtain it through a
+ * The mutable repository for the realtime-updated timetables and trip calendar. It is managed by
+ * the transaction framework: trip updaters obtain it through a
  * {@link org.opentripplanner.framework.transaction.api.WriteContext} on the single writer thread,
  * and {@link #createSnapshot()} is called at commit time to publish a new immutable
  * {@link TimetableRepositorySnapshot} for the request threads.
@@ -19,6 +20,17 @@ public interface TimetableRepository extends TimetableRepositorySnapshot {
    * service date of the update.
    */
   void update(RealTimeTripUpdate realTimeTripUpdate);
+
+  /**
+   * Get or create a serviceId for a given date. Used when a new trip is added from a realtime
+   * data update. It makes sure the date is in the existing transit service period.
+   *
+   * @param serviceDate service date for the added service id
+   * @return service-id for date if it exists or is created. If the given service date is outside
+   * the service period {@code null} is returned.
+   */
+  @Nullable
+  FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
 
   /**
    * Produce an immutable snapshot of the current state of this repository.

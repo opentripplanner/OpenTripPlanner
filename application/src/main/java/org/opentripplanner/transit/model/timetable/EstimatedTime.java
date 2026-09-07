@@ -23,7 +23,7 @@ public class EstimatedTime {
 
   public static EstimatedTime of(ZonedDateTime scheduledTime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new EstimatedTime(scheduledTime.minus(delay), delay);
+    return new EstimatedTime(scheduledTime.plus(delay), delay);
   }
 
   public ZonedDateTime time() {

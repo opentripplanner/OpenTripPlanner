@@ -7,7 +7,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
 public class TripOnServiceDateBuilder
-  extends AbstractEntityBuilder<TripOnServiceDate, TripOnServiceDateBuilder> {
+  extends AbstractEntityBuilder<TripOnServiceDate, TripOnServiceDateBuilder>
+{
 
   private Trip trip;
   private LocalDate serviceDate;

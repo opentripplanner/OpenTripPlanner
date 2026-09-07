@@ -84,13 +84,11 @@ public class AlternativeLegs {
     Station fromStation = fromStop.getParentStation();
     Station toStation = toStop.getParentStation();
 
-    Collection<StopLocation> origins = fromStation == null || exactOriginStop
-      ? List.of(fromStop)
-      : fromStation.getChildStops();
+    Collection<StopLocation> origins =
+      fromStation == null || exactOriginStop ? List.of(fromStop) : fromStation.getChildStops();
 
-    Collection<StopLocation> destinations = toStation == null || exactDestinationStop
-      ? List.of(toStop)
-      : toStation.getChildStops();
+    Collection<StopLocation> destinations =
+      toStation == null || exactDestinationStop ? List.of(toStop) : toStation.getChildStops();
 
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
       ScheduledTransitLeg::startTime
@@ -168,9 +166,10 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange = direction == NavigationDirection.PREVIOUS
-          ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
-          : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
+        boolean departureTimeInRange =
+          direction == NavigationDirection.PREVIOUS
+            ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
+            : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 
         if (departureTimeInRange) {
           pq.add(

@@ -82,13 +82,13 @@ public class LinkingEnvironment {
       linkedVertex,
       new TraverseModeSet(TraverseMode.WALK),
       BIDIRECTIONAL,
-      ((vertex, streetVertex) -> {
+      (vertex, streetVertex) -> {
         var s = (TransitStopVertex) vertex;
         return List.of(
           StreetTransitStopLink.createStreetTransitStopLink(s, streetVertex),
           StreetTransitStopLink.createStreetTransitStopLink(streetVertex, s)
         );
-      })
+      }
     );
   }
 

@@ -26,15 +26,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * This implementation makes it so that TurnRestrictions on the parent edge are applied to this
-   * edge as well.
-   */
-  @Override
-  public boolean isEquivalentTo(Edge e) {
-    return (e == this || e == parentEdge);
-  }
-
-  /**
    * Returns true if this edge is trivial - beginning and ending at the same point.
    */
   public boolean isTrivial() {

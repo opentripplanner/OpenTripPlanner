@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -27,6 +28,7 @@ public class TripTimeOnDateRequest {
 
   private final List<LocalDateRange> serviceDateRanges;
   private final CancellationPolicy cancellationPolicy;
+  private final FilterValues<TimePeriod> includeCallTimePeriods;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
@@ -48,6 +50,7 @@ public class TripTimeOnDateRequest {
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
     CancellationPolicy cancellationPolicy,
+    FilterValues<TimePeriod> includeCallTimePeriods,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
@@ -64,6 +67,7 @@ public class TripTimeOnDateRequest {
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
     this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
+    this.includeCallTimePeriods = includeCallTimePeriods;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
@@ -108,6 +112,16 @@ public class TripTimeOnDateRequest {
 
   public CancellationPolicy cancellationPolicy() {
     return cancellationPolicy;
+  }
+
+  /**
+   * Limit the returned output to the defined periods of time based on when the vehicle is
+   * scheduled to visit the stop. At least one of the periods has to overlap with the visit at the
+   * stop, which lasts from the scheduled arrival at the stop until the scheduled departure from
+   * it.
+   */
+  public FilterValues<TimePeriod> includeCallTimePeriods() {
+    return includeCallTimePeriods;
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {

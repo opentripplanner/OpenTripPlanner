@@ -34,7 +34,7 @@ public class MoreThanTwoIntersectionsTest {
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
-    var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(4);
     var elevatorHopVertices = graph
       .getVerticesOfType(ElevatorHopVertex.class)

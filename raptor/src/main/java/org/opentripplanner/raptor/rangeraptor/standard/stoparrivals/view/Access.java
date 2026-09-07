@@ -12,7 +12,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 final class Access<T extends RaptorTripSchedule>
   extends StopArrivalViewAdapter<T>
-  implements AccessPathView {
+  implements AccessPathView
+{
 
   private final int arrivalTime;
   private final RaptorAccessEgress access;

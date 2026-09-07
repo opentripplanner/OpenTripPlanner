@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -27,7 +27,7 @@ public class RouteRequestMapper {
 
   public static RouteRequest toRouteRequest(
     DataFetchingEnvironment environment,
-    GraphQLRequestContext context
+    GtfsGraphQLRequestContext context
   ) {
     var request = context.defaultRouteRequest().copyOf();
     var args = new GraphQLTypes.GraphQLQueryTypePlanConnectionArgs(environment.getArguments());

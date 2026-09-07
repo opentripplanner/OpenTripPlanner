@@ -528,26 +528,22 @@ class LinkingContextFactoryTest {
   }
 
   private boolean outgoingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
-    return edges
-      .stream()
-      .anyMatch(outgoing ->
-        outgoing
-          .getToVertex()
-          .getOutgoingStreetEdges()
-          .stream()
-          .anyMatch(edge -> edge.canTraverse(mode))
-      );
+    return edges.stream().anyMatch(outgoing ->
+      outgoing
+        .getToVertex()
+        .getOutgoingStreetEdges()
+        .stream()
+        .anyMatch(edge -> edge.canTraverse(mode))
+    );
   }
 
   private boolean incomingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
-    return edges
-      .stream()
-      .anyMatch(incoming ->
-        incoming
-          .getFromVertex()
-          .getIncomingStreetEdges()
-          .stream()
-          .anyMatch(edge -> edge.canTraverse(mode))
-      );
+    return edges.stream().anyMatch(incoming ->
+      incoming
+        .getFromVertex()
+        .getIncomingStreetEdges()
+        .stream()
+        .anyMatch(edge -> edge.canTraverse(mode))
+    );
   }
 }

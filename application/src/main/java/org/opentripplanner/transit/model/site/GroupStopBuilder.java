@@ -67,8 +67,10 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public GroupStopBuilder addLocation(StopLocation location) {
     if (
-      !(location.getStopType() == StopType.REGULAR ||
-        location.getStopType() == StopType.FLEXIBLE_AREA)
+      !(
+        location.getStopType() == StopType.REGULAR ||
+        location.getStopType() == StopType.FLEXIBLE_AREA
+      )
     ) {
       throw new RuntimeException(
         String.format(

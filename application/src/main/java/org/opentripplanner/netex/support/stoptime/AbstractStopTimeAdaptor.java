@@ -14,7 +14,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 abstract sealed class AbstractStopTimeAdaptor
   implements StopTimeAdaptor
-  permits AreaStopTimeAdaptor, RegularStopTimeAdaptor {
+  permits AreaStopTimeAdaptor, RegularStopTimeAdaptor
+{
 
   private final TimetabledPassingTime timetabledPassingTime;
 

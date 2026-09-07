@@ -10,7 +10,7 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.process.internal.RequestScope;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -21,7 +21,7 @@ class DaggerToJerseyBridgeTest {
     Supplier<RequestScopedFactory> factorySupplier = () -> {
       RequestScopedFactory factory = mock(RequestScopedFactory.class);
       when(factory.transitService()).thenReturn(mock(TransitService.class));
-      when(factory.createServerContext()).thenReturn(mock(OtpServerRequestContext.class));
+      when(factory.routingService()).thenReturn(mock(RoutingService.class));
       return factory;
     };
 
@@ -37,12 +37,12 @@ class DaggerToJerseyBridgeTest {
       factoryFromRequestA[0] = factory;
 
       TransitService expectedTs = factory.transitService();
-      OtpServerRequestContext expectedCtx = factory.createServerContext();
+      RoutingService expectedRoutingService = factory.routingService();
 
       TransitService ts = im.getInstance(TransitService.class);
-      OtpServerRequestContext ctx = im.getInstance(OtpServerRequestContext.class);
+      RoutingService routingService = im.getInstance(RoutingService.class);
       assertSame(expectedTs, ts);
-      assertSame(expectedCtx, ctx);
+      assertSame(expectedRoutingService, routingService);
 
       assertSame(factory, im.getInstance(RequestScopedFactory.class));
     });

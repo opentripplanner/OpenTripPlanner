@@ -126,9 +126,9 @@ class LuceneIndexTest {
     transitRepository.index();
     var transitService = new DefaultTransitService(transitRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
-          StopLocation,
-          TransitMode
-        >builder()
+        StopLocation,
+        TransitMode
+      >builder()
         .putAll(WESTHAFEN, FERRY, BUS)
         .build();
 

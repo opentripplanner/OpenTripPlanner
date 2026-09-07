@@ -41,6 +41,8 @@ config:
     RouteType: org.opentripplanner.apis.gtfs.model.RouteTypeModel#RouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType#GraphQLAlertCauseType
+    AlertConnection: org.opentripplanner.framework.graphql.CountedConnection#CountedConnection<TransitAlert>
+    AlertEdge: graphql.relay.Edge#Edge<TransitAlert>
     AlertEffectType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType#GraphQLAlertEffectType
     AlertSeverityLevelType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType#GraphQLAlertSeverityLevelType
     BikePark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
@@ -147,4 +149,5 @@ config:
     CanceledTripsSummaryPattern: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryPattern#CanceledTripsSummaryPattern
     CanceledTripsSummaryRoute: org.opentripplanner.apis.gtfs.model.CanceledTripsSummaryRoute#CanceledTripsSummaryRoute
     Notice: org.opentripplanner.transit.model.basic.Notice
+    OffsetDateTimeRange: org.opentripplanner.apis.gtfs.model.OffsetDateTimeRange#OffsetDateTimeRange
     RealTimeTripState: org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel#RealTimeTripStateModel

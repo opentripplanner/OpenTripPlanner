@@ -55,14 +55,12 @@ record TestCase(
         .append(fromAToB ? " to " : " and ")
         .append(stopIndexToName(stopIndexB));
     }
-    buf
-      .append(". ")
-      .append(
-        points
-          .stream()
-          .map(p -> p.toString(this::stopIndexToName))
-          .toList()
-      );
+    buf.append(". ").append(
+      points
+        .stream()
+        .map(p -> p.toString(this::stopIndexToName))
+        .toList()
+    );
     return buf.toString();
   }
 

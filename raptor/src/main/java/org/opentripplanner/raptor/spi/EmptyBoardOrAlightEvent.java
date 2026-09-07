@@ -2,8 +2,9 @@ package org.opentripplanner.raptor.spi;
 
 import org.opentripplanner.utils.time.TimeUtils;
 
-record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime) implements
-  RaptorBoardOrAlightEvent<T> {
+record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(
+  int earliestBoardTime
+) implements RaptorBoardOrAlightEvent<T> {
   @Override
   public int tripScheduleIndex() {
     return RaptorConstants.NOT_FOUND;

@@ -12,7 +12,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
  * This class maps a GraphQL viaTrip query into a {@link RouteViaRequest}
@@ -34,8 +33,7 @@ public class ViaRequestMapper {
    */
   public RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    OtpServerRequestContext serverContext = context.getServerContext();
-    RouteRequest request = serverContext.defaultRouteRequest();
+    RouteRequest request = context.getDefaultRouteRequest();
 
     List<Map<String, Object>> viaInput = environment.getArgument("via");
     List<ViaLocationDeprecated> vias = viaInput

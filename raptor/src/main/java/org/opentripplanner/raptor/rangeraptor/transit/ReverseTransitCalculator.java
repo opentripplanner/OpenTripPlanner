@@ -10,7 +10,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 public class ReverseTransitCalculator<T extends RaptorTripSchedule>
   extends ReverseTimeCalculator
-  implements TransitCalculator<T> {
+  implements TransitCalculator<T>
+{
 
   @Override
   public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {

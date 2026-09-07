@@ -59,7 +59,7 @@ class NewTripHandler {
     if (transitService.getScheduledTrip(tripUpdate.tripId()) != null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_ALREADY_EXISTS);
     }
-    var serviceId = transitService.getOrCreateServiceIdForDate(tripUpdate.startDate());
+    var serviceId = buffer.getOrCreateServiceIdForDate(tripUpdate.startDate());
     if (serviceId == null) {
       throw UpdateException.of(tripUpdate.tripId(), OUTSIDE_SERVICE_PERIOD);
     }

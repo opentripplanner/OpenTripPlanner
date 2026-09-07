@@ -11,8 +11,8 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
  * <p/>
  * This class is immutable and thread safe.
  */
-public final class DefaultCostCalculator<T extends DefaultTripSchedule>
-  implements RaptorCostCalculator<T> {
+public final class DefaultCostCalculator<T extends DefaultTripSchedule> implements
+  RaptorCostCalculator<T> {
 
   private final int boardCostOnly;
   private final int transferCostOnly;
@@ -47,9 +47,10 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     this.boardAndTransferCost = transferCostOnly + boardCostOnly;
     this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
 
-    this.transitFactors = transitReluctanceFactors == null
-      ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
-      : new IndexBasedFactorStrategy(transitReluctanceFactors);
+    this.transitFactors =
+      transitReluctanceFactors == null
+        ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
+        : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }

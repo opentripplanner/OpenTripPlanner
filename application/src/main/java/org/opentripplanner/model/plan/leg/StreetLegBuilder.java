@@ -1,16 +1,13 @@
 package org.opentripplanner.model.plan.leg;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 
 public class StreetLegBuilder {
@@ -28,7 +25,6 @@ public class StreetLegBuilder {
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
-  private Set<StreetNote> streetNotes = new HashSet<>();
   private Float accessibilityScore;
   private Emission emissionPerPerson;
 
@@ -48,7 +44,6 @@ public class StreetLegBuilder {
     this.walkingBike = leg.walkingBike();
     this.rentedVehicle = leg.rentedVehicle();
     this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
-    this.streetNotes = Set.copyOf(leg.listStreetNotes());
     this.accessibilityScore = leg.accessibilityScore();
     this.emissionPerPerson = leg.emissionPerPerson();
   }
@@ -111,10 +106,6 @@ public class StreetLegBuilder {
 
   public Float getAccessibilityScore() {
     return accessibilityScore;
-  }
-
-  public Set<StreetNote> getStreetNotes() {
-    return streetNotes;
   }
 
   public Emission emissionPerPerson() {
@@ -183,11 +174,6 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withVehicleRentalNetwork(String vehicleRentalNetwork) {
     this.vehicleRentalNetwork = vehicleRentalNetwork;
-    return this;
-  }
-
-  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
-    streetNotes = notes;
     return this;
   }
 

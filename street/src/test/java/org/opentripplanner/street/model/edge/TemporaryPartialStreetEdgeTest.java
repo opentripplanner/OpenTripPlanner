@@ -58,7 +58,6 @@ public class TemporaryPartialStreetEdgeTest {
       e1.getDistanceMeters()
     );
 
-    assertTrue(pEdge.isEquivalentTo(e1));
     assertFalse(pEdge.isBack());
     assertFalse(pEdge.isReverseOf(e1));
     assertTrue(pEdge.isReverseOf(e1Reverse));

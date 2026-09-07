@@ -33,26 +33,24 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
     Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
-    transitRepository
-      .getAllTripPatterns()
-      .forEach(pattern -> {
-        var timeShift = agencyShift.computeIfAbsent(
-          pattern.getRoute().getAgency().getTimezone(),
-          zoneId ->
-            (graphOffset.minusSeconds(zoneId.getRules().getOffset(serviceStart).getTotalSeconds()))
-        );
+    transitRepository.getAllTripPatterns().forEach(pattern -> {
+      var timeShift = agencyShift.computeIfAbsent(
+        pattern.getRoute().getAgency().getTimezone(),
+        zoneId ->
+          graphOffset.minusSeconds(zoneId.getRules().getOffset(serviceStart).getTotalSeconds())
+      );
 
-        if (timeShift.isZero()) {
-          return;
-        }
+      if (timeShift.isZero()) {
+        return;
+      }
 
-        TripPattern updatedPattern = pattern
-          .copy()
-          .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
-          .build();
-        // replace the original pattern with the updated pattern in the transit model
-        transitRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
-      });
+      TripPattern updatedPattern = pattern
+        .copy()
+        .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
+        .build();
+      // replace the original pattern with the updated pattern in the transit model
+      transitRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
+    });
     transitRepository.index();
   }
 }

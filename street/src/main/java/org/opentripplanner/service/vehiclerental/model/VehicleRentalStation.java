@@ -350,7 +350,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       isReturning == that.isReturning &&
       overloadingAllowed == that.overloadingAllowed &&
       isArrivingInRentalVehicleAtDestinationAllowed ==
-      that.isArrivingInRentalVehicleAtDestinationAllowed &&
+        that.isArrivingInRentalVehicleAtDestinationAllowed &&
       realTimeData == that.realTimeData &&
       Objects.equals(id, that.id) &&
       Objects.equals(name, that.name) &&

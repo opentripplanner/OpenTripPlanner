@@ -220,7 +220,9 @@ public class DebugVectorTilesResource {
         layerParameters,
         locale,
         // There are not many GroupStops, so we can just list them all.
-        context.transitService().listGroupStops()
+        context
+          .transitService()
+          .listGroupStops()
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(
         context.vehicleRentalService(),
