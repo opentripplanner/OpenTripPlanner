@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -67,9 +66,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -167,31 +163,9 @@ class RealtimeResolverTest {
     UpdateResult updateResult = siri.applyEstimatedTimetable(updates);
     assertEquals(1, updateResult.successful());
 
-    ZonedDateTime busStartTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip1.tripTimes().getDepartureTime(0),
-      TRANSIT_ENV.timeZone()
-    );
-    ZonedDateTime busEndTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip1.tripTimes().getDepartureTime(1),
-      TRANSIT_ENV.timeZone()
-    );
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
 
-    ZonedDateTime trainStartTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip2.tripTimes().getDepartureTime(0),
-      TRANSIT_ENV.timeZone()
-    );
-    ZonedDateTime trainEndTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip2.tripTimes().getDepartureTime(1),
-      TRANSIT_ENV.timeZone()
-    );
-
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, busStartTime, busEndTime);
-
-    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, trainStartTime, trainEndTime);
+    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
 
     Place from = Place.normal(VB.vertex, VB.vertex.getName());
     Place to = Place.normal(VC.vertex, VC.vertex.getName());
@@ -200,8 +174,8 @@ class RealtimeResolverTest {
       .withFrom(from)
       .withMode(TraverseMode.WALK)
       .withTo(to)
-      .withStartTime(busEndTime.plusMinutes(1))
-      .withEndTime(busEndTime.plusMinutes(10))
+      .withStartTime(busLeg.startTime().plusMinutes(1))
+      .withEndTime(busLeg.endTime().plusMinutes(10))
       .withGeneralizedCost(Cost.ZERO.toSeconds())
       .withDistanceMeters(500)
       .build();
@@ -234,30 +208,9 @@ class RealtimeResolverTest {
   void testPopulateLegsWithRealtime() {
     TripOnDateDataFetcher trip5 = TRANSIT_ENV.tripData("trip5");
     TripOnDateDataFetcher trip6 = TRANSIT_ENV.tripData("trip6");
-    ZonedDateTime busOneStartTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip5.tripTimes().getDepartureTime(0),
-      TRANSIT_ENV.timeZone()
-    );
-    ZonedDateTime busOneEndTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip5.tripTimes().getDepartureTime(1),
-      TRANSIT_ENV.timeZone()
-    );
 
-    ZonedDateTime busTwoStartTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip6.tripTimes().getDepartureTime(0),
-      TRANSIT_ENV.timeZone()
-    );
-    ZonedDateTime busTwoEndTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip6.tripTimes().getDepartureTime(1),
-      TRANSIT_ENV.timeZone()
-    );
-
-    ScheduledTransitLeg busOneLeg = buildScheduledTransitLeg(trip5, busOneStartTime, busOneEndTime);
-    ScheduledTransitLeg busTwoLeg = buildScheduledTransitLeg(trip6, busTwoStartTime, busTwoEndTime);
+    ScheduledTransitLeg busOneLeg = buildScheduledTransitLeg(trip5, 0, 1);
+    ScheduledTransitLeg busTwoLeg = buildScheduledTransitLeg(trip6, 0, 1);
 
     var itinerary = Itinerary.ofScheduledTransit(List.of(busOneLeg, busTwoLeg))
       .withGeneralizedCost(Cost.ZERO)
@@ -307,21 +260,9 @@ class RealtimeResolverTest {
   @Test
   void testPopulateLegsWithRealtimeNonTransit() {
     // Test walk leg and transit leg that doesn't have a corresponding realtime leg
-
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
 
-    ZonedDateTime busStartTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip1.tripTimes().getDepartureTime(0),
-      TRANSIT_ENV.timeZone()
-    );
-    ZonedDateTime busEndTime = TimeUtils.zonedDateTime(
-      SERVICE_DATE,
-      trip1.tripTimes().getDepartureTime(1),
-      TRANSIT_ENV.timeZone()
-    );
-
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, busStartTime, busEndTime);
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
 
     Place from = Place.normal(VB.vertex, VB.vertex.getName());
     Place to = Place.normal(VC.vertex, VC.vertex.getName());
@@ -331,8 +272,8 @@ class RealtimeResolverTest {
       .withMode(TraverseMode.WALK)
       .withTo(to)
       .withDistanceMeters(300)
-      .withStartTime(busEndTime.plusMinutes(1))
-      .withEndTime(busEndTime.plusMinutes(10))
+      .withStartTime(busLeg.endTime().plusMinutes(1))
+      .withEndTime(busLeg.endTime().plusMinutes(10))
       .withGeneralizedCost(Cost.ZERO.toSeconds())
       .withDistanceMeters(500)
       .build();
@@ -405,33 +346,22 @@ class RealtimeResolverTest {
       .collect(Collectors.toList());
   }
 
-  private static TransitService makeTransitService(
-    List<TripPattern> patterns,
-    LocalDate serviceDate
-  ) {
-    var transitRepository = new TransitRepository();
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-
-    patterns.forEach(pattern -> {
-      transitRepository.addTripPattern(pattern.getId(), pattern);
-
-      var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
-      transitRepository.getServiceCodes().put(pattern.getId(), serviceCode);
-
-      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
-    });
-
-    transitRepository.updateCalendarServiceData(calendarServiceData);
-    transitRepository.index();
-
-    return new DefaultTransitService(transitRepository);
-  }
-
   private ScheduledTransitLeg buildScheduledTransitLeg(
     TripOnDateDataFetcher trip,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime
+    int boardPos,
+    int alightPos
   ) {
+    ZonedDateTime startTime = TimeUtils.zonedDateTime(
+      SERVICE_DATE,
+      trip.scheduledTripTimes().getDepartureTime(boardPos),
+      TRANSIT_ENV.timeZone()
+    );
+
+    ZonedDateTime endTime = TimeUtils.zonedDateTime(
+      SERVICE_DATE,
+      trip.scheduledTripTimes().getDepartureTime(alightPos),
+      TRANSIT_ENV.timeZone()
+    );
     return ScheduledTransitLeg.of()
       .withTripTimes(trip.scheduledTripTimes())
       .withTripPattern(trip.tripPattern())
@@ -439,8 +369,8 @@ class RealtimeResolverTest {
       .withEndTime(endTime)
       .withServiceDate(SERVICE_DATE)
       .withZoneId(TRANSIT_ENV.timeZone())
-      .withBoardStopIndexInPattern(0)
-      .withAlightStopIndexInPattern(1)
+      .withBoardStopIndexInPattern(boardPos)
+      .withAlightStopIndexInPattern(alightPos)
       .withGeneralizedCost(Cost.ZERO.toSeconds())
       .build();
   }

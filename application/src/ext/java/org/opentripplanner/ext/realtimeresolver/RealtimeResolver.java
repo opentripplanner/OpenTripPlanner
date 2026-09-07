@@ -2,6 +2,7 @@ package org.opentripplanner.ext.realtimeresolver;
 
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -49,8 +50,8 @@ public class RealtimeResolver {
       .filter(Objects::nonNull)
       .toList();
 
-    GenericLocation fromLocation = getWalkingLocation(itinerary.legs().getFirst(), true);
-    GenericLocation toLocation = getWalkingLocation(itinerary.legs().getLast(), false);
+    GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
+    GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
 
     Itinerary itinerary1 = refetchItineraryService.refetchItinerary(
       fromLocation,
@@ -61,8 +62,9 @@ public class RealtimeResolver {
     return itinerary1;
   }
 
-  private GenericLocation getWalkingLocation(Leg leg, boolean from) {
-    if (!leg.isWalkingLeg()) {
+  @Nullable
+  private GenericLocation getStreetLocation(Leg leg, boolean from) {
+    if (!leg.isStreetLeg()) {
       return null;
     }
 
