@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithOpDay;
@@ -503,20 +504,17 @@ class DayTypeAssignmentMapperTest {
     periods.add(createUicOperatingPeriod(OP_1, null, D2020_11_03, "101"));
     assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
 
-    var issueStore = new DefaultDataImportIssueStore();
-    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-      dayTypes,
-      assignments,
-      EMPTY_OPERATING_DAYS,
-      periods,
-      issueStore
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      DayTypeAssignmentMapper.mapDayTypes(
+        dayTypes,
+        assignments,
+        EMPTY_OPERATING_DAYS,
+        periods,
+        null
+      )
     );
 
-    assertEquals("[]", toStr(result, DAY_TYPE_1));
-
-    assertThat(issueStore.listIssues().stream().map(Object::toString)).contains(
-      "Issue{type: 'InvalidUicOperatingPeriod', message: 'Missing start date for UIC operating period OP-1'}"
-    );
+    assertThat(ex).hasMessageThat().isEqualTo("Missing start date for operating period OP-1");
   }
 
   /* private helper methods */
