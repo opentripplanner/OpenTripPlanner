@@ -1,11 +1,8 @@
 package org.opentripplanner.standalone.configure;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.standalone.configure.DaggerBindingKey.of;
 
 import graphql.schema.GraphQLSchema;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
@@ -58,38 +55,39 @@ class ConstructApplicationFactoryIntegrationTest {
   /** Correctly scoped as application-wide singletons today. */
   private static final List<DaggerBindingKey> SINGLETONS = List.of(
     of(ConfigModel.class),
-    of(RaptorConfig.class),
-    of(Graph.class),
-    of(TransitRepository.class),
-    of(TransferRepository.class),
-    of(WorldEnvelopeRepository.class),
-    of(WorldEnvelopeService.class),
-    of(RepositoryHandle.class),
-    of(VehicleRentalRepository.class),
-    of(VehicleRentalService.class),
-    of(VehicleParkingRepository.class),
-    of(VehicleParkingService.class),
-    of(UpdateManager.class, TransitDomain.class),
-    of(UpdateManager.class, StreetDomain.class),
     of(DataImportIssueSummary.class),
-    of(CarpoolingService.class),
-    of(CarpoolingRepository.class),
-    of(CarpoolTripVertexResolver.class),
-    of(EmissionRepository.class),
-    of(StreetDetailsRepository.class),
-    of(EmpiricalDelayRepository.class),
+    of(DeduplicatorService.class),
     of(DelegatingTransitAlertServiceImpl.class),
-    of(StopConsolidationRepository.class),
-    of(StreetRepository.class),
-    of(SorlandsbanenNorwayService.class),
-    of(TransitService.class, StaticTransitService.class),
+    of(FareServiceFactory.class),
+    of(Graph.class),
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
-    of(LuceneIndex.class),
-    of(FareServiceFactory.class),
-    of(DeduplicatorService.class),
+    of(MetricsLogging.class),
+    of(RaptorConfig.class),
+    of(RepositoryHandle.class),
+    of(StreetDetailsRepository.class),
+    of(StreetRepository.class),
+    of(TransferRepository.class),
+    of(TransitRepository.class),
+    of(TransitService.class, StaticTransitService.class),
+    of(UpdateManager.class, StreetDomain.class),
+    of(UpdateManager.class, TransitDomain.class),
+    of(VehicleParkingRepository.class),
+    of(VehicleParkingService.class),
+    of(VehicleRentalRepository.class),
+    of(VehicleRentalService.class),
     of(WarmupLauncher.class),
-    of(MetricsLogging.class)
+    of(WorldEnvelopeRepository.class),
+    of(WorldEnvelopeService.class),
+    // Sandbox
+    of(CarpoolingRepository.class),
+    of(CarpoolingService.class),
+    of(CarpoolTripVertexResolver.class),
+    of(EmissionRepository.class),
+    of(EmpiricalDelayRepository.class),
+    of(LuceneIndex.class),
+    of(SorlandsbanenNorwayService.class),
+    of(StopConsolidationRepository.class)
   );
 
   /**
@@ -108,53 +106,14 @@ class ConstructApplicationFactoryIntegrationTest {
   );
 
   @Test
-  void everyExposedServiceHasTheExpectedScope() throws ReflectiveOperationException {
+  void everyExposedServiceHasTheExpectedScope() {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
-    var accessors = List.of(ConstructApplicationFactory.class.getDeclaredMethods())
-      .stream()
-      .filter(method -> method.getParameterCount() == 0)
-      .toList();
-
-    var unclassified = accessors
-      .stream()
-      .map(DaggerBindingKey::ofAccessor)
-      .filter(
-        key ->
-          !SINGLETONS.contains(key) &&
-          !KNOWN_UNSCOPED_BUGS.contains(key) &&
-          !PROTOTYPE_BY_DESIGN.contains(key)
-      )
-      .toList();
-
-    assertWithMessage(
-      "Every accessor on %s must be classified into SINGLETONS, KNOWN_UNSCOPED_BUGS or " +
-        "PROTOTYPE_BY_DESIGN, but these are not: %s",
-      ConstructApplicationFactory.class.getSimpleName(),
-      unclassified
-    )
-      .that(unclassified)
-      .isEmpty();
-
-    var failures = new ArrayList<String>();
-    for (var method : accessors) {
-      var key = DaggerBindingKey.ofAccessor(method);
-      var first = method.invoke(factory);
-      var second = method.invoke(factory);
-
-      if (SINGLETONS.contains(key) && first != second) {
-        failures.add(method.getName() + "() should be an application singleton but was rebuilt");
-      } else if (KNOWN_UNSCOPED_BUGS.contains(key) && first == second) {
-        failures.add(
-          method.getName() +
-            "() is listed in KNOWN_UNSCOPED_BUGS but now returns a stable instance — move " +
-            key +
-            " to SINGLETONS"
-        );
-      } else if (PROTOTYPE_BY_DESIGN.contains(key) && first == second) {
-        failures.add(method.getName() + "() should build a fresh instance every call");
-      }
-    }
-
-    assertThat(failures).isEmpty();
+    DaggerScopeAssertions.assertSingleInstanceScope(
+      ConstructApplicationFactory.class,
+      factory,
+      SINGLETONS,
+      KNOWN_UNSCOPED_BUGS,
+      PROTOTYPE_BY_DESIGN
+    );
   }
 }

@@ -1,11 +1,9 @@
 package org.opentripplanner.standalone.configure;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.standalone.configure.DaggerBindingKey.of;
 
 import graphql.schema.GraphQLSchema;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
@@ -37,43 +35,42 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Verifies the real Dagger scoping added for bindings inside the {@link RequestScopedFactory}.
+ * Verifies the Dagger scoping of bindings exposed by {@link RequestScopedFactory}, built through
+ * the real production {@link ConstructApplicationFactory}.
  * <p>
- * This test builds the real production {@link ConstructApplicationFactory}. That way every real
- * module (including the ones outside {@link RequestScopedModule} itself) is actually exercised
- * through Dagger, not substituted with a hand-built instance.
- * <p>
- * This test reflects over every no-arg accessor on {@link RequestScopedFactory} and checks it has
- * the DI scope its binding is supposed to have. Every accessor's binding (return type plus
- * qualifier annotation, if any) must be classified into exactly one of the three lists below; an
- * unclassified accessor fails the test.
+ * Every accessor's binding (including qualifier, if any) must be classified into exactly one of the
+ * lists below; an unclassified accessor fails the test.
  */
 class RequestScopedFactoryIntegrationTest {
 
   /**
-   * Application-wide singletons, just exposed through the request scope for convenience: same
+   * Application-wide singletons, just exposed through the request scope for convenience: the same
    * instance within one request, and the same instance across two independent requests.
    */
   private static final List<DaggerBindingKey> APPLICATION_SINGLETON = List.of(
-    of(Graph.class),
-    of(GraphQLSchema.class, GtfsSchema.class),
-    of(GraphQLSchema.class, TransmodelSchema.class),
-    of(VehicleRentalService.class),
-    of(VehicleParkingService.class),
-    of(TransitAlertService.class),
-    of(RouteRequest.class),
     of(DebugUiConfig.class),
     of(FareService.class),
-    of(RegularTransferService.class),
-    of(LuceneIndex.class),
-    of(VectorTileConfig.class),
+    of(Graph.class),
+    // Unqualified: GtfsGraphQLRequestContext#schema() needs no qualifier to disambiguate, since
+    // the context is already GTFS-specific, but it's the exact same binding as GraphQLSchema
+    // below.
+    of(GraphQLSchema.class, GtfsSchema.class),
+    of(GraphQLSchema.class, TransmodelSchema.class),
     of(GtfsApiParameters.class),
+    of(RegularTransferService.class),
+    of(RouteRequest.class),
+    of(TransitAlertService.class),
     of(TransmodelAPIParameters.class),
-    of(OjpApiParameters.class),
-    of(TriasApiParameters.class),
+    of(VectorTileConfig.class),
+    of(VehicleParkingService.class),
+    of(VehicleRentalService.class),
     of(WorldEnvelopeService.class),
+    // Sandbox
     // Nullable and off by default in this test's config, so both requests observe null.
-    of(EmpiricalDelayService.class)
+    of(EmpiricalDelayService.class),
+    of(LuceneIndex.class),
+    of(OjpApiParameters.class),
+    of(TriasApiParameters.class)
   );
 
   /**
@@ -81,11 +78,11 @@ class RequestScopedFactoryIntegrationTest {
    * instance across two independent request builds.
    */
   private static final List<DaggerBindingKey> REQUEST_SCOPED = List.of(
+    of(GtfsGraphQLRequestContext.class),
+    of(RealtimeVehicleService.class),
+    of(RoutingService.class),
     of(TransactionScope.class),
     of(TransitService.class),
-    of(RoutingService.class),
-    of(RealtimeVehicleService.class),
-    of(GtfsGraphQLRequestContext.class),
     of(TransmodelGraphQLRequestContext.class)
   );
 
@@ -95,106 +92,47 @@ class RequestScopedFactoryIntegrationTest {
    * fixed.
    */
   private static final List<DaggerBindingKey> KNOWN_UNSCOPED_BUGS = List.of(
-    of(StreetDetailsService.class),
     of(LinkingContextFactory.class),
+    of(StreetDetailsService.class),
     of(StreetLimitationParametersService.class)
   );
 
+  /** Nothing exposed directly by {@link RequestScopedFactory} is a hand-memoized, non-Dagger value. */
+  private static final List<DaggerBindingKey> IGNORED = List.of();
+
+  /**
+   * Guards against the #7441 regression: a binding reached through a nested consumer ({@link
+   * GtfsGraphQLRequestContext}) must resolve to the same shared instance as the direct accessor
+   * on {@link RequestScopedFactory}, which is all the scope check below covers.
+   */
   @Test
-  void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
+  void nestedConsumersShareTheSameInstancesAsDirectAccessors() {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
 
     var requestOne = factory.requestScopedFactoryBuilder().build();
-    assertThat(requestOne.transitService()).isSameInstanceAs(requestOne.transitService());
-    assertThat(requestOne.transactionScope()).isSameInstanceAs(requestOne.transactionScope());
-    assertThat(requestOne.gtfsRequestContext()).isSameInstanceAs(requestOne.gtfsRequestContext());
     assertThat(requestOne.gtfsRequestContext().transitService()).isSameInstanceAs(
       requestOne.transitService()
     );
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
-    assertThat(requestOne.transitService()).isNotSameInstanceAs(requestTwo.transitService());
-    assertThat(requestOne.gtfsRequestContext()).isNotSameInstanceAs(
-      requestTwo.gtfsRequestContext()
-    );
     assertThat(requestOne.gtfsRequestContext().schema()).isSameInstanceAs(
       requestTwo.gtfsRequestContext().schema()
-    );
-    assertThat(requestOne.transmodelGraphQLSchema()).isSameInstanceAs(
-      requestTwo.transmodelGraphQLSchema()
     );
   }
 
   @Test
-  void everyExposedServiceHasTheExpectedScope() throws ReflectiveOperationException {
+  void everyExposedServiceHasTheExpectedScope() {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
-    var accessors = List.of(RequestScopedFactory.class.getDeclaredMethods())
-      .stream()
-      .filter(method -> method.getParameterCount() == 0)
-      .toList();
-
-    var unclassified = accessors
-      .stream()
-      .map(DaggerBindingKey::ofAccessor)
-      .filter(
-        key ->
-          !APPLICATION_SINGLETON.contains(key) &&
-          !REQUEST_SCOPED.contains(key) &&
-          !KNOWN_UNSCOPED_BUGS.contains(key)
-      )
-      .toList();
-
-    assertWithMessage(
-      "Every accessor on %s must be classified into APPLICATION_SINGLETON, REQUEST_SCOPED or " +
-        "KNOWN_UNSCOPED_BUGS, but these are not: %s",
-      RequestScopedFactory.class.getSimpleName(),
-      unclassified
-    )
-      .that(unclassified)
-      .isEmpty();
-
     var requestOne = factory.requestScopedFactoryBuilder().build();
     var requestTwo = factory.requestScopedFactoryBuilder().build();
-    var failures = new ArrayList<String>();
-
-    for (var method : accessors) {
-      var key = DaggerBindingKey.ofAccessor(method);
-      var withinRequestFirst = method.invoke(requestOne);
-      var withinRequestSecond = method.invoke(requestOne);
-      var acrossRequests = method.invoke(requestTwo);
-
-      if (KNOWN_UNSCOPED_BUGS.contains(key)) {
-        if (withinRequestFirst == withinRequestSecond) {
-          failures.add(
-            method.getName() +
-              "() is listed in KNOWN_UNSCOPED_BUGS but is now stable within one request — " +
-              "reclassify " +
-              key
-          );
-        }
-        continue;
-      }
-
-      if (withinRequestFirst != withinRequestSecond) {
-        failures.add(method.getName() + "() should be cached within one request but was rebuilt");
-        continue;
-      }
-
-      if (APPLICATION_SINGLETON.contains(key) && withinRequestFirst != acrossRequests) {
-        failures.add(
-          method.getName() + "() should be stable across requests but differed across requests"
-        );
-      } else if (REQUEST_SCOPED.contains(key) && withinRequestFirst == acrossRequests) {
-        failures.add(
-          method.getName() +
-            "() is listed as REQUEST_SCOPED but returned the same instance across two " +
-            "independent requests — move " +
-            key +
-            " to APPLICATION_SINGLETON"
-        );
-      }
-    }
-
-    assertThat(failures).isEmpty();
+    DaggerScopeAssertions.assertRequestScope(
+      RequestScopedFactory.class,
+      requestOne,
+      requestTwo,
+      APPLICATION_SINGLETON,
+      REQUEST_SCOPED,
+      KNOWN_UNSCOPED_BUGS,
+      IGNORED
+    );
   }
 }
