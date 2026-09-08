@@ -53,13 +53,12 @@ public class RealtimeResolver {
     GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
     GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
 
-    Itinerary itinerary1 = refetchItineraryService.refetchItinerary(
+    return refetchItineraryService.refetchItinerary(
       fromLocation,
       toLocation,
       legReferences,
       routeRequest
     );
-    return itinerary1;
   }
 
   @Nullable
@@ -68,7 +67,7 @@ public class RealtimeResolver {
       return null;
     }
 
-    Place place = from ? leg.from() : leg.to();
+    var place = from ? leg.from() : leg.to();
 
     if (place.stop != null) {
       return GenericLocation.fromCoordinate(place.stop.getCoordinate());

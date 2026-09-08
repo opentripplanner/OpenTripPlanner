@@ -167,10 +167,10 @@ class RealtimeResolverTest {
 
     ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
 
-    Place from = Place.normal(VB.vertex, VB.vertex.getName());
-    Place to = Place.normal(VC.vertex, VC.vertex.getName());
+    var from = Place.normal(VB.vertex, VB.vertex.getName());
+    var to = Place.normal(VC.vertex, VC.vertex.getName());
 
-    StreetLeg walkLeg = StreetLeg.of()
+    var walkLeg = StreetLeg.of()
       .withFrom(from)
       .withMode(TraverseMode.WALK)
       .withTo(to)
