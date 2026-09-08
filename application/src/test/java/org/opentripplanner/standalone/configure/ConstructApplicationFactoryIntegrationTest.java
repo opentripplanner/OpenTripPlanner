@@ -82,6 +82,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(StopConsolidationRepository.class),
     of(StreetRepository.class),
     of(SorlandsbanenNorwayService.class),
+    of(TransitService.class, StaticTransitService.class),
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
     of(LuceneIndex.class),
@@ -97,7 +98,6 @@ class ConstructApplicationFactoryIntegrationTest {
   private static final List<DaggerBindingKey> KNOWN_UNSCOPED_BUGS = List.of(
     of(LinkingContextFactory.class),
     of(VertexLinker.class),
-    of(TransitService.class, StaticTransitService.class),
     of(MetricsLogging.class),
     of(ViaCoordinateTransferFactory.class)
   );
