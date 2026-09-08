@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.time.Duration.ofMinutes;
+import static java.time.Duration.ofSeconds;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -22,7 +23,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class AccessEgressPreferences implements Serializable {
 
   private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST =
-    createDefaultCarPenalty();
+    createDefaultAccessEgressPenalty();
 
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();
 
@@ -159,11 +160,15 @@ public final class AccessEgressPreferences implements Serializable {
     return DurationForEnum.of(StreetMode.class).withDefault(defaultValue).build();
   }
 
-  private static TimeAndCostPenaltyForEnum<StreetMode> createDefaultCarPenalty() {
+  private static TimeAndCostPenaltyForEnum<StreetMode> createDefaultAccessEgressPenalty() {
     var penaltyBuilder = TimeAndCostPenaltyForEnum.of(StreetMode.class);
 
     var flexDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(10), 1.3f), 1.3);
     penaltyBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
+
+    // 500 m of walking: 6m10s at the default walk speed, times the default walk reluctance
+    var carpoolDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofSeconds(370), 0f), 2.0);
+    penaltyBuilder.with(StreetMode.CARPOOL, carpoolDefaultPenalty);
 
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
