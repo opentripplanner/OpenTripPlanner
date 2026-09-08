@@ -113,6 +113,7 @@ public class GraphBuilderModules {
       .withIncludeInclinedEdgeLevelInfo(config.includeInclinedEdgeLevelInfo)
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
+      .withElevatorRefTags(config.elevatorRefTags)
       .withIncludeOsmStationEntrances(config.osmDefaults.includeOsmStationEntrances())
       .withCacheManager(cacheManager)
       .withIssueStore(issueStore)
