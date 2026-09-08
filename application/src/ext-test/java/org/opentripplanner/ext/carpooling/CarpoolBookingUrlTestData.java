@@ -7,8 +7,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * Shared booking-URL template and its expected expansion, for tests asserting that the carpool
  * booking URL has had the passenger's pickup/dropoff coordinates expanded into it. Centralised so
  * the production contract — the {@code {from}}/{@code {to}} placeholder spelling and the
- * {@code "latitude,longitude"} rendering at six decimals — is pinned down in one place that all
- * {@code CarpoolItineraryMapper} tests assert against.
+ * {@code "latitude,longitude"} rendering at six decimals — is pinned down in one place that the
+ * mapper and service tests assert against.
  * <p>
  * The query parameter names carrying the placeholders ({@code from_coordinate},
  * {@code to_coordinate}) are the provider's own choice and form no part of OTP's contract; they

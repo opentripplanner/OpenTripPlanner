@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expandedCoordinate;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
@@ -67,10 +66,6 @@ class CarpoolItineraryMapperTest {
 
   private static final WgsCoordinate PICKUP = new WgsCoordinate(59.910000, 10.750000);
   private static final WgsCoordinate DROPOFF = new WgsCoordinate(59.920000, 10.760000);
-
-  /** What {@code {from}} and {@code {to}} expand to for {@link #PICKUP} / {@link #DROPOFF}. */
-  private static final String PICKUP_COORD = expandedCoordinate(PICKUP);
-  private static final String DROPOFF_COORD = expandedCoordinate(DROPOFF);
 
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int PICKUP_POSITION = 1;
@@ -145,86 +140,6 @@ class CarpoolItineraryMapperTest {
     );
   }
 
-  /**
-   * A booking URL carrying neither placeholder is the provider declining to receive the
-   * passenger's coordinates, so the URL must reach the API byte-for-byte as published — no
-   * coordinate parameters invented on the provider's behalf, and no normalisation applied by the
-   * {@link java.net.URI} round-trip that validates it.
-   */
-  @Test
-  void urlWithoutPlaceholders_isPassedThroughUnchanged() {
-    var url = "https://book.example.com/trip/42?ref=foo#bookform";
-    var contact = ContactInfo.of().withBookingUrl(url).build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    assertEquals(EnumSet.of(BookingMethod.ONLINE), info.bookingMethods());
-    assertEquals(url, info.getContactInfo().getBookingUrl());
-  }
-
-  /**
-   * The two placeholders are independent: a provider wanting only the pickup publishes only
-   * {@code {from}}, and the rest of its URL — including a query that never mentions
-   * {@code {to}} — must survive untouched.
-   */
-  @Test
-  void urlWithOnlyFromPlaceholder_expandsItAndLeavesTheRestAlone() {
-    var contact = ContactInfo.of()
-      .withBookingUrl("https://book.example.com/trip/42?pickup={from}&ref=foo")
-      .build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    assertEquals(
-      "https://book.example.com/trip/42?pickup=" + PICKUP_COORD + "&ref=foo",
-      info.getContactInfo().getBookingUrl()
-    );
-  }
-
-  /**
-   * Placeholders are expanded wherever the provider puts them — path segment, query or fragment,
-   * a single-page booking app routing on the {@code #fragment} included — and at every
-   * occurrence, because expansion is a plain substitution on the published URL rather than a
-   * rebuild of the URI's components.
-   */
-  @Test
-  void placeholders_areExpandedInEveryComponentAndAtEveryOccurrence() {
-    var contact = ContactInfo.of()
-      .withBookingUrl("https://book.example.com/book/{from}/to/{to}?pickup={from}#at/{to}")
-      .build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    assertEquals(
-      "https://book.example.com/book/" +
-        PICKUP_COORD +
-        "/to/" +
-        DROPOFF_COORD +
-        "?pickup=" +
-        PICKUP_COORD +
-        "#at/" +
-        DROPOFF_COORD,
-      info.getContactInfo().getBookingUrl()
-    );
-  }
-
-  /**
-   * Placeholder names are case-sensitive, so {@code {From}} is not expanded and its leftover
-   * braces get the URL dropped along with {@link BookingMethod#ONLINE}, rather than handed to the
-   * user with a literal {@code {From}} in it.
-   */
-  @Test
-  void urlWithUnrecognisedPlaceholder_dropsUrl() {
-    var contact = ContactInfo.of()
-      .withBookingUrl("https://book.example.com/trip/42?pickup={From}")
-      .build();
-
-    assertNull(CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF));
-  }
-
   @Test
   void phoneAndUrl_addsBothMethodsAndOnlyRewritesUrl() {
     var contact = ContactInfo.of()
@@ -245,42 +160,6 @@ class CarpoolItineraryMapperTest {
       expectedExpandedUrl("https://book.example.com", PICKUP, DROPOFF),
       expanded.getBookingUrl()
     );
-  }
-
-  /**
-   * When the booking URL is unparseable, the URL is dropped from the contact and
-   * {@link BookingMethod#ONLINE} is removed from the booking methods rather than left in place
-   * pointing nowhere. If the contact carried only the (now-dropped) URL, no actionable booking
-   * method remains and {@code toBookingInfo} returns {@code null}, matching the
-   * "non-null return ⇒ at least one usable method" contract.
-   */
-  @Test
-  void malformedUrlOnly_returnsNull() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/has space").build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNull(info);
-  }
-
-  /**
-   * Same malformed-URL handling as {@link #malformedUrlOnly_returnsNull()} but with a phone
-   * number also present: the call-office method survives, the dropped URL is reflected as
-   * {@code null} on the returned contact, and {@code ONLINE} is absent from the booking methods.
-   */
-  @Test
-  void malformedUrlWithPhone_keepsCallOfficeAndDropsUrl() {
-    var contact = ContactInfo.of()
-      .withPhoneNumber("+4712345678")
-      .withBookingUrl("https://book.example.com/has space")
-      .build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    assertEquals(EnumSet.of(BookingMethod.CALL_OFFICE), info.bookingMethods());
-    assertEquals("+4712345678", info.getContactInfo().getPhoneNumber());
-    assertNull(info.getContactInfo().getBookingUrl());
   }
 
   /**

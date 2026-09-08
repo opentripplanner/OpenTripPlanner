@@ -102,9 +102,13 @@ Notes:
 - **Both placeholders are optional.** A URL containing neither is passed through unchanged, so a
   provider that does not want the passenger's coordinates simply publishes a plain URL.
 - **Names are case-sensitive.** `{From}` is not recognised, and since curly braces are not legal
-  URI characters, its leftover braces make the expanded URL unparseable — OTP then logs the
-  problem, drops the URL, and omits the `ONLINE` booking method rather than returning a link that
-  cannot be opened. The same applies to any booking URL that is not a valid URI once expanded.
+  URI characters, its leftover braces would make the expanded URL unparseable.
+
+#### Contact validation
+
+The booking URL of an incoming SIRI message is checked when the message is read: it must expand to
+a parseable URI. A URL that fails is logged and left off the trip; the trip itself is kept either
+way, and the booking information on the carpool leg advertises only the channels that survived.
 
 ## Features
 
