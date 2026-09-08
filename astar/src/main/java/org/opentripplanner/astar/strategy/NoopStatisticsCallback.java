@@ -7,8 +7,8 @@ import org.opentripplanner.astar.spi.StatisticsCallback;
 /**
  * A statistics callback that does nothing.
  */
-public class NoopStatisticsCallback<V extends AStarVertex<?, ?, ?>>
-  implements StatisticsCallback<V> {
+public class NoopStatisticsCallback<V extends AStarVertex<?, ?, ?>> implements
+  StatisticsCallback<V> {
 
   @Override
   public void searchStarted() {}

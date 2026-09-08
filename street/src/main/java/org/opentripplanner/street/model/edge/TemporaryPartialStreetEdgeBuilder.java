@@ -1,7 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
 public class TemporaryPartialStreetEdgeBuilder
-  extends StreetEdgeBuilder<TemporaryPartialStreetEdgeBuilder> {
+  extends StreetEdgeBuilder<TemporaryPartialStreetEdgeBuilder>
+{
 
   private StreetEdge parentEdge;
 

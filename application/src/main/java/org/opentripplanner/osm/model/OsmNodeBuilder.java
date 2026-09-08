@@ -2,6 +2,7 @@ package org.opentripplanner.osm.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.opentripplanner.osm.OsmProvider;
 
 public class OsmNodeBuilder {
@@ -47,8 +48,16 @@ public class OsmNodeBuilder {
     return this;
   }
 
+  /**
+   * Sets the tag map directly, without copying. The caller must not mutate the map afterwards.
+   */
+  public OsmNodeBuilder withTags(Map<String, String> tags) {
+    this.tags = tags;
+    return this;
+  }
+
   public OsmNodeBuilder withOsmProvider(OsmProvider osmProvider) {
-    this.osmProvider = osmProvider;
+    this.osmProvider = Objects.requireNonNull(osmProvider);
     return this;
   }
 

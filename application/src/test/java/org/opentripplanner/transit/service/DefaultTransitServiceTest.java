@@ -24,15 +24,16 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -47,6 +48,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -185,10 +187,9 @@ class DefaultTransitServiceTest {
       List.of(firstDate, secondDate)
     );
 
-    var serviceCodes = transitRepository.getServiceCodes();
-    serviceCodes.put(SERVICE_ID, SERVICE_CODE);
-    serviceCodes.put(CALENDAR_ID, SERVICE_CODE);
-    serviceCodes.put(CALENDAR_ID_TWO, 1);
+    transitRepository.putServiceCode(SERVICE_ID, SERVICE_CODE);
+    transitRepository.putServiceCode(CALENDAR_ID, SERVICE_CODE);
+    transitRepository.putServiceCode(CALENDAR_ID_TWO, 1);
 
     transitRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     transitRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
@@ -200,7 +201,7 @@ class DefaultTransitServiceTest {
 
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      transitRepository.getTripCalendar()
     );
     TripTimes tripTimes = ScheduledTripTimes.of()
       .withTrip(TransitRepositoryForTest.trip("123").build())
@@ -328,6 +329,75 @@ class DefaultTransitServiceTest {
       var busExcludeRequest = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
       var excludedBusTrips = service.findCanceledTrips(busExcludeRequest);
       assertThat(excludedBusTrips).isEmpty();
+    }
+
+    /**
+     * The canceled trip on 2024-08-09 is scheduled to run from 11:30 to 11:40 (Europe/Paris).
+     */
+    @Nested
+    class RunningTimeFilter {
+
+      private static final LocalDate SERVICE_DAY = LocalDate.of(2024, 8, 9);
+      private static final Instant DEPARTURE = Instant.parse("2024-08-09T09:30:00Z");
+      private static final Instant ARRIVAL = Instant.parse("2024-08-09T09:40:00Z");
+
+      @Test
+      void findTripsRunningInPeriod() {
+        var trips = findByRunningTimePeriod(
+          TimePeriod.of(DEPARTURE.minusSeconds(600), ARRIVAL.plusSeconds(600))
+        );
+        assertThat(trips).hasSize(1);
+        assertEquals(SERVICE_DAY, trips.getFirst().getServiceDate());
+      }
+
+      @Test
+      void findTripsArrivingJustAfterStartOfPeriod() {
+        var trips = findByRunningTimePeriod(
+          TimePeriod.of(ARRIVAL.minusSeconds(60), ARRIVAL.plusSeconds(3600))
+        );
+        assertThat(trips).hasSize(1);
+        assertEquals(SERVICE_DAY, trips.getFirst().getServiceDate());
+      }
+
+      @Test
+      void endOfPeriodIsExclusive() {
+        var trips = findByRunningTimePeriod(TimePeriod.of(DEPARTURE.minusSeconds(3600), DEPARTURE));
+        assertThat(trips).isEmpty();
+      }
+
+      @Test
+      void findNoTripsOutsidePeriod() {
+        assertThat(
+          findByRunningTimePeriod(TimePeriod.of(ARRIVAL.plusSeconds(1), ARRIVAL.plusSeconds(3600)))
+        ).isEmpty();
+      }
+
+      @Test
+      void serviceDateAndRunningTimeAreCombined() {
+        var request = TripOnServiceDateRequest.of()
+          .withIncludeRunningTimePeriods(
+            FilterValues.ofRequired(
+              "runningTimePeriods",
+              List.of(TimePeriod.of(DEPARTURE.minusSeconds(600), ARRIVAL.plusSeconds(600)))
+            )
+          )
+          .withIncludeServiceDates(
+            FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 8, 8)))
+          )
+          .build();
+
+        // The trip running within the period is not running on the requested service date
+        assertThat(service.findCanceledTrips(request)).isEmpty();
+      }
+
+      private List<TripOnServiceDate> findByRunningTimePeriod(TimePeriod period) {
+        var request = TripOnServiceDateRequest.of()
+          .withIncludeRunningTimePeriods(
+            FilterValues.ofRequired("runningTimePeriods", List.of(period))
+          )
+          .build();
+        return service.findCanceledTrips(request);
+      }
     }
   }
 

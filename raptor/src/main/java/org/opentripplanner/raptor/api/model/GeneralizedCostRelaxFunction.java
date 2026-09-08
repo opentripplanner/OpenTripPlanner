@@ -63,7 +63,7 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
   }
 
   public int relax(int value) {
-    return ((value * normalizedRatio) / RATIO_RESOLUTION) + slack;
+    return (value * normalizedRatio) / RATIO_RESOLUTION + slack;
   }
 
   @Override

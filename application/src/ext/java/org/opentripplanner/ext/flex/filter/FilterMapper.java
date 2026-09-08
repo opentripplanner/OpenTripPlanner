@@ -54,17 +54,13 @@ public class FilterMapper {
   }
 
   private void addFilter(TransitFilterRequest sr) {
-    sr
-      .not()
-      .forEach(s -> {
-        excludedRoutes.addAll(s.routes());
-        excludedAgencies.addAll(s.agencies());
-      });
-    sr
-      .select()
-      .forEach(s -> {
-        selectedRoutes.addAll(s.routes());
-        selectedAgencies.addAll(s.agencies());
-      });
+    sr.not().forEach(s -> {
+      excludedRoutes.addAll(s.routes());
+      excludedAgencies.addAll(s.agencies());
+    });
+    sr.select().forEach(s -> {
+      selectedRoutes.addAll(s.routes());
+      selectedAgencies.addAll(s.agencies());
+    });
   }
 }

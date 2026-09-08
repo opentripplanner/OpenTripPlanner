@@ -161,7 +161,9 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
         .withIndex(i);
 
       // Search and find trip 'i' using the previous trip index
-      searchForTrip(tripAlightTime, STOP_POS_0, i - 1).assertTripFound().withIndex(i);
+      searchForTrip(tripAlightTime, STOP_POS_0, i - 1)
+        .assertTripFound()
+        .withIndex(i);
 
       // Search with a time and index that together exclude trip 'i'
       searchForTrip(tripAlightTime, STOP_POS_0, i).assertNoTripFound();

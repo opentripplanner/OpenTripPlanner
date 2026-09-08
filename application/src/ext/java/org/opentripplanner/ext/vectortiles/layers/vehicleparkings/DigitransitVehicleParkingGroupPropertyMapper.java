@@ -11,7 +11,8 @@ import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.inspector.vector.KeyValue;
 
 public class DigitransitVehicleParkingGroupPropertyMapper
-  extends PropertyMapper<VehicleParkingAndGroup> {
+  extends PropertyMapper<VehicleParkingAndGroup>
+{
 
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private final I18NStringMapper i18NStringMapper;

@@ -2,7 +2,7 @@ package org.opentripplanner.warmup;
 
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.warmup.api.WarmupParameters;
@@ -24,16 +24,16 @@ public class WarmupLauncher {
   @Nullable
   private final WarmupParameters parameters;
 
-  private final Supplier<OtpServerRequestContext> serverContextSupplier;
+  private final Supplier<RequestScopedFactory> requestScopedFactorySupplier;
   private final TransitRepository transitRepository;
 
   public WarmupLauncher(
     @Nullable WarmupParameters parameters,
-    Supplier<OtpServerRequestContext> serverContextSupplier,
+    Supplier<RequestScopedFactory> requestScopedFactorySupplier,
     TransitRepository transitRepository
   ) {
     this.parameters = parameters;
-    this.serverContextSupplier = serverContextSupplier;
+    this.requestScopedFactorySupplier = requestScopedFactorySupplier;
     this.transitRepository = transitRepository;
   }
 
@@ -53,10 +53,10 @@ public class WarmupLauncher {
       LOG.info("Application warmup configured but no updaters found. Skipping warmup.");
       return;
     }
-    var serverContext = serverContextSupplier.get();
+    var requestScopedFactory = requestScopedFactorySupplier.get();
     var schema = switch (parameters.api()) {
-      case TRANSMODEL -> serverContext.transmodelSchema();
-      case GTFS -> serverContext.gtfsSchema();
+      case TRANSMODEL -> requestScopedFactory.transmodelGraphQLSchema().schema();
+      case GTFS -> requestScopedFactory.graphQLRequestContext().schema();
     };
     if (schema == null) {
       LOG.warn(
@@ -66,7 +66,7 @@ public class WarmupLauncher {
       );
       return;
     }
-    var worker = new WarmupWorker(parameters, serverContext, () -> updaterManager);
+    var worker = new WarmupWorker(parameters, requestScopedFactory, () -> updaterManager);
     var thread = new Thread(worker, "app-warmup");
     thread.setDaemon(true);
     thread.start();

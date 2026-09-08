@@ -6,7 +6,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * A place where a station connects to the street network. Equivalent to GTFS stop location .
  */
 public final class PathwayNodeBuilder
-  extends StationElementBuilder<PathwayNode, PathwayNodeBuilder> {
+  extends StationElementBuilder<PathwayNode, PathwayNodeBuilder>
+{
 
   PathwayNodeBuilder(FeedScopedId id) {
     super(id);

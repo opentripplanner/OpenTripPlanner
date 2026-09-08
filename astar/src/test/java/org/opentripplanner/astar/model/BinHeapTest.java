@@ -109,7 +109,7 @@ public class BinHeapTest {
 
       // fill both keys and values with random numbers
       for (int i = 0; i < N; i++) {
-        keys.add(i, (Math.random() * 10000));
+        keys.add(i, Math.random() * 10000);
         vals.add(i, (N - i) * 3);
       }
 

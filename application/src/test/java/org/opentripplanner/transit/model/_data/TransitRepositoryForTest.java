@@ -113,7 +113,10 @@ public class TransitRepositoryForTest {
 
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(String id) {
-    return Route.of(id(id)).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+    return Route.of(id(id))
+      .withAgency(AGENCY)
+      .withShortName("R" + id)
+      .withMode(TransitMode.BUS);
   }
 
   /**
@@ -125,7 +128,10 @@ public class TransitRepositoryForTest {
 
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(FeedScopedId id) {
-    return Route.of(id).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+    return Route.of(id)
+      .withAgency(AGENCY)
+      .withShortName("R" + id)
+      .withMode(TransitMode.BUS);
   }
 
   public static TripPatternBuilder tripPattern(String id, Route route) {
@@ -257,7 +263,7 @@ public class TransitRepositoryForTest {
   public List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, String time) {
     var startTime = TimeUtils.time(time);
     return IntStream.range(0, count)
-      .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
+      .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + seq * 60 * 5))
       .toList();
   }
 

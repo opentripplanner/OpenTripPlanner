@@ -68,7 +68,7 @@ public class DatedServiceJourneyType {
           .name("serviceJourney")
           .description("The service journey this Dated Service Journey is based on")
           .type(new GraphQLNonNull(serviceJourneyType))
-          .dataFetcher(environment -> (tripOnServiceDate(environment).getTrip()))
+          .dataFetcher(environment -> tripOnServiceDate(environment).getTrip())
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

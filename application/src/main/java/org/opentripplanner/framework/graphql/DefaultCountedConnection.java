@@ -13,7 +13,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class DefaultCountedConnection<T>
   extends DefaultConnection<T>
-  implements CountedConnection<T> {
+  implements CountedConnection<T>
+{
 
   private final Integer totalCount;
 

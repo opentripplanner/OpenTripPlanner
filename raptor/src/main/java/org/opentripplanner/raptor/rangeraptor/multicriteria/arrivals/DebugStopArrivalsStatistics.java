@@ -35,8 +35,8 @@ class DebugStopArrivalsStatistics {
         arrayLen += stop.internalArrayLength();
       }
     }
-    double avg = ((double) total) / numOfStops;
-    double arrayLenAvg = ((double) arrayLen) / numOfStops;
+    double avg = (double) total / numOfStops;
+    double arrayLenAvg = (double) arrayLen / numOfStops;
 
     // Debug stop arrivals statistics.
     //  - For each stop the number of arrivals logged with:

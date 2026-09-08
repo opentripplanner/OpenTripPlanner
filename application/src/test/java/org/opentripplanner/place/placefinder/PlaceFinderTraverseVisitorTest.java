@@ -56,7 +56,10 @@ public class PlaceFinderTraverseVisitorTest {
   static final Route R = route("r").build();
 
   static final TransitRepository TIMETABLE_REPO = new TransitRepository(
-    model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build()
+    model
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4))
+      .build()
   );
 
   static {

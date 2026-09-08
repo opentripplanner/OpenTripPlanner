@@ -3,12 +3,15 @@ package org.opentripplanner.standalone.configure;
 import dagger.Subcomponent;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
@@ -18,7 +21,6 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -44,8 +46,6 @@ public interface RequestScopedFactory {
   RefetchItineraryService refetchItineraryService();
 
   TransitAlertService transitAlertService();
-
-  OtpServerRequestContext createServerContext();
 
   Graph graph();
 
@@ -79,6 +79,12 @@ public interface RequestScopedFactory {
   OjpApiParameters ojpApiParameters();
 
   TriasApiParameters triasApiParameters();
+
+  RoutingService routingService();
+
+  TransmodelRequestContext transmodelRequestContext();
+
+  GtfsGraphQLRequestContext graphQLRequestContext();
 
   @Subcomponent.Builder
   interface Builder {

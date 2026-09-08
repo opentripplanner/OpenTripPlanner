@@ -54,7 +54,7 @@ public class EscalatorPreferences implements Serializable {
       return false;
     }
     EscalatorPreferences that = (EscalatorPreferences) o;
-    return (doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed));
+    return doubleEquals(that.reluctance, reluctance) && doubleEquals(that.speed, speed);
   }
 
   @Override

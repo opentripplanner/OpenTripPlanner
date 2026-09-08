@@ -58,9 +58,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   /**
    * Scope: Request
    */
-  public static <T extends RaptorTripSchedule> OptimizeTransferService<
-    T
-  > createOptimizeTransferService(
+  public static <T extends RaptorTripSchedule> OptimizeTransferService<T> createOptimizeTransferService(
     IntFunction<StopLocation> stopLookup,
     RaptorStopNameResolver stopNameResolver,
     ConstrainedTransferService transferService,
@@ -129,9 +127,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private TransferGenerator<T> createTransferGenerator(boolean transferPriority) {
-    var transferServiceAdaptor = (transferService != null && transferPriority)
-      ? TransferServiceAdaptor.<T>create(stopLookup, transferService)
-      : TransferServiceAdaptor.<T>noop();
+    var transferServiceAdaptor =
+      transferService != null && transferPriority
+        ? TransferServiceAdaptor.<T>create(stopLookup, transferService)
+        : TransferServiceAdaptor.<T>noop();
 
     return new TransferGenerator<>(transferServiceAdaptor, transitDataProvider);
   }

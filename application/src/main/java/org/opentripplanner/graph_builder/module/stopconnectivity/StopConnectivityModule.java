@@ -36,6 +36,9 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
+    if (!graph.hasStreets) {
+      return;
+    }
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,

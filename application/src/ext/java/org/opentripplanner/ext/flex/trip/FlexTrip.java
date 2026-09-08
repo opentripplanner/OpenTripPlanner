@@ -19,8 +19,10 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * subclasses encapsulates the different business logic, which the different types of services
  * adhere to.
  */
-public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuilder<T, B>>
-  extends AbstractTransitEntity<T, B> {
+public abstract class FlexTrip<
+  T extends FlexTrip<T, B>,
+  B extends FlexTripBuilder<T, B>
+> extends AbstractTransitEntity<T, B> {
 
   public static int STOP_INDEX_NOT_FOUND = -1;
 

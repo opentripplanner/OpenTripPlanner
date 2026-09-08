@@ -24,7 +24,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -72,7 +72,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
 
     Timetable scheduled = resolver.resolve(pattern, today);
@@ -123,7 +123,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     Timetable origNow = resolver.resolve(pattern, today);
 
@@ -177,7 +177,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
       DefaultTimetableRepository resolver = new DefaultTimetableRepository(
         RaptorTransitDataTestFactory.empty(),
-        new DefaultTripCalendars()
+        TripCalendars.empty()
       );
 
       // only return a new snapshot if there are changes
@@ -257,7 +257,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     updateSnapshot(resolver, pattern, tripUpdate, today);
     updateSnapshot(resolver, pattern, tripUpdate, yesterday);

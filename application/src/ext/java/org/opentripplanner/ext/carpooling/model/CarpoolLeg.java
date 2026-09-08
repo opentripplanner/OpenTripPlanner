@@ -22,7 +22,6 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -286,11 +285,6 @@ public class CarpoolLeg implements Leg {
   @Override
   public List<WalkStep> listWalkSteps() {
     return Leg.super.listWalkSteps();
-  }
-
-  @Override
-  public Set<StreetNote> listStreetNotes() {
-    return Leg.super.listStreetNotes();
   }
 
   @Override

@@ -19,7 +19,8 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
 public final class RegularStopBuilder
-  extends StationElementBuilder<RegularStop, RegularStopBuilder> {
+  extends StationElementBuilder<RegularStop, RegularStopBuilder>
+{
 
   private final IntSupplier indexCounter;
 

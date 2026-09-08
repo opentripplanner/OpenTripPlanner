@@ -77,7 +77,7 @@ public class ParkingFilter {
       return false;
     }
     ParkingFilter that = (ParkingFilter) o;
-    return (Arrays.equals(not, that.not) && Arrays.equals(select, that.select));
+    return Arrays.equals(not, that.not) && Arrays.equals(select, that.select);
   }
 
   @Override

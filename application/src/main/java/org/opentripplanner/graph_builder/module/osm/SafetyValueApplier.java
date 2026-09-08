@@ -1,13 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * provide a {@link org.opentripplanner.astar.spi.RemainingWeightHeuristic}
  * that incorporates walk and bike safety in its lower bound.
  */
-class SafetyValueApplier {
+public class SafetyValueApplier {
 
   private static final Logger LOG = LoggerFactory.getLogger(SafetyValueApplier.class);
 
@@ -32,7 +30,7 @@ class SafetyValueApplier {
    */
   private float bestWalkSafety = 1.0f;
 
-  SafetyValueApplier(Graph graph) {
+  public SafetyValueApplier(Graph graph) {
     this.graph = graph;
   }
 
@@ -56,7 +54,7 @@ class SafetyValueApplier {
     return bestWalkSafety;
   }
 
-  void applyWayProperties(
+  public void applyWayProperties(
     @Nullable StreetEdge street,
     @Nullable StreetEdge backStreet,
     WayProperties forwardWayData,
@@ -64,8 +62,6 @@ class SafetyValueApplier {
     OsmEntity way
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
-
-    Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
 
     boolean motorVehicleNoThrough =
       tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
@@ -93,11 +89,6 @@ class SafetyValueApplier {
           street
         );
       }
-      if (notes != null) {
-        for (var it : notes) {
-          graph.streetNotesService.addStaticNote(street, it.note(), it.matcher());
-        }
-      }
       street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       street.setBicycleNoThruTraffic(bicycleNoThrough);
       street.setWalkNoThruTraffic(walkNoThrough);
@@ -124,11 +115,6 @@ class SafetyValueApplier {
         );
       }
       backStreet.setWalkSafetyFactor((float) walkSafety);
-      if (notes != null) {
-        for (var it : notes) {
-          graph.streetNotesService.addStaticNote(backStreet, it.note(), it.matcher());
-        }
-      }
       backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
       backStreet.setWalkNoThruTraffic(walkNoThrough);

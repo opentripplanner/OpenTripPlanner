@@ -47,7 +47,6 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -59,7 +58,7 @@ import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.internal.DefaultTransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -70,11 +69,11 @@ import org.opentripplanner.transit.service.TransitRepository;
 /**
  * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
  * RequestScopedFactory} build (one simulated HTTP request) are cached and shared, while two
- * separate builds (two requests) get independent instances. Since Step 3, {@link
- * OtpServerRequestContext} itself is one of those bindings, so this test's root {@code
- * TestFactory} has to feed every dependency {@link RequestScopedModule#serverRequestContext} needs
- * — reusing the same construction recipes as {@link TestServerContext} rather than duplicating
- * them.
+ * separate builds (two requests) get independent instances. {@link
+ * org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext} is one such binding, so this test's
+ * root {@code TestFactory} has to feed every dependency {@link
+ * RequestScopedModule#graphQLRequestContext} needs — reusing the same construction recipes as
+ * {@link TestServerContext} rather than duplicating them.
  */
 class RequestScopedFactoryTest {
 
@@ -84,7 +83,7 @@ class RequestScopedFactoryTest {
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     var timetableRepositoryHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -165,15 +164,17 @@ class RequestScopedFactoryTest {
     var requestOne = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isSameInstanceAs(requestOne.transitService());
     assertThat(requestOne.transactionScope()).isSameInstanceAs(requestOne.transactionScope());
-    assertThat(requestOne.createServerContext()).isSameInstanceAs(requestOne.createServerContext());
-    assertThat(requestOne.createServerContext().transitService()).isSameInstanceAs(
+    assertThat(requestOne.graphQLRequestContext()).isSameInstanceAs(
+      requestOne.graphQLRequestContext()
+    );
+    assertThat(requestOne.graphQLRequestContext().transitService()).isSameInstanceAs(
       requestOne.transitService()
     );
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isNotSameInstanceAs(requestTwo.transitService());
-    assertThat(requestOne.createServerContext()).isNotSameInstanceAs(
-      requestTwo.createServerContext()
+    assertThat(requestOne.graphQLRequestContext()).isNotSameInstanceAs(
+      requestTwo.graphQLRequestContext()
     );
   }
 

@@ -6,8 +6,8 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
-public class WheelchairCostCalculator<T extends DefaultTripSchedule>
-  implements RaptorCostCalculator<T> {
+public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements
+  RaptorCostCalculator<T> {
 
   private final RaptorCostCalculator<T> delegate;
   private final int[] wheelchairBoardingCost;

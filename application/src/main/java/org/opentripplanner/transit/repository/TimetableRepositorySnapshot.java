@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -15,10 +16,14 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
- * An immutable, read-only snapshot of the realtime-updated timetables. A new snapshot is published
- * each time a transaction that touched the {@link TimetableRepository} commits. Request
- * threads read a snapshot resolved at the start of the request, through the request-scoped
- * {@link org.opentripplanner.transit.service.TransitService}.
+ * An immutable, read-only snapshot of the realtime-updated timetables and trip calendar. A new
+ * snapshot is published each time a transaction that touched the {@link TimetableRepository}
+ * commits. Request threads read a snapshot resolved at the start of the request, through the
+ * request-scoped {@link org.opentripplanner.transit.service.TransitService}.
+ * <p>
+ * The trip calendar is included here (rather than being its own repository) because every
+ * consumer that needs realtime timetable data also needs the calendar — new service ids created
+ * for real-time-added trips must be visible in the same transaction as the trips that use them.
  */
 public interface TimetableRepositorySnapshot {
   /**
@@ -126,4 +131,10 @@ public interface TimetableRepositorySnapshot {
    * Does this snapshot contain any realtime data or is it completely empty?
    */
   boolean isEmpty();
+
+  /**
+   * Return the trip calendar for this snapshot, including any service ids created for
+   * real-time-added trips.
+   */
+  TripCalendars getTripCalendars();
 }

@@ -11,14 +11,13 @@ class TransferConfig {
 
   static void mapTransferPreferences(NodeAdapter c, TransferPreferences.Builder tx) {
     var dft = tx.original();
-    tx
-      .withNonpreferredCost(
-        c
-          .of("nonpreferredTransferPenalty")
-          .since(V2_0)
-          .summary("Penalty (in seconds) for using a non-preferred transfer.")
-          .asInt(dft.nonpreferredCost())
-      )
+    tx.withNonpreferredCost(
+      c
+        .of("nonpreferredTransferPenalty")
+        .since(V2_0)
+        .summary("Penalty (in seconds) for using a non-preferred transfer.")
+        .asInt(dft.nonpreferredCost())
+    )
       .withCost(
         c
           .of("transferPenalty")

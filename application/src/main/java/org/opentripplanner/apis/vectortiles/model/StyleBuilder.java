@@ -34,6 +34,12 @@ public class StyleBuilder {
   private final Map<String, Object> layout = new LinkedHashMap<>();
   private final Map<String, Object> metadata = new LinkedHashMap<>();
   private final Map<String, Object> line = new LinkedHashMap<>();
+  /**
+   * The layer's filter, always in MapLibre's expression syntax, which reaches a property through
+   * {@code ["get", …]} rather than naming it directly as the legacy syntax does. The two cannot be
+   * mixed inside a single filter, and the debug client combines a filter of its own with the one
+   * sent from here, so every filter built by this class has to keep speaking that dialect.
+   */
   private List<?> filter = List.of();
 
   public static StyleBuilder ofId(String id) {
@@ -293,7 +299,7 @@ public class StyleBuilder {
    * Filter the entities by a boolean property.
    */
   public final StyleBuilder booleanFilter(String propertyName, boolean value) {
-    filter = List.of("==", propertyName, value);
+    filter = List.of("==", List.of("get", propertyName), value);
     return this;
   }
 
@@ -342,7 +348,7 @@ public class StyleBuilder {
 
   private StyleBuilder filterClasses(Class... classToFilter) {
     var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
-    filter = new ArrayList<>(ListUtils.combine(List.of("in", "class"), clazzes));
+    filter = List.of("in", List.of("get", "class"), List.of("literal", clazzes));
     return this;
   }
 

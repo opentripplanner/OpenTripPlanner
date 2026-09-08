@@ -4,7 +4,8 @@ import java.time.Duration;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 public final class ViaVisitLocationBuilder
-  extends AbstractViaLocationBuilder<ViaVisitLocationBuilder> {
+  extends AbstractViaLocationBuilder<ViaVisitLocationBuilder>
+{
 
   private final int minimumWaitTime;
 

@@ -19,7 +19,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 public class AreaStop
   extends AbstractTransitEntity<AreaStop, AreaStopBuilder>
-  implements StopLocation {
+  implements StopLocation
+{
 
   private final int index;
   private final I18NString name;

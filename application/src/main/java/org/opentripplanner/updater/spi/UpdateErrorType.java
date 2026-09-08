@@ -37,4 +37,6 @@ public enum UpdateErrorType {
   NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED,
   NOT_MONITORED,
   CANNOT_RESOLVE_AGENCY,
+  // there are several trips that would match the reference
+  AMBIGIOUS_TRIP_REFERENCE,
 }

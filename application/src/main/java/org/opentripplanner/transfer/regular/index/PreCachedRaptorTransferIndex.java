@@ -60,9 +60,15 @@ class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
 
     // Create immutable copies of the lists for each stop to make them immutable and faster to iterate
     //noinspection unchecked
-    this.forwardTransfers = forwardTransfers.stream().map(List::copyOf).toArray(List[]::new);
+    this.forwardTransfers = forwardTransfers
+      .stream()
+      .map(List::copyOf)
+      .toArray(List[]::new);
     //noinspection unchecked
-    this.reversedTransfers = reversedTransfers.stream().map(List::copyOf).toArray(List[]::new);
+    this.reversedTransfers = reversedTransfers
+      .stream()
+      .map(List::copyOf)
+      .toArray(List[]::new);
   }
 
   public Collection<DefaultRaptorTransfer> getForwardTransfers(int stopIndex) {

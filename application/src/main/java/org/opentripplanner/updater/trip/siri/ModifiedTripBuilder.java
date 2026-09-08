@@ -243,7 +243,7 @@ class ModifiedTripBuilder {
         startOfService,
         builder,
         stopIndex,
-        stopIndex == (stopsInPattern.size() - 1),
+        stopIndex == stopsInPattern.size() - 1,
         predictionInaccurate,
         matchingCall,
         occupancy
@@ -312,7 +312,7 @@ class ModifiedTripBuilder {
       }
     }
     var newStopPattern = builder.build();
-    return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
+    return pattern.isModified() && pattern.getStopPattern().equals(newStopPattern)
       ? pattern.getStopPattern()
       : newStopPattern;
   }

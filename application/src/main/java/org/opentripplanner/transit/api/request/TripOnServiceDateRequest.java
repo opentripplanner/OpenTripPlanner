@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -22,6 +23,7 @@ public class TripOnServiceDateRequest {
 
   private final FilterValues<LocalDate> includeServiceDates;
   private final FilterValues<LocalDateRange> includeServiceDateRanges;
+  private final FilterValues<TimePeriod> includeRunningTimePeriods;
   private final FilterValues<FeedScopedId> includeAgencies;
   private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> includePatterns;
@@ -34,6 +36,7 @@ public class TripOnServiceDateRequest {
   TripOnServiceDateRequest(
     FilterValues<LocalDate> includeServiceDates,
     FilterValues<LocalDateRange> includeServiceDateRanges,
+    FilterValues<TimePeriod> includeRunningTimePeriods,
     FilterValues<FeedScopedId> includeAgencies,
     FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> includePatterns,
@@ -45,6 +48,7 @@ public class TripOnServiceDateRequest {
   ) {
     this.includeServiceDates = includeServiceDates;
     this.includeServiceDateRanges = includeServiceDateRanges;
+    this.includeRunningTimePeriods = includeRunningTimePeriods;
     this.includeAgencies = includeAgencies;
     this.includeRoutes = includeRoutes;
     this.includePatterns = includePatterns;
@@ -93,6 +97,13 @@ public class TripOnServiceDateRequest {
 
   public FilterValues<LocalDateRange> includeServiceDateRanges() {
     return includeServiceDateRanges;
+  }
+
+  /**
+   * Periods of time in which the trip must be running, according to its schedule.
+   */
+  public FilterValues<TimePeriod> includeRunningTimePeriods() {
+    return includeRunningTimePeriods;
   }
 
   public FilterValues<TransitMode> includeModes() {

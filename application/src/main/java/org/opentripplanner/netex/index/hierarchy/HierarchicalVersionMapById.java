@@ -22,7 +22,8 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
  */
 public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
   extends HierarchicalMultimap<String, V>
-  implements ReadOnlyHierarchicalVersionMapById<V> {
+  implements ReadOnlyHierarchicalVersionMapById<V>
+{
 
   /** Create a root for the hierarchy */
   public HierarchicalVersionMapById() {}

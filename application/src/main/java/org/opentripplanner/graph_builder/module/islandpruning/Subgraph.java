@@ -36,7 +36,7 @@ class Subgraph {
   }
 
   boolean contains(Vertex vertex) {
-    return (streetVertices.contains(vertex) || stopVertices.contains(vertex));
+    return streetVertices.contains(vertex) || stopVertices.contains(vertex);
   }
 
   int streetSize() {

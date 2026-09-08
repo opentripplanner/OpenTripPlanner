@@ -257,12 +257,10 @@ public class CarpoolItineraryMapper {
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
-    Vertex startBoundaryVertex = walkToPickup != null
-      ? walkToPickup.states.getFirst().getVertex()
-      : pickupVertex;
-    Vertex endBoundaryVertex = walkFromDropoff != null
-      ? walkFromDropoff.states.getLast().getVertex()
-      : dropoffVertex;
+    Vertex startBoundaryVertex =
+      walkToPickup != null ? walkToPickup.states.getFirst().getVertex() : pickupVertex;
+    Vertex endBoundaryVertex =
+      walkFromDropoff != null ? walkFromDropoff.states.getLast().getVertex() : dropoffVertex;
 
     Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
     Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
@@ -349,9 +347,10 @@ public class CarpoolItineraryMapper {
     if (contact.getPhoneNumber() != null) {
       bookingMethods.add(BookingMethod.CALL_OFFICE);
     }
-    String effectiveUrl = contact.getBookingUrl() == null
-      ? null
-      : appendPassengerCoordinates(contact.getBookingUrl(), pickup, dropoff);
+    String effectiveUrl =
+      contact.getBookingUrl() == null
+        ? null
+        : appendPassengerCoordinates(contact.getBookingUrl(), pickup, dropoff);
     if (effectiveUrl != null) {
       bookingMethods.add(BookingMethod.ONLINE);
     }

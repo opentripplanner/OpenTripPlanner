@@ -9,7 +9,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccess
 import org.opentripplanner.street.search.state.State;
 
 public final class RoutingStartOnBoardAccess
-  implements RaptorStartOnBoardAccess, RoutingAccessEgress {
+  implements RaptorStartOnBoardAccess, RoutingAccessEgress
+{
 
   private final int routeIndex;
   private final int tripScheduleIndex;

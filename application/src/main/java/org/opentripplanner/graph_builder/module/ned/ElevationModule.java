@@ -323,9 +323,8 @@ public class ElevationModule implements GraphBuilderModule {
   ) {
     // knownElevations will be null if there are no ElevationPoints in the data
     // for instance, with the Shapefile loader.)
-    var elevations = knownElevations != null
-      ? new HashMap<>(knownElevations)
-      : new HashMap<Vertex, Double>();
+    var elevations =
+      knownElevations != null ? new HashMap<>(knownElevations) : new HashMap<Vertex, Double>();
 
     // If including the EllipsoidToGeoidDifference, subtract these from the known elevations
     // found in OpenStreetMap data.
@@ -444,7 +443,7 @@ public class ElevationModule implements GraphBuilderModule {
               sampleDistance,
               getElevation(
                 coverage,
-                new Coordinate(x1 + (pctAlongSeg * (x2 - x1)), y1 + (pctAlongSeg * (y2 - y1)))
+                new Coordinate(x1 + pctAlongSeg * (x2 - x1), y1 + pctAlongSeg * (y2 - y1))
               )
             )
           );
@@ -586,7 +585,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     var elevation =
-      (values[0] * gridCoverageFactory.elevationUnitMultiplier()) -
+      values[0] * gridCoverageFactory.elevationUnitMultiplier() -
       (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
 
     minElevation = Math.min(minElevation, elevation);

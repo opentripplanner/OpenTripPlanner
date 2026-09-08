@@ -37,6 +37,8 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
 
 public class BarrierRoutingTest {
 
@@ -149,13 +151,12 @@ public class BarrierRoutingTest {
           .stream()
           .flatMap(i -> i.legs().stream())
           .map(
-            l ->
-              () ->
-                assertEquals(
-                  mapMode(streetMode),
-                  (l instanceof StreetLeg s) ? s.getMode() : null,
-                  "Allow only " + streetMode + " legs"
-                )
+            l -> () ->
+              assertEquals(
+                mapMode(streetMode),
+                l instanceof StreetLeg s ? s.getMode() : null,
+                "Allow only " + streetMode + " legs"
+              )
           )
     );
   }
@@ -192,9 +193,21 @@ public class BarrierRoutingTest {
     var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-    var ctx = TestServerContext.ofGraph(graph);
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
 
-    var itineraries = DirectStreetRouter.route(ctx, request, linkingContext);
+    var itineraries = DirectStreetRouter.route(
+      graph,
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
+      request,
+      linkingContext
+    );
 
     assertAll(assertions.apply(itineraries));
 

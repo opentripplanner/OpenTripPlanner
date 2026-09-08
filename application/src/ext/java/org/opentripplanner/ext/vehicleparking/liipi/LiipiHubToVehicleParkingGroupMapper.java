@@ -42,14 +42,12 @@ public class LiipiHubToVehicleParkingGroupMapper {
     try {
       Map<String, String> translations = new HashMap<>();
       JsonNode nameNode = jsonNode.path("name");
-      nameNode
-        .fieldNames()
-        .forEachRemaining(lang -> {
-          String name = nameNode.path(lang).asText();
-          if (!name.isEmpty()) {
-            translations.put(lang, nameNode.path(lang).asText());
-          }
-        });
+      nameNode.fieldNames().forEachRemaining(lang -> {
+        String name = nameNode.path(lang).asText();
+        if (!name.isEmpty()) {
+          translations.put(lang, nameNode.path(lang).asText());
+        }
+      });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(hubId.getId())
         : TranslatedString.getI18NString(translations, false);

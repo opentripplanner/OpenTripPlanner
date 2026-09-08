@@ -208,7 +208,9 @@ class TripTimeOnDateRequestBuilderTest {
   void withTransitFilters() {
     var filter = FilterRequest.<TripTimeOnDateSelectRequest>of()
       .addSelect(
-        TripTimeOnDateSelectRequest.of().withAgencies(List.of(new FeedScopedId("F", "A1"))).build()
+        TripTimeOnDateSelectRequest.of()
+          .withAgencies(List.of(new FeedScopedId("F", "A1")))
+          .build()
       )
       .build();
 

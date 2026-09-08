@@ -84,22 +84,22 @@ public class VehicleParkingsLayerTest {
     repo.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config = """
-      {
-        "vectorTiles": {
-          "layers" : [
-            {
-              "name": "vehicleParking",
-              "type": "VehicleParking",
-              "mapper": "Stadtnavi",
-              "maxZoom": 20,
-              "minZoom": 14,
-              "cacheMaxSeconds": 60,
-              "expansionFactor": 0
-            }
-          ]
-        }
+    {
+      "vectorTiles": {
+        "layers" : [
+          {
+            "name": "vehicleParking",
+            "type": "VehicleParking",
+            "mapper": "Stadtnavi",
+            "maxZoom": 20,
+            "minZoom": 14,
+            "cacheMaxSeconds": 60,
+            "expansionFactor": 0
+          }
+        ]
       }
-      """;
+    }
+    """;
     var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());

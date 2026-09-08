@@ -33,15 +33,14 @@ public class LogicalOrSpecifier implements OsmSpecifier {
 
   @Override
   public int matchScore(OsmEntity way, TraverseDirection direction) {
-    var oneMatchesExactly = subSpecs
-      .stream()
-      .anyMatch(subspec ->
+    var oneMatchesExactly = subSpecs.stream().anyMatch(
+      subspec ->
         switch (direction) {
           case DIRECTIONLESS -> subspec.allTagsMatch(way);
           case FORWARD -> subspec.allForwardTagsMatch(way);
           case BACKWARD -> subspec.allBackwardTagsMatch(way);
         }
-      );
+    );
     if (oneMatchesExactly) {
       return 1;
     } else {

@@ -13,7 +13,7 @@ public record GbfsVehicleRentalDataSourceParameters(
   HttpHeaders httpHeaders,
   String network,
   boolean geofencingZones,
-  boolean geofencingBusinessAreaBorders,
+  boolean requireDropOffInsideBusinessArea,
   boolean overloadingAllowed,
   Set<RentalPickupType> rentalPickupTypes
 ) implements VehicleRentalDataSourceParameters, GbfsDataSourceParameters {

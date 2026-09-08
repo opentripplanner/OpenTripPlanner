@@ -578,9 +578,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var prevTransit = prevTransitLeg();
     var txBeforeLeg = prevTransit == null ? null : prevTransit.constrainedTransferAfterLeg();
-    var transferConstraint = txBeforeLeg == null
-      ? RaptorTransferConstraint.REGULAR_TRANSFER
-      : txBeforeLeg.getTransferConstraint();
+    var transferConstraint =
+      txBeforeLeg == null
+        ? RaptorTransferConstraint.REGULAR_TRANSFER
+        : txBeforeLeg.getTransferConstraint();
     boolean firstBoarding = prev != null && prev.isAccessWithoutRides();
 
     int boardCost = costCalculator.boardingCost(

@@ -9,7 +9,8 @@ import org.opentripplanner.service.streetdetails.model.Level;
  * {@link org.opentripplanner.model.plan.walkstep.WalkStep}.
  */
 public abstract sealed class VerticalTransportationUse
-  permits ElevatorUse, EscalatorUse, StairsUse {
+  permits ElevatorUse, EscalatorUse, StairsUse
+{
 
   private final Level from;
   private final Level to;

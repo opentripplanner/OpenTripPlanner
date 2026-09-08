@@ -3,12 +3,6 @@
     "url": "https://example.com/gbfs/v3/manifest.json",
     "headers": {
       "ET-Client-Name": "otp"
-    },
-    "networks": [
-      {
-        "network": "oslo-by-sykkel",
-        "geofencingZones": true
-      }
-    ]
+    }
   }
 }

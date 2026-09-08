@@ -109,9 +109,8 @@ public final class EndpointContextLineString {
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
-    int intermediateCount = packedCoords == null
-      ? 0
-      : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
+    int intermediateCount =
+      packedCoords == null ? 0 : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
     double[] c = new double[(intermediateCount + 2) * 2];
     c[0] = x0;
     c[1] = y0;

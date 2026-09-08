@@ -12,7 +12,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 final class Transit<T extends RaptorTripSchedule>
   extends StopArrivalViewAdapter<T>
-  implements TransitPathView<T> {
+  implements TransitPathView<T>
+{
 
   private final StopArrivalState<T> arrival;
   private final StopsCursor<T> cursor;

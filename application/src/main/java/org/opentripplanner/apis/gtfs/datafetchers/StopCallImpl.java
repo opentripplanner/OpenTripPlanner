@@ -5,7 +5,7 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.stopTimeToInt;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
@@ -27,13 +27,15 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         return null;
       }
       var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
-      var estimatedArrival = scheduledArrival == null
-        ? null
-        : EstimatedTime.of(scheduledArrival, tripTime.getArrivalDelay());
+      var estimatedArrival =
+        scheduledArrival == null
+          ? null
+          : EstimatedTime.of(scheduledArrival, tripTime.getArrivalDelay());
       var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
-      var estimatedDeparture = scheduledDeparture == null
-        ? null
-        : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
+      var estimatedDeparture =
+        scheduledDeparture == null
+          ? null
+          : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
       return new CallRealTime(estimatedArrival, estimatedDeparture);
     };
   }
@@ -81,7 +83,7 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private ZonedDateTime getZonedDateTime(DataFetchingEnvironment environment, int time) {

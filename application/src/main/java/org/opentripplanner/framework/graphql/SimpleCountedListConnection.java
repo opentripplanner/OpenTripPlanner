@@ -11,8 +11,9 @@ import java.util.Objects;
  * This class is a version of the {@link SimpleListConnection} that returns a
  * {@link CountedConnection}.
  */
-public class SimpleCountedListConnection<T>
-  implements DataFetcher<CountedConnection<T>>, TrivialDataFetcher<CountedConnection<T>> {
+public class SimpleCountedListConnection<T> implements
+  DataFetcher<CountedConnection<T>>,
+  TrivialDataFetcher<CountedConnection<T>> {
 
   private final List<T> data;
 

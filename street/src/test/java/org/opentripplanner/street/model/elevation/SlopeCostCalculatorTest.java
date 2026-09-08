@@ -19,9 +19,10 @@ class SlopeCostCalculatorTest {
   @Test
   void testLengthMultiplier() {
     PackedCoordinateSequenceFactory factory = PackedCoordinateSequenceFactory.DOUBLE_FACTORY;
-    CoordinateSequence seq = factory.create(
-      new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 1) }
-    );
+    CoordinateSequence seq = factory.create(new Coordinate[] {
+      new Coordinate(0, 1),
+      new Coordinate(10, 1),
+    });
     SlopeCosts costs = SlopeCostCalculator.getSlopeCosts(seq);
     assertEquals(1.0, costs.lengthMultiplier);
 
@@ -29,9 +30,11 @@ class SlopeCostCalculatorTest {
     costs = SlopeCostCalculator.getSlopeCosts(seq);
     assertEquals(1.00498756211208902702, costs.lengthMultiplier);
 
-    seq = factory.create(
-      new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 2), new Coordinate(15, 1) }
-    );
+    seq = factory.create(new Coordinate[] {
+      new Coordinate(0, 1),
+      new Coordinate(10, 2),
+      new Coordinate(15, 1),
+    });
     costs = SlopeCostCalculator.getSlopeCosts(seq);
     assertEquals(1.00992634231424500668, costs.lengthMultiplier);
   }
@@ -121,8 +124,9 @@ class SlopeCostCalculatorTest {
   }
 
   private static PackedCoordinateSequence flatProfile() {
-    return new PackedCoordinateSequence.Double(
-      new Coordinate[] { new Coordinate(0, 100), new Coordinate(50, 100) }
-    );
+    return new PackedCoordinateSequence.Double(new Coordinate[] {
+      new Coordinate(0, 100),
+      new Coordinate(50, 100),
+    });
   }
 }

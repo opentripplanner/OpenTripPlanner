@@ -25,7 +25,7 @@ class ShapeSegmentKey {
     result = prime * result + (int) (temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(shapeDistanceTo);
     result = prime * result + (int) (temp ^ (temp >>> 32));
-    result = prime * result + ((shapeId == null) ? 0 : shapeId.hashCode());
+    result = prime * result + (shapeId == null ? 0 : shapeId.hashCode());
     return result;
   }
 

@@ -30,7 +30,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
-  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
+  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants
+{
 
   private static final AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
 
@@ -65,7 +66,11 @@ public class TestTransitData
   }
 
   public TestTransitData access(String... accessList) {
-    access(Arrays.stream(accessList).map(TestAccessEgress::of).toArray(TestAccessEgress[]::new));
+    access(
+      Arrays.stream(accessList)
+        .map(TestAccessEgress::of)
+        .toArray(TestAccessEgress[]::new)
+    );
     return this;
   }
 
@@ -175,7 +180,8 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataStartTime() {
-    return this.routes.stream()
+    return this.routes
+      .stream()
       .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
       .min()
       .orElseThrow();
@@ -183,7 +189,8 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataEndTime() {
-    return this.routes.stream()
+    return this.routes
+      .stream()
       .mapToInt(route -> {
         RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
         RaptorTripPattern pattern = route.pattern();
@@ -251,7 +258,7 @@ public class TestTransitData
         if (ROUTE_NAME_PATTERN.matcher(firstLine.trim()).matches()) {
           withTimetable(firstLine, timetable.substring(firstLine.length() + 1).trim());
         } else {
-          withTimetable("R" + (++routeIndex), timetable.trim());
+          withTimetable("R" + ++routeIndex, timetable.trim());
         }
       }
     }

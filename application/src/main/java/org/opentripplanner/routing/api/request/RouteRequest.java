@@ -99,9 +99,10 @@ public class RouteRequest implements Serializable {
     // The given dateTime will be set to a whole number of seconds. We don't do sub-second
     // accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
     // guaranteed to be the same for departAt and arriveBy queries.
-    this.dateTime = (!builder.defaultRequest && builder.dateTime == null)
-      ? normalizeNow()
-      : TimeUtils.truncateToSeconds(builder.dateTime);
+    this.dateTime =
+      !builder.defaultRequest && builder.dateTime == null
+        ? normalizeNow()
+        : TimeUtils.truncateToSeconds(builder.dateTime);
 
     this.arriveBy = builder.arriveBy;
     this.timetableView = builder.timetableView;

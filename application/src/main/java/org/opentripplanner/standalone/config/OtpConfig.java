@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import java.util.Map;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpFileNames;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,22 +20,29 @@ public class OtpConfig {
    * This description is shared for otp-config, build-config and router-config.
    */
   public static final String CONFIG_VERSION_DESCRIPTION = """
-    The config-version is a parameter which each OTP deployment may set to be able to query the
-    OTP server and verify that it uses the correct version of the config. The version should be
-    injected into the config in the (continuous) deployment pipeline. How this is done, is up to
-    the deployment.
+  The config-version is a parameter which each OTP deployment may set to be able to query the
+  OTP server and verify that it uses the correct version of the config. The version should be
+  injected into the config in the (continuous) deployment pipeline. How this is done, is up to
+  the deployment.
 
-    The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
-    or format check on the version and it can be any string.
+  The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
+  or format check on the version and it can be any string.
 
-    Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
-    """;
+  Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+  """;
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
   public final NodeAdapter root;
 
   public final Map<OTPFeature, Boolean> otpFeatures;
+
+  /**
+   * Per-network GBFS configuration shared by the vehicle rental graph builder (build phase) and
+   * the vehicle rental service directory (serve phase). It lives here because this is the only
+   * config file read in both phases.
+   */
+  public final GbfsNetworkOverrides gbfsNetworks;
 
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
@@ -63,6 +71,7 @@ public class OtpConfig {
       .since(V2_0)
       .summary("Turn features on/off.")
       .asEnumMap(OTPFeature.class, Boolean.class);
+    this.gbfsNetworks = GbfsNetworksConfig.map("gbfs", root);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);

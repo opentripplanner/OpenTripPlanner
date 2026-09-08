@@ -14,9 +14,9 @@ public class TemplateUtilTest {
   @Test
   public void replaceSectionTest() {
     var body = """
-      Expected line 1.
-      Expected line 2.
-      """;
+    Expected line 1.
+    Expected line 2.
+    """;
     var doc = "<!-- INSERT: TEST -->";
 
     assertEquals(

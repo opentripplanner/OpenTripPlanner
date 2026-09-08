@@ -38,12 +38,13 @@ public class TemplateUtil {
       throw new IllegalStateException("Doc did not contain token: " + replaceToken);
     }
     var replacementText = """
-      <!-- %s BEGIN -->
-      <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+    <!-- %s BEGIN -->
+    <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-      %s
-      <!-- %s END -->
-      """.trim()
+    %s
+    <!-- %s END -->
+    """
+      .trim()
       .formatted(token, replacement, token);
 
     return doc.replace(replaceToken, replacementText);

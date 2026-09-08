@@ -205,11 +205,11 @@ public abstract class OsmEntity {
   }
 
   public static boolean isFalse(String tagValue) {
-    return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
+    return "no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue);
   }
 
   public static boolean isTrue(String tagValue) {
-    return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    return "yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue);
   }
 
   /**
@@ -585,7 +585,7 @@ public abstract class OsmEntity {
       // get the translated value, if exists
       for (String lang : i18n.keySet()) {
         String i18nTag = getTag(defKey + ":" + lang);
-        i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
+        i18n.get(lang).append(i18nTag != null ? i18nTag : defTag != null ? defTag : "");
       }
     }
     for (StringBuffer sb : i18n.values()) {
@@ -866,7 +866,7 @@ public abstract class OsmEntity {
    */
   public boolean isLink() {
     String highway = getTag("highway");
-    return highway != null && highway.endsWith(("_link"));
+    return highway != null && highway.endsWith("_link");
   }
 
   public boolean isElevator() {
@@ -996,6 +996,28 @@ public abstract class OsmEntity {
     }
 
     return permission;
+  }
+
+  /**
+   * Entities are considered equal if they have the same id and are of the same concrete type.
+   * OSM ids are only unique within a single entity type (a node and a way can share the same
+   * numeric id), and this needs to hold even when the same OSM entity is represented by several
+   * distinct (but equivalent) Java instances, as is done for {@link org.opentripplanner.osm.model.OsmNode}.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof OsmEntity other)) {
+      return false;
+    }
+    return getClass() == other.getClass() && id == other.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getClass(), id);
   }
 
   @Override

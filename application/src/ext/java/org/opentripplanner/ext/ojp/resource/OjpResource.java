@@ -19,9 +19,9 @@ import org.opentripplanner.ext.ojp.service.OjpService;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
@@ -33,18 +33,18 @@ public class OjpResource {
   private static final Logger LOG = LoggerFactory.getLogger(OjpResource.class);
 
   private static final String EXPLORER_HTML = """
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8"/>
-          <meta name="viewport" content="width=device-width,initial-scale=1"/>
-          <title>OJP Explorer</title>
-          <script defer="defer" src="https://leonardehrenfried.github.io/ojp-mini-client/static/js/main.1a443aab.js"></script>
-          <link href="https://leonardehrenfried.github.io/ojp-mini-client/static/css/main.320826b9.css" rel="stylesheet">
-        </head>
-        <body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body>
-      </html>
-    """;
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <title>OJP Explorer</title>
+        <script defer="defer" src="https://leonardehrenfried.github.io/ojp-mini-client/static/js/main.1a443aab.js"></script>
+        <link href="https://leonardehrenfried.github.io/ojp-mini-client/static/css/main.320826b9.css" rel="stylesheet">
+      </head>
+      <body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body>
+    </html>
+  """;
 
   private final RequestHandler handler;
   private final RouteRequest defaultRouteRequest;
@@ -55,9 +55,7 @@ public class OjpResource {
     @Context LinkingContextFactory linkingContextFactory,
     @Context OjpApiParameters ojpApiParameters,
     @Context RouteRequest defaultRouteRequest,
-    // Only RoutingService still requires the whole context - it isn't independently
-    // request-scoped/bindable yet, see issue #7441.
-    @Context OtpServerRequestContext context
+    @Context RoutingService routingService
   ) {
     NearbyStopFinder nearbyStopFinder = graph.hasStreets
       ? StreetNearbyStopFinder.of(linkingContextFactory).build()
@@ -66,7 +64,7 @@ public class OjpResource {
     var idMapper = idMapper(ojpApiParameters);
     var ojpService = new OjpService(
       callAtStopService,
-      context.routingService(),
+      routingService,
       idMapper,
       transitService.getTimeZone()
     );

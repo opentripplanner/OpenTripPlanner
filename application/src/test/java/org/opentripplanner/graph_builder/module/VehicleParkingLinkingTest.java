@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
@@ -77,12 +78,13 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, transitRepository);
 
-    var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
-    assertEquals(2, streetLinks.size());
+    assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(2);
 
-    streetLinks.forEach(e ->
-      assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
-    );
+    graph
+      .findEdges(StreetVehicleParkingLink.class)
+      .forEach(e ->
+        assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
+      );
   }
 
   @Test
@@ -110,12 +112,13 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, transitRepository);
 
-    var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
-    assertEquals(4, streetLinks.size());
+    assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(4);
 
-    streetLinks.forEach(e ->
-      assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
-    );
+    graph
+      .findEdges(StreetVehicleParkingLink.class)
+      .forEach(e ->
+        assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
+      );
   }
 
   @Test
@@ -148,8 +151,8 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(1, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
-    assertEquals(1, graph.getEdgesOfType(VehicleParkingEdge.class).size());
-    assertEquals(2, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertThat(graph.findEdges(VehicleParkingEdge.class)).hasSize(1);
+    assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(2);
   }
 
   @Test
@@ -175,10 +178,10 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
-    assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertThat(graph.findEdges(VehicleParkingEdge.class)).isEmpty();
+    assertThat(graph.findEdges(StreetVehicleParkingLink.class)).isEmpty();
 
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertThat(graph.findEdges(StreetVehicleParkingLink.class)).isEmpty();
     assertEquals(0, vehicleParkingService.listVehicleParkings().size());
   }
 }

@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 public class GtfsRealtimeAlertsUpdater
   extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-  implements TransitAlertProvider {
+  implements TransitAlertProvider
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 

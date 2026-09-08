@@ -133,7 +133,7 @@ class GenericEdgeUpdater {
 
     edgesUpdated++;
 
-    if (LOG.isInfoEnabled() && (edgesUpdated % REPORT_EVERY_N_EDGE) == 0) {
+    if (LOG.isInfoEnabled() && edgesUpdated % REPORT_EVERY_N_EDGE == 0) {
       LOG.info(String.format("%d / %d street edges updated", edgesUpdated, streetEdges.size()));
     }
   }

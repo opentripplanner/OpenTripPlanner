@@ -34,10 +34,6 @@ public class WarmupModule {
     RequestScopedFactory.Builder requestScopedComponentBuilder,
     TransitRepository transitRepository
   ) {
-    return new WarmupLauncher(
-      parameters,
-      () -> requestScopedComponentBuilder.build().createServerContext(),
-      transitRepository
-    );
+    return new WarmupLauncher(parameters, requestScopedComponentBuilder::build, transitRepository);
   }
 }

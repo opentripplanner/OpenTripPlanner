@@ -114,11 +114,12 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .withTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeD = FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
-      .withPrice(D_PRICE)
-      .withTransferDuration(fiveMinutes)
-      //.setAgency(agency1.getId().getId())
-      .build();
+    FareAttribute fareAttributeD =
+      FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
+        .withPrice(D_PRICE)
+        .withTransferDuration(fiveMinutes)
+        //.setAgency(agency1.getId().getId())
+        .build();
 
     FareAttribute fareAttributeABC = FareAttribute.of(new FeedScopedId(FEED_ID, "ABC"))
       .withPrice(ABC_PRICE)

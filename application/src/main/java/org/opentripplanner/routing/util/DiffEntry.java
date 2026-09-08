@@ -29,7 +29,7 @@ public record DiffEntry<T>(T left, T right) {
    * exist left only - or, exist right only
    */
   public String status(String equal, String left, String right) {
-    return leftOnly() ? left : (rightOnly() ? right : equal);
+    return leftOnly() ? left : rightOnly() ? right : equal;
   }
 
   @Override

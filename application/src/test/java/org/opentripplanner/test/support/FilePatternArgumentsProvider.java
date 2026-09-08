@@ -25,7 +25,8 @@ import org.junit.jupiter.params.support.AnnotationConsumer;
  * Check the usages of {@link FilePatternSource} to see examples for how to use.
  */
 class FilePatternArgumentsProvider
-  implements ArgumentsProvider, AnnotationConsumer<FilePatternSource> {
+  implements ArgumentsProvider, AnnotationConsumer<FilePatternSource>
+{
 
   private List<String> patterns;
 

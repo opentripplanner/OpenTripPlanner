@@ -42,9 +42,8 @@ public class CarpoolingRequestBuilder {
       .accessEgress()
       .maxDuration()
       .valueOf(StreetMode.WALK);
-    this.searchWindow = request.searchWindow() == null
-      ? DEFAULT_SEARCH_WINDOW
-      : request.searchWindow();
+    this.searchWindow =
+      request.searchWindow() == null ? DEFAULT_SEARCH_WINDOW : request.searchWindow();
   }
 
   public CarpoolingRequestBuilder withAccessOrEgress(AccessEgressType accessOrEgress) {

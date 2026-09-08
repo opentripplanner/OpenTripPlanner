@@ -52,7 +52,7 @@ public class TestTableParser {
 
   private static String stripComment(String line) {
     int pos = line.indexOf("#");
-    return pos < 0 ? line : (pos == 0 ? "" : line.substring(0, pos).trim());
+    return pos < 0 ? line : pos == 0 ? "" : line.substring(0, pos).trim();
   }
 
   private static Object toValue(String arg) {

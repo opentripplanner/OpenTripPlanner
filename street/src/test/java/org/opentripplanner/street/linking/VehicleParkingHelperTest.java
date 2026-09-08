@@ -1,5 +1,6 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,14 +48,13 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, 3)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id ->
-              builder ->
-                builder
-                  .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                  .name(new NonLocalizedString("Entrance " + id))
-                  .coordinate(new WgsCoordinate(id, id))
-                  .carAccessible(id == 1 || id == 3)
-                  .walkAccessible(id == 2 || id == 3)
+            id -> builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .carAccessible(id == 1 || id == 3)
+                .walkAccessible(id == 2 || id == 3)
           )
           .collect(Collectors.toList())
       )
@@ -64,7 +64,7 @@ class VehicleParkingHelperTest {
     new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertEquals(3, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
-    assertEquals(7, graph.getEdgesOfType(VehicleParkingEdge.class).size());
+    assertThat(graph.findEdges(VehicleParkingEdge.class)).hasSize(7);
   }
 
   private VehicleParking createParingWithEntrances(int entranceNumber) {
@@ -73,13 +73,12 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, entranceNumber)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id ->
-              builder ->
-                builder
-                  .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                  .name(new NonLocalizedString("Entrance " + id))
-                  .coordinate(new WgsCoordinate(id, id))
-                  .walkAccessible(true)
+            id -> builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .walkAccessible(true)
           )
           .collect(Collectors.toList())
       )

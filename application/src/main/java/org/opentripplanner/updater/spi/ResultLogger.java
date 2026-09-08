@@ -38,19 +38,17 @@ public class ResultLogger {
       return;
     }
     var errorIndex = updateResult.failures();
-    errorIndex
-      .keySet()
-      .forEach(key -> {
-        var value = errorIndex.get(key);
-        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-        LOG.warn(
-          "[{} {}] {} failures of {}: {}",
-          keyValue("feedId", feedId),
-          keyValue("type", type),
-          value.size(),
-          keyValue("errorType", key),
-          tripIds
-        );
-      });
+    errorIndex.keySet().forEach(key -> {
+      var value = errorIndex.get(key);
+      var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
+      LOG.warn(
+        "[{} {}] {} failures of {}: {}",
+        keyValue("feedId", feedId),
+        keyValue("type", type),
+        value.size(),
+        keyValue("errorType", key),
+        tripIds
+      );
+    });
   }
 }

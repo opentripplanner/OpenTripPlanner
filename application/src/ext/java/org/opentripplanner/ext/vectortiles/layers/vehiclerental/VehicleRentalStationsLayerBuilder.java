@@ -13,7 +13,8 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class VehicleRentalStationsLayerBuilder
-  extends VehicleRentalLayerBuilder<VehicleRentalStation> {
+  extends VehicleRentalLayerBuilder<VehicleRentalStation>
+{
 
   public VehicleRentalStationsLayerBuilder(
     VehicleRentalService service,

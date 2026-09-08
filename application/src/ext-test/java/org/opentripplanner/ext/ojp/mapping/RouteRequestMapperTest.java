@@ -201,9 +201,7 @@ class RouteRequestMapperTest {
           new LineDirectionFilterStructure()
             .withExclude(false)
             .withLine(
-              (new LineDirectionStructure().withLineRef(
-                  new LineRefStructure().withValue("F:route1")
-                ))
+              new LineDirectionStructure().withLineRef(new LineRefStructure().withValue("F:route1"))
             )
         )
       ),
@@ -213,9 +211,9 @@ class RouteRequestMapperTest {
           new LineDirectionFilterStructure()
             .withExclude(true)
             .withLine(
-              (new LineDirectionStructure().withLineRef(
-                  new LineRefStructure().withValue("F:agency1")
-                ))
+              new LineDirectionStructure().withLineRef(
+                new LineRefStructure().withValue("F:agency1")
+              )
             )
         )
       ),

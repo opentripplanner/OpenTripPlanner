@@ -39,9 +39,10 @@ public class TripSearchMetadata {
     @Nullable Instant firstDepartureTime
   ) {
     // Round down to the minute before to avoid duplicates. This may cause missed itineraries.
-    Instant actualEdt = firstDepartureTime == null
-      ? earliestDepartureTimeUsed
-      : firstDepartureTime.minusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
+    Instant actualEdt =
+      firstDepartureTime == null
+        ? earliestDepartureTimeUsed
+        : firstDepartureTime.minusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
     return new TripSearchMetadata(
       pageDepartureTimeStart,
@@ -61,9 +62,10 @@ public class TripSearchMetadata {
   ) {
     // There is no way to make this work properly with lastDepartureTime. If we round down we get
     // duplicates, if we round up we might skip itineraries.
-    Instant nextDateTime = lastDepartureTime == null
-      ? requestDepartureTime.plus(raptorSearchWindowUsed)
-      : lastDepartureTime.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
+    Instant nextDateTime =
+      lastDepartureTime == null
+        ? requestDepartureTime.plus(raptorSearchWindowUsed)
+        : lastDepartureTime.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
     return new TripSearchMetadata(
       pageDepartureTimeStart,

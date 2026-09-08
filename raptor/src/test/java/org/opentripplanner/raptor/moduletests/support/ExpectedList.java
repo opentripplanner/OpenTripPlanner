@@ -38,6 +38,8 @@ public class ExpectedList {
   }
 
   public String[] range(int startInclusive, int endExclusive) {
-    return Arrays.stream(items, startInclusive, endExclusive).toList().toArray(new String[0]);
+    return Arrays.stream(items, startInclusive, endExclusive)
+      .toList()
+      .toArray(new String[0]);
   }
 }

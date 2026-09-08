@@ -62,8 +62,7 @@ public class TripTimesStringBuilder {
       if (!flags.isEmpty()) {
         s.append(" [").append(String.join(",", flags)).append("]");
       }
-      s
-        .append(" ")
+      s.append(" ")
         .append(TimeUtils.timeToStrCompact(arrive))
         .append(" ")
         .append(TimeUtils.timeToStrCompact(depart));

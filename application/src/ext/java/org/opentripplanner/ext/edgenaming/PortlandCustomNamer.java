@@ -3,9 +3,9 @@ package org.opentripplanner.ext.edgenaming;
 import java.util.HashSet;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
-import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
+import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -75,27 +75,25 @@ class PortlandCustomNamer implements EdgeNamer {
   public void recordEdges(OsmWay way, StreetEdgePair edgePair, OsmDatabase osmdb) {
     final boolean isHighwayLink = isHighwayLink(way);
     final boolean isLowerLink = isLowerLink(way);
-    edgePair
-      .asIterable()
-      .forEach(edge -> {
-        if (!edge.nameIsDerived()) {
-          // this edge already has a real name so there is nothing to do
-          return;
+    edgePair.asIterable().forEach(edge -> {
+      if (!edge.nameIsDerived()) {
+        // this edge already has a real name so there is nothing to do
+        return;
+      }
+      if (isHighwayLink) {
+        if (edge.isBack()) {
+          nameByDestination.add(edge);
+        } else {
+          nameByOrigin.add(edge);
         }
-        if (isHighwayLink) {
-          if (edge.isBack()) {
-            nameByDestination.add(edge);
-          } else {
-            nameByOrigin.add(edge);
-          }
-        } else if (isLowerLink) {
-          if (edge.isBack()) {
-            nameByOrigin.add(edge);
-          } else {
-            nameByDestination.add(edge);
-          }
+      } else if (isLowerLink) {
+        if (edge.isBack()) {
+          nameByOrigin.add(edge);
+        } else {
+          nameByDestination.add(edge);
         }
-      });
+      }
+    });
   }
 
   @Override

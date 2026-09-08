@@ -31,9 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # nodejs is needed because the dynamic download of it via the prettier maven plugin often
-      # times out
-      # Example: https://github.com/opentripplanner/OpenTripPlanner/actions/runs/4490450225/jobs/7897533439
+      # nodejs is needed because Spotless runs Prettier through node/npm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -51,9 +49,8 @@ jobs:
         # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
-        # we set nodePath and npmPath to skip downloading the node binary, which frequently times out
         run: |
-          mvn jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
+          mvn jacoco:prepare-agent test jacoco:report -P prettierCheck
           mvn package -Dmaven.test.skip -P prettierSkip,checkstyleSkip
 
       - name: Send coverage data to codecov.io

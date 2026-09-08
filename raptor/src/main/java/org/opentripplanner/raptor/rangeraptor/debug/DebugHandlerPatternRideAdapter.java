@@ -7,7 +7,8 @@ import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 final class DebugHandlerPatternRideAdapter
-  extends AbstractDebugHandlerAdapter<PatternRideView<?, ?>> {
+  extends AbstractDebugHandlerAdapter<PatternRideView<?, ?>>
+{
 
   DebugHandlerPatternRideAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {
     super(debug, debug.patternRideDebugListener(), lifeCycle);

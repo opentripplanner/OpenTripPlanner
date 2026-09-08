@@ -101,7 +101,7 @@ public class StateEditor {
       // check that time changes are coherent with edge traversal
       // direction
       double timeDelta = time_ms - backState.getTimeMilliseconds();
-      if (traversingBackward ? (timeDelta > 0) : (timeDelta < 0)) {
+      if (traversingBackward ? timeDelta > 0 : timeDelta < 0) {
         throw new IllegalStateException(
           "Time was incremented the wrong direction during state editing, while traversing " +
             backEdge
@@ -160,7 +160,7 @@ public class StateEditor {
         "A state's time is being incremented by a negative amount while traversing edge " + backEdge
       );
     }
-    this.time_ms += (traversingBackward ? -milliseconds : milliseconds);
+    this.time_ms += traversingBackward ? -milliseconds : milliseconds;
   }
 
   public void incrementTimeInSeconds(long seconds) {
@@ -368,9 +368,10 @@ public class StateEditor {
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-      stateData.currentMode = formFactor != null
-        ? formFactor.traverseMode
-        : StreetModeToRentalTraverseModeMapper.map(request.mode());
+      stateData.currentMode =
+        formFactor != null
+          ? formFactor.traverseMode
+          : StreetModeToRentalTraverseModeMapper.map(request.mode());
       stateData.vehicleRentalNetwork = network;
       stateData.rentalVehicleFormFactor = formFactor;
       stateData.rentalVehiclePropulsionType = propulsionType;

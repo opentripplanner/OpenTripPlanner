@@ -98,7 +98,7 @@ class ScheduledTransitLegReferenceTest {
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
       transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
-      transitRepository.getServiceCodes().put(tripPattern.getId(), SERVICE_CODE);
+      transitRepository.putServiceCode(tripPattern.getId(), SERVICE_CODE);
       FeedScopedId tripOnServiceDateId = id("TRIP_ON_SERVICE_DATE" + item.getKey().getId());
       transitRepository.addTripOnServiceDate(
         TripOnServiceDate.of(tripOnServiceDateId)

@@ -13,14 +13,14 @@ public class FlexConfig implements FlexParameters {
   private static final FlexParameters DEFAULT = FlexParameters.defaultValues();
 
   public static final String ACCESS_EGRESS_DESCRIPTION = """
-    If you have multiple overlapping flex zones the high default value can lead to performance problems.
-    A lower value means faster routing.
+  If you have multiple overlapping flex zones the high default value can lead to performance problems.
+  A lower value means faster routing.
 
-    Depending on your service this might be what you want to do anyway: many flex services are used
-    by passengers with mobility problems so offering a long walk might be problematic. In other words,
-    if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
-    services.
-    """;
+  Depending on your service this might be what you want to do anyway: many flex services are used
+  by passengers with mobility problems so offering a long walk might be problematic. In other words,
+  if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
+  services.
+  """;
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;

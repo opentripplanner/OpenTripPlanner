@@ -76,18 +76,18 @@ public class TransfersReport {
     transfers.forEach(t -> {
       var from = pointInfo(t.getFrom(), ALIGHT);
       var to = pointInfo(t.getTo(), BOARD);
-      var dist = (from.coordinate == null || to.coordinate == null)
-        ? ""
-        : String.format(
-            "%.0fm",
-            SphericalDistanceLibrary.fastDistance(
-              from.coordinate.asJtsCoordinate(),
-              to.coordinate.asJtsCoordinate()
-            )
-          );
-      var duration = (from.time == NOT_SET || to.time == NOT_SET)
-        ? ""
-        : durationToStr(to.time - from.time);
+      var dist =
+        from.coordinate == null || to.coordinate == null
+          ? ""
+          : String.format(
+              "%.0fm",
+              SphericalDistanceLibrary.fastDistance(
+                from.coordinate.asJtsCoordinate(),
+                to.coordinate.asJtsCoordinate()
+              )
+            );
+      var duration =
+        from.time == NOT_SET || to.time == NOT_SET ? "" : durationToStr(to.time - from.time);
       var c = t.getTransferConstraint();
 
       buf.addText(t.getId() == null ? "" : t.getId().getId());

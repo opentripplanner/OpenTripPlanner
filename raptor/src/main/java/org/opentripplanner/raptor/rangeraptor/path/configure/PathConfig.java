@@ -81,7 +81,9 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
     ParetoSetTime timeConfig = ctx.searchParams().timetable()
       ? ParetoSetTime.USE_TIMETABLE
-      : (preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME : ParetoSetTime.USE_ARRIVAL_TIME);
+      : preferLatestDeparture
+        ? ParetoSetTime.USE_DEPARTURE_TIME
+        : ParetoSetTime.USE_ARRIVAL_TIME;
     return timeConfig;
   }
 

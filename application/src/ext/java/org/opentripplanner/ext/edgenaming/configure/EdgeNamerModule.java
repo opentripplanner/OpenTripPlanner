@@ -4,7 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.ext.edgenaming.EdgeNamerFactory;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.standalone.config.BuildConfig;
 
 @Module

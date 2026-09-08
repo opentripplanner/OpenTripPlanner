@@ -42,8 +42,8 @@ class LegMapper {
     final int lastIdx = size - 1;
 
     for (int i = 0; i < size; ++i) {
-      ZonedDateTime arrivalTimeFromPlace = (i == 0) ? null : domain.get(i - 1).endTime();
-      ZonedDateTime departureTimeToPlace = (i == lastIdx) ? null : domain.get(i + 1).startTime();
+      ZonedDateTime arrivalTimeFromPlace = i == 0 ? null : domain.get(i - 1).endTime();
+      ZonedDateTime departureTimeToPlace = i == lastIdx ? null : domain.get(i + 1).startTime();
 
       apiLegs.add(mapLeg(domain.get(i), arrivalTimeFromPlace, departureTimeToPlace));
     }

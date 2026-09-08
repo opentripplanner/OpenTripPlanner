@@ -61,16 +61,14 @@ class BidirectionalWayPropertiesIndex {
     >();
     TLongObjectMap<BidirectionalWayProperties> index = new TLongObjectHashMap<>(ways.size());
     var synchronizedIndex = TCollections.synchronizedMap(index);
-    ways
-      .parallelStream()
-      .forEach(way -> {
-        var props = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
-        var canonicalProps = distinctProps.computeIfAbsent(props, p -> p);
-        synchronizedIndex.put(way.getId(), canonicalProps);
-        //Keep lambda! A method-ref would log incorrect class and line number
-        //noinspection Convert2MethodRef
-        progress.step(m -> LOG.info(m));
-      });
+    ways.parallelStream().forEach(way -> {
+      var props = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
+      var canonicalProps = distinctProps.computeIfAbsent(props, p -> p);
+      synchronizedIndex.put(way.getId(), canonicalProps);
+      //Keep lambda! A method-ref would log incorrect class and line number
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
+    });
 
     LOG.info(progress.completeMessage());
     return new BidirectionalWayPropertiesIndex(index);

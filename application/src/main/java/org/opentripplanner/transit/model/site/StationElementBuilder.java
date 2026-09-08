@@ -15,8 +15,7 @@ import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 public abstract class StationElementBuilder<
   E extends StationElement<E, B>,
   B extends StationElementBuilder<E, B>
->
-  extends AbstractEntityBuilder<E, B> {
+> extends AbstractEntityBuilder<E, B> {
 
   private I18NString name;
   private String code;

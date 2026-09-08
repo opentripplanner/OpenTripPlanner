@@ -131,15 +131,13 @@ public final class RaptorViaLocation {
     if (label != null) {
       buf.append(label).append(" ");
     }
-    buf
-      .append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ")
-      .append(
-        connections
-          .stream()
-          .limit(10)
-          .map(it -> it.toString(stopNameResolver))
-          .toList()
-      );
+    buf.append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ").append(
+      connections
+        .stream()
+        .limit(10)
+        .map(it -> it.toString(stopNameResolver))
+        .toList()
+    );
     return buf.append("}").toString();
   }
 

@@ -17,6 +17,9 @@ import org.opentripplanner.graph_builder.issues.CouldNotApplyMultiLevelInfoToEle
 import org.opentripplanner.graph_builder.issues.FewerThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.issues.MoreThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.issues.OnlyOneConnectionToElevatorNode;
+import org.opentripplanner.graph_builder.module.osm.model.OsmElevatorKey;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.VertexGenerator;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmLevelSource;
@@ -134,7 +137,7 @@ class ElevatorProcessor {
    * Needs to be called after elevatorNodes have been created in vertexGenerator.
    */
   private void buildElevatorEdgesFromElevatorNodes() {
-    for (Long nodeId : vertexGenerator.elevatorNodes().keySet()) {
+    for (long nodeId : vertexGenerator.elevatorNodes().keySet()) {
       OsmNode node = osmdb.getNode(nodeId);
       Map<OsmElevatorKey, OsmElevatorVertex> vertices = vertexGenerator.elevatorNodes().get(nodeId);
       Map<OsmElevatorKey, OsmLevel> verticeLevels = vertexGenerator.elevatorNodeLevels();
@@ -151,8 +154,7 @@ class ElevatorProcessor {
           .stream()
           .map(key -> verticeLevels.get(key))
           .distinct()
-          .count() ==
-        1
+          .count() == 1
       ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
@@ -218,8 +220,8 @@ class ElevatorProcessor {
         issueStore.add(
           new FewerThanTwoIntersectionNodesInElevatorWay(
             way,
-            osmdb.getNode(firstNodeRef).getCoordinate(),
-            osmdb.getNode(lastNodeRef).getCoordinate(),
+            osmdb.getNodeCoordinate(firstNodeRef),
+            osmdb.getNodeCoordinate(lastNodeRef),
             nodes.size()
           )
         );
@@ -229,8 +231,8 @@ class ElevatorProcessor {
         issueStore.add(
           new MoreThanTwoIntersectionNodesInElevatorWay(
             way,
-            osmdb.getNode(nodes.getFirst()).getCoordinate(),
-            osmdb.getNode(nodes.getLast()).getCoordinate(),
+            osmdb.getNodeCoordinate(nodes.getFirst()),
+            osmdb.getNodeCoordinate(nodes.getLast()),
             nodes.size()
           )
         );
@@ -240,8 +242,8 @@ class ElevatorProcessor {
         issueStore.add(
           new CouldNotApplyMultiLevelInfoToElevatorWay(
             way,
-            osmdb.getNode(nodes.getFirst()).getCoordinate(),
-            osmdb.getNode(nodes.getLast()).getCoordinate(),
+            osmdb.getNodeCoordinate(nodes.getFirst()),
+            osmdb.getNodeCoordinate(nodes.getLast()),
             nodeLevels.size(),
             nodes.size()
           )

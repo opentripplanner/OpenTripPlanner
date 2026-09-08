@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.site.Entrance;
 
@@ -161,7 +160,6 @@ class StatesToWalkStepsMapperTest {
     var mapper = new StatesToWalkStepsMapper(
       path.states,
       null,
-      new StreetNotesService(),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       id -> Entrance.of(id).withCoordinate(WgsCoordinate.GREENWICH).build(),
       0

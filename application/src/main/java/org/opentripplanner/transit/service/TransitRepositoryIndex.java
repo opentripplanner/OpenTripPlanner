@@ -68,12 +68,10 @@ class TransitRepositoryIndex {
 
     for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
       patternsForRoute.put(pattern.getRoute(), pattern);
-      pattern
-        .scheduledTripsAsStream()
-        .forEach(trip -> {
-          patternForTrip.put(trip, pattern);
-          tripForId.put(trip.getId(), trip);
-        });
+      pattern.scheduledTripsAsStream().forEach(trip -> {
+        patternForTrip.put(trip, pattern);
+        tripForId.put(trip.getId(), trip);
+      });
       for (StopLocation stop : pattern.getStops()) {
         patternsForStop.put(stop, pattern);
       }
@@ -217,18 +215,16 @@ class TransitRepositoryIndex {
     Map<StopLocation, LocalDate> endOfServiceDates = new HashMap<>();
     for (StopLocation stop : patternsForStop.keySet()) {
       for (TripPattern pattern : patternsForStop.get(stop)) {
-        pattern
-          .scheduledTripsAsStream()
-          .forEach(trip -> {
-            LocalDate tripEndDate = endOfServiceDateForService.get(trip.getServiceId());
-            LocalDate endOfServiceDate = endOfServiceDates.get(stop);
-            if (
-              tripEndDate != null &&
-              (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
-            ) {
-              endOfServiceDates.put(stop, tripEndDate);
-            }
-          });
+        pattern.scheduledTripsAsStream().forEach(trip -> {
+          LocalDate tripEndDate = endOfServiceDateForService.get(trip.getServiceId());
+          LocalDate endOfServiceDate = endOfServiceDates.get(stop);
+          if (
+            tripEndDate != null &&
+            (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
+          ) {
+            endOfServiceDates.put(stop, tripEndDate);
+          }
+        });
       }
     }
     endOfServiceDateForStop = Map.copyOf(endOfServiceDates);

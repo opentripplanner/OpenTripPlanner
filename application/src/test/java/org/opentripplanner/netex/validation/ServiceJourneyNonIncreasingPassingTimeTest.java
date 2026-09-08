@@ -475,7 +475,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
         .getPointsInSequence()
         .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
         .get(order)
-    ).getScheduledStopPointRef()
+    )
+      .getScheduledStopPointRef()
       .getValue()
       .getRef();
   }

@@ -24,7 +24,8 @@ import java.util.Iterator;
  */
 public class CollectionsView<T>
   extends AbstractCollection<T>
-  implements Collection<T>, Serializable {
+  implements Collection<T>, Serializable
+{
 
   private final Collection<? extends T>[] collections;
 

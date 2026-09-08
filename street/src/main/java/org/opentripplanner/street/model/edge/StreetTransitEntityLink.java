@@ -15,7 +15,8 @@ import org.opentripplanner.street.search.state.StateEditor;
  */
 public abstract class StreetTransitEntityLink<T extends Vertex>
   extends Edge
-  implements CarPickupableEdge {
+  implements CarPickupableEdge
+{
 
   static final int STEL_TRAVERSE_COST = 1;
 
@@ -88,11 +89,13 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         // floating rental vehicles.
         else if (
           s0.isRentingVehicleFromStation() &&
-          !(s0.mayKeepRentedVehicleAtDestination() &&
+          !(
+            s0.mayKeepRentedVehicleAtDestination() &&
             s0
               .getRequest()
               .rental(s0.getRequest().mode())
-              .allowArrivingInRentedVehicleAtDestination())
+              .allowArrivingInRentedVehicleAtDestination()
+          )
         ) {
           yield State.empty();
         }

@@ -56,7 +56,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
 
   private final VehicleRentalDataSource source;
   private final String nameForLogging;
-  private final boolean applyBusinessAreas;
+  private final boolean requireDropOffInsideBusinessArea;
 
   private Set<Vertex> latestBoundaryVertices = Set.of();
   private GeofencingZoneIndex latestZoneIndex;
@@ -83,10 +83,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
       parameters.sourceParameters().url()
     );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
-    this.applyBusinessAreas = parameters.sourceParameters() instanceof
-        GbfsVehicleRentalDataSourceParameters gbfs
-      ? gbfs.geofencingBusinessAreaBorders()
-      : true;
+    this.requireDropOffInsideBusinessArea =
+      parameters.sourceParameters() instanceof GbfsVehicleRentalDataSourceParameters gbfs
+        ? gbfs.requireDropOffInsideBusinessArea()
+        : true;
 
     // Creation of network linker library will not modify the graph
     this.linker = vertexLinker;
@@ -160,7 +160,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
   }
 
   private class VehicleRentalGraphWriterRunnable
-    implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
+    implements GraphWriterRunnable<StreetRealTimeUpdateContext>
+  {
 
     private final List<VehicleRentalPlace> stations;
     private final Set<GeofencingZone> geofencingZones;
@@ -197,13 +198,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
             // Copy reference to pass into lambda
             var vrv = vehicleRentalVertex;
             unlinkedPlaceThrottle.throttle(() ->
-              // the toString includes the text "Bike rental station"
-              LOG.warn(
-                "VehicleRentalPlace is unlinked for {}: {}  {}",
-                nameForLogging,
-                vrv,
-                unlinkedPlaceThrottle.setupInfo()
-              )
+              LOG
+                // the toString includes the text "Bike rental station"
+                .warn(
+                  "VehicleRentalPlace is unlinked for {}: {}  {}",
+                  nameForLogging,
+                  vrv,
+                  unlinkedPlaceThrottle.setupInfo()
+                )
             );
           }
           VehicleRentalEdge.createRentalEdgesForStation(vehicleRentalVertex, station, tempEdges);
@@ -246,7 +248,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         var applier = new GeofencingZoneApplier(
           ls -> graph.findEdgesAlongLineStrings(ls, Scope.REQUEST),
           env -> graph.findEdges(env, Scope.REQUEST),
-          applyBusinessAreas
+          requireDropOffInsideBusinessArea
         );
         var result = applier.applyGeofencingZones(geofencingZones);
         latestBoundaryVertices = result.boundaryVertices();
@@ -257,7 +259,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         GeofencingZoneApplier.preResolveVertexZones(
           verticesByStation.values(),
           latestZoneIndex,
-          applyBusinessAreas
+          requireDropOffInsideBusinessArea
         );
 
         var end = System.currentTimeMillis();

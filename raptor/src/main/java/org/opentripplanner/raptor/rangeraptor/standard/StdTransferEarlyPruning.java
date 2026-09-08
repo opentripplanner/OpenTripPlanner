@@ -75,8 +75,8 @@ public class StdTransferEarlyPruning<T extends RaptorTripSchedule> {
     this.bestDestCurrentIteration = calculator.unreachedTime();
     this.currentRound = 0;
     lifeCycle.onPrepareForNextRound(round -> this.currentRound = round);
-    lifeCycle.onSetupIteration(ignore ->
-      this.bestDestCurrentIteration = calculator.unreachedTime()
+    lifeCycle.onSetupIteration(
+      ignore -> this.bestDestCurrentIteration = calculator.unreachedTime()
     );
   }
 

@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
  */
 public class AbortOnUnprocessableRequestExecutionStrategy
   extends AsyncExecutionStrategy
-  implements Closeable {
+  implements Closeable
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(
     AbortOnUnprocessableRequestExecutionStrategy.class

@@ -23,7 +23,7 @@ class AreaEdgeBuilderTest {
     new Coordinate[] { FROM_VERTEX.getCoordinate(), TO_VERTEX.getCoordinate() }
   );
 
-  private static final AreaGroup AREA = new AreaGroup(null);
+  private static final AreaGroup AREA = AreaGroup.of(null).build();
 
   @Test
   void buildAndConnect() {

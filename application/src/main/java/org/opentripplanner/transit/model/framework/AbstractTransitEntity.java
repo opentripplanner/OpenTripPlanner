@@ -23,8 +23,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 public abstract class AbstractTransitEntity<
   E extends AbstractTransitEntity<E, B>,
   B extends AbstractEntityBuilder<E, B>
->
-  implements TransitEntity, TransitObject<E, B>, Serializable {
+> implements TransitEntity, TransitObject<E, B>, Serializable {
 
   private final FeedScopedId id;
 
@@ -64,7 +63,7 @@ public abstract class AbstractTransitEntity<
 
     buf.append('{').append(getId());
 
-    if ((this instanceof LogInfo n) && n.logName() != null) {
+    if (this instanceof LogInfo n && n.logName() != null) {
       buf.append(' ').append(n.logName());
     }
     buf.append('}');

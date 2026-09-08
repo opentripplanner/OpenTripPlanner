@@ -19,6 +19,8 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
 
 class WalkRoutingTest {
 
@@ -69,8 +71,20 @@ class WalkRoutingTest {
       var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
-      var ctx = TestServerContext.ofGraph(graph);
-      return DirectStreetRouter.route(ctx, request, linkingContext);
+      var transitService = TestServerContext.createTransitService(
+        new TransitRepository(),
+        TransferServiceTestFactory.defaultTransferRepository()
+      );
+      return DirectStreetRouter.route(
+        graph,
+        transitService,
+        TestServerContext.createStreetLimitationParametersService(),
+        TestServerContext.createVehicleRentalService(),
+        TestServerContext.createStreetDetailsService(),
+        null,
+        request,
+        linkingContext
+      );
     }
   }
 }

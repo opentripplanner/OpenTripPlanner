@@ -12,8 +12,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are
  * scanned to find the latest possible alighting time.
  */
-public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
-  implements RaptorTripScheduleSearch<T> {
+public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule> implements
+  RaptorTripScheduleSearch<T> {
 
   private final TripPatternForDates patternForDates;
 

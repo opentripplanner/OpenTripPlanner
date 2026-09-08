@@ -14,12 +14,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.apis.gtfs.mapping.AlertCauseMapper;
+import org.opentripplanner.apis.gtfs.model.OffsetDateTimeRange;
 import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
 import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
 import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
@@ -43,6 +44,20 @@ import org.opentripplanner.transit.service.TransitService;
 public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   private static final String FALLBACK_EMPTY_STRING = "";
+
+  @Override
+  public DataFetcher<Iterable<OffsetDateTimeRange>> activityPeriods() {
+    return environment -> {
+      var zoneId = getTransitService(environment).getTimeZone();
+      return getSource(environment)
+        .calendar()
+        .timePeriods()
+        .stream()
+        .map(period -> OffsetDateTimeRange.of(period, zoneId))
+        .sorted(OffsetDateTimeRange.CHRONOLOGICAL_ORDER)
+        .toList();
+    };
+  }
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -400,7 +415,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService();
+    return environment.<GtfsGraphQLRequestContext>getContext().transitService();
   }
 
   private TransitAlert getSource(DataFetchingEnvironment environment) {

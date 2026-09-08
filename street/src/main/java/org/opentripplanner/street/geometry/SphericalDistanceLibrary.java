@@ -220,7 +220,7 @@ public abstract class SphericalDistanceLibrary {
    * converge toward the poles.
    */
   public static double degreesLatitudeToMeters(double degreesLatitude) {
-    return ((2 * Math.PI * RADIUS_OF_EARTH_IN_M) * degreesLatitude) / 360;
+    return (2 * Math.PI * RADIUS_OF_EARTH_IN_M * degreesLatitude) / 360;
   }
 
   /**

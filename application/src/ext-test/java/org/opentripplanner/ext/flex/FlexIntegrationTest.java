@@ -43,8 +43,6 @@ import org.opentripplanner.transit.service.TransitRepository;
  */
 public class FlexIntegrationTest {
 
-  private static final FlexParameters FLEX_PARAMETERS = FlexParameters.defaultValues();
-
   public static final GenericLocation OUTSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
     33.7552,
     -84.4631
@@ -82,14 +80,11 @@ public class FlexIntegrationTest {
         FlexIntegrationTestData.COBB_FLEX_GTFS
       )
     );
-    service = TestServerContext.createServerContext(
-      graph,
+    var transitService = TestServerContext.createTransitService(
       transitRepository,
-      transferRepository,
-      model.fareServiceFactory().makeFareService(),
-      null,
-      FLEX_PARAMETERS
-    ).routingService();
+      transferRepository
+    );
+    service = TestServerContext.createRoutingService(graph, transitService, transferRepository);
   }
 
   @Test

@@ -18,8 +18,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
-  implements StopArrivalsState<T> {
+public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implements
+  StopArrivalsState<T> {
 
   private final StopArrivalsState<T> delegate;
   private final StateDebugger<T> debug;

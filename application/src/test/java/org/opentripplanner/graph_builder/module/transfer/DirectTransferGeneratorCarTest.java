@@ -87,10 +87,10 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
       .build();
 
     String expected_walk_bike_results = """
-       S0 - S11, 100m
-       S0 - S21, 100m
-       S0 - S22, 200m
-      S12 - S22, 110m""";
+     S0 - S11, 100m
+     S0 - S21, 100m
+     S0 - S22, 200m
+    S12 - S22, 110m""";
     assertEquals(
       expected_walk_bike_results,
       pathToString(repository.findTransfersByMode(StreetMode.WALK))
@@ -209,7 +209,8 @@ class DirectTransferGeneratorCarTest extends GraphRoutingTest {
     assertEquals(
       """
       S0 - S11, 100m
-      S0 - S21, 100m""".indent(1)
+      S0 - S21, 100m"""
+        .indent(1)
         .stripTrailing(),
       pathToString(repository.findTransfersByMode(StreetMode.BIKE))
     );

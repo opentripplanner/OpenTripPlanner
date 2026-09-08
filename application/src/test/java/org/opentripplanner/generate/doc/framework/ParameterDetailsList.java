@@ -97,7 +97,10 @@ public class ParameterDetailsList {
       doc.dotSeparator().label("Default value:").code(info.type().quote(info.defaultValue()));
     }
 
-    doc.lineBreak().label("Path:").path(path == null ? "/" : "/" + path.replace('.', '/'));
+    doc
+      .lineBreak()
+      .label("Path:")
+      .path(path == null ? "/" : "/" + path.replace('.', '/'));
 
     skipNodes
       .linkDetails(info)

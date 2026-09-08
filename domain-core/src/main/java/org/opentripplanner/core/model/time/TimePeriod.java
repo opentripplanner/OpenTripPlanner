@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Represents a half-open period of time {@code [start, end)}.
+ * Represents a period of time with an inclusive start and an exclusive end {@code [start, end)}.
  * <p>
- * Both bounds are optional: a {@code null} start means that the period has always been valid, and a
- * {@code null} end means that it is valid indefinitely (open-ended).
+ * Both bounds are optional: a {@code null} start means that the period has always been valid
+ * (unbounded start), and a {@code null} end means that it is valid indefinitely (unbounded end).
  */
 public final class TimePeriod {
 
@@ -64,25 +64,25 @@ public final class TimePeriod {
   /**
    * Returns {@code true} if the period has no defined start, meaning it has always been valid.
    */
-  public boolean hasOpenStart() {
+  public boolean hasUnboundedStart() {
     return start == null;
   }
 
   /**
    * Returns {@code true} if the period has no defined end, meaning it is valid indefinitely.
    */
-  public boolean hasOpenEnd() {
+  public boolean hasUnboundedEnd() {
     return end == null;
   }
 
   /**
-   * Returns {@code true} if this period overlaps the given {@code other} period. Open bounds on
-   * either period are treated as extending indefinitely in that direction.
+   * Returns {@code true} if this period overlaps the given {@code other} period. Unbounded bounds
+   * on either period are treated as extending indefinitely in that direction.
    */
   public boolean overlaps(TimePeriod other) {
     return (
-      (hasOpenStart() || other.hasOpenEnd() || start.isBefore(other.end)) &&
-      (hasOpenEnd() || other.hasOpenStart() || other.start.isBefore(end))
+      (hasUnboundedStart() || other.hasUnboundedEnd() || start.isBefore(other.end)) &&
+      (hasUnboundedEnd() || other.hasUnboundedStart() || other.start.isBefore(end))
     );
   }
 
@@ -90,7 +90,10 @@ public final class TimePeriod {
    * Returns {@code true} if the {@code instant} is within this period.
    */
   public boolean contains(Instant instant) {
-    return ((hasOpenStart() || !instant.isBefore(start)) && (hasOpenEnd() || end.isAfter(instant)));
+    return (
+      (hasUnboundedStart() || !instant.isBefore(start)) &&
+      (hasUnboundedEnd() || end.isAfter(instant))
+    );
   }
 
   @Override

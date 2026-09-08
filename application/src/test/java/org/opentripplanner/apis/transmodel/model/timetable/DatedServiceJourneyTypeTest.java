@@ -21,10 +21,16 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -65,13 +71,13 @@ class DatedServiceJourneyTypeTest {
     var unknownTrip = Trip.of(id("does-not-exist")).withRoute(envBuilder.route("Runknown")).build();
     var tripOnServiceDate = tripOnServiceDate(unknownTrip);
 
-    assertNull(fetch(env.transitService(), tripOnServiceDate));
+    assertNull(fetch(env, tripOnServiceDate));
   }
 
   @Test
   void realTimeJourneyState_allFlagsFalse_forScheduledTrip() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var state = fetch(env.transitService(), tripOnServiceDate(env, TRIP_ID));
+    var state = fetch(env, tripOnServiceDate(env, TRIP_ID));
 
     assertFalse(flag(state, "extraJourney"));
     assertFalse(flag(state, "cancellation"));
@@ -82,7 +88,7 @@ class DatedServiceJourneyTypeTest {
 
   @Test
   void realTimeJourneyState_cancellationFlag() {
-    var state = fetchWithUpdate(builder -> builder.withCanceled());
+    var state = fetchWithUpdate(RealTimeTripTimesBuilder::withCanceled);
 
     assertTrue(flag(state, "cancellation"));
     assertTrue(flag(state, "updated"));
@@ -93,7 +99,7 @@ class DatedServiceJourneyTypeTest {
 
   @Test
   void realTimeJourneyState_timesModifiedFlag() {
-    var state = fetchWithUpdate(builder -> builder.withRealTimeUpdated());
+    var state = fetchWithUpdate(RealTimeTripTimesBuilder::withRealTimeUpdated);
 
     assertTrue(flag(state, "timesModified"));
     assertTrue(flag(state, "updated"));
@@ -104,7 +110,7 @@ class DatedServiceJourneyTypeTest {
 
   @Test
   void realTimeJourneyState_extraJourneyFlag() {
-    var state = fetchWithUpdate(builder -> builder.withAdded());
+    var state = fetchWithUpdate(RealTimeTripTimesBuilder::withAdded);
 
     assertTrue(flag(state, "extraJourney"));
     assertTrue(flag(state, "updated"));
@@ -113,7 +119,7 @@ class DatedServiceJourneyTypeTest {
 
   @Test
   void realTimeJourneyState_journeyPatternModifiedFlag() {
-    var state = fetchWithUpdate(builder -> builder.withModifiedTripPattern());
+    var state = fetchWithUpdate(RealTimeTripTimesBuilder::withModifiedTripPattern);
 
     assertTrue(flag(state, "journeyPatternModified"));
     assertTrue(flag(state, "updated"));
@@ -135,8 +141,10 @@ class DatedServiceJourneyTypeTest {
     customize.accept(builder);
     var tripTimes = builder.build();
     var update = RealTimeTripUpdate.of(tripData.tripPattern(), tripTimes, SERVICE_DATE).build();
-    var transitService = transitServiceWithUpdate(env, update);
-    return fetch(transitService, tripOnServiceDate(env, TRIP_ID));
+
+    env.applyUpdate(update);
+
+    return fetch(env, tripOnServiceDate(env, TRIP_ID));
   }
 
   /** Builds a {@link TransitService} that sees the given real-time update in its snapshot. */
@@ -147,7 +155,7 @@ class DatedServiceJourneyTypeTest {
     var repo = env.transitRepository();
     var snapshot = new DefaultTimetableRepository(
       repo.getRaptorTransitData(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     snapshot.update(update);
     return new DefaultTransitService(repo, snapshot.commit());
@@ -172,10 +180,31 @@ class DatedServiceJourneyTypeTest {
 
   @SuppressWarnings("unchecked")
   private static Map<String, Object> fetch(
-    TransitService transitService,
+    TransitTestEnvironment env,
     TripOnServiceDate tripOnServiceDate
   ) {
-    var context = new TransmodelRequestContext(null, null, transitService, null);
+    var transitService = env.transitService();
+    var graph = new Graph();
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+    var defaultRequest = RouteRequest.defaultValue();
+
+    TransferRepository transferRepository = TransferServiceTestFactory.defaultTransferRepository();
+
+    TransmodelRequestContext context = new TransmodelRequestContext(
+      TestServerContext.createRoutingService(graph, transitService, transferRepository),
+      transitService,
+      null,
+      null,
+      defaultRequest,
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createVehicleParkingService(),
+      graph,
+      TransferServiceTestFactory.transferService(transferRepository),
+      TestServerContext.createStreetDetailsService(),
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
+      TestServerContext.createStreetLimitationParametersService()
+    );
+
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
         .query(

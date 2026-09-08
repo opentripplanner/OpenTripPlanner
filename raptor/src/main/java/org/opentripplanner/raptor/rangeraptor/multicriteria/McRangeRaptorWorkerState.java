@@ -61,8 +61,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
-  implements RaptorWorkerState<T> {
+public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implements
+  RaptorWorkerState<T> {
 
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;

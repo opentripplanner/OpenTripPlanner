@@ -14,7 +14,7 @@ import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.calendar.DefaultTripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -125,7 +125,7 @@ class TripOnServiceDateImplTest {
     var repo = env.transitRepository();
     var snapshot = new DefaultTimetableRepository(
       repo.getRaptorTransitData(),
-      new DefaultTripCalendars()
+      TripCalendars.empty()
     );
     snapshot.update(update);
     return new DefaultTransitService(repo, snapshot.commit());

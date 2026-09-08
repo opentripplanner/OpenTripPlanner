@@ -27,7 +27,8 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  */
 public class Station
   extends AbstractTransitEntity<Station, StationBuilder>
-  implements StopLocationsGroup, LogInfo {
+  implements StopLocationsGroup, LogInfo
+{
 
   private final I18NString name;
   private final String code;
@@ -209,9 +210,10 @@ public class Station
     );
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
-    var geometries = stationPoint != null
-      ? new Geometry[] { stationPoint, convexHull }
-      : new Geometry[] { convexHull };
+    var geometries =
+      stationPoint != null
+        ? new Geometry[] { stationPoint, convexHull }
+        : new Geometry[] { convexHull };
     return getGeometryFactory().createGeometryCollection(geometries);
   }
 }

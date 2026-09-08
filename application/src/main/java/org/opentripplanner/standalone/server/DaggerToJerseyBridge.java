@@ -6,11 +6,14 @@ import java.util.function.Supplier;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchema;
+import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -18,7 +21,6 @@ import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
@@ -28,8 +30,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Bridges the Dagger-managed {@link RequestScopedFactory} into HK2/Jersey: the component itself,
- * {@link OtpServerRequestContext} (grab-bag of everything not yet migrated), and individual
- * request-scoped services (currently just {@link TransitService}) that resources can inject
+ * plus individual request-scoped services (e.g. {@link TransitService}) that resources can inject
  * directly with {@code @Context}.
  * <p>
  * All bindings are scoped {@code .in(RequestScoped.class)} — Jersey's own per-actual-HTTP-request
@@ -64,7 +65,6 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     // Binding for all request-scoped services used by resources
     bridge(factory, RequestScopedFactory::transitService, TransitService.class);
     bridge(factory, RequestScopedFactory::transitAlertService, TransitAlertService.class);
-    bridge(factory, RequestScopedFactory::createServerContext, OtpServerRequestContext.class);
     bridge(factory, RequestScopedFactory::graph, Graph.class);
     bridge(factory, RequestScopedFactory::defaultRouteRequest, RouteRequest.class);
     bridge(factory, RequestScopedFactory::vehicleParkingService, VehicleParkingService.class);
@@ -81,6 +81,9 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     bridge(factory, RequestScopedFactory::linkingContextFactory, LinkingContextFactory.class);
     bridge(factory, RequestScopedFactory::ojpApiParameters, OjpApiParameters.class);
     bridge(factory, RequestScopedFactory::triasApiParameters, TriasApiParameters.class);
+    bridge(factory, RequestScopedFactory::routingService, RoutingService.class);
+    bridge(factory, RequestScopedFactory::transmodelRequestContext, TransmodelRequestContext.class);
+    bridge(factory, RequestScopedFactory::graphQLRequestContext, GtfsGraphQLRequestContext.class);
   }
 
   /**

@@ -12,7 +12,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 final class TransitStopArrivalC2<T extends RaptorTripSchedule>
   extends AbstractStopArrivalC2<T>
-  implements TransitPathView<T>, TransitArrival<T> {
+  implements TransitPathView<T>, TransitArrival<T>
+{
 
   private final T trip;
   private final int boardStopPosition;

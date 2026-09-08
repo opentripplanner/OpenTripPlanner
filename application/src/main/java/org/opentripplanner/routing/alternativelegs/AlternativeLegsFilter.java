@@ -8,17 +8,16 @@ import org.opentripplanner.transit.model.network.TripPattern;
 public enum AlternativeLegsFilter {
   NO_FILTER((Leg leg) -> (TripPattern tripPattern) -> true),
   SAME_AGENCY(
-    (Leg leg) ->
-      (TripPattern tripPattern) -> leg.agency().equals(tripPattern.getRoute().getAgency())
+    (Leg leg) -> (TripPattern tripPattern) ->
+      leg.agency().equals(tripPattern.getRoute().getAgency())
   ),
   SAME_ROUTE((Leg leg) -> (TripPattern tripPattern) -> leg.route().equals(tripPattern.getRoute())),
   SAME_MODE(
     (Leg leg) -> (TripPattern tripPattern) -> leg.trip().getMode().equals(tripPattern.getMode())
   ),
   SAME_SUBMODE(
-    (Leg leg) ->
-      (TripPattern tripPattern) ->
-        leg.trip().getNetexSubMode().equals(tripPattern.getNetexSubmode())
+    (Leg leg) -> (TripPattern tripPattern) ->
+      leg.trip().getNetexSubMode().equals(tripPattern.getNetexSubmode())
   );
 
   public final Function<Leg, Predicate<TripPattern>> predicateGenerator;

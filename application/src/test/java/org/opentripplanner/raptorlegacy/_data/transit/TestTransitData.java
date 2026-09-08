@@ -39,7 +39,8 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 @Deprecated
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
-  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
+  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants
+{
 
   public static final TransferConstraint TX_GUARANTEED = TransferConstraint.of()
     .guaranteed()
@@ -156,7 +157,8 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataStartTime() {
-    return this.routes.stream()
+    return this.routes
+      .stream()
       .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
       .min()
       .orElseThrow();
@@ -164,7 +166,8 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataEndTime() {
-    return this.routes.stream()
+    return this.routes
+      .stream()
       .mapToInt(route -> {
         RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
         RaptorTripPattern pattern = route.pattern();

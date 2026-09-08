@@ -103,8 +103,8 @@ public class CarpoolSiriMapper {
 
     for (int i = 0; i < activeCalls.size(); i++) {
       EstimatedCall call = activeCalls.get(i);
-      boolean isFirst = (i == 0);
-      boolean isLast = (i == activeCalls.size() - 1);
+      boolean isFirst = i == 0;
+      boolean isLast = i == activeCalls.size() - 1;
 
       var stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
       stops.add(stop);
@@ -144,9 +144,10 @@ public class CarpoolSiriMapper {
     // trees across the network and degrades every later request. When the destination has no
     // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
     // the same default the destination stop itself receives when the feed omits a latest arrival.
-    var latestArrival = lastStop.getLatestExpectedArrivalTime() != null
-      ? lastStop.getLatestExpectedArrivalTime()
-      : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
+    var latestArrival =
+      lastStop.getLatestExpectedArrivalTime() != null
+        ? lastStop.getLatestExpectedArrivalTime()
+        : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
     var tripDuration = Duration.between(startTime, latestArrival);
     if (tripDuration.compareTo(CarpoolTrip.MAX_TRIP_DURATION) > 0) {
       throw new IllegalArgumentException(
@@ -347,9 +348,10 @@ public class CarpoolSiriMapper {
    */
   private Duration extractDeviationBudget(EstimatedCall call) {
     var latestExpected = call.getLatestExpectedArrivalTime();
-    var arrivalTime = call.getExpectedArrivalTime() != null
-      ? call.getExpectedArrivalTime()
-      : call.getAimedArrivalTime();
+    var arrivalTime =
+      call.getExpectedArrivalTime() != null
+        ? call.getExpectedArrivalTime()
+        : call.getAimedArrivalTime();
 
     if (latestExpected == null || arrivalTime == null) {
       return CarpoolStop.DEFAULT_DEVIATION_BUDGET;
@@ -397,9 +399,10 @@ public class CarpoolSiriMapper {
     // Validate intermediate calls are between first and last
     for (int i = 1; i < calls.size() - 1; i++) {
       EstimatedCall intermediateCall = calls.get(i);
-      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null
-        ? intermediateCall.getAimedDepartureTime()
-        : intermediateCall.getAimedArrivalTime();
+      ZonedDateTime intermediateTime =
+        intermediateCall.getAimedDepartureTime() != null
+          ? intermediateCall.getAimedDepartureTime()
+          : intermediateCall.getAimedArrivalTime();
 
       if (intermediateTime == null) {
         LOG.info("Intermediate call at index {} has no timing information", i);
@@ -435,9 +438,10 @@ public class CarpoolSiriMapper {
     var flexibleArea = toFlexibleArea(call);
     var circleLocation = flexibleArea.getCircularArea();
     var legacyGeometry = flexibleArea.getPolygon();
-    var centroid = circleLocation == null
-      ? toWgsCoordinate(toPolygon(legacyGeometry))
-      : toWgsCoordinate(circleLocation);
+    var centroid =
+      circleLocation == null
+        ? toWgsCoordinate(toPolygon(legacyGeometry))
+        : toWgsCoordinate(circleLocation);
 
     return CarpoolStop.of(new FeedScopedId(feedId, id))
       .withCoordinate(centroid)

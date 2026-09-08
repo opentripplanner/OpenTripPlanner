@@ -8,7 +8,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
 public class MultiModalStationBuilder
-  extends AbstractEntityBuilder<MultiModalStation, MultiModalStationBuilder> {
+  extends AbstractEntityBuilder<MultiModalStation, MultiModalStationBuilder>
+{
 
   private Collection<Station> childStations;
 

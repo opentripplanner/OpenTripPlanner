@@ -8,62 +8,50 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 /**
  * Area is a subset of an area group with a certain set of properties (name, safety, etc).
  */
-
 public final class Area implements Serializable {
 
-  private Geometry geometry;
-  private I18NString name;
-  private float bicycleSafety;
-  private float walkSafety;
-  private StreetTraversalPermission permission;
-  private boolean wheelchairAccessible = true;
+  private final Geometry geometry;
+  private final I18NString name;
+  private final float bicycleSafety;
+  private final float walkSafety;
+  private final StreetTraversalPermission permission;
+  private final boolean wheelchairAccessible;
+
+  private Area(Builder builder) {
+    this.geometry = builder.geometry;
+    this.name = builder.name;
+    this.bicycleSafety = builder.bicycleSafety;
+    this.walkSafety = builder.walkSafety;
+    this.permission = builder.permission;
+    this.wheelchairAccessible = builder.wheelchairAccessible;
+  }
+
+  public static Builder of() {
+    return new Builder();
+  }
 
   public I18NString getName() {
     return name;
-  }
-
-  public void setName(I18NString name) {
-    this.name = name;
   }
 
   public Geometry getGeometry() {
     return geometry;
   }
 
-  public void setGeometry(Geometry geometry) {
-    this.geometry = geometry;
-  }
-
   public float getBicycleSafety() {
     return bicycleSafety;
-  }
-
-  public void setBicycleSafety(float bicycleSafety) {
-    this.bicycleSafety = bicycleSafety;
   }
 
   public float getWalkSafety() {
     return walkSafety;
   }
 
-  public void setWalkSafety(float walkSafety) {
-    this.walkSafety = walkSafety;
-  }
-
   public StreetTraversalPermission getPermission() {
     return permission;
   }
 
-  public void setPermission(StreetTraversalPermission permission) {
-    this.permission = permission;
-  }
-
   public boolean isWheelchairAccessible() {
     return wheelchairAccessible;
-  }
-
-  public void setWheelchairAccessible(boolean wheelchairAccessible) {
-    this.wheelchairAccessible = wheelchairAccessible;
   }
 
   /**
@@ -82,5 +70,51 @@ public final class Area implements Serializable {
   @Override
   public final int hashCode() {
     return super.hashCode();
+  }
+
+  public static class Builder {
+
+    private Geometry geometry;
+    private I18NString name;
+    private float bicycleSafety;
+    private float walkSafety;
+    private StreetTraversalPermission permission;
+    private boolean wheelchairAccessible = true;
+
+    private Builder() {}
+
+    public Builder withGeometry(Geometry geometry) {
+      this.geometry = geometry;
+      return this;
+    }
+
+    public Builder withName(I18NString name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder withBicycleSafety(float bicycleSafety) {
+      this.bicycleSafety = bicycleSafety;
+      return this;
+    }
+
+    public Builder withWalkSafety(float walkSafety) {
+      this.walkSafety = walkSafety;
+      return this;
+    }
+
+    public Builder withPermission(StreetTraversalPermission permission) {
+      this.permission = permission;
+      return this;
+    }
+
+    public Builder withWheelchairAccessible(boolean wheelchairAccessible) {
+      this.wheelchairAccessible = wheelchairAccessible;
+      return this;
+    }
+
+    public Area build() {
+      return new Area(this);
+    }
   }
 }

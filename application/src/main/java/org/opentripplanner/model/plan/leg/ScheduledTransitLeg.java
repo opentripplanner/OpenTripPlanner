@@ -230,20 +230,16 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public int departureDelay() {
-    return (
-        tripTimes.isCanceledStop(boardStopPosInPattern) ||
-        tripTimes.isNoDataStop(boardStopPosInPattern)
-      )
+    return tripTimes.isCanceledStop(boardStopPosInPattern) ||
+      tripTimes.isNoDataStop(boardStopPosInPattern)
       ? 0
       : tripTimes.getDepartureDelay(boardStopPosInPattern);
   }
 
   @Override
   public int arrivalDelay() {
-    return (
-        tripTimes.isCanceledStop(alightStopPosInPattern) ||
-        tripTimes.isNoDataStop(alightStopPosInPattern)
-      )
+    return tripTimes.isCanceledStop(alightStopPosInPattern) ||
+      tripTimes.isNoDataStop(alightStopPosInPattern)
       ? 0
       : tripTimes.getArrivalDelay(alightStopPosInPattern);
   }
