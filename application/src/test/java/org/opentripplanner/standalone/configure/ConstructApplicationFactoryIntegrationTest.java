@@ -88,7 +88,8 @@ class ConstructApplicationFactoryIntegrationTest {
     of(LuceneIndex.class),
     of(FareServiceFactory.class),
     of(DeduplicatorService.class),
-    of(WarmupLauncher.class)
+    of(WarmupLauncher.class),
+    of(MetricsLogging.class)
   );
 
   /**
@@ -98,7 +99,6 @@ class ConstructApplicationFactoryIntegrationTest {
   private static final List<DaggerBindingKey> KNOWN_UNSCOPED_BUGS = List.of(
     of(LinkingContextFactory.class),
     of(VertexLinker.class),
-    of(MetricsLogging.class),
     of(ViaCoordinateTransferFactory.class)
   );
 
