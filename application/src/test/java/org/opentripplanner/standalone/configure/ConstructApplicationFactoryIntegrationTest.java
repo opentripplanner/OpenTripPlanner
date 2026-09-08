@@ -63,6 +63,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(TransitRepository.class),
     of(TransferRepository.class),
     of(WorldEnvelopeRepository.class),
+    of(WorldEnvelopeService.class),
     of(RepositoryHandle.class),
     of(VehicleRentalRepository.class),
     of(VehicleRentalService.class),
@@ -94,7 +95,6 @@ class ConstructApplicationFactoryIntegrationTest {
    * fresh instance on every access. Move a binding to {@link #SINGLETONS} once it's fixed.
    */
   private static final List<DaggerBindingKey> KNOWN_UNSCOPED_BUGS = List.of(
-    of(WorldEnvelopeService.class),
     of(LinkingContextFactory.class),
     of(VertexLinker.class),
     of(TransitService.class, StaticTransitService.class),

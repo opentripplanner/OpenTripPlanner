@@ -71,6 +71,7 @@ class RequestScopedFactoryIntegrationTest {
     of(TransmodelAPIParameters.class),
     of(OjpApiParameters.class),
     of(TriasApiParameters.class),
+    of(WorldEnvelopeService.class),
     // Nullable and off by default in this test's config, so both requests observe null.
     of(EmpiricalDelayService.class)
   );
@@ -94,7 +95,6 @@ class RequestScopedFactoryIntegrationTest {
    * fixed.
    */
   private static final List<DaggerBindingKey> KNOWN_UNSCOPED_BUGS = List.of(
-    of(WorldEnvelopeService.class),
     of(StreetDetailsService.class),
     of(LinkingContextFactory.class),
     of(StreetLimitationParametersService.class)

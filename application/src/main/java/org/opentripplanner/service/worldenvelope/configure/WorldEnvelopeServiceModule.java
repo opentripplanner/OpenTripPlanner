@@ -2,6 +2,7 @@ package org.opentripplanner.service.worldenvelope.configure;
 
 import dagger.Binds;
 import dagger.Module;
+import jakarta.inject.Singleton;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 
@@ -12,5 +13,6 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeSe
 @Module
 public interface WorldEnvelopeServiceModule {
   @Binds
+  @Singleton
   WorldEnvelopeService bindService(DefaultWorldEnvelopeService service);
 }
