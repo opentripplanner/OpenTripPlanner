@@ -59,8 +59,7 @@ class WgsCoordinateMapperTest {
 
   @Test
   void handleCoordinatesWithMissingLongitude() {
-    SimplePoint_VersionStructure p;
-    p = new SimplePoint_VersionStructure().withLocation(
+    var p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withLatitude(LATITUDE)
     );
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
@@ -68,10 +67,23 @@ class WgsCoordinateMapperTest {
 
   @Test
   void pos2Numbers() {
+    var coord = WgsCoordinateMapper.mapToDomain(
+      new SimplePoint_VersionStructure().withLocation(
+        new LocationStructure().withPos(
+          new DirectPositionType().withValue(LATITUDE_VALUE, LONGITUDE_VALUE)
+        )
+      )
+    );
+    assertEquals(LATITUDE_VALUE, coord.latitude(), EPSILON);
+    assertEquals(LONGITUDE_VALUE, coord.longitude(), EPSILON);
+  }
+
+  @Test
+  void pos3Numbers() {
     SimplePoint_VersionStructure p;
     p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withPos(
-        new DirectPositionType().withValue(LATITUDE_VALUE, LONGITUDE_VALUE)
+        new DirectPositionType().withValue(LATITUDE_VALUE, LONGITUDE_VALUE, 100d)
       )
     );
     var coord = WgsCoordinateMapper.mapToDomain(p);
@@ -81,8 +93,7 @@ class WgsCoordinateMapperTest {
 
   @Test
   void pos0Numbers() {
-    SimplePoint_VersionStructure p;
-    p = new SimplePoint_VersionStructure().withLocation(
+    var p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withPos(new DirectPositionType())
     );
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import javax.annotation.Nullable;
+import net.opengis.gml._3.DirectPositionType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
@@ -8,11 +9,7 @@ import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 class WgsCoordinateMapper {
 
   /**
-   * This utility method check if the given {@code point} or one of its sub elements is {@code null}
-   * before passing the location to the given {@code locationHandler}.
-   *
-   * @return true if the handler is successfully invoked with a location, {@code false} if any of
-   * the required data elements are {@code null}.
+   * Maps a NeTEx {@code SimplePoint_VersionStructure} to a {@code WgsCoordinate}.
    */
   @Nullable
   static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point) {
@@ -21,12 +18,13 @@ class WgsCoordinateMapper {
     }
     LocationStructure loc = point.getLocation();
 
+    final DirectPositionType pos = loc.getPos();
     if (loc.getLongitude() != null && loc.getLatitude() != null) {
       return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
     }
     // seen in Italian NeTEx data
-    else if (loc.getPos() != null && loc.getPos().getValue().size() >= 2) {
-      var coordinates = loc.getPos().getValue();
+    else if (pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3)) {
+      var coordinates = pos.getValue();
       return new WgsCoordinate(coordinates.getFirst(), coordinates.get(1));
     } else {
       throw new IllegalArgumentException("Coordinate is not valid: " + loc);
