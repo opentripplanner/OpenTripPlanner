@@ -41,6 +41,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -314,7 +315,6 @@ public class RequestScopedModule {
     return new GtfsGraphQLRequestContext(
       routingService,
       transitService,
-      refetchItineraryService,
       transitAlertService,
       transferService,
       fareService,

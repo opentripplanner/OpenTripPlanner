@@ -47,6 +47,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.paging.PagingService;
@@ -255,15 +256,14 @@ public class RoutingWorker {
     // is off (too few or too many results found).
 
     var pagingService = createPagingService(result.itineraries());
-
+    var refetchItineraryService = createRefetchItineraryService();
     return RoutingResponseMapper.map(
       request,
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
-      transitService,
-      transitAlertService,
-      pagingService
+      pagingService,
+      refetchItineraryService
     );
   }
 
@@ -440,6 +440,18 @@ public class RoutingWorker {
       raptorSearchParamsUsed,
       pageCursorInput,
       itineraries
+    );
+  }
+
+  private RefetchItineraryService createRefetchItineraryService() {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
     );
   }
 

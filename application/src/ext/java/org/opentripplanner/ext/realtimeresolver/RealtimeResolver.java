@@ -31,7 +31,7 @@ public class RealtimeResolver {
     return new RealtimeResolver(refetchItineraryService).addRealtimeInfo(itineraries, routeRequest);
   }
 
-  private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries, RouteRequest routeRequest) {
+  public List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries, RouteRequest routeRequest) {
     return itineraries
       .stream()
       .map(o -> decorateItinerary(o, routeRequest))
