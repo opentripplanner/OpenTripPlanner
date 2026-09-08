@@ -3,6 +3,10 @@
   "extends": [
     "config:base"
   ],
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
   "prConcurrentLimit": 3,
   "labels": [
     "+Skip Changelog"
