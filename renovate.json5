@@ -73,6 +73,7 @@
         "org.junit.jupiter:{/,}**"
       ],
       "automerge": true,
+      "minimumReleaseAge": "7 days",
       "schedule": "on the 17th day of the month"
     },
     {
@@ -81,7 +82,8 @@
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",
-      "automerge": true
+      "automerge": true,
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Automerge Maven plugins in a single PR",
@@ -105,7 +107,8 @@
         "org.sonatype.central:central-publishing-maven-plugin"
       ],
       "schedule": "on the 23rd day of the month",
-      "automerge": true
+      "automerge": true,
+      "minimumReleaseAge": "7 days"
     },
     {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
@@ -154,7 +157,8 @@
       "extends": [
         "schedule:quarterly"
       ],
-      "automerge": true
+      "automerge": true,
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Automerge logging dependencies in a single PR",
@@ -165,6 +169,7 @@
         "net.logstash.logback:logstash-logback-encoder"
       ],
       "automerge": true,
+      "minimumReleaseAge": "7 days",
       "schedule": "on the 4th day of the month"
     },
     {
@@ -185,7 +190,8 @@
         "com.fasterxml.jackson.datatype:{/,}**",
         "com.azure:{/,}**"
       ],
-      "automerge": true
+      "automerge": true,
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",
