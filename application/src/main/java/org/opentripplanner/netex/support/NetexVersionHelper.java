@@ -40,7 +40,7 @@ public class NetexVersionHelper {
    * XML automatic consistency check)."
    */
   public static long versionOf(EntityInVersionStructure e) {
-    if (e.getVersion().equals(ANY)) {
+    if (ANY.equals(e.getVersion())) {
       return UNKNOWN_VERSION;
     } else {
       try {
