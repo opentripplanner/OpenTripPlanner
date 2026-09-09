@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -139,7 +140,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     LOG.debug("nothru pruning");
     Map<Vertex, Subgraph> subgraphs = new HashMap<>();
     Map<Vertex, Subgraph> extgraphs = new HashMap<>();
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<>();
+    Map<Vertex, ArraySet<Vertex>> neighborsForVertex = new HashMap<>();
     Map<Edge, Boolean> isolated = new HashMap<>();
     ArrayList<Subgraph> islands = new ArrayList<>();
     int count;
@@ -270,7 +271,7 @@ public class IslandPruningModule implements GraphBuilderModule {
   }
 
   private void collectNeighbourVertices(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    Map<Vertex, ArraySet<Vertex>> neighborsForVertex,
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
@@ -302,19 +303,17 @@ public class IslandPruningModule implements GraphBuilderModule {
         Arrays.stream(states)
           .map(State::getVertex)
           .forEach(out -> {
-            var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
-            vertexList.add(out);
+            neighborsForVertex.computeIfAbsent(gv, k -> new ArraySet<>()).add(out);
 
             // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-            vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
-            vertexList.add(gv);
+            neighborsForVertex.computeIfAbsent(out, k -> new ArraySet<>()).add(gv);
           });
       }
     }
   }
 
   private int collectSubGraphs(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    Map<Vertex, ArraySet<Vertex>> neighborsForVertex,
     // put new subgraphs here
     Map<Vertex, Subgraph> newgraphs,
     // optional isolation map from a previous round
@@ -465,13 +464,13 @@ public class IslandPruningModule implements GraphBuilderModule {
   }
 
   private Subgraph computeConnectedSubgraph(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    Map<Vertex, ArraySet<Vertex>> neighborsForVertex,
     Vertex startVertex,
     Map<Vertex, Subgraph> anchors,
     Map<Vertex, Subgraph> alreadyMapped
   ) {
     Subgraph subgraph = new Subgraph();
-    Queue<Vertex> q = new LinkedList<>();
+    Queue<Vertex> q = new ArrayDeque<>();
     Subgraph anchor = null;
 
     if (anchors != null) {
