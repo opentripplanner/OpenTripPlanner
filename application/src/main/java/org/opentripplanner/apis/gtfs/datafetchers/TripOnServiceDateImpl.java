@@ -5,10 +5,12 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.RealTimeTripStateModel;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.network.ReplacementForRelation;
@@ -16,6 +18,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -124,6 +127,21 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<Trip> trip() {
     return this::getTrip;
+  }
+
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return environment -> {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
+        return null;
+      }
+      var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
+      return Optional.ofNullable(tripTimes)
+        .flatMap(t -> ((TripTimes<?>) t).getVehicleId())
+        .map(FeedScopedId::toString)
+        .orElse(null);
+    };
   }
 
   @Nullable

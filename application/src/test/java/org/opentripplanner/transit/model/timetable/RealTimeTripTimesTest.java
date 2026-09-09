@@ -417,11 +417,11 @@ class RealTimeTripTimesTest {
   public void vehicleIdIsStoredAndRetrieved() {
     var tripTimes = (RealTimeTripTimes) createInitialTripTimes()
       .createRealTimeFromScheduledTimes()
-      .withVehicleId("BUS-42")
+      .withVehicleId(id("BUS-42"))
       .build();
 
     assertTrue(tripTimes.getVehicleId().isPresent());
-    assertEquals("BUS-42", tripTimes.getVehicleId().get());
+    assertEquals(id("BUS-42"), tripTimes.getVehicleId().get());
   }
 
   @Test

@@ -11,6 +11,7 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.ReplacedByRelation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -46,7 +47,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   private final RealTimeTripState state;
 
   @Nullable
-  private final String vehicleId;
+  private final FeedScopedId vehicleId;
 
   RealTimeTripTimes(RealTimeTripTimesBuilder builder) {
     scheduledTripTimes = builder.scheduledTripTimes();
@@ -150,11 +151,8 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return tripHeadsign;
   }
 
-  /**
-   * @return the id of the vehicle operating this trip, as supplied by real-time updates. Empty if no
-   * vehicle has been assigned or reported yet.
-   */
-  public Optional<String> getVehicleId() {
+  @Override
+  public Optional<FeedScopedId> getVehicleId() {
     return Optional.ofNullable(vehicleId);
   }
 
