@@ -149,7 +149,7 @@ public class VehicleParkingLinkingTest {
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
-    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).hasSize(1);
+    assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).hasSize(1);
 
     assertThat(graph.findEdges(VehicleParkingEdge.class)).hasSize(1);
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(2);
@@ -176,7 +176,7 @@ public class VehicleParkingLinkingTest {
 
     TestStreetLinkerModule.link(graph, vehicleParkingService, transitRepository);
 
-    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).isEmpty();
+    assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).isEmpty();
 
     assertThat(graph.findEdges(VehicleParkingEdge.class)).isEmpty();
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).isEmpty();

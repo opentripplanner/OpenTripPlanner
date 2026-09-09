@@ -158,7 +158,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
-    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = graph.findVertices(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
       map.put(it.getId(), it);
@@ -167,7 +167,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    var vertices = graph.getVerticesOfType(StationCentroidVertex.class);
+    var vertices = graph.findVertices(StationCentroidVertex.class);
     return StreamUtils.ofIterable(vertices).collect(
       Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v)
     );

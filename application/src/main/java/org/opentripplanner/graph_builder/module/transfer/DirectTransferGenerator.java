@@ -155,7 +155,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
      */
     bikesAllowedStops.addAll(emptyStops);
 
-    var stops = graph.getVerticesOfType(TransitStopVertex.class);
+    var stops = graph.findVertices(TransitStopVertex.class);
     StreamUtils.ofIterable(stops)
       .parallel()
       .forEach(ts0 -> {

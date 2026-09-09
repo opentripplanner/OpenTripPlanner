@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
-import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -136,7 +135,7 @@ class OsmBoardingLocationsModuleTest {
     ).buildGraph();
 
     var boardingLocations = ListUtils.ofIterable(
-      graph.getVerticesOfType(OsmBoardingLocationVertex.class)
+      graph.findVertices(OsmBoardingLocationVertex.class)
     );
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
     // the module
@@ -316,8 +315,8 @@ class OsmBoardingLocationsModuleTest {
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 
-    var boardingLocations = ImmutableList.copyOf(
-      graph.getVerticesOfType(OsmBoardingLocationVertex.class)
+    var boardingLocations = ListUtils.ofIterable(
+      graph.findVertices(OsmBoardingLocationVertex.class)
     );
 
     for (var testCase : testCases) {
@@ -419,7 +418,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(1, platformVertex2.getIncoming().size());
     assertEquals(1, platformVertex2.getOutgoing().size());
 
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+    var boardingLocations = graph.findVertices(OsmBoardingLocationVertex.class);
 
     // Only one centroid should exist for the shared platform area
     var areaCentroids = StreamUtils.ofIterable(boardingLocations)

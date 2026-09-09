@@ -1,6 +1,5 @@
 package org.opentripplanner.street.graph.summary;
 
-import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,6 +14,7 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.collection.StreamUtils;
 
 /// A class for converting graph entities into human-readable strings, which help writing assertions
@@ -47,7 +47,7 @@ public class GraphSummarizer {
   }
 
   public List<TransitStopVertex> listStopVertices() {
-    return ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
+    return ListUtils.ofIterable(graph.findVertices(TransitStopVertex.class));
   }
 
   /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges. This is a
@@ -75,7 +75,7 @@ public class GraphSummarizer {
   }
 
   public Collection<String> summarizeSplitVertices() {
-    var vertices = graph.getVerticesOfType(SplitterVertex.class);
+    var vertices = graph.findVertices(SplitterVertex.class);
     return StreamUtils.ofIterable(vertices).map(StreetSummarizer::summarizeVertex).toList();
   }
 

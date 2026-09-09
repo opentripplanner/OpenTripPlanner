@@ -38,7 +38,7 @@ public class MoreThanTwoIntersectionsTest {
     var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(4);
     var elevatorHopVertices = StreamUtils.ofIterable(
-      graph.getVerticesOfType(ElevatorHopVertex.class)
+      graph.findVertices(ElevatorHopVertex.class)
     ).map(vertex -> vertex.getLabelString());
     assertThat(elevatorHopVertices).containsNoDuplicates();
   }
