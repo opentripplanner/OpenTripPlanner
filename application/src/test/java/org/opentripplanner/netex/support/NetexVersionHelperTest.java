@@ -48,7 +48,7 @@ class NetexVersionHelperTest {
 
   @Test
   void veryLargeVersion() {
-    assertEquals(20260819234001d, versionOf(versionedEntity("20260819234001")));
+    assertEquals(20260819234001L, versionOf(versionedEntity("20260819234001")));
   }
 
   @Test
@@ -102,7 +102,7 @@ class NetexVersionHelperTest {
     assertNull(firstValidDateTime(List.of(pFrom2ndTo3rd), may4th));
   }
 
-  private static EntityInVersionStructure versionedEntity(String any) {
+  private static EntityInVersionStructure versionedEntity(String version) {
     return new EntityInVersionStructure().withVersion(any);
   }
 }
