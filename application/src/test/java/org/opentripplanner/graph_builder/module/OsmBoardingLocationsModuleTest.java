@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,6 +40,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 class OsmBoardingLocationsModuleTest {
 
@@ -134,7 +135,7 @@ class OsmBoardingLocationsModuleTest {
       osmService
     ).buildGraph();
 
-    var boardingLocations = ImmutableList.copyOf(
+    var boardingLocations = ListUtils.ofIterable(
       graph.getVerticesOfType(OsmBoardingLocationVertex.class)
     );
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
@@ -421,7 +422,7 @@ class OsmBoardingLocationsModuleTest {
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
 
     // Only one centroid should exist for the shared platform area
-    var areaCentroids = StreamSupport.stream(boardingLocations.spliterator(), false)
+    var areaCentroids = StreamUtils.ofIterable(boardingLocations)
       .filter(
         bl ->
           bl.references.contains(platform1.getId().getId()) ||

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -16,6 +15,7 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /// A class for converting graph entities into human-readable strings, which help writing assertions
 /// in test. It does not create or manipulate any entities - it is purely read-only.
@@ -76,9 +76,7 @@ public class GraphSummarizer {
 
   public Collection<String> summarizeSplitVertices() {
     var vertices = graph.getVerticesOfType(SplitterVertex.class);
-    return StreamSupport.stream(vertices.spliterator(), false)
-      .map(StreetSummarizer::summarizeVertex)
-      .toList();
+    return StreamUtils.ofIterable(vertices).map(StreetSummarizer::summarizeVertex).toList();
   }
 
   public Collection<String> summarizeEdges() {
