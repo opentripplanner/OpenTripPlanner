@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,15 +18,13 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -67,9 +64,7 @@ public class TransitDataImportBuilder {
 
   private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
-  private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
-
-  private final List<ServiceCalendar> calendars = new ArrayList<>();
+  private final TripCalendarsBuilder tripCalendars;
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -123,9 +118,29 @@ public class TransitDataImportBuilder {
 
   private final DataImportIssueStore issueStore;
 
+  /**
+   * Create a builder with no transit period limit - see
+   * {@link #TransitDataImportBuilder(SiteRepository, DataImportIssueStore, LocalDateRange)}.
+   */
   public TransitDataImportBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
+    this(siteRepository, issueStore, LocalDateRange.ofUnbounded());
+  }
+
+  /**
+   * @param transitPeriodLimit dates outside this period are dropped as calendar data is added
+   * (see build-config's {@code transitServiceStart}/{@code transitServiceEnd}).
+   */
+  public TransitDataImportBuilder(
+    SiteRepository siteRepository,
+    DataImportIssueStore issueStore,
+    LocalDateRange transitPeriodLimit
+  ) {
     this.siteRepositoryBuilder = siteRepository.withContext();
     this.issueStore = issueStore;
+    this.tripCalendars = TripCalendars.of(transitPeriodLimit);
+    if (!transitPeriodLimit.isUnbounded()) {
+      LOG.info("Limiting transit service to time period: {}", transitPeriodLimit);
+    }
   }
 
   /* Accessors */
@@ -134,12 +149,14 @@ public class TransitDataImportBuilder {
     return agenciesById;
   }
 
-  public List<ServiceCalendarDate> getCalendarDates() {
-    return calendarDates;
-  }
-
-  public List<ServiceCalendar> getCalendars() {
-    return calendars;
+  /**
+   * The builder used to accumulate scheduled calendar data for this feed - one
+   * {@link TripCalendarsBuilder#addWeeklyCalendar} call per GTFS {@code calendar.txt} row, plus
+   * one {@link TripCalendarsBuilder#addServiceDate}/{@link TripCalendarsBuilder#removeServiceDate}
+   * call per {@code calendar_dates.txt} row (or NeTEx equivalent).
+   */
+  public TripCalendarsBuilder tripCalendars() {
+    return tripCalendars;
   }
 
   public List<FeedInfo> getFeedInfos() {
@@ -250,13 +267,6 @@ public class TransitDataImportBuilder {
     return tripOnServiceDates;
   }
 
-  public CalendarServiceData buildCalendarServiceData() {
-    return CalendarServiceDataFactoryImpl.createCalendarServiceData(
-      getCalendarDates(),
-      getCalendars()
-    );
-  }
-
   /**
    * The list of parking lots contained in the transit data (so far only NeTEx).
    * Note that parking lots can also be sourced from OSM data as well as realtime updaters.
@@ -272,43 +282,14 @@ public class TransitDataImportBuilder {
     return stopsByScheduledStopPoints;
   }
 
-  public TransitDataImport build() {
-    return new DefaultTransitDataImport(this);
-  }
-
   /**
-   * Limit the transit service to a time period removing calendar dates and services outside the
-   * period. If a service is start before and/or ends after the period then the service is modified
-   * to match the period.
+   * Build the {@link TransitDataImport}. Since calendar data is clipped to this builder's transit
+   * period limit as it is added (see the constructor), any trip/stopTime/pattern/transfer/
+   * tripOnServiceDate left referencing a service id with no remaining dates is removed first.
    */
-  public void limitServiceDays(LocalDateRange periodLimit) {
-    if (periodLimit.isUnbounded()) {
-      LOG.info("Limiting transit service is skipped, the period is unbounded.");
-      return;
-    }
-
-    LOG.warn("Limiting transit service days to time period: {}", periodLimit);
-
-    int orgSize = calendarDates.size();
-    calendarDates.removeIf(c -> !periodLimit.contains(c.getDate()));
-    logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
-
-    List<ServiceCalendar> keepCal = new ArrayList<>();
-    for (ServiceCalendar calendar : calendars) {
-      if (calendar.getPeriod().overlap(periodLimit)) {
-        calendar.setPeriod(calendar.getPeriod().intersection(periodLimit));
-        keepCal.add(calendar);
-      }
-    }
-
-    orgSize = calendars.size();
-    if (orgSize != keepCal.size()) {
-      calendars.clear();
-      calendars.addAll(keepCal);
-      logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
-    }
+  public TransitDataImport build() {
     removeEntitiesWithInvalidReferences();
-    LOG.info("Limiting transit service days to time period complete.");
+    return new DefaultTransitDataImport(this);
   }
 
   /**
@@ -319,17 +300,10 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * Find all serviceIds in both CalendarServices and CalendarServiceDates.
+   * Find all serviceIds registered on {@link #tripCalendars()}.
    */
   Set<FeedScopedId> findAllServiceIds() {
-    Set<FeedScopedId> serviceIds = new HashSet<>();
-    for (ServiceCalendar calendar : getCalendars()) {
-      serviceIds.add(calendar.getServiceId());
-    }
-    for (ServiceCalendarDate date : getCalendarDates()) {
-      serviceIds.add(date.getServiceId());
-    }
-    return serviceIds;
+    return tripCalendars.listServiceIds();
   }
 
   private static void logRemove(String type, int orgSize, int newSize, String reason) {
@@ -343,7 +317,7 @@ public class TransitDataImportBuilder {
    * Check all relations and remove entities which reference none existing entries. This may happen
    * as a result of inconsistent data or by deliberate removal of elements in the builder.
    */
-  private void removeEntitiesWithInvalidReferences() {
+  void removeEntitiesWithInvalidReferences() {
     removeTripsWithNoneExistingServiceIds();
     removeStopTimesForNoneExistingTrips();
     fixOrRemovePatternsWhichReferenceNoneExistingTrips();

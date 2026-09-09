@@ -1,9 +1,9 @@
 package org.opentripplanner.gtfs;
 
-import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 public interface GtfsContext {
   String getFeedId();
 
-  CalendarServiceData getCalendarServiceData();
+  TripCalendars getTripCalendars();
 }

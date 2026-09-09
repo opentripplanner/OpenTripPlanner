@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
@@ -189,10 +188,10 @@ public class TransitRepository implements Serializable {
     return tripCalendars;
   }
 
-  public void updateCalendarServiceData(CalendarServiceData data) {
+  public void mergeTripCalendars(TripCalendars other) {
     assertModificationsAllowed();
     invalidateIndex();
-    tripCalendars = tripCalendars.merge(data);
+    tripCalendars = tripCalendars.merge(other);
   }
 
   /**

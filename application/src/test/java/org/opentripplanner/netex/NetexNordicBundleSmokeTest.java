@@ -22,9 +22,9 @@ import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -80,7 +80,7 @@ public class NetexNordicBundleSmokeTest {
     assertNoticeAssignments(otpModel.getNoticeAssignments());
 
     // And then - smoke test service calendar
-    assetServiceCalendar(transitBuilder.buildCalendarServiceData());
+    assetServiceCalendar(transitBuilder.tripCalendars().build());
   }
 
   /* private methods */
@@ -245,13 +245,13 @@ public class NetexNordicBundleSmokeTest {
     assertEquals(tripServiceIds, Set.copyOf(serviceIds));
   }
 
-  private void assetServiceCalendar(CalendarServiceData cal) {
-    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
+  private void assetServiceCalendar(TripCalendars cal) {
+    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.listServiceIds());
     assertEquals(3, sIds.size());
 
     var dates = sIds
       .stream()
-      .map(cal::getServiceDatesForServiceId)
+      .map(id -> cal.listServiceDates(id).stream().sorted().toList())
       .sorted(Comparator.comparing(List::size))
       .toList();
 

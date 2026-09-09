@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -15,13 +14,12 @@ import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VehicleParkingHelper;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -42,12 +40,6 @@ public class NetexModule implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
 
   /**
-   * @see BuildConfig#transitServiceStart
-   * @see BuildConfig#transitServiceEnd
-   */
-  private final LocalDateRange transitPeriodLimit;
-
-  /**
    * This collection is a queue because the bundles contain state that remains after loading.
    * They should be garbage collected after loading is finished.
    */
@@ -61,7 +53,6 @@ public class NetexModule implements GraphBuilderModule {
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
-    LocalDateRange transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;
@@ -71,14 +62,13 @@ public class NetexModule implements GraphBuilderModule {
     this.streetDetailsRepository = streetDetailsRepository;
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
-    this.transitPeriodLimit = transitPeriodLimit;
     this.netexBundles = new LinkedList<>(netexBundles);
   }
 
   @Override
   public void buildGraph() {
     try {
-      var calendarServiceData = new CalendarServiceData();
+      TripCalendars tripCalendars = TripCalendars.empty();
 
       while (!netexBundles.isEmpty()) {
         // removes the bundle from the collection and allows it to be garbage collected
@@ -86,8 +76,6 @@ public class NetexModule implements GraphBuilderModule {
         netexBundle.checkInputs();
 
         TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
-        transitBuilder.limitServiceDays(transitPeriodLimit);
-        calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
         if (OTPFeature.FlexRouting.isOn()) {
           transitBuilder
@@ -111,12 +99,14 @@ public class NetexModule implements GraphBuilderModule {
         parkingRepository.updateVehicleParking(lots, List.of());
         var linker = new VehicleParkingHelper(graph);
         lots.forEach(linker::linkVehicleParkingToGraph);
+
+        tripCalendars = tripCalendars.merge(otpService.getTripCalendars());
       }
 
-      transitRepository.updateCalendarServiceData(calendarServiceData);
+      transitRepository.mergeTripCalendars(tripCalendars);
 
       TransitWithFutureDateValidator.validate(
-        calendarServiceData,
+        tripCalendars,
         issueStore,
         transitRepository.getTimeZone()
       );

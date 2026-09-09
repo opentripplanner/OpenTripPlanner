@@ -7,7 +7,7 @@ import java.util.HashSet;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
-import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -16,7 +16,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public class TransitWithFutureDateValidator {
 
   public static void validate(
-    CalendarServiceData data,
+    TripCalendars data,
     DataImportIssueStore issueStore,
     ZoneId timeZone
   ) {
@@ -24,9 +24,9 @@ public class TransitWithFutureDateValidator {
     HashSet<String> agenciesWithFutureDates = new HashSet<>();
     HashSet<String> agencies = new HashSet<>();
 
-    for (FeedScopedId sid : data.getServiceIds()) {
+    for (FeedScopedId sid : data.listServiceIds()) {
       agencies.add(sid.getFeedId());
-      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
+      for (LocalDate sd : data.listServiceDates(sid)) {
         var t = ServiceDateUtils.asStartOfService(sd, timeZone).toInstant();
         if (t.isAfter(now)) {
           agenciesWithFutureDates.add(sid.getFeedId());
