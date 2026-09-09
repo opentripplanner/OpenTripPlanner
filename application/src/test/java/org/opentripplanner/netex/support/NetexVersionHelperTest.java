@@ -52,6 +52,11 @@ class NetexVersionHelperTest {
   }
 
   @Test
+  void alphabeticVersion() {
+    assertEquals(-1, versionOf(versionedEntity("AAA")));
+  }
+
+  @Test
   void comparingVersionTest() {
     // Given a comparator (subject under test)
     Comparator<EntityInVersionStructure> subject = comparingVersion();
@@ -103,6 +108,6 @@ class NetexVersionHelperTest {
   }
 
   private static EntityInVersionStructure versionedEntity(String version) {
-    return new EntityInVersionStructure().withVersion(any);
+    return new EntityInVersionStructure().withVersion(version);
   }
 }

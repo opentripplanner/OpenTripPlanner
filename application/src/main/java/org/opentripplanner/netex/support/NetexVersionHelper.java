@@ -43,7 +43,11 @@ public class NetexVersionHelper {
     if (e.getVersion().equals(ANY)) {
       return UNKNOWN_VERSION;
     } else {
-      return Long.parseLong(e.getVersion());
+      try {
+        return Long.parseLong(e.getVersion());
+      } catch (NumberFormatException _) {
+        return UNKNOWN_VERSION;
+      }
     }
   }
 
