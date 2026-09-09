@@ -24,6 +24,8 @@ public final class StopArrival {
   @Nullable
   public final Integer gtfsStopSequence;
 
+  public final boolean canceled;
+
   @Nullable
   public final ViaLocationType viaLocationType;
 
@@ -43,7 +45,8 @@ public final class StopArrival {
     @Nullable LegCallTime departure,
     @Nullable Integer stopPosInPattern,
     @Nullable Integer gtfsStopSequence,
-    @Nullable ViaLocationType viaLocationType
+    @Nullable ViaLocationType viaLocationType,
+    boolean canceled
   ) {
     this.place = place;
     this.arrival = arrival;
@@ -51,6 +54,7 @@ public final class StopArrival {
     this.stopPosInPattern = stopPosInPattern;
     this.gtfsStopSequence = gtfsStopSequence;
     this.viaLocationType = viaLocationType;
+    this.canceled = canceled;
   }
 
   @Override
