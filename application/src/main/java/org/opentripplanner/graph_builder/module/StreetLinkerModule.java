@@ -88,7 +88,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   public void linkTransitStops(Graph graph, TransitRepository transitRepository) {
     var vertices = graph.getVerticesOfType(TransitStopVertex.class);
-    var progress = ProgressTracker.track("Linking transit stops to graph", 5000, ProgressTracker.UNKNOWN_SIZE);
+    var progress = ProgressTracker.track(
+      "Linking transit stops to graph",
+      5000,
+      ProgressTracker.UNKNOWN_SIZE
+    );
     LOG.info(progress.startMessage());
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();

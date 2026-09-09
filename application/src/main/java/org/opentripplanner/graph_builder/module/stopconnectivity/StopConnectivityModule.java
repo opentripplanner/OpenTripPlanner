@@ -12,7 +12,6 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,
-      ListUtils.countIterable(stopVertices)
+      ProgressTracker.UNKNOWN_SIZE
     );
     LOG.info(progress.startMessage());
     var issues = StreamUtils.ofIterable(stopVertices)

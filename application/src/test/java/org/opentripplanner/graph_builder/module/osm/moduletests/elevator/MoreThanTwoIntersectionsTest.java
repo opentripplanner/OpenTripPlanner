@@ -10,6 +10,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 public class MoreThanTwoIntersectionsTest {
 
@@ -36,10 +37,9 @@ public class MoreThanTwoIntersectionsTest {
 
     var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(4);
-    var elevatorHopVertices = graph
-      .getVerticesOfType(ElevatorHopVertex.class)
-      .stream()
-      .map(vertex -> vertex.getLabelString());
+    var elevatorHopVertices = StreamUtils.ofIterable(
+      graph.getVerticesOfType(ElevatorHopVertex.class)
+    ).map(vertex -> vertex.getLabelString());
     assertThat(elevatorHopVertices).containsNoDuplicates();
   }
 }
