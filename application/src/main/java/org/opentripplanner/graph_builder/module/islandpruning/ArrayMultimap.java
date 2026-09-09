@@ -9,9 +9,7 @@ import java.util.Map;
  * operations that class actually needs are implemented: {@link #put}, {@link #containsKey} and
  * {@link #get}.
  * <p>
- * Values for a key are deduplicated and stored in an {@link ArraySet} rather than a hash-based
- * {@link java.util.Set} — see {@link ArraySet} for the benchmarked rationale (street graph
- * vertices typically have very few neighbors, so a linear scan beats hashing).
+ * Values for a key are deduplicated and stored in an {@link ArraySet} for performance.
  */
 class ArrayMultimap<K, V> {
 
