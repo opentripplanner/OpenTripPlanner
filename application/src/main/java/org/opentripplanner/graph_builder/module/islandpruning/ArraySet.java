@@ -12,8 +12,7 @@ import java.util.NoSuchElementException;
  * This is a deliberate trade-off for very small collections: for the per-vertex street graph
  * neighbor lists held by {@link ArrayMultimap} in {@link IslandPruningModule} (a handful of
  * elements each), the hashing overhead of a hash-based {@code Set} costs more than a linear scan
- * saves. Benchmarked against a full-country OSM extract, a {@code HashSet}-based dedupe of those
- * neighbor lists was ~14% slower overall than this approach.
+ * saves.
  * <p>
  * Not a general-purpose collection: this does not implement {@link java.util.Set}, has no
  * removal, and degrades to O(n) per {@link #add} as element count grows.
