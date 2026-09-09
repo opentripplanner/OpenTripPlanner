@@ -63,7 +63,7 @@ class VehicleParkingHelperTest {
 
     new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
-    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).hasSize(3);
+    assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).hasSize(3);
     assertThat(graph.findEdges(VehicleParkingEdge.class)).hasSize(7);
   }
 
@@ -87,9 +87,9 @@ class VehicleParkingHelperTest {
 
   private void assertGraph(Graph graph, int vertexNumber) {
     assertEquals(vertexNumber, graph.getVertices().size());
-    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).hasSize(vertexNumber);
+    assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).hasSize(vertexNumber);
 
-    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
+    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.findVertices(
       VehicleParkingEntranceVertex.class
     )) {
       assertEquals(vertexNumber, vehicleParkingEntranceVertex.getOutgoing().size());

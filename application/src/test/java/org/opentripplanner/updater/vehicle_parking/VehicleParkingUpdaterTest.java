@@ -227,7 +227,7 @@ class VehicleParkingUpdaterTest {
   }
 
   private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
-    var parkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
+    var parkingVertices = graph.findVertices(VehicleParkingEntranceVertex.class);
 
     assertThat(parkingVertices).hasSize(vehicleParkingNumber);
 
@@ -282,7 +282,7 @@ class VehicleParkingUpdaterTest {
   }
 
   private void assertVehicleParkingNotLinked() {
-    assertThat(graph.getVerticesOfType(VehicleParkingEntranceVertex.class)).isEmpty();
+    assertThat(graph.findVertices(VehicleParkingEntranceVertex.class)).isEmpty();
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).isEmpty();
     assertThat(graph.findEdges(VehicleParkingEdge.class)).isEmpty();
   }

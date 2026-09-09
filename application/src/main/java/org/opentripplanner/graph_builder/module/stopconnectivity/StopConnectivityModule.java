@@ -40,7 +40,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     if (!graph.hasStreets) {
       return;
     }
-    var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var stopVertices = graph.findVertices(TransitStopVertex.class);
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,

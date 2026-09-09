@@ -87,7 +87,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   public void linkTransitStops(Graph graph, TransitRepository transitRepository) {
-    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = graph.findVertices(TransitStopVertex.class);
     var progress = ProgressTracker.track(
       "Linking transit stops to graph",
       5000,
@@ -249,7 +249,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
-    for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
+    for (TransitEntranceVertex tEntrance : graph.findVertices(TransitEntranceVertex.class)) {
       vertexLinker.linkVertexPermanently(
         tEntrance,
         new TraverseModeSet(TraverseMode.WALK),
@@ -285,7 +285,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         )
       );
 
-    for (StationCentroidVertex station : graph.getVerticesOfType(StationCentroidVertex.class)) {
+    for (StationCentroidVertex station : graph.findVertices(StationCentroidVertex.class)) {
       vertexLinker.linkVertexPermanently(
         station,
         new TraverseModeSet(TraverseMode.WALK),
@@ -298,7 +298,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkVehicleParks(Graph graph, DataImportIssueStore issueStore) {
     LOG.info("Linking vehicle parks to graph...");
     List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
-    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
+    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.findVertices(
       VehicleParkingEntranceVertex.class
     )) {
       if (vehicleParkingEntranceVertex.isLinkedToGraph()) {
