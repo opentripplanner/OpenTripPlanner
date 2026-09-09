@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -19,6 +18,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +168,7 @@ class StreetIndex {
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
     var vertices = graph.getVerticesOfType(StationCentroidVertex.class);
-    return StreamSupport.stream(vertices.spliterator(), false).collect(
+    return StreamUtils.ofIterable(vertices).collect(
       Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v)
     );
   }

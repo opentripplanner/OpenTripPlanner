@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.transfer;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +105,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // The linker will use streets if they are available, or straight-line distance otherwise.
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
-    var stops = ImmutableList.copyOf(graph.getVerticesOfType(TransitStopVertex.class));
     Set<StopLocation> carsAllowedStops =
       transitRepository.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
@@ -125,7 +124,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track(
       "Create transfer edges for stops",
       1000,
-      stops.size()
+      ProgressTracker.UNKNOWN_SIZE
     );
 
     AtomicInteger nTransfersTotal = new AtomicInteger();
@@ -156,8 +155,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
      */
     bikesAllowedStops.addAll(emptyStops);
 
-    stops
-      .stream()
+    var stops = graph.getVerticesOfType(TransitStopVertex.class);
+    StreamUtils.ofIterable(stops)
       .parallel()
       .forEach(ts0 -> {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
