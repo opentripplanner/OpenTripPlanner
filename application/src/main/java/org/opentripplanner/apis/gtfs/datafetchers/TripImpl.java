@@ -329,7 +329,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   @Override
   public DataFetcher<String> serviceId() {
-    return environment -> getSource(environment).getServiceId().toString();
+    // Deprecated: GTFS service-id is being phased out as an internal OTP concept, see
+    // https://github.com/opentripplanner/OpenTripPlanner/issues/7972
+    return environment -> null;
   }
 
   @Override
