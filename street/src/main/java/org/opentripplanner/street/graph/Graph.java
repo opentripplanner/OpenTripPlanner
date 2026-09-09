@@ -183,7 +183,7 @@ public class Graph implements Serializable {
    * java.util.stream.Stream} and can only be iterated a single time.
    */
   public <T extends Vertex> Iterable<T> getVerticesOfType(Class<T> cls) {
-    return this.getVertices().stream().filter(cls::isInstance).map(cls::cast)::iterator;
+    return () -> this.getVertices().stream().filter(cls::isInstance).map(cls::cast).iterator();
   }
 
   /**
