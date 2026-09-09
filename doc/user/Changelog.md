@@ -124,6 +124,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove street notes feature [#7959](https://github.com/opentripplanner/OpenTripPlanner/pull/7959)
 - Add alertConnection query to the GTFS GraphQL API [#7924](https://github.com/opentripplanner/OpenTripPlanner/pull/7924)
 - Allow nanosecond precision in NeTEx date times [#7983](https://github.com/opentripplanner/OpenTripPlanner/pull/7983)
+- Support GML DirectPosition in NeTEx  [#7954](https://github.com/opentripplanner/OpenTripPlanner/pull/7954)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.9.0 (2026-03-18)
