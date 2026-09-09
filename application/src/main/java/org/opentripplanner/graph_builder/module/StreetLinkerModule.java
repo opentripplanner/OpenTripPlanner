@@ -34,6 +34,7 @@ import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   public void linkTransitStops(Graph graph, TransitRepository transitRepository) {
-    List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = ListUtils.ofIterable(graph.getVerticesOfType(TransitStopVertex.class));
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
 

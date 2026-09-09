@@ -12,6 +12,8 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +41,15 @@ public class StopConnectivityModule implements GraphBuilderModule {
     if (!graph.hasStreets) {
       return;
     }
+    var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,
-      graph.getVerticesOfType(TransitStopVertex.class).size()
+      ListUtils.countIterable(stopVertices)
     );
     LOG.info(progress.startMessage());
-    var issues = graph
-      .getVerticesOfType(TransitStopVertex.class)
-      .parallelStream()
+    var issues = StreamUtils.ofIterable(stopVertices)
+      .parallel()
       .map(stop -> {
         if (stop.isFerryStop()) {
           return checkFerryStop(stop, progress);
