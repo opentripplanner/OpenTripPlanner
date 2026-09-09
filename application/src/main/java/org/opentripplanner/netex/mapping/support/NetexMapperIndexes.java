@@ -2,11 +2,11 @@ package org.opentripplanner.netex.mapping.support;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.DatedServiceJourney;
 
@@ -23,7 +23,7 @@ import org.rutebanken.netex.model.DatedServiceJourney;
 public class NetexMapperIndexes {
 
   private final Multimap<String, Station> stationsByMultiModalStationRfs;
-  private final Map<String, StopTime> stopTimesByNetexId;
+  private final HierarchicalMap<String, StopTime> stopTimesByNetexId;
   private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySjId;
   private final NetexMapperIndexes parent;
 
@@ -33,7 +33,7 @@ public class NetexMapperIndexes {
     if (parent == null) {
       this.datedServiceJourneysBySjId = indexDSJBySJId(index.getDatedServiceJourneys());
       this.stationsByMultiModalStationRfs = ArrayListMultimap.create();
-      this.stopTimesByNetexId = new HashMap<>();
+      this.stopTimesByNetexId = new HierarchicalMap<>();
     } else {
       // Cached by level(shared files, shared group files and group files). If any entries exist at
       // the current level, then they will hide entries at a higher level.
@@ -43,7 +43,7 @@ public class NetexMapperIndexes {
 
       // should not be a global list otherwise this would contain the ids of _all_
       // TimetabledPassingTime instances in the entire feed. (7 million in Norway)
-      this.stopTimesByNetexId = new HashMap<>(parent.stopTimesByNetexId);
+      this.stopTimesByNetexId = new HierarchicalMap<>(parent.stopTimesByNetexId);
 
       // Feed global instances. These fields contain mapping from a netex id to a OTP domain
       // model object, hence we are not adding a lot of data to memory - only the id to object
@@ -70,12 +70,12 @@ public class NetexMapperIndexes {
    * This is needed to assign a notice to a stop time. It is not part of the target
    * TransitDataImport, so we need to temporally cache this here.
    */
-  public Map<String, StopTime> getStopTimesByNetexId() {
+  public HierarchicalMap<String, StopTime> getStopTimesByNetexId() {
     return stopTimesByNetexId;
   }
 
   public void addStopTimesByNetexId(Map<String, StopTime> stopTimesByNetexId) {
-    this.stopTimesByNetexId.putAll(stopTimesByNetexId);
+    this.stopTimesByNetexId.addAll(stopTimesByNetexId);
   }
 
   public Multimap<String, DatedServiceJourney> getDatedServiceJourneysBySjId() {

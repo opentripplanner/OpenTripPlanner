@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -59,7 +58,7 @@ public class NoticeAssignmentMapperTest {
       new HierarchicalMapById<>(),
       routesById,
       new DefaultEntityById<>(),
-      new HashMap<>()
+      new HierarchicalMap<>()
     );
 
     Multimap<
@@ -92,9 +91,9 @@ public class NoticeAssignmentMapperTest {
     StopTime stopTime1 = createStopTime(1, trip);
     StopTime stopTime2 = createStopTime(2, trip);
 
-    Map<String, StopTime> stopTimesById = new HashMap<>();
-    stopTimesById.put(TIMETABLED_PASSING_TIME1, stopTime1);
-    stopTimesById.put(TIMETABLED_PASSING_TIME2, stopTime2);
+    var stopTimesById = new HierarchicalMap<String, StopTime>();
+    stopTimesById.add(TIMETABLED_PASSING_TIME1, stopTime1);
+    stopTimesById.add(TIMETABLED_PASSING_TIME2, stopTime2);
 
     noticesById.add(NOTICE);
 

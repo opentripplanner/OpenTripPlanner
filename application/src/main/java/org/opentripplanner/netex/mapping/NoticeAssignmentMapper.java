@@ -3,12 +3,12 @@ package org.opentripplanner.netex.mapping;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -40,7 +40,7 @@ class NoticeAssignmentMapper {
 
   private final EntityById<Trip> tripsById;
 
-  private final Map<String, StopTime> stopTimesByNetexId;
+  private final HierarchicalMap<String, StopTime> stopTimesByNetexId;
 
   /** Note! The notice mapper caches notices, making sure duplicates are not created. */
   private final NoticeMapper noticeMapper;
@@ -52,7 +52,7 @@ class NoticeAssignmentMapper {
     ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
     EntityById<Route> routesById,
     EntityById<Trip> tripsById,
-    Map<String, StopTime> stopTimesByNetexId
+    HierarchicalMap<String, StopTime> stopTimesByNetexId
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
@@ -131,7 +131,7 @@ class NoticeAssignmentMapper {
     String stopTimeId,
     Notice notice
   ) {
-    StopTime stopTime = stopTimesByNetexId.get(stopTimeId);
+    StopTime stopTime = stopTimesByNetexId.lookup(stopTimeId);
     if (stopTime == null) {
       issueStore.add(
         "NoticeAssigmentWithoutStopTime",
