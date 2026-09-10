@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import java.util.Map;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.transit.model.site.Station;
@@ -70,7 +71,7 @@ public class NetexMapperIndexes {
    * This is needed to assign a notice to a stop time. It is not part of the target
    * TransitDataImport, so we need to temporally cache this here.
    */
-  public HierarchicalMap<String, StopTime> getStopTimesByNetexId() {
+  public ReadOnlyHierarchicalMap<String, StopTime> getStopTimesByNetexId() {
     return stopTimesByNetexId;
   }
 
