@@ -1,9 +1,6 @@
 package org.opentripplanner.ext.taxizone.routing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 
@@ -106,8 +103,10 @@ class TaxiRouterTest implements PlanTestConstants {
 
     var result = subject.decorateAndFilter(List.of(itinerary)).getFirst();
 
-    var leg = assertInstanceOf(TaxiZoneLeg.class, result.legs().getFirst());
-    assertEquals(ZONE_ROUTE, leg.route());
+    var resultLeg = result.legs().getFirst();
+    assertThat(resultLeg).isInstanceOf(TaxiZoneLeg.class);
+    var leg = (TaxiZoneLeg) resultLeg;
+    assertThat(leg.route()).isEqualTo(ZONE_ROUTE);
   }
 
   @Test
@@ -119,7 +118,7 @@ class TaxiRouterTest implements PlanTestConstants {
 
     var result = subject.decorateAndFilter(List.of(itinerary));
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -131,37 +130,41 @@ class TaxiRouterTest implements PlanTestConstants {
 
     var result = subject.decorateAndFilter(List.of(itinerary));
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
   void nonDrivingLegIsLeftUntouched() {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
-      .bus(21, T11_00, T11_10, PLACE_B)
+      .bicycle(T11_00, T11_10, PLACE_B)
+      .walk(60, PLACE_A)
+      .bus(21, T11_10, T11_20, PLACE_B)
       .build();
-    var originalLeg = itinerary.legs().getFirst();
+    var originalLegs = List.copyOf(itinerary.legs());
     var subject = new TaxiRouter(EMPTY_INDEX);
 
     var result = subject.decorateAndFilter(List.of(itinerary)).getFirst();
 
-    assertEquals(originalLeg, result.legs().getFirst());
+    assertThat(result.legs()).isEqualTo(originalLegs);
   }
 
   @Test
   void routeDirectDecoratesItineraryWithMatchingZone() {
     var itineraries = routeDirect(List.of(COVERING_ZONE));
 
-    assertFalse(itineraries.isEmpty());
+    assertThat(itineraries).isNotEmpty();
     var itinerary = itineraries.getFirst();
-    var leg = assertInstanceOf(TaxiZoneLeg.class, itinerary.legs().getFirst());
-    assertEquals(ZONE_ROUTE, leg.route());
+    var resultLeg = itinerary.legs().getFirst();
+    assertThat(resultLeg).isInstanceOf(TaxiZoneLeg.class);
+    var leg = (TaxiZoneLeg) resultLeg;
+    assertThat(leg.route()).isEqualTo(ZONE_ROUTE);
   }
 
   @Test
   void routeDirectFiltersOutItineraryWhenNoZoneMatches() {
     var itineraries = routeDirect(List.of());
 
-    assertTrue(itineraries.isEmpty());
+    assertThat(itineraries).isEmpty();
   }
 
   /**

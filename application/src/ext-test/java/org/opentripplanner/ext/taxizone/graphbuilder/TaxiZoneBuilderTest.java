@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.taxizone.graphbuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +35,174 @@ class TaxiZoneBuilderTest {
     .withRoute(TransitRepositoryForTest.route("taxi-route").withMode(TransitMode.TAXI).build())
     .withServiceId(FeedScopedIdForTestFactory.id("service-1"))
     .build();
+
+  @Test
+  void validTripProducesZone() {
+    var trip = unscheduledTrip(validStopTimes());
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).hasSize(1);
+    var zone = zones.get(0);
+    assertThat(zone.geometry()).isEqualTo(AREA_1.getGeometry());
+    assertThat(zone.route()).isEqualTo(TRIP.getRoute());
+    assertThat(zone.serviceDateRange()).isEqualTo(
+      LocalDateRange.ofInclusiveEnd(SERVICE_DATE, SERVICE_DATE)
+    );
+  }
+
+  @Test
+  void scheduledTripIsSkipped() {
+    var stopTimes = List.of(
+      FlexStopTimesFactory.area(AREA_1, "10:10", "10:15"),
+      FlexStopTimesFactory.regularStop("10:40", "10:45")
+    );
+    var trip = ScheduledDeviatedTrip.of(FeedScopedIdForTestFactory.id("t2"))
+      .withStopTimes(stopTimes)
+      .build();
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void nonTaxiRouteTypeIsSkipped() {
+    var nonTaxiTrip = TransitRepositoryForTest.trip("bus-route")
+      .withRoute(TransitRepositoryForTest.route("bus-route").withMode(TransitMode.BUS).build())
+      .withServiceId(TRIP.getServiceId())
+      .build();
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, nonTaxiTrip),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, nonTaxiTrip)
+    );
+    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-bus"))
+      .withTrip(nonTaxiTrip)
+      .withStopTimes(stopTimes)
+      .build();
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void missingServiceIdIsSkipped() {
+    var noServiceTrip = TransitRepositoryForTest.trip("no-service")
+      .withRoute(TransitRepositoryForTest.route("taxi-route-2").withMode(TransitMode.TAXI).build())
+      .build();
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, noServiceTrip),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, noServiceTrip)
+    );
+    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-no-service"))
+      .withTrip(noServiceTrip)
+      .withStopTimes(stopTimes)
+      .build();
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void emptyServiceDatesIsSkipped() {
+    var emptyServiceCalendarData = calendarServiceData(TRIP.getServiceId(), List.of());
+    var trip = unscheduledTrip(validStopTimes());
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), emptyServiceCalendarData);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void nonContiguousServiceDatesIsSkipped() {
+    var gappedServiceCalendarData = calendarServiceData(
+      TRIP.getServiceId(),
+      List.of(SERVICE_DATE, SERVICE_DATE.plusDays(2))
+    );
+    var trip = unscheduledTrip(validStopTimes());
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), gappedServiceCalendarData);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void boundedTimeRestrictionIsSkipped() {
+    var stopTimes = List.of(
+      restrictedAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
+      restrictedAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void fullDayWindowIsAllowed() {
+    var trip = unscheduledTrip(validStopTimes());
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).hasSize(1);
+  }
+
+  @Test
+  void wrongNumberOfStopsIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @Test
+  void differentAreasIsSkipped() {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
+  void invalidPickupTypeIsSkipped(PickDrop pickupType) {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, pickupType, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
+  void invalidDropOffTypeIsSkipped(PickDrop dropOffType) {
+    var stopTimes = List.of(
+      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
+      fullDayAreaStop(AREA_1, PickDrop.NONE, dropOffType, TRIP)
+    );
+    var trip = unscheduledTrip(stopTimes);
+
+    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
+
+    assertThat(zones).isEmpty();
+  }
 
   private static final CalendarServiceData CALENDAR_SERVICE_DATA = calendarServiceData(
     TRIP.getServiceId(),
@@ -80,174 +247,5 @@ class TaxiZoneBuilderTest {
       .withTrip(TRIP)
       .withStopTimes(stopTimes)
       .build();
-  }
-
-  @Test
-  void validTripProducesZone() {
-    var trip = unscheduledTrip(validStopTimes());
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertEquals(1, zones.size());
-    var zone = zones.get(0);
-    assertEquals(AREA_1.getGeometry(), zone.geometry());
-    assertEquals(TRIP.getRoute(), zone.route());
-    assertEquals(
-      LocalDateRange.ofInclusiveEnd(SERVICE_DATE, SERVICE_DATE),
-      zone.serviceDateRange()
-    );
-  }
-
-  @Test
-  void notUnscheduledTripIsSkipped() {
-    var stopTimes = List.of(
-      FlexStopTimesFactory.area(AREA_1, "10:10", "10:15"),
-      FlexStopTimesFactory.regularStop("10:40", "10:45")
-    );
-    var trip = ScheduledDeviatedTrip.of(FeedScopedIdForTestFactory.id("t2"))
-      .withStopTimes(stopTimes)
-      .build();
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void nonTaxiRouteTypeIsSkipped() {
-    var nonTaxiTrip = TransitRepositoryForTest.trip("bus-route")
-      .withRoute(TransitRepositoryForTest.route("bus-route").withMode(TransitMode.BUS).build())
-      .withServiceId(TRIP.getServiceId())
-      .build();
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, nonTaxiTrip),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, nonTaxiTrip)
-    );
-    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-bus"))
-      .withTrip(nonTaxiTrip)
-      .withStopTimes(stopTimes)
-      .build();
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void missingServiceIdIsSkipped() {
-    var noServiceTrip = TransitRepositoryForTest.trip("no-service")
-      .withRoute(TransitRepositoryForTest.route("taxi-route-2").withMode(TransitMode.TAXI).build())
-      .build();
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, noServiceTrip),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, noServiceTrip)
-    );
-    var trip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-no-service"))
-      .withTrip(noServiceTrip)
-      .withStopTimes(stopTimes)
-      .build();
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void emptyServiceDatesIsSkipped() {
-    var emptyServiceCalendarData = calendarServiceData(TRIP.getServiceId(), List.of());
-    var trip = unscheduledTrip(validStopTimes());
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), emptyServiceCalendarData);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void nonContiguousServiceDatesIsSkipped() {
-    var gappedServiceCalendarData = calendarServiceData(
-      TRIP.getServiceId(),
-      List.of(SERVICE_DATE, SERVICE_DATE.plusDays(2))
-    );
-    var trip = unscheduledTrip(validStopTimes());
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), gappedServiceCalendarData);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void boundedTimeRestrictionIsSkipped() {
-    var stopTimes = List.of(
-      restrictedAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE),
-      restrictedAreaStop(AREA_1, PickDrop.NONE, PickDrop.COORDINATE_WITH_DRIVER)
-    );
-    var trip = unscheduledTrip(stopTimes);
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void fullDayWindowIsAllowed() {
-    var trip = unscheduledTrip(validStopTimes());
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertEquals(1, zones.size());
-  }
-
-  @Test
-  void wrongNumberOfStopsIsSkipped() {
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.NONE, TRIP),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
-    );
-    var trip = unscheduledTrip(stopTimes);
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @Test
-  void differentAreasIsSkipped() {
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
-      fullDayAreaStop(AREA_2, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
-    );
-    var trip = unscheduledTrip(stopTimes);
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @ParameterizedTest
-  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
-  void invalidPickupTypeIsSkipped(PickDrop pickupType) {
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, pickupType, PickDrop.NONE, TRIP),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, PickDrop.CALL_AGENCY, TRIP)
-    );
-    var trip = unscheduledTrip(stopTimes);
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
-  }
-
-  @ParameterizedTest
-  @EnumSource(value = PickDrop.class, names = { "NONE", "COORDINATE_WITH_DRIVER" })
-  void invalidDropOffTypeIsSkipped(PickDrop dropOffType) {
-    var stopTimes = List.of(
-      fullDayAreaStop(AREA_1, PickDrop.CALL_AGENCY, PickDrop.NONE, TRIP),
-      fullDayAreaStop(AREA_1, PickDrop.NONE, dropOffType, TRIP)
-    );
-    var trip = unscheduledTrip(stopTimes);
-
-    var zones = TaxiZoneBuilder.buildZones(List.of(trip), CALENDAR_SERVICE_DATA);
-
-    assertTrue(zones.isEmpty());
   }
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.taxizone;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,18 +37,14 @@ class TaxiZoneIndexTest {
   private static final WgsCoordinate INSIDE_SQUARE_2_B = new WgsCoordinate(28, 28);
   private static final WgsCoordinate OUTSIDE_ALL_ZONES = new WgsCoordinate(50, 50);
 
-  private static TaxiZone zone(Polygon geometry, Route route) {
-    return new TaxiZone(geometry, route, null, null, LocalDateRange.ofInclusiveEnd(DATE, DATE));
-  }
-
   @Test
   void findsZoneCoveringBothPickupAndDropoff() {
     var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, ROUTE_1)));
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B, DATE);
 
-    assertTrue(result.isPresent());
-    assertEquals(ROUTE_1, result.get().route());
+    assertThat(result).isPresent();
+    assertThat(result.get().route()).isEqualTo(ROUTE_1);
   }
 
   @Test
@@ -58,7 +53,7 @@ class TaxiZoneIndexTest {
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_2_A, DATE);
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -67,7 +62,7 @@ class TaxiZoneIndexTest {
 
     var result = index.findFirstZone(OUTSIDE_ALL_ZONES, OUTSIDE_ALL_ZONES, DATE);
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -76,7 +71,7 @@ class TaxiZoneIndexTest {
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B, DATE);
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -85,7 +80,7 @@ class TaxiZoneIndexTest {
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B, OTHER_DATE);
 
-    assertTrue(result.isEmpty());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -95,9 +90,13 @@ class TaxiZoneIndexTest {
     var resultInSquare1 = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B, DATE);
     var resultInSquare2 = index.findFirstZone(INSIDE_SQUARE_2_A, INSIDE_SQUARE_2_B, DATE);
 
-    assertTrue(resultInSquare1.isPresent());
-    assertEquals(ROUTE_1, resultInSquare1.get().route());
-    assertTrue(resultInSquare2.isPresent());
-    assertEquals(ROUTE_2, resultInSquare2.get().route());
+    assertThat(resultInSquare1).isPresent();
+    assertThat(resultInSquare1.get().route()).isEqualTo(ROUTE_1);
+    assertThat(resultInSquare2).isPresent();
+    assertThat(resultInSquare2.get().route()).isEqualTo(ROUTE_2);
+  }
+
+  private static TaxiZone zone(Polygon geometry, Route route) {
+    return new TaxiZone(geometry, route, null, null, LocalDateRange.ofInclusiveEnd(DATE, DATE));
   }
 }
