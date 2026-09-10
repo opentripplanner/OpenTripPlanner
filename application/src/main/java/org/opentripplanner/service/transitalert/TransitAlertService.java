@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.services;
+package org.opentripplanner.service.transitalert;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -12,26 +13,16 @@ import org.opentripplanner.transit.model.filter.transit.TransitAlertMatcherFacto
 import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
- * A TransitAlertService stores a set of alerts (passenger-facing textual information associated
- * with transit entities such as stops or routes) which are currently active and should be provided
- * to end users when their itineraries include the relevant stop, route, etc.
- *
- * Its primary purpose is to index those alerts, which may be numerous, so they can be looked up
- * rapidly and attached to the various pieces of an itinerary as it's being returned to the user.
- *
- * Most elements in an itinerary will have no alerts attached, so those cases need to return
- * quickly. For example, no alerts on board stop A, no alerts on route 1 ridden, no alerts on alight
- * stop B, no alerts on route 2 ridden, yes one alert found on alight stop C.
- *
- * The fact that alerts are relatively sparse (at the scale of the entire transportation system)
- * is central to this implementation. Adding a list of alerts to every element in the system would
- * mean storing large amounts of null or empty list references. Instead, alerts are looked up in
- * maps allowing them to be attached to any object with minimal space overhead, but requiring some
- * careful indexing to ensure their presence or absence on each object can be determined quickly.
+ * A TransitAlertService gives read access to the set of alerts (passenger-facing textual
+ * information associated with transit entities such as stops or routes) which are currently active
+ * and should be provided to end users when their itineraries include the relevant stop, route,
+ * etc.
+ * <p>
+ * It is a read-only, request-scoped view over a {@link TransitAlertRepositorySnapshot}. A new
+ * instance should be created for each request, with a snapshot resolved from the request's
+ * transaction scope, so that the whole request sees one consistent view of the realtime data.
  */
 public interface TransitAlertService {
-  void setAlerts(Collection<TransitAlert> alerts);
-
   Collection<TransitAlert> getAllAlerts();
 
   /**
@@ -46,6 +37,7 @@ public interface TransitAlertService {
     return alerts.stream().filter(matcher::match).toList();
   }
 
+  @Nullable
   TransitAlert getAlertById(FeedScopedId id);
 
   default Collection<TransitAlert> getStopAlerts(FeedScopedId stop) {

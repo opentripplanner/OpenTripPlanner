@@ -220,9 +220,11 @@ public class ConstructApplication {
       carpoolingRepository(),
       carpoolTripVertexResolver(),
       factory.transitUpdateManager(),
+      factory.alertUpdateManager(),
       factory.streetUpdateManager(),
+      factory.transitRepositoryRegistry(),
       factory.timetableRepositoryHandle(),
-      factory.transitAlertService(),
+      factory.transitAlertRepositoryHandle(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks
     );

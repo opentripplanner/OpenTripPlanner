@@ -27,8 +27,10 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.AlertDomain;
 import org.opentripplanner.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
@@ -38,10 +40,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.configure.LinkingServiceModule;
-import org.opentripplanner.routing.services.configure.TransitAlertServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -49,6 +49,9 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySna
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.configure.StreetDetailsServiceModule;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
+import org.opentripplanner.service.transitalert.configure.TransitAlertRepositoryModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
@@ -105,7 +108,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StopConsolidationServiceModule.class,
     StreetLimitationParametersServiceModule.class,
     TransitModule.class,
-    TransitAlertServiceModule.class,
+    TransitAlertRepositoryModule.class,
     TransferServiceModule.class,
     VehicleParkingServiceModule.class,
     VehicleRentalRepositoryModule.class,
@@ -138,10 +141,26 @@ public interface ConstructApplicationFactory {
   @TransitDomain
   UpdateManager transitUpdateManager();
 
+  @AlertDomain
+  UpdateManager alertUpdateManager();
+
+  @TransitDomain
+  RepositoryRegistry transitRepositoryRegistry();
+
   @StreetDomain
   UpdateManager streetUpdateManager();
 
   RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle();
+
+  /**
+   * The application-wide handle for the transactional transit-alert repository. Alert updaters
+   * write to it through a write context, request-scoped services read a snapshot of it.
+   */
+  RepositoryHandle<
+    TransitAlertRepositorySnapshot,
+    TransitAlertRepository
+  > transitAlertRepositoryHandle();
+
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -165,12 +184,6 @@ public interface ConstructApplicationFactory {
   TransitService transitService();
 
   RequestScopedFactory.Builder requestScopedFactoryBuilder();
-
-  /**
-   * The application-wide alert service aggregator. Exposed as the concrete type so that the updater
-   * configuration can register the per-updater alert services into it.
-   */
-  DelegatingTransitAlertServiceImpl transitAlertService();
 
   MetricsLogging metricsLogging();
 

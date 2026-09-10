@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.trip;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;

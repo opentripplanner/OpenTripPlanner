@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.updater.http;
 
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.UpdateIncrementality.FULL_DATASET;
 
 import com.google.protobuf.ExtensionRegistry;
 import com.google.transit.realtime.GtfsRealtime;
@@ -15,7 +15,7 @@ import java.util.List;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

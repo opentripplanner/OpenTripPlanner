@@ -3,9 +3,9 @@ package org.opentripplanner.updater.trip.siri.updater;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri21.ServiceDelivery;
 
 /**

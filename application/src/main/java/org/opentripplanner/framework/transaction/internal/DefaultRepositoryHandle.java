@@ -20,7 +20,15 @@ class DefaultRepositoryHandle<S, M> implements RepositoryHandle<S, M> {
   @Override
   public S repositorySnapshot(TransactionScope scope) {
     var transaction = ((DefaultTransactionScope) scope).transaction();
-    return repo.repositorySnapshot(transaction);
+    var snapshot = repo.repositorySnapshot(transaction);
+    if (snapshot == null) {
+      throw new IllegalArgumentException(
+        "No repository snapshot exists for %s. The scope was most likely created by another " +
+          "RepositoryRegistry than the one this repository is registered on - a scope can only be " +
+          "used to read repositories of its own write domain.".formatted(scope)
+      );
+    }
+    return snapshot;
   }
 
   M repository() {

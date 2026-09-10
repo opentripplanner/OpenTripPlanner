@@ -3,12 +3,12 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.DUPLICATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED;
 import static org.opentripplanner.updater.spi.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

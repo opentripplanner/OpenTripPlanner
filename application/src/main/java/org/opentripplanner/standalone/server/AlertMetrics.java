@@ -12,30 +12,43 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A binder that creates metrics about the alerts present in the system. The metrics are read from
- * the alert service twice a minute by a background thread.
+ * the alert repository twice a minute by a background thread.
  */
 public class AlertMetrics implements MeterBinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AlertMetrics.class);
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-  private final Supplier<TransitAlertService> serviceSupplier;
+  private final RepositoryRegistry repositoryRegistry;
+  private final RepositoryHandle<
+    TransitAlertRepositorySnapshot,
+    TransitAlertRepository
+  > transitAlertRepositoryHandle;
   private MultiGauge statuses;
 
-  public AlertMetrics(Supplier<TransitAlertService> serviceSupplier) {
-    this.serviceSupplier = serviceSupplier;
+  public AlertMetrics(
+    RepositoryRegistry repositoryRegistry,
+    RepositoryHandle<
+      TransitAlertRepositorySnapshot,
+      TransitAlertRepository
+    > transitAlertRepositoryHandle
+  ) {
+    this.repositoryRegistry = repositoryRegistry;
+    this.transitAlertRepositoryHandle = transitAlertRepositoryHandle;
     scheduler.scheduleWithFixedDelay(this::recordMetrics, 0, 30, TimeUnit.SECONDS);
   }
 
@@ -54,10 +67,10 @@ public class AlertMetrics implements MeterBinder {
   @VisibleForTesting
   void recordMetrics() {
     try {
-      // during construction of the app the service can be null so we must check for this case.
-      var transitAlertService = serviceSupplier.get();
-      if (transitAlertService != null && statuses != null) {
-        var rows = summarizeAlerts(transitAlertService);
+      if (statuses != null) {
+        // Resolve a fresh scope on every run so that each sample sees the latest committed alerts.
+        var snapshot = transitAlertRepositoryHandle.repositorySnapshot(repositoryRegistry.scope());
+        var rows = summarizeAlerts(snapshot);
         statuses.register(rows, true);
       }
     } catch (Exception e) {
@@ -65,8 +78,10 @@ public class AlertMetrics implements MeterBinder {
     }
   }
 
-  private Iterable<MultiGauge.Row<Number>> summarizeAlerts(TransitAlertService alertService) {
-    var alerts = alertService.getAllAlerts();
+  private Iterable<MultiGauge.Row<Number>> summarizeAlerts(
+    TransitAlertRepositorySnapshot snapshot
+  ) {
+    var alerts = snapshot.getAllAlerts();
 
     ImmutableMultimap<AlertTags, TransitAlert> taggedAlerts = alerts
       .stream()

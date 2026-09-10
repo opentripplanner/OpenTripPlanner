@@ -13,7 +13,9 @@ import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 
 class DecorateTransitAlertTest implements PlanTestConstants {
 
@@ -61,7 +63,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
   @Test
   void testSkipsLegRebuildWhenNoAlertsMatch() {
     // Alert service with no alerts at all — nothing can match.
-    var transitAlertService = new TransitAlertServiceImpl();
+    var transitAlertService = buildService(List.of());
     var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
     var i1 = newItinerary(A).bus(31, 0, 30, E).build();
@@ -79,11 +81,13 @@ class DecorateTransitAlertTest implements PlanTestConstants {
     }
   }
 
-  private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {
-    var transitAlertService = new TransitAlertServiceImpl();
-    transitAlertService.setAlerts(
-      List.of(builder.withCalendar(AlertCalendar.ofAlwaysActive()).build())
-    );
-    return transitAlertService;
+  private static TransitAlertService buildService(TransitAlertBuilder builder) {
+    return buildService(List.of(builder.withCalendar(AlertCalendar.ofAlwaysActive()).build()));
+  }
+
+  private static TransitAlertService buildService(List<TransitAlert> alerts) {
+    var repository = new DefaultTransitAlertRepository();
+    repository.replaceAlerts(ID.getFeedId(), alerts);
+    return new DefaultTransitAlertService(repository.freeze());
   }
 }

@@ -78,7 +78,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
@@ -88,6 +87,8 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsSe
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.service.streetdetails.model.Level;
 import org.opentripplanner.service.streetdetails.model.VertexLevelInfo;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -518,8 +519,9 @@ class GraphQLIntegrationTest {
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
-    var transitAlertService = new TransitAlertServiceImpl();
-    transitAlertService.setAlerts(alerts);
+    var transitAlertRepository = new DefaultTransitAlertRepository();
+    transitAlertRepository.replaceAlerts(FEED_ID, alerts);
+    var transitAlertService = new DefaultTransitAlertService(transitAlertRepository.freeze());
 
     var realtimeVehicleRepository = new DefaultRealtimeVehicleRepository();
     var occypancyVehicle = RealtimeVehicle.builder()

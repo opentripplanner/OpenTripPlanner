@@ -31,12 +31,15 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.DefaultTransitRealTimeUpdateContext;
-import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.updater.AlertRealTimeUpdateContext;
+import org.opentripplanner.updater.DefaultAlertRealTimeUpdateContext;
+import org.opentripplanner.updater.UpdateIncrementality;
 import uk.org.ifopt.siri21.StopPlaceRef;
 import uk.org.siri.siri21.AffectedLineStructure;
 import uk.org.siri.siri21.AffectedRouteStructure;
@@ -70,11 +73,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   SiriAlertsUpdateHandler alertsUpdateHandler;
 
-  TransitAlertServiceImpl transitAlertService;
+  DefaultTransitAlertRepository transitAlertRepository;
 
   TransitService transitService;
 
-  private TransitRealTimeUpdateContext realTimeUpdateContext;
+  private AlertRealTimeUpdateContext realTimeUpdateContext;
 
   @Override
   public String getFeedName() {
@@ -86,26 +89,24 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
-    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(transitRepository);
     if (transitService == null) {
       transitService = new DefaultTransitService(transitRepository);
     } else {
-      transitAlertService.getAllAlerts().clear();
+      transitAlertRepository.replaceAlerts(FEED_ID, List.of());
     }
     if (alertsUpdateHandler == null) {
-      transitAlertService = new TransitAlertServiceImpl();
-      alertsUpdateHandler = new SiriAlertsUpdateHandler(
-        FEED_ID,
-        transitAlertService,
-        Duration.ZERO,
-        null
-      );
+      transitAlertRepository = new DefaultTransitAlertRepository();
+      alertsUpdateHandler = new SiriAlertsUpdateHandler(FEED_ID, Duration.ZERO, null);
     }
+    realTimeUpdateContext = new DefaultAlertRealTimeUpdateContext(
+      () -> transitAlertRepository,
+      new DefaultTransitService(transitRepository)
+    );
   }
 
   @Test
   public void testSiriSxUpdateForStop() {
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final FeedScopedId stopId = new FeedScopedId(FEED_ID, "stop0");
@@ -140,11 +141,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
-    final Collection<TransitAlert> stopPatches = transitAlertService.getStopAlerts(stopId);
+    final Collection<TransitAlert> stopPatches = transitAlertService().getStopAlerts(stopId);
 
     assertNotNull(stopPatches);
     assertEquals(1, stopPatches.size());
@@ -212,7 +217,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForStopMultipleValidityPeriods() {
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
 
@@ -251,11 +256,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
-    final Collection<TransitAlert> stopPatches = transitAlertService.getStopAlerts(stopId);
+    final Collection<TransitAlert> stopPatches = transitAlertService().getStopAlerts(stopId);
 
     assertNotNull(stopPatches);
     assertEquals(1, stopPatches.size());
@@ -270,7 +279,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForMultipleStops() {
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
 
@@ -291,11 +300,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.setSeverity(severity);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
-    Collection<TransitAlert> stopPatches = transitAlertService.getStopAlerts(stopId0);
+    Collection<TransitAlert> stopPatches = transitAlertService().getStopAlerts(stopId0);
 
     assertNotNull(stopPatches);
     assertEquals(1, stopPatches.size());
@@ -322,7 +335,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       "Alert does not contain default condition DESTINATION"
     );
 
-    stopPatches = transitAlertService.getStopAlerts(stopId1);
+    stopPatches = transitAlertService().getStopAlerts(stopId1);
 
     assertNotNull(stopPatches);
     assertEquals(1, stopPatches.size());
@@ -356,7 +369,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForTrip() {
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
@@ -369,12 +382,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsFramedVehicleJourney(tripId.getId(), "2014-01-01")
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+    final Collection<TransitAlert> tripPatches = transitAlertService().getTripAlerts(
       tripId,
       serviceDate
     );
@@ -406,7 +423,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForTripWithoutSpecificDate() {
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
@@ -419,20 +436,24 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsFramedVehicleJourney(tripId.getId(), null)
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     // Verify that requesting specific date does include alert for all dates
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
-    Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
+    Collection<TransitAlert> tripPatches = transitAlertService().getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
     final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
     // Verify that NOT requesting specific date includes alert for all dates
-    tripPatches = transitAlertService.getTripAlerts(tripId);
+    tripPatches = transitAlertService().getTripAlerts(tripId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -464,7 +485,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForTripByVehicleJourney() {
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     var modelZoneId = transitRepository.getTimeZone();
     var situationNumber = "TST:SituationNumber:1234";
@@ -478,12 +499,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsVehicleJourney(tripId.getId(), startTime)
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+    final Collection<TransitAlert> tripPatches = transitAlertService().getTripAlerts(
       tripId,
       serviceDate
     );
@@ -503,7 +528,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final FeedScopedId stopId0 = new FeedScopedId(FEED_ID, "stop0");
     final FeedScopedId stopId1 = new FeedScopedId(FEED_ID, "stop1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     ZoneId zoneId = transitRepository.getTimeZone();
     final String situationNumber = "TST:SituationNumber:1234";
@@ -517,13 +542,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsVehicleJourney(tripId.getId(), startTime, stopId0.getId(), stopId1.getId())
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     final LocalDate serviceDate = LocalDate.of(2014, 1, 1);
 
-    Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
+    Collection<TransitAlert> tripPatches = transitAlertService().getStopAndTripAlerts(
       stopId0,
       tripId,
       serviceDate
@@ -535,7 +564,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId().getId());
     assertTrue(matchesEntity(transitAlert, stopId0, tripId, serviceDate));
 
-    tripPatches = transitAlertService.getStopAndTripAlerts(stopId1, tripId, serviceDate);
+    tripPatches = transitAlertService().getStopAndTripAlerts(stopId1, tripId, serviceDate);
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
     transitAlert = tripPatches.iterator().next();
@@ -549,7 +578,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForTripByDatedVehicleJourney() {
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
@@ -562,12 +591,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsDatedVehicleJourney(tripId.getId())
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+    final Collection<TransitAlert> tripPatches = transitAlertService().getTripAlerts(
       tripId,
       serviceDate
     );
@@ -585,7 +618,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForLine() {
     final FeedScopedId lineRef = new FeedScopedId(FEED_ID, "route0");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
@@ -599,11 +632,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
-    final Collection<TransitAlert> tripPatches = transitAlertService.getRouteAlerts(lineRef);
+    final Collection<TransitAlert> tripPatches = transitAlertService().getRouteAlerts(lineRef);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -631,7 +668,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForLineThenExpiry() {
     final FeedScopedId lineRef = new FeedScopedId(FEED_ID, "route0");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
@@ -644,11 +681,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsLine(lineRef.getId())
     );
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
-    Collection<TransitAlert> tripPatches = transitAlertService.getRouteAlerts(lineRef);
+    Collection<TransitAlert> tripPatches = transitAlertService().getRouteAlerts(lineRef);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -666,9 +707,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     ptSituation.setProgress(WorkflowStatusEnumeration.CLOSED);
 
-    alertsUpdateHandler.update(createServiceDelivery(ptSituation), realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      createServiceDelivery(ptSituation),
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    tripPatches = transitAlertService.getRouteAlerts(lineRef);
+    tripPatches = transitAlertService().getRouteAlerts(lineRef);
 
     assertNotNull(tripPatches);
     assertTrue(tripPatches.isEmpty());
@@ -678,7 +723,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForTripAndStop() {
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final FeedScopedId stopId0 = new FeedScopedId(FEED_ID, "stop0");
@@ -697,16 +742,20 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     /*
      * Trip and stop-alerts should result in several TransitAlertes. One for each tripId/stop combination
      */
 
     final LocalDate serviceDate = LocalDate.of(2014, 1, 1);
-    Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
+    Collection<TransitAlert> tripPatches = transitAlertService().getStopAndTripAlerts(
       stopId0,
       tripId,
       serviceDate
@@ -720,7 +769,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId0, tripId, serviceDate));
 
-    tripPatches = transitAlertService.getStopAndTripAlerts(stopId1, tripId, serviceDate);
+    tripPatches = transitAlertService().getStopAndTripAlerts(stopId1, tripId, serviceDate);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -734,7 +783,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForLineAndStop() {
     final String routeId = "route0";
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
@@ -747,9 +796,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     /*
      * Line and stop-alerts should result in several TransitAlertes. One for each routeId/stop combination
@@ -762,7 +815,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForLineAndExternallyDefinedStopPoint() {
     final String routeId = "route0";
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
@@ -775,9 +828,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
   }
@@ -807,15 +864,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       )
     );
 
-    alertsUpdateHandler.update(outbound, realTimeUpdateContext);
-    alertsUpdateHandler.update(inbound, realTimeUpdateContext);
+    alertsUpdateHandler.update(outbound, UpdateIncrementality.DIFFERENTIAL, realTimeUpdateContext);
+    alertsUpdateHandler.update(inbound, UpdateIncrementality.DIFFERENTIAL, realTimeUpdateContext);
 
     // Line and stop-alerts should result in several TransitAlerts. One for each routeId/stop combination
     var feedRouteId = new FeedScopedId(FEED_ID, routeId);
     var feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
     var feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
 
-    var alerts = transitAlertService.getStopAndRouteAlerts(
+    var alerts = transitAlertService().getStopAndRouteAlerts(
       feedStop_0_id,
       feedRouteId,
       Set.of(),
@@ -858,13 +915,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       )
     );
 
-    alertsUpdateHandler.update(unknown, realTimeUpdateContext);
+    alertsUpdateHandler.update(unknown, UpdateIncrementality.DIFFERENTIAL, realTimeUpdateContext);
 
     var feedRouteId = new FeedScopedId(FEED_ID, routeId);
     var feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
     var feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
 
-    var alerts = transitAlertService.getStopAndRouteAlerts(
+    var alerts = transitAlertService().getStopAndRouteAlerts(
       feedStop_0_id,
       feedRouteId,
       Set.of(),
@@ -892,7 +949,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxWithUnboundedEndValidity() {
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
@@ -917,13 +974,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.getValidityPeriods().add(period_2);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
 
     final FeedScopedId stopId = new FeedScopedId(FEED_ID, stopId0);
 
-    Collection<TransitAlert> tripPatches = transitAlertService.getStopAlerts(stopId);
+    Collection<TransitAlert> tripPatches = transitAlertService().getStopAlerts(stopId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -941,7 +1002,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void testSiriSxUpdateForLineAndExternallyDefinedStopPlace() {
     final String routeId = "route0";
 
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
@@ -954,15 +1015,19 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertFalse(transitAlertService().getAllAlerts().isEmpty());
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
   }
 
   @Test
   public void testSiriSxUpdateForUnknownEntity() {
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+    assertTrue(transitAlertService().getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
     PtSituationElement ptSituation = createPtSituationElement(
@@ -973,9 +1038,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery, realTimeUpdateContext);
+    alertsUpdateHandler.update(
+      serviceDelivery,
+      UpdateIncrementality.DIFFERENTIAL,
+      realTimeUpdateContext
+    );
 
-    Collection<TransitAlert> alerts = transitAlertService.getAllAlerts();
+    Collection<TransitAlert> alerts = transitAlertService().getAllAlerts();
     assertEquals(1, alerts.size());
     TransitAlert transitAlert = alerts.iterator().next();
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Unknown.class));
@@ -1327,7 +1396,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
     final FeedScopedId feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
-    Collection<TransitAlert> tripPatches = transitAlertService.getStopAndRouteAlerts(
+    Collection<TransitAlert> tripPatches = transitAlertService().getStopAndRouteAlerts(
       feedStop_0_id,
       feedRouteId
     );
@@ -1342,7 +1411,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, feedStop_0_id, feedRouteId));
 
     final FeedScopedId feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
-    tripPatches = transitAlertService.getStopAndRouteAlerts(feedStop_1_id, feedRouteId);
+    tripPatches = transitAlertService().getStopAndRouteAlerts(feedStop_1_id, feedRouteId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -1397,7 +1466,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
      */
 
     final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
-    Collection<TransitAlert> tripPatches = transitAlertService.getRouteAlerts(feedRouteId);
+    Collection<TransitAlert> tripPatches = transitAlertService().getRouteAlerts(feedRouteId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -1406,7 +1475,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, feedRouteId));
 
     FeedScopedId feedStopId = new FeedScopedId(FEED_ID, stopId0);
-    tripPatches = transitAlertService.getStopAlerts(feedStopId);
+    tripPatches = transitAlertService().getStopAlerts(feedStopId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -1415,7 +1484,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, feedStopId));
 
     feedStopId = new FeedScopedId(FEED_ID, stopId1);
-    tripPatches = transitAlertService.getStopAlerts(feedStopId);
+    tripPatches = transitAlertService().getStopAlerts(feedStopId);
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -1454,5 +1523,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     }
 
     return affects;
+  }
+
+  private TransitAlertService transitAlertService() {
+    return new DefaultTransitAlertService(transitAlertRepository.freeze());
   }
 }

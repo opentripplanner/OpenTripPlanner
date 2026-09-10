@@ -4,14 +4,14 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.updater.TransitRealTimeUpdateContext;
-import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.AlertRealTimeUpdateContext;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
 import uk.org.siri.siri21.Siri;
 
-public class SiriSXUpdater
-  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-  implements TransitAlertProvider
-{
+public class SiriSXUpdater extends PollingGraphUpdater<AlertRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final int RETRY_MAX_ATTEMPTS = 3;
@@ -36,7 +33,6 @@ public class SiriSXUpdater
 
   private final String url;
   private final String originalRequestorRef;
-  private final TransitAlertService transitAlertService;
 
   // TODO RT_AB: Document why SiriAlertsUpdateHandler is a separate instance that persists across
   //  many graph update operations.
@@ -66,10 +62,8 @@ public class SiriSXUpdater
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.transitAlertService = new TransitAlertServiceImpl();
     this.updateHandler = new SiriAlertsUpdateHandler(
       config.feedId(),
-      transitAlertService,
       config.earlyStart(),
       siriFuzzyTripMatcherCache
     );
@@ -87,13 +81,9 @@ public class SiriSXUpdater
     LOG.info("Creating SIRI-SX updater running every {}: {}", pollingPeriod(), url);
   }
 
-  public TransitAlertService getTransitAlertService() {
-    return transitAlertService;
-  }
-
   @Override
-  public WriteDomain<TransitRealTimeUpdateContext> writeDomain() {
-    return WriteDomain.TRANSIT;
+  public WriteDomain<AlertRealTimeUpdateContext> writeDomain() {
+    return WriteDomain.ALERT;
   }
 
   @Override
@@ -115,6 +105,7 @@ public class SiriSXUpdater
    */
   private void updateSiri() {
     boolean moreData = false;
+    boolean firstPage = true;
     do {
       var updates = getUpdates();
       if (updates.isPresent()) {
@@ -123,47 +114,56 @@ public class SiriSXUpdater
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
+        // Only the first page of a full data set may replace the previously stored alerts; the
+        // remaining pages have to be merged into it.
+        var incrementality = firstPage
+          ? siriHttpLoader.incrementality()
+          : UpdateIncrementality.DIFFERENTIAL;
+        firstPage = false;
         if (serviceDelivery.getSituationExchangeDeliveries() != null) {
-          // FIXME RT_AB: This is submitting a reference to a method on a long-lived instance as a
-          //   GraphWriterRunnable. These runnables were originally intended to be small,
-          //   self-contained, throw-away update tasks.
-          //   See org/opentripplanner/updater/trip/PollingTripUpdater.java:90
-          //   Clarify why the long-lived instance is capturing and holding so many references.
-          //   The runnable should only contain the minimum needed to operate on the graph.
-          //   Such runnables should be illustrated in documentation as e.g. a little box labeled
-          //   "change trip ABC123 by making stop 53 late by 2 minutes."
-          //   Also clarify how this runnable works without even using the supplied
-          //   (graph, transitRepository) parameters. There are multiple TransitAlertServices and they
-          //   are not versioned along with the Graph, they are attached to updaters.
-          //
-          // This is submitting a runnable to an executor, but that runnable only writes back to
-          // objects referenced by updateHandler itself, rather than the graph or transitRepository
-          // supplied for writing, and apparently with no versioning. This seems like a
-          // misinterpretation of the realtime design.
-          // If this is an intentional choice to live-patch a single server-wide instance of an
-          // alerts service/index while it's already in use by routing, we should be clear about
-          // this and document why it differs from the graph-writer design. Currently the code
-          // seems to follow some surface conventions of the threadsafe copy-on-write pattern
-          // without actually providing threadsafe behavior.
-          // It's a reasonable choice to defer processing the list of alerts to another thread than
-          // this fetching thread, but we probably don't want to defer any such processing to the
-          // graph writer thread, as that's explicitly restricted to be one single shared thread for
-          // the entire application. There seems to be a misunderstanding that the tasks are
-          // submitted to get them off the updater thread, but the real reason is to ensure
-          // consistent transactions in graph writing and reading.
-          // All that said, out of all the update types, Alerts (and SIRI SX) are probably the ones
-          // that would be most tolerant of non-versioned application-wide storage since they don't
-          // participate in routing and are tacked on to already-completed routing responses.
-
-          updateGraph(context -> {
-            updateHandler.update(serviceDelivery, context);
+          var task = updateGraph(context -> {
+            updateHandler.update(serviceDelivery, incrementality, context);
             if (markPrimed) {
               primed = true;
             }
           });
+          if (!awaitAppliedOrResync(task)) {
+            return;
+          }
         }
       }
     } while (moreData);
+  }
+
+  /**
+   * Wait for the write task to be applied and committed.
+   * <p>
+   * The alert domain commits atomically, so a task that throws is rolled back: nothing of this
+   * delivery was stored. The SIRI-SX server only sends the situations that changed since the
+   * previous request with the same requestorRef, so the rolled-back situations would be lost for
+   * good. Resetting the requestorRef makes the server send all available messages again on the
+   * next poll.
+   *
+   * @return {@code true} if the delivery was applied, {@code false} if it was rolled back and the
+   *         remaining pages of this polling cycle should be abandoned.
+   */
+  private boolean awaitAppliedOrResync(Future<?> task) {
+    try {
+      task.get();
+      return true;
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return false;
+    } catch (ExecutionException e) {
+      LOG.warn(
+        "Applying the SIRI-SX delivery from {} failed and was rolled back. Resetting the " +
+          "requestorRef to re-fetch all situations on the next poll.",
+        url,
+        e.getCause()
+      );
+      updateRequestorRef();
+      return false;
+    }
   }
 
   private Optional<Siri> getUpdates() {

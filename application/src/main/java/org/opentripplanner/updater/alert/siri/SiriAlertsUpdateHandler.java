@@ -4,10 +4,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -19,8 +17,9 @@ import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.updater.TransitRealTimeUpdateContext;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.updater.AlertRealTimeUpdateContext;
+import org.opentripplanner.updater.UpdateIncrementality;
 import org.opentripplanner.updater.alert.siri.mapping.AffectsMapper;
 import org.opentripplanner.updater.alert.siri.mapping.SiriSeverityMapper;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
@@ -53,36 +52,52 @@ import uk.org.siri.siri21.WorkflowStatusEnumeration;
 public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
+
   private final String feedId;
-  private final Set<TransitAlert> alerts = new HashSet<>();
-  private final TransitAlertService transitAlertService;
+
   private final Duration earlyStart;
 
   @Nullable
   private final SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache;
 
   /**
+   * @param feedId the feed the incoming situations belong to
    * @param earlyStart display the alerts to users this long before their activePeriod begins
    */
   public SiriAlertsUpdateHandler(
     String feedId,
-    TransitAlertService transitAlertService,
     Duration earlyStart,
     @Nullable SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache
   ) {
     this.feedId = feedId;
-    this.transitAlertService = transitAlertService;
     this.earlyStart = earlyStart;
     this.siriFuzzyTripMatcherCache = siriFuzzyTripMatcherCache;
   }
 
-  public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
+  /**
+   * Apply a SIRI-SX service delivery to the alert repository of the current transaction.
+   * <p>
+   * The handler is stateless: the repository carries the alerts committed by previous updates
+   * forward. For a {@link UpdateIncrementality#DIFFERENTIAL} feed the mapped situations are merged
+   * into the existing ones and situations with progress {@code CLOSED} are removed. For a
+   * {@link UpdateIncrementality#FULL_DATASET} feed the delivery contains every situation that is
+   * still active, so the previous alerts of this feed are all replaced, which also expires
+   * situations that silently disappeared from the feed.
+   */
+  public void update(
+    ServiceDelivery delivery,
+    UpdateIncrementality incrementality,
+    AlertRealTimeUpdateContext context
+  ) {
+    TransitAlertRepository repository = context.transitAlertRepository();
+
     for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
       if (situations != null) {
         long t1 = System.currentTimeMillis();
-        int addedCounter = 0;
-        int expiredCounter = 0;
+        var updatedAlerts = new ArrayList<TransitAlert>();
+        var expiredAlertIds = new ArrayList<FeedScopedId>();
+
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
           boolean expireSituation =
             sxElement.getProgress() != null &&
@@ -95,13 +110,11 @@ public class SiriAlertsUpdateHandler {
           FeedScopedId id = new FeedScopedId(feedId, situationNumber);
 
           if (expireSituation) {
-            alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
-            expiredCounter++;
+            expiredAlertIds.add(id);
           } else {
             TransitAlert alert = null;
             try {
               alert = mapSituationToAlert(sxElement, context);
-              addedCounter++;
             } catch (Exception e) {
               LOG.info(
                 "Caught exception when processing situation with situationNumber {}: {}",
@@ -110,20 +123,28 @@ public class SiriAlertsUpdateHandler {
               );
             }
             if (alert != null) {
-              alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
-              alerts.add(alert);
+              updatedAlerts.add(alert);
+            } else {
+              // The situation could not be mapped, e.g. because it has no text at all. Drop any
+              // previous version of it instead of keeping a stale alert around.
+              expiredAlertIds.add(id);
             }
           }
         }
 
-        transitAlertService.setAlerts(alerts);
+        if (incrementality == UpdateIncrementality.FULL_DATASET) {
+          repository.replaceAlerts(feedId, updatedAlerts);
+        } else {
+          repository.addOrUpdateAlerts(feedId, updatedAlerts);
+          repository.removeAlerts(feedId, expiredAlertIds);
+        }
 
         LOG.info(
           "Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms",
-          addedCounter,
-          expiredCounter,
+          updatedAlerts.size(),
+          expiredAlertIds.size(),
           situations.getPtSituationElements().size(),
-          transitAlertService.getAllAlerts().size(),
+          repository.getAlertCount(feedId),
           System.currentTimeMillis() - t1
         );
       }
@@ -137,7 +158,7 @@ public class SiriAlertsUpdateHandler {
    */
   private TransitAlert mapSituationToAlert(
     PtSituationElement situation,
-    TransitRealTimeUpdateContext context
+    AlertRealTimeUpdateContext context
   ) {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 

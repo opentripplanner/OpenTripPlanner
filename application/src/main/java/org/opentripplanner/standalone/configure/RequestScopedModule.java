@@ -26,6 +26,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.framework.transaction.configure.AlertDomain;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
@@ -41,13 +42,16 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
@@ -95,6 +99,23 @@ public class RequestScopedModule {
     return repositoryRegistry.scope();
   }
 
+  /**
+   * The alerts live in a registry of their own, so they need a scope of their own: a scope can only
+   * resolve snapshots of repositories registered on the registry that created it.
+   * <p>
+   * A request therefore pins two transactions, one per registry, and could in principle see a
+   * timetable from one commit together with alerts from the next. That is harmless because alerts
+   * are looked up by entity id and carry no timetable state.
+   */
+  @Provides
+  @HttpRequestScoped
+  @AlertDomain
+  static TransactionScope alertTransactionScope(
+    @AlertDomain RepositoryRegistry repositoryRegistry
+  ) {
+    return repositoryRegistry.scope();
+  }
+
   @Provides
   @HttpRequestScoped
   static TransitService transitService(
@@ -104,6 +125,20 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static TransitAlertService transitAlertService(
+    RepositoryHandle<
+      TransitAlertRepositorySnapshot,
+      TransitAlertRepository
+    > transitAlertRepositoryHandle,
+    @AlertDomain TransactionScope alertTransactionScope
+  ) {
+    return new DefaultTransitAlertService(
+      transitAlertRepositoryHandle.repositorySnapshot(alertTransactionScope)
+    );
   }
 
   @Provides

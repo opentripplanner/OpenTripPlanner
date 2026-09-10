@@ -25,7 +25,7 @@ import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,11 @@ public class AlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(AlertsUpdateHandler.class);
   private static final int MISSING_INT_FIELD_VALUE = -1;
+
+  /**
+   * The feed this updater provides alerts for.
+   */
   private String feedId;
-  private TransitAlertService transitAlertService;
 
   /** How long before the posted start of an event it should be displayed to users */
   private Duration earlyStart = Duration.ZERO;
@@ -55,7 +58,15 @@ public class AlertsUpdateHandler {
     this.fuzzyTripMatching = fuzzyTripMatching;
   }
 
-  public void update(FeedMessage message, GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
+  /**
+   * Apply a GTFS-RT service alert feed. A GTFS-RT feed always contains the complete set of alerts,
+   * so the previously stored alerts of this feed are all replaced.
+   */
+  public void update(
+    FeedMessage message,
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    TransitAlertRepository repository
+  ) {
     Collection<TransitAlert> alerts = new ArrayList<>();
     for (FeedEntity entity : message.getEntityList()) {
       if (!entity.hasAlert()) {
@@ -69,17 +80,13 @@ public class AlertsUpdateHandler {
         LOG.warn("Failed to map GTFS-RT alert with id {}: {}", id, e.getMessage(), e);
       }
     }
-    transitAlertService.setAlerts(alerts);
+    repository.replaceAlerts(feedId, alerts);
   }
 
   public void setFeedId(String feedId) {
     if (feedId != null) {
       this.feedId = feedId.intern();
     }
-  }
-
-  public void setTransitAlertService(TransitAlertService transitAlertService) {
-    this.transitAlertService = transitAlertService;
   }
 
   public void setEarlyStart(Duration earlyStart) {

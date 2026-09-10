@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.FEED_ID;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -20,7 +21,9 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.transitalert.TransitAlertService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -32,6 +35,8 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 class RealtimeResolverTest {
+
+  private static final TransitAlertService NO_ALERTS = alertService(List.of());
 
   private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
@@ -56,12 +61,11 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
     // Put an alert on stop3
-    var transitAlertService = new TransitAlertServiceImpl();
     var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .withCalendar(AlertCalendar.ofAlwaysActive())
       .build();
-    transitAlertService.setAlerts(List.of(alert));
+    var transitAlertService = alertService(List.of(alert));
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
@@ -99,11 +103,7 @@ class RealtimeResolverTest {
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(
-      itineraries,
-      transitService,
-      new TransitAlertServiceImpl()
-    );
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService, NO_ALERTS);
 
     assertEquals(1, itineraries.size());
 
@@ -125,11 +125,7 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(
-      itineraries,
-      transitService,
-      new TransitAlertServiceImpl()
-    );
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService, NO_ALERTS);
 
     assertEquals(1, itineraries.size());
 
@@ -189,5 +185,11 @@ class RealtimeResolverTest {
     transitRepository.index();
 
     return new DefaultTransitService(transitRepository);
+  }
+
+  private static TransitAlertService alertService(List<TransitAlert> alerts) {
+    var repository = new DefaultTransitAlertRepository();
+    repository.replaceAlerts(FEED_ID, alerts);
+    return new DefaultTransitAlertService(repository.freeze());
   }
 }

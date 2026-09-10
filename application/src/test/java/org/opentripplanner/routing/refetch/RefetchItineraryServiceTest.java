@@ -14,10 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertRepository;
+import org.opentripplanner.service.transitalert.internal.DefaultTransitAlertService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -336,7 +337,7 @@ class RefetchItineraryServiceTest {
     return new RefetchItineraryService(
       GRAPH,
       TRANSIT_ENV.transitService(),
-      new TransitAlertServiceImpl(),
+      new DefaultTransitAlertService(new DefaultTransitAlertRepository().freeze()),
       TRANSFER_SERVICE,
       streetDetailsService,
       linkingContextFactory,

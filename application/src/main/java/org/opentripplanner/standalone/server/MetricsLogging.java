@@ -20,13 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.AlertDomain;
 import org.opentripplanner.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.transitalert.TransitAlertRepository;
+import org.opentripplanner.service.transitalert.TransitAlertRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -38,10 +42,15 @@ public class MetricsLogging {
   @Inject
   public MetricsLogging(
     TransitRepository transitRepository,
-    TransitAlertService transitAlertService,
+    @AlertDomain RepositoryRegistry alertRepositoryRegistry,
+    RepositoryHandle<
+      TransitAlertRepositorySnapshot,
+      TransitAlertRepository
+    > transitAlertRepositoryHandle,
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary,
     @TransitDomain UpdateManager transitUpdateManager,
+    @AlertDomain UpdateManager alertUpdateManager,
     @StreetDomain UpdateManager streetUpdateManager
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
@@ -56,7 +65,9 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
     if (OTPFeature.AlertMetrics.isOn()) {
-      new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
+      new AlertMetrics(alertRepositoryRegistry, transitAlertRepositoryHandle).bindTo(
+        Metrics.globalRegistry
+      );
     }
 
     if (transitRepository.getRaptorTransitData() != null) {
@@ -93,9 +104,9 @@ public class MetricsLogging {
     ).bindTo(Metrics.globalRegistry);
 
     new ExecutorServiceMetrics(
-      streetUpdateManager.writerThreadExecutor(),
-      "streetUpdateScheduler",
-      List.of(Tag.of("pool", "streetUpdateScheduler"))
+      alertUpdateManager.writerThreadExecutor(),
+      "alertUpdateScheduler",
+      List.of(Tag.of("pool", "alertUpdateScheduler"))
     ).bindTo(Metrics.globalRegistry);
 
     if (raptorConfig.isMultiThreaded()) {

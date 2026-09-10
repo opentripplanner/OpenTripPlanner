@@ -24,6 +24,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.configure.AlertDomain;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -35,13 +36,13 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.routing.services.configure.TransitAlertServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.transitalert.configure.TransitAlertRepositoryModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
@@ -81,6 +82,7 @@ class RequestScopedFactoryTest {
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
     var transitRepository = new TransitRepository();
     var repositoryRegistry = TransactionFactory.createRepositoryRegistry();
+    var alertRepositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       TripCalendars.empty()
@@ -104,6 +106,7 @@ class RequestScopedFactoryTest {
     var factory = DaggerRequestScopedFactoryTest_TestFactory.builder()
       .transitRepository(transitRepository)
       .repositoryRegistry(repositoryRegistry)
+      .alertRepositoryRegistry(alertRepositoryRegistry)
       .timetableRepositoryHandle(timetableRepositoryHandle)
       .routerConfig(routerConfig)
       .debugUiConfig(DebugUiConfig.DEFAULT)
@@ -179,7 +182,7 @@ class RequestScopedFactoryTest {
   }
 
   @Singleton
-  @Component(modules = { ConstructApplicationModule.class, TransitAlertServiceModule.class })
+  @Component(modules = { ConstructApplicationModule.class, TransitAlertRepositoryModule.class })
   interface TestFactory {
     RequestScopedFactory.Builder requestScopedFactoryBuilder();
 
@@ -190,6 +193,9 @@ class RequestScopedFactoryTest {
 
       @BindsInstance
       Builder repositoryRegistry(@TransitDomain RepositoryRegistry repositoryRegistry);
+
+      @BindsInstance
+      Builder alertRepositoryRegistry(@AlertDomain RepositoryRegistry alertRepositoryRegistry);
 
       @BindsInstance
       Builder timetableRepositoryHandle(
