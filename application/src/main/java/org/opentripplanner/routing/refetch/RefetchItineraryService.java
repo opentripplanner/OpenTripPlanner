@@ -3,6 +3,7 @@ package org.opentripplanner.routing.refetch;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -37,6 +39,7 @@ import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -52,6 +55,7 @@ public class RefetchItineraryService {
 
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
+  private final ConstrainedTransferService constrainedTransferService;
   private final RegularTransferService transferService;
   private final Graph graph;
   private final LinkingContextFactory linkingContextFactory;
@@ -64,9 +68,11 @@ public class RefetchItineraryService {
     TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
+    ConstrainedTransferService constrainedTransferService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
+    this.constrainedTransferService = constrainedTransferService;
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
     this.transferService = transferService;
@@ -83,10 +89,13 @@ public class RefetchItineraryService {
 
   /// Refetch an itinerary
   ///
-  /// @param from An optional from location. If null the first legReference will be the start of the itinerary.
-  /// @param to An optional to location. If null the last legReference will be the end of the itinerary.
+  /// @param from          An optional from location. If null the first legReference will be the
+  ///                      start of the itinerary.
+  /// @param to            An optional to location. If null the last legReference will be the end of
+  ///                      the itinerary.
   /// @param legReferences A list of leg references describing the parts of the itinerary.
-  /// @throws RefetchItineraryException If there is some issue with the input values that should be mapped so some kind of InvalidInput message to the user.
+  /// @throws RefetchItineraryException If there is some issue with the input values that should be
+  ///                                   mapped so some kind of InvalidInput message to the user.
   public Itinerary refetchItinerary(
     @Nullable GenericLocation from,
     @Nullable GenericLocation to,
@@ -192,19 +201,72 @@ public class RefetchItineraryService {
       legs.addAll(access);
     }
 
+    Set<I18NString> transferStops = new HashSet<>();
     legs.add(transitLegs.getFirst());
 
     for (int i = 1; i < transitLegs.size(); i++) {
       var legA = transitLegs.get(i - 1);
       var legB = transitLegs.get(i);
 
-      // ScheduledTransitLegs are guaranteed to have StopLocation in both ends
+      // ScheduledTransitLegs are guaranteed to have StopLocation in both ends.
       var transferFrom = Objects.requireNonNull(legA.to().stop);
       var transferTo = Objects.requireNonNull(legB.from().stop);
 
+      var legAAlightStopPos = Objects.requireNonNullElse(legA.alightStopPosInPattern(), 1);
+      var legBAlightStopPos = Objects.requireNonNullElse(legB.alightStopPosInPattern(), 1);
+
+      var transfer = constrainedTransferService.findTransfer(
+        legA.trip(),
+        legAAlightStopPos,
+        transferFrom,
+        legB.trip(),
+        legBAlightStopPos,
+        transferTo
+      );
+
+      StopLocation fromTransferStop = null;
+      StopLocation toTransferStop = null;
+
+      if (transfer != null) {
+        fromTransferStop = transfer.getFrom().asStopTransferPoint().getStop();
+
+        toTransferStop = transfer.getTo().asStopTransferPoint().getStop();
+
+        transferStops.add(fromTransferStop.getName());
+        transferStops.add(toTransferStop.getName());
+      }
+
+      var newLegA = legA
+        .copyOf()
+        .withTransferFromPreviousLeg(
+          hasTransferStop(legA.from().name, fromTransferStop, transferStops) ? transfer : null
+        )
+        .withTransferToNextLeg(
+          hasTransferStop(legA.to().name, toTransferStop, transferStops) ? transfer : null
+        )
+        .build();
+
+      var newLegB = legB
+        .copyOf()
+        .withTransferFromPreviousLeg(
+          hasTransferStop(legB.from().name, fromTransferStop, transferStops) ? transfer : null
+        )
+        .withTransferToNextLeg(
+          hasTransferStop(legB.to().name, toTransferStop, transferStops) ? transfer : null
+        )
+        .build();
+
+      // TODO: Remove workaround once constrained transfers are handled properly.
+      replaceLastScheduledTransitLeg(legs, newLegA);
+
       if (!transferFrom.equals(transferTo)) {
-        var alightSlack = routeRequest.preferences().transit().alightSlack().valueOf(legA.mode());
-        var transferStartTime = legA.endTime().toInstant().plus(alightSlack);
+        var alightSlack = routeRequest
+          .preferences()
+          .transit()
+          .alightSlack()
+          .valueOf(newLegA.mode());
+
+        var transferStartTime = newLegA.endTime().toInstant().plus(alightSlack);
 
         var request = StreetSearchRequest.copyOf(transferRequest)
           .withStartTime(transferStartTime)
@@ -215,10 +277,11 @@ public class RefetchItineraryService {
             "Could not transfer from " + transferFrom.getId() + " to " + transferTo.getId()
           )
         );
+
         legs.addAll(transferLegs);
       }
 
-      legs.add(legB);
+      legs.add(newLegB);
     }
 
     if (toVertices != null) {
@@ -241,6 +304,25 @@ public class RefetchItineraryService {
       // We don't try to calculate a cost for the refetched itinerary.
       .withGeneralizedCost(Cost.ZERO)
       .build();
+  }
+
+  private boolean hasTransferStop(
+    I18NString legStopName,
+    StopLocation transferStop,
+    Set<I18NString> transferStops
+  ) {
+    return transferStop != null && transferStops.contains(legStopName);
+  }
+
+  private void replaceLastScheduledTransitLeg(List<Leg> legs, ScheduledTransitLeg replacement) {
+    for (int i = legs.size() - 1; i >= 0; i--) {
+      if (legs.get(i) instanceof ScheduledTransitLeg) {
+        legs.set(i, replacement);
+        return;
+      }
+    }
+
+    throw new IllegalStateException("No ScheduledTransitLeg found to replace");
   }
 
   /// This takes a place that has to have a stop id in it and maps to GenericLocation

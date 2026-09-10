@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;

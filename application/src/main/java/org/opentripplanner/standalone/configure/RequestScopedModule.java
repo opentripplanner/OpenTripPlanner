@@ -57,6 +57,8 @@ import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -109,12 +111,19 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
+  static ConstrainedTransferService constrainedTransferService() {
+    return new DefaultConstrainedTransferService();
+  }
+
+  @Provides
+  @HttpRequestScoped
   static RefetchItineraryService refetchItineraryService(
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
+    ConstrainedTransferService constrainedTransferService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
@@ -124,6 +133,7 @@ public class RequestScopedModule {
       transitAlertService,
       transferService,
       streetDetailsService,
+      constrainedTransferService,
       linkingContextFactory,
       streetLimitationParametersService
     );

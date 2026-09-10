@@ -51,6 +51,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -456,6 +457,7 @@ class RealtimeResolverTest {
       transitAlertService,
       TRANSFER_SERVICE,
       streetDetailsService,
+      new DefaultConstrainedTransferService(),
       linkingContextFactory,
       streetLimitationParametersService
     );

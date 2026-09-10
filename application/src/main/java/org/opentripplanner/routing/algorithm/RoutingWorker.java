@@ -57,6 +57,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitService;
@@ -450,6 +451,7 @@ public class RoutingWorker {
       transitAlertService,
       transferService,
       streetDetailsService,
+      new DefaultConstrainedTransferService(),
       linkingContextFactory,
       streetLimitationParametersService
     );

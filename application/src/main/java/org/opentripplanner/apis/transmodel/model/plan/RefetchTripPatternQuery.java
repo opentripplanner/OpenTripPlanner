@@ -218,6 +218,7 @@ public class RefetchTripPatternQuery {
       ctx.getTransitAlertService(),
       ctx.getTransferService(),
       ctx.getStreetDetailsService(),
+      ctx.getTransitService().getConstrainedTransferService(),
       ctx.getLinkingContextFactory(),
       ctx.getStreetLimitationParametersService()
     );

@@ -2,6 +2,8 @@ package org.opentripplanner.routing.refetch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -33,6 +36,11 @@ import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -54,12 +62,45 @@ class RefetchItineraryServiceTest {
   static final RegularStop STOP_C = ENV_BUILDER.stop("C");
   static final RegularStop STOP_D = ENV_BUILDER.stop("D");
 
+  static final FeedScopedId ID = new FeedScopedId("F", "TX1");
+  static final TransferConstraint GUARANTEED = TransferConstraint.of().guaranteed().build();
+  static final StopTransferPoint STOP_B_TX = new StopTransferPoint(STOP_B);
+  static final StopTransferPoint STOP_C_TX = new StopTransferPoint(STOP_C);
+
   static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
-    TripInput.of("trip1").addStop(STOP_A, "10:00").addStop(STOP_B, "11:00").addStop(STOP_D, "12:00")
+    TripInput.of("trip1")
+      .withWithTripOnServiceDate("trip1")
+      .addStop(STOP_A, "10:00")
+      .addStop(STOP_B, "11:00")
+      .addStop(STOP_D, "12:00")
   )
     .addTrip(TripInput.of("trip2").addStop(STOP_B, "12:00").addStop(STOP_C, "13:00"))
     .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
     .addTrip(TripInput.of("trip4").addStop(STOP_C, "08:30").addStop(STOP_D, "09:30"))
+    .addTrip(
+      TripInput.of("trip5")
+        .withWithTripOnServiceDate("trip5")
+        .addStop(STOP_A, "10:00")
+        .addStop(STOP_B, "11:00")
+    )
+    .addTrip(
+      TripInput.of("trip6")
+        .withWithTripOnServiceDate("trip6")
+        .addStop(STOP_B, "11:00")
+        .addStop(STOP_D, "12:00")
+    )
+    .addTrip(
+      TripInput.of("trip7")
+        .withWithTripOnServiceDate("trip7")
+        .addStop(STOP_C, "13:00")
+        .addStop(STOP_D, "14:00")
+    )
+    .addTrip(
+      TripInput.of("trip8")
+        .withWithTripOnServiceDate("trip8")
+        .addStop(STOP_B, "11:00")
+        .addStop(STOP_C, "12:00")
+    )
     .build();
 
   // Setup street
@@ -209,6 +250,52 @@ class RefetchItineraryServiceTest {
   }
 
   @Test
+  void refetchItineraryWithTwoTransitLegsAndConstrainedTransfer() {
+    var refetch = createRefetchService();
+
+    var start = GenericLocation.fromCoordinate(VA.coord());
+    var end = GenericLocation.fromCoordinate(VD.coord());
+
+    var leg1 = legRef("trip5", STOP_A, STOP_B);
+    var leg2 = legRef("trip6", STOP_B, STOP_D);
+
+    var itinerary = refetch.refetchItinerary(start, end, List.of(leg1, leg2), routeRequest());
+
+    assertNotNull(itinerary.legs().getFirst().transferToNextLeg());
+    assertNull(itinerary.legs().getFirst().transferFromPrevLeg());
+    assertNotNull(itinerary.legs().getLast().transferFromPrevLeg());
+    assertNull(itinerary.legs().getLast().transferToNextLeg());
+
+    assertEquals("A ~ BUS trip5 10:00 11:00 ~ B ~ BUS trip6 11:00 12:00 ~ D []", itinerary.toStr());
+  }
+
+  @Test
+  void refetchItineraryWithThreeTransitLegsAndConstrainedTransfer() {
+    var refetch = createRefetchService();
+
+    var start = GenericLocation.fromCoordinate(VA.coord());
+    var end = GenericLocation.fromCoordinate(VD.coord());
+
+    var leg1 = legRef("trip5", STOP_A, STOP_B);
+    var leg2 = legRef("trip8", STOP_B, STOP_C);
+    var leg3 = legRef("trip7", STOP_C, STOP_D);
+
+    var itinerary = refetch.refetchItinerary(start, end, List.of(leg1, leg2, leg3), routeRequest());
+
+    assertNull(itinerary.legs().getFirst().transferFromPrevLeg());
+    assertNotNull(itinerary.legs().getFirst().transferToNextLeg());
+    assertNotNull(itinerary.legs().get(1).transferFromPrevLeg());
+    assertNotNull(itinerary.legs().get(1).transferToNextLeg());
+    assertNotNull(itinerary.legs().getLast().transferFromPrevLeg());
+    assertNull(itinerary.legs().getLast().transferToNextLeg());
+
+    assertEquals(
+      "A ~ BUS trip5 10:00 11:00 ~ B ~ BUS trip8 11:00 12:00 ~ C ~ BUS trip7 13:00 14:00 ~ D []",
+      itinerary.toStr()
+    );
+  }
+
+  @Test
   void refetchWithFailedLinking() {
     var refetch = createRefetchService();
 
@@ -297,6 +384,15 @@ class RefetchItineraryServiceTest {
     );
   }
 
+  private ConstrainedTransferService createConstrainedTransferService() {
+    DefaultConstrainedTransferService service = new DefaultConstrainedTransferService();
+
+    ConstrainedTransfer transfer1 = new ConstrainedTransfer(ID, STOP_B_TX, STOP_B_TX, GUARANTEED);
+    ConstrainedTransfer transfer2 = new ConstrainedTransfer(ID, STOP_C_TX, STOP_C_TX, GUARANTEED);
+    service.addAll(List.of(transfer1, transfer2));
+    return service;
+  }
+
   private RefetchItineraryService createRefetchService() {
     StreetDetailsService streetDetailsService = null;
     VertexCreationService vertexCreationService = new VertexCreationService(
@@ -339,6 +435,7 @@ class RefetchItineraryServiceTest {
       new TransitAlertServiceImpl(),
       TRANSFER_SERVICE,
       streetDetailsService,
+      createConstrainedTransferService(),
       linkingContextFactory,
       streetLimitationParametersService
     );
