@@ -85,7 +85,7 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
-        <plugin.spotless.version>3.10.0</plugin.spotless.version>
+        <plugin.spotless.version>3.10.1</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
@@ -259,7 +259,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.15.0</version>
+                <version>3.16.0</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>25</release>
@@ -427,7 +427,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>10.0.0</version>
+                <version>10.0.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -452,7 +452,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.44.0</version>
+                <version>6.46.1</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -471,7 +471,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.39.0</version>
+                        <version>2.41.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -495,7 +495,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>13.8.0</version>
+                        <version>13.11.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
