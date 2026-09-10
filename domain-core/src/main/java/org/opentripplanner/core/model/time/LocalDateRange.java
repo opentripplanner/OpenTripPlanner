@@ -24,7 +24,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * {@code null} is accepted in all factory method parameters and is treated as unbounded (equivalent
  * to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
  */
-public final class LocalDateRange implements Serializable {
+public final class LocalDateRange {
 
   private static final LocalDateRange UNBOUNDED = new LocalDateRange(MIN, MAX);
 

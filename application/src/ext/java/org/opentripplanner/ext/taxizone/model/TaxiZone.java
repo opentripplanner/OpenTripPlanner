@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -20,20 +19,16 @@ public final class TaxiZone implements Serializable {
   @Nullable
   private final BookingInfo dropOffBookingInfo;
 
-  private final LocalDateRange serviceDateRange;
-
   public TaxiZone(
     Geometry geometry,
     Route route,
     @Nullable BookingInfo pickupBookingInfo,
-    @Nullable BookingInfo dropOffBookingInfo,
-    LocalDateRange serviceDateRange
+    @Nullable BookingInfo dropOffBookingInfo
   ) {
     this.geometry = geometry;
     this.route = route;
     this.pickupBookingInfo = pickupBookingInfo;
     this.dropOffBookingInfo = dropOffBookingInfo;
-    this.serviceDateRange = serviceDateRange;
   }
 
   public Geometry geometry() {
@@ -54,10 +49,6 @@ public final class TaxiZone implements Serializable {
     return dropOffBookingInfo;
   }
 
-  public LocalDateRange serviceDateRange() {
-    return serviceDateRange;
-  }
-
   @Override
   public boolean equals(Object obj) {
     if (obj == this) {
@@ -71,20 +62,13 @@ public final class TaxiZone implements Serializable {
       Objects.equals(geometry, taxiZone.geometry) &&
       Objects.equals(route, taxiZone.route) &&
       Objects.equals(pickupBookingInfo, taxiZone.pickupBookingInfo) &&
-      Objects.equals(dropOffBookingInfo, taxiZone.dropOffBookingInfo) &&
-      Objects.equals(serviceDateRange, taxiZone.serviceDateRange)
+      Objects.equals(dropOffBookingInfo, taxiZone.dropOffBookingInfo)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      geometry,
-      route,
-      pickupBookingInfo,
-      dropOffBookingInfo,
-      serviceDateRange
-    );
+    return Objects.hash(geometry, route, pickupBookingInfo, dropOffBookingInfo);
   }
 
   @Override
@@ -94,7 +78,6 @@ public final class TaxiZone implements Serializable {
       .addObj("route", route)
       .addObj("pickupBookingInfo", pickupBookingInfo)
       .addObj("dropOffBookingInfo", dropOffBookingInfo)
-      .addObj("serviceDateRange", serviceDateRange)
       .toString();
   }
 }

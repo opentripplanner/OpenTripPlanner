@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.taxizone.internal.graphbuilder;
 
 import java.io.IOException;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.ext.taxizone.graphbuilder.TaxiZoneBuilder;
@@ -23,16 +22,13 @@ public class TaxiZoneDataReader {
 
   private final TaxiZoneRepository taxiZoneRepository;
   private final DataImportIssueStore issueStore;
-  private final LocalDateRange transitPeriodLimit;
 
   public TaxiZoneDataReader(
     TaxiZoneRepository taxiZoneRepository,
-    DataImportIssueStore issueStore,
-    LocalDateRange transitPeriodLimit
+    DataImportIssueStore issueStore
   ) {
     this.taxiZoneRepository = taxiZoneRepository;
     this.issueStore = issueStore;
-    this.transitPeriodLimit = transitPeriodLimit;
   }
 
   /**
@@ -49,14 +45,8 @@ public class TaxiZoneDataReader {
       bundle.parameters().stationTransferPreference()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder(dao);
-    var builder = mapper.getBuilder();
-    // Trim calendar data to the same transitServiceStart/transitServiceEnd window used for the
-    // rest of the transit model, so taxi zone service dates stay consistent with it.
-    builder.limitServiceDays(transitPeriodLimit);
-    var calendarServiceData = builder.buildCalendarServiceData();
     var zones = TaxiZoneBuilder.buildZones(
-      FlexTripsMapper.createFlexTrips(builder, issueStore),
-      calendarServiceData
+      FlexTripsMapper.createFlexTrips(mapper.getBuilder(), issueStore)
     );
     taxiZoneRepository.addZones(zones);
     LOG.info("Loaded {} taxi zone(s) from {}", zones.size(), bundle.feedInfo());

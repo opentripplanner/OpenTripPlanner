@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
@@ -56,42 +55,16 @@ class TaxiRouterTest implements PlanTestConstants {
   private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
 
   private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
-    List.of(
-      new TaxiZone(
-        ZONE_POLYGON,
-        ZONE_ROUTE,
-        null,
-        null,
-        LocalDateRange.ofInclusiveEnd(
-          TestItineraryBuilder.SERVICE_DAY,
-          TestItineraryBuilder.SERVICE_DAY
-        )
-      )
-    )
+    List.of(new TaxiZone(ZONE_POLYGON, ZONE_ROUTE, null, null))
   );
   private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
-  private static final TaxiZoneIndex WRONG_DATE_INDEX = new TaxiZoneIndex(
-    List.of(
-      new TaxiZone(
-        ZONE_POLYGON,
-        ZONE_ROUTE,
-        null,
-        null,
-        LocalDateRange.ofInclusiveEnd(
-          TestItineraryBuilder.SERVICE_DAY.plusDays(1),
-          TestItineraryBuilder.SERVICE_DAY.plusDays(1)
-        )
-      )
-    )
-  );
 
   // Covers the synthetic FROM/TO coordinates used by routeDirect(...).
   private static final TaxiZone COVERING_ZONE = new TaxiZone(
     Polygons.square(new Coordinate(10.69, 59.89), new Coordinate(10.71, 59.91)),
     ZONE_ROUTE,
     null,
-    null,
-    LocalDateRange.ofInclusiveEnd(null, null)
+    null
   );
 
   @Test
@@ -115,18 +88,6 @@ class TaxiRouterTest implements PlanTestConstants {
       .drive(T11_00, T11_10, PLACE_B)
       .build();
     var subject = new TaxiRouter(EMPTY_INDEX);
-
-    var result = subject.decorateAndFilter(List.of(itinerary));
-
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  void driveLegOutsideZoneServiceDatesIsRemovedFromResult() {
-    var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
-      .drive(T11_00, T11_10, PLACE_B)
-      .build();
-    var subject = new TaxiRouter(WRONG_DATE_INDEX);
 
     var result = subject.decorateAndFilter(List.of(itinerary));
 

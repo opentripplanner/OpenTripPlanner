@@ -3,14 +3,11 @@ package org.opentripplanner.ext.taxizone.graphbuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
@@ -28,29 +25,20 @@ public class TaxiZoneBuilder {
 
   private TaxiZoneBuilder() {}
 
-  public static List<TaxiZone> buildZones(
-    Collection<FlexTrip<?, ?>> flexTrips,
-    CalendarServiceData calendarServiceData
-  ) {
+  public static List<TaxiZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
     List<TaxiZone> result = new ArrayList<>();
     for (FlexTrip<?, ?> flexTrip : flexTrips) {
-      if (!isValidTaxiZoneTrip(flexTrip)) {
-        continue;
+      if (isValidTaxiZoneTrip(flexTrip)) {
+        var areaStop = (AreaStop) flexTrip.getStop(0);
+        result.add(
+          new TaxiZone(
+            areaStop.getGeometry(),
+            flexTrip.getTrip().getRoute(),
+            flexTrip.getPickupBookingInfo(0),
+            flexTrip.getDropOffBookingInfo(1)
+          )
+        );
       }
-      var serviceDateRange = continuousServiceDateRange(flexTrip, calendarServiceData);
-      if (serviceDateRange.isEmpty()) {
-        continue;
-      }
-      var areaStop = (AreaStop) flexTrip.getStop(0);
-      result.add(
-        new TaxiZone(
-          areaStop.getGeometry(),
-          flexTrip.getTrip().getRoute(),
-          flexTrip.getPickupBookingInfo(0),
-          flexTrip.getDropOffBookingInfo(1),
-          serviceDateRange.get()
-        )
-      );
     }
     return result;
   }
@@ -58,7 +46,7 @@ public class TaxiZoneBuilder {
   private static boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
     // Order matters!
     // - isUnscheduledTrip must run first, since only UnscheduledTrip guarantees getTrip() is
-    //   non-null, which the checks after it (and continuousServiceDateRange) rely on.
+    //   non-null, which the checks after it rely on.
     // - hasTwoStops must run before hasSingleZone and hasValidPickupDropoffTypes, since those
     //   access stop index 1 directly and would throw if fewer than two stops are present.
     return (
@@ -170,38 +158,5 @@ public class TaxiZoneBuilder {
       return false;
     }
     return true;
-  }
-
-  /**
-   * Resolves a trip's GTFS service calendar and, if its dates form one contiguous run of days
-   * with no gaps, returns the equivalent {@link LocalDateRange}. Returns empty (with a warning)
-   * if the service has no valid dates, or if its dates contain any gap (e.g. a
-   * partial/weekday-only calendar).
-   */
-  private static Optional<LocalDateRange> continuousServiceDateRange(
-    FlexTrip<?, ?> flexTrip,
-    CalendarServiceData calendarServiceData
-  ) {
-    var serviceId = flexTrip.getTrip().getServiceId();
-    var serviceDates = calendarServiceData.getServiceDatesForServiceId(serviceId);
-    if (serviceDates != null && !serviceDates.isEmpty()) {
-      var sortedDates = new ArrayList<>(serviceDates);
-      sortedDates.sort(null);
-      var range = LocalDateRange.ofInclusiveEnd(
-        sortedDates.get(0),
-        sortedDates.get(sortedDates.size() - 1)
-      );
-      if (sortedDates.size() == range.daysInPeriod()) {
-        return Optional.of(range);
-      }
-    }
-    LOG.warn(
-      "Skipping trip {} for taxi zones: service {} must have at least one valid service date " +
-        "and run every day within its service period, with no gaps " +
-        "(missing from calendar.txt / calendar_dates.txt, or a partial/weekday-only calendar)",
-      flexTrip.getId(),
-      serviceId
-    );
-    return Optional.empty();
   }
 }

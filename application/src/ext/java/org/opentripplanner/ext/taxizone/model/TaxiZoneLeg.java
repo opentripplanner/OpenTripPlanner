@@ -73,11 +73,6 @@ public class TaxiZoneLeg implements Leg {
     return taxiZone.route();
   }
 
-  /**
-   * The leg only exists because {@link org.opentripplanner.ext.taxizone.TaxiZoneIndex} already
-   * matched the {@link TaxiZone} against this exact date (see
-   * {@link TaxiZone#serviceDateRange()}).
-   */
   @Override
   public LocalDate serviceDate() {
     return startTime().toLocalDate();

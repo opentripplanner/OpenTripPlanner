@@ -89,8 +89,7 @@ public class TaxiRouter {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode().isDrivingIsh()) {
         var taxiZone = taxiZoneIndex.findFirstZone(
           streetLeg.from().coordinate,
-          streetLeg.to().coordinate,
-          streetLeg.startTime().toLocalDate()
+          streetLeg.to().coordinate
         );
         if (taxiZone.isEmpty()) {
           return Optional.empty();

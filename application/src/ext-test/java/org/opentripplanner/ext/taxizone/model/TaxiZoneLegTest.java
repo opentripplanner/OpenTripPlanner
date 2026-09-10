@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -125,7 +124,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
     var otherRoute = TransitRepositoryForTest.route("other-route")
       .withMode(TransitMode.CARPOOL)
       .build();
-    var otherZone = new TaxiZone(null, otherRoute, null, null, LocalDateRange.ofUnbounded());
+    var otherZone = new TaxiZone(null, otherRoute, null, null);
     var other = new TaxiZoneLeg(driveLeg(), otherZone);
     assertThat(leg.hasSameMode(other)).isFalse();
   }
@@ -138,13 +137,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
   }
 
   private static TaxiZoneLeg taxiZoneLeg() {
-    var zone = new TaxiZone(
-      null,
-      ROUTE,
-      PICKUP_BOOKING_INFO,
-      DROP_OFF_BOOKING_INFO,
-      LocalDateRange.ofUnbounded()
-    );
+    var zone = new TaxiZone(null, ROUTE, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
     return new TaxiZoneLeg(driveLeg(), zone);
   }
 }

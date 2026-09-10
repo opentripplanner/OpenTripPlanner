@@ -10,10 +10,8 @@ The taxi zone module filters and decorates taxi itineraries using spatial zone d
 loaded from dedicated GTFS Flex feeds.
 
 For each driving-ish leg in a taxi itinerary:
-- If **no zone covers both the pickup and drop-off coordinates on the leg's travel date**, the
-  itinerary is removed from the response. A zone only matches on dates within its resolved GTFS
-  service period (a single contiguous date range, trimmed to the configured
-  `transitServiceStart`/`transitServiceEnd` window, same as the rest of the transit model).
+- If **no zone covers both the pickup and drop-off coordinates**, the itinerary is removed from
+  the response.
 - If **a matching zone is found**, the generic driving leg is replaced with a `TaxiZoneLeg`
   decorated with the provider's route, agency, and booking information from the matched flex trip.
 - Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
@@ -27,6 +25,7 @@ For each driving-ish leg in a taxi itinerary:
 
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
+- Calendar/service-date validation?
 
 ### Taxi Zone Data Files
 
@@ -82,15 +81,6 @@ a warning in the build report:
    have a geometry. Trips with separate departure and arrival zones are not supported.
 6. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
    (CALL_AGENCY). `0` (SCHEDULED) and `3` (COORDINATE_WITH_DRIVER) are not accepted.
-7. The trip's `service_id` must run on every day within its service period, i.e. its resolved GTFS
-   calendar dates (`calendar.txt` / `calendar_dates.txt`) must form one contiguous run of days with no
-   gaps. Trips whose service has no valid dates at all, or only a partial/weekday-only calendar,
-   are skipped. This lets OTP store each zone's valid period as a single compact date range
-   instead of a full set of individual dates.
-
-A zone built from a trip is only used to decorate a leg on dates within its resolved service
-period — a request for a date outside that range will not match the zone, the same as any
-other GTFS-scheduled service.
 
 ### GTFS API Modes
 
@@ -115,7 +105,7 @@ wrapped street leg.
 | `agency` / `authority`             | Agency from the matched route.                                |
 | `route` / `line`                   | Route from the matched flex trip.                              |
 | `mode`                              | `TransitMode` from the matched route (e.g. `TAXI`), resolved via an explicit `instanceof TaxiZoneLeg` branch in `LegImpl`/`LegType`, since it isn't a `TransitLeg`. |
-| `serviceDate`                      | The leg's own start date, validated against the matched zone's resolved GTFS service period. |
+| `serviceDate`                      | The leg's own start date |
 | `boardStopPosInPattern`            | Always `0` (the pickup stop).                                  |
 | `alightStopPosInPattern`           | Always `1` (the drop-off stop).                                |
 | `pickupBookingInfo`                | Booking info from stop 0 of the matched flex trip.             |

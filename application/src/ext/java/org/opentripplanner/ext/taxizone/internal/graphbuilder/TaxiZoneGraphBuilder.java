@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.taxizone.internal.graphbuilder;
 
 import java.io.IOException;
-import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
@@ -25,11 +24,10 @@ public class TaxiZoneGraphBuilder implements GraphBuilderModule {
   public TaxiZoneGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources,
     TaxiZoneRepository taxiZoneRepository,
-    DataImportIssueStore issueStore,
-    LocalDateRange transitPeriodLimit
+    DataImportIssueStore issueStore
   ) {
     this.gtfsDataSources = gtfsDataSources;
-    this.dataReader = new TaxiZoneDataReader(taxiZoneRepository, issueStore, transitPeriodLimit);
+    this.dataReader = new TaxiZoneDataReader(taxiZoneRepository, issueStore);
   }
 
   @Override
