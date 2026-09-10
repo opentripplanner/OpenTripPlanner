@@ -75,7 +75,6 @@ nav:
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Preparing DEM Data: 'Preparing-DEM.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
-    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
     - Frontends: 'Frontends.md'
 - APIs:
     - Introduction: 'apis/Apis.md'
