@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.10.0-SNAPSHOT</version>
+    <version>2.11.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>276</otp.serialization.version.id>
+        <otp.serialization.version.id>278</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.5</geotools.version>
@@ -72,11 +72,11 @@
         <logback.version>1.6.3</logback.version>
         <lucene.version>10.5.0</lucene.version>
         <micrometer.version>1.17.1</micrometer.version>
-        <netex-java-model.version>2.0.15.3</netex-java-model.version>
+        <netex-java-model.version>2.0.15.4</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.35.1</protobuf.version>
+        <protobuf.version>4.36.1</protobuf.version>
         <siri-java-model.version>2.0.6</siri-java-model.version>
-        <slf4j.version>2.0.18</slf4j.version>
+        <slf4j.version>2.0.19</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -592,7 +592,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.86.0</version>
+                <version>26.88.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -615,7 +615,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.6.0-jre</version>
+                <version>33.7.1-jre</version>
             </dependency>
 
             <!-- Logging API -->

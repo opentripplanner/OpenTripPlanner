@@ -32,15 +32,18 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.ext.taxizone.config.TaxiZoneConfig;
 import org.opentripplanner.ext.taxizone.parameters.TaxiZoneParameters;
+import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
+import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
+import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
@@ -171,12 +174,17 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
   public final Set<String> boardingLocationTags;
+  public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
   public final TaxiZoneParameters taxiZone;
   public final EmpiricalDelayParameters empiricalDelay;
+
+  @Nullable
+  public final VehicleRentalGeofencingParameters vehicleRentalGeofencing;
+
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -498,6 +506,28 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .description("[Detailed documentation](BoardingLocations.md)")
       .asStringSet(List.copyOf(Set.of("ref")));
+    elevatorRefTags = root
+      .of("elevatorRefTags")
+      .since(V2_10)
+      .summary("Groups of OSM tags whose values are combined into an elevator id.")
+      .description(
+        """
+        Each group is a list of one or more OSM tag keys. If every tag in a group is present
+        on an elevator node/way, their values are joined with ':' (in the given order) into
+        one id. A group with a single tag key produces a plain id. If any tag in a group is
+        missing, that group produces no id. If more than one group is configured, the first
+        one (in the given order) that produces an id is used as the elevator's id."""
+      )
+      .asObjects(List.of(), node ->
+        CompoundRefTagGroup.of(
+          node
+            .of("tagGroup")
+            .since(V2_10)
+            .summary("The ordered OSM tag keys whose values are combined into one id.")
+            .asStringList(List.of())
+            .toArray(String[]::new)
+        )
+      );
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
@@ -600,6 +630,10 @@ public class BuildConfig implements OtpDataStoreConfig {
     this.emission = EmissionConfig.mapEmissionsConfig("emission", root);
     this.taxiZone = TaxiZoneConfig.mapTaxiZoneConfig("taxiZone", root);
     this.empiricalDelay = EmpiricalDelayConfig.mapEmpiricalDelayConfig("empiricalDelay", root);
+    this.vehicleRentalGeofencing = VehicleRentalGeofencingConfig.mapConfig(
+      "vehicleRentalGeofencing",
+      root
+    );
     this.netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     this.gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     this.transitFeeds = TransitFeedConfig.mapTransitFeeds(

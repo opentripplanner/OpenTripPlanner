@@ -22,6 +22,9 @@ import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.ext.taxizone.configure.TaxiZoneGraphBuilderModule;
 import org.opentripplanner.ext.taxizone.internal.graphbuilder.TaxiZoneGraphBuilder;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.ext.vehiclerentalgeofencing.configure.VehicleRentalGeofencingModule;
+import org.opentripplanner.ext.vehiclerentalgeofencing.internal.graphbuilder.VehicleRentalGeofencingGraphBuilder;
+import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.configure.GraphBuilderModule;
@@ -63,6 +66,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     EmissionGraphBuilderModule.class,
     TaxiZoneGraphBuilderModule.class,
     EmpiricalDelayGraphBuilderModule.class,
+    VehicleRentalGeofencingModule.class,
     GraphBuilderModule.class,
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
@@ -103,6 +107,9 @@ public interface GraphBuilderFactory {
   EmpiricalDelayGraphBuilder empiricalDelayGraphBuilder();
 
   @Nullable
+  VehicleRentalGeofencingGraphBuilder vehicleRentalGeofencingGraphBuilder();
+
+  @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
 
   @Nullable
@@ -116,6 +123,9 @@ public interface GraphBuilderFactory {
   interface Builder {
     @BindsInstance
     Builder config(BuildConfig config);
+
+    @BindsInstance
+    Builder gbfsNetworkOverrides(GbfsNetworkOverrides gbfsNetworkOverrides);
 
     @BindsInstance
     Builder graph(Graph graph);

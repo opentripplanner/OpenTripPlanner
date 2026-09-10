@@ -57,6 +57,8 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                                                 |       `object`       | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)                          |       `double`       | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                                         |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
+| [elevatorRefTags](#elevatorRefTags)                                                         |      `object[]`      | Groups of OSM tags whose values are combined into an elevator id.                                                                                              | *Optional* |                                   |  2.10 |
+|       [tagGroup](#elevatorRefTags_0_tagGroup)                                               |      `string[]`      | The ordered OSM tag keys whose values are combined into one id.                                                                                                | *Optional* |                                   |  2.10 |
 | [emission](sandbox/Emission.md)                                                             |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | empiricalDelay                                                                              |       `object`       | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
 | [fares](sandbox/Fares.md)                                                                   |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
@@ -130,6 +132,7 @@ Sections follow that describe particular settings in more depth.
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle)                    |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
 | [transitRouteToStationCentroid](#transitRouteToStationCentroid)                             |  `feed-scoped-id[]`  | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
+| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                                         |       `object`       | Load GBFS geofencing zones into the graph during graph build.                                                                                                  | *Optional* |                                   |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -781,6 +784,26 @@ for the next graph build operation. You should add the `--cache <directory>` com
 to specify your NED tile cache location.
 
 
+<h3 id="elevatorRefTags">elevatorRefTags</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Groups of OSM tags whose values are combined into an elevator id.
+
+Each group is a list of one or more OSM tag keys. If every tag in a group is present
+on an elevator node/way, their values are joined with ':' (in the given order) into
+one id. A group with a single tag key produces a plain id. If any tag in a group is
+missing, that group produces no id. If more than one group is configured, the first
+one (in the given order) that produces an id is used as the elevator's id.
+
+<h3 id="elevatorRefTags_0_tagGroup">tagGroup</h3>
+
+**Since version:** `2.10` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /elevatorRefTags/[0] 
+
+The ordered OSM tag keys whose values are combined into one id.
+
 <h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>
 
 **Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
@@ -1318,6 +1341,28 @@ transit that starts/ends at the station will work as usual without any additiona
 the centroid.
 
 
+<h3 id="vehicleRentalGeofencing">vehicleRentalGeofencing</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Load GBFS geofencing zones into the graph during graph build.
+
+Discovers the networks a provider publishes from a GBFS v3 `manifest.json` and, for each
+network configured with `"applyGeofencingZones": "graph-build"` in the `gbfs` section of
+`otp-config.json`, loads its geofencing zones and applies them to the street graph during
+the graph build. This moves the cost of computing zone boundaries off the runtime path.
+
+A network is only loaded if its GBFS feed actually publishes a `geofencing_zones` feed;
+this is checked against the feed list in `gbfs.json` before the feed is fetched.
+
+Vehicles and stations remain realtime data, so a vehicle rental updater is still required.
+
+Note: a GBFS updater configured directly under `updaters` in `router-config.json` does not
+read the shared `gbfs` section. Enabling `geofencing.enabled` on such an updater for a
+network that is also built here applies the zones twice.
+
+
 
 <!-- PARAMETERS-DETAILS END -->
 
@@ -1347,6 +1392,14 @@ the centroid.
       "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
       "timeZone" : "Europe/Oslo",
       "osmTagMapping" : "norway"
+    }
+  ],
+  "elevatorRefTags" : [
+    {
+      "tagGroup" : [
+        "manufacturer",
+        "ref"
+      ]
     }
   ],
   "demDefaults" : {

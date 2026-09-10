@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.support;
 
-import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.comparingLong;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class NetexVersionHelper {
   /**
    * A special value that represents an unknown version.
    */
-  private static final int UNKNOWN_VERSION = -1;
+  private static final long UNKNOWN_VERSION = -1;
 
   /**
    * private constructor to prevent instantiation of utility class
@@ -39,11 +39,15 @@ public class NetexVersionHelper {
    * defines this as follows: "Use "any" if the VERSION is unknown (note that this will trigger NeTEx's
    * XML automatic consistency check)."
    */
-  public static int versionOf(EntityInVersionStructure e) {
-    if (e.getVersion().equals(ANY)) {
+  public static long versionOf(EntityInVersionStructure e) {
+    if (ANY.equals(e.getVersion())) {
       return UNKNOWN_VERSION;
     } else {
-      return Integer.parseInt(e.getVersion());
+      try {
+        return Long.parseLong(e.getVersion());
+      } catch (NumberFormatException _) {
+        return UNKNOWN_VERSION;
+      }
     }
   }
 
@@ -51,8 +55,8 @@ public class NetexVersionHelper {
    * Return the latest (maximum) version number for the given {@code list} of elements. If no
    * elements exist in the collection {@code -1} is returned.
    */
-  public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
-    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
+  public static long latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
+    return list.stream().mapToLong(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
   }
 
   /**
@@ -69,7 +73,7 @@ public class NetexVersionHelper {
    * Return a comparator to compare {@link EntityInVersionStructure} elements by <b>version</b>.
    */
   public static <T extends EntityInVersionStructure> Comparator<T> comparingVersion() {
-    return comparingInt(NetexVersionHelper::versionOf);
+    return comparingLong(NetexVersionHelper::versionOf);
   }
 
   /**
