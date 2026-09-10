@@ -15,5 +15,6 @@
 
     <modules>
         <module>router</module>
+        <module>data</module>
     </modules>
 </project>
