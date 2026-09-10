@@ -173,13 +173,13 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Return all vertices of the given type.
+   * Lazily iterate over the vertices in the graph of a certain class, without materializing an
+   * intermediate collection. Can be reused/iterated over multiple times.
    * <p>
-   * This returns a lazy {@link Iterable} for efficiency: it avoids materializing a copy of
-   * (a subset of) all graph vertices on every call. Only collect it into a list (e.g. with
-   * {@code ImmutableList.copyOf(...)}) if you actually need random access, a size,
-   * or to iterate it more than once - the returned {@link Iterable} is backed by a {@link
-   * java.util.stream.Stream} and can only be iterated a single time.
+   * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
+   * required (e.g. serialization).
+   * <p>
+   * THREAD SAFETY - This method does not support concurrent use. The behavior is undefined.
    */
   public <T extends Vertex> Iterable<T> findVertices(Class<T> cls) {
     return () -> this.getVertices().stream().filter(cls::isInstance).map(cls::cast).iterator();
@@ -219,7 +219,7 @@ public class Graph implements Serializable {
    * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
    * required (e.g. serialization).
    * <p>
-   * THREAD SAFTY - This method does not support concurent use. The behavior is undefined.
+   * THREAD SAFETY - This method does not support concurrent use. The behavior is undefined.
    */
   public Iterable<Edge> listEdges() {
     return () ->
