@@ -101,6 +101,7 @@
     <modules>
         <module>utils</module>
         <module>domain-core</module>
+        <module>transit</module>
         <module>raptor</module>
         <module>astar</module>
         <module>gtfs-realtime-protobuf</module>
