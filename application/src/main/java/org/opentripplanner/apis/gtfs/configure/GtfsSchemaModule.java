@@ -17,7 +17,7 @@ import org.opentripplanner.standalone.configure.StaticRouteRequestDefaults;
  * constructed if the API feature flag is on.
  */
 @Module
-public class SchemaModule {
+public class GtfsSchemaModule {
 
   @Provides
   @Singleton

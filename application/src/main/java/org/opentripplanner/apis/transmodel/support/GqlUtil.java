@@ -14,7 +14,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
@@ -34,29 +34,29 @@ public class GqlUtil {
   private GqlUtil() {}
 
   public static TransitService getTransitService(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getTransitService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).transitService();
   }
 
   public static TransitAlertService getTransitAlertService(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getTransitAlertService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).transitAlertService();
   }
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getVehicleRentalService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).vehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(
     DataFetchingEnvironment environment
   ) {
-    return ((TransmodelRequestContext) environment.getContext()).getVehicleParkingService();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).vehicleParkingService();
   }
 
   public static NearbyPlaceFinder getNearbyPlaceFinder(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getNearbyPlaceFinder();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).nearbyPlaceFinder();
   }
 
   public static NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getNearbyStopFinder();
+    return ((TransmodelGraphQLRequestContext) environment.getContext()).nearbyStopFinder();
   }
 
   public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {
