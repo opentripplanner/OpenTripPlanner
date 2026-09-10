@@ -31,7 +31,8 @@ import org.opentripplanner.utils.lang.Sandbox;
  *   matching zone.
  * </ol>
  *
- * <p>TODO: Multi-provider support. Currently only the first matching zone is used. In the future
+ * <p>
+ * TODO: Multi-provider support. Currently only the first matching zone is used. In the future
  * all matching providers should be available so users can choose.
  */
 @Sandbox
