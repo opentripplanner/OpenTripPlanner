@@ -7,6 +7,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 - Allow very large NeTEx versions [#7955](https://github.com/opentripplanner/OpenTripPlanner/pull/7955)
 - Expose vehicle id through GTFS API [#7923](https://github.com/opentripplanner/OpenTripPlanner/pull/7923)
+- Add vehicleRentalGeofencing sandbox loading GBFS geofencing zones during the graph build [#7887](https://github.com/opentripplanner/OpenTripPlanner/pull/7887)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
