@@ -57,7 +57,6 @@ public class AccessEgressRouter {
       ? linkingContext.findVertices(request.from())
       : linkingContext.findVertices(request.to());
     var streetAccessEgress = StreetNearbyStopFinder.of(null)
-      .withIgnoreVertices(ignoreVertices)
       .withExtensionRequestContexts(extensionRequestContexts)
       .build()
       .findNearbyStops(
@@ -66,7 +65,8 @@ public class AccessEgressRouter {
         streetMode,
         accessOrEgress.isEgress(),
         durationLimit,
-        maxStopCount
+        maxStopCount,
+        ignoreVertices
       );
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);

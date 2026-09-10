@@ -471,7 +471,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
           StreetMode.CAR_PICKUP,
           accessOrEgress.isEgress(),
           nearbyStopSearchDuration,
-          0
+          0,
+          Set.of()
         );
       // AreaStops are GTFS Flex zones — their linked vertex is a synthetic point inside the zone,
       // not a real stop or platform a carpool driver could drop the passenger at, so skip them.

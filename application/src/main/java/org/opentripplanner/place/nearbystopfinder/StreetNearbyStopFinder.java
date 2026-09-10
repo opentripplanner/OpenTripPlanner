@@ -39,23 +39,19 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final LinkingContextFactory linkingContextFactory;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
-  private final Set<Vertex> ignoreVertices;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
-   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
     @Nullable LinkingContextFactory linkingContextFactory,
-    Collection<ExtensionRequestContext> extensionRequestContexts,
-    Set<Vertex> ignoreVertices
+    Collection<ExtensionRequestContext> extensionRequestContexts
   ) {
     // This is temporarily nullable as we don't need it when we don't link coordinates, but soon
     // setting this everywhere will be easier once construction is moved to dagger
     this.linkingContextFactory = linkingContextFactory;
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
-    this.ignoreVertices = requireNonNull(ignoreVertices);
   }
 
   public static Builder of(LinkingContextFactory linkingContextFactory) {
@@ -94,7 +90,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       streetMode,
       reverseDirection,
       durationLimit,
-      maxStopCount
+      maxStopCount,
+      Set.of()
     );
   }
 
@@ -143,6 +140,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    *                         have the originVertex as the destination.
    * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
    *                         we will always return all the directly connected stops.
+   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
@@ -150,7 +148,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     StreetMode streetMode,
     boolean reverseDirection,
     Duration durationLimit,
-    int maxStopCount
+    int maxStopCount,
+    Set<Vertex> ignoreVertices
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -188,7 +187,9 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     if (maxStopCount > 0) {
       streetSearch.withTerminationStrategy(
-        new MaxCountTerminationStrategy<>(maxStopCount, this::hasReachedStop)
+        new MaxCountTerminationStrategy<>(maxStopCount, state ->
+          hasReachedStop(state, ignoreVertices)
+        )
       );
     }
 
@@ -227,7 +228,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * states that speculatively rent a vehicle move the walk states down the A* priority queue until
    * the required number of stops are reached to abort the search, leading to zero egress results.
    */
-  private boolean hasReachedStop(State state) {
+  private boolean hasReachedStop(State state, Set<Vertex> ignoreVertices) {
     var vertex = state.getVertex();
     return (
       vertex instanceof TransitStopVertex && state.isFinal() && !ignoreVertices.contains(vertex)
@@ -238,7 +239,6 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     private final LinkingContextFactory linkingContextFactory;
     private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
-    private Set<Vertex> ignoreVertices = Set.of();
 
     public Builder(LinkingContextFactory linkingContextFactory) {
       this.linkingContextFactory = linkingContextFactory;
@@ -257,20 +257,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       return this;
     }
 
-    /**
-     * Specify a set of stop vertices to ignore and not return NearbyStops for.
-     */
-    public Builder withIgnoreVertices(Set<Vertex> ignoreVertices) {
-      this.ignoreVertices = ignoreVertices;
-      return this;
-    }
-
     public StreetNearbyStopFinder build() {
-      return new StreetNearbyStopFinder(
-        linkingContextFactory,
-        extensionRequestContexts,
-        ignoreVertices
-      );
+      return new StreetNearbyStopFinder(linkingContextFactory, extensionRequestContexts);
     }
   }
 }
