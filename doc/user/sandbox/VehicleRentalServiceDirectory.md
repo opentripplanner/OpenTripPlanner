@@ -35,7 +35,7 @@ To enable this you need to specify a url for the `vehicleRentalServiceDirectory`
 | Config Parameter                                  |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | language                                          |     `string`    | Language code for GBFS feeds.                                              | *Optional* |               |  2.1  |
-| [url](#vehicleRentalServiceDirectory_url)         |      `uri`      | URL or file path to the GBFS v3 manifest.json                              | *Required* |               |  2.1  |
+| [url](#vehicleRentalServiceDirectory_url)         |      `uri`      | URL of the GBFS v3 manifest.json                                           | *Required* |               |  2.1  |
 | [headers](#vehicleRentalServiceDirectory_headers) | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.1  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -50,9 +50,9 @@ To enable this you need to specify a url for the `vehicleRentalServiceDirectory`
 **Since version:** `2.1` ∙ **Type:** `uri` ∙ **Cardinality:** `Required`   
 **Path:** /vehicleRentalServiceDirectory 
 
-URL or file path to the GBFS v3 manifest.json
+URL of the GBFS v3 manifest.json
 
-Can be either a remote URL (http/https) or a local file path (file://). The manifest must conform to the GBFS v3.0 specification.
+A remote URL (http/https). The manifest must conform to the GBFS v3.0 specification.
 
 <h4 id="vehicleRentalServiceDirectory_headers">headers</h4>
 

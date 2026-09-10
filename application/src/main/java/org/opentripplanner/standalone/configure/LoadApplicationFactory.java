@@ -103,6 +103,7 @@ public interface LoadApplicationFactory {
   @Singleton
   VehicleParkingRepository emptyVehicleParkingRepository();
 
+  @Singleton
   @Component.Builder
   interface Builder {
     @BindsInstance

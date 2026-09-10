@@ -1,8 +1,8 @@
 package org.opentripplanner.gbfs.network;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.gbfs.network.GeofencingZoneScope.OFF;
-import static org.opentripplanner.gbfs.network.GeofencingZoneScope.REALTIME;
+import static org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase.OFF;
+import static org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase.SERVE;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -10,11 +10,7 @@ import org.junit.jupiter.api.Test;
 class GbfsNetworkOverridesTest {
 
   private static final GbfsNetworkParameters DEFAULTS = new GbfsNetworkParameters(OFF, true, false);
-  private static final GbfsNetworkParameters TIER = new GbfsNetworkParameters(
-    REALTIME,
-    false,
-    true
-  );
+  private static final GbfsNetworkParameters TIER = new GbfsNetworkParameters(SERVE, false, true);
 
   @Test
   void listedNetworkResolvesToItsOwnParameters() {
