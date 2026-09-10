@@ -66,9 +66,10 @@ class DenseStreetGridFixture {
         }
         if (r + 1 < rows) {
           // every fourth north-south street is car-only, so mode filtering matters
-          var perm = c % 4 == 0
-            ? StreetTraversalPermission.CAR
-            : StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+          var perm =
+            c % 4 == 0
+              ? StreetTraversalPermission.CAR
+              : StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
           twoWay(grid[c][r], grid[c][r + 1], perm);
         }
       }

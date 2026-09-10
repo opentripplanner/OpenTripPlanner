@@ -65,19 +65,30 @@ class VertexLinkerNearbyEdgesTest {
       double xscale = DenseStreetGridFixture.xscale(coordinate.y);
 
       List<StreetVertex> linkedTo = new ArrayList<>();
-      var disposable = scope == Scope.REQUEST
-        ? linker.linkVertexForRequest(location, modes, LinkingDirection.BIDIRECTIONAL, (v, sv) -> {
-            linkedTo.add(sv);
-            return List.<Edge>of(
-              TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v, sv)
+      var disposable =
+        scope == Scope.REQUEST
+          ? linker.linkVertexForRequest(
+              location,
+              modes,
+              LinkingDirection.BIDIRECTIONAL,
+              (v, sv) -> {
+                linkedTo.add(sv);
+                return List.<Edge>of(
+                  TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v, sv)
+                );
+              }
+            )
+          : linker.linkVertexForRealTime(
+              location,
+              modes,
+              LinkingDirection.BIDIRECTIONAL,
+              (v, sv) -> {
+                linkedTo.add(sv);
+                return List.<Edge>of(
+                  TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v, sv)
+                );
+              }
             );
-          })
-        : linker.linkVertexForRealTime(location, modes, LinkingDirection.BIDIRECTIONAL, (v, sv) -> {
-            linkedTo.add(sv);
-            return List.<Edge>of(
-              TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v, sv)
-            );
-          });
 
       // Oracle: closest traversable edges by the same projected distance the linker uses
       double best = Double.POSITIVE_INFINITY;
