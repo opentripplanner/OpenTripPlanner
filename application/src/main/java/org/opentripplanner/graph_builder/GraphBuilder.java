@@ -11,6 +11,7 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
@@ -87,6 +88,7 @@ public class GraphBuilder implements Runnable {
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiZoneRepository taxiZoneRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
@@ -108,6 +110,7 @@ public class GraphBuilder implements Runnable {
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
       .emissionRepository(emissionRepository)
+      .taxiZoneRepository(taxiZoneRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .fareServiceFactory(fareServiceFactory)
       .dataSources(dataSources)
@@ -184,6 +187,8 @@ public class GraphBuilder implements Runnable {
         OTPFeature.EmpiricalDelay
       );
     }
+
+    graphBuilder.addModuleOptional(factory.taxiZoneGraphBuilder(), OTPFeature.TaxiZone);
 
     if (loadStreetGraph || dataSources.hasOsm()) {
       graphBuilder.addModuleOptional(factory.vehicleRentalGeofencingGraphBuilder());

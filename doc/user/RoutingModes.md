@@ -89,6 +89,10 @@ _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynami
 See [Configuring GBFS](GBFS-Config.md) on how to add one.
 
 
+<h4 id="TAXI">TAXI</h4>
+
+Walking to a pickup point along the road, being driven by a taxi to a drop-off point along the road, and walking the rest of the way.
+
 <h4 id="WALK">WALK</h4>
 
 Walking some or all of the way of the route.

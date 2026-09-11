@@ -135,6 +135,7 @@ public class TestServerContext {
       null,
       createViaTransferResolver(graph, transitService),
       null,
+      null,
       createEmissionsItineraryDecorator(),
       null,
       createLinkingContextFactory(graph, vertexLinker, transitService),

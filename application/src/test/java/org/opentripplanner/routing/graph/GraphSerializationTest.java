@@ -270,6 +270,7 @@ public class GraphSerializationTest {
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),
       emissionRepository,
+      null,
       empiricalDelayRepository,
       null,
       new GtfsFareServiceFactory()

@@ -31,6 +31,7 @@ public class DebugTimingAggregator {
   private final Timer directStreetRouterTimer;
   private final Timer directFlexRouterTimer;
   private final Timer directCarpoolRouterTimer;
+  private final Timer directTaxiRouterTimer;
 
   private final Timer accessTimer;
   private final Timer egressTimer;
@@ -57,6 +58,8 @@ public class DebugTimingAggregator {
   private long directFlexRouterTime;
   private Timer.Sample startedDirectCarpoolRouter;
   private long directCarpoolRouterTime;
+  private Timer.Sample startedDirectTaxiRouter;
+  private long directTaxiRouterTime;
   private Timer.Sample finishedPatternFiltering;
   private Timer.Sample finishedAccessEgress;
   private Timer.Sample finishedRouters;
@@ -117,6 +120,7 @@ public class DebugTimingAggregator {
     accessTimer = Timer.builder("routing.access").tags(tags).register(registry);
     directFlexRouterTimer = Timer.builder("routing.directFlex").tags(tags).register(registry);
     directCarpoolRouterTimer = Timer.builder("routing.directCarpool").tags(tags).register(registry);
+    directTaxiRouterTimer = Timer.builder("routing.directTaxi").tags(tags).register(registry);
     directStreetRouterTimer = Timer.builder("routing.directStreet").tags(tags).register(registry);
   }
 
@@ -172,6 +176,19 @@ public class DebugTimingAggregator {
       return;
     }
     directCarpoolRouterTime = startedDirectCarpoolRouter.stop(directCarpoolRouterTimer);
+  }
+
+  /** Record the time when starting the direct taxi router search. */
+  public void startedDirectTaxiRouter() {
+    startedDirectTaxiRouter = Timer.start(clock);
+  }
+
+  /** Record the time when we finished the direct taxi router search. */
+  public void finishedDirectTaxiRouter() {
+    if (startedDirectTaxiRouter == null) {
+      return;
+    }
+    directTaxiRouterTime = startedDirectTaxiRouter.stop(directTaxiRouterTimer);
   }
 
   /** Record the time when starting the transit router search. */
