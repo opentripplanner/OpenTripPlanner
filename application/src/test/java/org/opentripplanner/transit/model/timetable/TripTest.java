@@ -33,7 +33,10 @@ class TripTest {
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final String NETEX_INTERNAL_PLANNING_CODE = "internalPlanningCode";
-  private static final String NETEX_VEHICLE_TYPE_ID = "RUT:VehicleType:1";
+  private static final VehicleAssignment VEHICLE_ASSIGNMENT = new VehicleAssignment(
+    null,
+    "RUT:VehicleType:1"
+  );
   private static final Operator OPERATOR = Operator.of(FeedScopedId.of("x", "operatorId"))
     .withName("operator name")
     .build();
@@ -51,7 +54,7 @@ class TripTest {
     .withNetexAlteration(TRIP_ALTERATION)
     .withNetexSubmode(NETEX_SUBMODE_NAME)
     .withNetexInternalPlanningCode(NETEX_INTERNAL_PLANNING_CODE)
-    .withNetexVehicleTypeId(NETEX_VEHICLE_TYPE_ID)
+    .withVehicleAssignment(VEHICLE_ASSIGNMENT)
     .withOperator(OPERATOR)
     .withServiceId(SERVICE_ID)
     .withShapeId(SHAPE_ID)
@@ -93,7 +96,7 @@ class TripTest {
     assertEquals(TRIP_ALTERATION, copy.getNetexAlteration());
     assertEquals(NETEX_SUBMODE, copy.getNetexSubMode());
     assertEquals(NETEX_INTERNAL_PLANNING_CODE, copy.getNetexInternalPlanningCode());
-    assertEquals(NETEX_VEHICLE_TYPE_ID, copy.getNetexVehicleTypeId());
+    assertEquals(VEHICLE_ASSIGNMENT, copy.getVehicleAssignment());
     assertEquals(OPERATOR, copy.getOperator());
     assertEquals(SERVICE_ID, copy.getServiceId());
     assertEquals(SHAPE_ID, copy.getShapeId());
@@ -123,7 +126,9 @@ class TripTest {
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withNetexSubmode("X").build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withNetexInternalPlanningCode("X").build()));
-    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withNetexVehicleTypeId("X").build()));
+    assertFalse(
+      SUBJECT.sameAs(SUBJECT.copy().withVehicleAssignment(new VehicleAssignment(null, "X")).build())
+    );
     assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()

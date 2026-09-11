@@ -67,7 +67,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   private final String netexInternalPlanningCode;
 
   @Nullable
-  private final String netexVehicleTypeId;
+  private final VehicleAssignment vehicleAssignment;
 
   Trip(TripBuilder builder) {
     super(builder.getId());
@@ -97,7 +97,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     this.shapeId = builder.getShapeId();
     this.gtfsBlockId = builder.getGtfsBlockId();
     this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
-    this.netexVehicleTypeId = builder.getNetexVehicleTypeId();
+    this.vehicleAssignment = builder.getVehicleAssignment();
   }
 
   public static TripBuilder of(FeedScopedId id) {
@@ -189,11 +189,11 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
-   * The id of the vehicle type planned to operate the trip.
+   * The vehicle expected to operate the trip, as given in the planned data.
    */
   @Nullable
-  public String getNetexVehicleTypeId() {
-    return netexVehicleTypeId;
+  public VehicleAssignment getVehicleAssignment() {
+    return vehicleAssignment;
   }
 
   /**
@@ -233,7 +233,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
       Objects.equals(this.serviceId, other.serviceId) &&
       Objects.equals(this.netexInternalPlanningCode, other.netexInternalPlanningCode) &&
-      Objects.equals(this.netexVehicleTypeId, other.netexVehicleTypeId) &&
+      Objects.equals(this.vehicleAssignment, other.vehicleAssignment) &&
       Objects.equals(this.headsign, other.headsign) &&
       Objects.equals(this.gtfsBlockId, other.gtfsBlockId) &&
       Objects.equals(this.shapeId, other.shapeId) &&

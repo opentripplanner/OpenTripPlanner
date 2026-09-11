@@ -48,7 +48,8 @@ public class ServiceJourneyType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
-    GraphQLOutputType timetabledPassingTimeType
+    GraphQLOutputType timetabledPassingTimeType,
+    GraphQLOutputType vehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -153,14 +154,10 @@ public class ServiceJourneyType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("vehicleTypeRef")
-          .type(Scalars.GraphQLString)
-          .description(
-            """
-            A reference to the type of vehicle to use on the service journey.
-            """
-          )
-          .dataFetcher(environment -> trip(environment).getNetexVehicleTypeId())
+          .name("vehicleAssignment")
+          .type(vehicleAssignmentType)
+          .description("References to the vehicle expected to operate the service journey.")
+          .dataFetcher(environment -> trip(environment).getVehicleAssignment())
           .build()
       )
       .field(

@@ -117,6 +117,7 @@ import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelatio
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
+import org.opentripplanner.apis.transmodel.model.timetable.VehicleAssignmentType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -352,6 +353,7 @@ public class TransmodelGraphQLSchemaFactory {
       dateTimeScalar
     );
 
+    GraphQLObjectType vehicleAssignmentType = VehicleAssignmentType.create(idMapper);
     GraphQLOutputType serviceJourneyType = serviceJourneyTypeFactory.create(
       bookingArrangementType,
       linkGeometryType,
@@ -362,7 +364,8 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType,
       journeyPatternType,
       estimatedCallType,
-      TimetabledPassingTimeType.REF
+      TimetabledPassingTimeType.REF,
+      vehicleAssignmentType
     );
 
     GraphQLObjectType realTimeJourneyStateType = RealTimeTripStateType.create();
@@ -373,7 +376,8 @@ public class TransmodelGraphQLSchemaFactory {
       quayType,
       replacedByRelationType,
       replacementForRelationType,
-      realTimeJourneyStateType
+      realTimeJourneyStateType,
+      vehicleAssignmentType
     );
 
     var timetabledPassingTime = TimetabledPassingTimeType.create(

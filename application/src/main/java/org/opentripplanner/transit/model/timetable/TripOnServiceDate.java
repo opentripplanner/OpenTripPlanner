@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +24,7 @@ public class TripOnServiceDate
   private final List<TripOnServiceDate> replacementFor;
 
   @Nullable
-  private final String netexVehicleTypeId;
+  private final VehicleAssignment vehicleAssignment;
 
   TripOnServiceDate(TripOnServiceDateBuilder builder) {
     super(builder.getId());
@@ -31,7 +33,10 @@ public class TripOnServiceDate
     this.tripAlteration = builder.getTripAlteration();
     this.realtimeExtraJourney = builder.isRealtimeExtraJourney();
     this.replacementFor = builder.getReplacementFor();
-    this.netexVehicleTypeId = builder.getNetexVehicleTypeId();
+    this.vehicleAssignment = ifNotNull(
+      builder.getVehicleAssignment(),
+      trip == null ? null : trip.getVehicleAssignment()
+    );
   }
 
   public static TripOnServiceDateBuilder of(FeedScopedId id) {
@@ -66,12 +71,13 @@ public class TripOnServiceDate
   }
 
   /**
-   * The id of the vehicle type planned to operate the trip on this service date, or the vehicle
-   * type of the trip itself if the service date has none of its own.
+   * The vehicle expected to operate the trip on this service date, as given in the planned data.
+   * The vehicle type falls back to the one given for the trip when the service date has none of its
+   * own.
    */
   @Nullable
-  public String getNetexVehicleTypeId() {
-    return netexVehicleTypeId;
+  public VehicleAssignment getVehicleAssignment() {
+    return vehicleAssignment;
   }
 
   @Override
@@ -83,7 +89,7 @@ public class TripOnServiceDate
       Objects.equals(this.tripAlteration, other.tripAlteration) &&
       this.realtimeExtraJourney == other.realtimeExtraJourney &&
       Objects.equals(this.replacementFor, other.replacementFor) &&
-      Objects.equals(this.netexVehicleTypeId, other.netexVehicleTypeId)
+      Objects.equals(this.vehicleAssignment, other.vehicleAssignment)
     );
   }
 

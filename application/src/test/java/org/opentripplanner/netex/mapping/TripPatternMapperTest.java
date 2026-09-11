@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
@@ -184,16 +185,16 @@ class TripPatternMapperTest {
     var r = res.get();
 
     Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
-    assertEquals("RUT:VehicleType:1", trip.getNetexVehicleTypeId());
+    assertEquals(new VehicleAssignment(null, "RUT:VehicleType:1"), trip.getVehicleAssignment());
 
     // The vehicle type of the service journey applies to the date without one of its own
     assertEquals(
-      "RUT:VehicleType:1",
-      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1).getNetexVehicleTypeId()
+      new VehicleAssignment(null, "RUT:VehicleType:1"),
+      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1).getVehicleAssignment()
     );
     assertEquals(
-      "RUT:VehicleType:2",
-      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2).getNetexVehicleTypeId()
+      new VehicleAssignment(null, "RUT:VehicleType:2"),
+      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2).getVehicleAssignment()
     );
   }
 

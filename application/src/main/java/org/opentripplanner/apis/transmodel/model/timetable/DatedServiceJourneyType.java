@@ -44,7 +44,8 @@ public class DatedServiceJourneyType {
     GraphQLType quayType,
     GraphQLOutputType replacedByType,
     GraphQLOutputType replacementForType,
-    GraphQLOutputType realTimeJourneyStateType
+    GraphQLOutputType realTimeJourneyStateType,
+    GraphQLOutputType vehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -90,16 +91,20 @@ public class DatedServiceJourneyType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("vehicleTypeRef")
-          .type(Scalars.GraphQLString)
+          .name("vehicleAssignment")
+          .type(vehicleAssignmentType)
           .description(
             """
-            A reference to the type of vehicle to use on the dated service journey.
-            A vehicle type given for the operating day takes precedence over the one given for
-            the service journey.
+            References to the vehicle expected to operate the dated service journey. The vehicle
+            type given for the operating day takes precedence over the one given for the service
+            journey.
             """
           )
-          .dataFetcher(environment -> tripOnServiceDate(environment).getNetexVehicleTypeId())
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .findVehicleAssignment(tripOnServiceDate(environment))
+              .orElse(null)
+          )
           .build()
       )
       .field(

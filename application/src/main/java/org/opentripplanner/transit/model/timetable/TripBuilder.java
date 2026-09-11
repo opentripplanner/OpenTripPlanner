@@ -26,7 +26,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private Accessibility wheelchairBoarding;
   private String gtfsBlockId;
   private String netexInternalPlanningCode;
-  private String netexVehicleTypeId;
+  private VehicleAssignment vehicleAssignment;
   private TripAlteration netexAlteration;
 
   TripBuilder(FeedScopedId id) {
@@ -50,7 +50,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     this.carsAllowed = original.getCarsAllowed();
     this.wheelchairBoarding = original.getWheelchairBoarding();
     this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
-    this.netexVehicleTypeId = original.getNetexVehicleTypeId();
+    this.vehicleAssignment = original.getVehicleAssignment();
   }
 
   public Operator getOperator() {
@@ -116,12 +116,12 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     return this;
   }
 
-  public String getNetexVehicleTypeId() {
-    return netexVehicleTypeId;
+  public VehicleAssignment getVehicleAssignment() {
+    return vehicleAssignment;
   }
 
-  public TripBuilder withNetexVehicleTypeId(String netexVehicleTypeId) {
-    this.netexVehicleTypeId = netexVehicleTypeId;
+  public TripBuilder withVehicleAssignment(VehicleAssignment vehicleAssignment) {
+    this.vehicleAssignment = vehicleAssignment;
     return this;
   }
 

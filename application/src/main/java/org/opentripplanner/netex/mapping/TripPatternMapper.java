@@ -1,7 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import jakarta.xml.bind.JAXBElement;
@@ -36,6 +34,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -341,10 +340,9 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
-    // If a vehicle type is given for a specific date, it overrides the one given for the trip
-    var netexVehicleTypeId = ifNotNull(
-      VehicleTypeRefMapper.mapVehicleTypeRef(datedServiceJourney.getVehicleTypeRef()),
-      trip.getNetexVehicleTypeId()
+    var vehicleAssignment = VehicleAssignment.ofNullable(
+      null,
+      VehicleTypeRefMapper.mapVehicleTypeRef(datedServiceJourney.getVehicleTypeRef())
     );
 
     return TripOnServiceDate.of(id)
@@ -352,7 +350,7 @@ class TripPatternMapper {
       .withServiceDate(serviceDate)
       .withTripAlteration(alteration)
       .withReplacementFor(replacementFor)
-      .withNetexVehicleTypeId(netexVehicleTypeId)
+      .withVehicleAssignment(vehicleAssignment)
       .build();
   }
 

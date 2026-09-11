@@ -65,6 +65,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
@@ -155,6 +156,22 @@ public class DefaultTransitService implements TransitService {
     return Optional.ofNullable(findPattern(trip, serviceDate))
       .map(pattern -> findTimetable(pattern, serviceDate))
       .map(timetable -> timetable.getTripTimes(trip));
+  }
+
+  @Override
+  public Optional<VehicleAssignment> findVehicleAssignment(TripOnServiceDate tripOnServiceDate) {
+    var realTimeVehicleId = findTripTimes(
+      tripOnServiceDate.getTrip(),
+      tripOnServiceDate.getServiceDate()
+    )
+      .flatMap(tripTimes -> ((TripTimes<?>) tripTimes).getVehicleId())
+      .orElse(null);
+    return Optional.ofNullable(
+      VehicleAssignment.ofPlannedAndRealTime(
+        tripOnServiceDate.getVehicleAssignment(),
+        realTimeVehicleId
+      )
+    );
   }
 
   @Override

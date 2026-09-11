@@ -21,6 +21,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
@@ -108,7 +109,7 @@ class TripMapperTest {
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
-    assertNull(trip.getNetexVehicleTypeId());
+    assertNull(trip.getVehicleAssignment());
   }
 
   @Test
@@ -137,7 +138,7 @@ class TripMapperTest {
 
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
-    assertEquals(VEHICLE_TYPE_REF, trip.getNetexVehicleTypeId());
+    assertEquals(new VehicleAssignment(null, VEHICLE_TYPE_REF), trip.getVehicleAssignment());
   }
 
   @Test
