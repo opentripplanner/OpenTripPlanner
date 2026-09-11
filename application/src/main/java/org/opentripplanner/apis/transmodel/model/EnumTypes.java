@@ -115,7 +115,17 @@ public class EnumTypes {
     .name("FilterPlaceType")
     .value("quay", TransmodelPlaceType.QUAY, "Quay")
     .value("stopPlace", TransmodelPlaceType.STOP_PLACE, "StopPlace")
-    .value("bicycleRent", TransmodelPlaceType.BICYCLE_RENT, "Bicycle rent stations")
+    .value(
+      "bicycleRent",
+      TransmodelPlaceType.BICYCLE_RENT,
+      "Bicycle rent stations",
+      "Use vehicleRent instead"
+    )
+    .value(
+      "vehicleRent",
+      TransmodelPlaceType.VEHICLE_RENT,
+      "Vehicle (bicycles, scooters, cars ...) rental stations and vehicles"
+    )
     .value("bikePark", TransmodelPlaceType.BIKE_PARK, "Bike parks")
     .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
     .build();
