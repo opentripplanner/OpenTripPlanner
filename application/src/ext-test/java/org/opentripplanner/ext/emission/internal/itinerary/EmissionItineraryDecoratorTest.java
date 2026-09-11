@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
@@ -85,7 +86,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     flex = newItinerary(A).flex(START_TIME, END_TIME, B).build();
 
     var taxiRoute = ENV_BUILDER.route("TAXI1", b -> b.withMode(TransitMode.TAXI));
-    var taxiZone = new TaxiZone(null, taxiRoute, null, null);
+    var taxiZone = new TaxiZone(Polygons.OSLO, taxiRoute, null, null);
     var driveLeg = (StreetLeg) newItinerary(A)
       .drive(START_TIME, END_TIME, B)
       .build()

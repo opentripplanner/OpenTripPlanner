@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -124,7 +125,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
     var otherRoute = TransitRepositoryForTest.route("other-route")
       .withMode(TransitMode.CARPOOL)
       .build();
-    var otherZone = new TaxiZone(null, otherRoute, null, null);
+    var otherZone = new TaxiZone(Polygons.OSLO, otherRoute, null, null);
     var other = new TaxiZoneLeg(driveLeg(), otherZone);
     assertThat(leg.hasSameMode(other)).isFalse();
   }
@@ -137,7 +138,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
   }
 
   private static TaxiZoneLeg taxiZoneLeg() {
-    var zone = new TaxiZone(null, ROUTE, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
+    var zone = new TaxiZone(Polygons.OSLO, ROUTE, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
     return new TaxiZoneLeg(driveLeg(), zone);
   }
 }
