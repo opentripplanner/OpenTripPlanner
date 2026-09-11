@@ -2,6 +2,7 @@ package org.opentripplanner.ext.realtimeresolver;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -84,21 +85,14 @@ public class RealtimeResolver {
   }
 
   private static boolean hasItineraryStopsChanged(Itinerary itinerary) {
-    boolean hasChanged = false;
+    var legs = itinerary.legs();
 
-    for (int i = 1; i < itinerary.legs().size(); i++) {
-      var legA = itinerary.legs().get(i - 1);
-      var legB = itinerary.legs().get(i);
+    return IntStream.range(1, legs.size()).anyMatch(i -> {
+      var legA = legs.get(i - 1);
+      var legB = legs.get(i);
 
-      var stopPlaceA = legA.to().name;
-      var stopPlaceB = legB.from().name;
-
-      if (stopPlaceA != stopPlaceB) {
-        hasChanged = true;
-        break;
-      }
-    }
-    return hasChanged;
+      return legA.isTransitLeg() && !Objects.equals(legA.to().name, legB.from().name);
+    });
   }
 
   private Leg mapLeg(Leg leg) {
