@@ -165,6 +165,7 @@ public class SpeedTest {
       null,
       transitUpdateManager,
       streetUpdateManager,
+      registry,
       timetableHandle,
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.updaterConfig(),
