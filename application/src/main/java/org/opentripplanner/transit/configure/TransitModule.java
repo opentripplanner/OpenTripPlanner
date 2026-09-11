@@ -31,6 +31,7 @@ public abstract class TransitModule {
    * RequestScopedFactory} — do not retarget this one.
    */
   @Binds
+  @Singleton
   @StaticTransitService
   abstract TransitService bind(DefaultTransitService service);
 
