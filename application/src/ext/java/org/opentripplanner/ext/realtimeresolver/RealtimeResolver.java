@@ -13,6 +13,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
@@ -71,9 +72,9 @@ public class RealtimeResolver {
     GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
     GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
 
-    boolean hasChanged = hasItineraryStopsChanged(itinerary);
+    boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
 
-    if (hasChanged) {
+    if (hasItineraryStopsChanged) {
       return refetchItineraryService.refetchItinerary(
         fromLocation,
         toLocation,
@@ -91,7 +92,12 @@ public class RealtimeResolver {
       var legA = legs.get(i - 1);
       var legB = legs.get(i);
 
-      return legA.isTransitLeg() && !Objects.equals(legA.to().name, legB.from().name);
+      StopLocation toStopLegA = legA.to().stop;
+      StopLocation fromStopLegB = legB.from().stop;
+      if (toStopLegA == null || fromStopLegB == null) {
+        return false;
+      }
+      return !toStopLegA.getId().equals(fromStopLegB.getId());
     });
   }
 

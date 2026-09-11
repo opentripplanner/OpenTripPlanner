@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
@@ -143,6 +145,74 @@ class RealtimeResolverTest {
   );
 
   @Test
+  void populateItineraryLegsWithNoRealTime() {
+    var refetchService = createRefetchService(new TransitAlertServiceImpl());
+    TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
+    TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip4");
+
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
+
+    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
+
+    StopLocation fromStop = RegularStop.of(
+      trip1.trip().getServiceId(),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("Stop"))
+      .withCoordinate(VC.vertex.toWgsCoordinate())
+      .withId(busLeg.to().stop.getId())
+      .build();
+
+    StopLocation toStop = RegularStop.of(
+      trip2.trip().getServiceId(),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("Stop"))
+      .withCoordinate(VC.vertex.toWgsCoordinate())
+      .withId(trainLeg.from().stop.getId())
+      .build();
+
+    var from = Place.forStop(fromStop);
+    var to = Place.forStop(toStop);
+
+    var walkLeg = StreetLeg.of()
+      .withFrom(from)
+      .withMode(TraverseMode.WALK)
+      .withTo(to)
+      .withStartTime(busLeg.startTime().plusMinutes(1))
+      .withEndTime(busLeg.endTime().plusMinutes(10))
+      .withGeneralizedCost(Cost.ZERO.toSeconds())
+      .withDistanceMeters(500)
+      .build();
+
+    var itinerary = Itinerary.ofScheduledTransit(List.of(busLeg, walkLeg, trainLeg))
+      .withGeneralizedCost(Cost.ZERO)
+      .build();
+    var model = new TransitRepository();
+    model.index();
+    var transitService = new DefaultTransitService(model);
+    List<Itinerary> itineraries = RealtimeResolver.populateLegsWithRealtime(
+      List.of(itinerary),
+      refetchService,
+      transitService,
+      new TransitAlertServiceImpl(),
+      routeRequest()
+    );
+
+    List<Leg> legs = itineraries.getFirst().legs();
+    Leg walkingLeg = legs.stream().filter(Leg::isWalkingLeg).findFirst().orElse(null);
+    assertEquals(3, legs.size());
+    assertEquals(
+      "2020-03-03T10:01+01:00[Europe/Paris]",
+      Objects.requireNonNull(walkingLeg).startTime().toString()
+    );
+    assertEquals(
+      "2020-03-03T11:10+01:00[Europe/Paris]",
+      Objects.requireNonNull(walkingLeg).endTime().toString()
+    );
+  }
+
+  @Test
   void populateItineraryLegsWithRealTime() {
     var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
@@ -171,8 +241,27 @@ class RealtimeResolverTest {
 
     ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
 
-    var from = Place.normal(VB.vertex, VB.vertex.getName());
-    var to = Place.normal(VC.vertex, VC.vertex.getName());
+    StopLocation fromStop = RegularStop.of(
+      trip1.trip().getServiceId(),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("Stop"))
+      .withCoordinate(VC.vertex.toWgsCoordinate())
+      .withId(busLeg.to().stop.getId())
+      .build();
+
+    StopLocation toStop = RegularStop.of(
+      trip2.trip().getServiceId(),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("Stop"))
+      .withCoordinate(VC.vertex.toWgsCoordinate())
+      //Sets wrong id that doesnt match previous leg, in order for stops to not match and force a refetch
+      .withId(STOP_D.getId())
+      .build();
+
+    var from = Place.forStop(fromStop);
+    var to = Place.forStop(toStop);
 
     var walkLeg = StreetLeg.of()
       .withFrom(from)
