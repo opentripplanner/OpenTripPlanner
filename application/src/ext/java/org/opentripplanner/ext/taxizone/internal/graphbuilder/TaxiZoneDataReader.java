@@ -45,7 +45,7 @@ public class TaxiZoneDataReader {
       bundle.parameters().stationTransferPreference()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder(dao);
-    var zones = TaxiZoneBuilder.buildZones(
+    var zones = new TaxiZoneBuilder(issueStore).buildZones(
       FlexTripsMapper.createFlexTrips(mapper.getBuilder(), issueStore)
     );
     taxiZoneRepository.addZones(zones);

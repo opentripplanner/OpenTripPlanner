@@ -3,7 +3,6 @@ package org.opentripplanner.core.model.time;
 import static java.time.LocalDate.MAX;
 import static java.time.LocalDate.MIN;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

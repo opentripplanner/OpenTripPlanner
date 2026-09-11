@@ -6,26 +6,28 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Converts a collection of {@link FlexTrip}s from a taxi zone provider feed into
  * {@link TaxiZone} objects. Trips that do not satisfy the data requirements are skipped
- * with a warning.
+ * and reported as {@link TaxiZoneTripSkipped} data import issues.
  */
 public class TaxiZoneBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TaxiZoneBuilder.class);
   private static final int SECONDS_IN_DAY = 86_400;
 
-  private TaxiZoneBuilder() {}
+  private final DataImportIssueStore issueStore;
 
-  public static List<TaxiZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
+  public TaxiZoneBuilder(DataImportIssueStore issueStore) {
+    this.issueStore = issueStore;
+  }
+
+  public List<TaxiZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
     List<TaxiZone> result = new ArrayList<>();
     for (FlexTrip<?, ?> flexTrip : flexTrips) {
       if (isValidTaxiZoneTrip(flexTrip)) {
@@ -43,7 +45,7 @@ public class TaxiZoneBuilder {
     return result;
   }
 
-  private static boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
+  private boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
     // Order matters!
     // - isUnscheduledTrip must run first, since only UnscheduledTrip guarantees getTrip() is
     //   non-null, which the checks after it rely on.
@@ -59,44 +61,49 @@ public class TaxiZoneBuilder {
     );
   }
 
-  private static boolean isUnscheduledTrip(FlexTrip<?, ?> flexTrip) {
+  private boolean isUnscheduledTrip(FlexTrip<?, ?> flexTrip) {
     if (flexTrip instanceof UnscheduledTrip) {
       return true;
     }
-    LOG.warn(
-      "Skipping trip {} for taxi zones: only UnscheduledTrip is supported; got {}",
-      flexTrip.getId(),
-      flexTrip.getClass().getSimpleName()
+    issueStore.add(
+      new TaxiZoneTripSkipped(
+        flexTrip.getId(),
+        "only UnscheduledTrip is supported; got %s".formatted(flexTrip.getClass().getSimpleName())
+      )
     );
     return false;
   }
 
-  private static boolean hasTaxiRouteType(FlexTrip<?, ?> flexTrip) {
+  private boolean hasTaxiRouteType(FlexTrip<?, ?> flexTrip) {
     TransitMode mode = flexTrip.getTrip().getMode();
     if (mode == TransitMode.TAXI) {
       return true;
     }
-    LOG.warn(
-      "Skipping trip {} for taxi zones: route mode is {}; must be TAXI (GTFS route_type 1500-1599)",
-      flexTrip.getId(),
-      mode
+    issueStore.add(
+      new TaxiZoneTripSkipped(
+        flexTrip.getId(),
+        "route mode is %s; must be TAXI (GTFS route_type 1500-1599)".formatted(mode)
+      )
     );
     return false;
   }
 
-  private static boolean hasNoTimeRestrictions(FlexTrip<?, ?> flexTrip) {
+  private boolean hasNoTimeRestrictions(FlexTrip<?, ?> flexTrip) {
     for (int i = 0; i < flexTrip.numberOfStops(); i++) {
       int start = flexTrip.earliestDepartureTime(i);
       int end = flexTrip.latestArrivalTime(i);
       boolean hasWindow = start != StopTime.MISSING_VALUE;
       boolean isFullDay = start == 0 && end == SECONDS_IN_DAY;
       if (hasWindow && !isFullDay) {
-        LOG.warn(
-          "Skipping trip {} for taxi zones: stop {} has a time restriction" +
-            " (start_pickup_dropoff_window / end_pickup_dropoff_window must not be set," +
-            " or must span the full day 0:00:00-24:00:00)",
-          flexTrip.getId(),
-          flexTrip.getStop(i)
+        issueStore.add(
+          new TaxiZoneTripSkipped(
+            flexTrip.getId(),
+            (
+              "stop %s has a time restriction (start_pickup_dropoff_window / " +
+              "end_pickup_dropoff_window must not be set, or must span the full day " +
+              "0:00:00-24:00:00)"
+            ).formatted(flexTrip.getStop(i))
+          )
         );
         return false;
       }
@@ -104,20 +111,22 @@ public class TaxiZoneBuilder {
     return true;
   }
 
-  private static boolean hasTwoStops(FlexTrip<?, ?> flexTrip) {
+  private boolean hasTwoStops(FlexTrip<?, ?> flexTrip) {
     if (flexTrip.numberOfStops() == 2) {
       return true;
     }
-    LOG.warn(
-      "Skipping trip {} for taxi zones: expected exactly 2 stop times " +
-        "(one pickup stop and one drop-off stop), got {}",
-      flexTrip.getId(),
-      flexTrip.numberOfStops()
+    issueStore.add(
+      new TaxiZoneTripSkipped(
+        flexTrip.getId(),
+        "expected exactly 2 stop times (one pickup stop and one drop-off stop), got %d".formatted(
+          flexTrip.numberOfStops()
+        )
+      )
     );
     return false;
   }
 
-  private static boolean hasSingleZone(FlexTrip<?, ?> flexTrip) {
+  private boolean hasSingleZone(FlexTrip<?, ?> flexTrip) {
     if (
       flexTrip.getStop(0) instanceof AreaStop stop0 &&
       flexTrip.getStop(1) instanceof AreaStop stop1 &&
@@ -126,34 +135,39 @@ public class TaxiZoneBuilder {
     ) {
       return true;
     }
-    LOG.warn(
-      "Skipping trip {} for taxi zones: both stop times must reference the same " +
-        "GTFS Flex area (location_id) with a geometry",
-      flexTrip.getId()
+    issueStore.add(
+      new TaxiZoneTripSkipped(
+        flexTrip.getId(),
+        "both stop times must reference the same GTFS Flex area (location_id) with a geometry"
+      )
     );
     return false;
   }
 
-  private static boolean hasValidPickupDropoffTypes(FlexTrip<?, ?> flexTrip) {
+  private boolean hasValidPickupDropoffTypes(FlexTrip<?, ?> flexTrip) {
     PickDrop boardRule = flexTrip.getBoardRule(0);
     PickDrop alightRule = flexTrip.getAlightRule(1);
     if (boardRule != PickDrop.CALL_AGENCY) {
-      LOG.warn(
-        "Skipping trip {} for taxi zones: stop 0 has pickup_type {} ({}); " +
-          "must be 2 (CALL_AGENCY)",
-        flexTrip.getId(),
-        boardRule.ordinal(),
-        boardRule
+      issueStore.add(
+        new TaxiZoneTripSkipped(
+          flexTrip.getId(),
+          "stop 0 has pickup_type %d (%s); must be 2 (CALL_AGENCY)".formatted(
+            boardRule.ordinal(),
+            boardRule
+          )
+        )
       );
       return false;
     }
     if (alightRule != PickDrop.CALL_AGENCY) {
-      LOG.warn(
-        "Skipping trip {} for taxi zones: stop 1 has drop_off_type {} ({}); " +
-          "must be 2 (CALL_AGENCY)",
-        flexTrip.getId(),
-        alightRule.ordinal(),
-        alightRule
+      issueStore.add(
+        new TaxiZoneTripSkipped(
+          flexTrip.getId(),
+          "stop 1 has drop_off_type %d (%s); must be 2 (CALL_AGENCY)".formatted(
+            alightRule.ordinal(),
+            alightRule
+          )
+        )
       );
       return false;
     }
