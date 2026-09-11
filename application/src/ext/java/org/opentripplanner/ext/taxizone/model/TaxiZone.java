@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -33,6 +37,20 @@ public final class TaxiZone implements Serializable {
 
   public Geometry geometry() {
     return geometry;
+  }
+
+  /**
+   * Returns {@code true} if this zone's geometry contains {@code coordinate}.
+   * <p>
+   * A {@link org.locationtech.jts.geom.prep.PreparedGeometry} is created on the fly for the
+   * check, since prepared geometries are much faster for repeated contains/intersects
+   * operations than plain {@link Geometry}. It is deliberately not cached on this class, as
+   * prepared geometries are not {@link Serializable} and {@code TaxiZone} instances are
+   * persisted as part of the serialized graph.
+   */
+  public boolean contains(WgsCoordinate coordinate) {
+    Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
+    return PreparedGeometryFactory.prepare(geometry).contains(point);
   }
 
   public Route route() {
