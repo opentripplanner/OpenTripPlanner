@@ -107,7 +107,7 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     int removed = 0;
     List<Vertex> toRemove = new LinkedList<>();
-    for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
+    for (Vertex v : graph.findVertices(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
         toRemove.add(v);
       }

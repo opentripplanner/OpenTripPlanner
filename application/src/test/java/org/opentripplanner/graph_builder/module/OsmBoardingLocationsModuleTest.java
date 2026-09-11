@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,6 +39,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 class OsmBoardingLocationsModuleTest {
 
@@ -131,10 +134,12 @@ class OsmBoardingLocationsModuleTest {
       osmService
     ).buildGraph();
 
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+    var boardingLocations = ListUtils.ofIterable(
+      graph.findVertices(OsmBoardingLocationVertex.class)
+    );
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
     // the module
-    assertEquals(5, boardingLocations.size());
+    assertThat(boardingLocations).hasSize(5);
 
     assertEquals(1, platformVertex.getIncoming().size());
     assertEquals(1, platformVertex.getOutgoing().size());
@@ -310,7 +315,9 @@ class OsmBoardingLocationsModuleTest {
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+    var boardingLocations = ListUtils.ofIterable(
+      graph.findVertices(OsmBoardingLocationVertex.class)
+    );
 
     for (var testCase : testCases) {
       var platformVertex = testCase.getPlatformVertex();
@@ -411,11 +418,10 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(1, platformVertex2.getIncoming().size());
     assertEquals(1, platformVertex2.getOutgoing().size());
 
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+    var boardingLocations = graph.findVertices(OsmBoardingLocationVertex.class);
 
     // Only one centroid should exist for the shared platform area
-    var areaCentroids = boardingLocations
-      .stream()
+    var areaCentroids = StreamUtils.ofIterable(boardingLocations)
       .filter(
         bl ->
           bl.references.contains(platform1.getId().getId()) ||

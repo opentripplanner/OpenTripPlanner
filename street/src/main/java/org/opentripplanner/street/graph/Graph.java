@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
@@ -173,12 +172,17 @@ public class Graph implements Serializable {
     return this.vertices.values();
   }
 
-  public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
-    return this.getVertices()
-      .stream()
-      .filter(cls::isInstance)
-      .map(cls::cast)
-      .collect(Collectors.toList());
+  /**
+   * Lazily iterate over the vertices in the graph of a certain class, without materializing an
+   * intermediate collection. Can be reused/iterated over multiple times.
+   * <p>
+   * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
+   * required (e.g. serialization).
+   * <p>
+   * THREAD SAFETY - This method does not support concurrent use. The behavior is undefined.
+   */
+  public <T extends Vertex> Iterable<T> findVertices(Class<T> cls) {
+    return () -> this.getVertices().stream().filter(cls::isInstance).map(cls::cast).iterator();
   }
 
   /**
@@ -215,7 +219,7 @@ public class Graph implements Serializable {
    * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
    * required (e.g. serialization).
    * <p>
-   * THREAD SAFTY - This method does not support concurent use. The behavior is undefined.
+   * THREAD SAFETY - This method does not support concurrent use. The behavior is undefined.
    */
   public Iterable<Edge> listEdges() {
     return () ->

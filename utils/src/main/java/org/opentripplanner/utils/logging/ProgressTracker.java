@@ -29,6 +29,7 @@ public class ProgressTracker {
    * Set the quiet period for the progress tracker, this value is used by all production code.
    */
   public static final int QUIET_PERIOD_MILLISECONDS = 5000;
+  public static final int UNKNOWN_SIZE = -1;
 
   /**
    * The expected number of steps.
