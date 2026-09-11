@@ -89,7 +89,6 @@ public class DefaultRoutingService implements RoutingService {
 
   public DefaultRoutingService(
     TransitService transitService,
-    TransitAlertService transitAlertService,
     Graph graph,
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
@@ -97,6 +96,7 @@ public class DefaultRoutingService implements RoutingService {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    TransitAlertService transitAlertService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,

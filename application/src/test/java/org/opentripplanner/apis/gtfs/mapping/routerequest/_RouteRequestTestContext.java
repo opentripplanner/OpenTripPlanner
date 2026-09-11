@@ -14,6 +14,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
+import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
@@ -77,7 +78,7 @@ class _RouteRequestTestContext {
         return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
       }
     );
-    this.context = new GtfsGraphQLRequestContext(
+    this.context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
       new TransitAlertServiceImpl(),

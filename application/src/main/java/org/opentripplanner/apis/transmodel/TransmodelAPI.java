@@ -75,7 +75,7 @@ public class TransmodelAPI {
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
     @Context HttpHeaders headers,
-    @Context TransmodelRequestContext requestContext
+    @Context TransmodelGraphQLRequestContext requestContext
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -117,7 +117,7 @@ public class TransmodelAPI {
   public Response getGraphQL(
     String query,
     @Context HttpHeaders headers,
-    @Context TransmodelRequestContext requestContext
+    @Context TransmodelGraphQLRequestContext requestContext
   ) {
     return index.executeGraphQL(
       query,
