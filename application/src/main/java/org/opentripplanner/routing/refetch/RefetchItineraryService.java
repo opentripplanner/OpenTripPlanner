@@ -3,7 +3,6 @@ package org.opentripplanner.routing.refetch;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +39,7 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -201,88 +201,70 @@ public class RefetchItineraryService {
       legs.addAll(access);
     }
 
-    Set<I18NString> transferStops = new HashSet<>();
-    legs.add(transitLegs.getFirst());
+    ConstrainedTransfer prevLegConstrainedTransfer = null;
 
-    for (int i = 1; i < transitLegs.size(); i++) {
-      var legA = transitLegs.get(i - 1);
-      var legB = transitLegs.get(i);
+    for (int i = 0; i < transitLegs.size() - 1; i++) {
+      var transitLeg = transitLegs.get(i);
+      var nextTransitLeg = transitLegs.get(i + 1);
 
       // ScheduledTransitLegs are guaranteed to have StopLocation in both ends.
-      var transferFrom = Objects.requireNonNull(legA.to().stop);
-      var transferTo = Objects.requireNonNull(legB.from().stop);
+      var transferFromStop = Objects.requireNonNull(transitLeg.to().stop);
+      var transferToStop = Objects.requireNonNull(nextTransitLeg.from().stop);
 
-      var legAAlightStopPos = Objects.requireNonNullElse(legA.alightStopPosInPattern(), 1);
-      var legBAlightStopPos = Objects.requireNonNullElse(legB.alightStopPosInPattern(), 1);
-
-      var transfer = constrainedTransferService.findTransfer(
-        legA.trip(),
-        legAAlightStopPos,
-        transferFrom,
-        legB.trip(),
-        legBAlightStopPos,
-        transferTo
-      );
-
-      StopLocation fromTransferStop = null;
-      StopLocation toTransferStop = null;
-
-      if (transfer != null) {
-        fromTransferStop = transfer.getFrom().asStopTransferPoint().getStop();
-
-        toTransferStop = transfer.getTo().asStopTransferPoint().getStop();
-
-        transferStops.add(fromTransferStop.getName());
-        transferStops.add(toTransferStop.getName());
+      if (prevLegConstrainedTransfer != null) {
+        transitLeg = transitLeg
+          .copyOf()
+          .withTransferFromPreviousLeg(prevLegConstrainedTransfer)
+          .build();
+        prevLegConstrainedTransfer = null;
       }
 
-      var newLegA = legA
-        .copyOf()
-        .withTransferFromPreviousLeg(
-          hasTransferStop(legA.from().name, fromTransferStop, transferStops) ? transfer : null
-        )
-        .withTransferToNextLeg(
-          hasTransferStop(legA.to().name, toTransferStop, transferStops) ? transfer : null
-        )
-        .build();
+      var constrainedTransfer = constrainedTransferService.findTransfer(
+        transitLeg.trip(),
+        transitLeg.alightStopPosInPattern(),
+        transferFromStop,
+        nextTransitLeg.trip(),
+        nextTransitLeg.boardStopPosInPattern(),
+        transferToStop
+      );
+      if (constrainedTransfer != null) {
+        transitLeg = transitLeg.copyOf().withTransferToNextLeg(constrainedTransfer).build();
+        prevLegConstrainedTransfer = constrainedTransfer;
+      }
 
-      var newLegB = legB
-        .copyOf()
-        .withTransferFromPreviousLeg(
-          hasTransferStop(legB.from().name, fromTransferStop, transferStops) ? transfer : null
-        )
-        .withTransferToNextLeg(
-          hasTransferStop(legB.to().name, toTransferStop, transferStops) ? transfer : null
-        )
-        .build();
+      legs.add(transitLeg);
 
-      // TODO: Remove workaround once constrained transfers are handled properly.
-      replaceLastScheduledTransitLeg(legs, newLegA);
-
-      if (!transferFrom.equals(transferTo)) {
+      if (!transferFromStop.equals(transferToStop)) {
         var alightSlack = routeRequest
           .preferences()
           .transit()
           .alightSlack()
-          .valueOf(newLegA.mode());
+          .valueOf(transitLeg.mode());
 
-        var transferStartTime = newLegA.endTime().toInstant().plus(alightSlack);
+        var transferStartTime = transitLeg.endTime().toInstant().plus(alightSlack);
 
         var request = StreetSearchRequest.copyOf(transferRequest)
           .withStartTime(transferStartTime)
           .build();
 
-        var transferLegs = transfer(transferFrom, transferTo, request).orElseThrow(() ->
+        var transferLegs = transfer(transferFromStop, transferToStop, request).orElseThrow(() ->
           new RefetchItineraryException(
-            "Could not transfer from " + transferFrom.getId() + " to " + transferTo.getId()
+            "Could not transfer from " + transferFromStop.getId() + " to " + transferToStop.getId()
           )
         );
 
         legs.addAll(transferLegs);
       }
-
-      legs.add(newLegB);
     }
+
+    var lastTransitLeg = transitLegs.getLast();
+    if (prevLegConstrainedTransfer != null) {
+      lastTransitLeg = lastTransitLeg
+        .copyOf()
+        .withTransferFromPreviousLeg(prevLegConstrainedTransfer)
+        .build();
+    }
+    legs.add(lastTransitLeg);
 
     if (toVertices != null) {
       var mode = routeRequest.journey().egress().mode();

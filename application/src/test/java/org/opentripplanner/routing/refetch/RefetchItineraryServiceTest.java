@@ -5,15 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableMultimap;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -39,8 +40,8 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
+import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
@@ -61,18 +62,10 @@ class RefetchItineraryServiceTest {
   static final RegularStop STOP_B = ENV_BUILDER.stop("B");
   static final RegularStop STOP_C = ENV_BUILDER.stop("C");
   static final RegularStop STOP_D = ENV_BUILDER.stop("D");
-
-  static final FeedScopedId ID = new FeedScopedId("F", "TX1");
-  static final TransferConstraint GUARANTEED = TransferConstraint.of().guaranteed().build();
-  static final StopTransferPoint STOP_B_TX = new StopTransferPoint(STOP_B);
-  static final StopTransferPoint STOP_C_TX = new StopTransferPoint(STOP_C);
+  static final RegularStop STOP_E = ENV_BUILDER.stop("E");
 
   static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
-    TripInput.of("trip1")
-      .withWithTripOnServiceDate("trip1")
-      .addStop(STOP_A, "10:00")
-      .addStop(STOP_B, "11:00")
-      .addStop(STOP_D, "12:00")
+    TripInput.of("trip1").addStop(STOP_A, "10:00").addStop(STOP_B, "11:00").addStop(STOP_D, "12:00")
   )
     .addTrip(TripInput.of("trip2").addStop(STOP_B, "12:00").addStop(STOP_C, "13:00"))
     .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
@@ -89,18 +82,7 @@ class RefetchItineraryServiceTest {
         .addStop(STOP_B, "11:00")
         .addStop(STOP_D, "12:00")
     )
-    .addTrip(
-      TripInput.of("trip7")
-        .withWithTripOnServiceDate("trip7")
-        .addStop(STOP_C, "13:00")
-        .addStop(STOP_D, "14:00")
-    )
-    .addTrip(
-      TripInput.of("trip8")
-        .withWithTripOnServiceDate("trip8")
-        .addStop(STOP_B, "11:00")
-        .addStop(STOP_C, "12:00")
-    )
+    .addTrip(TripInput.of("trip7").addStop(STOP_D, "15:00").addStop(STOP_E, "16:00"))
     .build();
 
   // Setup street
@@ -251,7 +233,8 @@ class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithTwoTransitLegsAndConstrainedTransfer() {
-    var refetch = createRefetchService();
+    var cts = createConstrainedTransferService(guaranteed("trip5", 1, "trip6", 0));
+    var refetch = createRefetchService(cts);
 
     var start = GenericLocation.fromCoordinate(VA.coord());
     var end = GenericLocation.fromCoordinate(VD.coord());
@@ -270,29 +253,32 @@ class RefetchItineraryServiceTest {
   }
 
   @Test
-  void refetchItineraryWithThreeTransitLegsAndConstrainedTransfer() {
-    var refetch = createRefetchService();
+  void refetchItineraryWithMultipleConstrainedTransfers() {
+    var cts = createConstrainedTransferService(
+      staySeated("trip1", 1, "trip3", 0),
+      guaranteed("trip3", 1, "trip7", 0)
+    );
+    var refetch = createRefetchService(cts);
 
-    var start = GenericLocation.fromCoordinate(VA.coord());
-    var end = GenericLocation.fromCoordinate(VD.coord());
+    var leg1 = legRef("trip1", STOP_A, STOP_B);
+    var leg2 = legRef("trip3", STOP_C, STOP_D);
+    var leg3 = legRef("trip7", STOP_D, STOP_E);
 
-    var leg1 = legRef("trip5", STOP_A, STOP_B);
-    var leg2 = legRef("trip8", STOP_B, STOP_C);
-    var leg3 = legRef("trip7", STOP_C, STOP_D);
-
-    var itinerary = refetch.refetchItinerary(start, end, List.of(leg1, leg2, leg3), routeRequest());
-
-    assertNull(itinerary.legs().getFirst().transferFromPrevLeg());
-    assertNotNull(itinerary.legs().getFirst().transferToNextLeg());
-    assertNotNull(itinerary.legs().get(1).transferFromPrevLeg());
-    assertNotNull(itinerary.legs().get(1).transferToNextLeg());
-    assertNotNull(itinerary.legs().getLast().transferFromPrevLeg());
-    assertNull(itinerary.legs().getLast().transferToNextLeg());
+    var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2, leg3), routeRequest());
 
     assertEquals(
-      "A ~ BUS trip5 10:00 11:00 ~ B ~ BUS trip8 11:00 12:00 ~ C ~ BUS trip7 13:00 14:00 ~ D []",
+      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D ~ BUS trip7 15:00 16:00 ~ E []",
       itinerary.toStr()
     );
+
+    var legs = itinerary.legs();
+    assertNull(legs.get(0).transferFromPrevLeg());
+    assertTrue(legs.get(0).transferToNextLeg().getTransferConstraint().isStaySeated());
+    assertTrue(legs.get(1).isWalkingLeg());
+    assertTrue(legs.get(2).transferFromPrevLeg().getTransferConstraint().isStaySeated());
+    assertTrue(legs.get(2).transferToNextLeg().getTransferConstraint().isGuaranteed());
+    assertTrue(legs.get(3).transferFromPrevLeg().getTransferConstraint().isGuaranteed());
+    assertNull(legs.get(3).transferToNextLeg());
   }
 
   @Test
@@ -384,16 +370,11 @@ class RefetchItineraryServiceTest {
     );
   }
 
-  private ConstrainedTransferService createConstrainedTransferService() {
-    DefaultConstrainedTransferService service = new DefaultConstrainedTransferService();
-
-    ConstrainedTransfer transfer1 = new ConstrainedTransfer(ID, STOP_B_TX, STOP_B_TX, GUARANTEED);
-    ConstrainedTransfer transfer2 = new ConstrainedTransfer(ID, STOP_C_TX, STOP_C_TX, GUARANTEED);
-    service.addAll(List.of(transfer1, transfer2));
-    return service;
+  private RefetchItineraryService createRefetchService() {
+    return createRefetchService(new DefaultConstrainedTransferService());
   }
 
-  private RefetchItineraryService createRefetchService() {
+  private RefetchItineraryService createRefetchService(ConstrainedTransferService cts) {
     StreetDetailsService streetDetailsService = null;
     VertexCreationService vertexCreationService = new VertexCreationService(
       new VertexLinker(
@@ -435,7 +416,7 @@ class RefetchItineraryServiceTest {
       new TransitAlertServiceImpl(),
       TRANSFER_SERVICE,
       streetDetailsService,
-      createConstrainedTransferService(),
+      cts,
       linkingContextFactory,
       streetLimitationParametersService
     );
@@ -592,5 +573,45 @@ class RefetchItineraryServiceTest {
       this.meters = meters;
       return this;
     }
+  }
+
+  private ConstrainedTransferService createConstrainedTransferService(
+    ConstrainedTransfer... constrainedTransfers
+  ) {
+    DefaultConstrainedTransferService service = new DefaultConstrainedTransferService();
+    service.addAll(Arrays.asList(constrainedTransfers));
+    return service;
+  }
+
+  private ConstrainedTransfer staySeated(String fromTrip, int fromPos, String toTrip, int toPos) {
+    return constrained(
+      fromTrip,
+      fromPos,
+      toTrip,
+      toPos,
+      TransferConstraint.of().staySeated().build()
+    );
+  }
+
+  private ConstrainedTransfer guaranteed(String fromTrip, int fromPos, String toTrip, int toPos) {
+    return constrained(
+      fromTrip,
+      fromPos,
+      toTrip,
+      toPos,
+      TransferConstraint.of().guaranteed().build()
+    );
+  }
+
+  private ConstrainedTransfer constrained(
+    String fromTrip,
+    int fromPos,
+    String toTrip,
+    int toPos,
+    TransferConstraint constraint
+  ) {
+    var p1 = new TripTransferPoint(TRANSIT_ENV.tripData(fromTrip).trip(), fromPos);
+    var p2 = new TripTransferPoint(TRANSIT_ENV.tripData(toTrip).trip(), toPos);
+    return new ConstrainedTransfer(null, p1, p2, constraint);
   }
 }
