@@ -6,16 +6,28 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
 
   private final RefetchItineraryService refetchItineraryService;
+  private final TransitService transitService;
+  private final TransitAlertService transitAlertService;
 
-  public RealtimeResolver(RefetchItineraryService refetchItineraryService) {
+  public RealtimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
     this.refetchItineraryService = refetchItineraryService;
+    this.transitService = transitService;
+    this.transitAlertService = transitAlertService;
   }
 
   /**
@@ -25,9 +37,15 @@ public class RealtimeResolver {
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
     RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
     RouteRequest routeRequest
   ) {
-    return new RealtimeResolver(refetchItineraryService).addRealtimeInfo(itineraries, routeRequest);
+    return new RealtimeResolver(
+      refetchItineraryService,
+      transitService,
+      transitAlertService
+    ).addRealtimeInfo(itineraries, routeRequest);
   }
 
   public List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries, RouteRequest routeRequest) {
@@ -52,12 +70,67 @@ public class RealtimeResolver {
     GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
     GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
 
-    return refetchItineraryService.refetchItinerary(
-      fromLocation,
-      toLocation,
-      legReferences,
-      routeRequest
+    boolean hasChanged = hasItineraryStopsChanged(itinerary);
+
+    if (hasChanged) {
+      return refetchItineraryService.refetchItinerary(
+        fromLocation,
+        toLocation,
+        legReferences,
+        routeRequest
+      );
+    }
+    return itinerary.copyOf().transformLegs(this::mapLeg).build();
+  }
+
+  private static boolean hasItineraryStopsChanged(Itinerary itinerary) {
+    boolean hasChanged = false;
+
+    for (int i = 1; i < itinerary.legs().size(); i++) {
+      var legA = itinerary.legs().get(i - 1);
+      var legB = itinerary.legs().get(i);
+
+      var stopPlaceA = legA.to().name;
+      var stopPlaceB = legB.from().name;
+
+      if (stopPlaceA != stopPlaceB) {
+        hasChanged = true;
+        break;
+      }
+    }
+    return hasChanged;
+  }
+
+  private Leg mapLeg(Leg leg) {
+    var ref = leg.legReference();
+    if (ref == null) {
+      return leg;
+    }
+
+    // Only ScheduledTransitLeg has leg references atm, so this check is just to be future-proof
+    if (!leg.isScheduledTransitLeg()) {
+      return leg;
+    }
+    var realTimeLeg = ref.getLeg(transitService, transitAlertService);
+    if (realTimeLeg == null) {
+      return leg;
+    }
+    return combineReferenceWithOriginal(
+      realTimeLeg.asScheduledTransitLeg(),
+      leg.asScheduledTransitLeg()
     );
+  }
+
+  private static Leg combineReferenceWithOriginal(
+    ScheduledTransitLeg reference,
+    ScheduledTransitLeg original
+  ) {
+    return new ScheduledTransitLegBuilder<>(reference)
+      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+      .withTransferToNextLeg(original.transferToNextLeg())
+      .withGeneralizedCost(original.generalizedCost())
+      .withAccessibilityScore(original.accessibilityScore())
+      .build();
   }
 
   @Nullable

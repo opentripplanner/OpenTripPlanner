@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -67,6 +67,9 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -184,10 +187,14 @@ class RealtimeResolverTest {
     var itinerary = Itinerary.ofScheduledTransit(List.of(busLeg, walkLeg, trainLeg))
       .withGeneralizedCost(Cost.ZERO)
       .build();
-
+    var model = new TransitRepository();
+    model.index();
+    var transitService = new DefaultTransitService(model);
     List<Itinerary> itineraries = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
       refetchService,
+      transitService,
+      new TransitAlertServiceImpl(),
       routeRequest()
     );
 
@@ -207,36 +214,21 @@ class RealtimeResolverTest {
 
   @Test
   void testPopulateLegsWithRealtime() {
-    TripOnDateDataFetcher trip5 = TRANSIT_ENV.tripData("trip5");
-    TripOnDateDataFetcher trip6 = TRANSIT_ENV.tripData("trip6");
-
-    ScheduledTransitLeg busOneLeg = buildScheduledTransitLeg(trip5, 0, 1);
-    ScheduledTransitLeg busTwoLeg = buildScheduledTransitLeg(trip6, 0, 1);
-
-    var itinerary = Itinerary.ofScheduledTransit(List.of(busOneLeg, busTwoLeg))
-      .withGeneralizedCost(Cost.ZERO)
+    var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
+      .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
+      .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
 
-    var siri = SiriTestHelper.of(TRANSIT_ENV);
+    // Put a delay on trip 1
+    var serviceDate = itinerary.startTime().toLocalDate();
+    var patterns = itineraryPatterns(itinerary);
+    var delayedPattern = delay(patterns.get(0), 123);
+    var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
-    var updates = siri
-      .etBuilder()
-      .withDatedVehicleJourneyRef("trip5")
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
-          .departAimedExpected("11:05", "11:07:03")
-          .call(STOP_B)
-          .arriveAimedExpected("11:20", "11:22:03")
-      )
-      .buildEstimatedTimetableDeliveries();
-    UpdateResult updateResult = siri.applyEstimatedTimetable(updates);
-    assertEquals(1, updateResult.successful());
-
-    // Put an alert on stopA
+    // Put an alert on stop3
     var transitAlertService = new TransitAlertServiceImpl();
-    var alert = TransitAlert.of(STOP_A.getId())
-      .addEntity(new EntitySelector.Stop(STOP_A.getId()))
+    var alert = TransitAlert.of(stop3.getId())
+      .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .withCalendar(AlertCalendar.ofAlwaysActive())
       .build();
     transitAlertService.setAlerts(List.of(alert));
@@ -244,17 +236,25 @@ class RealtimeResolverTest {
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
       createRefetchService(transitAlertService),
+      transitService,
+      transitAlertService,
       routeRequest()
     );
 
     assertFalse(itinerariesWithRealtime.isEmpty());
 
     var legs = itinerariesWithRealtime.getFirst().legs();
-    var leg1ArrivalDelay = legs.getFirst().asScheduledTransitLeg().endTime();
-
-    assertEquals("2020-03-03T11:22:03+01:00[Europe/Paris]", leg1ArrivalDelay.toString());
-    assertEquals(1, legs.get(0).listTransitAlerts().size());
-    assertEquals(0, legs.get(1).listTransitAlerts().size());
+    var leg1ArrivalDelay = legs
+      .get(0)
+      .asScheduledTransitLeg()
+      .tripPattern()
+      .getScheduledTimetable()
+      .getTripTimes()
+      .getFirst()
+      .getArrivalDelay(1);
+    assertEquals(123, leg1ArrivalDelay);
+    assertEquals(0, legs.get(0).listTransitAlerts().size());
+    assertEquals(1, legs.get(1).listTransitAlerts().size());
     assertEquals(1, itinerariesWithRealtime.size());
   }
 
@@ -283,10 +283,16 @@ class RealtimeResolverTest {
       .withGeneralizedCost(Cost.ZERO)
       .build();
 
+    var model = new TransitRepository();
+    model.index();
+    var transitService = new DefaultTransitService(model);
+
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
       createRefetchService(new TransitAlertServiceImpl()),
+      transitService,
+      new TransitAlertServiceImpl(),
       routeRequest()
     );
 
@@ -299,7 +305,6 @@ class RealtimeResolverTest {
   }
 
   @Test
-  @Disabled
   void testPopulateLegsWithRealtimeKeepStaySeated() {
     var staySeatedItinerary = newItinerary(Place.forStop(stop1), time("11:00"))
       .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
@@ -307,13 +312,44 @@ class RealtimeResolverTest {
       .build();
 
     var itineraries = List.of(staySeatedItinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, null, null);
+    var model = new TransitRepository();
+    model.index();
+    var transitService = new DefaultTransitService(model);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      createRefetchService(new TransitAlertServiceImpl()),
+      transitService,
+      new TransitAlertServiceImpl(),
+      routeRequest()
+    );
 
     assertEquals(1, itineraries.size());
 
-    var constrained = itineraries.get(0).legs().get(1).transferFromPrevLeg();
+    var constrained = itineraries.getFirst().legs().get(1).transferFromPrevLeg();
     assertNotNull(constrained);
     assertTrue(constrained.getTransferConstraint().isStaySeated());
+  }
+
+  private static TransitService makeTransitService(
+    List<TripPattern> patterns,
+    LocalDate serviceDate
+  ) {
+    var transitRepository = new TransitRepository();
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+
+    patterns.forEach(pattern -> {
+      transitRepository.addTripPattern(pattern.getId(), pattern);
+
+      var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
+      transitRepository.putServiceCode(pattern.getId(), serviceCode);
+
+      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+    });
+
+    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.index();
+
+    return new DefaultTransitService(transitRepository);
   }
 
   private static TripPattern delay(TripPattern pattern1, int seconds) {

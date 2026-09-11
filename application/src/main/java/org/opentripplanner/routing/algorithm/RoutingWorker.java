@@ -264,7 +264,9 @@ public class RoutingWorker {
       result.errors(),
       debugTimingAggregator,
       pagingService,
-      refetchItineraryService
+      refetchItineraryService,
+      transitService,
+      transitAlertService
     );
   }
 

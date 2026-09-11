@@ -12,7 +12,9 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.paging.PagingService;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +28,22 @@ public class RoutingResponseMapper {
     Set<RoutingError> routingErrors,
     DebugTimingAggregator debugTimingAggregator,
     PagingService pagingService,
-    RefetchItineraryService refetchItineraryService
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
   ) {
     // Search is performed without realtime, but we still want to
     // include realtime information in the result
     if (
       request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
     ) {
-      itineraries = populateLegsWithRealtime(itineraries, refetchItineraryService, request);
+      itineraries = populateLegsWithRealtime(
+        itineraries,
+        refetchItineraryService,
+        transitService,
+        transitAlertService,
+        request
+      );
     }
 
     // Create response
