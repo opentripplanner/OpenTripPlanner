@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
@@ -331,6 +332,17 @@ public class Graph implements Serializable {
   public Collection<Edge> findEdges(Envelope env, Scope scope) {
     requireIndex();
     return streetIndex.findEdges(env, scope);
+  }
+
+  /**
+   * Visit the spatial-index candidates for the edges with the given scope inside the bounding box
+   * defined by {@code env}. Unlike {@link #findEdges(Envelope, Scope)} nothing is deduplicated or
+   * collected: the consumer may see edges outside the envelope and may see the same edge more than
+   * once. Intended for callers that keep only a few of many candidates, e.g. the vertex linker.
+   */
+  public void forEachEdgeCandidate(Envelope env, Scope scope, Consumer<? super Edge> consumer) {
+    requireIndex();
+    streetIndex.forEachEdgeCandidate(env, scope, consumer);
   }
 
   /**
