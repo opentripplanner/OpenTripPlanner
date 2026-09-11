@@ -2,6 +2,8 @@ package org.opentripplanner.updater.trip.siri.moduletests.update;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,39 @@ class QuayChangeTest implements RealtimeTestConstants {
       "P U | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
+  }
+
+  /**
+   * Change quay on a trip without setting times
+   */
+  @Test
+  void testChangeQuayWithoutTimes() {
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
+    var siri = SiriTestHelper.of(env);
+
+    var updates = siri
+      .etBuilder()
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:00:11", null)
+          .call(STOP_C)
+          .arriveAimedExpected("00:00:20", null)
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = siri.applyEstimatedTimetable(updates);
+
+    assertSuccess(result);
+    var trip = env.tripData(TRIP_1_ID);
+    assertEquals("P U | A [ND] 0:00:10 0:00:11 | C [ND] 0:00:20 0:00:21", trip.showTimetable());
+
+    assertFalse(trip.tripTimes().isTimesModified());
+    assertTrue(trip.tripTimes().isTripPatternModified());
 
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
   }
