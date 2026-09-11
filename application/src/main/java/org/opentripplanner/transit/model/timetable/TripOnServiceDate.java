@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
@@ -20,6 +21,9 @@ public class TripOnServiceDate
   private final boolean realtimeExtraJourney;
   private final List<TripOnServiceDate> replacementFor;
 
+  @Nullable
+  private final String netexVehicleTypeId;
+
   TripOnServiceDate(TripOnServiceDateBuilder builder) {
     super(builder.getId());
     this.trip = builder.getTrip();
@@ -27,6 +31,7 @@ public class TripOnServiceDate
     this.tripAlteration = builder.getTripAlteration();
     this.realtimeExtraJourney = builder.isRealtimeExtraJourney();
     this.replacementFor = builder.getReplacementFor();
+    this.netexVehicleTypeId = builder.getNetexVehicleTypeId();
   }
 
   public static TripOnServiceDateBuilder of(FeedScopedId id) {
@@ -60,6 +65,15 @@ public class TripOnServiceDate
     return replacementFor;
   }
 
+  /**
+   * The id of the vehicle type planned to operate the trip on this service date, or the vehicle
+   * type of the trip itself if the service date has none of its own.
+   */
+  @Nullable
+  public String getNetexVehicleTypeId() {
+    return netexVehicleTypeId;
+  }
+
   @Override
   public boolean sameAs(TripOnServiceDate other) {
     return (
@@ -68,7 +82,8 @@ public class TripOnServiceDate
       Objects.equals(this.serviceDate, other.serviceDate) &&
       Objects.equals(this.tripAlteration, other.tripAlteration) &&
       this.realtimeExtraJourney == other.realtimeExtraJourney &&
-      Objects.equals(this.replacementFor, other.replacementFor)
+      Objects.equals(this.replacementFor, other.replacementFor) &&
+      Objects.equals(this.netexVehicleTypeId, other.netexVehicleTypeId)
     );
   }
 

@@ -15,6 +15,7 @@ public class TripOnServiceDateBuilder
   private TripAlteration tripAlteration;
   private boolean realtimeExtraJourney;
   private List<TripOnServiceDate> replacementFor = List.of();
+  private String netexVehicleTypeId;
 
   TripOnServiceDateBuilder(FeedScopedId id) {
     super(id);
@@ -27,6 +28,7 @@ public class TripOnServiceDateBuilder
     this.tripAlteration = original.getTripAlteration();
     this.realtimeExtraJourney = original.isRealtimeExtraJourney();
     this.replacementFor = new ArrayList<>(original.getReplacementFor());
+    this.netexVehicleTypeId = original.getNetexVehicleTypeId();
   }
 
   public TripOnServiceDateBuilder withTrip(Trip trip) {
@@ -54,6 +56,11 @@ public class TripOnServiceDateBuilder
     return this;
   }
 
+  public TripOnServiceDateBuilder withNetexVehicleTypeId(String netexVehicleTypeId) {
+    this.netexVehicleTypeId = netexVehicleTypeId;
+    return this;
+  }
+
   public Trip getTrip() {
     return trip;
   }
@@ -72,6 +79,10 @@ public class TripOnServiceDateBuilder
 
   public List<TripOnServiceDate> getReplacementFor() {
     return replacementFor;
+  }
+
+  public String getNetexVehicleTypeId() {
+    return netexVehicleTypeId;
   }
 
   @Override

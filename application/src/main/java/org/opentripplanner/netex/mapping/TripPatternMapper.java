@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import jakarta.xml.bind.JAXBElement;
@@ -339,11 +341,18 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
+    // If a vehicle type is given for a specific date, it overrides the one given for the trip
+    var netexVehicleTypeId = ifNotNull(
+      VehicleTypeRefMapper.mapVehicleTypeRef(datedServiceJourney.getVehicleTypeRef()),
+      trip.getNetexVehicleTypeId()
+    );
+
     return TripOnServiceDate.of(id)
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withTripAlteration(alteration)
       .withReplacementFor(replacementFor)
+      .withNetexVehicleTypeId(netexVehicleTypeId)
       .build();
   }
 
