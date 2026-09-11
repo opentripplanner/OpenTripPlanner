@@ -3,7 +3,8 @@ package org.opentripplanner.ext.carpooling.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
@@ -15,7 +16,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
@@ -125,48 +125,26 @@ class CarpoolItineraryMapperTest {
   }
 
   @Test
-  void urlOnly_addsOnlineAndAppendsPickupAndDropoffCoordinatesToUrl() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com").build();
+  void urlOnly_addsOnlineAndExpandsPickupAndDropoffCoordinatesIntoUrl() {
+    var contact = ContactInfo.of()
+      .withBookingUrl(bookingUrlTemplate("https://book.example.com"))
+      .build();
 
     var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
 
     assertNotNull(info);
     assertEquals(EnumSet.of(BookingMethod.ONLINE), info.bookingMethods());
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", PICKUP, DROPOFF),
+      expectedExpandedUrl("https://book.example.com", PICKUP, DROPOFF),
       info.getContactInfo().getBookingUrl()
     );
-  }
-
-  /**
-   * Guards against the easy bug of unconditionally appending {@code ?from_coordinate=…}, which
-   * would yield an invalid double-{@code ?} URL when the provider's booking URL already carries
-   * its own query string (e.g. tracking parameters). The coordinate parameters must be appended
-   * with {@code &} in that case.
-   */
-  @Test
-  void urlWithExistingQueryString_usesAmpersandSeparator() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/?ref=foo").build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    var expected = String.format(
-      Locale.ROOT,
-      "https://book.example.com/?ref=foo&from_coordinate=%.6f,%.6f&to_coordinate=%.6f,%.6f",
-      PICKUP.latitude(),
-      PICKUP.longitude(),
-      DROPOFF.latitude(),
-      DROPOFF.longitude()
-    );
-    assertEquals(expected, info.getContactInfo().getBookingUrl());
   }
 
   @Test
   void phoneAndUrl_addsBothMethodsAndOnlyRewritesUrl() {
     var contact = ContactInfo.of()
       .withPhoneNumber("+4712345678")
-      .withBookingUrl("https://book.example.com")
+      .withBookingUrl(bookingUrlTemplate("https://book.example.com"))
       .build();
 
     var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
@@ -176,72 +154,12 @@ class CarpoolItineraryMapperTest {
       EnumSet.of(BookingMethod.CALL_OFFICE, BookingMethod.ONLINE),
       info.bookingMethods()
     );
-    var augmented = info.getContactInfo();
-    assertEquals("+4712345678", augmented.getPhoneNumber());
+    var expanded = info.getContactInfo();
+    assertEquals("+4712345678", expanded.getPhoneNumber());
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", PICKUP, DROPOFF),
-      augmented.getBookingUrl()
+      expectedExpandedUrl("https://book.example.com", PICKUP, DROPOFF),
+      expanded.getBookingUrl()
     );
-  }
-
-  /**
-   * Pins down the URL with a {@code #fragment}: the appended coordinate parameters must end up
-   * in the query (before the fragment), not inside the fragment. The string-level
-   * {@code url.contains("?")} predicate doesn't catch this — switching to {@link java.net.URI}
-   * parsing does, because the fragment is split off the URL before it can swallow the params.
-   */
-  @Test
-  void urlWithFragment_appendsParamsBeforeFragment() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/page#bookform").build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    var expected = String.format(
-      Locale.ROOT,
-      "https://book.example.com/page?from_coordinate=%.6f,%.6f&to_coordinate=%.6f,%.6f#bookform",
-      PICKUP.latitude(),
-      PICKUP.longitude(),
-      DROPOFF.latitude(),
-      DROPOFF.longitude()
-    );
-    assertEquals(expected, info.getContactInfo().getBookingUrl());
-  }
-
-  /**
-   * When the booking URL is unparseable, the URL is dropped from the contact and
-   * {@link BookingMethod#ONLINE} is removed from the booking methods rather than left in place
-   * pointing nowhere. If the contact carried only the (now-dropped) URL, no actionable booking
-   * method remains and {@code toBookingInfo} returns {@code null}, matching the
-   * "non-null return ⇒ at least one usable method" contract.
-   */
-  @Test
-  void malformedUrlOnly_returnsNull() {
-    var contact = ContactInfo.of().withBookingUrl("https://book.example.com/has space").build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNull(info);
-  }
-
-  /**
-   * Same malformed-URL handling as {@link #malformedUrlOnly_returnsNull()} but with a phone
-   * number also present: the call-office method survives, the dropped URL is reflected as
-   * {@code null} on the returned contact, and {@code ONLINE} is absent from the booking methods.
-   */
-  @Test
-  void malformedUrlWithPhone_keepsCallOfficeAndDropsUrl() {
-    var contact = ContactInfo.of()
-      .withPhoneNumber("+4712345678")
-      .withBookingUrl("https://book.example.com/has space")
-      .build();
-
-    var info = CarpoolItineraryMapper.toBookingInfo(contact, TRIP_START, PICKUP, DROPOFF);
-
-    assertNotNull(info);
-    assertEquals(EnumSet.of(BookingMethod.CALL_OFFICE), info.bookingMethods());
-    assertEquals("+4712345678", info.getContactInfo().getPhoneNumber());
-    assertNull(info.getContactInfo().getBookingUrl());
   }
 
   /**
