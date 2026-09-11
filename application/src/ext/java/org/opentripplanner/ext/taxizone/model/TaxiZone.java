@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.taxizone.model;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -26,7 +24,7 @@ public final class TaxiZone implements Serializable {
   @Nullable
   private final BookingInfo dropOffBookingInfo;
 
-  private transient PreparedGeometry preparedGeometry;
+  private transient volatile PreparedGeometry preparedGeometry;
 
   public TaxiZone(
     Geometry geometry,
@@ -38,7 +36,6 @@ public final class TaxiZone implements Serializable {
     this.route = Objects.requireNonNull(route);
     this.pickupBookingInfo = pickupBookingInfo;
     this.dropOffBookingInfo = dropOffBookingInfo;
-    this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
   }
 
   public Geometry geometry() {
@@ -53,7 +50,7 @@ public final class TaxiZone implements Serializable {
    */
   public boolean contains(WgsCoordinate coordinate) {
     Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
-    return preparedGeometry.contains(point);
+    return preparedGeometry().contains(point);
   }
 
   public Route route() {
@@ -102,12 +99,10 @@ public final class TaxiZone implements Serializable {
       .toString();
   }
 
-  /**
-   * Rebuilds the transient {@link #preparedGeometry} cache after deserialization, since
-   * {@link PreparedGeometry} is not {@link Serializable}.
-   */
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
+  private PreparedGeometry preparedGeometry() {
+    if (preparedGeometry == null) {
+      preparedGeometry = PreparedGeometryFactory.prepare(geometry);
+    }
+    return preparedGeometry;
   }
 }
