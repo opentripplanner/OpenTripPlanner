@@ -30,10 +30,10 @@ import org.opentripplanner.transit.service.TransitRepository;
  */
 public class NetexConfigure {
 
-  private final BuildConfig buildParams;
+  private final BuildConfig buildConfig;
 
-  public NetexConfigure(BuildConfig builderParams) {
-    this.buildParams = builderParams;
+  public NetexConfigure(BuildConfig buildConfig) {
+    this.buildConfig = buildConfig;
   }
 
   public NetexModule createNetexModule(
@@ -62,8 +62,8 @@ public class NetexConfigure {
       parkingRepository,
       streetDetailsRepository,
       issueStore,
-      buildParams.getSubwayAccessTimeSeconds(),
-      buildParams.getTransitServicePeriod(),
+      buildConfig.getSubwayAccessTimeSeconds(),
+      buildConfig.getTransitServicePeriod(),
       netexBundles
     );
   }
@@ -82,18 +82,12 @@ public class NetexConfigure {
       hierarchy(source, config),
       transitServiceBuilder,
       config.ferryIdsNotAllowedForBicycle(),
-      buildParams.transitRouteToStationCentroid(),
-      buildParams.maxStopToShapeSnapDistance,
-      transitShapeSimplificationToleranceMetersOrDisabled(),
+      buildConfig.transitRouteToStationCentroid(),
+      buildConfig.maxStopToShapeSnapDistance,
+      buildConfig.transitShapeSimplificationToleranceMeters(),
       config.noTransfersOnIsolatedStops(),
       config.ignoredFeatures()
     );
-  }
-
-  private double transitShapeSimplificationToleranceMetersOrDisabled() {
-    return buildParams.transitShapeSimplificationToleranceMeters == null
-      ? 0.0
-      : buildParams.transitShapeSimplificationToleranceMeters;
   }
 
   private NetexDataSourceHierarchy hierarchy(

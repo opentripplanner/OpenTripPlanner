@@ -26,6 +26,7 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -82,17 +83,21 @@ public class GeometryProcessor {
    */
   public List<LineString> createHopGeometries(Trip trip) {
     List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
-    List<LineString> hopGeometries;
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
-      hopGeometries = Arrays.asList(createStraightLineHopGeometries(stopTimes));
-    } else {
-      hopGeometries = Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+      // a straight line between two stops has no interior points to simplify away
+      return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
-    return GeometryUtils.simplify(hopGeometries, transitShapeSimplificationToleranceMeters);
+    LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
+
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometry)
+      : Arrays.stream(geometry)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
