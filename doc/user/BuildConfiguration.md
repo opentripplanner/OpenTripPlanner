@@ -45,6 +45,7 @@ Sections follow that describe particular settings in more depth.
 | [transitModelTimeZone](#transitModelTimeZone)                                               |      `time-zone`     | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                                     |      `duration`      | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                                                 |      `duration`      | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
+| [transitShapeSimplificationToleranceMeters](#transitShapeSimplificationToleranceMeters)     |       `double`       | Douglas-Peucker simplification tolerance for transit route shapes, in meters.                                                                                  | *Optional* |                                   |  2.11 |
 | [boardingLocationTags](#boardingLocationTags)                                               |      `string[]`      | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
 | [cache](#cache)                                                                             |       `object`       | Configuration for the graph-build file cache.                                                                                                                  | *Optional* |                                   |  2.10 |
 |    [enabled](#cache_enabled)                                                                |       `boolean`      | Master switch for the graph-build cache.                                                                                                                       | *Optional* | `false`                           |  2.10 |
@@ -641,6 +642,23 @@ will not be part of the graph. Use an absolute date or a period relative to the 
 build(BUILD_DAY).
 
 To get an effectively unbounded value, use a very large period like `"-P100Y"`.
+
+
+<h3 id="transitShapeSimplificationToleranceMeters">transitShapeSimplificationToleranceMeters</h3>
+
+**Since version:** `2.11` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Douglas-Peucker simplification tolerance for transit route shapes, in meters.
+
+Simplifies each trip pattern's shape geometry once, at graph-build time, using the
+Douglas-Peucker algorithm with this distance tolerance. A larger tolerance removes more
+points (and any shape detail smaller than it); points are never removed from an
+individual hop's endpoints, so stop locations are unaffected.
+
+This is opt-in - leave it unset to keep the raw, unsimplified shapes. A conservative
+starting point, if enabled, is a few meters: enough to remove excess shape-recording
+detail on long shapes without visibly straightening real curves.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>

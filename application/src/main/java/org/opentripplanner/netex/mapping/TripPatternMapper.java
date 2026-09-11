@@ -107,7 +107,8 @@ class TripPatternMapper {
     Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId,
     Map<String, FeedScopedId> serviceIds,
     DeduplicatorService deduplicator,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
@@ -142,7 +143,8 @@ class TripPatternMapper {
       quayIdByStopPointRef,
       stopById,
       issueStore,
-      maxStopToShapeSnapDistance
+      maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMeters
     );
     this.deduplicator = deduplicator;
 

@@ -259,4 +259,25 @@ public class GeometryUtilsTest {
     var meters = GeometryUtils.sumDistances(multiPoint);
     assertEquals(255_384.0, meters, 0.5);
   }
+
+  @Test
+  void simplifyDisabledWhenToleranceIsZeroOrLess() {
+    var zigzag = GeometryUtils.makeLineString(0, 0, 0.00001, 1, 0, 2, 0.00001, 3, 0, 4);
+    assertEquals(List.of(zigzag), GeometryUtils.simplify(List.of(zigzag), 0));
+    assertEquals(List.of(zigzag), GeometryUtils.simplify(List.of(zigzag), -5));
+  }
+
+  @Test
+  void simplifyReducesPointsButKeepsEndpoints() {
+    // A near-straight line with a tiny zigzag - well within a 50 m tolerance, so every
+    // interior point should be removable, leaving just the two endpoints.
+    var zigzag = GeometryUtils.makeLineString(0, 0, 0.00001, 0.5, 0, 1, 0.00001, 1.5, 0, 2);
+    var simplified = GeometryUtils.simplify(List.of(zigzag), 50);
+
+    assertEquals(1, simplified.size());
+    var line = simplified.get(0);
+    assertEquals(2, line.getNumPoints());
+    assertEquals(zigzag.getStartPoint().getCoordinate(), line.getStartPoint().getCoordinate());
+    assertEquals(zigzag.getEndPoint().getCoordinate(), line.getEndPoint().getCoordinate());
+  }
 }

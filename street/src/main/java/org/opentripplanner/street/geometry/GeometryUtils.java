@@ -27,6 +27,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 
 public class GeometryUtils {
 
@@ -67,6 +68,26 @@ public class GeometryUtils {
   public static LineString makeLineString(double... coords) {
     var seq = CSF.create(coords, 2);
     return GF.createLineString(seq);
+  }
+
+  /**
+   * Simplifies each line in {@code lineStrings} with the Douglas-Peucker algorithm, keeping the
+   * first and last point of every line exactly - safe to apply to a set of hop geometries whose
+   * endpoints must stay pinned to stop locations. A {@code toleranceMeters} of {@code 0} (or less)
+   * is treated as "disabled" and returns the input unchanged, so callers can wire this straight to
+   * an opt-in build-config parameter without a separate on/off check.
+   */
+  public static List<LineString> simplify(List<LineString> lineStrings, double toleranceMeters) {
+    if (toleranceMeters <= 0) {
+      return lineStrings;
+    }
+    double toleranceDegrees = SphericalDistanceLibrary.metersToDegrees(toleranceMeters);
+    return lineStrings
+      .stream()
+      .map(
+        lineString -> (LineString) DouglasPeuckerSimplifier.simplify(lineString, toleranceDegrees)
+      )
+      .toList();
   }
 
   public static LineString makeLineString(List<Coordinate> coordinates) {

@@ -146,8 +146,15 @@ public class GraphBuilderModules {
       config.getTransitServicePeriod(),
       fareServiceFactory,
       config.maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMetersOrDisabled(config),
       config.getSubwayAccessTimeSeconds()
     );
+  }
+
+  private static double transitShapeSimplificationToleranceMetersOrDisabled(BuildConfig config) {
+    return config.transitShapeSimplificationToleranceMeters == null
+      ? 0.0
+      : config.transitShapeSimplificationToleranceMeters;
   }
 
   @Provides
