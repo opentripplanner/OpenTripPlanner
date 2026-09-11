@@ -315,6 +315,7 @@ public class RoutingWorker {
     if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
+    // Direct taxi routing is handled separately in routeDirectTaxi().
     if (request.journey().direct().mode() == StreetMode.TAXI) {
       return RoutingResult.empty();
     }
