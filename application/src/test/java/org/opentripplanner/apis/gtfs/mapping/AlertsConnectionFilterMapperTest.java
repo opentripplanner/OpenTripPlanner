@@ -58,6 +58,33 @@ class AlertsConnectionFilterMapperTest {
     assertFalse(matcher.match(STOP_ALERT));
   }
 
+  /**
+   * Both include and exclude can be set in the same filter. An alert then has to match at least one
+   * of the include selectors and none of the exclude selectors.
+   */
+  @Test
+  void includeAndExcludeCanBeCombined() {
+    var matcher = matcher(
+      filter(
+        Map.of(
+          "include",
+          List.of(Map.of("feeds", List.of("test"))),
+          "exclude",
+          List.of(Map.of("effects", List.of("DETOUR")))
+        )
+      )
+    );
+    assertTrue(matcher.match(ROUTE_ALERT));
+    assertFalse(matcher.match(STOP_ALERT));
+  }
+
+  @Test
+  void filterWithoutIncludeAndExcludeIsRejected() {
+    assertThrows(InvalidInputException.class, () ->
+      AlertsConnectionFilterMapper.map(List.of(filter(Map.of())))
+    );
+  }
+
   @Test
   void severityIsExpandedToInternalValues() {
     var matcher = matcher(filter("include", Map.of("severityLevels", List.of("SEVERE"))));
@@ -117,9 +144,11 @@ class AlertsConnectionFilterMapperTest {
     String direction,
     Map<String, Object>... selectors
   ) {
-    return new GraphQLTypes.GraphQLAlertsFilterInput(
-      Map.of(direction, Arrays.stream(selectors).toList())
-    );
+    return filter(Map.of(direction, Arrays.stream(selectors).toList()));
+  }
+
+  private static GraphQLTypes.GraphQLAlertsFilterInput filter(Map<String, Object> args) {
+    return new GraphQLTypes.GraphQLAlertsFilterInput(args);
   }
 
   private static Map<String, Object> mapOfNullableList(String key, String... values) {

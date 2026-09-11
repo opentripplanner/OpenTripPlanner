@@ -4501,9 +4501,10 @@ input AccessibilityPreferencesInput {
 """
 A collection of selectors for including or excluding alerts from the alerts search.
 An alert matches a filter if it matches at least one of the `include` selectors and none of the
-`exclude` selectors. When several filters are given, an alert matches if it matches any of them.
+`exclude` selectors. Both `include` and `exclude` can be set in the same filter, but at least one
+of them has to be set. When several filters are given, an alert matches if it matches any of them.
 """
-input AlertsFilterInput @oneOf {
+input AlertsFilterInput {
   """
   A list of selectors for excluding alerts.
     

@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
@@ -41,6 +42,11 @@ public class AlertsConnectionFilterMapper {
   ) {
     var includes = filter.getGraphQLInclude();
     var excludes = filter.getGraphQLExclude();
+    if (includes == null && excludes == null) {
+      throw new InvalidInputException(
+        "A filter must define at least one of 'filters.include' and 'filters.exclude'."
+      );
+    }
     CollectionUtils.requireNullOrNonEmpty(includes, "filters.include");
     CollectionUtils.requireNullOrNonEmpty(excludes, "filters.exclude");
 
@@ -139,7 +145,7 @@ public class AlertsConnectionFilterMapper {
         "'%s' must be either null or have at least one entry.".formatted(path)
       );
     }
-    if (values.contains(null)) {
+    if (values.stream().anyMatch(Objects::isNull)) {
       throw new InvalidInputException("'%s' must not contain null values.".formatted(path));
     }
     return values;
