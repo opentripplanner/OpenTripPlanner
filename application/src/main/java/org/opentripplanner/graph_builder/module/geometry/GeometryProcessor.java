@@ -53,16 +53,19 @@ public class GeometryProcessor {
   // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
     TransitDataImportBuilder builder,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.issueStore = issueStore;
   }
 
@@ -79,15 +82,17 @@ public class GeometryProcessor {
    */
   public List<LineString> createHopGeometries(Trip trip) {
     List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
+    List<LineString> hopGeometries;
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
-      return Arrays.asList(createStraightLineHopGeometries(stopTimes));
+      hopGeometries = Arrays.asList(createStraightLineHopGeometries(stopTimes));
+    } else {
+      hopGeometries = Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
     }
-
-    return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+    return GeometryUtils.simplify(hopGeometries, transitShapeSimplificationToleranceMeters);
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

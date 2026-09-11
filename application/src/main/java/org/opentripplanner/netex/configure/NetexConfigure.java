@@ -84,9 +84,16 @@ public class NetexConfigure {
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.transitRouteToStationCentroid(),
       buildParams.maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMetersOrDisabled(),
       config.noTransfersOnIsolatedStops(),
       config.ignoredFeatures()
     );
+  }
+
+  private double transitShapeSimplificationToleranceMetersOrDisabled() {
+    return buildParams.transitShapeSimplificationToleranceMeters == null
+      ? 0.0
+      : buildParams.transitShapeSimplificationToleranceMeters;
   }
 
   private NetexDataSourceHierarchy hierarchy(

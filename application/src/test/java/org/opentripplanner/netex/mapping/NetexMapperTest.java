@@ -61,6 +61,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 
@@ -87,6 +88,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 
@@ -120,6 +122,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 

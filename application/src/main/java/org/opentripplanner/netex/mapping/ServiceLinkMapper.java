@@ -42,6 +42,7 @@ class ServiceLinkMapper {
   private final ImmutableEntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
 
   ServiceLinkMapper(
     FeedScopedIdFactory idFactory,
@@ -49,7 +50,8 @@ class ServiceLinkMapper {
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ImmutableEntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters
   ) {
     this.idFactory = idFactory;
     this.serviceLinkById = serviceLinkById;
@@ -57,6 +59,7 @@ class ServiceLinkMapper {
     this.stopById = stopById;
     this.issueStore = issueStore;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
   }
 
   List<LineString> getGeometriesByJourneyPattern(
@@ -71,7 +74,8 @@ class ServiceLinkMapper {
         geometries[i] = createSimpleGeometry(stopPattern.getStop(i), stopPattern.getStop(i + 1));
       }
     }
-    return Arrays.asList(geometries);
+    List<LineString> hopGeometries = Arrays.asList(geometries);
+    return GeometryUtils.simplify(hopGeometries, transitShapeSimplificationToleranceMeters);
   }
 
   private LineString[] generateGeometriesFromServiceLinks(

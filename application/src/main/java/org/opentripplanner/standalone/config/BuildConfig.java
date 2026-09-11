@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
@@ -171,6 +172,14 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
+
+  /**
+   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code null}
+   * (not set) disables simplification.
+   */
+  @Nullable
+  public final Double transitShapeSimplificationToleranceMeters;
+
   public final Set<String> boardingLocationTags;
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
@@ -304,6 +313,24 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(150);
+    this.transitShapeSimplificationToleranceMeters = root
+      .of("transitShapeSimplificationToleranceMeters")
+      .since(V2_11)
+      .summary("Douglas-Peucker simplification tolerance for transit route shapes, in meters.")
+      .description(
+        """
+        Simplifies each trip pattern's shape geometry once, at graph-build time, using the
+        Douglas-Peucker algorithm with this distance tolerance. A larger tolerance removes more
+        points (and any shape detail smaller than it); points are never removed from an
+        individual hop's endpoints, so stop locations are unaffected.
+
+        This is opt-in - leave it unset to keep the raw, unsimplified shapes. A conservative
+        starting point, if enabled, is a few meters: enough to remove excess shape-recording
+        detail on long shapes without visibly straightening real curves.
+        """
+      )
+      .asDoubleOptional()
+      .orElse(null);
     this.multiThreadElevationCalculations = root
       .of("multiThreadElevationCalculations")
       .since(V2_0)
