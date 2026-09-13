@@ -97,8 +97,12 @@ public class DouglasPeuckerAlgorithm {
   }
 
   /**
-   * Distance from {@code point} to the line through {@code start} and {@code end}, in degrees,
-   * with longitude scaled by {@link #lonScale}.
+   * Distance from {@code point} to the segment between {@code start} and {@code end}, in
+   * degrees, with longitude scaled by {@link #lonScale}. Using the segment rather than the
+   * infinite line through it matters for a point that overshoots past {@code start} or
+   * {@code end} while staying close to that line's bearing: measured against the infinite line
+   * such a point looks almost colinear (near-zero distance) even though reaching it is a real,
+   * arbitrarily long detour, which would wrongly let it be simplified away.
    */
   private double perpendicularDistance(Coordinate start, Coordinate end, Coordinate point) {
     double x1 = start.x * lonScale;
@@ -110,10 +114,13 @@ public class DouglasPeuckerAlgorithm {
 
     double dx = x2 - x1;
     double dy = y2 - y1;
-    if (dx == 0 && dy == 0) {
+    double lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared == 0) {
       return Math.hypot(px - x1, py - y1);
     }
-    return Math.abs(dy * px - dx * py + x2 * y1 - y2 * x1) / Math.hypot(dx, dy);
+
+    double t = Math.clamp(((px - x1) * dx + (py - y1) * dy) / lengthSquared, 0.0, 1.0);
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
   }
 
   /**

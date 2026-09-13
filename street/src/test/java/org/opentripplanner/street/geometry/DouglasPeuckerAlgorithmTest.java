@@ -80,4 +80,28 @@ class DouglasPeuckerAlgorithmTest {
       .asList()
       .containsExactly(start, end);
   }
+
+  /// A spike that overshoots past `end` while staying on (near) the same bearing as the
+  /// start-end chord is the classic Douglas-Peucker failure mode: measured against the
+  /// *infinite line* through start/end, the spike looks colinear (~0 distance) no matter how
+  /// far out it goes, so a naive implementation erases it at any tolerance. Measuring against
+  /// the *segment* instead - clamping the projection to [start, end] - fixes this: the spike's
+  /// distance becomes the real distance to the nearest endpoint, so it survives.
+  @Test
+  void simplifyKeepsASpikeThatOvershootsPastTheChordEndpoint() {
+    var start = new WgsCoordinate(60.0, 10.0);
+    var end = start.moveEastMeters(1000);
+    var spikeTip = start.moveEastMeters(3000);
+
+    var line = GeometryUtils.makeLineString(
+      start.asJtsCoordinate(),
+      spikeTip.asJtsCoordinate(),
+      end.asJtsCoordinate()
+    );
+    var simplified = DouglasPeuckerAlgorithm.of(line, 5.0);
+
+    assertThat(simplified.getCoordinates())
+      .asList()
+      .containsExactly(start.asJtsCoordinate(), spikeTip.asJtsCoordinate(), end.asJtsCoordinate());
+  }
 }
