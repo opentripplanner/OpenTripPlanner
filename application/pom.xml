@@ -288,7 +288,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>14.2.2</version>
+            <version>14.2.3</version>
         </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
@@ -352,7 +352,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.59.0</version>
+            <version>1.59.1</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -362,7 +362,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.18.5</version>
+            <version>1.18.6</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
