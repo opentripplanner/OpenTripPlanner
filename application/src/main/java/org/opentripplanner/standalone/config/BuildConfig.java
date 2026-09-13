@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
@@ -171,6 +172,13 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
+
+  /**
+   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0}
+   * (the default when not set) disables simplification.
+   */
+  private final double transitShapeSimplificationToleranceMeters;
+
   public final Set<String> boardingLocationTags;
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
@@ -304,6 +312,22 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(150);
+    this.transitShapeSimplificationToleranceMeters = root
+      .of("transitShapeSimplificationToleranceMeters")
+      .since(V2_11)
+      .summary("Douglas-Peucker simplification tolerance for transit route shapes, in meters.")
+      .description(
+        """
+        Simplifies each trip pattern's shape geometry once, at graph-build time, using the Douglas-Peucker
+        algorithm with this distance tolerance. A larger tolerance removes more points (and any shape detail
+        smaller than it); points are never removed from an individual hop's endpoints, so stop locations are
+        unaffected.
+
+        This is opt-in - leave it unset to keep the raw, unsimplified shapes. 0.5 or 3.0 meters may save a
+        significant amount of memory - if some of the feeds contains shapes with a lot of detail.
+        """
+      )
+      .asDouble(0.0);
     this.multiThreadElevationCalculations = root
       .of("multiThreadElevationCalculations")
       .since(V2_0)
@@ -781,5 +805,15 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public boolean hasUnknownParameters() {
     return root.hasUnknownParameters();
+  }
+
+  public double transitShapeSimplificationToleranceMeters() {
+    if (transitShapeSimplificationToleranceMeters < 0.0) {
+      LOG.warn(
+        "Build config transitShapeSimplificationToleranceMeters should be greater than 0.0 or not set."
+      );
+      return 0.0;
+    }
+    return transitShapeSimplificationToleranceMeters;
   }
 }

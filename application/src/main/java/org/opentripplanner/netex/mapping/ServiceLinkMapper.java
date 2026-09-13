@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
@@ -42,6 +43,7 @@ class ServiceLinkMapper {
   private final ImmutableEntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
 
   ServiceLinkMapper(
     FeedScopedIdFactory idFactory,
@@ -49,7 +51,8 @@ class ServiceLinkMapper {
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ImmutableEntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters
   ) {
     this.idFactory = idFactory;
     this.serviceLinkById = serviceLinkById;
@@ -57,6 +60,7 @@ class ServiceLinkMapper {
     this.stopById = stopById;
     this.issueStore = issueStore;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
   }
 
   List<LineString> getGeometriesByJourneyPattern(
@@ -71,7 +75,11 @@ class ServiceLinkMapper {
         geometries[i] = createSimpleGeometry(stopPattern.getStop(i), stopPattern.getStop(i + 1));
       }
     }
-    return Arrays.asList(geometries);
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometries)
+      : Arrays.stream(geometries)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private LineString[] generateGeometriesFromServiceLinks(

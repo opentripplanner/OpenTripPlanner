@@ -26,6 +26,7 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -53,16 +54,19 @@ public class GeometryProcessor {
   // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
     TransitDataImportBuilder builder,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.issueStore = issueStore;
   }
 
@@ -84,10 +88,16 @@ public class GeometryProcessor {
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
+      // a straight line between two stops has no interior points to simplify away
       return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
+    LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
 
-    return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometry)
+      : Arrays.stream(geometry)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

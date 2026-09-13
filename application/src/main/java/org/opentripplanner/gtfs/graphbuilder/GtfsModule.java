@@ -53,6 +53,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final DeduplicatorService deduplicator;
 
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final int subwayAccessTime_s;
 
   public GtfsModule(
@@ -65,6 +66,7 @@ public class GtfsModule implements GraphBuilderModule {
     LocalDateRange transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
@@ -76,6 +78,7 @@ public class GtfsModule implements GraphBuilderModule {
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.subwayAccessTime_s = subwayAccessTime_s;
   }
 
@@ -98,6 +101,7 @@ public class GtfsModule implements GraphBuilderModule {
       transitPeriodLimit,
       new GtfsFareServiceFactory(),
       150.0,
+      0.0,
       120
     );
   }
@@ -151,6 +155,7 @@ public class GtfsModule implements GraphBuilderModule {
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
           maxStopToShapeSnapDistance,
+          transitShapeSimplificationToleranceMeters,
           issueStore
         );
 
