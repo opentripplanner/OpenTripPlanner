@@ -32,10 +32,9 @@ import org.opentripplanner.street.search.state.StateEditor;
  * Tests for propulsion-aware cost calculation in StreetEdge.
  * <p>
  * Verifies that different propulsion types (ELECTRIC, ELECTRIC_ASSIST, HUMAN) result in
- * appropriate cost calculations, especially regarding slope effects:
- * - ELECTRIC (e-scooters): Use flat distance (constant speed, motor does all work)
- * - ELECTRIC_ASSIST (e-bikes): Reduced slope sensitivity (default 30% of human-powered effect)
- * - HUMAN and others: Full slope effect
+ * appropriate cost calculations, especially regarding slope effects: - ELECTRIC (e-scooters): Use
+ * flat distance (constant speed, motor does all work) - ELECTRIC_ASSIST (e-bikes): Reduced slope
+ * sensitivity (default 30% of human-powered effect) - HUMAN and others: Full slope effect
  */
 class StreetEdgePropulsionCostTest {
 
@@ -114,13 +113,12 @@ class StreetEdgePropulsionCostTest {
   }
 
   /**
-   * Test cases for propulsion type slope sensitivity.
-   * Each case specifies: propulsion type, form factor, street mode, slope sensitivity factor.
+   * Test cases for propulsion type slope sensitivity. Each case specifies: propulsion type, form
+   * factor, street mode, slope sensitivity factor.
    * <p>
-   * Slope sensitivity determines how much the elevation profile affects travel time:
-   * - 0.0: No slope effect (electric scooters maintain constant speed)
-   * - 0.3: Default e-assist sensitivity (motor helps on hills)
-   * - 1.0: Full slope effect (human-powered)
+   * Slope sensitivity determines how much the elevation profile affects travel time: - 0.0: No
+   * slope effect (electric scooters maintain constant speed) - 0.3: Default e-assist sensitivity
+   * (motor helps on hills) - 1.0: Full slope effect (human-powered)
    */
   static Stream<Arguments> propulsionSlopeCases() {
     return Stream.of(

@@ -6,8 +6,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 
 /**
- * Implementation of an OAuth service that sends its parameters as a form url-endcoded
- * POST request.
+ * Implementation of an OAuth service that sends its parameters as a form url-endcoded POST request.
  */
 public class UrlEncodedOAuthService extends CachingOAuthService {
 

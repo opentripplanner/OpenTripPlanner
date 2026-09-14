@@ -11,14 +11,15 @@ import org.opentripplanner.street.search.state.State;
  * an A* street search. The state chain is a linked list from the final state back to the origin via
  * {@link State#getBackState()}/{@link State#getBackEdge()}.
  * <p>
- * This utility encapsulates the direction-dependent ordering: for depart-after searches the chain
- * yields edges in reverse chronological order (newest first), while for arriveBy searches the chain
- * already yields edges in chronological order.
+ * This utility encapsulates the direction-dependent ordering: for depart-after searches the
+ * chain yields edges in reverse chronological order (newest first), while for arriveBy searches the
+ * chain already yields edges in chronological order.
  * <p>
- * Implementation note: an earlier design relied on {@link org.opentripplanner.astar.model.GraphPath}
- * which allocates a {@code LinkedList<State>} and, for depart-after searches, a full reversed copy
- * of the state chain via {@code State.reverse()}. This implementation avoids both by collecting
- * only the edges into a single {@code ArrayList} and reversing it in place.
+ * Implementation note: an earlier design relied on
+ * {@link org.opentripplanner.astar.model.GraphPath} which allocates a {@code LinkedList<State>}
+ * and, for depart-after searches, a full reversed copy of the state chain via
+ * {@code State.reverse()}. This implementation avoids both by collecting only the edges into a
+ * single {@code ArrayList} and reversing it in place.
  */
 public class ChronologicalGraphPath {
 

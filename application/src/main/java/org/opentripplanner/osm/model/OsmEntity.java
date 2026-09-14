@@ -281,7 +281,7 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   * or a parent mode, empty if it is not specified.
+   *         or a parent mode, empty if it is not specified.
    */
   protected Optional<Permission> checkModePermission(String mode) {
     return checkModePermission(mode, DIRECTIONLESS);
@@ -293,7 +293,8 @@ public abstract class OsmEntity {
    *
    * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
    * @return an optional value if the mode is allowed or denied access through tagging for the mode
-   * or a parent mode, either with a directional suffix or not, empty if it is not specified.
+   *         or a parent mode, either with a directional suffix or not, empty if it is not
+   *         specified.
    */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     if (isTagless()) {
@@ -334,8 +335,8 @@ public abstract class OsmEntity {
   }
 
   /**
-   * @return Converts a tag to lower case and returns the associated value.
-   * Returns null if tag is not present.
+   * @return Converts a tag to lower case and returns the associated value. Returns null if tag is
+   *         not present.
    */
   @Nullable
   public final String getTag(String tag) {
@@ -347,8 +348,8 @@ public abstract class OsmEntity {
   }
 
   /**
-   * @return Converts a tag to lower case and returns the associated value.
-   * An empty Optional if tag is not present.
+   * @return Converts a tag to lower case and returns the associated value. An empty Optional if tag
+   *         is not present.
    */
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
@@ -371,13 +372,9 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Parse an OSM duration tag, which is one of:
-   *   mm
-   *   hh:mm
-   *   hh:mm:ss
-   * and where the leading value is not limited to any maximum.
-   * See <a href="https://wiki.openstreetmap.org/wiki/Key:duration">OSM wiki definition
-   * of duration</a>.
+   * Parse an OSM duration tag, which is one of: mm hh:mm hh:mm:ss and where the leading value is
+   * not limited to any maximum. See <a href="https://wiki.openstreetmap.org/wiki/Key:duration">OSM
+   * wiki definition of duration</a>.
    *
    * @param duration string in format mm, hh:mm, or hh:mm:ss
    * @return Duration
@@ -449,8 +446,8 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Gets a tag's value, assumes it is an OSM wiki specified duration, parses and returns it.
-   * If parsing fails, calls the error handler.
+   * Gets a tag's value, assumes it is an OSM wiki specified duration, parses and returns it. If
+   * parsing fails, calls the error handler.
    *
    * @param key
    * @param errorHandler
@@ -552,7 +549,7 @@ public abstract class OsmEntity {
    *                Tag names between {} are replaced by the OSM tag value, if it is present (or the
    *                empty string if not).
    * @return A map language code → text, with at least one entry for the default language, and any
-   * other language found in OSM tag.
+   *         other language found in OSM tag.
    */
   public Map<String, String> generateI18NForPattern(String pattern) {
     Map<String, StringBuffer> i18n = new HashMap<>();
@@ -623,17 +620,16 @@ public abstract class OsmEntity {
   /**
    * Returns true if access is generally denied to this element (potentially with exceptions).
    *
-   * @return true if access is denied in general, regardless if permission is explicitly given
-   * when traversing in a specific (forward or backward) direction.
+   * @return true if access is denied in general, regardless if permission is explicitly given when
+   *         traversing in a specific (forward or backward) direction.
    */
   public boolean isGeneralAccessDenied() {
     return isGeneralAccessDenied(DIRECTIONLESS);
   }
 
   /**
-   * Returns true if access is generally denied to this element (potentially with exceptions)
-   * when traversing in the specified direction.
-   * Note that oneway tags are not handled in this method.
+   * Returns true if access is generally denied to this element (potentially with exceptions) when
+   * traversing in the specified direction. Note that oneway tags are not handled in this method.
    */
   public boolean isGeneralAccessDenied(TraverseDirection direction) {
     return checkModePermission("access", direction)
@@ -678,8 +674,9 @@ public abstract class OsmEntity {
 
   /**
    * Check if the way is explicitly set as one-way for the specified traversal mode
-   * @return empty if it is not explicitly set, value containing empty if it is explicitly set
-   * as two-way.
+   *
+   * @return empty if it is not explicitly set, value containing empty if it is explicitly set as
+   *         two-way.
    */
   private Optional<Optional<TraverseDirection>> isExplicitlyOneWay(@Nullable String mode) {
     String key = mode == null ? "oneway" : "oneway:" + mode;
@@ -732,8 +729,8 @@ public abstract class OsmEntity {
    * Is this a public transport boarding location where passengers wait for transit and that can be
    * linked to a transit stop vertex later on.
    * <p>
-   * This intentionally excludes railway=stop and public_transport=stop because these are supposed
-   * to be placed on the tracks not on the platform.
+   * This intentionally excludes railway=stop and public_transport=stop because these are
+   * supposed to be placed on the tracks not on the platform.
    *
    * @return whether the node is a place used to board a public transport vehicle
    */
@@ -753,8 +750,8 @@ public abstract class OsmEntity {
   /**
    * Determines if an entity is a platform.
    * <p>
-   * However, they are filtered out if they are tagged usage=tourism. This prevents miniature tourist
-   * railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
+   * However, they are filtered out if they are tagged usage=tourism. This prevents miniature
+   * tourist railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
    * from being linked to transit stops that are underneath it.
    **/
   public boolean isPlatform() {
@@ -828,8 +825,8 @@ public abstract class OsmEntity {
    * groups that resolves to a value.
    * <p>
    * A group's tag values are joined with {@code :} in the given order. If any tag in a group is
-   * missing from this entity, that group is skipped in favor of the next one. A group with a
-   * single tag key produces a plain (non-compound) id.
+   * missing from this entity, that group is skipped in favor of the next one. A group with a single
+   * tag key produces a plain (non-compound) id.
    */
   public Optional<String> getCompoundTagValue(List<CompoundRefTagGroup> tagGroups) {
     return tagGroups
@@ -890,9 +887,9 @@ public abstract class OsmEntity {
   }
 
   /**
-   * @return true if there is no explicit tag that makes this unsuitable for wheelchair use.
-   *         In other words: we assume that something is wheelchair-accessible in the absence
-   *         of other information.
+   * @return true if there is no explicit tag that makes this unsuitable for wheelchair use. In
+   *         other words: we assume that something is wheelchair-accessible in the absence of other
+   *         information.
    */
   public boolean isWheelchairAccessible() {
     var wheelchairValue = getTag("wheelchair");
@@ -931,8 +928,8 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Whether this entity explicitly doesn't have a name. This is different to no name being
-   * set on the entity in OSM.
+   * Whether this entity explicitly doesn't have a name. This is different to no name being set on
+   * the entity in OSM.
    *
    * @see OsmEntity#isNamed()
    * @link https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
@@ -965,16 +962,16 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
-   * or bicycle=yes that override them.
+   * Given an assumed traversal permissions, check if there are explicit additional tags, like
+   * bicycle=no or bicycle=yes that override them.
    */
   public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
     return overridePermissions(def, DIRECTIONLESS);
   }
 
   /**
-   * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
-   * or bicycle=yes that override them when traversing in the given direction.
+   * Given an assumed traversal permissions, check if there are explicit additional tags, like
+   * bicycle=no or bicycle=yes that override them when traversing in the given direction.
    */
   public StreetTraversalPermission overridePermissions(
     StreetTraversalPermission def,
@@ -1015,10 +1012,10 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Entities are considered equal if they have the same id and are of the same concrete type.
-   * OSM ids are only unique within a single entity type (a node and a way can share the same
-   * numeric id), and this needs to hold even when the same OSM entity is represented by several
-   * distinct (but equivalent) Java instances, as is done for {@link org.opentripplanner.osm.model.OsmNode}.
+   * Entities are considered equal if they have the same id and are of the same concrete type. OSM
+   * ids are only unique within a single entity type (a node and a way can share the same numeric
+   * id), and this needs to hold even when the same OSM entity is represented by several distinct
+   * (but equivalent) Java instances, as is done for {@link org.opentripplanner.osm.model.OsmNode}.
    */
   @Override
   public boolean equals(Object o) {

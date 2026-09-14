@@ -16,8 +16,10 @@ public final class JAXBUtils {
   /**
    * Transform a collection of JAXBElement wrappers into a stream containing the unwrapped values.
    * Null values are filtered out. Note:
-   * <ul>A null JAXBElement represents an element not present in the document.</ul>
-   * <ul>A non-null JAXBElement wrapping a null value represents an xsi:nil element.</ul>
+   * <ul>A null JAXBElement represents an element not present in the document.
+   * </ul>
+   * <ul>A non-null JAXBElement wrapping a null value represents an xsi:nil element.
+   * </ul>
    * There is currently no nillable elements in NeTEx.
    *
    * @param type the Java type of the wrapped element.

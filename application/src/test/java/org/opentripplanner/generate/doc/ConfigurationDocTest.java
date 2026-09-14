@@ -30,8 +30,8 @@ public class ConfigurationDocTest {
    *   <li>The configuration type table</li>
    *   <li>The list of OTP features</li>
    * </ul>
-   * This test fails if the document has changed. This makes sure that this test fails in the
-   * CI pipeline if config file changes are not committed. Manually inspect the changes in the
+   * This test fails if the document has changed. This makes sure that this test fails in the CI
+   * pipeline if config file changes are not committed. Manually inspect the changes in the
    * configuration, commit the configuration document, and run test again to pass.
    */
   @Test

@@ -42,9 +42,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
- * These tests use a real street graph with transit stops to verify the full
- * access/egress routing pipeline including nearby stop finding, insertion
- * evaluation, and result mapping.
+ * These tests use a real street graph with transit stops to verify the full access/egress
+ * routing pipeline including nearby stop finding, insertion evaluation, and result mapping.
  * <p>
  * Graph layout (going east):
  * <pre>
@@ -550,13 +549,13 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Regression test: {@code routeAccessEgress} must call {@code findNearbyStops} with
-   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search
-   * to leave the drivable network and walk the last stretch to a transit stop whose link
-   * endpoint is reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
+   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search to
+   * leave the drivable network and walk the last stretch to a transit stop whose link endpoint is
+   * reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
    * <p>
    * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A pure CAR
-   * search would never reach it, so it would not appear in any access result. If the
-   * implementation regresses to using CAR here, this assertion will fail.
+   * search would never reach it, so it would not appear in any access result. If the implementation
+   * regresses to using CAR here, this assertion will fail.
    */
   @Test
   void accessFindsTransitStopReachableOnlyViaWalkOnlySideBranchFromDrivableNetwork() {
@@ -604,11 +603,11 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   /**
-   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit on
-   * the drivable network, the carpool can pick up at the passenger's location and drop off at
+   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit
+   * on the drivable network, the carpool can pick up at the passenger's location and drop off at
    * the stop's link vertex without any walking. Both {@code walkToPickup} and
-   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration
-   * placeholders) so the itinerary mapper can tell the walking and no-walking cases apart.
+   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration placeholders)
+   * so the itinerary mapper can tell the walking and no-walking cases apart.
    */
   @Test
   void accessResultForStopOnDrivableNetworkHasNullWalkSegments() {
@@ -763,12 +762,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Verifies the booking URL is rewritten with passenger pickup/dropoff query parameters when an
-   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial,
-   * the {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
+   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial, the
+   * {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
    * vertex incident to T5's pedestrian-only side branch) and the passenger then walks
-   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg,
-   * so the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the
-   * walking endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
+   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg, so
+   * the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the walking
+   * endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
    */
   @Test
   void accessItinerary_expandsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {

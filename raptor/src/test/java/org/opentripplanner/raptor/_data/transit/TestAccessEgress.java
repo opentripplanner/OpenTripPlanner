@@ -74,8 +74,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   /**
-   * @deprecated A stop cannot be both free and have a cost - This is not a valid
-   *             access/egress.
+   * @deprecated A stop cannot be both free and have a cost - This is not a valid access/egress.
    */
   @Deprecated
   public static TestAccessEgress free(int stop, int cost) {

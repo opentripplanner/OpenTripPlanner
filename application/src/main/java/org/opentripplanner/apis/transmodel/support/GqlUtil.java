@@ -86,10 +86,9 @@ public class GqlUtil {
   }
 
   /**
-   * Return the integer value of the argument or throw an exception if the value is null
-   * or strictly negative.
-   * This should generally be handled at the GraphQL schema level,
-   * but must sometimes be implemented programmatically to preserve backward compatibility.
+   * Return the integer value of the argument or throw an exception if the value is null or strictly
+   * negative. This should generally be handled at the GraphQL schema level, but must sometimes be
+   * implemented programmatically to preserve backward compatibility.
    */
   public static int getPositiveNonNullIntegerArgument(
     DataFetchingEnvironment environment,

@@ -8,8 +8,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Notice;
 
 /**
- * Responsible for mapping onebusaway GTFS Notice into the OTP model.
- * Caches mapped instances so that the same GTFS notice produces the same OTP notice object.
+ * Responsible for mapping onebusaway GTFS Notice into the OTP model. Caches mapped instances so
+ * that the same GTFS notice produces the same OTP notice object.
  */
 class NoticeMapper {
 

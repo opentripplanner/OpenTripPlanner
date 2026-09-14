@@ -11,17 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Runs GraphQL trip queries in a background thread during OTP startup to warm up the
- * application before production traffic arrives.
+ * Runs GraphQL trip queries in a background thread during OTP startup to warm up the application
+ * before production traffic arrives.
  * <p>
  * The worker sends sequential queries through the configured GraphQL API (TransModel or GTFS),
  * exercising the full stack: GraphQL parsing, data fetchers, routing (Raptor + A*), itinerary
  * filtering, and response serialization. This warms up JIT compilation, GraphQL schema caches,
- * routing data structures, and other lazily initialized components. It alternates between
- * depart-at / arrive-by and cycles through access/egress modes (walk, bike, car-to-park).
+ * routing data structures, and other lazily initialized components. It alternates between depart-at
+ * / arrive-by and cycles through access/egress modes (walk, bike, car-to-park).
  * <p>
- * It starts after Raptor transit data is created and stops when the health probe
- * reports "UP" (all updaters primed).
+ * It starts after Raptor transit data is created and stops when the health probe reports "UP"
+ * (all updaters primed).
  */
 class WarmupWorker implements Runnable {
 

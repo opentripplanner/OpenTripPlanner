@@ -25,7 +25,7 @@ public class M04_DirectTransitCostLimitTest implements RaptorTestConstants {
 
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
-  ///  Expensive trips should be included even if they are not optimal on arrival or departure
+  /// Expensive trips should be included even if they are not optimal on arrival or departure
   @Test
   void testIncludeExpensive() {
     var data = new TestTransitData();
@@ -47,7 +47,8 @@ public class M04_DirectTransitCostLimitTest implements RaptorTestConstants {
     );
   }
 
-  ///  Trips with a cost above the limit should be rejected when they are not optimal on arrival or departure
+  /// Trips with a cost above the limit should be rejected when they are not optimal on arrival
+  /// or departure
   @Test
   void testRejectExpensive() {
     var data = new TestTransitData();

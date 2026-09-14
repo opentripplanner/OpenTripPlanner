@@ -39,9 +39,9 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * This class exposes methods for fetching access and egress legs for a request.
- * An access or egress may be e.g. a walking path to the first transit stop on a route,
- * but could also include other modes such as bicycle, shared mobility, flex or carpooling.
+ * This class exposes methods for fetching access and egress legs for a request. An access or egress
+ * may be e.g. a walking path to the first transit stop on a route, but could also include other
+ * modes such as bicycle, shared mobility, flex or carpooling.
  */
 class AccessEgressFetcher {
 

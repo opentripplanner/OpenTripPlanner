@@ -8,12 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for keeping a single instance of the OTP configuration in memory.
- * OTP load the config from the {@code baseDirectory}, and then if not found the config is read
- * from the serialized graph.
+ * This class is responsible for keeping a single instance of the OTP configuration in memory. OTP
+ * load the config from the {@code baseDirectory}, and then if not found the config is read from the
+ * serialized graph.
  * <p>
- * OTP load the following configuration files, see {@link OtpFileNames}. All files are loaded from
- * the same base directory.
+ * OTP load the following configuration files, see {@link OtpFileNames}. All files are loaded
+ * from the same base directory.
  * <p>
  * Comments and unquoted keys are allowed in the these configuration files. The configuration is
  * cached, and not reloaded even if it is changed on the filesystem. Changing some parameters would
@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
  * missing, causing us to fall back on all the default values as if there was a JSON file present
  * with no fields defined.
  * <p>
- * This class is responsible for logging when a configuration file is loaded, and if the
- * loading fails. It delegates most of this responsibility to the {@link OtpConfigLoader}.
+ * This class is responsible for logging when a configuration file is loaded, and if the loading
+ * fails. It delegates most of this responsibility to the {@link OtpConfigLoader}.
  */
 public class ConfigModel {
 

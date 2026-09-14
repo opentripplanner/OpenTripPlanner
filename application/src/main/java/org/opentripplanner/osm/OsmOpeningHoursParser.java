@@ -114,8 +114,8 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
-   * Currently, doesn't have support for all types of rules.
+   * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours. Currently, doesn't
+   * have support for all types of rules.
    */
   public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link, ZoneId zoneId)
     throws OpeningHoursParseException {
@@ -176,8 +176,8 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that is always open on the days defined in the rule's {@link DateRange}.
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is always open on the days defined
+   * in the rule's {@link DateRange}.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> createOHCalendarBuildersForOpen24DayRanges(
     OHCalendarBuilder calendarBuilder,
@@ -195,9 +195,9 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that is open according to the {@link TimeSpan} in the rule on the days defined
-   * in the rule's {@link DateRange} and {@link WeekDayRange}.
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is open according to the
+   * {@link TimeSpan} in the rule on the days defined in the rule's {@link DateRange} and
+   * {@link WeekDayRange}.
    *
    * TODO there are some unhandled things here
    */
@@ -276,9 +276,9 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that is open according to the {@link TimeSpan} in the rule or 24 hours a day on the days defined
-   * in the rule's {@link WeekDayRange}.
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is open according to the
+   * {@link TimeSpan} in the rule or 24 hours a day on the days defined in the rule's
+   * {@link WeekDayRange}.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> createOHCalendarBuildersForDayRanges(
     OHCalendarBuilder calendarBuilder,
@@ -307,8 +307,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Sets provided weekday(s) to be open on a
-   * {@link OHCalendarBuilder.OpeningHoursBuilder}.
+   * Sets provided weekday(s) to be open on a {@link OHCalendarBuilder.OpeningHoursBuilder}.
    *
    * TODO there are a some unhandled things here
    */
@@ -331,9 +330,9 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that is open according to the provided {@link TimeSpan} but doesn't set the builder to be open on any days.
-   * That part should be handled by a separate method.
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is open according to the provided
+   * {@link TimeSpan} but doesn't set the builder to be open on any days. That part should be
+   * handled by a separate method.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> createOHCalendarBuildersForTimeSpan(
     OHCalendarBuilder calendarBuilder,
@@ -366,8 +365,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that is always open.
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder} that is always open.
    */
   private OHCalendarBuilder.OpeningHoursBuilder createOHCalendarBuilderForOpen247(
     OHCalendarBuilder calendarBuilder
@@ -381,9 +379,9 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Edits {@link OHCalendarBuilder.OpeningHoursBuilder}
-   * that have been created based on previous rules so that they are not on the same days as in the
-   * newly created builder based on a new rule that can partly override previous rules.
+   * Edits {@link OHCalendarBuilder.OpeningHoursBuilder} that have been created based on previous
+   * rules so that they are not on the same days as in the newly created builder based on a new rule
+   * that can partly override previous rules.
    */
   private void editPreviousBuilders(
     OHCalendarBuilder.OpeningHoursBuilder newOpeningHoursBuilder,
@@ -395,17 +393,17 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * For each opening hours builder added based on the previous rules, we do the following according to the
-   * new builder created based of a closed/off rule:
-   * 1. If time spans or days don't overlap, do nothing
-   * 2. if the place is closed for the whole opening period, edit the old builder to be off on the common days
-   * 3. if the place is closed for the beginning or end part of the opening period, edit the old builder to be
-   *    off on common days and create a new builder that is open on those common days for the remaining part
-   * 4. if the place is closed in the middle of the opening period, edit the old builder to be off on the common days
-   *    and create two new builders that are open on the common days, one for the beginning and one for the end part of the opening period
+   * For each opening hours builder added based on the previous rules, we do the following according
+   * to the new builder created based of a closed/off rule: 1. If time spans or days don't overlap,
+   * do nothing 2. if the place is closed for the whole opening period, edit the old builder to be
+   * off on the common days 3. if the place is closed for the beginning or end part of the opening
+   * period, edit the old builder to be off on common days and create a new builder that is open on
+   * those common days for the remaining part 4. if the place is closed in the middle of the opening
+   * period, edit the old builder to be off on the common days and create two new builders that are
+   * open on the common days, one for the beginning and one for the end part of the opening period
    *
-   * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while
-   * splitting existing builders.
+   * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while splitting
+   *         existing builders.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> splitPreviousBuilders(
     OHCalendarBuilder.OpeningHoursBuilder closedOpeningHoursBuilder,
@@ -430,9 +428,8 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Converts minutes from the start of day to {@link LocalTime}.
-   * if end time is 24:00, we use 23:59 instead and if end time is unknown (time is defined with 10+ format),
-   * we also use 23:59.
+   * Converts minutes from the start of day to {@link LocalTime}. if end time is 24:00, we use 23:59
+   * instead and if end time is unknown (time is defined with 10+ format), we also use 23:59.
    */
   private LocalTime getEndTime(int endTimeMinutes) {
     if (endTimeMinutes < 0) {
@@ -444,7 +441,8 @@ public class OsmOpeningHoursParser {
   /**
    * Checks if rule doesn't have any modifiers or if the modifier is open or unknown.
    *
-   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule to be of the open type but maybe we should
+   * TODO if a modifier only has a comment (such as "by appointment"), we don't consider the rule to
+   * be of the open type but maybe we should
    */
   private boolean isOpenRule(Rule rule) {
     var modifier = rule.getModifier();
@@ -469,7 +467,8 @@ public class OsmOpeningHoursParser {
   /**
    * Checks if rule has times defined and there is a {@link TimeSpan} definition with start time.
    *
-   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they could be implemented
+   * TODO We filter out {@link TimeSpan} that have events like "sunrise-sunset" but maybe they could
+   * be implemented
    */
   private boolean hasTimes(Rule rule) {
     return (
@@ -482,8 +481,8 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Checks if rule is just either 24/7 or open/closed/off.
-   * If the rule is just a modifier such as "by appointment", we don't consider it to be open 24/7.
+   * Checks if rule is just either 24/7 or open/closed/off. If the rule is just a modifier such as
+   * "by appointment", we don't consider it to be open 24/7.
    */
   private boolean is247Rule(Rule rule) {
     return (

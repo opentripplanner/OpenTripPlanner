@@ -12,14 +12,12 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * Build a path from a destination arrival - this maps between the domain of routing to the domain
  * of result paths. All values not needed for routing is computed as part of this mapping.
- * <p/>
- * This mapper maps the result of a reverse-search. And is therefore responsible for doing some
+ * <p/>This mapper maps the result of a reverse-search. And is therefore responsible for doing some
  * adjustments to the result. The internal state stores 'latest possible arrival-times', so to map
  * back to paths the 'board slack' is removed from the 'latest possible arrival-time' to get the
  * next legs 'boardTime'. Also, the path is reversed again, so the original origin - temporally made
  * destination - is returned to origin again ;-)
- * <p/>
- * This mapper uses recursion to reverse the results.
+ * <p/>This mapper uses recursion to reverse the results.
  */
 public final class ReversePathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 

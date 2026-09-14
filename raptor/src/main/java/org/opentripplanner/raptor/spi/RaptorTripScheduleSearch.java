@@ -1,11 +1,10 @@
 package org.opentripplanner.raptor.spi;
 
 /**
- * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
- * The search need to be optimized for speed, this is one of the most frequently called
- * operations in Raptor and accessing objects in memory should be avoided.
- * <p/>
- * There should be two implementations of this interface, one for board-times and one for
+ * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern. The
+ * search need to be optimized for speed, this is one of the most frequently called operations in
+ * Raptor and accessing objects in memory should be avoided.
+ * <p/>There should be two implementations of this interface, one for board-times and one for
  * alight-times. When Raptor search in reverse direction the alight-time search should be used. For
  * a reverse search (searching backward in time) the trip found departure/arrival times are swapped.
  * This is one of the things that allows for the Raptor implementation to be generic, used in both
@@ -18,8 +17,8 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
   int UNBOUNDED_TRIP_INDEX = -1;
 
   /**
-   * Find the best trip matching the given {@code timeLimit}. This is the same as calling {@link
-   * #search(int, int, int)} with {@code tripIndexLimit: UNBOUNDED_TRIP_INDEX}.
+   * Find the best trip matching the given {@code timeLimit}. This is the same as calling
+   * {@link #search(int, int, int)} with {@code tripIndexLimit: UNBOUNDED_TRIP_INDEX}.
    *
    * @see #search(int, int, int)
    */

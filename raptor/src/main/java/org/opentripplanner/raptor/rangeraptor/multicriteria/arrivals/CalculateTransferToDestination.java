@@ -29,8 +29,7 @@ class CalculateTransferToDestination<T extends RaptorTripSchedule> implements
 
   /**
    * When a stop arrival is accepted and we arrived by transit, then add a new destination arrival.
-   * <p/>
-   * We do not have to handle other events like dropped or rejected.
+   * <p/>We do not have to handle other events like dropped or rejected.
    *
    * @param newElement the new transit arrival
    */

@@ -62,7 +62,7 @@ public class TripOnDateDataFetcher {
   }
 
   /**
-   *  Get realtime TripTimes for the trip on the date
+   * Get realtime TripTimes for the trip on the date
    */
   public TripTimes tripTimes() {
     var timetable = transitService.findTimetable(tripPattern(), serviceDate);
@@ -70,7 +70,7 @@ public class TripOnDateDataFetcher {
   }
 
   /**
-   *  Get scheduled TripTimes for the trip
+   * Get scheduled TripTimes for the trip
    */
   public TripTimes scheduledTripTimes() {
     var timetable = scheduledTripPattern().getScheduledTimetable();

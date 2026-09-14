@@ -53,9 +53,9 @@ public class TokenDefinitionBuilder {
   /**
    * A deprecated field will be removed from the *next* token. A value must be provided for the
    * deprecated field when encoding the current version. But, you can not read it! This make sure
-   * that the previous version sees the deprecated value, while this version will still work with
-   * a token provided with the next version. The deprecated field is automatically removed from
-   * the next version.
+   * that the previous version sees the deprecated value, while this version will still work with a
+   * token provided with the next version. The deprecated field is automatically removed from the
+   * next version.
    */
   public TokenDefinitionBuilder deprecate(String fieldName) {
     int index = indexOfField(fieldName);

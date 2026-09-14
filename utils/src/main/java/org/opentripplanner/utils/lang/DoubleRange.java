@@ -5,8 +5,8 @@ import java.util.Objects;
 /**
  * An double range is a continous range from the start value(inclusive) to the end value(exclusive).
  * The start value must be smaller then the end value. The start is inclusive and the end excusive.
- * This allows the range to contain exactly one number like 2.0: [2.0 - 2.0), and that to ranges
- * can be added together nicely: [1.0 - 2.4) + [2.4 - 3.0) = [1.0 - 3.0).
+ * This allows the range to contain exactly one number like 2.0: [2.0 - 2.0), and that to ranges can
+ * be added together nicely: [1.0 - 2.4) + [2.4 - 3.0) = [1.0 - 3.0).
  */
 public class DoubleRange {
 

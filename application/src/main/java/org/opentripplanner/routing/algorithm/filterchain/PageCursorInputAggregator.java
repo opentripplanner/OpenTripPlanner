@@ -7,7 +7,8 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 
 /**
- * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for PageCursorInput.
+ * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for
+ * PageCursorInput.
  */
 public class PageCursorInputAggregator {
 

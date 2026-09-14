@@ -8,11 +8,11 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Configure a GTFS feed.
- * Example: {@code [ {type="gtfs", source: "file:///path/to/otp/norway-gtfs.zip"} ] }
+ * Configure a GTFS feed. Example:
+ * {@code [ {type="gtfs", source: "file:///path/to/otp/norway-gtfs.zip"} ] }
  * <p>
- * For object creation, use the {@link GtfsDefaultParameters#withFeedInfo()} method which returns a builder.
- * For example: {@code GtfsDefaultParameters.DEFAULT.copyOfFeed()}.
+ * For object creation, use the {@link GtfsDefaultParameters#withFeedInfo()} method which returns
+ * a builder. For example: {@code GtfsDefaultParameters.DEFAULT.copyOfFeed()}.
  */
 public final class GtfsFeedParameters extends GtfsDefaultParameters implements DataSourceConfig {
 
@@ -38,7 +38,7 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
   }
 
   /**
-   *  See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
+   * See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
    */
   @Nullable
   public String feedId() {

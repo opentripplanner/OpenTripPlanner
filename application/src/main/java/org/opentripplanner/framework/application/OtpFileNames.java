@@ -1,8 +1,8 @@
 package org.opentripplanner.framework.application;
 
 /**
- * This class defile a list of Otp file names. These are used in various
- * places, hence need to be defined in a common place.
+ * This class defile a list of Otp file names. These are used in various places, hence need to be
+ * defined in a common place.
  */
 public class OtpFileNames {
 

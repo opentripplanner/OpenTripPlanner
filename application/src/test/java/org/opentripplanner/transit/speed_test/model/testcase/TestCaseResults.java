@@ -12,9 +12,9 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
  * Contains the expected, actual and matched test results. The responsibility is match all expected
  * with actual results and produce a list of results:
  * <ul>
- *     <li> Matched actual results, status : OK
- *     <li> Expected results NOT found in actual results, status: FAILED
- *     <li> Actual results NOT found in expected, status: WARN
+ *   <li>Matched actual results, status : OK
+ *   <li>Expected results NOT found in actual results, status: FAILED
+ *   <li>Actual results NOT found in expected, status: WARN
  * </ul>
  */
 class TestCaseResults {

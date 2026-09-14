@@ -195,10 +195,9 @@ public class GtfsModule implements GraphBuilderModule {
   /**
    * Verifies that a feed id is not assigned twice.
    * <p>
-   * Duplicates can happen in the following cases:
-   *  - the feed id is configured twice in build-config.json
-   *  - two GTFS feeds have the same feed_info.feed_id
-   *  - a GTFS feed defines a feed_info.feed_id like '3' that collides with an auto-generated one
+   * Duplicates can happen in the following cases: - the feed id is configured twice in
+   * build-config.json - two GTFS feeds have the same feed_info.feed_id - a GTFS feed defines a
+   * feed_info.feed_id like '3' that collides with an auto-generated one
    * <p>
    * Debugging these cases is very confusing, so we prevent it from happening.
    */

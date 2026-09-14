@@ -14,14 +14,14 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
  * Test that cancelling the same stop on two trips from different routes (but with the same stop
  * pattern) does not cause cross-contamination via TripPatternCache.
  * <p>
- * TripPatternCache caches RT patterns keyed by StopPattern only, setting
- * originalTripPattern from the first trip. When a second trip on a different route produces the
- * same modified StopPattern, the cache returns a pattern with the wrong originalTripPattern.
- * If the updater uses originalTripPattern to identify the original scheduled pattern of a
- * modified trip, it will return the wrong result (symptom: when looking up for TripTimes
- * in the wrong pattern's timetable, it will get null → TRIP_NOT_FOUND_IN_PATTERN).
- * TODO RT_VP this design flaw is documented also in TripPatternCache
- *      and org.opentripplanner.transit.model.network.TripPattern#getOriginalTripPattern()
+ * TripPatternCache caches RT patterns keyed by StopPattern only, setting originalTripPattern
+ * from the first trip. When a second trip on a different route produces the same modified
+ * StopPattern, the cache returns a pattern with the wrong originalTripPattern. If the updater uses
+ * originalTripPattern to identify the original scheduled pattern of a modified trip, it will return
+ * the wrong result (symptom: when looking up for TripTimes in the wrong pattern's timetable, it
+ * will get null → TRIP_NOT_FOUND_IN_PATTERN). TODO RT_VP this design flaw is documented also in
+ * TripPatternCache and
+ * org.opentripplanner.transit.model.network.TripPattern#getOriginalTripPattern()
  */
 class CancelledStopCrossPatternTest implements RealtimeTestConstants {
 

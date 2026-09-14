@@ -7,7 +7,7 @@ import org.opentripplanner.transfer.regular.internal.TransferIndex;
 
 /**
  * TODO Refactor this into a builder so that one instance hold ONE repository and the
- *      defaultTransferService() and defaultTransferRepository() uses the same instance.
+ * defaultTransferService() and defaultTransferRepository() uses the same instance.
  */
 public class TransferServiceTestFactory {
 

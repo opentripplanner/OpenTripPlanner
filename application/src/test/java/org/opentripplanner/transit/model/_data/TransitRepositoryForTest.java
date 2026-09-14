@@ -52,11 +52,10 @@ import org.opentripplanner.utils.time.TimeUtils;
 /**
  * Test utility class to help construct valid transit model objects.
  * <p>
- * TODO: This need cleanup - it has static factory methods. This is not safe, since
- *       all objects created will be created in the same context. All stops are created
- *       withing the context of a SiteRepository, mixing more than one model in a test is sharing
- *       state between tests. For now, it is just the stop index - but we want to
- *       use this to encapsulate the SiteRepository completely.
+ * TODO: This need cleanup - it has static factory methods. This is not safe, since all objects
+ * created will be created in the same context. All stops are created withing the context of a
+ * SiteRepository, mixing more than one model in a test is sharing state between tests. For now, it
+ * is just the stop index - but we want to use this to encapsulate the SiteRepository completely.
  *
  * @deprecated This has been deprecated in favour of {@link TransitTestEnvironment}
  */
@@ -255,8 +254,8 @@ public class TransitRepositoryForTest {
   }
 
   /**
-   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after
-   * the previous one.
+   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after the
+   * previous one.
    * <p>
    * The first stop has stop sequence 10, the following one has 20 and so on.
    */

@@ -46,18 +46,17 @@ public interface RaptorTripPattern {
   int slackIndex();
 
   /**
-   * A pattern may belong to a transit-group-priority. Each group is given an advantage during
-   * the multi-criteria search, so the best alternative for each group is found.
+   * A pattern may belong to a transit-group-priority. Each group is given an advantage during the
+   * multi-criteria search, so the best alternative for each group is found.
    */
   int priorityGroupId();
 
   /**
    * Pattern debug info, return transit mode and route name. This is used for debugging purposes
    * only. The implementation should provide a short description with enough information for humans
-   * to identify the trip/route. This is used in a context where information about agency and
-   * stop is known, so there is no need to include agency or geographical region information.
-   * <p/>
-   * The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
+   * to identify the trip/route. This is used in a context where information about agency and stop
+   * is known, so there is no need to include agency or geographical region information.
+   * <p/>The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
    */
   String debugInfo();
 
@@ -67,8 +66,9 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos  the stop position in the pattern to start the search (exclusive). Note! Only
-   *                  defined for range {@code [0..N]}  (N = number of stops in the pattern).
+   * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
+   *                        Only defined for range {@code [0..N]} (N = number of stops in the
+   *                        pattern).
    * @param alightStopIndex the stopIndex to find
    */
   default int findAlightStopPositionBefore(int startPos, int alightStopIndex) {
@@ -88,8 +88,9 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos  the stop position in the pattern to start the search (exclusive). Note! Only
-   *                  defined for range {@code [0..N-1]} (N = number of stops in the pattern).
+   * @param startPos        the stop position in the pattern to start the search (exclusive). Note!
+   *                        Only defined for range {@code [0..N-1]} (N = number of stops in the
+   *                        pattern).
    * @param alightStopIndex the stopIndex to find
    */
   default int findAlightStopPositionAfter(int startPos, int alightStopIndex) {
@@ -128,8 +129,9 @@ public interface RaptorTripPattern {
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos  the stop position in the pattern to start the search (exclusive). Note! Only
-   *                  defined for range {@code [0..N-1]} (N = number of stops in the pattern).
+   * @param startPos       the stop position in the pattern to start the search (exclusive). Note!
+   *                       Only defined for range {@code [0..N-1]} (N = number of stops in the
+   *                       pattern).
    * @param boardStopIndex the stopIndex to find
    */
   default int findBoardStopPositionBefore(int startPos, int boardStopIndex) {
@@ -143,14 +145,15 @@ public interface RaptorTripPattern {
   }
 
   /**
-   * Return the first occurrence of the stop position for the given stop index at or after the
-   * given startPos(inclusive). Note that the returned value might not be the only occurrence if
-   * the pattern goes in a loop.
+   * Return the first occurrence of the stop position for the given stop index at or after the given
+   * startPos(inclusive). Note that the returned value might not be the only occurrence if the
+   * pattern goes in a loop.
    * <p>
    * {@code -1} is returned if not found.
    *
-   * @param startPos the stop position in the pattern to start the search (inclusive). Note! Only
-   *    *            defined for range {@code [0..N-1]} (N = number of stops in the pattern).
+   * @param startPos       the stop position in the pattern to start the search (inclusive). Note!
+   *                       Only * defined for range {@code [0..N-1]} (N = number of stops in the
+   *                       pattern).
    * @param boardStopIndex the stopIndex to find
    */
   default int findBoardStopPositionAfter(int startPos, int boardStopIndex) {

@@ -25,9 +25,9 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This type of FlexTrip is used when a taxi-type service is modeled, which operates in any number
- * of areas/groups of stops without a set schedule. The travel times are calculated based
- * on the driving time between the stops, with the schedule times being used just for deciding if a
- * trip is possible.
+ * of areas/groups of stops without a set schedule. The travel times are calculated based on the
+ * driving time between the stops, with the schedule times being used just for deciding if a trip is
+ * possible.
  * <p>
  * An unscheduled flex trip may visit/drive from one flex stops(areas/group of stop locations) to
  * any other stop in the pattern without driving through the stops in between. Only the times in the
@@ -86,9 +86,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   /**
    * Tests if the stop times constitute an {@link UnscheduledTrip}.
    * <p>
-   * Returns true for the following cases:
-   *  - A single fixed scheduled stop followed by a flexible one
-   *  - One or more stop times with a flexible time window but no fixed stop in between them
+   * Returns true for the following cases: - A single fixed scheduled stop followed by a flexible
+   * one - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     if (stopTimes.size() < 2) {

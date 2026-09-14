@@ -13,8 +13,8 @@ import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpStatus;
 
 /**
- * Represents an HTTP response containing the body content, headers and status code.
- * This class provides access to HTTP response headers and the response body as an InputStream.
+ * Represents an HTTP response containing the body content, headers and status code. This class
+ * provides access to HTTP response headers and the response body as an InputStream.
  * <p>
  * The InputStream lifecycle is managed by OtpHttpClient. Callers must not close the stream.
  */
@@ -27,7 +27,7 @@ public class OtpHttpResponse {
   /**
    * Creates an HTTP response wrapper.
    *
-   * @param body the response body as an InputStream
+   * @param body       the response body as an InputStream
    * @param rawHeaders the HTTP headers from the response
    * @param statusCode the HTTP status code from the response
    */
@@ -53,8 +53,8 @@ public class OtpHttpResponse {
   /**
    * Returns all response headers as an immutable map.
    * <p>
-   * Header names are case-insensitive. The map keys are in lowercase.
-   * Multiple header values with the same name are stored as a list.
+   * Header names are case-insensitive. The map keys are in lowercase. Multiple header values
+   * with the same name are stored as a list.
    *
    * @return an immutable map of headers
    */
@@ -81,8 +81,8 @@ public class OtpHttpResponse {
   /**
    * Returns all values of the specified header.
    * <p>
-   * Header name comparison is case-insensitive.
-   * Returns an empty list if the header is not present.
+   * Header name comparison is case-insensitive. Returns an empty list if the header is not
+   * present.
    *
    * @param name the header name (case-insensitive)
    * @return a list of header values (empty if header not present)
@@ -116,8 +116,8 @@ public class OtpHttpResponse {
   /**
    * Converts Apache HttpComponents headers to a case-insensitive map structure.
    * <p>
-   * All header names are normalized to lowercase for case-insensitive lookup.
-   * Multiple headers with the same name are stored as a list of values.
+   * All header names are normalized to lowercase for case-insensitive lookup. Multiple headers
+   * with the same name are stored as a list of values.
    */
   private static Map<String, List<String>> convertHeaders(Header[] rawHeaders) {
     Map<String, List<String>> headerMap = new HashMap<>();

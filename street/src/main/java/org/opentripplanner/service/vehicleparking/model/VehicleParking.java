@@ -17,8 +17,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
  * <p>
- * All fields are immutable except for the availability, capacity which may be updated by updaters.
- * If any other properties change a new VehicleParking instance should be created.
+ * All fields are immutable except for the availability, capacity which may be updated by
+ * updaters. If any other properties change a new VehicleParking instance should be created.
  */
 public class VehicleParking implements Serializable {
 
@@ -257,9 +257,8 @@ public class VehicleParking implements Serializable {
 
   /**
    * The only mutable method in this class: it allows to update the available parking spaces during
-   * real-time updates.
-   * Since the entity is used both by writer threads (real-time updates) and reader threads
-   * (A* routing), the variable holding the information is marked as volatile.
+   * real-time updates. Since the entity is used both by writer threads (real-time updates) and
+   * reader threads (A* routing), the variable holding the information is marked as volatile.
    */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
     this.availability = vehicleParkingSpaces;

@@ -17,8 +17,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * By wrapping the log statement only one log event will occur per second.
  * <p>
  * THREAD SAFETY - The implementation is very simple and do not do any synchronization, so it is
- * possible that more than 1 log event is logged for each second, but that is the only thread
- * safety issue. It is safe to use in a multithreaded cases. See the JavaDoc on the private
+ * possible that more than 1 log event is logged for each second, but that is the only thread safety
+ * issue. It is safe to use in a multithreaded cases. See the JavaDoc on the private
  * {@code throttle()} method for implementation details.
  */
 public class Throttle {
@@ -61,9 +61,9 @@ public class Throttle {
    * least one event is logged for each throttle time period. This is guaranteed based on the
    * assumption that writing to the {@code timeout} (primitive long) is an atomic operation.
    * <p>
-   * In the worst case scenario, each thread keep their local version of the {@code timeout} and one
-   * log message from each thread is printed every second. This can behave differently from one JVM
-   * to another.
+   * In the worst case scenario, each thread keep their local version of the {@code timeout} and
+   * one log message from each thread is printed every second. This can behave differently from one
+   * JVM to another.
    */
   public boolean throttle() {
     long time = System.currentTimeMillis();

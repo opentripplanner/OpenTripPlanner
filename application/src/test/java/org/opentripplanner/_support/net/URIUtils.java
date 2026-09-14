@@ -6,9 +6,9 @@ import java.net.URISyntaxException;
 public class URIUtils {
 
   /**
-   * Create URI, throw {@link RuntimeException} if it fails. This is used to simplify tests, so
-   * they do not have to handle the checked {@link URISyntaxException} thrown by the Java
-   * {@link URI} constructor.
+   * Create URI, throw {@link RuntimeException} if it fails. This is used to simplify tests, so they
+   * do not have to handle the checked {@link URISyntaxException} thrown by the Java {@link URI}
+   * constructor.
    */
   public static URI uri(String uri) {
     try {

@@ -270,9 +270,8 @@ public class VehicleRentalEdge extends Edge {
   }
 
   /**
-   * Extract the propulsion type from the rental place.
-   * For floating vehicles, this comes from the vehicle type.
-   * For stations, we use the propulsion type of the first matching vehicle type,
+   * Extract the propulsion type from the rental place. For floating vehicles, this comes from the
+   * vehicle type. For stations, we use the propulsion type of the first matching vehicle type,
    * defaulting to HUMAN if none is specified.
    */
   private PropulsionType getPropulsionType(VehicleRentalPlace place) {

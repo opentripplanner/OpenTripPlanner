@@ -14,6 +14,10 @@ Prettier and Prettier Java versions, as well as the formatting options, are conf
 In addition to running Prettier, Spotless removes unused imports from Java files before formatting
 them. Imports that are only referenced from Javadoc (for example `{@link Foo}`) are kept.
 
+Prettier does not format the _content_ of Javadoc comments, it only re-indents them. Spotless
+therefore runs the Eclipse JDT formatter before Prettier, configured to format Javadoc comments
+only.
+
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
 plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and fix
 issues. We also have an OpenRewrite Maven plugin available that can be used to automatically fix

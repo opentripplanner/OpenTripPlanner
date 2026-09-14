@@ -7,8 +7,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 
 /**
  * This qualifier is used to inject the Google Storage Data Source Repository. Enable the
- * {@link OTPFeature#GoogleCloudStorage} and the repository
- * is initialized automatically.
+ * {@link OTPFeature#GoogleCloudStorage} and the repository is initialized automatically.
  */
 @Qualifier
 @Target({ ElementType.METHOD, ElementType.PARAMETER })

@@ -10,8 +10,8 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 public final class ArrivalDepartureMapper {
 
   /**
-   * Maps the API enum to the internal one. If no value is given, calls that either allow pickup
-   * or drop off are included by returning {@link ArrivalDeparture#BOTH}.
+   * Maps the API enum to the internal one. If no value is given, calls that either allow pickup or
+   * drop off are included by returning {@link ArrivalDeparture#BOTH}.
    */
   public static ArrivalDeparture map(@Nullable GraphQLArrivalDeparture arrivalDeparture) {
     if (arrivalDeparture == null) {

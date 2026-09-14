@@ -30,6 +30,7 @@ public class OffsetDateTimeParser {
   /**
    * Parses a ISO-8601 string into am OffsetDateTime instance allowing the offset to be both in
    * '02:00' and '0200' format.
+   *
    * @throws ParseException if the string cannot be parsed
    */
   public static OffsetDateTime parseLeniently(CharSequence input) throws ParseException {

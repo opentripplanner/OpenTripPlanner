@@ -126,8 +126,8 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
   }
 
   /**
-   * Taking route A, then transferring to B and then another B should lead to a single
-   * dependent fare product for the second and third leg.
+   * Taking route A, then transferring to B and then another B should lead to a single dependent
+   * fare product for the second and third leg.
    */
   @Test
   void ABB() {

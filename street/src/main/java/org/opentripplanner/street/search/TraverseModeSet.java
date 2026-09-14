@@ -7,13 +7,13 @@ import java.util.List;
 
 /**
  * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
- * more transit modes (bus, tram, etc).  This class allows efficiently adding or removing modes from
+ * more transit modes (bus, tram, etc). This class allows efficiently adding or removing modes from
  * a set.
  *
  * @author novalis
- * <p>
- * <p>
- * TODO OTP2 - Replace this with the use of a EnumSet
+ *         <p>
+ *         <p>
+ *         TODO OTP2 - Replace this with the use of a EnumSet
  */
 public class TraverseModeSet implements Cloneable, Serializable {
 

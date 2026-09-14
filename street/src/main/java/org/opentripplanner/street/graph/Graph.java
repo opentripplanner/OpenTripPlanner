@@ -36,24 +36,25 @@ import org.slf4j.LoggerFactory;
  * algorithms are defined. A graph is made up of vertices and edges. These are also referred to as
  * nodes and arcs or links, but in OTP we always use the vertices and edges terminology.
  * <p>
- * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
- * including edges representing both street segments and public transit lines connecting stops. In
- * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
- * other data structures suited to the Raptor algorithm (the TransitRepository). Some transit-related
- * vertices are still present in the Graph, specifically those representing transit stops,
- * entrances, and elevators. Their presence in the street graph creates a connection between the two
- * routable data structures (identifying where stops in the TransitRepository are located relative to
- * roads).
+ * In OTP1, the Graph contained vertices and edges representing the entire transportation
+ * network, including edges representing both street segments and public transit lines connecting
+ * stops. In OTP2, the Graph edges now represent only the street network. Transit routing is
+ * performed on other data structures suited to the Raptor algorithm (the TransitRepository). Some
+ * transit-related vertices are still present in the Graph, specifically those representing transit
+ * stops, entrances, and elevators. Their presence in the street graph creates a connection between
+ * the two routable data structures (identifying where stops in the TransitRepository are located
+ * relative to roads).
  * <p>
  * Other data structures related to street routing, such as elevation data and vehicle parking
  * information, are also collected here as fields of the Graph. For historical reasons the Graph
  * sometimes serves as a catch-all, as it used to be the root of the object tree representing the
  * whole transportation network. This use of the Graph object is being phased out and discouraged.
  * <p>
- * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
- * of edges for each vertex, but those lists are now attached to the vertices themselves.
+ * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold
+ * lists of edges for each vertex, but those lists are now attached to the vertices themselves.
  * <p>
- * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in review.
+ * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in
+ * review.
  */
 public class Graph implements Serializable {
 
@@ -156,7 +157,8 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Fetching a vertex by its by label. This is convenient in tests and such, but avoid using in general.
+   * Fetching a vertex by its by label. This is convenient in tests and such, but avoid using in
+   * general.
    *
    * @see VertexLabel
    */
@@ -200,8 +202,8 @@ public class Graph implements Serializable {
   }
 
   /**
-   * If the {@code stopId} is a station id and it is configured to route to its center,
-   * return the corresponding vertex, otherwise return an empty optional.
+   * If the {@code stopId} is a station id and it is configured to route to its center, return the
+   * corresponding vertex, otherwise return an empty optional.
    */
   public Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId stopId) {
     requireIndex();
@@ -228,8 +230,8 @@ public class Graph implements Serializable {
 
   /**
    * Lazily iterate over all edges of a certain type in the graph, without materializing an
-   * intermediate collection. Walks the vertices and yielding only the ones that are instances
-   * of {@code clazz}.
+   * intermediate collection. Walks the vertices and yielding only the ones that are instances of
+   * {@code clazz}.
    * <p>
    * The iterable may contain duplicates and can only be iterated once.
    * <p>
@@ -283,9 +285,9 @@ public class Graph implements Serializable {
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graph builder to server in memory, without a round trip through serialization.
    * <p>
-   * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
-   *           - graph. This allows a module to index the streetIndex BEFORE another module add
-   *           - something that should go into the index; Hence, inconsistent data.
+   * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the -
+   * graph. This allows a module to index the streetIndex BEFORE another module add - something that
+   * should go into the index; Hence, inconsistent data.
    */
   public void index() {
     LOG.info("Index street model...");
@@ -296,7 +298,8 @@ public class Graph implements Serializable {
   /**
    * Index this graph if it hasn't been already. If the index already exists, this is a no-op.
    * <p>
-   * TODO: The indexing process (and the index itself) should be completely hidden from the callers.
+   * TODO: The indexing process (and the index itself) should be completely hidden from the
+   * callers.
    */
   public void requestIndex() {
     if (streetIndex == null) {

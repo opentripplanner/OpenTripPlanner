@@ -11,15 +11,17 @@ import org.opentripplanner.framework.transaction.api.WriteContext;
 /**
  * Application-scoped manager for write operations against transactional repositories.
  * <p>
- * {@code UpdateManager} is the single public entry point for all writes. It owns a single-threaded
- * executor that serialises tasks, preventing concurrent mutation of mutable snapshots. Each task
- * is put on a queue. All task in the queue is processed in FIFO order when the commit is performed.
+ * {@code UpdateManager} is the single public entry point for all writes. It owns a
+ * single-threaded executor that serialises tasks, preventing concurrent mutation of mutable
+ * snapshots. Each task is put on a queue. All task in the queue is processed in FIFO order when the
+ * commit is performed.
  * <p>
  * Typical usage:
  * <ol>
- *   <li>At startup, register {@link EventHandler}s via {@link #register(EventHandler, RepositoryHandle)}.
- *   <li>When an updater has work to do, call {@link #submit(Consumer)} with a lambda that receives
- *       a fresh {@link WriteContext}. Construct the updater service inside the lambda.
+ *   <li>At startup, register {@link EventHandler}s via
+ *       {@link #register(EventHandler, RepositoryHandle)}.
+ *   <li>When an updater has work to do, call {@link #submit(Consumer)} with a lambda that receives a
+ *       fresh {@link WriteContext}. Construct the updater service inside the lambda.
  *   <li>The {@code WriteContext} provides repository snapshot access and event publication.
  *   <li>Either the caller needs to commit or the manager can be set up to auto-commit periodically.
  * </ol>
@@ -32,8 +34,8 @@ public interface UpdateManager {
    * publications.
    * <p>
    * When a {@link org.opentripplanner.framework.event.DomainEvent} matching
-   * {@code handler.eventType()} is published, the {@link WriteContext} will call the
-   * given event handler, injecting the mutable repository for {@code repoHandle} at dispatch time.
+   * {@code handler.eventType()} is published, the {@link WriteContext} will call the given event
+   * handler, injecting the mutable repository for {@code repoHandle} at dispatch time.
    *
    * @param <E> the domain event type
    * @param <M> the repository type
@@ -46,12 +48,12 @@ public interface UpdateManager {
   /**
    * Submit an update task for execution on the single writer thread.
    * <p>
-   * The task receives a fresh {@link WriteContext} scoped to this invocation. All writes and event
-   * publications must go through the context.
+   * The task receives a fresh {@link WriteContext} scoped to this invocation. All writes and
+   * event publications must go through the context.
    * <p>
    * In <em>atomic-commit</em> mode (no periodic scheduler) the commit is performed immediately
-   * after the task completes, and the returned {@link Future} resolves when the commit is done.
-   * If the task throws a {@link RuntimeException} a rollback is performed and the exception is
+   * after the task completes, and the returned {@link Future} resolves when the commit is done. If
+   * the task throws a {@link RuntimeException} a rollback is performed and the exception is
    * propagated through the Future.
    * <p>
    * In <em>periodic-commit</em> mode the Future resolves as soon as the task completes; the
@@ -63,9 +65,9 @@ public interface UpdateManager {
   Future<Void> submit(Consumer<WriteContext> task);
 
   /**
-   * The single-threaded executor running all submitted write tasks. Exposed for monitoring
-   * purposes only, e.g. to observe the length of the task queue on the writer thread. Never
-   * submit tasks directly to the executor — use {@link #submit(Consumer)}.
+   * The single-threaded executor running all submitted write tasks. Exposed for monitoring purposes
+   * only, e.g. to observe the length of the task queue on the writer thread. Never submit tasks
+   * directly to the executor — use {@link #submit(Consumer)}.
    */
   ExecutorService writerThreadExecutor();
 

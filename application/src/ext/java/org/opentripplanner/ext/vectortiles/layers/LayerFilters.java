@@ -16,8 +16,8 @@ import org.opentripplanner.transit.service.PatternByServiceDatesFilter;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Predicates for filtering elements of vector tile layers. Currently only contains predicates
- * for {@link RegularStop}. Once more types need to be filtered, this may need some refactoring.
+ * Predicates for filtering elements of vector tile layers. Currently only contains predicates for
+ * {@link RegularStop}. Once more types need to be filtered, this may need some refactoring.
  */
 public class LayerFilters {
 
@@ -27,8 +27,8 @@ public class LayerFilters {
   public static final Predicate<RegularStop> NO_FILTER = x -> true;
 
   /**
-   * Returns a predicate which only includes stop which are visited by a pattern that is in the current
-   * "service week", which lasts from Sunday to Sunday.
+   * Returns a predicate which only includes stop which are visited by a pattern that is in the
+   * current "service week", which lasts from Sunday to Sunday.
    */
   public static Predicate<RegularStop> buildCurrentServiceWeekPredicate(
     Function<RegularStop, Collection<TripPattern>> getPatternsForStop,

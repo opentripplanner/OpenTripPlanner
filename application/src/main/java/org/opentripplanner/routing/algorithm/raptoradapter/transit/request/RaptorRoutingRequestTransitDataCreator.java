@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for creating the internal data structure of {@link
- * RaptorRoutingRequestTransitData}. The code is messy so it is nice to NOT have it in the transit
- * data class itself, to keep it clean. Another benefit of isolating this code is that these methods
- * are only available at construction time.
+ * This class is responsible for creating the internal data structure of
+ * {@link RaptorRoutingRequestTransitData}. The code is messy so it is nice to NOT have it in the
+ * transit data class itself, to keep it clean. Another benefit of isolating this code is that these
+ * methods are only available at construction time.
  */
 class RaptorRoutingRequestTransitDataCreator {
 

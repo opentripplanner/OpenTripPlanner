@@ -48,7 +48,8 @@ public class SelectRequest implements Serializable {
   }
 
   /**
-   * Will return true if the pattern matches the filter and false if it doesn't match or might not match.
+   * Will return true if the pattern matches the filter and false if it doesn't match or might not
+   * match.
    */
   public boolean matchesPatternNot(TripPattern tripPattern) {
     return matchesPattern(tripPattern, false);

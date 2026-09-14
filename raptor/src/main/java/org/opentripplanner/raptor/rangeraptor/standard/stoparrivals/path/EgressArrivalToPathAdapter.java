@@ -20,11 +20,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * The responsibility of this class is to listen for egress stop arrivals and forward these as
  * Destination arrivals to the {@link DestinationArrivalPaths}.
- * <p/>
- * Range Raptor requires paths to be collected at the end of each iteration. Following iterations
- * may overwrite the existing state; Hence invalidate trips explored in previous iterations. Because
- * adding new destination arrivals to the set of paths is expensive, this class optimize this by
- * only adding new destination arrivals at the end of each round.
+ * <p/>Range Raptor requires paths to be collected at the end of each iteration. Following
+ * iterations may overwrite the existing state; Hence invalidate trips explored in previous
+ * iterations. Because adding new destination arrivals to the set of paths is expensive, this class
+ * optimize this by only adding new destination arrivals at the end of each round.
  * <p/>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

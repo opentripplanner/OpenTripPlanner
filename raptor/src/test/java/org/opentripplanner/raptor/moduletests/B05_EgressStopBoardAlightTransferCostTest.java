@@ -18,8 +18,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This verifies that the stopBoardAlightTransferCost is not applied for egress legs. If this is not
- * correctly handled by the heuristics optimization, the cheapest journey could be discarded.
+ * This verifies that the stopBoardAlightTransferCost is not applied for egress legs. If this is
+ * not correctly handled by the heuristics optimization, the cheapest journey could be discarded.
  */
 public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestConstants {
 

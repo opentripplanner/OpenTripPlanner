@@ -255,8 +255,8 @@ class ParkingProcessor {
   /**
    * Creates an artificial entrance to a parking facility's centroid.
    * <p>
-   * This is useful if the facility is not linked to the street network in OSM. Without this method
-   * it would not be usable by the routing algorithm as it's unreachable.
+   * This is useful if the facility is not linked to the street network in OSM. Without this
+   * method it would not be usable by the routing algorithm as it's unreachable.
    */
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
     OsmAreaGroup group,

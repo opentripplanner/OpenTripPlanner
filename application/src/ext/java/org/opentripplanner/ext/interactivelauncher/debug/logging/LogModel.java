@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Responsible for storing the selected loggers to debug. This is
- * serialized to store the user preferences between runs.
+ * Responsible for storing the selected loggers to debug. This is serialized to store the user
+ * preferences between runs.
  */
 public class LogModel implements Serializable {
 

@@ -12,11 +12,8 @@ public class OtpBadgeGenerator {
   private static final String DEC = " ?\\d+(\\.\\d+)? ?";
 
   /**
-   * Accept formats:
-   * - HEX: #112233
-   * - RGB: rgb(0,255,0)
-   * - RGBA: rgba(0,255,0,0.5)
-   * - Named colors (\w{3, 20}) 'tan' to 'lightgoldenrodyellow'
+   * Accept formats: - HEX: #112233 - RGB: rgb(0,255,0) - RGBA: rgba(0,255,0,0.5) - Named colors
+   * (\w{3, 20}) 'tan' to 'lightgoldenrodyellow'
    */
   private static final Pattern COLOR_PATTERN = Pattern.compile(
     "(#[\\dA-Fa-f]{6}|rgba?\\(N,N,N(,D)?\\)|[\\w]{3,30})".replace("N", NUM).replace("D", DEC)
@@ -78,9 +75,9 @@ public class OtpBadgeGenerator {
 
   /**
    *
-   * @param label The label in the
+   * @param label        The label in the
    * @param labelBgColor The background color for the label using a valid SVG color format.
-   * @param body The text for the body. The background color will be in OTP blue.
+   * @param body         The text for the body. The background color will be in OTP blue.
    * @return A string containing the svg xml document.
    */
   public static String generateOtpBadgeSvg(String label, String labelBgColor, String body) {
@@ -105,8 +102,8 @@ public class OtpBadgeGenerator {
   }
 
   /**
-   * This method estimates the width needed for the given {@code text}. It is not accurate,
-   * but the text will be stretched/compressed to match the width.
+   * This method estimates the width needed for the given {@code text}. It is not accurate, but the
+   * text will be stretched/compressed to match the width.
    */
   private static int fontWidth(String text) {
     int length = text.length();

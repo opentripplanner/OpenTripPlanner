@@ -197,8 +197,8 @@ public enum ConfigType {
   }
 
   /**
-   * Return the {@link ConfigType} matching the Java type. This method only support the
-   * basic and string types like String and Integer. Do not use this for {@link #isComplex()} types.
+   * Return the {@link ConfigType} matching the Java type. This method only support the basic and
+   * string types like String and Integer. Do not use this for {@link #isComplex()} types.
    */
   static ConfigType of(Class<?> javaType) {
     if (Boolean.class.isAssignableFrom(javaType)) {
@@ -223,8 +223,8 @@ public enum ConfigType {
   }
 
   /**
-   * Get basic and string type value of given {@code node}. The "type-safe" {@link JsonNode}
-   * methods are used. This method should not be used with {@link #isComplex()} types.
+   * Get basic and string type value of given {@code node}. The "type-safe" {@link JsonNode} methods
+   * are used. This method should not be used with {@link #isComplex()} types.
    */
   @SuppressWarnings("unchecked")
   <T> T valueOf(JsonNode node) {

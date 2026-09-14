@@ -12,15 +12,15 @@ import java.util.Iterator;
  * <p>
  * Use this when you want to concatenate several big {@link Collection}s for read-only access.
  * <p>
- * This list will reflect any changes in the underlying {@link Collection}s, so keeping a reference
- * to it is safe.
+ * This list will reflect any changes in the underlying {@link Collection}s, so keeping a
+ * reference to it is safe.
  * <p>
  * Any attempts to modify the view will throw an exception - it is READ-ONLY, even when the
  * underlying collections are modifiable.
  * <p>
  * This class is serializable, but be aware that the underlying collections also must be
- * serializable for it to work. The view is very light-weight, so in general it is better to
- * avoid serialization. In most cases you can create a new instance every time you need a view.
+ * serializable for it to work. The view is very light-weight, so in general it is better to avoid
+ * serialization. In most cases you can create a new instance every time you need a view.
  */
 public class CollectionsView<T>
   extends AbstractCollection<T>

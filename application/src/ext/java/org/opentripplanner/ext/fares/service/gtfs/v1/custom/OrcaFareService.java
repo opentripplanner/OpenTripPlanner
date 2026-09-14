@@ -31,10 +31,11 @@ import org.opentripplanner.transit.model.network.Route;
 public class OrcaFareService extends DefaultFareService {
 
   /***
-   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used for the validity period.
-   * This is intended to allow us to extend the expiry time without affecting the FareOffer's start time, because that would
-   * cause the unique ID to change. The ID needs to stay consistent to indicate that this isn't a new fare product that the user
-   * has to buy.
+   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used
+   * for the validity period. This is intended to allow us to extend the expiry time without
+   * affecting the FareOffer's start time, because that would cause the unique ID to change. The ID
+   * needs to stay consistent to indicate that this isn't a new fare product that the user has to
+   * buy.
    */
   private static class ExtendedFareOffer {
 
@@ -51,8 +52,8 @@ public class OrcaFareService extends DefaultFareService {
     }
 
     /**
-     * Check if a FareOffer is valid at a given time based on the transfer window.
-     * For ORCA transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
+     * Check if a FareOffer is valid at a given time based on the transfer window. For ORCA
+     * transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
      */
     public boolean isValidAt(ZonedDateTime checkTime) {
       return this.extendedStartTime.plus(MAX_TRANSFER_DISCOUNT_DURATION).isAfter(checkTime);
@@ -185,8 +186,9 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Categorizes a leg based on various parameters.
-   * The classifications determine the various rules and fares applied to the leg.
+   * Categorizes a leg based on various parameters. The classifications determine the various rules
+   * and fares applied to the leg.
+   *
    * @param leg Leg to be classified.
    * @return RideType classification
    */
@@ -459,8 +461,7 @@ public class OrcaFareService extends DefaultFareService {
 
   /**
    * Get the ride price for a single leg. If testing, this class is being called directly so the
-   * required agency cash values are not available therefore the default test price is used
-   * instead.
+   * required agency cash values are not available therefore the default test price is used instead.
    */
   protected Optional<Money> getRidePrice(
     Leg leg,
@@ -475,10 +476,10 @@ public class OrcaFareService extends DefaultFareService {
    * If free transfers are applicable, the most expensive discount fare across all legs is added to
    * the final cumulative price.
    * <p>
-   * The computed fare for Orca card users takes into account real-time trip updates where available,
-   * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
-   * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
-   * one.
+   * The computed fare for Orca card users takes into account real-time trip updates where
+   * available, so that, for instance, when a leg on a long itinerary is delayed to begin after the
+   * initial two hour window has expired, the calculated fare for that trip will be two one-way
+   * fares instead of one.
    */
   @Override
   public ItineraryFare calculateFaresForType(
@@ -633,8 +634,8 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * In the base class only the rules for a specific feed are selected and then passed to the
-   * fare engine, however here we want to explicitly compute fares across feed boundaries.
+   * In the base class only the rules for a specific feed are selected and then passed to the fare
+   * engine, however here we want to explicitly compute fares across feed boundaries.
    */
   @Nullable
   @Override
@@ -643,8 +644,8 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Disables functionality grouping legs by their feed.
-   * This ensures we can calculate transfers between agencies/feeds.
+   * Disables functionality grouping legs by their feed. This ensures we can calculate transfers
+   * between agencies/feeds.
    */
   @Override
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {

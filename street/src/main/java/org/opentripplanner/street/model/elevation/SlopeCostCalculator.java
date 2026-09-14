@@ -6,16 +6,16 @@ import org.locationtech.jts.geom.CoordinateSequence;
 /**
  * Computes slope-related cost factors for an edge from its elevation profile.
  * <p>
- * Bicycle speed and safety derive from {@link BicycleSlopeSpeedFunction}, a quadratic
- * B-spline fitted to analytical cycling data. The bike work cost uses a cubic energy term
- * ({@link #ENERGY_PER_METER_ON_FLAT} + {@link #ENERGY_SLOPE_FACTOR}&middot;slope&sup3;) and
- * the walking effective length uses {@link ToblersHikingFunction}.
+ * Bicycle speed and safety derive from {@link BicycleSlopeSpeedFunction}, a quadratic B-spline
+ * fitted to analytical cycling data. The bike work cost uses a cubic energy term
+ * ({@link #ENERGY_PER_METER_ON_FLAT} + {@link #ENERGY_SLOPE_FACTOR}&middot;slope&sup3;) and the
+ * walking effective length uses {@link ToblersHikingFunction}.
  * <p>
- * Segments with a slope above &plusmn;100% are treated as raster/OSM data glitches and
- * flattened to zero entirely (see {@link #MAX_ABS_SLOPE}); the real slope is preserved for
- * everything between &plusmn;35% and &plusmn;100% so that wheelchair reluctance, walking
- * length and bike energy still see genuine steep terrain. The B-spline itself clamps its
- * input to &plusmn;35% internally to stay within its valid domain.
+ * Segments with a slope above &plusmn;100% are treated as raster/OSM data glitches and flattened
+ * to zero entirely (see {@link #MAX_ABS_SLOPE}); the real slope is preserved for everything between
+ * &plusmn;35% and &plusmn;100% so that wheelchair reluctance, walking length and bike energy still
+ * see genuine steep terrain. The B-spline itself clamps its input to &plusmn;35% internally to stay
+ * within its valid domain.
  */
 public class SlopeCostCalculator {
 
@@ -41,22 +41,22 @@ public class SlopeCostCalculator {
     MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR
   );
 
-  /// Slopes steeper than 100% are treated as raster/OSM data glitches and flattened to zero.
-  /// No real road or path is that steep — footpaths and tracks in mountain terrain that
-  /// genuinely exceed 35% stay below this threshold.
+  /// Slopes steeper than 100% are treated as raster/OSM data glitches and flattened to zero. No
+  /// real road or path is that steep — footpaths and tracks in mountain terrain that genuinely
+  /// exceed 35% stay below this threshold.
   private static final double MAX_ABS_SLOPE = 1.0;
 
   /// Compute the slope costs for an elevation profile.
   ///
   /// Slopes above ±100% ({@link #MAX_ABS_SLOPE}) are treated as raster/OSM data glitches and
-  /// flattened to zero — no real road or path is that steep, so the segment is dropped from
-  /// every cost computation and the {@code flattened} flag is set.
+  /// flattened to zero — no real road or path is that steep, so the segment is dropped from every
+  /// cost computation and the {@code flattened} flag is set.
   ///
-  /// Genuinely steep terrain (alpine footpaths, mountain tracks) between ±35% and ±100% keeps
-  /// its real slope for `maxSlope` (wheelchair reluctance), the bike energy formula, the Tobler
-  /// walking length and the length multiplier. Only the B-spline used for bicycle speed clamps
-  /// its input internally (see {@link BicycleSlopeSpeedFunction}); the rationale is in
-  /// [PR #7579](https://github.com/opentripplanner/OpenTripPlanner/pull/7579).
+  /// Genuinely steep terrain (alpine footpaths, mountain tracks) between ±35% and ±100% keeps its
+  /// real slope for `maxSlope` (wheelchair reluctance), the bike energy formula, the Tobler walking
+  /// length and the length multiplier. Only the B-spline used for bicycle speed clamps its input
+  /// internally (see {@link BicycleSlopeSpeedFunction}); the rationale is in [PR
+  /// #7579](https://github.com/opentripplanner/OpenTripPlanner/pull/7579).
   ///
   /// @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
   public static SlopeCosts getSlopeCosts(CoordinateSequence elev) {
@@ -124,13 +124,11 @@ public class SlopeCostCalculator {
 
   /**
    * <p>
-   * We use the Tobler function {@link ToblersHikingFunction} to calculate this.
-   * </p>
+   * We use the Tobler function {@link ToblersHikingFunction} to calculate this.</p>
    * <p>
-   * When testing this we get good results in general, but for some edges the elevation profile is
-   * not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
-   * profile in OTP is not as smooth, resulting in an extra penalty for these roads.
-   * </p>
+   * When testing this we get good results in general, but for some edges the elevation profile
+   * is not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
+   * profile in OTP is not as smooth, resulting in an extra penalty for these roads.</p>
    */
   static double calculateEffectiveWalkLength(double run, double rise) {
     return run * TOBLER_WALKING_FUNCTION.calculateHorizontalWalkingDistanceMultiplier(run, rise);

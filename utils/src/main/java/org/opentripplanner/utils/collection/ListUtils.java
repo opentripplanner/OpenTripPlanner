@@ -12,16 +12,14 @@ import javax.annotation.Nullable;
 public class ListUtils {
 
   /**
-   * Return the first element in the list. {@code null} is returned if the list is
-   * null or empty.
+   * Return the first element in the list. {@code null} is returned if the list is null or empty.
    */
   public static <T> T first(List<T> list) {
     return list == null || list.isEmpty() ? null : list.getFirst();
   }
 
   /**
-   * Return the last element in the list. {@code null} is returned if the list is
-   * null or empty.
+   * Return the last element in the list. {@code null} is returned if the list is null or empty.
    */
   public static <T> T last(List<T> list) {
     return list == null || list.isEmpty() ? null : list.getLast();
@@ -63,14 +61,14 @@ public class ListUtils {
    * {@code partition([A,B,C,D,E], 2)} yields {@code [[A,B],[C,D],[E]]}.
    * <p>
    * The partitioning is computed eagerly - the number of sublists is fixed when this method
-   * returns. The sublists themselves are {@link List#subList(int, int) views} of the original
-   * list, so they must be consumed before the original list is structurally modified (elements
-   * added or removed). Unlike the Guava equivalent, the returned outer list does not reflect
-   * later changes to the input list.
+   * returns. The sublists themselves are {@link List#subList(int, int) views} of the original list,
+   * so they must be consumed before the original list is structurally modified (elements added or
+   * removed). Unlike the Guava equivalent, the returned outer list does not reflect later changes
+   * to the input list.
    *
    * @param maxSize the maximum number of elements in each sublist, must be at least 1
    * @throws IllegalArgumentException if {@code maxSize} is less than 1
-   * @throws NullPointerException if {@code list} is {@code null}
+   * @throws NullPointerException     if {@code list} is {@code null}
    */
   public static <T> List<List<T>> partition(List<T> list, int maxSize) {
     if (maxSize < 1) {
@@ -108,8 +106,8 @@ public class ListUtils {
   }
 
   /**
-   * Take a single nullable variable and return an empty list if it is null. Otherwise
-   * return a list with one element.
+   * Take a single nullable variable and return an empty list if it is null. Otherwise return a list
+   * with one element.
    */
   public static <T> List<T> ofNullable(@Nullable T input) {
     if (input == null) {
@@ -130,6 +128,7 @@ public class ListUtils {
 
   /**
    * Check if a list has at least the given {@code minLimit} number of elements(inclusive).
+   *
    * @throws IllegalStateException if the list has fewer elements.
    * @throws NumberFormatException if the list is {@code null}
    */
@@ -141,8 +140,8 @@ public class ListUtils {
   }
 
   /**
-   * Take a list of items and split it into a list of "overlapping" pairs. For example
-   * [A,B,C,D] becomes [[A,B],[B,C],[C,D]].
+   * Take a list of items and split it into a list of "overlapping" pairs. For example [A,B,C,D]
+   * becomes [[A,B],[B,C],[C,D]].
    */
   public static <T> List<Pair<T>> partitionIntoOverlappingPairs(List<T> input) {
     if (input.size() < 2) {
@@ -161,13 +160,8 @@ public class ListUtils {
   }
 
   /**
-   * Takes a list of at least 2 items and partitions them into "splits".
-   * For example, [A,B,C,D] becomes
-   *   [
-   *     [A,[B,C,D]],
-   *     [B,[C,D],
-   *     [C,[D]]
-   *   ]
+   * Takes a list of at least 2 items and partitions them into "splits". For example, [A,B,C,D]
+   * becomes [ [A,[B,C,D]], [B,[C,D], [C,[D]] ]
    */
   public static <T> List<Split<T>> partitionIntoSplits(List<T> input) {
     requireAtLeastNElements(input, 2);

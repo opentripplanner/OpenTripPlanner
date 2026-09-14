@@ -20,8 +20,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * Many methods in this class throw {@link NotImplementedException}. Please implement them when
- * you need them.
+ * Many methods in this class throw {@link NotImplementedException}. Please implement them when you
+ * need them.
  */
 public class TestTransitLeg implements TransitLeg {
 
