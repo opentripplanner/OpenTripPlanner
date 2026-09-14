@@ -14,6 +14,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServic
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
@@ -82,6 +83,7 @@ public class UpdaterConfigurator {
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
+  private final RepositoryRegistry repositoryRegistry;
   private final RepositoryHandle<
     TimetableRepositorySnapshot,
     TimetableRepository
@@ -106,6 +108,7 @@ public class UpdaterConfigurator {
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
+    RepositoryRegistry repositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
@@ -121,6 +124,7 @@ public class UpdaterConfigurator {
     this.parkingRepository = parkingRepository;
     this.transitUpdateManager = transitUpdateManager;
     this.streetUpdateManager = streetUpdateManager;
+    this.repositoryRegistry = repositoryRegistry;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
@@ -143,6 +147,7 @@ public class UpdaterConfigurator {
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
+    RepositoryRegistry repositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
     DelegatingTransitAlertServiceImpl transitAlertService,
     UpdatersParameters updatersParameters,
@@ -160,6 +165,7 @@ public class UpdaterConfigurator {
       carpoolTripVertexResolver,
       transitUpdateManager,
       streetUpdateManager,
+      repositoryRegistry,
       timetableRepositoryHandle,
       transitAlertService,
       updatersParameters,
@@ -189,6 +195,7 @@ public class UpdaterConfigurator {
 
     var transitWriterService = GraphWriterService.forTransitDomain(
       transitUpdateManager,
+      repositoryRegistry,
       timetableRepositoryHandle,
       realtimeVehicleRepositoryHandle,
       transitRepository
