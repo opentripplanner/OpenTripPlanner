@@ -372,9 +372,9 @@ public class TripCalendars implements Serializable {
     Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate
   ) {
     Map<LocalDate, Set<FeedScopedId>> frozen = new HashMap<>();
-    serviceIdsByDate.forEach((date, serviceIds) ->
-      frozen.put(date, Collections.unmodifiableSet(serviceIds))
-    );
+    for (var e : serviceIdsByDate.entrySet()) {
+      frozen.put(e.getKey(), Collections.unmodifiableSet(e.getValue()));
+    }
     return Collections.unmodifiableMap(frozen);
   }
 

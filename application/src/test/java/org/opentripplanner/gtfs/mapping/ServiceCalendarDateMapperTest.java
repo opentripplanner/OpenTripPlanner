@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -43,7 +44,7 @@ public class ServiceCalendarDateMapperTest {
   @Test
   public void testMapCollection() {
     var calendars = TripCalendars.of();
-    subject.map((java.util.Collection<ServiceCalendarDate>) null, calendars);
+    subject.map((Collection<ServiceCalendarDate>) null, calendars);
     subject.map(Collections.emptyList(), calendars);
     assertTrue(calendars.listServiceIds().isEmpty());
 
