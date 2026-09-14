@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>raptor</artifactId>
+            <artifactId>raptor-router</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
