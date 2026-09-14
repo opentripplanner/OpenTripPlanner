@@ -217,7 +217,7 @@ class ItineraryReferenceSerializerTest {
     String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
     String joinedWithTrailingDelimiter = validLegToken + "~";
 
-    String craftedToken = craftedTokenBuilder(joinedWithTrailingDelimiter).build();
+    String craftedToken = craftedToken(joinedWithTrailingDelimiter, null, null, "1.3");
 
     assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
@@ -230,7 +230,7 @@ class ItineraryReferenceSerializerTest {
   void latitudeWithoutLongitudeDecodesToNull() {
     String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
 
-    String craftedToken = craftedTokenBuilder(validLegToken).withString("fromLat", "1.0").build();
+    String craftedToken = craftedToken(validLegToken, "1.0", null, "1.3");
 
     assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
@@ -239,18 +239,43 @@ class ItineraryReferenceSerializerTest {
   void longitudeWithoutLatitudeDecodesToNull() {
     String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
 
-    String craftedToken = craftedTokenBuilder(validLegToken).withString("fromLng", "2.0").build();
+    String craftedToken = craftedToken(validLegToken, null, "2.0", "1.3");
+
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
+  }
+
+  @Test
+  void nonFiniteWalkSpeedDecodesToNull() {
+    String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
+
+    String craftedToken = craftedToken(validLegToken, null, null, "NaN");
+
+    assertNull(ItineraryReferenceSerializer.decode(craftedToken));
+  }
+
+  @Test
+  void nonFiniteLatitudeDecodesToNull() {
+    String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
+
+    String craftedToken = craftedToken(validLegToken, "Infinity", "2.0", "1.3");
 
     assertNull(ItineraryReferenceSerializer.decode(craftedToken));
   }
 
   /**
-   * A {@link TokenBuilder} pre-filled with otherwise-valid values for every field production
-   * uses, and no {@code from}/{@code to} location - so a test only needs to override the one
-   * field it wants to make malformed. Field names/order must match
-   * {@code ItineraryReferenceSerializer}'s schema exactly.
+   * Builds a token with otherwise-valid values for every field production uses, and no
+   * {@code toStopId}/{@code toLat}/{@code toLng} location - so a test only needs to pass in the
+   * one or two fields it wants to make malformed. Field names/order must match
+   * {@code ItineraryReferenceSerializer}'s schema exactly. {@code fromLat}/{@code fromLng}/
+   * {@code walkSpeed} are parameters (not later overrides) because {@link TokenBuilder} rejects
+   * setting the same field twice.
    */
-  private static TokenBuilder craftedTokenBuilder(String legReferencesValue) {
+  private static String craftedToken(
+    String legReferencesValue,
+    String fromLat,
+    String fromLng,
+    String walkSpeed
+  ) {
     var schema = TokenSchema.ofVersion(1)
       .addString("legReferences")
       .addString("fromStopId")
@@ -277,8 +302,8 @@ class ItineraryReferenceSerializerTest {
       .encode()
       .withString("legReferences", legReferencesValue)
       .withString("fromStopId", null)
-      .withString("fromLat", null)
-      .withString("fromLng", null)
+      .withString("fromLat", fromLat)
+      .withString("fromLng", fromLng)
       .withString("toStopId", null)
       .withString("toLat", null)
       .withString("toLng", null)
@@ -289,10 +314,11 @@ class ItineraryReferenceSerializerTest {
       .withString("boardSlackOverrides", "")
       .withDuration("alightSlackDefault", Duration.ZERO)
       .withString("alightSlackOverrides", "")
-      .withString("walkSpeed", "1.3")
+      .withString("walkSpeed", walkSpeed)
       .withString("walkReluctance", "2.0")
       .withDuration("maxAccessEgressDurationDefault", Duration.ZERO)
       .withString("maxAccessEgressDurationOverrides", "")
-      .withBoolean("wheelchair", false);
+      .withBoolean("wheelchair", false)
+      .build();
   }
 }

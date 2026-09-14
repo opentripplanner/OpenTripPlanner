@@ -169,8 +169,8 @@ public class ItineraryReferenceSerializer {
         token.getString(ALIGHT_SLACK_OVERRIDES_FIELD).orElse("")
       );
 
-      var walkSpeed = Double.parseDouble(token.getString(WALK_SPEED_FIELD).orElseThrow());
-      var walkReluctance = Double.parseDouble(token.getString(WALK_RELUCTANCE_FIELD).orElseThrow());
+      var walkSpeed = finiteDouble(token.getString(WALK_SPEED_FIELD).orElseThrow());
+      var walkReluctance = finiteDouble(token.getString(WALK_RELUCTANCE_FIELD).orElseThrow());
 
       var maxAccessEgressDuration = decodeDurationForEnum(
         StreetMode.class,
@@ -195,9 +195,21 @@ public class ItineraryReferenceSerializer {
         wheelchair
       );
     } catch (RuntimeException e) {
-      LOG.debug("Unable to decode itinerary reference: '{}'", itineraryReference, e);
+      LOG.debug("Unable to decode itinerary reference", e);
       return null;
     }
+  }
+
+  /**
+   * Rejects non-finite values ({@code NaN}, {@code Infinity}, {@code -Infinity}) that
+   * {@link Double#parseDouble} would otherwise accept - the token is untrusted client input.
+   */
+  private static double finiteDouble(String value) {
+    double result = Double.parseDouble(value);
+    if (!Double.isFinite(result)) {
+      throw new IllegalArgumentException("Expected a finite number");
+    }
+    return result;
   }
 
   private static String encodeLegReference(LegReference legReference) {
@@ -248,8 +260,8 @@ public class ItineraryReferenceSerializer {
     String lngField
   ) {
     var stopId = token.getString(stopIdField).map(FeedScopedId::parseStrict).orElse(null);
-    var lat = token.getString(latField).map(Double::parseDouble);
-    var lng = token.getString(lngField).map(Double::parseDouble);
+    var lat = token.getString(latField).map(ItineraryReferenceSerializer::finiteDouble);
+    var lng = token.getString(lngField).map(ItineraryReferenceSerializer::finiteDouble);
 
     if (lat.isPresent() != lng.isPresent()) {
       throw new IllegalArgumentException("Location must contain both latitude and longitude");
