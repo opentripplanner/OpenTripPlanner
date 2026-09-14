@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
@@ -99,5 +101,25 @@ class BuildConfigTest {
     var subject = new BuildConfig(node, "Test", false);
 
     assertEquals(0.0, subject.transitShapeSimplificationToleranceMeters());
+  }
+
+  @Test
+  public void transitServicePeriodOfExactlyTenYearsIsAllowed() {
+    var node = jsonNodeForTest(
+      "{ 'transitServiceStart' : '2010-01-01', 'transitServiceEnd' : '2020-01-01' }"
+    );
+    assertDoesNotThrow(() -> new BuildConfig(node, "Test", false));
+  }
+
+  @Test
+  public void transitServicePeriodOfMoreThanTenYearsIsRejected() {
+    var node = jsonNodeForTest(
+      "{ 'transitServiceStart' : '2010-01-01', 'transitServiceEnd' : '2020-01-02' }"
+    );
+    var ex = assertThrows(IllegalStateException.class, () -> new BuildConfig(node, "Test", false));
+    assertEquals(
+      "The transit service period is more than 10 years. This is not supported.",
+      ex.getMessage()
+    );
   }
 }
