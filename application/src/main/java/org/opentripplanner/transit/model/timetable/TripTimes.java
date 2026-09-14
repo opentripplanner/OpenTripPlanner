@@ -8,10 +8,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -177,6 +179,12 @@ public sealed interface TripTimes<T extends TripTimes>
    */
   @Nullable
   I18NString getTripHeadsign();
+
+  /**
+   * @return the id of the vehicle operating this trip, as supplied by real-time updates, or empty
+   * if no vehicle has been reported.
+   */
+  Optional<FeedScopedId> getVehicleId();
 
   /**
    * The headsign displayed by the vehicle, which may change at each stop position along the trip.

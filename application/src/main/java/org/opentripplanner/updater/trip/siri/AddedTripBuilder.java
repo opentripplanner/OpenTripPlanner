@@ -262,7 +262,7 @@ class AddedTripBuilder {
       );
     }
 
-    builder.withVehicleId(vehicleRef);
+    builder.withVehicleId(FeedScopedId.ofNullable(tripId.getFeedId(), vehicleRef));
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }

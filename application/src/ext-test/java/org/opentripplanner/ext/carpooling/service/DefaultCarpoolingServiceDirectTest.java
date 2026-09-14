@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -407,21 +408,21 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   }
 
   /**
-   * Verifies that the booking URL on the carpool leg is augmented with {@code from_coordinate}
-   * and {@code to_coordinate} query parameters reflecting the passenger's carpool boarding and
-   * alighting points. In this graph the passenger's requested pickup is itself a graph vertex
+   * Verifies that the booking URL template on the carpool leg has its {@code {from}} and
+   * {@code {to}} placeholders expanded with the passenger's carpool boarding and alighting
+   * points. In this graph the passenger's requested pickup is itself a graph vertex
    * (P) and the carpool ride goes P → Q, so the URL coordinates equal P/Q (which are also the
    * passenger's request endpoints here — distinguishing them from a separate walk leg is the job
    * of {@link DefaultCarpoolingServiceWalkLegsTest}). The exact-equality assertion also pins
    * down that the URL does NOT use the driver's origin (A) or destination (D).
    */
   @Test
-  void directItinerary_appendsCarpoolPickupAndDropoffCoordsToBookingUrl() {
+  void directItinerary_expandsCarpoolPickupAndDropoffCoordsIntoBookingUrl() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
     var trip = new CarpoolTripBuilder(baseTrip)
       .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
       )
       .build();
     context.upsertTrip(trip);
@@ -434,7 +435,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
     assertNotNull(bookingInfo);
 
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", passengerPickup, passengerDropoff),
+      expectedExpandedUrl("https://book.example.com", passengerPickup, passengerDropoff),
       bookingInfo.getContactInfo().getBookingUrl()
     );
   }

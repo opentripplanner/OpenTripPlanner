@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -109,7 +110,9 @@ class ModifiedTripBuilder {
    */
   public TripUpdate build() throws UpdateException {
     RealTimeTripTimesBuilder builder = existingTripTimes.createRealTimeFromScheduledTimes();
-    builder.withVehicleId(vehicleRef);
+    builder.withVehicleId(
+      FeedScopedId.ofNullable(existingTripTimes.getTrip().getId().getFeedId(), vehicleRef)
+    );
 
     if (added) {
       builder.withAdded();

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.time.LocalDate;
@@ -49,7 +50,7 @@ class AddedTripBuilderTest {
 
   private static final Agency AGENCY = TransitRepositoryForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
-  private static final Operator OPERATOR = Operator.of(FeedScopedIdForTestFactory.id("OPERATOR_ID"))
+  private static final Operator OPERATOR = Operator.of(id("OPERATOR_ID"))
     .withName("OPERATOR_NAME")
     .build();
   private static final Route REPLACED_ROUTE = TransitRepositoryForTest.route("REPLACED_ROUTE")
@@ -57,10 +58,8 @@ class AddedTripBuilderTest {
     .withOperator(OPERATOR)
     .build();
   private static final String LINE_REF = "ROUTE_ID";
-  private static final FeedScopedId TRIP_ID = FeedScopedIdForTestFactory.id("TRIP_ID");
-  private static final FeedScopedId DATED_SERVICE_JOURNEY_ID = FeedScopedIdForTestFactory.id(
-    "DATED_SERVICE_JOURNEY_ID"
-  );
+  private static final FeedScopedId TRIP_ID = id("TRIP_ID");
+  private static final FeedScopedId DATED_SERVICE_JOURNEY_ID = id("DATED_SERVICE_JOURNEY_ID");
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
   private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
   private static final String SUB_MODE = "replacementRailService";
@@ -277,8 +276,8 @@ class AddedTripBuilderTest {
 
     var firstTrip = firstAddedTrip.tripTimes().getTrip();
 
-    var tripId2 = FeedScopedIdForTestFactory.id("TRIP_ID_2");
-    var datedServiceJourneyId2 = FeedScopedIdForTestFactory.id("DATED_SERVICE_JOURNEY_ID_2");
+    var tripId2 = id("TRIP_ID_2");
+    var datedServiceJourneyId2 = id("DATED_SERVICE_JOURNEY_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
       transitService,
@@ -595,7 +594,7 @@ class AddedTripBuilderTest {
     String subMode
   ) {
     // Arrange
-    var route = Route.of(FeedScopedIdForTestFactory.id(LINE_REF))
+    var route = Route.of(id(LINE_REF))
       .withShortName(SHORT_NAME)
       .withAgency(AGENCY)
       .withMode(TransitMode.valueOf(replacedRouteMode))
@@ -641,7 +640,7 @@ class AddedTripBuilderTest {
 
     var realTimeTimes = assertInstanceOf(RealTimeTripTimes.class, tripUpdate.tripTimes());
     assertTrue(realTimeTimes.getVehicleId().isPresent());
-    assertEquals("BUS-42", realTimeTimes.getVehicleId().get());
+    assertEquals(id("BUS-42"), realTimeTimes.getVehicleId().get());
   }
 
   @Test

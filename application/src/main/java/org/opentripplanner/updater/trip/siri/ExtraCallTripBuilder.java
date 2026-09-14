@@ -179,7 +179,7 @@ class ExtraCallTripBuilder {
       );
     }
 
-    builder.withVehicleId(vehicleRef);
+    builder.withVehicleId(FeedScopedId.ofNullable(trip.getId().getFeedId(), vehicleRef));
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }

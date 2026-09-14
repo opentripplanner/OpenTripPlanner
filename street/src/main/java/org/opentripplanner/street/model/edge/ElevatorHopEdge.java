@@ -26,6 +26,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   private final double levels;
   private final int travelTime;
+  private final String id;
 
   private ElevatorHopEdge(
     Vertex from,
@@ -33,13 +34,15 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairAccessibility,
     double levels,
-    int travelTime
+    int travelTime,
+    String id
   ) {
     super(from, to);
     this.permission = permission;
     this.wheelchairAccessibility = wheelchairAccessibility;
     this.levels = levels;
     this.travelTime = travelTime;
+    this.id = id;
   }
 
   private ElevatorHopEdge(
@@ -48,7 +51,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairAccessibility
   ) {
-    this(from, to, permission, wheelchairAccessibility, DEFAULT_LEVELS, DEFAULT_TRAVEL_TIME);
+    this(from, to, permission, wheelchairAccessibility, DEFAULT_LEVELS, DEFAULT_TRAVEL_TIME, null);
   }
 
   public static void bidirectional(
@@ -57,10 +60,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairBoarding,
     double levels,
-    int travelTime
+    int travelTime,
+    String id
   ) {
-    createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
-    createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
+    createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime, id);
+    createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime, id);
   }
 
   public static ElevatorHopEdge createElevatorHopEdge(
@@ -71,8 +75,28 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     double levels,
     int travelTime
   ) {
+    return createElevatorHopEdge(
+      from,
+      to,
+      permission,
+      wheelchairAccessibility,
+      levels,
+      travelTime,
+      null
+    );
+  }
+
+  private static ElevatorHopEdge createElevatorHopEdge(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    Accessibility wheelchairAccessibility,
+    double levels,
+    int travelTime,
+    String id
+  ) {
     return connectToGraph(
-      new ElevatorHopEdge(from, to, permission, wheelchairAccessibility, levels, travelTime)
+      new ElevatorHopEdge(from, to, permission, wheelchairAccessibility, levels, travelTime, id)
     );
   }
 
@@ -87,6 +111,17 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   public StreetTraversalPermission getPermission() {
     return permission;
+  }
+
+  /**
+   * The id of the elevator, as extracted from OSM tags configured via the
+   * {@code elevatorRefTags} build-config option. Will be used for #6533.
+   * <p>
+   * If multiple configured tag groups resolve to a value, the first one (in configured order)
+   * is used.
+   */
+  public Optional<String> id() {
+    return Optional.ofNullable(id);
   }
 
   /**
