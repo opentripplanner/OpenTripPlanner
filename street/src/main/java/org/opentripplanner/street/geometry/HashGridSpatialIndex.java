@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
@@ -103,6 +104,23 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
       return false;
     });
     return new ArrayList<>(ret);
+  }
+
+  /**
+   * Pass every item stored in the bins touching the envelope to {@code consumer}, without
+   * deduplication. As with {@link #query(Envelope)} the result contains false positives (whole bins
+   * are returned), and in addition an item spanning several of the visited bins is passed once per
+   * bin. Use this instead of {@link #query(Envelope)} when only a few of many candidates are kept:
+   * the caller can discard candidates with a cheap geometric test before paying for a hash-based
+   * dedup of the survivors, rather than hashing and copying every item in the bins first.
+   */
+  public final void forEachCandidate(Envelope envelope, Consumer<? super T> consumer) {
+    visit(envelope, false, (bin, mapKey) -> {
+      for (int i = 0, n = bin.size(); i < n; i++) {
+        consumer.accept(bin.get(i));
+      }
+      return false;
+    });
   }
 
   @Override

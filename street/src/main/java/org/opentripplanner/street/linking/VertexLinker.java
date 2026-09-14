@@ -1,5 +1,6 @@
 package org.opentripplanner.street.linking;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -281,21 +283,12 @@ public class VertexLinker {
     // Expand more in the longitude direction than the latitude direction to account for converging meridians.
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
-    // Perform several transformations at once on the edges returned by the index. Only consider
-    // street edges traversable by at least one of the given modes and are still present in the
-    // graph. Calculate a distance to each of those edges, and keep only the ones within the search
-    // radius.
-    // Distances are squared (see squaredDistance), so compare against the squared radius.
-    final double radiusDegSq = radiusDeg * radiusDeg;
-    var candidateEdges = graph.findEdges(env, scope);
-    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
-      .stream()
-      .filter(StreetEdge.class::isInstance)
-      .map(StreetEdge.class::cast)
-      .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
-      .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
-      .filter(ead -> ead.squaredDistanceDegreesLat < radiusDegSq)
-      .toList();
+    // The spatial index returns whole grid cells, so in a dense city centre a small envelope still
+    // yields hundreds or thousands of candidate edges of which only a handful lie within the search
+    // radius. Visit the candidates in place and apply the cheap, allocation-free distance test
+    // first; only the survivors are deduplicated, mode-checked and materialised as DistanceTo.
+    var collector = new NearbyStreetEdgeCollector(vertex, traverseModes, radiusDeg, xscale);
+    graph.forEachEdgeCandidate(env, scope, collector);
 
     return linkToCandidateEdges(
       vertex,
@@ -303,9 +296,59 @@ public class VertexLinker {
       direction,
       scope,
       tempEdges,
-      candidateDistanceToEdges,
+      collector.nearbyEdges(),
       xscale
     );
+  }
+
+  /**
+   * Collects the street edges within the search radius of a vertex from the spatial-index
+   * candidates. Only street edges traversable by at least one of the given modes and still present
+   * in the graph are kept. The index may report the same edge once per grid cell it spans, so
+   * survivors are deduplicated with the same {@code equals}/{@code hashCode} semantics the
+   * set-based index query used to apply to every candidate.
+   */
+  private static final class NearbyStreetEdgeCollector implements Consumer<Edge> {
+
+    private final double lon;
+    private final double lat;
+    private final double xscale;
+    /** Squared search radius, compared with {@link VertexLinker#squaredDistance} values. */
+    private final double radiusDegSq;
+    private final TraverseModeSet traverseModes;
+    private final Set<StreetEdge> seen = new HashSet<>();
+    private final List<DistanceTo<StreetEdge>> nearbyEdges = new ArrayList<>();
+
+    NearbyStreetEdgeCollector(
+      Vertex vertex,
+      TraverseModeSet traverseModes,
+      double radiusDeg,
+      double xscale
+    ) {
+      this.lon = vertex.getLon();
+      this.lat = vertex.getLat();
+      this.xscale = xscale;
+      this.radiusDegSq = radiusDeg * radiusDeg;
+      this.traverseModes = traverseModes;
+    }
+
+    @Override
+    public void accept(Edge edge) {
+      if (!(edge instanceof StreetEdge streetEdge)) {
+        return;
+      }
+      double squaredDistance = streetEdge.squaredEquirectangularDistanceToPoint(lon, lat, xscale);
+      if (squaredDistance >= radiusDegSq || !seen.add(streetEdge)) {
+        return;
+      }
+      if (streetEdge.canTraverse(traverseModes) && streetEdge.isReachableFromGraph()) {
+        nearbyEdges.add(new DistanceTo<>(streetEdge, squaredDistance));
+      }
+    }
+
+    List<DistanceTo<StreetEdge>> nearbyEdges() {
+      return nearbyEdges;
+    }
   }
 
   private static double getXscale(Vertex vertex) {
