@@ -11,6 +11,7 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
 
@@ -38,6 +39,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   private final Pattern GRAPH_PATTERN = Pattern.compile("(?i)(street)?graph.*\\.obj");
   private final Pattern CACHE_PATTERN = Pattern.compile("(?i).*-cache-\\d+\\.obj");
   private final Pattern EMISSION_PATTERN = Pattern.compile("(?i)(emission).*\\.(txt|csv)");
+  private final Pattern TAXI_ZONE_PATTERN = Pattern.compile("(?i)(taxi[_-]?zone).*");
   private final Pattern EMPIRICAL_DELAY_PATTERN = Pattern.compile("(?i)(empirical[_-]?delay).*");
 
   private final File baseDir;
@@ -195,6 +197,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     }
     if (EMISSION_PATTERN.matcher(name).find()) {
       return EMISSION;
+    }
+    if (TAXI_ZONE_PATTERN.matcher(name).find()) {
+      return TAXI_ZONE;
     }
     if (EMPIRICAL_DELAY_PATTERN.matcher(name).find()) {
       return EMPIRICAL_DATA;

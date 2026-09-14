@@ -28,6 +28,7 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
+import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
@@ -520,6 +521,9 @@ public class LegType {
     }
     if (leg instanceof CarpoolLeg cl) {
       return cl.mode();
+    }
+    if (leg instanceof TaxiZoneLeg tzl) {
+      return tzl.mode();
     }
     throw new IllegalStateException("Unhandled leg type: " + leg);
   }

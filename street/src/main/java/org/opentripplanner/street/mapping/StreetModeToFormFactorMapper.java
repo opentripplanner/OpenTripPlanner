@@ -22,6 +22,7 @@ public class StreetModeToFormFactorMapper {
         CAR,
         CAR_TO_PARK,
         CAR_PICKUP,
+        TAXI,
         CAR_HAILING,
         CARPOOL,
         FLEXIBLE -> throw new IllegalStateException(

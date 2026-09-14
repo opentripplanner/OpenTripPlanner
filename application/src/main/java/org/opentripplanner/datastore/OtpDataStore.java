@@ -10,6 +10,7 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -104,6 +105,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
+    addAll(findMultipleCompositeSources(config.taxiZoneFiles(), TAXI_ZONE));
     addAll(findMultipleCompositeSources(config.empiricalDelayFiles(), EMPIRICAL_DATA));
     addAll(findMultipleSources(config.cacheFiles(), CACHE));
 

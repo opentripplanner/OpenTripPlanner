@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -76,6 +77,9 @@ public class DefaultRoutingService implements RoutingService {
   private final CarpoolingService carpoolingService;
 
   @Nullable
+  private final TaxiZoneService taxiZoneService;
+
+  @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
@@ -99,6 +103,7 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
@@ -120,6 +125,7 @@ public class DefaultRoutingService implements RoutingService {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
@@ -174,6 +180,7 @@ public class DefaultRoutingService implements RoutingService {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiZoneService,
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,

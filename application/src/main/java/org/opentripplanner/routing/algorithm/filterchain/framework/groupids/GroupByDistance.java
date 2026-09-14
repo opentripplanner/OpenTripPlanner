@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -149,6 +150,8 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
       builder.addEnum("mode", trLeg.mode()).addObj("tripId", leg.trip().getId());
     } else if (leg instanceof StreetLeg stLeg) {
       builder.addEnum("mode", stLeg.getMode());
+    } else if (leg instanceof TaxiZoneLeg tzLeg) {
+      builder.addEnum("mode", tzLeg.mode()).addObj("route", tzLeg.route().getId());
     } else {
       throw new IllegalStateException("Unhandled type: " + leg.getClass());
     }

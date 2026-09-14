@@ -7,6 +7,7 @@ import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -126,6 +127,13 @@ public class GraphBuilderDataSources implements Closeable {
     return hasOneOf(GTFS, NETEX);
   }
 
+  /**
+   * Unlike {@link #hasTransitData()}, taxi zone data never populates the TransitRepository.
+   */
+  public boolean hasTransitOrTaxiZoneData() {
+    return hasOneOf(GTFS, NETEX, TAXI_ZONE);
+  }
+
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
     return ofStream(OSM).map(this::mapOsmData).toList();
   }
@@ -146,6 +154,12 @@ public class GraphBuilderDataSources implements Closeable {
 
   public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
+  }
+
+  public Iterable<
+    ConfiguredCompositeDataSource<GtfsFeedParameters>
+  > getTaxiZoneConfiguredDataSource() {
+    return ofStream(TAXI_ZONE).map(this::mapTaxiZoneFeed).toList();
   }
 
   public Iterable<
@@ -285,6 +299,22 @@ public class GraphBuilderDataSources implements Closeable {
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
+  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapTaxiZoneFeed(DataSource dataSource) {
+    var feedId = buildConfig.taxiZone
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow()
+      .feedId();
+    var p = buildConfig.gtfsDefaults
+      .withFeedInfo()
+      .withFeedId(feedId)
+      .withSource(dataSource.uri())
+      .build();
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
+  }
+
   private ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters> mapEmpiricalDelayFeed(
     DataSource dataSource
   ) {
@@ -335,11 +365,11 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOsm() && !hasTransitData()) {
+      if (!hasOsm() && !hasTransitOrTaxiZoneData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
-      if (!has(OSM)) {
+      if (!hasOsm()) {
         throw new OtpAppException("Unable to build street graph, no OSM data available.");
       }
     } else if (cli.load) {
@@ -356,7 +386,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasTransitData()) {
+      if (!hasTransitOrTaxiZoneData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }

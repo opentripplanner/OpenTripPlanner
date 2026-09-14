@@ -27,6 +27,8 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxizone.configure.TaxiZoneServiceModule;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.StreetDomain;
@@ -91,6 +93,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
     EmissionServiceModule.class,
+    TaxiZoneServiceModule.class,
     EmpiricalDelayServiceModule.class,
     DeduplicatorServiceModule.class,
     GeocoderModule.class,
@@ -155,6 +158,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   EmissionRepository emissionRepository();
+
+  @Nullable
+  TaxiZoneRepository taxiZoneRepository();
 
   StreetDetailsRepository streetDetailsRepository();
 
@@ -231,6 +237,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionRepository(EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder taxiZoneRepository(@Nullable TaxiZoneRepository taxiZoneRepository);
 
     @BindsInstance
     Builder streetDetailsRepository(StreetDetailsRepository streetDetailsRepository);

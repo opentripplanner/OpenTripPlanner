@@ -252,6 +252,7 @@ class ScheduledDeviatedTripIntegrationTest {
         additionalSearchDays,
         new DebugTimingAggregator(),
         linkingContext,
+        null,
         null
       );
 
