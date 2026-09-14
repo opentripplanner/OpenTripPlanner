@@ -105,6 +105,9 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   private static final String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
+  // The number of days in 10 years, including 3 leap days.
+  private static final int TEN_YEARS_IN_DAYS = 365 * 10 + 3;
+
   /**
    * The root adaptor kept for reference and (de)serialization.
    */
@@ -614,6 +617,14 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
+    }
+
+    // This should be stored and validated inside the domain model and accessed through it, but
+    // this is injected into the build modules, so the check needs to be here.
+    if (getTransitServicePeriod().daysInPeriod() > TEN_YEARS_IN_DAYS) {
+      throw new IllegalStateException(
+        "The transit service period is more than 10 years. This is not supported."
+      );
     }
   }
 
