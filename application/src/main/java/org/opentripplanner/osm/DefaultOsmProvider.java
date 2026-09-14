@@ -1,10 +1,12 @@
 package org.opentripplanner.osm;
 
-import crosby.binary.file.BlockInputStream;
+import crosby.binary.file.ParallelBlockInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.time.ZoneId;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
@@ -35,6 +37,8 @@ public class DefaultOsmProvider implements OsmProvider {
   private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
+  private final int parallelism = Math.max(4,  Runtime.getRuntime().availableProcessors());
+  private final ExecutorService executorService = Executors.newFixedThreadPool(parallelism);
   private byte[] cachedBytes = null;
 
   /** For tests */
@@ -70,6 +74,9 @@ public class DefaultOsmProvider implements OsmProvider {
     } catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
     }
+    finally {
+      executorService.shutdown();
+    }
   }
 
   @Override
@@ -95,7 +102,7 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private void parsePhase(OsmParser parser, OsmParserPhase phase) {
     parser.setPhase(phase);
-    try (BlockInputStream in = new BlockInputStream(createInputStream(phase), parser)) {
+    try (var in = new ParallelBlockInputStream(createInputStream(phase), parser, executorService, parallelism)) {
       in.process();
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
