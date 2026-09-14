@@ -17,12 +17,14 @@ import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.IntIterators;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
@@ -30,7 +32,11 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
-  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants
+  implements
+    RaptorTransitDataProvider<TestTripSchedule>,
+    RaptorTransferDataProvider<TestTripSchedule>,
+    RaptorDataProvider<TestTripSchedule>,
+    RaptorTestConstants
 {
 
   private static final AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
@@ -408,5 +414,15 @@ public class TestTransitData
     boolean sysDebug = System.getProperties().containsKey("debugRaptor");
     boolean envDebug = System.getenv().containsKey("debugRaptor");
     return sysDebug || envDebug;
+  }
+
+  @Override
+  public RaptorTransitDataProvider<TestTripSchedule> transitData() {
+    return this;
+  }
+
+  @Override
+  public RaptorTransferDataProvider<TestTripSchedule> transferData() {
+    return this;
   }
 }

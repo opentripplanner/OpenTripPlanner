@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.extensions.extrasearch;
 import java.util.Collection;
 import java.util.function.BiFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -28,8 +29,8 @@ public interface ExtraMcRouterSearch<T extends RaptorTripSchedule> {
    * The returned transit-data is used in the ALTERNATIVE search. The given transit data is used in
    * the main search. It is the same data passed into Raptor.
    */
-  RaptorTransitDataProvider<T> createTransitDataAlternativeSearch(
-    RaptorTransitDataProvider<T> transitDataMainSearch
+  RaptorDataProvider<T> createTransitDataAlternativeSearch(
+    RaptorDataProvider<T> transitDataMainSearch
   );
 
   /**
