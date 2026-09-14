@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
@@ -153,7 +152,7 @@ class PlatformRelationWithTwoHolesAndStairsTest {
       );
   }
 
-  private static @NonNull GraphSummarizer buildSummarizer(int maxAreaNodes) {
+  private static GraphSummarizer buildSummarizer(int maxAreaNodes) {
     // Outer ring: ~200 m square
     var outerBL = node(0, new WgsCoordinate(0, 0));
     var outerTL = node(1, new WgsCoordinate(0.002, 0));
