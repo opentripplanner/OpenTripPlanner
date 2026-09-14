@@ -10,7 +10,9 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
+import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
@@ -36,8 +38,8 @@ public class TransmodelGraphQLPlanner {
     Locale locale;
     PlanResponse response;
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
+    RouteRequest request = requestBuilder.buildRequest();
     try {
-      var request = requestBuilder.buildRequest();
       RoutingResponse res = ctx.getRoutingService().route(request);
       response = PlanResponse.of()
         .withPlan(res.getTripPlan())
@@ -59,7 +61,7 @@ public class TransmodelGraphQLPlanner {
     }
     return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
-      .localContext(Map.of("locale", locale))
+      .localContext(Map.of("locale", locale, TripPatternType.ROUTE_REQUEST_CONTEXT_KEY, request))
       .build();
   }
 

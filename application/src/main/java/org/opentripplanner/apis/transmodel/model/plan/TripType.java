@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
 import graphql.Scalars;
+import graphql.execution.DataFetcherResult;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 
 public class TripType {
@@ -63,7 +65,12 @@ public class TripType {
           .name("tripPatterns")
           .description("A list of possible trip patterns")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).itineraries())
+          .dataFetcher(env ->
+            DataFetcherResult.<Iterable<Itinerary>>newResult()
+              .data(((PlanResponse) env.getSource()).itineraries())
+              .localContext(env.getLocalContext())
+              .build()
+          )
           .build()
       )
       .field(
