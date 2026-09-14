@@ -40,6 +40,8 @@ violations:
   2-space indent; the options are configured in the root `pom.xml`). Spotless also removes unused
   imports (Javadoc-only references are kept). Requires `node`/`npm` on the `PATH`. CI enforces it;
   check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip locally with `-Dps`.
+- **Javadoc** is formatted by the Eclipse JDT formatter, run as a Spotless step before Prettier. The
+  settings live in `eclipse-formatter.properties`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
   with `-Dcs` (or `-PcheckstyleSkip`).
 
