@@ -28,6 +28,11 @@
             <artifactId>raptor-router</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>domain-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 3rd party dependencies -->
         <dependency>

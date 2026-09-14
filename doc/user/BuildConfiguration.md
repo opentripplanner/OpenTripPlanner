@@ -109,6 +109,7 @@ Sections follow that describe particular settings in more depth.
 |       [disableDefaultTransfers](#tpfm_CAR_disableDefaultTransfers)                          |       `boolean`      | This disables default transfer calculations.                                                                                                                   | *Optional* | `false`                           |  2.7  |
 |       [maxTransferDuration](#tpfm_CAR_maxTransferDuration)                                  |      `duration`      | This overwrites the default `maxTransferDuration` for the given mode.                                                                                          | *Optional* |                                   |  2.7  |
 | [transferRequests](RouteRequest.md)                                                         |      `object[]`      | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
+| [transfers](#transfers)                                                                     |       `object`       | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
 | [transitFeeds](#transitFeeds)                                                               |      `object[]`      | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                                               |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "gtfs"                                                                         |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
@@ -1202,6 +1203,20 @@ If it isn't known which stops actually allow cars/bikes, combine a lower value h
 `carsAllowedStopMaxTransferDuration` or `bikesAllowedStopMaxTransferDuration` as a
 compromise: this bounds memory usage for stops in general, while the allowed-stop field
 still supplies a longer range for the stops it is known to be needed for.
+
+
+<h3 id="transfers">transfers</h3>
+
+**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Transfer profiles for the raptor-data regular-transfer pipeline.
+
+Replaces `transferRequests` for regular (non-FLEX) transfer generation. One entry per
+named profile (`walk`, `wheelchair`, `bicycle`, `car`, `scooter`), each declaring its own
+preferences, duration limits, and optionally a `base` profile to deduplicate its
+discovered paths against. If this block is omitted entirely, a single default `walk`
+profile is used, mirroring the implicit default of the old `transferRequests` config.
 
 
 <h3 id="transitFeeds">transitFeeds</h3>

@@ -24,6 +24,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -41,6 +42,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -70,6 +72,7 @@ public class SerializedGraphObject implements Serializable {
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
   public final TransferRepository transferRepository;
+  public final RegularTransferRepository<NearbyStop> regularTransferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
 
@@ -104,6 +107,7 @@ public class SerializedGraphObject implements Serializable {
     StreetRepository streetRepository,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     BuildConfig buildConfig,
@@ -121,6 +125,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
     this.transferRepository = transferRepository;
+    this.regularTransferRepository = regularTransferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
     this.buildConfig = buildConfig;

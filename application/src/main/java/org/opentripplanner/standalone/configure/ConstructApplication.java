@@ -15,6 +15,7 @@ import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -43,6 +44,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -87,6 +89,7 @@ public class ConstructApplication {
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
@@ -113,7 +116,14 @@ public class ConstructApplication {
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
+      RaptorTransitDataMapper.map(
+        tuningParameters,
+        graph,
+        transitRepository,
+        transferRepository,
+        regularTransferRepository,
+        config.buildConfig().transferProfiles()
+      )
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
@@ -127,6 +137,7 @@ public class ConstructApplication {
       .streetDetailsRepository(streetDetailsRepository)
       .transitRepository(transitRepository)
       .transferRepository(transferRepository)
+      .regularTransferRepository(regularTransferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
@@ -173,6 +184,7 @@ public class ConstructApplication {
       factory.streetRepository(),
       factory.transitRepository(),
       factory.transferRepository(),
+      factory.regularTransferRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
@@ -282,6 +294,10 @@ public class ConstructApplication {
 
   public TransferRepository transferRepository() {
     return factory.transferRepository();
+  }
+
+  public RegularTransferRepository<NearbyStop> regularTransferRepository() {
+    return factory.regularTransferRepository();
   }
 
   @Nullable

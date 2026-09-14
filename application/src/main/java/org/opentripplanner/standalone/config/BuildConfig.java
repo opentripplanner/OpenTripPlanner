@@ -39,6 +39,7 @@ import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
@@ -50,6 +51,7 @@ import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.RegularTransferConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
+import org.opentripplanner.standalone.config.buildconfig.TransferProfilesConfigMapper;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -166,6 +168,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParameters osmDefaults;
 
   private final RegularTransferParameters regularTransferParameters;
+  private final TransferProfilesConfig transferProfiles;
 
   public final int maxAreaNodes;
 
@@ -291,6 +294,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       .asInt(1000);
 
     this.regularTransferParameters = RegularTransferConfig.map(root);
+    this.transferProfiles = TransferProfilesConfigMapper.map(root);
 
     this.maxStopToShapeSnapDistance = root
       .of("maxStopToShapeSnapDistance")
@@ -765,6 +769,14 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public RegularTransferParameters regularTransferParameters() {
     return regularTransferParameters;
+  }
+
+  /**
+   * Falls back to a single default {@code walk} profile if the new {@code transfers:} block is
+   * not present in build-config.json.
+   */
+  public TransferProfilesConfig transferProfiles() {
+    return transferProfiles;
   }
 
   public int getSubwayAccessTimeSeconds() {

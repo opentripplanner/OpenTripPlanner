@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.UnknownPathLeg;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -343,6 +344,17 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
+    // Not a type raptorTransitData's graph-less fallback would produce - must be a transfer from
+    // the raptor-data regular-transfer pipeline. Recover its street path template for the leg's
+    // geometry/walk-steps.
+    var regularTransferPath = raptorTransitData.findRegularTransferPath(
+      request,
+      pathLeg.fromStop(),
+      pathLeg.toStop()
+    );
+    if (regularTransferPath != null) {
+      return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
+    }
     throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
   }
 
@@ -381,6 +393,39 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .withDistanceMeters(transfer.getDistanceMeters())
           .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
           .withGeometry(transfer.getGeometry())
+          .withWalkSteps(List.of())
+          .build()
+      );
+    } else {
+      return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
+    }
+  }
+
+  /**
+   * Mirrors {@link #mapTransferLeg(PathLeg, PathTransfer, TraverseMode, Place, Place)} for a
+   * transfer recovered from the raptor-data regular-transfer pipeline via
+   * {@link RaptorTransitData#findRegularTransferPath}. Uses an empty line string when there are
+   * no edges, matching {@link PathTransfer#getGeometry()}'s behavior for the same case.
+   */
+  private List<Leg> mapTransferLeg(
+    PathLeg<T> pathLeg,
+    NearbyStop transfer,
+    TraverseMode transferMode,
+    Place from,
+    Place to
+  ) {
+    List<Edge> edges = transfer.edges;
+    if (edges == null || edges.isEmpty()) {
+      return List.of(
+        StreetLeg.of()
+          .withMode(transferMode)
+          .withStartTime(createZonedDateTime(pathLeg.fromTime()))
+          .withEndTime(createZonedDateTime(pathLeg.toTime()))
+          .withFrom(from)
+          .withTo(to)
+          .withDistanceMeters(transfer.distance)
+          .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
+          .withGeometry(GeometryUtils.getGeometryFactory().createLineString())
           .withWalkSteps(List.of())
           .build()
       );

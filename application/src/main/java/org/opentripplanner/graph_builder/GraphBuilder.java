@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -30,6 +31,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
@@ -84,6 +86,7 @@ public class GraphBuilder implements Runnable {
     StreetRepository streetRepository,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
@@ -104,6 +107,7 @@ public class GraphBuilder implements Runnable {
       .streetRepository(streetRepository)
       .transitRepository(transitRepository)
       .transferRepository(transferRepository)
+      .regularTransferRepository(regularTransferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -172,7 +176,13 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.areaStopsToVerticesMapper(), OTPFeature.FlexRouting);
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+      // Runs unconditionally - FLEX transfers, and the graph-less/test fallback for regular
+      // transfers, depend on its PathTransfer output regardless of the module below.
       graphBuilder.addModule(factory.directTransferGenerator());
+
+      // Generates the raptor-data regular-transfer pipeline (per-profile transfers), the primary
+      // source of regular transfers for Raptor routing whenever a Graph is available.
+      graphBuilder.addModule(factory.raptorDataTransferGenerator());
 
       // Analyze routing between stops to generate report
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);

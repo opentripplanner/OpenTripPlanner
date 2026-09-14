@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>raptor-root</artifactId>
-    <name>OpenTripPlanner - Raptor</name>
+    <name>OpenTripPlanner - Raptor Root</name>
     <packaging>pom</packaging>
 
     <modules>
