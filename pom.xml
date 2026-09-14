@@ -66,6 +66,7 @@
         <jackson.version>2.22.2</jackson.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jersey.version>3.1.12</jersey.version>
+        <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <junit.version>6.1.2</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
