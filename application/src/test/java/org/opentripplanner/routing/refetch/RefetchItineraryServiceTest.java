@@ -67,22 +67,15 @@ class RefetchItineraryServiceTest {
   static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
     TripInput.of("trip1").addStop(STOP_A, "10:00").addStop(STOP_B, "11:00").addStop(STOP_D, "12:00")
   )
-    .addTrip(TripInput.of("trip2").addStop(STOP_B, "12:00").addStop(STOP_C, "13:00"))
+    .addTrip(
+      TripInput.of("trip2")
+        .addStop(STOP_B, "12:00")
+        .addStop(STOP_C, "13:00")
+        .addStop(STOP_D, "14:00")
+    )
     .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
     .addTrip(TripInput.of("trip4").addStop(STOP_C, "08:30").addStop(STOP_D, "09:30"))
-    .addTrip(
-      TripInput.of("trip5")
-        .withWithTripOnServiceDate("trip5")
-        .addStop(STOP_A, "10:00")
-        .addStop(STOP_B, "11:00")
-    )
-    .addTrip(
-      TripInput.of("trip6")
-        .withWithTripOnServiceDate("trip6")
-        .addStop(STOP_B, "11:00")
-        .addStop(STOP_D, "12:00")
-    )
-    .addTrip(TripInput.of("trip7").addStop(STOP_D, "15:00").addStop(STOP_E, "16:00"))
+    .addTrip(TripInput.of("trip5").addStop(STOP_D, "15:00").addStop(STOP_E, "16:00"))
     .build();
 
   // Setup street
@@ -233,41 +226,38 @@ class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithTwoTransitLegsAndConstrainedTransfer() {
-    var cts = createConstrainedTransferService(guaranteed("trip5", 1, "trip6", 0));
+    var cts = createConstrainedTransferService(guaranteed("trip1", 1, "trip2", 0));
     var refetch = createRefetchService(cts);
 
-    var start = GenericLocation.fromCoordinate(VA.coord());
-    var end = GenericLocation.fromCoordinate(VD.coord());
+    var leg1 = legRef("trip1", STOP_A, STOP_B);
+    var leg2 = legRef("trip2", STOP_B, STOP_D);
 
-    var leg1 = legRef("trip5", STOP_A, STOP_B);
-    var leg2 = legRef("trip6", STOP_B, STOP_D);
-
-    var itinerary = refetch.refetchItinerary(start, end, List.of(leg1, leg2), routeRequest());
+    var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
     assertNotNull(itinerary.legs().getFirst().transferToNextLeg());
     assertNull(itinerary.legs().getFirst().transferFromPrevLeg());
     assertNotNull(itinerary.legs().getLast().transferFromPrevLeg());
     assertNull(itinerary.legs().getLast().transferToNextLeg());
 
-    assertEquals("A ~ BUS trip5 10:00 11:00 ~ B ~ BUS trip6 11:00 12:00 ~ D []", itinerary.toStr());
+    assertEquals("A ~ BUS trip1 10:00 11:00 ~ B ~ BUS trip2 12:00 14:00 ~ D []", itinerary.toStr());
   }
 
   @Test
   void refetchItineraryWithMultipleConstrainedTransfers() {
     var cts = createConstrainedTransferService(
       staySeated("trip1", 1, "trip3", 0),
-      guaranteed("trip3", 1, "trip7", 0)
+      guaranteed("trip3", 1, "trip5", 0)
     );
     var refetch = createRefetchService(cts);
 
     var leg1 = legRef("trip1", STOP_A, STOP_B);
     var leg2 = legRef("trip3", STOP_C, STOP_D);
-    var leg3 = legRef("trip7", STOP_D, STOP_E);
+    var leg3 = legRef("trip5", STOP_D, STOP_E);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2, leg3), routeRequest());
 
     assertEquals(
-      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D ~ BUS trip7 15:00 16:00 ~ E []",
+      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D ~ BUS trip5 15:00 16:00 ~ E []",
       itinerary.toStr()
     );
 
