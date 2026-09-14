@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 
-class RaptorTransfersTest {
+class RaptorTransferStoreTest {
 
   private static final int STOP_A = 0;
   private static final int STOP_B = 1;
@@ -24,7 +24,7 @@ class RaptorTransfersTest {
 
   @Test
   void simpleCase() {
-    RaptorTransfers subject = RaptorTransfers.of(3)
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
       .addTransfer(STOP_A, STOP_B,  TIME_AB, C1_AB)
       .addTransfer(STOP_A, STOP_C,  TIME_AC, C1_AC)
       .build();
@@ -40,7 +40,7 @@ class RaptorTransfersTest {
 
   @Test
   void testIteratorHasNextForEmptySet() {
-    RaptorTransfers subject = RaptorTransfers.of(3)
+    RaptorTransferStore subject = RaptorTransferStore.of(3)
       .addTransfer(STOP_A, STOP_B, 100, 10)
       .build();
 
