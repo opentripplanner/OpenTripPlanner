@@ -11,9 +11,9 @@ import org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap;
  * comes from more than one source (stops register & authority transit data) and these sources are
  * out of sync.
  * <p>
- * Make sure the order of the validation steps are inline with the data relations. For example, if A
- * reference B, any validation of the reference should be done AFTER validation steps on B. If B is
- * removed, then validating A -> B, should also remove A.
+ * Make sure the order of the validation steps are inline with the data relations. For example,
+ * if A reference B, any validation of the reference should be done AFTER validation steps on B. If
+ * B is removed, then validating A -> B, should also remove A.
  */
 public class Validator {
 

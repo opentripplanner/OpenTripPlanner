@@ -16,7 +16,8 @@ public interface FeedScopedIdMapper {
 
   /// Parse an id into a FeedScopedId, throwing an exception on invalid inputs
   ///
-  /// @throws org.opentripplanner.apis.support.InvalidInputException if the input is not a valid FeedScopedId
+  /// @throws org.opentripplanner.apis.support.InvalidInputException if the input is not a
+  ///                                                                valid FeedScopedId
   default FeedScopedId parseStrict(String id) throws InvalidInputException {
     return parse(id).orElseThrow(() -> new InvalidInputException("invalid feed-scoped-id: " + id));
   }
@@ -24,8 +25,8 @@ public interface FeedScopedIdMapper {
   /**
    * @param id a string representation of the id that should be parsed. May be <code>null</code> or
    *           blank
-   * @return <code>Optional.empty()</code> if the input id is <code>null</code> or blank, otherwise a
-   * <code>FeedScopedId</code> wrapped in an Optional
+   * @return <code>Optional.empty()</code> if the input id is <code>null</code> or blank, otherwise
+   *         a <code>FeedScopedId</code> wrapped in an Optional
    */
   default Optional<FeedScopedId> parseNullSafe(@Nullable String id) {
     if (id == null) {
@@ -38,7 +39,7 @@ public interface FeedScopedIdMapper {
    * @param ids a collection of string representations of the ids that should be parsed. May contain
    *            <code>null</code> or blank values
    * @return a list of <code>FeedScopedId</code>. Any <code>null</code> or blank values in the input
-   * collection are filtered out.
+   *         collection are filtered out.
    */
   default List<FeedScopedId> parseList(Collection<String> ids) {
     return ids
@@ -53,10 +54,11 @@ public interface FeedScopedIdMapper {
    * @param ids a collection of string representations of the ids that should be parsed. May be
    *            <code>null</code> and may contain <code>null</code> or blank values
    * @return empty list if the input collection is <code>null</code>, otherwise a list of
-   * <code>FeedScopedId</code>. Any <code>null</code> or blank values in the input collection are
-   * filtered out.
+   *         <code>FeedScopedId</code>. Any <code>null</code> or blank values in the input
+   *         collection are filtered out.
    * @deprecated This method should no longer be used. Use
-   * {@link FeedScopedIdMapper#parseList(Collection)} instead and handle null cases at call site
+   *             {@link FeedScopedIdMapper#parseList(Collection)} instead and handle null cases at
+   *             call site
    */
   @Deprecated
   default List<FeedScopedId> parseListNullSafe(@Nullable Collection<String> ids) {

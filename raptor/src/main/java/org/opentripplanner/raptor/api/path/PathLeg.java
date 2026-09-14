@@ -14,8 +14,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  * legs can follow each* other or be connected by one {@link TransferPathLeg}. Note! Access and
  * egress path legs may contain more than one "OTP leg", but inside raptor these are threaded as one
  * leg; hence also just one leg returned by Raptor.
- * <p/>
- * This interface contain utility methods to _cast_ a leg into the concrete sub-type:
+ * <p/>This interface contain utility methods to _cast_ a leg into the concrete sub-type:
  * <pre>
  * if(leg.isTransitLeg()) {
  *     trip = leg.asTransitLeg().trip();
@@ -151,11 +150,12 @@ public interface PathLeg<T extends RaptorTripSchedule> {
 
   /**
    * <ul>
-   * <li>An access leg is always followed by a transit leg.
-   * <li>A transit leg can be followed by a new transit leg, an transfer leg or an egress leg.
-   * <li>A transfer leg can only be followed by a transit leg.
-   * <li>An egress leg is always the last leg and this method will throw a {@link UnsupportedOperationException}.
-   * Use the {@link #isEgressLeg()} to check if the last leg is reached.
+   *   <li>An access leg is always followed by a transit leg.
+   *   <li>A transit leg can be followed by a new transit leg, an transfer leg or an egress leg.
+   *   <li>A transfer leg can only be followed by a transit leg.
+   *   <li>An egress leg is always the last leg and this method will throw a
+   *       {@link UnsupportedOperationException}. Use the {@link #isEgressLeg()} to check if the last leg
+   *       is reached.
    * </ul>
    *
    * @return Next leg in path.

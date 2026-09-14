@@ -68,8 +68,8 @@ public class OHCalendarBuilder {
   }
 
   /**
-   * Record that can be used for builder methods that create new builders that should be returned
-   * in addition to the original builder.
+   * Record that can be used for builder methods that create new builders that should be returned in
+   * addition to the original builder.
    */
   public record OpeningHoursBuilderAndNewBuilders(
     OpeningHoursBuilder originalBuilder,
@@ -109,8 +109,8 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets the defined date as open if it's within the defined period. If the builder is set be
-     * for times after midnight, the date is shifted one day forward.
+     * Sets the defined date as open if it's within the defined period. If the builder is set be for
+     * times after midnight, the date is shifted one day forward.
      */
     public OpeningHoursBuilder on(LocalDate date) {
       var shiftedDate = date.plusDays(afterMidnight ? 1 : 0);
@@ -141,9 +141,9 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets every weekday in the range to be open on every instance they exist within the defined period.
-     * The range is inclusive in both ends.
-     * If the builder is set be for times after midnight, the weekdays are shifted one day forward.
+     * Sets every weekday in the range to be open on every instance they exist within the defined
+     * period. The range is inclusive in both ends. If the builder is set be for times after
+     * midnight, the weekdays are shifted one day forward.
      */
     public OpeningHoursBuilder on(DayOfWeek fromDayOfWeek, DayOfWeek untilDayOfWeek) {
       if (fromDayOfWeek == null) {
@@ -166,10 +166,10 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets every weekday in the range to be open on every instance they exist within the defined period
-     * on the defined month range. Both ranges are inclusive in both ends.
-     * If the builder is set be for times after midnight, the days are shifted one day forward
-     * so that first day of the first month is never on but the first day after the last month can be.
+     * Sets every weekday in the range to be open on every instance they exist within the defined
+     * period on the defined month range. Both ranges are inclusive in both ends. If the builder is
+     * set be for times after midnight, the days are shifted one day forward so that first day of
+     * the first month is never on but the first day after the last month can be.
      */
     public OpeningHoursBuilder on(
       Month fromMonth,
@@ -241,8 +241,8 @@ public class OHCalendarBuilder {
     /**
      * Sets the days that are on in the given {@link OpeningHoursBuilder} to be off in this builder
      * and updates this builder's description to reflect that. The provided builder is unmodified.
-     * If the builder is set be for times after midnight, we check if the previous day is set
-     * in the provided bitset.
+     * If the builder is set be for times after midnight, we check if the previous day is set in the
+     * provided bitset.
      */
     public OpeningHoursBuilder offWithTimeShift(OpeningHoursBuilder otherBuilder) {
       BitSet daysOff = otherBuilder.getOpeningDays();
@@ -267,20 +267,19 @@ public class OHCalendarBuilder {
 
     /**
      * Edits this builder and potentially creates one or two new {@link OpeningHoursBuilder} based
-     * on the provided {@link OpeningHoursBuilder} according to the following rules:
-     * 1. If time spans or days don't overlap with this builder, do nothing and return 0 new builders.
-     * 2. if the provided builder covers the whole period from this builder's start time to end time,
-     *    edit this builder to be off on the common days and return 0 new builders.
-     * 3. if the provided builder covers only the beginning or end part of this builder's opening
-     *    period, edit this builder to be off on the common days and return a new builder that is
-     *    open on those common days for the remaining part not covered by the provided builder.
-     * 4. if the provided builder covers a period in the middle of this builder's opening period,
-     *    edit this builder to be off on the common days and return two new builders that are open
-     *    on the common days, one for the beginning and one for the end part of this builder's
-     *    opening period
+     * on the provided {@link OpeningHoursBuilder} according to the following rules: 1. If time
+     * spans or days don't overlap with this builder, do nothing and return 0 new builders. 2. if
+     * the provided builder covers the whole period from this builder's start time to end time, edit
+     * this builder to be off on the common days and return 0 new builders. 3. if the provided
+     * builder covers only the beginning or end part of this builder's opening period, edit this
+     * builder to be off on the common days and return a new builder that is open on those common
+     * days for the remaining part not covered by the provided builder. 4. if the provided builder
+     * covers a period in the middle of this builder's opening period, edit this builder to be off
+     * on the common days and return two new builders that are open on the common days, one for the
+     * beginning and one for the end part of this builder's opening period
      *
-     * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while
-     * splitting existing builders.
+     * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while splitting
+     *         existing builders.
      */
     public OpeningHoursBuilderAndNewBuilders createBuildersForRelativeComplement(
       OpeningHoursBuilder otherBuilder
@@ -378,8 +377,9 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets the days that are true in the given {@link BitSet} to be on without setting any days off.
-     * If the builder is set be for times after midnight, the days are not shifted in this case.
+     * Sets the days that are true in the given {@link BitSet} to be on without setting any days
+     * off. If the builder is set be for times after midnight, the days are not shifted in this
+     * case.
      */
     private OpeningHoursBuilder on(BitSet days) {
       if (days.size() != openingDays.size()) {
@@ -390,8 +390,8 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets the days that are true in the given {@link BitSet} to be off.
-     * If the builder is set be for times after midnight, the days are not shifted in this case.
+     * Sets the days that are true in the given {@link BitSet} to be off. If the builder is set be
+     * for times after midnight, the days are not shifted in this case.
      */
     private OpeningHoursBuilder off(BitSet daysOff, String offDescription) {
       if (openingDays.intersects(daysOff)) {

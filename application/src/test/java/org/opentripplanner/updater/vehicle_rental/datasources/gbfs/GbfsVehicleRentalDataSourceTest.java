@@ -13,7 +13,8 @@ class GbfsVehicleRentalDataSourceTest {
 
   /**
    * Test that a network or HTTP error during setup is correctly rethrown as an
-   * {@link UpdaterConstructionException}, which leds OTP to start up anyway rather than shutting down completely.
+   * {@link UpdaterConstructionException}, which leds OTP to start up anyway rather than shutting
+   * down completely.
    */
   @Test
   void rethrowCorrectExceptionDuringSetup() {

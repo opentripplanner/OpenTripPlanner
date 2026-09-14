@@ -23,8 +23,8 @@ import org.opentripplanner.utils.text.FileSizeToTextConverter;
  * The data source metadata should be fetched once. The data is NOT updated even if the source
  * itself changes. If this happens it might cause the streaming to fail.
  * <p>
- * Concurrent modifications to underlying data-sources is not accounted for, and there is no need to
- * support that in the implementation of this class. This means that we assume all input- and
+ * Concurrent modifications to underlying data-sources is not accounted for, and there is no need
+ * to support that in the implementation of this class. This means that we assume all input- and
  * output-files in OTP are stable (not changed in any way) during the period OTP need to access
  * these files.
  */
@@ -34,25 +34,25 @@ public interface DataSource {
 
   /**
    * @return the short name identifying the source within its scope (withing a {@link OtpDataStore}
-   * or {@link CompositeDataSource}) Including the file extension.
-   * <p>
-   * Examples:
-   * <p>
-   * {@code build-config.json, gtfs.zip and stops.txt}
+   *         or {@link CompositeDataSource}) Including the file extension.
+   *         <p>
+   *         Examples:
+   *         <p>
+   *         {@code build-config.json, gtfs.zip and stops.txt}
    */
   String name();
 
   /**
    * @return the full path (or description) to be used when describing this data source. This method
-   * is mainly used for humans to identify the source in logs and error handling.
+   *         is mainly used for humans to identify the source in logs and error handling.
    */
   String path();
 
   /**
    * Return the URI of the datasource. The URI can be used to identify uniquely the data source.
    * <p>
-   * Note! Do NOT use this to load the file(s), use the datasource abstraction - if you bypass the
-   * framework your code might not work with all supported datasources like filesystems,
+   * Note! Do NOT use this to load the file(s), use the datasource abstraction - if you bypass
+   * the framework your code might not work with all supported datasources like filesystems,
    * zip-archives and cloud storage.
    */
   URI uri();
@@ -85,9 +85,9 @@ public interface DataSource {
 
   /**
    * @return {@code true} if it is possible to write to data source. Also, return {@code true} if if
-   * it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may fail. This
-   * method can be used to avoid consuming a lot of resource before writing to a datasource, if this
-   * method return {@code false}.
+   *         it is not easy to check. No guarantee is given and the {@link #asOutputStream()} may
+   *         fail. This method can be used to avoid consuming a lot of resource before writing to a
+   *         datasource, if this method return {@code false}.
    */
   default boolean isWritable() {
     return true;
@@ -112,8 +112,7 @@ public interface DataSource {
   /**
    * Return the content as a byte array. The implementation may chose to implement this in a more
    * efficient way - not reading the input stream. Do not change the data returned.
-   * <p/>
-   * Calling this method is the same as reading everything off the {@link #asInputStream()}.
+   * <p/>Calling this method is the same as reading everything off the {@link #asInputStream()}.
    */
   default byte[] asBytes() {
     try (var is = asInputStream()) {

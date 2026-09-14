@@ -22,19 +22,19 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * request-scoped {@link org.opentripplanner.transit.service.TransitService}.
  * <p>
  * The trip calendar is included here (rather than being its own repository) because every
- * consumer that needs realtime timetable data also needs the calendar — new service ids created
- * for real-time-added trips must be visible in the same transaction as the trips that use them.
+ * consumer that needs realtime timetable data also needs the calendar — new service ids created for
+ * real-time-added trips must be visible in the same transaction as the trips that use them.
  */
 public interface TimetableRepositorySnapshot {
   /**
-   * Return the updated timetable for the specified pattern if one is available in this snapshot,
-   * or the originally scheduled timetable if there are no updates in this snapshot.
+   * Return the updated timetable for the specified pattern if one is available in this snapshot, or
+   * the originally scheduled timetable if there are no updates in this snapshot.
    */
   Timetable resolve(TripPattern pattern, @Nullable LocalDate serviceDate);
 
   /**
-   * Return the current trip pattern given a trip id and a service date, if it has been changed
-   * from the scheduled pattern by an update with a different stop pattern.
+   * Return the current trip pattern given a trip id and a service date, if it has been changed from
+   * the scheduled pattern by an update with a different stop pattern.
    *
    * @return trip pattern created by the updater; null if the trip is on its original trip pattern
    */
@@ -122,8 +122,8 @@ public interface TimetableRepositorySnapshot {
   Collection<TripPattern> getPatternsForStop(StopLocation stop);
 
   /**
-   * Return the raptor transit data that includes the realtime updates of this snapshot. This is
-   * the transit data used for routing with this snapshot.
+   * Return the raptor transit data that includes the realtime updates of this snapshot. This is the
+   * transit data used for routing with this snapshot.
    */
   RaptorTransitData getRealtimeRaptorTransitData();
 

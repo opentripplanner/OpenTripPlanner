@@ -7,9 +7,8 @@ import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
- * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
- * <p/>
- * This class is immutable and thread safe.
+ * The responsibility for the cost calculator is to calculate the default multi-criteria cost.
+ * <p/>This class is immutable and thread safe.
  */
 public final class DefaultCostCalculator<T extends DefaultTripSchedule> implements
   RaptorCostCalculator<T> {
@@ -21,8 +20,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
   private final FactorStrategy transitFactors;
 
   /**
-   * Costs for boarding and alighting at a given stop during transfer.
-   * See RaptorTransitData.getStopBoardAlightTransferCosts()
+   * Costs for boarding and alighting at a given stop during transfer. See
+   * RaptorTransitData.getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;
@@ -32,8 +31,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                      transformed into the Raptor cast unit to avoid the transformation for each
-   *                      request. Use {@code null} to ignore stop cost.
+   *                                     transformed into the Raptor cast unit to avoid the
+   *                                     transformation for each request. Use {@code null} to ignore
+   *                                     stop cost.
    */
   public DefaultCostCalculator(
     int boardCost,

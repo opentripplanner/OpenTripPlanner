@@ -149,9 +149,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
-   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
-   * resolve.
+   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes
+   * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
+   * to resolve.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {

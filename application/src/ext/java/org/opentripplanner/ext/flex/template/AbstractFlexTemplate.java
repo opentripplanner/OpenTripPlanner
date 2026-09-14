@@ -25,16 +25,16 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A container for a few pieces of information that can be used to calculate flex accesses, egresses,
- * direct flex itineraries or polylines.
+ * A container for a few pieces of information that can be used to calculate flex accesses,
+ * egresses, direct flex itineraries or polylines.
  * <p>
  * Please also see Flex.svg for an illustration of how the flex concepts relate to each other.
  */
 abstract class AbstractFlexTemplate {
 
   /**
-   * We do not want extremely short flex trips, they will normally be dominated in the
-   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
+   * We do not want extremely short flex trips, they will normally be dominated in the routing
+   * later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
    */
   private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
 

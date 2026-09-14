@@ -23,9 +23,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
- * guaranteed/stay-seated. A guaranteed transfer should be possible even if there is zero time to
- * do the transfer, even with a short walk leg of 30s between the stops. In these cases the walk
- * leg and the transfer-slack should be ignored and the connection should be possible.
+ * guaranteed/stay-seated. A guaranteed transfer should be possible even if there is zero time to do
+ * the transfer, even with a short walk leg of 30s between the stops. In these cases the walk leg
+ * and the transfer-slack should be ignored and the connection should be possible.
  */
 public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
 

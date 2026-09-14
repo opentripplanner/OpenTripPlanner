@@ -1,14 +1,13 @@
 package org.opentripplanner.raptor.api.model;
 
-/// Types for printing primitive values used with Raptor. The prefixes should be easy to
-/// read and easy to remember. The suffix subscripts represent:
+/// Types for printing primitive values used with Raptor. The prefixes should be easy to read and
+/// easy to remember. The suffix subscripts represent:
 /// - ₁ & ₂ : Is used to index Cost 1 & 2
 /// - ₜ : Time related
 /// - ₙ : Total number of, count
 /// - ₚ : Priority
 ///
-/// `Wₜ` is **W**AIT_TIME_COST and `ₜ` because it is time related,
-/// Tₙ is the number of **T**ransfers
+/// `Wₜ` is **W**AIT_TIME_COST and `ₜ` because it is time related, Tₙ is the number of **T**ransfers
 public enum RaptorValueType {
   // Cost 1 or "generalized cost"
   C1("C₁"),

@@ -44,8 +44,7 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
   }
 
   /**
-   * This method returns the list of modes that are considered 'transit' by users, removing
-   * carpool.
+   * This method returns the list of modes that are considered 'transit' by users, removing carpool.
    */
   public static TransitMode[] modesConsideredTransitByUsers() {
     return NO_CARPOOL_MODES.toArray(TransitMode[]::new);

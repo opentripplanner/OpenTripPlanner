@@ -78,9 +78,9 @@ public class WalkableAreaBuilder {
   private final SafetyValueApplier safetyValueApplier;
 
   /**
-   * Visibility cache loaded from disk before processing begins. Key: area group hash.
-   * Value: survived visibility-edge pairs as {@code {fromX, fromY, toX, toY}} per entry.
-   * {@code null} when visibility caching is disabled.
+   * Visibility cache loaded from disk before processing begins. Key: area group hash. Value:
+   * survived visibility-edge pairs as {@code {fromX, fromY, toX, toY}} per entry. {@code null} when
+   * visibility caching is disabled.
    */
   @Nullable
   private final KeyValueCache<Long, double[][]> visibilityCache;
@@ -196,11 +196,12 @@ public class WalkableAreaBuilder {
   /**
    * Build walkable area edges using visibility graph computation.
    *
-   * <p>Three phases:
+   * <p>
+   * Three phases:
    * <ol>
    *   <li>Build immutable AreaGroups and ring edges for each ring.
-   *   <li>Compute which vertex pairs have line-of-sight within the polygon (cache miss),
-   *       or replay previously computed pairs (cache hit).
+   *   <li>Compute which vertex pairs have line-of-sight within the polygon (cache miss), or replay
+   *       previously computed pairs (cache hit).
    *   <li>Add visibility edges and prune unused ones.
    * </ol>
    */
@@ -247,9 +248,8 @@ public class WalkableAreaBuilder {
   // ---- Phase 1: ring traversal -------------------------------------------------------
 
   /**
-   * Traverse all rings in the group: collect visibility vertex candidates and area metadata,
-   * build immutable AreaGroups, then create ring edges. Returns combined data for subsequent
-   * phases.
+   * Traverse all rings in the group: collect visibility vertex candidates and area metadata, build
+   * immutable AreaGroups, then create ring edges. Returns combined data for subsequent phases.
    */
   private RingSetData buildAllRingEdges(OsmAreaGroup group, Set<Long> osmWayIds) {
     Set<Edge> allEdges = new HashSet<>();
@@ -400,10 +400,11 @@ public class WalkableAreaBuilder {
   // ---- Phase 2: visibility computation -----------------------------------------------
 
   /**
-   * For each ring, test all candidate vertex pairs for line-of-sight within the ring polygon.
-   * This is a pure computation — no graph mutations.
+   * For each ring, test all candidate vertex pairs for line-of-sight within the ring polygon. This
+   * is a pure computation — no graph mutations.
    *
-   * <p>When the area has more vertices than {@code maxAreaNodes}, the vertex set is sampled
+   * <p>
+   * When the area has more vertices than {@code maxAreaNodes}, the vertex set is sampled
    * uniformly so that at least some cross-edges are added even for complex areas.
    */
   private List<VisibilityPair> computeVisiblePairs(RingSetData ringSetData) {
@@ -446,8 +447,8 @@ public class WalkableAreaBuilder {
   // ---- Phase 3a: add visibility edges (cache miss) -----------------------------------
 
   /**
-   * Create graph edges for each visibility pair and return them split into all edges and the
-   * subset that must survive pruning because they connect platform-linking vertices.
+   * Create graph edges for each visibility pair and return them split into all edges and the subset
+   * that must survive pruning because they connect platform-linking vertices.
    */
   private VisibilityEdgesResult addVisibilityEdges(List<VisibilityPair> pairs, OsmAreaGroup group) {
     Set<AreaEdge> allEdges = new HashSet<>();
@@ -471,8 +472,8 @@ public class WalkableAreaBuilder {
   // ---- Phase 3b: replay visibility edges (cache hit) ---------------------------------
 
   /**
-   * Reconstruct visibility edges from previously cached coordinate pairs. No pruning step is
-   * needed because the cached pairs are already the pruned survivors of a previous run.
+   * Reconstruct visibility edges from previously cached coordinate pairs. No pruning step is needed
+   * because the cached pairs are already the pruned survivors of a previous run.
    */
   private void replayVisibilityEdges(
     double[][] cachedPairs,
@@ -501,8 +502,8 @@ public class WalkableAreaBuilder {
   // ---- Pruning -----------------------------------------------------------------------
 
   /**
-   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges,
-   * and retain only those edges which are actually used in some shortest path.
+   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges, and
+   * retain only those edges which are actually used in some shortest path.
    *
    * @return the visibility edges (not in {@code edgesToKeep}) that survived pruning
    */
@@ -767,9 +768,9 @@ public class WalkableAreaBuilder {
   private record NodeEdge(IntersectionVertex from, IntersectionVertex to) {}
 
   /**
-   * Per-ring data collected during Phase 1, passed into Phase 2 for visibility computation.
-   * The {@code alreadyAddedEdges} set is mutable and extended during Phase 2 to prevent
-   * duplicate visibility edges across both phases.
+   * Per-ring data collected during Phase 1, passed into Phase 2 for visibility computation. The
+   * {@code alreadyAddedEdges} set is mutable and extended during Phase 2 to prevent duplicate
+   * visibility edges across both phases.
    */
   private record PerRingData(
     AreaGroup areaGroup,

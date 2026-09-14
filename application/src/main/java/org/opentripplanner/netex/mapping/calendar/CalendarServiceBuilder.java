@@ -52,8 +52,7 @@ public class CalendarServiceBuilder {
 
   /**
    * Generate service calendar.
-   * <p/>
-   * THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
+   * <p/>THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
    */
   public Collection<ServiceCalendarDate> createServiceCalendar() {
     List<ServiceCalendarDate> dates = new ArrayList<>();

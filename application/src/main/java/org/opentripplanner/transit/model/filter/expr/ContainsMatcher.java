@@ -5,10 +5,10 @@ import java.util.function.Function;
 /**
  * A matcher that applies a provided matcher to an iterable of child entities returned from the main
  * entity that this matcher is for.
+ * <p/>If any of the iterable entities match the valueMatcher, then the match method returns true.
+ * In this way it is similar to an OR.
  * <p/>
- * If any of the iterable entities match the valueMatcher, then the match method returns true. In
- * this way it is similar to an OR.
- * <p/>
+ *
  * @param <S> The main entity type this matcher is applied to.
  * @param <T> The type of the child entities, for which there is a mapping from S to T.
  */
@@ -21,10 +21,10 @@ public class ContainsMatcher<S, T> implements Matcher<S> {
   /**
    * @param relationshipName The name of the type of relationship between the main entity and the
    *                         entity matched by the valueMatcher.
-   * @param valuesProvider The function that maps the entity being matched by this matcher (S) to
-   *                       the iterable of items being matched by valueMatcher.
-   * @param valueMatcher The matcher that is applied each of the iterable entities returned from the
-   *                     valuesProvider function.
+   * @param valuesProvider   The function that maps the entity being matched by this matcher (S) to
+   *                         the iterable of items being matched by valueMatcher.
+   * @param valueMatcher     The matcher that is applied each of the iterable entities returned from
+   *                         the valuesProvider function.
    */
   public ContainsMatcher(
     String relationshipName,

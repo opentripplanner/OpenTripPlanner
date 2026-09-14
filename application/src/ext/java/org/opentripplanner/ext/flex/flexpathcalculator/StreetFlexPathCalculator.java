@@ -22,8 +22,8 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * Subsequent requests from the same fromVertex can fetch the path to the toVertex from the existing
  * ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
  * <p>
- * Because we will have lots of searches with the same origin when doing access searches and a lot
- * of searches with the same destination when doing egress searches, the calculator needs to be
+ * Because we will have lots of searches with the same origin when doing access searches and a
+ * lot of searches with the same destination when doing egress searches, the calculator needs to be
  * configured so that the caching is done with either the origin or destination vertex as the key.
  * The one-to-many search will then either be done in the forward or the reverse direction depending
  * on this configuration.

@@ -18,13 +18,14 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Represents a transfer for a set of modes between stops with the street network path attached to it.
+ * Represents a transfer for a set of modes between stops with the street network path attached to
+ * it.
  * <p>
  * Do not confuse this with {@link ConstrainedTransfer}.
  *
  * <p>
  * TODO Should we just store the NearbyStop as a field here, or even switch to using it instead
- *      where this class is used
+ * where this class is used
  */
 public class PathTransfer implements Serializable {
 

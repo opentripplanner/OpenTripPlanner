@@ -17,8 +17,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * objects for each StopArrival. These view objects are temporary objects and when the algorithm
  * progress they might get invalid - so do not keep references to these objects bejond the scope of
  * of a the callers method.
- * <p/>
- * The design was originally done to support the FLyweight design pattern.
+ * <p/>The design was originally done to support the FLyweight design pattern.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

@@ -4,9 +4,8 @@ package org.opentripplanner.street.model.elevation;
  * <p>
  * Tobler's hiking function is an exponential function determining the hiking speed, taking into
  * account the slope angle. It was formulated by Waldo Tobler. This function was estimated from
- * empirical data of Eduard Imhof. [ <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a>
- * ]
- * </p>
+ * empirical data of Eduard Imhof. [
+ * <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a> ]</p>
  * <pre>
  * Walking speed(W):
  *
@@ -17,8 +16,7 @@ package org.opentripplanner.street.model.elevation;
  * The {@code 6 m/s} is the Maximum speed achieved. This happens at angle 2.86 degrees or -5%
  * downhill. In OTP we want to apply this as a multiplier to the horizontal walking distance. This
  * is done for all walkable edges in the graph. To find the walkingtime for an edge we use the
- * horizontal walking speed. Therefore:
- * </p>
+ * horizontal walking speed. Therefore:</p>
  * <pre>
  * Given:
  *   Vflat : Speed at 0 degrees - flat

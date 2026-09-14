@@ -79,8 +79,7 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
   }
 
   /**
-   * Only itinerary which are walk-only or have a transit leg should have an itinerary-level
-   * score.
+   * Only itinerary which are walk-only or have a transit leg should have an itinerary-level score.
    */
   @MethodSource("nonWalkingCases")
   @ParameterizedTest

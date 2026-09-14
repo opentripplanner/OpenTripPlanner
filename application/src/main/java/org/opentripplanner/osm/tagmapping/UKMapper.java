@@ -18,7 +18,8 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * roads. The default has these the same (25mph) but in the UK tertiary roads are considered by OSM
  * tagging guidelines to be busy unclassified through roads wide enough to allow two cars to pass
  * safely. The free flow speeds are therefore higher. These changes result in more realistic driving
- * routes. https://www.gov.uk/government/statistical-data-sets/vehicle-speed-compliance-statistics-data-tables-spe
+ * routes.
+ * https://www.gov.uk/government/statistical-data-sets/vehicle-speed-compliance-statistics-data-tables-spe
  * https://wiki.openstreetmap.org/wiki/United_Kingdom_Tagging_Guidelines
  *
  * @author marcusyoung

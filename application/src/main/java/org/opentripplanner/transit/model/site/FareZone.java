@@ -8,8 +8,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 /**
  * Equal to GTFS zone_id or NeTEx TariffZone.
  *
- * TODO This should at some point be connected to Agency or Operator. Currently is is up to the
- *      user to make this connection (based on TariffZone id).
+ * TODO This should at some point be connected to Agency or Operator. Currently is is up to the user
+ * to make this connection (based on TariffZone id).
  */
 public class FareZone extends AbstractTransitEntity<FareZone, FareZoneBuilder> {
 

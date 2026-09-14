@@ -41,8 +41,8 @@ public class NearbyStopFactory {
   }
 
   /**
-   * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops
-   * for them.
+   * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops for
+   * them.
    */
   public static List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
     Collection<? extends Vertex> vertices,

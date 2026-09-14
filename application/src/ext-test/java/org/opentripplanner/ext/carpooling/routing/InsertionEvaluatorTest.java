@@ -248,17 +248,17 @@ class InsertionEvaluatorTest {
   }
 
   /**
-   * Given two viable insertion positions with different total trip durations,
-   * the evaluator should select the one with the shorter total.
+   * Given two viable insertion positions with different total trip durations, the evaluator should
+   * select the one with the shorter total.
    *
-   * Trip: SOUTH → CENTER → NORTH (baseline: 10 + 10 = 20 min)
-   * Passenger: pickup at EAST, dropoff at WEST
+   * Trip: SOUTH → CENTER → NORTH (baseline: 10 + 10 = 20 min) Passenger: pickup at EAST, dropoff at
+   * WEST
    *
-   * Position (1,2) modified route: SOUTH → EAST → WEST → CENTER → NORTH
-   *   segments: 8 + 4 + 9 + 10(reused) = 31 min
+   * Position (1,2) modified route: SOUTH → EAST → WEST → CENTER → NORTH segments: 8 + 4 + 9 +
+   * 10(reused) = 31 min
    *
-   * Position (2,3) modified route: SOUTH → CENTER → EAST → WEST → NORTH
-   *   segments: 10(reused) + 3 + 4 + 5 = 22 min  ← shorter, should be selected
+   * Position (2,3) modified route: SOUTH → CENTER → EAST → WEST → NORTH segments: 10(reused) + 3 +
+   * 4 + 5 = 22 min ← shorter, should be selected
    */
   @Test
   void findBestInsertion_selectsShorterTotalTripDuration() {

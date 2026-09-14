@@ -7,11 +7,11 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The contract the state must implement for the {@link RangeRaptor} to do its job. This
- * allows us to mix workers and states to implement different versions of the algorithm like
- * Standard, Standard-reversed and multi-criteria and use this with different states keeping only
- * the information needed by the use-case. Some example use-cases are calculating heuristics,
- * debugging and returning result paths.
+ * The contract the state must implement for the {@link RangeRaptor} to do its job. This allows us
+ * to mix workers and states to implement different versions of the algorithm like Standard,
+ * Standard-reversed and multi-criteria and use this with different states keeping only the
+ * information needed by the use-case. Some example use-cases are calculating heuristics, debugging
+ * and returning result paths.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -30,8 +30,7 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    * current round. If no paths to the destination is found in the current round, FALSE is returned.
    * And last, if a new path is found in the current round - reaching the destination - but the path
    * is NOT accepted(not pareto-optimal), then FALSE is returned.
-   * <p/>
-   * This method is called at the end of each round.
+   * <p/>This method is called at the end of each round.
    */
   boolean isDestinationReachedInCurrentRound();
 

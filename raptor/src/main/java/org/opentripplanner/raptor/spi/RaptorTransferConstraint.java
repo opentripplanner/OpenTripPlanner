@@ -27,8 +27,8 @@ public interface RaptorTransferConstraint {
 
   /**
    * Return {@code true} if the constrained transfer is not allowed between the two routes. Note! If
-   * a constraint only apply to specific trips, then the {@link RaptorConstrainedBoardingSearch}
-   * is reponsible for NOT returning the NOT-ALLOWED transfer, and finding the next ALLOWED trip.
+   * a constraint only apply to specific trips, then the {@link RaptorConstrainedBoardingSearch} is
+   * reponsible for NOT returning the NOT-ALLOWED transfer, and finding the next ALLOWED trip.
    */
   boolean isNotAllowed();
 

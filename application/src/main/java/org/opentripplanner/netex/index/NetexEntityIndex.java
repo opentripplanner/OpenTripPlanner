@@ -38,8 +38,8 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 /**
- * This class holds indexes of Netex objects for lookup during the NeTEx import using the {@link
- * NetexEntityIndexReadOnlyView}.
+ * This class holds indexes of Netex objects for lookup during the NeTEx import using the
+ * {@link NetexEntityIndexReadOnlyView}.
  * <p>
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared
  * data</em>, and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to
@@ -50,20 +50,19 @@ import org.rutebanken.netex.model.TariffZone_VersionStructure;
  * shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a parent. When
  * such <em>group of shared data</em> is not needed any more it is discard and become ready for
  * garbage collection. For each <em>single files</em> a new {@code NetexImportDataIndex} is created
- * with the corresponding
- * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
- * the file is loaded.
+ * with the corresponding <em>group of shared data</em> as parent. The <em>single files</em> object
+ * is thrown away when the file is loaded.
  * <p>
  * This hierarchy make it possible to override values in child instances of the {@code
  * NetexImportDataIndex} and save memory during the load operation, because data not needed any more
  * can be thrown away.
  * <p>
- * The hierarchy implementation is delegated to the {@link org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap}
- * and the {@link HierarchicalElement} classes.
- * <p/>
- * The mapping code should not insert entities, so an instance of this class implements the {@link
- * NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into OTP domain
- * model objects.
+ * The hierarchy implementation is delegated to the
+ * {@link org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap} and the
+ * {@link HierarchicalElement} classes.
+ * <p/>The mapping code should not insert entities, so an instance of this class implements the
+ * {@link NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into OTP
+ * domain model objects.
  */
 public class NetexEntityIndex {
 
@@ -215,10 +214,9 @@ public class NetexEntityIndex {
       /**
        * Lookup a Network given a GroupOfLine id or an Network id. If the given
        * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
-       * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
-       * can lookup the Network directly.
-       * <p/>
-       * If no Network is found {@code null} is returned.
+       * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we can
+       * lookup the Network directly.
+       * <p/>If no Network is found {@code null} is returned.
        */
       @Override
       public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
@@ -248,8 +246,8 @@ public class NetexEntityIndex {
       }
 
       /**
-       * @deprecated This should be replaced with a collection of DayTypeAssignment. The
-       *             mapper is responsible for indexing its data, except for entities by id.
+       * @deprecated This should be replaced with a collection of DayTypeAssignment. The mapper is
+       *             responsible for indexing its data, except for entities by id.
        */
       @Deprecated
       public ReadOnlyHierarchicalMap<

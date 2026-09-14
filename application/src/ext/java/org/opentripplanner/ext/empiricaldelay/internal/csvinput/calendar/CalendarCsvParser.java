@@ -8,17 +8,13 @@ import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 /**
- * <pre>
- * empirical_delay_calendar.txt
+ * <pre> empirical_delay_calendar.txt
  *
- * empirical_delay_service_id, monday, tuesday, wednesday, thursday, friday, saturday, sunday, start_date, end_date
- * MONDAY   ,1,0,0,0,0,0,0,2025-01-01, 2030-12-31
- * TUESDAY  ,0,1,0,0,0,0,0,2025-01-01, 2030-12-31
- * WEDNESDAY,0,0,1,0,0,0,0,2025-01-01, 2030-12-31
- * THURDAY  ,0,0,0,1,0,0,0,2025-01-01, 2030-12-31
- * FRIDAY   ,0,0,0,0,1,0,0,2025-01-01, 2030-12-31
- * SATURDAY ,0,0,0,0,0,1,0,2025-01-01, 2030-12-31
- * SUNDAY   ,0,0,0,0,0,0,1,2025-01-01, 2030-12-31
+ * empirical_delay_service_id, monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+ * start_date, end_date MONDAY ,1,0,0,0,0,0,0,2025-01-01, 2030-12-31 TUESDAY
+ * ,0,1,0,0,0,0,0,2025-01-01, 2030-12-31 WEDNESDAY,0,0,1,0,0,0,0,2025-01-01, 2030-12-31 THURDAY
+ * ,0,0,0,1,0,0,0,2025-01-01, 2030-12-31 FRIDAY ,0,0,0,0,1,0,0,2025-01-01, 2030-12-31 SATURDAY
+ * ,0,0,0,0,0,1,0,2025-01-01, 2030-12-31 SUNDAY ,0,0,0,0,0,0,1,2025-01-01, 2030-12-31
  */
 public class CalendarCsvParser extends AbstractCsvParser<CalendarRow> {
 

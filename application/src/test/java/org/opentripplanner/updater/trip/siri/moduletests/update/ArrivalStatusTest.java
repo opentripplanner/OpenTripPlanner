@@ -26,9 +26,9 @@ class ArrivalStatusTest implements RealtimeTestConstants {
     .addStop(STOP_B, "0:20", "0:20")
     .addStop(STOP_C, "0:30", "0:30");
 
-  /// Verify that a RecordedCall with ActualArrivalTime but no ActualDepartureTime
-  /// is treated as arrived but NOT departed. This matches the SIRI-ET semantics where
-  /// a vehicle can be at the platform (arrived) but not yet have left (not departed).
+  /// Verify that a RecordedCall with ActualArrivalTime but no ActualDepartureTime is treated as
+  /// arrived but NOT departed. This matches the SIRI-ET semantics where a vehicle can be at the
+  /// platform (arrived) but not yet have left (not departed).
   @Test
   void testRecordedCallWithArrivalButNoDeparture() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();

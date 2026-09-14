@@ -5,9 +5,9 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Default GTFS feed configuration - can be set for all feeds in the
- * build-config. The {@link GtfsFeedParameters} contain the feed specific
- * extensions - the extra info you must specify for each feed.
+ * Default GTFS feed configuration - can be set for all feeds in the build-config. The
+ * {@link GtfsFeedParameters} contain the feed specific extensions - the extra info you must specify
+ * for each feed.
  */
 public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 

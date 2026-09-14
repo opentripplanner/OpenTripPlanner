@@ -25,8 +25,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should use reversed transfers when searching in reverse, so that directional transfers are
- * used correctly.
+ * Raptor should use reversed transfers when searching in reverse, so that directional transfers
+ * are used correctly.
  * <p>
  * The expected result is an itinerary with 2 transit legs and a transfer.
  */

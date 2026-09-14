@@ -26,14 +26,14 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should be able to handle a route request with a specified pass-through point.
- * If a stop point is specified as a pass-through point in the request, then all the results
- * returned from Raptor should include this stop point either as an alight or board point for a
- * trip or as an intermediate point in the trip.
+ * Raptor should be able to handle a route request with a specified pass-through point. If a stop
+ * point is specified as a pass-through point in the request, then all the results returned from
+ * Raptor should include this stop point either as an alight or board point for a trip or as an
+ * intermediate point in the trip.
  * <p>
  * It should be possible to specify more than one pass-through point. The result should include
- * stop points in the order in which they were specified in the request. Only alternatives that
- * pass through all stop points should be included in the result.
+ * stop points in the order in which they were specified in the request. Only alternatives that pass
+ * through all stop points should be included in the result.
  * <p>
  * In order to support stop areas raptor should also support multiple stop points in the same
  * pass-through group. It should be possible to define both stop A and B as a pass-through. Then

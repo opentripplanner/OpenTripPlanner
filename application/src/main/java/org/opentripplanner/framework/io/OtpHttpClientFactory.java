@@ -24,20 +24,19 @@ import org.slf4j.Logger;
  * <h3>Timeout configuration</h3>
  * The same timeout value is applied to the following parameters:
  * <ul>
- *  <li>Connection request timeout: the maximum waiting time for leasing a connection in the
- *  connection pool.
- *  <li>Connect timeout: the maximum waiting time for the first packet received from the server.
- *  <li>Socket timeout: the maximum waiting time between two packets received from the server.
+ *   <li>Connection request timeout: the maximum waiting time for leasing a connection in the
+ *       connection pool.
+ *   <li>Connect timeout: the maximum waiting time for the first packet received from the server.
+ *   <li>Socket timeout: the maximum waiting time between two packets received from the server.
  * </ul>
  * The default timeout is set to 5 seconds.
  * <h3>Connection time-to-live</h3>
- * Maximum time an HTTP connection can stay in the connection pool before being closed.
- * Note that HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to
- * close idle connections at any time.
- * The default connection time-to-live is set to 1 minute.
+ * Maximum time an HTTP connection can stay in the connection pool before being closed. Note that
+ * HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to close idle
+ * connections at any time. The default connection time-to-live is set to 1 minute.
  * <h3>Connection Pooling</h3>
- * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections
- * per host.
+ * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections per
+ * host.
  *
  * <h3>Thread-safety</h3>
  * Instances of this class are thread-safe.
@@ -72,8 +71,8 @@ public class OtpHttpClientFactory implements AutoCloseable {
   }
 
   /**
-   * Creates an HTTP client the given timeout and connection time-to-live and the default max
-   * number of connections.
+   * Creates an HTTP client the given timeout and connection time-to-live and the default max number
+   * of connections.
    */
   public OtpHttpClientFactory(Duration timeout, Duration connectionTtl) {
     this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS);

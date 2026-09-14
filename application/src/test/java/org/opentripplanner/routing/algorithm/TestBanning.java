@@ -17,8 +17,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 
 /**
- * Test the banning and whitelisting functionality in the RouteRequest.
- * TODO This does not test the that banning/whitelisting affects the routing correctly.
+ * Test the banning and whitelisting functionality in the RouteRequest. TODO This does not test the
+ * that banning/whitelisting affects the routing correctly.
  */
 public class TestBanning {
 

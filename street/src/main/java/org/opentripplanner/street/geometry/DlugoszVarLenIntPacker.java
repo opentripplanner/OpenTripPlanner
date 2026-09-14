@@ -137,9 +137,9 @@ class DlugoszVarLenIntPacker {
     /**
      * Decode the varint at the current position, advance past it, and return its signed value.
      * <p>
-     * Implementation note: This method is hot and is currently short enough to be inlined
-     * by the JIT. When changing the implementation or refactoring, make sure to measure
-     * performance with a microbenchmark.
+     * Implementation note: This method is hot and is currently short enough to be inlined by the
+     * JIT. When changing the implementation or refactoring, make sure to measure performance with a
+     * microbenchmark.
      */
     int next() {
       int p = pos;

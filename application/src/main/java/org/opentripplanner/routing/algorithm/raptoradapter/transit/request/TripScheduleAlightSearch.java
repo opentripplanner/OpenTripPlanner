@@ -195,11 +195,10 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
   }
 
   /**
-   * Do a binary search to find the approximate lower bound index for where to start the search.
-   * We IGNORE if the trip schedule is in service.
-   * <p/>
-   * This is just a guess, and we return when the trip with a best valid arrival is in the range of
-   * the next {@link #binarySearchThreshold}.
+   * Do a binary search to find the approximate lower bound index for where to start the search. We
+   * IGNORE if the trip schedule is in service.
+   * <p/>This is just a guess, and we return when the trip with a best valid arrival is in the range
+   * of the next {@link #binarySearchThreshold}.
    *
    * @return a better lower bound index (inclusive)
    */

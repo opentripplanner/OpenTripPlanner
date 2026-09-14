@@ -145,9 +145,9 @@ public class RouteRequest implements Serializable {
   }
 
   /**
-   * The booking time is used to exclude services which are not bookable at the
-   * requested booking time. If a service is bookable at this time or later, the service
-   * is included. This applies to FLEX access, egress and direct services.
+   * The booking time is used to exclude services which are not bookable at the requested booking
+   * time. If a service is bookable at this time or later, the service is included. This applies to
+   * FLEX access, egress and direct services.
    */
   public Instant bookingTime() {
     return bookingTime;
@@ -157,9 +157,9 @@ public class RouteRequest implements Serializable {
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
    * <p>
-   * The search time for the current request. If the client have moved to the next page then this is
-   * the adjusted search time - the dateTime passed in is ignored and replaced with by a time from
-   * the pageToken.
+   * The search time for the current request. If the client have moved to the next page then this
+   * is the adjusted search time - the dateTime passed in is ignored and replaced with by a time
+   * from the pageToken.
    *
    * This method returns {@code null} for default requests.
    */
@@ -187,10 +187,11 @@ public class RouteRequest implements Serializable {
    * used for many things, for example finding the days to search, but the transit search is using
    * the cursor[if exist], not the date-time.
    * <p>
-   * The direct mode is also unset when there is a page cursor because for anything other than the
-   * initial page we don't want to see direct results. If the direct mode was given in the first request,
-   * the generalized cost of the direct mode itinerary from the initial request is stored in the page cursor
-   * for use with {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+   * The direct mode is also unset when there is a page cursor because for anything other than
+   * the initial page we don't want to see direct results. If the direct mode was given in the first
+   * request, the generalized cost of the direct mode itinerary from the initial request is stored
+   * in the page cursor for use with
+   * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
    * to filter away unwanted transit results.
    */
   public RouteRequest withPageCursor() {
@@ -217,9 +218,9 @@ public class RouteRequest implements Serializable {
 
   /**
    * When paging we must crop the list of itineraries in the right end according to the sorting of
-   * the original search and according to the paging direction (next or previous). We always
-   * crop at the end of the initial search. This is a utility function delegating to the
-   * pageCursor, if available.
+   * the original search and according to the paging direction (next or previous). We always crop at
+   * the end of the initial search. This is a utility function delegating to the pageCursor, if
+   * available.
    */
   public ListSection cropItinerariesAt() {
     return pageCursor == null ? ListSection.TAIL : pageCursor.cropItinerariesAt();
@@ -229,10 +230,10 @@ public class RouteRequest implements Serializable {
    * Validate that the routing request contains both an origin and a destination. Origin and
    * destination can be specified either by a reference to a stop place or by geographical
    * coordinates. Origin and destination are required in a one-to-one search, but not in a
-   * many-to-one or one-to-many.
-   * TODO - Refactor and make separate requests for one-to-one and the other searches.
+   * many-to-one or one-to-many. TODO - Refactor and make separate requests for one-to-one and the
+   * other searches.
    *
-   * @throws RoutingValidationException if either origin or destination is missing.
+   * @throws RoutingValidationException   if either origin or destination is missing.
    * @throws InvalidRoutingInputException if the destination is an on-board location.
    */
   public void validateOriginAndDestination() {
@@ -280,19 +281,19 @@ public class RouteRequest implements Serializable {
   }
 
   /**
-   * TransferOptimization is applied to all results except via-visit requests.
-   * TODO VIA - When the Optimized transfer support this, then this method should be removed.
+   * TransferOptimization is applied to all results except via-visit requests. TODO VIA - When the
+   * Optimized transfer support this, then this method should be removed.
    */
   public boolean allowTransferOptimization() {
     return !isViaSearch() || via.stream().allMatch(ViaLocation::isPassThroughLocation);
   }
 
   /**
-   * Returns {@code true} when the request has no way to reach transit on at least one of the
-   * access and egress sides. A side is unreachable when its street mode is
-   * {@link StreetMode#NOT_SET} and the corresponding endpoint is not a stop (a stop endpoint
-   * provides a zero-distance access/egress, so it does not need a street mode). An on-board
-   * origin is always considered reachable since the traveler is already on a transit vehicle.
+   * Returns {@code true} when the request has no way to reach transit on at least one of the access
+   * and egress sides. A side is unreachable when its street mode is {@link StreetMode#NOT_SET} and
+   * the corresponding endpoint is not a stop (a stop endpoint provides a zero-distance
+   * access/egress, so it does not need a street mode). An on-board origin is always considered
+   * reachable since the traveler is already on a transit vehicle.
    */
   public boolean cannotReachTransit() {
     boolean accessUnreachable =
@@ -353,13 +354,13 @@ public class RouteRequest implements Serializable {
    * <p>
    * All optimal itineraries that depart within the search window are guaranteed to be found.
    * <p>
-   * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
-   * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
-   * confuse this with the travel-window, which is the time between EDT to LAT.
+   * This is sometimes referred to as the Range Raptor Search Window - but could be used in a
+   * none Transit search as well; Hence this is named search-window and not raptor-search-window. Do
+   * not confuse this with the travel-window, which is the time between EDT to LAT.
    * <p>
-   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
-   * dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you may
-   * use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
+   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value
+   * is dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you
+   * may use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
    * infrequent long distant journeys, the best option is normally to use the dynamic auto
    * assignment.
    * <p>
@@ -375,6 +376,7 @@ public class RouteRequest implements Serializable {
 
   /**
    * For testing only. Use {@link TransitRoutingConfig#maxSearchWindow()} instead.
+   *
    * @see #initMaxSearchWindow(Duration)
    */
   public Duration maxSearchWindow() {
@@ -402,25 +404,19 @@ public class RouteRequest implements Serializable {
    * <p>
    * In combination with {@code arriveBy} this parameter cover the following 3 use cases:
    * <ul>
-   *   <li>
-   *     The traveler want to find the best alternative within a time window. Set
-   *     {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
-   *     intention of the traveler is unknown, this gives the best result. This use-case includes
-   *     all itineraries in the two next use-cases. This option also work well with paging.
-   * <p>
-   *     Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
-   *     interpreted as latest-arrival-time, and not earliest-departure-time.
-   *   </li>
-   *   <li>
-   *     The traveler want to find the best alternative with departure after a specific time.
-   *     For example: I am at the station now and want to get home as quickly as possible.
-   *     Set {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.
-   *   </li>
-   *   <li>
-   *     Traveler want to find the best alternative with arrival before specific time. For
-   *     example going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}.
-   *     Do not support paging.
-   *   </li>
+   *   <li>The traveler want to find the best alternative within a time window. Set
+   *       {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
+   *       intention of the traveler is unknown, this gives the best result. This use-case includes all
+   *       itineraries in the two next use-cases. This option also work well with paging.
+   *       <p>
+   *       Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
+   *       interpreted as latest-arrival-time, and not earliest-departure-time.</li>
+   *   <li>The traveler want to find the best alternative with departure after a specific time. For
+   *       example: I am at the station now and want to get home as quickly as possible. Set
+   *       {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.</li>
+   *   <li>Traveler want to find the best alternative with arrival before specific time. For example
+   *       going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}. Do not support
+   *       paging.</li>
    * </ul>
    * Default: true
    */
@@ -442,8 +438,8 @@ public class RouteRequest implements Serializable {
    * find all pareto-optimal itineraries when paging. Also, a large search-window and a small {@code
    * numItineraries} waste computer CPU calculation time.
    * <p>
-   * The default value is 50. This is a reasonably high threshold to prevent large amount of data to
-   * be returned. Consider tuning the search-window instead of setting this to a small value.
+   * The default value is 50. This is a reasonably high threshold to prevent large amount of data
+   * to be returned. Consider tuning the search-window instead of setting this to a small value.
    */
   public int numItineraries() {
     return numItineraries;
@@ -541,8 +537,8 @@ public class RouteRequest implements Serializable {
   /**
    * Validate that the routing request contains both a from location(origin) and a to
    * location(destination). Origin and destination can be specified either by a reference to a stop
-   * place or by geographical coordinates. From/to locations are required in a one-to-one
-   * search, but not in a many-to-one or one-to-many(legacy, not supported any more).
+   * place or by geographical coordinates. From/to locations are required in a one-to-one search,
+   * but not in a many-to-one or one-to-many(legacy, not supported any more).
    *
    * @throws RoutingValidationException if either origin or destination is missing.
    */

@@ -286,8 +286,8 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a generic RENTING_FLOATING state does NOT have the network committed,
-   * VehicleRentalEdge should allow picking up the vehicle.
+   * When a generic RENTING_FLOATING state does NOT have the network committed, VehicleRentalEdge
+   * should allow picking up the vehicle.
    */
   @Test
   void uncommittedNetworkAllowsGenericPickup() {
@@ -306,8 +306,8 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce
-   * both RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
+   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce both
+   * RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
    */
   @Test
   void pickupAtNoTraversalBoundaryVertexShouldFork() {

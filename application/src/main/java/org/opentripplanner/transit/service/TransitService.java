@@ -56,14 +56,15 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not TransitRepository.
- *   Is this intentional, because RaptorTransitData is meant to be read-only and TransitRepository is not?
- *   Should this be renamed TransitDataService since it seems to provide access to the data but
- *   not to transit routing functionality (which is provided by the RoutingService)?
- *   The DefaultTransitService implementation has a TransitRepository instance and many of its methods
- *   read through to that TransitRepository instance. But that field itself is not exposed, while the
- *   RaptorTransitData is here. It seems like exposing the raw RaptorTransitData is still a risk since it's
- *   copy-on-write and shares a lot of objects with any other RaptorTransitData instances.
+ * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not
+ * TransitRepository. Is this intentional, because RaptorTransitData is meant to be read-only and
+ * TransitRepository is not? Should this be renamed TransitDataService since it seems to provide
+ * access to the data but not to transit routing functionality (which is provided by the
+ * RoutingService)? The DefaultTransitService implementation has a TransitRepository instance and
+ * many of its methods read through to that TransitRepository instance. But that field itself is not
+ * exposed, while the RaptorTransitData is here. It seems like exposing the raw RaptorTransitData is
+ * still a risk since it's copy-on-write and shares a lot of objects with any other
+ * RaptorTransitData instances.
  */
 public interface TransitService {
   /**
@@ -91,9 +92,9 @@ public interface TransitService {
   TripPattern getTripPattern(FeedScopedId id);
 
   /**
-   * Return all scheduled trip patterns, not including real-time created trip patterns.
-   * TODO: verify this is the intended behavior and possibly change the method name to
-   *       getAllScheduledTripPatterns
+   * Return all scheduled trip patterns, not including real-time created trip patterns. TODO: verify
+   * this is the intended behavior and possibly change the method name to
+   * getAllScheduledTripPatterns
    */
   Collection<TripPattern> listTripPatterns();
 
@@ -119,15 +120,15 @@ public interface TransitService {
   Collection<Route> getRoutes(Collection<FeedScopedId> ids);
 
   /**
-   * Return the routes using the given stop, not including real-time updates.
-   * This includes area stops and resolution of members of group stops - if a trip visits a group
-   * stop, all member stops are considered visited, too.
+   * Return the routes using the given stop, not including real-time updates. This includes area
+   * stops and resolution of members of group stops - if a trip visits a group stop, all member
+   * stops are considered visited, too.
    */
   Set<Route> findRoutes(StopLocation stop);
 
   /**
-   * Return all the scheduled trip patterns for a specific stop
-   * (not taking into account real-time updates).
+   * Return all the scheduled trip patterns for a specific stop (not taking into account real-time
+   * updates).
    */
   Collection<TripPattern> findPatterns(StopLocation stop);
 
@@ -164,8 +165,8 @@ public interface TransitService {
   /**
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
    * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
-   * stop, area stop or stop group, then a list with one item is returned.
-   * An empty collection is returned if nothing is found.
+   * stop, area stop or stop group, then a list with one item is returned. An empty collection is
+   * returned if nothing is found.
    */
   Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
 
@@ -217,19 +218,20 @@ public interface TransitService {
   Collection<Route> listRoutes();
 
   /**
-   * Return the scheduled trip pattern for a given trip.
-   * If the trip is an added trip (extra journey), return the initial trip pattern for this trip.
+   * Return the scheduled trip pattern for a given trip. If the trip is an added trip (extra
+   * journey), return the initial trip pattern for this trip.
    */
   TripPattern findPattern(Trip trip);
 
   /**
-   * Return the trip pattern for a given trip on a service date. The real-time updated version
-   * is returned if it exists, otherwise the scheduled trip pattern is returned.
+   * Return the trip pattern for a given trip on a service date. The real-time updated version is
+   * returned if it exists, otherwise the scheduled trip pattern is returned.
    */
   TripPattern findPattern(Trip trip, LocalDate serviceDate);
 
   /**
-   * Return all the trip patterns used in the given route, including those added by real-time updates
+   * Return all the trip patterns used in the given route, including those added by real-time
+   * updates
    */
   Collection<TripPattern> findPatterns(Route route);
 
@@ -309,8 +311,10 @@ public interface TransitService {
    * departures. The queue is shared between all dates, as services from the previous service date
    * can visit the stop later than the current service date's services.
    * <p>
-   * This method is similar to {@link TransitService#findTripTimesOnDate(StopLocation, TripPattern, Instant, Duration, int, ArrivalDeparture, boolean)}
-   * in that it uses a filter request which allows you to include and exclude routes, agencies and modes.
+   * This method is similar to
+   * {@link TransitService#findTripTimesOnDate(StopLocation, TripPattern, Instant, Duration, int, ArrivalDeparture, boolean)}
+   * in that it uses a filter request which allows you to include and exclude routes, agencies and
+   * modes.
    */
   List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request);
 
@@ -328,9 +332,9 @@ public interface TransitService {
   Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate);
 
   /**
-   * Return the real-time added pattern for a given tripId and a given service date.
-   * Return null if the trip does not exist or if the trip has no real-time added pattern for
-   * this date (that is: it is still using its scheduled trip pattern for this date).
+   * Return the real-time added pattern for a given tripId and a given service date. Return null if
+   * the trip does not exist or if the trip has no real-time added pattern for this date (that is:
+   * it is still using its scheduled trip pattern for this date).
    */
   @Nullable
   TripPattern findNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate);
@@ -376,8 +380,8 @@ public interface TransitService {
   /**
    * For a {@link StopLocationsGroup} get all child stops and get their modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null)
-   * or from the list of patterns that use the stop location.
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from
+   * the list of patterns that use the stop location.
    * <p>
    * The returning stream is ordered by the number of occurrences of the mode in the child stops.
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
@@ -387,11 +391,11 @@ public interface TransitService {
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null)
-   * or from the list of patterns that use the stop location.
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null) or from
+   * the list of patterns that use the stop location.
    * <p>
-   * If {@link StopLocation#getVehicleType()} is null the returning stream is ordered by the number
-   * of occurrences of the mode in the stop.
+   * If {@link StopLocation#getVehicleType()} is null the returning stream is ordered by the
+   * number of occurrences of the mode in the stop.
    * <p>
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
@@ -426,8 +430,8 @@ public interface TransitService {
   Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint);
 
   /**
-   * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other criteria
-   * in the request object.
+   * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other
+   * criteria in the request object.
    */
   Collection<RegularStop> findRegularStopsByBoundingBox(
     FindRegularStopsByBoundingBoxRequest request
@@ -444,21 +448,20 @@ public interface TransitService {
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 
   /**
-   * Returns boolean indicating if there are scheduled services on or after the given date.
-   * This does not include real-time updates, so it only checks the scheduled service dates.
+   * Returns boolean indicating if there are scheduled services on or after the given date. This
+   * does not include real-time updates, so it only checks the scheduled service dates.
    */
   boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 
   /**
-   * Returns a helper for Route/Trip/TripOnServiceDate replacement logic, with the same lifecycle
-   * as TransitService.
+   * Returns a helper for Route/Trip/TripOnServiceDate replacement logic, with the same lifecycle as
+   * TransitService.
    */
   ReplacementHelper getReplacementHelper();
 
   /**
-   * @return the current (real-time if available, otherwise scheduled) trip times
-   *         for the given trip on the given service date, or empty if the
-   *         trip does not run on that date.
+   * @return the current (real-time if available, otherwise scheduled) trip times for the given trip
+   *         on the given service date, or empty if the trip does not run on that date.
    */
   Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 }

@@ -11,16 +11,15 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
- * This filter remove none-transit itineraries with generalized-cost higher than the max-limit.
- * The max-limit is computed based on the overall min-generalized-cost using the provided cost
- * function.
+ * This filter remove none-transit itineraries with generalized-cost higher than the max-limit. The
+ * max-limit is computed based on the overall min-generalized-cost using the provided cost function.
  * <p>
  * This filter is similar to {@link TransitGeneralizedCostFilter}. There are some important
  * differences, however. It will only remove non-transit results, but ALL results can be used as a
  * basis for computing the cost limit.
  * <p>
- * This will, for example, remove walk legs which last several hours, when transit can take you to
- * the destination much quicker.
+ * This will, for example, remove walk legs which last several hours, when transit can take you
+ * to the destination much quicker.
  * <p>
  *
  * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()

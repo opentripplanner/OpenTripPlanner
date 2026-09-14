@@ -11,16 +11,13 @@ import javax.annotation.Nullable;
 /**
  * This {@link java.util.Collection} stores all pareto-optimal elements. The {@link #add(Object)}
  * method returns {@code true} if and only if the element was added successfully. When an element is
- *  added, other elements which are no longer pareto-optimal are dropped.
- * <p/>
- * Like the {@link java.util.ArrayList} the elements are stored internally in an array for
+ * added, other elements which are no longer pareto-optimal are dropped.
+ * <p/>Like the {@link java.util.ArrayList} the elements are stored internally in an array for
  * performance reasons, and the order is guaranteed to be the same as the order the elements are
  * added. New elements are added at the end, while dominated elements are removed. Elements in
  * between are shifted towards the beginning of the list:
- * <p/>
- * {@code  [[1,7], [3,5], [5,3]] + [2,4] => [[1,7], [5,3], [2,4]]   -- less than dominates}
- * <p/>
- * No methods for removing elements like {@link #remove(Object)} are supported.
+ * <p/>{@code  [[1,7], [3,5], [5,3]] + [2,4] => [[1,7], [5,3], [2,4]]   -- less than dominates}
+ * <p/>No methods for removing elements like {@link #remove(Object)} are supported.
  *
  * @param <T> the element type
  */
@@ -70,8 +67,8 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   /**
    * Return an iterator over the contained collection.
    * <p>
-   * This is NOT thread-safe and the behavior is undefined if the collection is modified during the
-   * iteration.
+   * This is NOT thread-safe and the behavior is undefined if the collection is modified during
+   * the iteration.
    */
   public final Iterator<T> iterator() {
     return tailIterator(0);
@@ -136,8 +133,7 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   /**
    * Test if an element qualify - the element is NOT added. Use the {@link #add(T)} method directly
    * if the purpose is to add the new element to the collection.
-   * <p/>
-   * Both methods are optimized for performance; hence the add method does not use this method.
+   * <p/>Both methods are optimized for performance; hence the add method does not use this method.
    */
   public final boolean qualify(T newValue) {
     if (size == 0) {

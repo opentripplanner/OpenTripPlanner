@@ -10,8 +10,8 @@ import org.opentripplanner._support.arch.ArchComponent;
 
 /**
  * Restrict the use of the Guava library to an explicit white-list of classes. Guava is a huge
- * library and we want to keep the usage of it to a minimum - prefer the JDK or the OTP utils
- * where they provide an equivalent. If you need another Guava class, add it to the white-list
+ * library and we want to keep the usage of it to a minimum - prefer the JDK or the OTP utils where
+ * they provide an equivalent. If you need another Guava class, add it to the white-list
  * deliberately - do not work around this test.
  */
 public class GuavaArchitectureTest {

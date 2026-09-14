@@ -16,9 +16,8 @@ import org.opentripplanner.utils.time.TimeUtils;
 /**
  * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model, it is not
  * kept as part of the Graph.
- * <p/>
- * TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the target
- *           - object structure.
+ * <p/>TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the
+ * target - object structure.
  */
 public final class StopTime implements Comparable<StopTime> {
 
@@ -66,10 +65,9 @@ public final class StopTime implements Comparable<StopTime> {
    * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
    * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
    * StopTime field.
-   * <p/>
-   * New ids should only be created when a travel search result is mapped to an itinerary, so even
-   * if creating new objects are expensive, the few extra objects created during the mapping process
-   * is ok.
+   * <p/>New ids should only be created when a travel search result is mapped to an itinerary, so
+   * even if creating new objects are expensive, the few extra objects created during the mapping
+   * process is ok.
    */
   public StopTimeKey getId() {
     return StopTimeKey.of(trip.getId(), stopSequence).build();

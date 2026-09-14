@@ -85,19 +85,12 @@ public class ConstrainedBoardingSearchTest {
    *   - Trip R2-6:           10:40  10:55  11:05
    * </pre>
    * <ul>
-   *     <li>
-   *         The transfer at stop B is tight between trip R1-2 and R2-1. There is no time between
-   *         the arrival and departure, and it is only possible to transfer if the transfer is
-   *         stay-seated or guaranteed. For other types of constrained transfers we should board
-   *         the next trip 'R2-2'.
-   *     </li>
-   *     <li>
-   *         The transfer at stop C allow regular transfers between trip R1-2 and R2-1.
-   *     </li>
-   *     <li>
-   *         R1-1 is the fallback in the reverse search in the same way as R2-2 is the fallback
-   *         int the forward search.
-   *     </li>
+   *   <li>The transfer at stop B is tight between trip R1-2 and R2-1. There is no time between the
+   *       arrival and departure, and it is only possible to transfer if the transfer is stay-seated or
+   *       guaranteed. For other types of constrained transfers we should board the next trip 'R2-2'.</li>
+   *   <li>The transfer at stop C allow regular transfers between trip R1-2 and R2-1.</li>
+   *   <li>R1-1 is the fallback in the reverse search in the same way as R2-2 is the fallback int the
+   *       forward search.</li>
    * </ul>
    * The
    */

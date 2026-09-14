@@ -5,8 +5,7 @@ import java.util.BitSet;
 /**
  * The purpose of this interface is to provide information about the trip schedule. The trip is a
  * child of, and lives in the context of a trip pattern.
- * <p/>
- * The purpose of hiding these attributes behind an interface is to allow the implementation to
+ * <p/>The purpose of hiding these attributes behind an interface is to allow the implementation to
  * choose the most efficient underlying representation that suits its needs.
  */
 public interface RaptorTripSchedule {
@@ -33,18 +32,18 @@ public interface RaptorTripSchedule {
   int departure(int stopPosInPattern);
 
   /// The relative-travel-duration is a proxy for time spent on transit from the boarding stop to
-  /// the alight stop. We do not know the alight stop, so it is impossible to calculate the
-  /// "correct" time. The only thing that matters is that the relative difference between two
-  /// boardings is correct. Compute a relative-time that can be used to compare the travel-time
-  /// cost for any two boardings in the same pattern.
+  /// the alight stop. We do not know the alight stop, so it is impossible to calculate the "correct"
+  /// time. The only thing that matters is that the relative difference between two boardings is
+  /// correct. Compute a relative-time that can be used to compare the travel-time cost for any two
+  /// boardings in the same pattern.
   ///
   /// Two invariants must hold:
   ///
-  /// - For two boardings at stop positions `i` and `j` on the same trip (where `i` comes before
-  ///   `j` in the pattern), `relativeTravelDuration(boardAtI) - relativeTravelDuration(boardAtJ)`
-  ///   must equal the actual transit duration from stop `i` to stop `j`. If the board time at
-  ///   position 3 is 10:00 and at the next stop is 10:05, then the value at position 3 is larger
-  ///   by 5*60s = 300 than at the next stop.
+  /// - For two boardings at stop positions `i` and `j` on the same trip (where `i` comes before `j`
+  ///   in the pattern), `relativeTravelDuration(boardAtI) - relativeTravelDuration(boardAtJ)` must
+  ///   equal the actual transit duration from stop `i` to stop `j`. If the board time at position 3
+  ///   is 10:00 and at the next stop is 10:05, then the value at position 3 is larger by 5*60s = 300
+  ///   than at the next stop.
   /// - All trips in the same pattern should return the same value for at least one stop. If you
   ///   choose to anchor the relative duration to the last stop, and the value for one trip at the
   ///   last stop is 56_000, then it must be 56_000 at the last stop for all other trips in the
@@ -58,9 +57,9 @@ public interface RaptorTripSchedule {
 
   /**
    * Search for the arrival stop position for the latest arrival time and stop index. We need the
-   * time in addition to the stop in cases where the trip pattern loops, visits the same stop
-   * twice. Also, the time alone is not enough, since more than one stop could have the exact
-   * same arrival time.
+   * time in addition to the stop in cases where the trip pattern loops, visits the same stop twice.
+   * Also, the time alone is not enough, since more than one stop could have the exact same arrival
+   * time.
    * <p>
    * Consider using position-based methods in {@link RaptorTripPattern} if possible.
    *
@@ -78,6 +77,7 @@ public interface RaptorTripSchedule {
 
   /**
    * Same as {@code #findDepartureStopPosition(0, earliestDepartureTime, stop)}.
+   *
    * @see #findDepartureStopPosition(int, int, int)
    */
   default int findDepartureStopPosition(int earliestDepartureTime, int stop) {
@@ -91,9 +91,9 @@ public interface RaptorTripSchedule {
    * <p>
    * Consider using position-based methods in {@link RaptorTripPattern} if possible.
    *
-   * @param startStopPos the start stop position to search from
+   * @param startStopPos          the start stop position to search from
    * @param earliestDepartureTime the earliest departure time to search for (inclusive)
-   * @param stop the stop index to search for
+   * @param stop                  the stop index to search for
    * @return the stop position in the trip pattern if found; otherwise, -1
    */
   default int findDepartureStopPosition(int startStopPos, int earliestDepartureTime, int stop) {
@@ -109,8 +109,8 @@ public interface RaptorTripSchedule {
   /**
    * Find all departure stop positions for a stop index after the given earliest departure time.
    * This is useful because a trip can pass through the same stop more than once if the stop pattern
-   * is circular. This method returns all stop positions, while
-   * {@link #findDepartureStopPosition} returns only the first stop position found.
+   * is circular. This method returns all stop positions, while {@link #findDepartureStopPosition}
+   * returns only the first stop position found.
    *
    * @return list of all valid stop positions for a given stop index
    */

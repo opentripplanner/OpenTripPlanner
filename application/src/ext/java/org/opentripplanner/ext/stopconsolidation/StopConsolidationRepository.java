@@ -6,8 +6,8 @@ import java.util.List;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 
 /**
- * A writeable repository which contains the source data for the consolidation of stops.
- * This repository is built during graph build and then serialized into the graph.
+ * A writeable repository which contains the source data for the consolidation of stops. This
+ * repository is built during graph build and then serialized into the graph.
  */
 public interface StopConsolidationRepository extends Serializable {
   /**

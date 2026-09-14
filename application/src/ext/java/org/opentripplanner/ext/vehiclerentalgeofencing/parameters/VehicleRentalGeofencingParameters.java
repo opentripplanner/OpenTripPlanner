@@ -12,9 +12,9 @@ import org.opentripplanner.framework.io.HttpHeaders;
  * The networks to load are discovered from the GBFS manifest rather than listed here; their
  * per-network settings live in the shared {@code gbfs} section of {@code otp-config.json}.
  *
- * @param url the GBFS v3 {@code manifest.json}
+ * @param url      the GBFS v3 {@code manifest.json}
  * @param language the language to request from the GBFS feeds
- * @param headers HTTP headers added to every request made by this builder
+ * @param headers  HTTP headers added to every request made by this builder
  */
 public record VehicleRentalGeofencingParameters(
   URI url,

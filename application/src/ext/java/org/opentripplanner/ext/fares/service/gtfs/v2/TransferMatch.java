@@ -15,8 +15,8 @@ public record TransferMatch(
   }
 
   /// Is there a product in the transfer products that matches the given product's category and
-  /// medium?
-  /// If the list of transfer products is empty, then the transfer is eligible for all products.
+  /// medium? If the list of transfer products is empty, then the transfer is eligible for
+  /// all products.
   public boolean matchesEligibility(FareProduct product) {
     if (transferRule.fareProducts().isEmpty()) {
       return true;
