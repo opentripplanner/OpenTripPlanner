@@ -211,8 +211,9 @@ public class WayPropertySet {
     Float speed = null;
     Float currentSpeed;
 
-    if (way.hasTag("maxspeed:motorcar")) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+    var motorCar = way.getTag("maxspeed:motorcar");
+    if (motorCar != null) {
+      speed = SpeedParser.getMetersSecondFromSpeed(motorCar);
     }
 
     if (speed == null && direction == FORWARD && way.hasTag("maxspeed:forward")) {
@@ -234,7 +235,8 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) {
+    var maxSpeed = way.getTag("maxspeed");
+    if (maxSpeed != null && speed == null) {
       speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed"));
     }
 
