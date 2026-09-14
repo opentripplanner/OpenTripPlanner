@@ -12,7 +12,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultDirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -100,7 +100,8 @@ public class BicycleRoutingTest {
       TransferServiceTestFactory.defaultTransferRepository()
     );
 
-    var itineraries = DirectStreetRouter.route(
+    var router = new DefaultDirectStreetRouter();
+    var itineraries = router.route(
       graph,
       transitService,
       TestServerContext.createStreetLimitationParametersService(),
