@@ -284,9 +284,9 @@ public class VertexLinker {
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
     // The spatial index returns whole grid cells, so in a dense city centre a small envelope still
-    // yields hundreds or thousands of candidate edges of which only a handful lie within the search
-    // radius. Visit the candidates in place and apply the cheap, allocation-free distance test
-    // first; only the survivors are deduplicated, mode-checked and materialised as DistanceTo.
+    // yields hundreds or thousands of candidate edges of which only a handful are kept. Visit the
+    // candidates in place and apply the cheap, allocation-free mode and distance tests first; only
+    // the survivors are deduplicated, reachability-checked and materialised as DistanceTo.
     var collector = new NearbyStreetEdgeCollector(vertex, traverseModes, radiusDeg, xscale);
     graph.forEachEdgeCandidate(env, scope, collector);
 
@@ -303,10 +303,10 @@ public class VertexLinker {
 
   /**
    * Collects the street edges within the search radius of a vertex from the spatial-index
-   * candidates. Only street edges traversable by at least one of the given modes and still present
-   * in the graph are kept. The index may report the same edge once per grid cell it spans, so
-   * survivors are deduplicated with the same {@code equals}/{@code hashCode} semantics the
-   * set-based index query used to apply to every candidate.
+   * candidates. Only street edges traversable by at least one of the given modes, within the search
+   * radius and still present in the graph are kept. The index may report the same edge once per grid
+   * cell it spans, so survivors are deduplicated with the same {@code equals}/{@code hashCode}
+   * semantics the set-based index query used to apply to every candidate.
    */
   private static final class NearbyStreetEdgeCollector implements Consumer<Edge> {
 
@@ -334,14 +334,18 @@ public class VertexLinker {
 
     @Override
     public void accept(Edge edge) {
-      if (!(edge instanceof StreetEdge streetEdge)) {
+      // The predicates are conjunctive, so the order only affects speed, not the result. The mode
+      // check is a single bitmask test and is by far the most selective filter for modes that only
+      // a fraction of the edges allow (for car it rejects around three quarters of the candidates),
+      // so it runs before the distance computation.
+      if (!(edge instanceof StreetEdge streetEdge) || !streetEdge.canTraverse(traverseModes)) {
         return;
       }
       double squaredDistance = streetEdge.squaredEquirectangularDistanceToPoint(lon, lat, xscale);
       if (squaredDistance >= radiusDegSq || !seen.add(streetEdge)) {
         return;
       }
-      if (streetEdge.canTraverse(traverseModes) && streetEdge.isReachableFromGraph()) {
+      if (streetEdge.isReachableFromGraph()) {
         nearbyEdges.add(new DistanceTo<>(streetEdge, squaredDistance));
       }
     }
