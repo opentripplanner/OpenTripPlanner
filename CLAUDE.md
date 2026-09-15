@@ -24,7 +24,7 @@ mvn test
 # Run tests with code coverage
 mvn jacoco:prepare-agent test
 
-# Skip prettier during local builds
+# Skip the code formatting during local builds
 mvn test -Dps          # equivalently: mvn test -PprettierSkip
 
 # Regenerate API/itinerary snapshot tests
@@ -36,12 +36,14 @@ mvn clean -Pclean-test-snapshots
 Quality gates run in the Maven `validate` / `process-sources` phases and fail the build on
 violations:
 
-- **Prettier**, run through the **Spotless** Maven plugin, auto-formats Java (100-char width,
-  2-space indent; the options are configured in the root `pom.xml`). Spotless also removes unused
-  imports (Javadoc-only references are kept). Requires `node`/`npm` on the `PATH`. CI enforces it;
-  check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip locally with `-Dps`.
-- **Javadoc** is formatted by the Eclipse JDT formatter, run as a Spotless step before Prettier. The
-  settings live in `eclipse-formatter.properties`.
+- **The Eclipse JDT formatter**, run through the **Spotless** Maven plugin, auto-formats the Java
+  code and the Javadoc (100-char width, 2-space indent; the settings live in
+  `eclipse-formatter.properties`). Spotless also removes unused imports (Javadoc-only references are
+  kept). CI enforces it; check with `mvn spotless:check`, format with `mvn spotless:apply`. Skip
+  locally with `-Dps`.
+- **Prettier** (Spotless, requires `node`/`npm` on the `PATH`) formats the Markdown and JSON files
+  only. Java was formatted with Prettier up to OTP v2.11; the Eclipse profile reproduces that style
+  as closely as possible, see `doc/dev/decisionrecords/Codestyle.md`.
 - **Checkstyle** runs against `checkstyle.xml` in the `process-sources` phase (after Spotless). Skip
   with `-Dcs` (or `-PcheckstyleSkip`).
 
