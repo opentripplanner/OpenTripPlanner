@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -89,13 +88,10 @@ public class RefetchItineraryService {
 
   /// Refetch an itinerary
   ///
-  /// @param from          An optional from location. If null the first legReference will be the
-  ///                      start of the itinerary.
-  /// @param to            An optional to location. If null the last legReference will be the end of
-  ///                      the itinerary.
+  /// @param from An optional from location. If null the first legReference will be the start of the itinerary.
+  /// @param to An optional to location. If null the last legReference will be the end of the itinerary.
   /// @param legReferences A list of leg references describing the parts of the itinerary.
-  /// @throws RefetchItineraryException If there is some issue with the input values that should be
-  ///                                   mapped so some kind of InvalidInput message to the user.
+  /// @throws RefetchItineraryException If there is some issue with the input values that should be mapped so some kind of InvalidInput message to the user.
   public Itinerary refetchItinerary(
     @Nullable GenericLocation from,
     @Nullable GenericLocation to,
@@ -286,25 +282,6 @@ public class RefetchItineraryService {
       // We don't try to calculate a cost for the refetched itinerary.
       .withGeneralizedCost(Cost.ZERO)
       .build();
-  }
-
-  private boolean hasTransferStop(
-    I18NString legStopName,
-    StopLocation transferStop,
-    Set<I18NString> transferStops
-  ) {
-    return transferStop != null && transferStops.contains(legStopName);
-  }
-
-  private void replaceLastScheduledTransitLeg(List<Leg> legs, ScheduledTransitLeg replacement) {
-    for (int i = legs.size() - 1; i >= 0; i--) {
-      if (legs.get(i) instanceof ScheduledTransitLeg) {
-        legs.set(i, replacement);
-        return;
-      }
-    }
-
-    throw new IllegalStateException("No ScheduledTransitLeg found to replace");
   }
 
   /// This takes a place that has to have a stop id in it and maps to GenericLocation

@@ -20,6 +20,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -58,7 +59,6 @@ import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
-import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -111,8 +111,8 @@ public class RequestScopedModule {
 
   @Provides
   @HttpRequestScoped
-  static ConstrainedTransferService constrainedTransferService() {
-    return new DefaultConstrainedTransferService();
+  static ConstrainedTransferService constrainedTransferService(TransitService transitService) {
+    return transitService.getConstrainedTransferService();
   }
 
   @Provides
@@ -218,7 +218,8 @@ public class RequestScopedModule {
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig
+    TransitRoutingConfig transitRoutingConfig,
+    RealtimeResolver realtimeResolver
   ) {
     return new DefaultRoutingService(
       transitService,
@@ -241,7 +242,8 @@ public class RequestScopedModule {
       linkingContextFactory,
       // transitRoutingConfig implements 2 roles; hence the repetition below
       transitRoutingConfig,
-      transitRoutingConfig
+      transitRoutingConfig,
+      realtimeResolver
     );
   }
 
@@ -289,13 +291,6 @@ public class RequestScopedModule {
     RoutingService routingService,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    RouteRequest defaultRequest,
-    RefetchItineraryService refetchItineraryService,
-    VectorTileConfig vectorTileConfig,
-    GtfsApiParameters gtfsApiConfig,
-    TransmodelAPIParameters transmodelAPIParameters,
-    OjpApiParameters ojpApiParameters,
-    TriasApiParameters triasApiParameters,
     RegularTransferService transferService,
     FareService fareService,
     VehicleRentalService vehicleRentalService,

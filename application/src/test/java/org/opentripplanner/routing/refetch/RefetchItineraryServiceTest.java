@@ -2,7 +2,6 @@ package org.opentripplanner.routing.refetch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -234,9 +234,15 @@ class RefetchItineraryServiceTest {
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
-    assertNotNull(itinerary.legs().getFirst().transferToNextLeg());
+    var legs = itinerary.legs();
+
+    assertTrue(legs.getFirst().transferToNextLeg().getTransferConstraint().isGuaranteed());
     assertNull(itinerary.legs().getFirst().transferFromPrevLeg());
-    assertNotNull(itinerary.legs().getLast().transferFromPrevLeg());
+    assertTrue(
+      Objects.requireNonNull(legs.getLast().transferFromPrevLeg())
+        .getTransferConstraint()
+        .isGuaranteed()
+    );
     assertNull(itinerary.legs().getLast().transferToNextLeg());
 
     assertEquals("A ~ BUS trip1 10:00 11:00 ~ B ~ BUS trip2 12:00 14:00 ~ D []", itinerary.toStr());

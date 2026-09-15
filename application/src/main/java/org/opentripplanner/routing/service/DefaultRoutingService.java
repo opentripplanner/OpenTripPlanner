@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -63,6 +64,7 @@ public class DefaultRoutingService implements RoutingService {
   private final LinkingContextFactory linkingContextFactory;
   private final TransitTuningParameters transitTuningParameters;
   private final RaptorTuningParameters raptorTuningParameters;
+  private final RealtimeResolver realtimeResolver;
 
   //private final TransitRoutingConfig transitRoutingConfig;
 
@@ -103,7 +105,8 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
-    RaptorTuningParameters raptorTuningParameters
+    RaptorTuningParameters raptorTuningParameters,
+    RealtimeResolver realtimeResolver
   ) {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
@@ -125,6 +128,7 @@ public class DefaultRoutingService implements RoutingService {
     this.linkingContextFactory = linkingContextFactory;
     this.transitTuningParameters = transitTuningParameters;
     this.raptorTuningParameters = raptorTuningParameters;
+    this.realtimeResolver = realtimeResolver;
 
     var timeZone = ZoneIdFallback.zoneId(transitService.getTimeZone());
 
@@ -179,7 +183,8 @@ public class DefaultRoutingService implements RoutingService {
       linkingContextFactory,
       transitTuningParameters,
       raptorTuningParameters,
-      workerRequest
+      workerRequest,
+      realtimeResolver
     );
   }
 

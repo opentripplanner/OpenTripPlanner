@@ -1,9 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.ext.realtimeresolver.RealtimeResolver.populateLegsWithRealtime;
-
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
@@ -11,10 +10,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.paging.PagingService;
-import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +24,14 @@ public class RoutingResponseMapper {
     Set<RoutingError> routingErrors,
     DebugTimingAggregator debugTimingAggregator,
     PagingService pagingService,
-    RefetchItineraryService refetchItineraryService,
-    TransitService transitService,
-    TransitAlertService transitAlertService
+    RealtimeResolver realtimeResolver
   ) {
     // Search is performed without realtime, but we still want to
     // include realtime information in the result
     if (
       request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
     ) {
-      itineraries = populateLegsWithRealtime(
-        itineraries,
-        refetchItineraryService,
-        transitService,
-        transitAlertService,
-        request
-      );
+      itineraries = realtimeResolver.addRealtimeInfo(itineraries, request);
     }
 
     // Create response

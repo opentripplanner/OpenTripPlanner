@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -92,6 +93,7 @@ public class RoutingWorker {
   private final LinkingContextFactory linkingContextFactory;
   private final TransitTuningParameters transitTuningParameters;
   private final RaptorTuningParameters raptorTuningParameters;
+  private final RealtimeResolver realtimeResolver;
 
   @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
@@ -139,7 +141,8 @@ public class RoutingWorker {
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
     RaptorTuningParameters raptorTuningParameters,
-    RoutingWorkerRequest workerRequest
+    RoutingWorkerRequest workerRequest,
+    RealtimeResolver realtimeResolver
   ) {
     this.request = workerRequest.request();
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();
@@ -163,6 +166,7 @@ public class RoutingWorker {
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.raptorTuningParameters = raptorTuningParameters;
+    this.realtimeResolver = realtimeResolver;
     this.transitTuningParameters = transitTuningParameters;
     this.debugTimingAggregator = new DebugTimingAggregator(
       meterRegistry,
@@ -187,6 +191,12 @@ public class RoutingWorker {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
         try {
+          /**
+           * DirectStreet = Resor som INTE använder kollektivtrafik.
+           * DirectFlex = Specialkollektivtrafik (Vi använder det inte). Vi har istället Närtrafik, egen flex.
+           * RouteTransit - Den som använder Raptor för att räkna ut kollektivtrafik.
+           * Carpooling - Inget som vi gör.
+           */
           var r1 = CompletableFuture.supplyAsync(() -> routeDirectStreet());
           var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex());
           var r3 = CompletableFuture.supplyAsync(() -> routeTransit());
@@ -257,16 +267,13 @@ public class RoutingWorker {
     // is off (too few or too many results found).
 
     var pagingService = createPagingService(result.itineraries());
-    var refetchItineraryService = createRefetchItineraryService();
     return RoutingResponseMapper.map(
       request,
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
       pagingService,
-      refetchItineraryService,
-      transitService,
-      transitAlertService
+      realtimeResolver
     );
   }
 
