@@ -1,13 +1,18 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -34,9 +39,14 @@ import org.slf4j.LoggerFactory;
  * {@link RoutedSegment#path()} is called — which happens for the few segments that make it into
  * an itinerary, not for the thousands evaluated and discarded per request.
  * <p>
- * Vertices must be registered via {@link #addVertex} before routing.
+ * Vertices must be registered via {@link #addVertex} or {@link #addLeg} before routing.
  * The router first attempts to use a forward tree from the origin;
  * if unavailable, it falls back to a reverse tree to the destination.
+ * <p>
+ * A tree registered with {@link #addVertex} explores everything within its duration limit — a
+ * disc around the root. A tree registered with {@link #addLeg} is bounded to the ellipse in which
+ * a detour of the leg can still be feasible, see {@link EllipseBoundSkipEdgeStrategy}; for long
+ * legs that is a small fraction of the disc.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
  */
@@ -44,6 +54,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolTreeStreetRouter.class);
 
+  private final double maxCarSpeedMetersPerSecond;
   private final Map<Vertex, VertexRegistration> forwardRegistrations = new HashMap<>();
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
   private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
@@ -66,19 +77,66 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     BOTH,
   }
 
-  private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
+  /**
+   * Uses {@link StreetConstants#DEFAULT_MAX_CAR_SPEED} to bound leg trees. Prefer the constructor
+   * taking the graph's real maximum car speed, which prunes tighter while staying safe.
+   */
+  public CarpoolTreeStreetRouter() {
+    this(StreetConstants.DEFAULT_MAX_CAR_SPEED);
+  }
+
+  /**
+   * @param maxCarSpeedMetersPerSecond the fastest speed any street in the graph can be driven at,
+   *        used to bound leg trees to their feasibility ellipse — see {@link #addLeg}.
+   */
+  public CarpoolTreeStreetRouter(double maxCarSpeedMetersPerSecond) {
+    if (maxCarSpeedMetersPerSecond <= 0) {
+      throw new IllegalArgumentException("maxCarSpeed must be positive");
+    }
+    this.maxCarSpeedMetersPerSecond = maxCarSpeedMetersPerSecond;
+  }
+
+  /**
+   * What a tree rooted at {@code vertex} has to cover. {@code foci} lists the far ends of the legs
+   * the tree serves, each with the most seconds that leg may take; the tree is then bounded to the
+   * union of the corresponding ellipses. A {@code null} {@code foci} means a plain disc of radius
+   * {@code searchLimit} — everything within the limit is wanted.
+   */
+  private record VertexRegistration(
+    Vertex vertex,
+    Duration searchLimit,
+    @Nullable List<EllipseBoundSkipEdgeStrategy.Focus> foci
+  ) {
+    /**
+     * Combines two registrations of the same vertex and direction: the larger limit wins, and the
+     * ellipses are united. A disc absorbs any ellipse — everything a disc registration asks for
+     * must stay reachable.
+     */
+    VertexRegistration merge(VertexRegistration other) {
+      var limit = searchLimit.compareTo(other.searchLimit) >= 0 ? searchLimit : other.searchLimit;
+      if (foci == null || other.foci == null) {
+        return new VertexRegistration(vertex, limit, null);
+      }
+      var union = new ArrayList<EllipseBoundSkipEdgeStrategy.Focus>(
+        foci.size() + other.foci.size()
+      );
+      union.addAll(foci);
+      union.addAll(other.foci);
+      return new VertexRegistration(vertex, limit, union);
+    }
+  }
 
   private ShortestPathTree<State, Edge, Vertex> createTree(
     Vertex vertex,
     boolean reverse,
-    Duration searchLimit
+    VertexRegistration registration
   ) {
     var streetSearchRequest = reverse
       ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
       : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     var builder = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
+      .withSkipEdgeStrategy(skipEdgeStrategy(registration, reverse))
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
       .withRequest(streetSearchRequest);
 
@@ -98,7 +156,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, false, reg.searchLimit());
+    tree = createTree(vertex, false, reg);
     forwardTrees.put(vertex, tree);
     forwardRegistrations.remove(vertex);
     return tree;
@@ -113,14 +171,36 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, true, reg.searchLimit());
+    tree = createTree(vertex, true, reg);
     reverseTrees.put(vertex, tree);
     reverseRegistrations.remove(vertex);
     return tree;
   }
 
   /**
-   * Register a vertex for tree computation in the given direction(s).
+   * The search bound of a tree: never beyond the registered duration limit, and — for a tree that
+   * only serves legs — never outside the union of the legs' feasibility ellipses.
+   */
+  private SkipEdgeStrategy<State, Edge> skipEdgeStrategy(
+    VertexRegistration registration,
+    boolean reverse
+  ) {
+    SkipEdgeStrategy<State, Edge> byDuration = new DurationSkipEdgeStrategy<>(
+      registration.searchLimit()
+    );
+    if (registration.foci() == null) {
+      return byDuration;
+    }
+    return new ComposingSkipEdgeStrategy<>(
+      byDuration,
+      new EllipseBoundSkipEdgeStrategy(registration.foci(), maxCarSpeedMetersPerSecond, reverse)
+    );
+  }
+
+  /**
+   * Register a vertex for tree computation in the given direction(s). The tree explores everything
+   * within {@code searchLimit} of the vertex. Use {@link #addLeg} instead when the tree only has to
+   * serve detours of a known leg.
    * Tree computation is deferred until a {@link #route} call actually needs the tree.
    * Vertices whose trees are never needed incur no computation cost. Adding vertices after
    * routing has started is disallowed to ensure that all temporary vertices are linked to the
@@ -141,32 +221,72 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       );
     }
     if (direction == Direction.FROM || direction == Direction.BOTH) {
-      registerLargest(forwardRegistrations, vertex, searchLimit);
+      register(forwardRegistrations, new VertexRegistration(vertex, searchLimit, null));
     }
     if (direction == Direction.TO || direction == Direction.BOTH) {
-      registerLargest(reverseRegistrations, vertex, searchLimit);
+      register(reverseRegistrations, new VertexRegistration(vertex, searchLimit, null));
     }
   }
 
   /**
-   * Registers {@code vertex} keeping the larger of any already-registered limit and
-   * {@code searchLimit}. Distinct
+   * Register the two trees a driver leg needs — a forward tree from {@code from} and a reverse tree
+   * to {@code to} — bounded to the region where a detour of the leg can still be feasible.
+   * <p>
+   * {@code legLimit} is the most the leg may take once a passenger is inserted: its baseline
+   * duration plus the allowed deviation (and any slack). Every segment the trees are asked for —
+   * {@code from → pickup}, {@code from → stop}, {@code pickup → to}, {@code stop → to}, and the
+   * baseline itself — is part of a detour that starts at {@code from}, ends at {@code to} and takes
+   * at most {@code legLimit}, so no vertex outside the ellipse with those foci and that bound is
+   * ever needed. The plain duration limit is kept as well: the ellipse never reaches beyond it.
+   * <p>
+   * Registering the same vertex and direction again — for another leg, or via {@link #addVertex} —
+   * widens the tree: the limits are maxed and the ellipses united, and a disc registration turns
+   * the tree back into a plain disc.
+   *
+   * @throws IllegalStateException if called after {@link #route} has already been invoked, see
+   *         {@link #addVertex}
+   */
+  public void addLeg(Vertex from, Vertex to, Duration legLimit) {
+    if (routingStarted) {
+      throw new IllegalStateException(
+        "Cannot add legs after routing has started. Register all legs before calling route()."
+      );
+    }
+    long bound = legLimit.toSeconds();
+    register(
+      forwardRegistrations,
+      new VertexRegistration(
+        from,
+        legLimit,
+        List.of(new EllipseBoundSkipEdgeStrategy.Focus(to.getCoordinate(), bound))
+      )
+    );
+    register(
+      reverseRegistrations,
+      new VertexRegistration(
+        to,
+        legLimit,
+        List.of(new EllipseBoundSkipEdgeStrategy.Focus(from.getCoordinate(), bound))
+      )
+    );
+  }
+
+  /**
+   * Registers a tree, widening any registration already present for the same vertex — see
+   * {@link VertexRegistration#merge}. Distinct
    * {@link org.opentripplanner.street.model.vertex.TemporaryStreetLocation}s at the same
    * coordinate compare equal, so two trips — or two legs of one trip — routing through the same
    * point collapse to a single registration here. The shared tree must span the longest leg
    * registered at that point, so the largest limit wins: a smaller limit would build a tree too
    * short for a longer leg's baseline, making it unroutable. An over-large tree only widens the
-   * search — any insertion it would wrongly admit is rejected by the delay constraints — so taking
-   * the maximum is always safe.
+   * search — any insertion it would wrongly admit is rejected by the delay constraints — so
+   * widening is always safe.
    */
-  private static void registerLargest(
+  private static void register(
     Map<Vertex, VertexRegistration> registrations,
-    Vertex vertex,
-    Duration searchLimit
+    VertexRegistration registration
   ) {
-    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit), (existing, added) ->
-      existing.searchLimit().compareTo(added.searchLimit()) >= 0 ? existing : added
-    );
+    registrations.merge(registration.vertex(), registration, VertexRegistration::merge);
   }
 
   /** Returns the total number of forward vertices (pending and computed). Package-private for testing. */
