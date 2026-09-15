@@ -1,6 +1,8 @@
 package org.opentripplanner.street.geometry;
 
+import java.util.ArrayDeque;
 import java.util.BitSet;
+import java.util.Deque;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 
@@ -82,31 +84,46 @@ public class DouglasPeuckerAlgorithm {
   }
 
   /**
-   * Keeps the point in {@code [start, end]} furthest from the chord between its endpoints if it exceeds
-   * {@code toleranceDegrees}, then recurses on both halves. The result is stored in the {@link #keep} BitSet.
+   * Keeps the point in each {@code [start, end]} range furthest from the chord between its
+   * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps
+   * going. The result is stored in the {@link #keep} BitSet.
+   *
+   * <p>This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
+   * rather than recursive: a naive recursive version can recurse as deep as the input is long
+   * (e.g. a shape whose furthest point from the chord always lands near one end), which risks a
+   * {@link StackOverflowError} on the JVM call stack for long, detailed shapes.
    */
   private void douglasPeucker(int start, int end) {
-    if (end <= start + 1) {
-      return;
-    }
-    double maxDistance = -1;
-    int maxIndex = -1;
-    for (int i = start + 1; i < end; i++) {
-      double distance = perpendicularDistance(
-        coordinates[start],
-        coordinates[end],
-        coordinates[i],
-        lonScale
-      );
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        maxIndex = i;
+    Deque<Range> stack = new ArrayDeque<>();
+    stack.push(new Range(start, end));
+
+    while (!stack.isEmpty()) {
+      var r = stack.pop();
+
+      if (r.start() + 1 == r.end()) {
+        continue;
       }
-    }
-    if (maxDistance > toleranceDegrees) {
-      keep.set(maxIndex);
-      douglasPeucker(start, maxIndex);
-      douglasPeucker(maxIndex, end);
+
+      double maxDistance = -1;
+      int maxIndex = -1;
+
+      for (int i = r.start() + 1; i < r.end(); i++) {
+        double distance = perpendicularDistance(
+          coordinates[r.start()],
+          coordinates[r.end()],
+          coordinates[i],
+          lonScale
+        );
+        if (distance > maxDistance) {
+          maxDistance = distance;
+          maxIndex = i;
+        }
+      }
+      if (maxDistance > toleranceDegrees) {
+        keep.set(maxIndex);
+        stack.push(new Range(r.start(), maxIndex));
+        stack.push(new Range(maxIndex, r.end()));
+      }
     }
   }
 
@@ -149,4 +166,6 @@ public class DouglasPeuckerAlgorithm {
     int lastIndex = coordinates.length - 1;
     return (coordinates[0].y + coordinates[lastIndex / 2].y + coordinates[lastIndex].y) / 3;
   }
+
+  private record Range(int start, int end) {}
 }

@@ -1,17 +1,17 @@
 package org.opentripplanner.street.geometry;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
 
 class DouglasPeuckerAlgorithmTest {
 
@@ -61,10 +61,7 @@ class DouglasPeuckerAlgorithmTest {
     var simplified = DouglasPeuckerAlgorithm.of(route, 130_000.0);
 
     assertEquals(2, simplified.getNumPoints());
-    assertEquals(
-      route.getStartPoint().getCoordinate(),
-      simplified.getStartPoint().getCoordinate()
-    );
+    assertEquals(route.getStartPoint().getCoordinate(), simplified.getStartPoint().getCoordinate());
     assertEquals(route.getEndPoint().getCoordinate(), simplified.getEndPoint().getCoordinate());
   }
 
@@ -124,27 +121,32 @@ class DouglasPeuckerAlgorithmTest {
   @ParameterizedTest
   @ValueSource(
     strings = {
-      "(60 10) (61 20) (60 30) 1.0 = 1.0  --  1º latitude",
-      "(-9  0) ( 0  1) ( 9  0) 1.0 = 1.0  --  1º longitude at equator",
-      "(57  0) (60  2) (63  0) 0.5 = 1.0  --  1º longitude at 60º North",
-      "(-59 0) (-60 2) (-61 0) 0.5 = 1.0  --  1º longitude at 60º South",
-      "( 0 10) ( 0 22) ( 0 20) 1.0 = 2.0  --  2º overshootingting the end point (longitude)",
-      "( 0 55) (-5 55) (30 55) 1.0 = 5.0  --  5º degrees overshootingting the start point (latitude)",
-      "( 0 50) (-4 47) (0  80) 1.0 = 5.0  --  4º by 2º overshootingting the start point",
-      "(58 10) (65 18) (62 10) 0.5 = 5.0  --  3º by 8º overshootingting the end point at 60º North",
+      "(60 10) (61 20) (60 30) 1.0 = 1.0  --  Ɛ = 1º latitude",
+      "(-9  0) ( 0  1) ( 9  0) 1.0 = 1.0  --  Ɛ = 1º longitude at equator",
+      "(57  0) (60  2) (63  0) 0.5 = 1.0  --  Ɛ = 1º longitude at 60º North",
+      "(-59 0) (-60 2) (-61 0) 0.5 = 1.0  --  Ɛ = 1º longitude at 60º South",
+      "( 0 10) ( 0 22) ( 0 20) 1.0 = 2.0  --  Ɛ = 2º overshootingting the end point (longitude)",
+      "( 0 55) (-5 55) (30 55) 1.0 = 5.0  --  Ɛ = 5º degrees overshootingting the start point (latitude)",
+      "( 0 50) (-4 47) (0  80) 1.0 = 5.0  --  Ɛ = 4º x 3º = 5º overshootingting the start point",
+      "(58 10) (65 18) (62 10) 0.5 = 5.0  --  Ɛ = 3º x 8º = 5º overshootingting the end point at 60º North",
     }
   )
   void testPerpendicularDistance(String text) {
     var m = PERPENDICULAR_DISTANCE_PTN.matcher(text);
     assertTrue(m.matches(), text);
 
-    var a = new WgsCoordinate(num(m, 1), num(m, 2)).asJtsCoordinate();
-    var b = new WgsCoordinate(num(m, 3), num(m, 4)).asJtsCoordinate();
-    var c = new WgsCoordinate(num(m, 5), num(m, 6)).asJtsCoordinate();
+    var start = new WgsCoordinate(num(m, 1), num(m, 2)).asJtsCoordinate();
+    var point = new WgsCoordinate(num(m, 3), num(m, 4)).asJtsCoordinate();
+    var end = new WgsCoordinate(num(m, 5), num(m, 6)).asJtsCoordinate();
     double lonScale = num(m, 7);
     double expected = num(m, 8);
 
-    assertEquals(  expected,  perpendicularDistance(a, c, b, lonScale), ON_CENTI_METER_DEGREES, text);
+    assertEquals(
+      expected,
+      perpendicularDistance(start, end, point, lonScale),
+      ON_CENTI_METER_DEGREES,
+      text
+    );
   }
 
   private static double num(Matcher m, int group) {
