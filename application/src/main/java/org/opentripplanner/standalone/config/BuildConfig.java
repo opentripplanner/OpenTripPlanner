@@ -443,7 +443,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           will not be part of the graph. Use an absolute date or a period relative to the date the graph is
           build(BUILD_DAY).
 
-          To get an effectively unbounded value, use a very large period like `"-P100Y"`.
+          The transit service period (`transitServiceStart` to `transitServiceEnd`) cannot exceed 10 years.
           """
         )
         .asDateOrRelativePeriod("-P1Y", confZone);
@@ -459,7 +459,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           will not be part of the graph. Use an absolute date or a period relative to the date the graph is
           build(BUILD_DAY).
 
-          To get an effectively unbounded value, use a very large period like `"P100Y"`.
+          The transit service period (`transitServiceStart` to `transitServiceEnd`) cannot exceed 10 years.
           """
         )
         .asDateOrRelativePeriod("P3Y", confZone);
