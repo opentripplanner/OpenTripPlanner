@@ -15,8 +15,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.index.ItemVisitor;
-import org.locationtech.jts.index.SpatialIndex;
 import org.opentripplanner.utils.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
  */
-public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
+public class HashGridSpatialIndex<T> implements Serializable {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
@@ -79,7 +77,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     this(DEFAULT_X_BIN_SIZE, DEFAULT_Y_BIN_SIZE);
   }
 
-  @Override
   public final void insert(Envelope envelope, final Object item) {
     visit(envelope, true, (bin, mapKey) -> {
       /*
@@ -96,7 +93,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
-  @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
     visit(envelope, false, (bin, mapKey) -> {
@@ -123,16 +119,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     });
   }
 
-  @Override
-  public final void query(Envelope envelope, ItemVisitor visitor) {
-    // We are cheating a bit here... But who cares? Never called in OTP.
-    List<T> tlist = query(envelope);
-    for (T t : tlist) {
-      visitor.visitItem(t);
-    }
-  }
-
-  @Override
   public final boolean remove(Envelope envelope, final Object item) {
     // This iterates over the entire rectangular envelope of the edge rather than the segments
     // making it up. It will be inefficient for very long edges, but creating a new remove method

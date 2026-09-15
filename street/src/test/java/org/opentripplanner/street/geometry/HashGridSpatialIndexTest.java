@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
 
 public class HashGridSpatialIndexTest {
@@ -31,8 +30,8 @@ public class HashGridSpatialIndexTest {
     final int N_QUERIES = 1000;
 
     Random rand = new Random(42);
-    SpatialIndex hashGrid = new HashGridSpatialIndex<>();
-    SpatialIndex strTree = new STRtree();
+    HashGridSpatialIndex<DummyObject> hashGrid = new HashGridSpatialIndex<>();
+    STRtree strTree = new STRtree();
 
     for (int i = 0; i < N_OBJS; i++) {
       Coordinate a = new Coordinate(rand.nextDouble() * DX + X0, rand.nextDouble() * DY + Y0);
