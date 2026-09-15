@@ -5,16 +5,22 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 
 /**
- * Simplifies a {@link LineString} with the Douglas-Peucker algorithm. A degree of longitude
- * covers fewer real-world meters than a degree of latitude away from the equator, so the
- * distance calculation scales longitude by {@code cos(latitude)} to correct for that - but only
- * inside the distance calculation, never on the coordinates themselves. That means every
- * retained point, endpoints included, is the exact original {@link Coordinate} instance: there is
- * no scale/unscale round-trip, and so no rounding error that could move a point off its original
- * location.
+ * Simplifies a {@link LineString} with the Douglas-Peucker algorithm (also known as Ramer-Douglas-Peucker, or RDP),
+ * operating on geographic (WGS84 longitude/latitude, in degrees) coordinates.
  *
- * Note! The Douglas-Peucker simplification implemented in OTP supports WGTS coordinates, the JTS
- * library we use also implements the Douglas-Peucker, but WGTS coordinates are not supported.
+ * <p>Away from the equator, a degree of longitude covers fewer real-world meters than a degree of latitude, so the
+ * distance calculation scales longitude by {@code cos(latitude)} to correct for that. This is the standard
+ * <a href="https://en.wikipedia.org/wiki/Equirectangular_projection"> equirectangular-projection</a> approximation,
+ * which treats the Earth as a sphere; it uses the line's approximate average latitude
+ * (see {@link #approximateAverageLatitude}), not the latitude of each individual point being measured. We copute
+ * the longitude scale once - this is a perfomance optimization. The scaling is applied only inside the distance
+ * calculation, never on the coordinates themselves. That means every retained point, endpoints included, is the exact
+ * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding error that could move
+ * a point off its original location.
+ *
+ * <p>JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian) and does not apply
+ * the longitude correction above, so it distorts distances when applied directly to WGS84 coordinates. This
+ * implementation exists to support those coordinates correctly.
  */
 public class DouglasPeuckerAlgorithm {
 
@@ -40,7 +46,7 @@ public class DouglasPeuckerAlgorithm {
    */
   public static LineString of(LineString lineString, double toleranceMeters) {
     if (toleranceMeters < 0.0) {
-      throw new IllegalArgumentException("toleranceMeters must be greater than 0");
+      throw new IllegalArgumentException("toleranceMeters must not be negative");
     }
     if (toleranceMeters == 0.0 || lineString.getNumPoints() < 3) {
       return lineString;
@@ -76,9 +82,8 @@ public class DouglasPeuckerAlgorithm {
   }
 
   /**
-   * Keeps the point in {@code [start, end]} furthest from the chord between its endpoints if it
-   * exceeds {@code toleranceDegrees}, then recurses on both halves. The rusult is stored in the
-   * {@link #keep} BitSet.
+   * Keeps the point in {@code [start, end]} furthest from the chord between its endpoints if it exceeds
+   * {@code toleranceDegrees}, then recurses on both halves. The result is stored in the {@link #keep} BitSet.
    */
   private void douglasPeucker(int start, int end) {
     if (end <= start + 1) {
@@ -87,7 +92,12 @@ public class DouglasPeuckerAlgorithm {
     double maxDistance = -1;
     int maxIndex = -1;
     for (int i = start + 1; i < end; i++) {
-      double distance = perpendicularDistance(coordinates[start], coordinates[end], coordinates[i]);
+      double distance = perpendicularDistance(
+        coordinates[start],
+        coordinates[end],
+        coordinates[i],
+        lonScale
+      );
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = i;
@@ -101,14 +111,18 @@ public class DouglasPeuckerAlgorithm {
   }
 
   /**
-   * Distance from {@code point} to the segment between {@code start} and {@code end}, in
-   * degrees, with longitude scaled by {@link #lonScale}. Using the segment rather than the
-   * infinite line through it matters for a point that overshoots past {@code start} or
-   * {@code end} while staying close to that line's bearing: measured against the infinite line
-   * such a point looks almost colinear (near-zero distance) even though reaching it is a real,
+   * Distance from {@code point} to the segment between {@code start} and {@code end}, in degrees, with longitude
+   * scaled by {@link #lonScale}. Using the segment rather than the infinite line through it matters for a point that
+   * overshoots past {@code start} or {@code end} while staying close to that line's bearing: measured against the
+   * infinite line such a point looks almost colinear (near-zero distance) even though reaching it is a real,
    * arbitrarily long detour, which would wrongly let it be simplified away.
    */
-  private double perpendicularDistance(Coordinate start, Coordinate end, Coordinate point) {
+  static double perpendicularDistance(
+    Coordinate start,
+    Coordinate end,
+    Coordinate point,
+    double lonScale
+  ) {
     double x1 = start.x * lonScale;
     double y1 = start.y;
     double x2 = end.x * lonScale;
@@ -118,17 +132,18 @@ public class DouglasPeuckerAlgorithm {
 
     double dx = x2 - x1;
     double dy = y2 - y1;
-    double lengthSquared = dx * dx + dy * dy;
-    if (lengthSquared == 0) {
+    double xySquared = dx * dx + dy * dy;
+
+    if (xySquared == 0) {
       return Math.hypot(px - x1, py - y1);
     }
 
-    double t = Math.clamp(((px - x1) * dx + (py - y1) * dy) / lengthSquared, 0.0, 1.0);
+    double t = Math.clamp(((px - x1) * dx + (py - y1) * dy) / xySquared, 0.0, 1.0);
     return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
   }
 
   /**
-   * Approximates the line's average latitude from its first, middle and last point.
+   * Approximates the line's average latitude from its first, middle, and last point.
    */
   private static double approximateAverageLatitude(Coordinate[] coordinates) {
     int lastIndex = coordinates.length - 1;

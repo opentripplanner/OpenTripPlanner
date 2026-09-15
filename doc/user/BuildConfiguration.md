@@ -651,13 +651,13 @@ To get an effectively unbounded value, use a very large period like `"-P100Y"`.
 
 Douglas-Peucker simplification tolerance for transit route shapes, in meters.
 
-Simplifies each trip pattern's shape geometry once, at graph-build time, using the Douglas-Peucker
-algorithm with this distance tolerance. A larger tolerance removes more points (and any shape detail
-smaller than it); points are never removed from an individual hop's endpoints, so stop locations are
-unaffected.
+Simplifies each trip pattern's shape geometry once, at graph-build time, using the Douglas-Peucker algorithm
+with this distance tolerance as the epsilon parameter of the algorithm. A larger tolerance removes more
+points (and any shape detail smaller than it); points are never removed from an individual hop's endpoints,
+so stop locations are unaffected.
 
-This is opt-in - leave it unset to keep the raw, unsimplified shapes. 0.5 or 3.0 meters may save a
-significant amount of memory - if some of the feeds contains shapes with a lot of detail.
+This is opt-in - leave it unset to keep the raw, unsimplified shapes. 0.5 or 3.0 meters may save a significant
+amount of memory - if some of the feeds contains shapes with a lot of detail.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
