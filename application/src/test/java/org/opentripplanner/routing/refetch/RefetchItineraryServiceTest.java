@@ -6,101 +6,26 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.common.collect.ImmutableMultimap;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.common.AbstractTestBase;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
-import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
-import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
-import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transfer.constrained.model.TransferConstraint;
-import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
-import org.opentripplanner.transfer.regular.RegularTransferService;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
-import org.opentripplanner.transit.model.TransitTestEnvironment;
-import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
-import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
 
-class RefetchItineraryServiceTest {
-
-  // Setup transit
-  static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
-  static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(SERVICE_DATE);
-  static final Station STATION_A = ENV_BUILDER.station("StationA");
-  static final RegularStop STOP_A = ENV_BUILDER.stopAtStation("A", "StationA");
-  static final RegularStop STOP_B = ENV_BUILDER.stop("B");
-  static final RegularStop STOP_C = ENV_BUILDER.stop("C");
-  static final RegularStop STOP_D = ENV_BUILDER.stop("D");
-  static final RegularStop STOP_E = ENV_BUILDER.stop("E");
-
-  static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
-    TripInput.of("trip1").addStop(STOP_A, "10:00").addStop(STOP_B, "11:00").addStop(STOP_D, "12:00")
-  )
-    .addTrip(
-      TripInput.of("trip2")
-        .addStop(STOP_B, "12:00")
-        .addStop(STOP_C, "13:00")
-        .addStop(STOP_D, "14:00")
-    )
-    .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
-    .addTrip(TripInput.of("trip4").addStop(STOP_C, "08:30").addStop(STOP_D, "09:30"))
-    .addTrip(TripInput.of("trip5").addStop(STOP_D, "15:00").addStop(STOP_E, "16:00"))
-    .build();
-
-  // Setup street
-  static final GraphBuilder G = GraphBuilder.of();
-  static final VertexRef V1 = G.vertex();
-  static final VertexRef VA = G.linkStop(STOP_A);
-  static final VertexRef VB = G.linkStop(STOP_B);
-  static final VertexRef VC = G.linkStop(STOP_C);
-  static final VertexRef VD = G.linkStop(STOP_D);
-  static final VertexRef V2 = G.vertex();
-
-  static {
-    // Connect street vertices to stops
-    V1.street(VA).meters(10);
-    V2.street(VD).meters(10);
-    // Create transfer path
-    VB.street(VC).meters(20);
-  }
-
-  static final Graph GRAPH = G.build();
-
-  // Setup transfers
-  static final RegularTransferService TRANSFER_SERVICE = createTransferService(
-    List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
-  );
+class RefetchItineraryServiceTest extends AbstractTestBase {
 
   @Test
   void refetchSimple() {
@@ -252,18 +177,18 @@ class RefetchItineraryServiceTest {
   void refetchItineraryWithMultipleConstrainedTransfers() {
     var cts = createConstrainedTransferService(
       staySeated("trip1", 1, "trip3", 0),
-      guaranteed("trip3", 1, "trip5", 0)
+      guaranteed("trip3", 1, "trip7", 0)
     );
     var refetch = createRefetchService(cts);
 
     var leg1 = legRef("trip1", STOP_A, STOP_B);
     var leg2 = legRef("trip3", STOP_C, STOP_D);
-    var leg3 = legRef("trip5", STOP_D, STOP_E);
+    var leg3 = legRef("trip7", STOP_D, STOP_E);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2, leg3), routeRequest());
 
     assertEquals(
-      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D ~ BUS trip5 15:00 16:00 ~ E []",
+      "A ~ BUS trip1 10:00 11:00 ~ B ~ Walk 10s ~ C ~ BUS trip3 12:30 13:30 ~ D ~ BUS trip7 15:00 16:00 ~ E []",
       itinerary.toStr()
     );
 
@@ -416,198 +341,5 @@ class RefetchItineraryServiceTest {
       linkingContextFactory,
       streetLimitationParametersService
     );
-  }
-
-  private static RegularTransferService createTransferService(List<PathTransfer> transfers) {
-    var transferRepo = TransferServiceTestFactory.defaultTransferRepository();
-    ImmutableMultimap.Builder<StopLocation, PathTransfer> builder = ImmutableMultimap.builder();
-    transfers.forEach(transfer -> builder.put(transfer.from, transfer));
-    transferRepo.addAllTransfersByStops(builder.build());
-    return TransferServiceTestFactory.transferService(transferRepo);
-  }
-
-  private RouteRequest routeRequest() {
-    // From and To doesn't have any effect for RefetchItineraryService
-    return RouteRequest.of()
-      .withFrom(GenericLocation.fromCoordinate(0, 0))
-      .withTo(GenericLocation.fromCoordinate(1, 1))
-      .withPreferences(p -> p.withWalk(w -> w.withSpeed(2)))
-      .buildRequest();
-  }
-
-  private static PathTransfer makeTransfer(RegularStop from, RegularStop to, Graph graph) {
-    var edges = findPath(from, to, graph);
-    var length = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-    return new PathTransfer(STOP_B, STOP_C, length, edges, EnumSet.of(StreetMode.WALK));
-  }
-
-  /// Find the edges that correspond to a transfer
-  private static List<Edge> findPath(RegularStop from, RegularStop to, Graph graph) {
-    var vFrom = graph.getStopVertex(from.getId());
-    var linkFrom = vFrom.getOutgoing().stream().findFirst().orElseThrow();
-    var vTo = graph.getStopVertex(to.getId());
-    var linkTo = vTo.getIncoming().stream().findFirst().orElseThrow();
-    var edge = linkFrom
-      .getToVertex()
-      .getOutgoingStreetEdges()
-      .stream()
-      .filter(e -> e.getToVertex().equals(linkTo.getFromVertex()))
-      .findFirst()
-      .orElseThrow(() -> new IllegalStateException("Could not find edge"));
-    return List.of(linkFrom, edge, linkTo);
-  }
-
-  /// A helper class for constructing a street graph
-  private static class GraphBuilder {
-
-    private final List<EdgeRef> edges = new ArrayList<>();
-    private final Graph graph = new Graph();
-
-    public static GraphBuilder of() {
-      return new GraphBuilder();
-    }
-
-    public VertexRef vertex() {
-      return new VertexRef(this, createVertex());
-    }
-
-    public VertexRef linkStop(RegularStop stop) {
-      var stopV = TransitStopVertex.of()
-        .withId(stop.getId())
-        .withCoordinate(stop.getCoordinate())
-        .build();
-      var streetVertex = createVertex();
-      BoardingLocationToStopLink.createBoardingLocationToStopLink(stopV, streetVertex);
-      BoardingLocationToStopLink.createBoardingLocationToStopLink(streetVertex, stopV);
-      var v = new VertexRef(this, streetVertex);
-      graph.addVertex(stopV);
-      return v;
-    }
-
-    public EdgeRef street(VertexRef from, VertexRef to) {
-      var e = new EdgeRef(from.vertex, to.vertex);
-      this.edges.add(e);
-      return e;
-    }
-
-    public Graph build() {
-      for (var e : edges) {
-        createEdge(e.from, e.to, e.meters);
-        createEdge(e.to, e.from, e.meters);
-      }
-      graph.hasStreets = true;
-      graph.index();
-      return graph;
-    }
-
-    private StreetVertex createVertex() {
-      var coord = nextCoord();
-      var v = new LabelledIntersectionVertex(
-        nextLabel(),
-        coord.longitude(),
-        coord.latitude(),
-        false,
-        false
-      );
-      graph.addVertex(v);
-      return v;
-    }
-
-    private void createEdge(StreetVertex v1, StreetVertex v2, int meters) {
-      var geom = GeometryUtils.makeLineString(v1.toWgsCoordinate(), v2.toWgsCoordinate());
-      new StreetEdgeBuilder<>()
-        .withFromVertex(v1)
-        .withToVertex(v2)
-        .withGeometry(geom)
-        .withName("TestEdge")
-        .withMeterLength(meters)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(false)
-        .buildAndConnect();
-    }
-
-    private WgsCoordinate nextCoord() {
-      return WgsCoordinate.GREENWICH.moveEastMeters(graph.countVertices());
-    }
-
-    private String nextLabel() {
-      return "X" + graph.countVertices();
-    }
-  }
-
-  private static class VertexRef {
-
-    private final StreetVertex vertex;
-    private final GraphBuilder graphBuilder;
-
-    public VertexRef(GraphBuilder graphBuilder, StreetVertex vertex) {
-      this.graphBuilder = graphBuilder;
-      this.vertex = vertex;
-    }
-
-    public EdgeRef street(VertexRef to) {
-      return graphBuilder.street(this, to);
-    }
-
-    public WgsCoordinate coord() {
-      return vertex.toWgsCoordinate();
-    }
-  }
-
-  private static class EdgeRef {
-
-    private final StreetVertex from;
-    private final StreetVertex to;
-    private int meters = 100;
-
-    public EdgeRef(StreetVertex from, StreetVertex to) {
-      this.from = from;
-      this.to = to;
-    }
-
-    public EdgeRef meters(int meters) {
-      this.meters = meters;
-      return this;
-    }
-  }
-
-  private ConstrainedTransferService createConstrainedTransferService(
-    ConstrainedTransfer... constrainedTransfers
-  ) {
-    DefaultConstrainedTransferService service = new DefaultConstrainedTransferService();
-    service.addAll(Arrays.asList(constrainedTransfers));
-    return service;
-  }
-
-  private ConstrainedTransfer staySeated(String fromTrip, int fromPos, String toTrip, int toPos) {
-    return constrained(
-      fromTrip,
-      fromPos,
-      toTrip,
-      toPos,
-      TransferConstraint.of().staySeated().build()
-    );
-  }
-
-  private ConstrainedTransfer guaranteed(String fromTrip, int fromPos, String toTrip, int toPos) {
-    return constrained(
-      fromTrip,
-      fromPos,
-      toTrip,
-      toPos,
-      TransferConstraint.of().guaranteed().build()
-    );
-  }
-
-  private ConstrainedTransfer constrained(
-    String fromTrip,
-    int fromPos,
-    String toTrip,
-    int toPos,
-    TransferConstraint constraint
-  ) {
-    var p1 = new TripTransferPoint(TRANSIT_ENV.tripData(fromTrip).trip(), fromPos);
-    var p2 = new TripTransferPoint(TRANSIT_ENV.tripData(toTrip).trip(), toPos);
-    return new ConstrainedTransfer(null, p1, p2, constraint);
   }
 }
