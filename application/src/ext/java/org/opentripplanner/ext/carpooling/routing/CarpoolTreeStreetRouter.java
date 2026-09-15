@@ -7,37 +7,30 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link CarpoolRouter} implementation that lazily computes shortest-path trees (SPTs)
- * from/to registered vertices.
+ * A {@link CarpoolRouter} implementation that lazily computes one-to-many car trees from/to
+ * registered vertices.
  * <p>
  * This is more efficient than individual A* searches when many routes share common
- * origin or destination vertices, as each SPT is computed at most once and reused for all
+ * origin or destination vertices, as each tree is computed at most once and reused for all
  * queries involving that vertex. Trees are only computed when first needed by a
  * {@link #route} call, so vertices that are never routed through never incur the cost
  * of tree expansion. Results are cached to avoid redundant tree lookups.
  * <p>
- * A {@link #route} answer is read straight off the tree: the arrival state at the far end gives
- * the segment's duration, and the full path is only assembled from the state's back pointers if
- * {@link RoutedSegment#path()} is called — which happens for the few segments that make it into
- * an itinerary, not for the thousands evaluated and discarded per request.
+ * The trees are {@link CompactCarTree}s: one integer label per reached vertex rather than a
+ * search state per settled vertex, so a request's trees cost tens of bytes per vertex instead of
+ * hundreds and leave almost nothing for the garbage collector. A {@link #route} answer is read
+ * straight off the tree; the full path is only assembled if {@link RoutedSegment#path()} is called
+ * — which happens for the few segments that make it into an itinerary, not for the thousands
+ * evaluated and discarded per request.
  * <p>
  * Vertices must be registered via {@link #addVertex} or {@link #addLeg} before routing.
  * The router first attempts to use a forward tree from the origin;
@@ -45,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * A tree registered with {@link #addVertex} explores everything within its duration limit — a
  * disc around the root. A tree registered with {@link #addLeg} is bounded to the ellipse in which
- * a detour of the leg can still be feasible, see {@link EllipseBoundSkipEdgeStrategy}; for long
- * legs that is a small fraction of the disc.
+ * a detour of the leg can still be feasible, see {@link EllipseBounds}; for long legs that is a
+ * small fraction of the disc.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
  */
@@ -57,8 +50,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private final double maxCarSpeedMetersPerSecond;
   private final Map<Vertex, VertexRegistration> forwardRegistrations = new HashMap<>();
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> reverseTrees = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> forwardTrees = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> reverseTrees = new HashMap<>();
   private final Map<Pair<Vertex>, RoutedSegment> segmentCache = new HashMap<>();
   private boolean routingStarted = false;
 
@@ -105,7 +98,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private record VertexRegistration(
     Vertex vertex,
     Duration searchLimit,
-    @Nullable List<EllipseBoundSkipEdgeStrategy.Focus> foci
+    @Nullable List<EllipseBounds.Focus> foci
   ) {
     /**
      * Combines two registrations of the same vertex and direction: the larger limit wins, and the
@@ -117,37 +110,30 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       if (foci == null || other.foci == null) {
         return new VertexRegistration(vertex, limit, null);
       }
-      var union = new ArrayList<EllipseBoundSkipEdgeStrategy.Focus>(
-        foci.size() + other.foci.size()
-      );
+      var union = new ArrayList<EllipseBounds.Focus>(foci.size() + other.foci.size());
       union.addAll(foci);
       union.addAll(other.foci);
       return new VertexRegistration(vertex, limit, union);
     }
   }
 
-  private ShortestPathTree<State, Edge, Vertex> createTree(
-    Vertex vertex,
-    boolean reverse,
-    VertexRegistration registration
-  ) {
-    var streetSearchRequest = reverse
-      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
-      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
-    var builder = StreetSearchBuilder.of()
-      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(skipEdgeStrategy(registration, reverse))
-      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .withRequest(streetSearchRequest);
-
-    if (reverse) {
-      return builder.withTo(vertex).getShortestPathTree();
-    }
-
-    return builder.withFrom(vertex).getShortestPathTree();
+  private CompactCarTree createTree(Vertex vertex, boolean reverse, VertexRegistration reg) {
+    var bounds =
+      reg.foci() == null ? null : new EllipseBounds(reg.foci(), maxCarSpeedMetersPerSecond);
+    var tree = CompactCarTree.build(vertex, reverse, reg.searchLimit(), bounds);
+    LOG.debug(
+      "Built {} carpool tree {} {} with {} labels (limit {}, {})",
+      reverse ? "reverse" : "forward",
+      reverse ? "to" : "from",
+      vertex,
+      tree.size(),
+      reg.searchLimit(),
+      bounds == null ? "disc" : "ellipse-bounded"
+    );
+    return tree;
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
+  private CompactCarTree getOrCreateForwardTree(Vertex vertex) {
     var tree = forwardTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -162,7 +148,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     return tree;
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateReverseTree(Vertex vertex) {
+  private CompactCarTree getOrCreateReverseTree(Vertex vertex) {
     var tree = reverseTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -178,33 +164,13 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   }
 
   /**
-   * The search bound of a tree: never beyond the registered duration limit, and — for a tree that
-   * only serves legs — never outside the union of the legs' feasibility ellipses.
-   */
-  private SkipEdgeStrategy<State, Edge> skipEdgeStrategy(
-    VertexRegistration registration,
-    boolean reverse
-  ) {
-    SkipEdgeStrategy<State, Edge> byDuration = new DurationSkipEdgeStrategy<>(
-      registration.searchLimit()
-    );
-    if (registration.foci() == null) {
-      return byDuration;
-    }
-    return new ComposingSkipEdgeStrategy<>(
-      byDuration,
-      new EllipseBoundSkipEdgeStrategy(registration.foci(), maxCarSpeedMetersPerSecond, reverse)
-    );
-  }
-
-  /**
    * Register a vertex for tree computation in the given direction(s). The tree explores everything
    * within {@code searchLimit} of the vertex. Use {@link #addLeg} instead when the tree only has to
    * serve detours of a known leg.
    * Tree computation is deferred until a {@link #route} call actually needs the tree.
    * Vertices whose trees are never needed incur no computation cost. Adding vertices after
    * routing has started is disallowed to ensure that all temporary vertices are linked to the
-   * graph before any SPT is created. Otherwise, a previously computed tree may not contain
+   * graph before any tree is created. Otherwise, a previously computed tree may not contain
    * edges leading to the late-added vertex, making it unreachable.
    *
    * @param vertex     the street vertex to build trees from/to
@@ -258,7 +224,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       new VertexRegistration(
         from,
         legLimit,
-        List.of(new EllipseBoundSkipEdgeStrategy.Focus(to.getCoordinate(), bound))
+        List.of(new EllipseBounds.Focus(to.getCoordinate(), bound))
       )
     );
     register(
@@ -266,7 +232,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       new VertexRegistration(
         to,
         legLimit,
-        List.of(new EllipseBoundSkipEdgeStrategy.Focus(from.getCoordinate(), bound))
+        List.of(new EllipseBounds.Focus(from.getCoordinate(), bound))
       )
     );
   }
@@ -310,8 +276,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * both left unregistered cannot be served and returns {@code null}. A registered endpoint whose
    * tree does not reach the other endpoint within its search limit returns {@code null} as well.
    * <p>
-   * The returned segment holds the tree's arrival state at the far end. Its duration is that
-   * state's elapsed time; its path is only assembled when {@link RoutedSegment#path()} is called.
+   * The returned segment's duration is the tree's elapsed time at the far end; its path is only
+   * assembled when {@link RoutedSegment#path()} is called.
    */
   @Override
   public RoutedSegment route(Vertex from, Vertex to) {
@@ -333,32 +299,36 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var arrival = tree.getState(isReverse ? from : to);
-    var segment = arrival == null ? null : new TreeSegment(from, to, arrival);
+    var farEnd = isReverse ? from : to;
+    int seconds = tree.elapsedSeconds(farEnd);
+    var segment = seconds < 0 ? null : new TreeSegment(from, to, tree, farEnd, seconds);
     segmentCache.put(key, segment);
     return segment;
   }
 
   /**
-   * A segment answered from a shortest-path tree. {@code arrival} is the tree's state at the end
-   * of the segment that is not the tree's root: the segment's {@code to} for a forward tree, its
-   * {@code from} for a reverse tree. The state's elapsed time is the segment's duration; walking
-   * its back pointers yields the path, which {@link GraphPath} puts in chronological order for
-   * both search directions.
+   * A segment answered from a tree. {@code farEnd} is the end of the segment that is not the
+   * tree's root: the segment's {@code to} for a forward tree, its {@code from} for a reverse tree.
+   * The duration was read off the tree when the segment was created; the path is built by
+   * {@link CompactCarTree#path} on demand and memoised.
    */
   static final class TreeSegment implements RoutedSegment {
 
     private final Vertex from;
     private final Vertex to;
-    private final State arrival;
+    private final CompactCarTree tree;
+    private final Vertex farEnd;
+    private final int durationSeconds;
 
     @Nullable
     private GraphPath<State, Edge, Vertex> path;
 
-    TreeSegment(Vertex from, Vertex to, State arrival) {
+    TreeSegment(Vertex from, Vertex to, CompactCarTree tree, Vertex farEnd, int durationSeconds) {
       this.from = from;
       this.to = to;
-      this.arrival = arrival;
+      this.tree = tree;
+      this.farEnd = farEnd;
+      this.durationSeconds = durationSeconds;
     }
 
     @Override
@@ -373,13 +343,18 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
     @Override
     public int durationSeconds() {
-      return (int) arrival.getElapsedTimeSeconds();
+      return durationSeconds;
     }
 
     @Override
     public GraphPath<State, Edge, Vertex> path() {
       if (path == null) {
-        path = new GraphPath<>(arrival);
+        path = tree.path(farEnd);
+        if (path == null) {
+          throw new IllegalStateException(
+            "The tree answered a duration for " + from + " -> " + to + " but no path"
+          );
+        }
       }
       return path;
     }
@@ -391,7 +366,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
     @Override
     public String toString() {
-      return "TreeSegment{" + from + " -> " + to + ", " + durationSeconds() + "s}";
+      return "TreeSegment{" + from + " -> " + to + ", " + durationSeconds + "s}";
     }
   }
 }
