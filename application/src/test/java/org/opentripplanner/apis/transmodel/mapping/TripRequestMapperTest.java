@@ -29,7 +29,6 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -46,6 +45,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -100,7 +100,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
     TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();
-    var calendarServiceData = new CalendarServiceData();
+    var tripCalendars = TripCalendars.of();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
       TRANSIT_REPOSITORY.addTripPattern(pattern.getId(), pattern);
@@ -110,10 +110,10 @@ public class TripRequestMapperTest implements PlanTestConstants {
         .getFirst()
         .getServiceCode();
       TRANSIT_REPOSITORY.putServiceCode(pattern.getId(), serviceCode);
-      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+      tripCalendars.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    TRANSIT_REPOSITORY.updateCalendarServiceData(calendarServiceData);
+    TRANSIT_REPOSITORY.mergeTripCalendars(tripCalendars.build());
     TRANSIT_REPOSITORY.index();
   }
 

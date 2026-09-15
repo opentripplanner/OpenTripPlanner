@@ -23,13 +23,13 @@ import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
@@ -104,7 +104,13 @@ public class GtfsModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    // TODO - Cleanup the mapping and use of service-id. A GTFS feed service-id is NOT the same as
+    //        the OTP domain model service-id.
+    //        See https://github.com/opentripplanner/OpenTripPlanner/issues/7972.
+    //        This applies to the body of this method and related code, e.g. fares and
+    //        InterlineProcessor.
+
+    TripCalendars tripCalendars = TripCalendars.empty();
 
     Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
 
@@ -118,7 +124,11 @@ public class GtfsModule implements GraphBuilderModule {
         feedIdsEncountered.put(feedId, gtfsBundle);
 
         GTFSToTransitDataImportMapper mapper = new GTFSToTransitDataImportMapper(
-          new TransitDataImportBuilder(transitRepository.getSiteRepository(), issueStore),
+          new TransitDataImportBuilder(
+            transitRepository.getSiteRepository(),
+            issueStore,
+            transitPeriodLimit
+          ),
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
@@ -129,14 +139,11 @@ public class GtfsModule implements GraphBuilderModule {
         TransitDataImportBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
 
-        builder.limitServiceDays(transitPeriodLimit);
-
-        calendarServiceData.add(builder.buildCalendarServiceData());
-
-        calendarServiceData
-          .getServiceIds()
+        builder
+          .tripCalendars()
+          .listServiceIds()
           .forEach(sId ->
-            fareRulesData.putServiceIds(sId, calendarServiceData.getServiceDatesForServiceId(sId))
+            fareRulesData.putServiceIds(sId, builder.tripCalendars().listServiceDates(sId))
           );
 
         if (OTPFeature.FlexRouting.isOn()) {
@@ -159,7 +166,7 @@ public class GtfsModule implements GraphBuilderModule {
           deduplicator,
           transitRepository,
           builder,
-          calendarServiceData.getServiceIds(),
+          builder.tripCalendars().listServiceIds(),
           geometryProcessor,
           issueStore
         );
@@ -174,19 +181,21 @@ public class GtfsModule implements GraphBuilderModule {
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
-            calendarServiceData
+            dataImport.getTripCalendars()
           ).run(dataImport.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesData);
+
+        tripCalendars = tripCalendars.merge(dataImport.getTripCalendars());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.mergeTripCalendars(tripCalendars);
     TransitWithFutureDateValidator.validate(
-      calendarServiceData,
+      tripCalendars,
       issueStore,
       transitRepository.getTimeZone()
     );
