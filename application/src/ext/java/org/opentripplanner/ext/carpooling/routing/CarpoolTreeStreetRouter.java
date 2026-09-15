@@ -2,9 +2,13 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.street.model.StreetConstants;
@@ -40,6 +44,11 @@ import org.slf4j.LoggerFactory;
  * disc around the root. A tree registered with {@link #addLeg} is bounded to the ellipse in which
  * a detour of the leg can still be feasible, see {@link EllipseBounds}; for long legs that is a
  * small fraction of the disc.
+ * <p>
+ * Trees live until {@link #releaseTrees} drops them. A request evaluates its candidate trips one
+ * after the other and only ever queries a trip's trees while that trip is evaluated, so releasing
+ * them right after keeps one trip's trees in memory at a time instead of all of them. Registrations
+ * survive a release: a later query rebuilds the tree.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
  */
@@ -144,7 +153,6 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     }
     tree = createTree(vertex, false, reg);
     forwardTrees.put(vertex, tree);
-    forwardRegistrations.remove(vertex);
     return tree;
   }
 
@@ -159,7 +167,6 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     }
     tree = createTree(vertex, true, reg);
     reverseTrees.put(vertex, tree);
-    reverseRegistrations.remove(vertex);
     return tree;
   }
 
@@ -255,14 +262,54 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     registrations.merge(registration.vertex(), registration, VertexRegistration::merge);
   }
 
-  /** Returns the total number of forward vertices (pending and computed). Package-private for testing. */
-  int forwardTreeCount() {
-    return forwardRegistrations.size() + forwardTrees.size();
+  /**
+   * Drops the trees rooted at {@code vertices}, in both directions, and forgets the segments that
+   * were answered from them. Call it once a trip's insertions have been evaluated, after
+   * {@link RoutedSegment#detach() detaching} the segments that must stay reproducible (the shared
+   * segments of the winning candidates): a detached segment keeps its edge chain and rebuilds its
+   * path without the tree, while a segment that was not detached re-routes if its path is ever
+   * asked for. The registrations stay, so a later query for a released vertex — a co-located
+   * waypoint of another trip — rebuilds the tree.
+   */
+  public void releaseTrees(Collection<Vertex> vertices) {
+    Set<CompactCarTree> released = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+    for (Vertex vertex : vertices) {
+      var forward = forwardTrees.remove(vertex);
+      if (forward != null) {
+        released.add(forward);
+      }
+      var reverse = reverseTrees.remove(vertex);
+      if (reverse != null) {
+        released.add(reverse);
+      }
+    }
+    if (released.isEmpty()) {
+      return;
+    }
+    segmentCache
+      .values()
+      .removeIf(segment -> segment instanceof TreeSegment ts && released.contains(ts.tree));
+    released.forEach(CompactCarTree::release);
+    LOG.debug("Released {} carpool trees", released.size());
   }
 
-  /** Returns the total number of reverse vertices (pending and computed). Package-private for testing. */
+  /** Returns the number of distinct forward vertices (pending and computed). Package-private for testing. */
+  int forwardTreeCount() {
+    Set<Vertex> vertices = new HashSet<>(forwardRegistrations.keySet());
+    vertices.addAll(forwardTrees.keySet());
+    return vertices.size();
+  }
+
+  /** Returns the number of distinct reverse vertices (pending and computed). Package-private for testing. */
   int reverseTreeCount() {
-    return reverseRegistrations.size() + reverseTrees.size();
+    Set<Vertex> vertices = new HashSet<>(reverseRegistrations.keySet());
+    vertices.addAll(reverseTrees.keySet());
+    return vertices.size();
+  }
+
+  /** Number of trees currently held in memory. Package-private for testing. */
+  int liveTreeCount() {
+    return forwardTrees.size() + reverseTrees.size();
   }
 
   /**
@@ -309,8 +356,9 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   /**
    * A segment answered from a tree. {@code farEnd} is the end of the segment that is not the
    * tree's root: the segment's {@code to} for a forward tree, its {@code from} for a reverse tree.
-   * The duration was read off the tree when the segment was created; the path is built by
-   * {@link CompactCarTree#path} on demand and memoised.
+   * The duration was read off the tree when the segment was created; the path is built on demand
+   * and memoised — from the tree while it is alive, from the {@link #detach() detached} edge chain
+   * after the tree has been released.
    */
   static final class TreeSegment implements RoutedSegment {
 
@@ -319,6 +367,9 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     private final CompactCarTree tree;
     private final Vertex farEnd;
     private final int durationSeconds;
+
+    @Nullable
+    private Edge[] detachedEdges;
 
     @Nullable
     private GraphPath<State, Edge, Vertex> path;
@@ -349,7 +400,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     @Override
     public GraphPath<State, Edge, Vertex> path() {
       if (path == null) {
-        path = tree.path(farEnd);
+        path =
+          detachedEdges != null ? tree.pathFromEdges(detachedEdges, farEnd) : tree.path(farEnd);
         if (path == null) {
           throw new IllegalStateException(
             "The tree answered a duration for " + from + " -> " + to + " but no path"
@@ -359,9 +411,25 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return path;
     }
 
+    /**
+     * Takes the edge chain from the tree so the path stays reproducible after
+     * {@link #releaseTrees}. A no-op once the path exists or the tree is already released.
+     */
+    @Override
+    public void detach() {
+      if (path == null && detachedEdges == null && !tree.isReleased()) {
+        detachedEdges = tree.edgesTo(farEnd);
+      }
+    }
+
     /** Whether {@link #path()} has been called. Package-private for testing. */
     boolean isPathMaterialized() {
       return path != null;
+    }
+
+    /** Whether {@link #detach()} took the edge chain. Package-private for testing. */
+    boolean isDetached() {
+      return detachedEdges != null;
     }
 
     @Override

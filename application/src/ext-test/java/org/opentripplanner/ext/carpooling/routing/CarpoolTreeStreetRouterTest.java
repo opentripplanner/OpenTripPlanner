@@ -3,12 +3,14 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -382,6 +384,63 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     router.route(vertexA, vertexB);
 
     assertThrows(IllegalStateException.class, () -> router.addLeg(vertexB, vertexC, SEARCH_LIMIT));
+  }
+
+  /**
+   * A trip's trees are only queried while the trip is evaluated, so the service releases them right
+   * after. A segment that was detached first keeps its path without the tree; the registration
+   * survives, so a later query for the same root rebuilds the tree.
+   */
+  @Test
+  void releasedTreesFreeMemoryDetachedSegmentsKeepTheirPathAndQueriesRebuild() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    assertEquals(1, router.liveTreeCount());
+
+    segment.detach();
+    assertTrue(segment.isDetached());
+    assertFalse(segment.isPathMaterialized(), "Detaching keeps edges, not a path");
+    router.releaseTrees(List.of(vertexA));
+    assertEquals(0, router.liveTreeCount());
+
+    var path = segment.path();
+    assertEquals(segment.durationSeconds(), path.getDuration());
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+
+    assertNotNull(router.route(vertexA, vertexC), "the kept registration rebuilds the tree");
+    assertEquals(1, router.liveTreeCount());
+    assertEquals(1, router.forwardTreeCount());
+  }
+
+  /** Without a detach, a released tree's segment still yields a path — by re-routing. */
+  @Test
+  void segmentOfAReleasedTreeThatWasNotDetachedReroutesItsPath() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    var segment = router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    router.releaseTrees(List.of(vertexA));
+
+    var path = segment.path();
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+    assertEquals(segment.durationSeconds(), path.getDuration());
+  }
+
+  @Test
+  void releaseForgetsTheCachedSegmentsOfTheReleasedTreeOnly() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+    var fromA = router.route(vertexA, vertexB);
+    var toD = router.route(vertexC, vertexD);
+    assertEquals(2, router.liveTreeCount());
+
+    router.releaseTrees(List.of(vertexA));
+
+    assertEquals(1, router.liveTreeCount());
+    assertNotSame(fromA, router.route(vertexA, vertexB), "answered by a rebuilt tree");
+    assertSame(toD, router.route(vertexC, vertexD), "the other tree's cache entry survives");
   }
 
   @Test

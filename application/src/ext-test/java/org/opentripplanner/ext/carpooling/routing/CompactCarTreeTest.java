@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -220,6 +221,32 @@ class CompactCarTreeTest extends GraphRoutingTest {
     assertTrue(
       reversePath.states.getFirst().getTimeSeconds() < reversePath.states.getLast().getTimeSeconds()
     );
+  }
+
+  /**
+   * The edge chain taken before a release replays to the same path the live tree gives; a path
+   * asked of the released tree without a chain is re-routed and takes the same time.
+   */
+  @Test
+  void edgeChainReplaysAfterReleaseAndReleasedTreeReroutes() {
+    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
+    int seconds = tree.elapsedSeconds(g22);
+    var edges = tree.edgesTo(g22);
+    assertNotNull(edges);
+    var viaTree = tree.path(g22);
+
+    tree.release();
+    assertTrue(tree.isReleased());
+
+    var replayed = tree.pathFromEdges(edges, g22);
+    assertNotNull(replayed);
+    assertEquals(seconds, replayed.getDuration());
+    assertEquals(viaTree.edges, replayed.edges);
+
+    var rerouted = tree.path(g22);
+    assertNotNull(rerouted);
+    assertEquals(seconds, rerouted.getDuration());
+    assertThrows(IllegalStateException.class, () -> tree.elapsedSeconds(g22));
   }
 
   @Test

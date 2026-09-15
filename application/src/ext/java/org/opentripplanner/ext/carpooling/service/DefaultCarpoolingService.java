@@ -29,6 +29,7 @@ import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
 import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
+import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
@@ -592,10 +593,27 @@ public class DefaultCarpoolingService implements CarpoolingService {
         })
         .toList();
 
-      var insertionCandidates = candidateTripsWithViableStopsAndPositions
-        .stream()
-        .flatMap(it -> insertionEvaluator.findBestInsertions(it).stream())
-        .toList();
+      // A trip's trees are only queried while that trip is evaluated, so they are released right
+      // after: the request then holds one trip's trees (plus the passenger's) instead of every
+      // candidate trip's — memory no longer grows with the number of trips. The winning candidates
+      // detach their shared segments first so their paths stay reproducible (see
+      // RoutedSegment#detach); nothing else from the trip's trees is ever read again.
+      var insertionCandidates = new ArrayList<InsertionCandidate>();
+      for (var tripWithViableStops : candidateTripsWithViableStopsAndPositions) {
+        var candidates = insertionEvaluator.findBestInsertions(tripWithViableStops);
+        for (var candidate : candidates) {
+          candidate.getSharedSegments().forEach(RoutedSegment::detach);
+        }
+        insertionCandidates.addAll(candidates);
+        carpoolTreeVertexRouter.releaseTrees(
+          tripWithViableStops
+            .tripWithVertices()
+            .vertices()
+            .stream()
+            .filter(vertex -> !vertex.equals(passengerSnap.vertex()))
+            .toList()
+        );
+      }
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.

@@ -44,6 +44,13 @@ public interface RoutedSegment {
    */
   GraphPath<State, Edge, Vertex> path();
 
+  /**
+   * Makes the segment independent of the search structure it was answered from, so that structure
+   * can be released while {@link #path()} stays available. Cheap: a tree-backed segment keeps its
+   * edge chain, not a path. A segment that already owns its path has nothing to do.
+   */
+  default void detach() {}
+
   /** Wraps an already materialised path. */
   static RoutedSegment of(GraphPath<State, Edge, Vertex> path) {
     return new PathSegment(path);

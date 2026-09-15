@@ -67,6 +67,13 @@ import org.slf4j.LoggerFactory;
  * methods, producing a genuine {@link State} chain with the standard weights and geometry; if the
  * replay disagrees with the label (it should not — the traversal model above is checked against
  * the generic search in tests) the segment is re-routed with a goal-directed street search.
+ *
+ * <h2>Lifetime</h2>
+ * A request builds trees for every candidate trip but queries each trip's trees only while that
+ * trip is evaluated. {@link #release()} drops the label storage once a tree is done, so a request
+ * holds one trip's trees at a time rather than all of them. Before releasing, the edge chains of
+ * the segments that must stay reproducible are taken with {@link #edgesTo} and replayed later via
+ * {@link #pathFromEdges}; a path asked of a released tree without such a chain is re-routed.
  */
 final class CompactCarTree {
 
@@ -95,7 +102,8 @@ final class CompactCarTree {
   private boolean[] labelNoThru;
   private int labelCount;
 
-  private final LabelMap labels = new LabelMap();
+  private LabelMap labels = new LabelMap();
+  private boolean released = false;
 
   private CompactCarTree(
     Vertex root,
@@ -156,12 +164,49 @@ final class CompactCarTree {
   }
 
   /**
+   * Drops the label storage. Afterwards only {@link #pathFromEdges} and {@link #path} (which then
+   * re-routes) work; {@link #elapsedSeconds} and {@link #edgesTo} may not be called any more.
+   */
+  void release() {
+    released = true;
+    labelVertex = null;
+    labelElapsedMs = null;
+    labelParent = null;
+    labelEdge = null;
+    labelNoThru = null;
+    labels = null;
+  }
+
+  boolean isReleased() {
+    return released;
+  }
+
+  private void checkNotReleased() {
+    if (released) {
+      throw new IllegalStateException("This carpool tree has been released");
+    }
+  }
+
+  /**
    * Elapsed travel time to (or, for a reverse tree, from) {@code vertex} in whole seconds, rounded
    * up like {@link State#getElapsedTimeSeconds()}; {@code -1} if the search did not reach it.
    */
   int elapsedSeconds(Vertex vertex) {
+    checkNotReleased();
     int label = bestLabel(vertex);
     return label == NO_LABEL ? -1 : toSeconds(labelElapsedMs[label]);
+  }
+
+  /**
+   * The edges of the label chain between the root and {@code vertex}, in search order (root
+   * first), or {@code null} if the search did not reach it. A few hundred references that let
+   * {@link #pathFromEdges} rebuild the path after the tree has been {@link #release() released}.
+   */
+  @Nullable
+  Edge[] edgesTo(Vertex vertex) {
+    checkNotReleased();
+    int label = bestLabel(vertex);
+    return label == NO_LABEL ? null : edgeChain(label);
   }
 
   /**
@@ -170,21 +215,44 @@ final class CompactCarTree {
    */
   @Nullable
   GraphPath<State, Edge, Vertex> path(Vertex vertex) {
+    if (released) {
+      LOG.debug(
+        "Path {} {} {} asked of a released carpool tree; re-routing it",
+        root,
+        arrow(),
+        vertex
+      );
+      return reroute(vertex);
+    }
     int label = bestLabel(vertex);
     if (label == NO_LABEL) {
       return null;
     }
-    var replayed = replay(label);
+    return pathFromEdges(edgeChain(label), vertex);
+  }
+
+  /**
+   * Replays {@code edges} (as returned by {@link #edgesTo}) through the real edge traversals into a
+   * chronological path ending (or, for a reverse tree, starting) at {@code vertex}. Works on a
+   * released tree. Falls back to a goal-directed search if the replay does not reproduce the chain.
+   */
+  @Nullable
+  GraphPath<State, Edge, Vertex> pathFromEdges(Edge[] edges, Vertex vertex) {
+    var replayed = replay(edges);
     if (replayed != null) {
       return replayed;
     }
     LOG.warn(
       "Replaying the carpool tree path {} {} {} did not reproduce the search; re-routing it",
       root,
-      reverse ? "<-" : "->",
+      arrow(),
       vertex
     );
     return reroute(vertex);
+  }
+
+  private String arrow() {
+    return reverse ? "<-" : "->";
   }
 
   /* ---------------------------------------------------------------- search */
@@ -340,19 +408,23 @@ final class CompactCarTree {
 
   /* ---------------------------------------------------------------- paths */
 
-  /**
-   * Drives the label chain's edges through the real edge traversals, starting from an initial
-   * state at the root. Returns {@code null} if some edge refuses the traversal or arrives at a
-   * different vertex than the search did.
-   */
-  @Nullable
-  private GraphPath<State, Edge, Vertex> replay(int label) {
+  /** The edges from the root to {@code label}, root first. */
+  private Edge[] edgeChain(int label) {
     List<Edge> edges = new ArrayList<>();
     for (int l = label; labelParent[l] != NO_LABEL; l = labelParent[l]) {
       edges.add(labelEdge[l]);
     }
     Collections.reverse(edges);
+    return edges.toArray(new Edge[0]);
+  }
 
+  /**
+   * Drives the edges through the real edge traversals, starting from an initial state at the
+   * root. Returns {@code null} if some edge refuses the traversal or arrives at a different vertex
+   * than the search did.
+   */
+  @Nullable
+  private GraphPath<State, Edge, Vertex> replay(Edge[] edges) {
     State state = new State(root, request);
     for (Edge edge : edges) {
       Vertex expected = reverse ? edge.getFromVertex() : edge.getToVertex();
@@ -367,13 +439,6 @@ final class CompactCarTree {
         return null;
       }
       state = next;
-    }
-    if (state.getElapsedTimeSeconds() != toSeconds(labelElapsedMs[label])) {
-      LOG.debug(
-        "Replayed carpool tree path takes {}s, the search said {}s",
-        state.getElapsedTimeSeconds(),
-        toSeconds(labelElapsedMs[label])
-      );
     }
     return new GraphPath<>(state);
   }
